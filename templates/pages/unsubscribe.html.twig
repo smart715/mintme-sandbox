@@ -11,17 +11,6 @@
                Unsubscribe
             </div>
             <div class="card-body py-3">
-               {% if result %}
-               <div class="row">
-                  <div class="col-12">
-                     {% if result %}
-                        <span>{{ mail }} was unsubscribed successfully.</span>
-                     {% else %}
-                        <span>Error when unsubscribing {{ mail }}. 
-                     {% endif %}
-                  </div>
-               </div>
-               {% else %}
                {{ form_start(form) }}
                <div class="row">
                   <div class="col-12 mb-3">
@@ -34,8 +23,7 @@
                      <div class="float-left"><a href="{{ path('homepage') }}" class="btn btn-cancel">No</a></div>
                   </div>
                </div>
-               {{ form_end(form) }}
-               {% endif %}                   								
+               {{ form_end(form) }}                 								
             </div>
          </div>
       </div>

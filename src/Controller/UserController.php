@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Form\ChangePasswordType;
-use App\Form\QuickRegistrationType;
 use App\Form\TwoFactorType;
 use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
@@ -341,16 +340,18 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 } else {
                     $fileSystem->dumpFile($file, $content);
                 }
-
-                $result = true;
             } catch (\Throwable $e) {
-                $result = false;
+                $form->addError("Error when unsubscribing {$mail}");
+
+                return $this->render('pages/unsubscribe.html.twig', [
+                    'mail' => $mail,
+                    'form' => $form->createView(),
+                ]);
             }
 
-            return $this->render('pages/unsubscribe.html.twig', [
-            'result' => $result,
-            'mail' => $mail,
-            'form' => $form->createView()]);
+            $this->addFlash('success', "{$mail} was successfully unsubscribed");
+
+            return $this->redirectToRoute('homepage');
         } else {
             $hmacShaOneKey = $this->getParameter('hmac_sha_one_key');
 
@@ -358,7 +359,6 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             
             return $encryptor->encrypt() === $key
             ? $this->render('pages/unsubscribe.html.twig', [
-                'result' => null,
                 'mail' => $mail,
                 'form' => $form->createView()])
             : $this->render('pages/404.html.twig');
