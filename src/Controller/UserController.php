@@ -17,6 +17,7 @@ use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -340,7 +341,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                     $fileSystem->dumpFile($file, $content);
                 }
             } catch (\Throwable $e) {
-                $form->addError("Error when unsubscribing {$mail}");
+                $form->addError(new FormError("Error when unsubscribing {$mail}"));
 
                 return $this->render('pages/unsubscribe.html.twig', [
                     'mail' => $mail,
