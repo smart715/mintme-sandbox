@@ -78,6 +78,7 @@ class UpdatePendingWithdrawals extends Command
                 $crypto = $item->getCrypto();
 
                 if (!$crypto) {
+
                     continue;
                 }
                 $fee = $crypto->getFee();
@@ -131,7 +132,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         Token::getFromCrypto($crypto),
-                        $crypto->getFee()
+                        $fee
                     );
                     $this->em->remove($item);
                     $this->em->flush();
