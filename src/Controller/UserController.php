@@ -10,7 +10,6 @@ use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
-use App\Utils\Encrypt\HMACSHAOneEncrypt;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
@@ -353,11 +352,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
             return $this->redirectToRoute('homepage');
         } else {
-            $hmacShaOneKey = $this->getParameter('hmac_sha_one_key');
-
-            $encryptor = new HMACSHAOneEncrypt($hmacShaOneKey, $mail);
-            
-            return $encryptor->encrypt() === $key
+            return hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key
             ? $this->render('pages/unsubscribe.html.twig', [
                 'mail' => $mail,
                 'form' => $form->createView()])
