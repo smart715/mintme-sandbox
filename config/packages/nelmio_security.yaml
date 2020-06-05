@@ -15,23 +15,38 @@ nelmio_security:
                 - 'http:'
             style-src:
                 - 'self'
-                - '*.googleapis.com'
-                - '*.jsdelivr.net'
-                - '*.tawk.to'
                 - 'unsafe-inline'
+                - 'https://*.googleapis.com'
+                - 'https://*.jsdelivr.net'
+                - 'https://*.tawk.to'
             connect-src:
                 - 'self'
-                - '*.google-analytics.com'
-                - '*.tawk.to'
+                - 'wss://self'
+                - 'https://*.google-analytics.com'
+                - 'https://*.mintme.com'
+                - 'https://mintme.com'
+                - 'https://static-v.tawk.to'
+                - 'https://va.tawk.to'
+                - 'https://*.tawk.to'
                 - 'wss://*.tawk.to'
             img-src:
-                - 'self'
+                - '*'
                 - 'data:'
-                - '*.google-analytics.com'
             font-src:
                 - 'self'
-                - '*.gstatic.com'
+                - 'https://*.gstatic.com'
+                - 'https://*.tawk.to'
             frame-src:
-                - '*.facebook.com'
-                - '*.tawk.to'
-                - '*.youtube.com'
+                - 'https://*.facebook.com'
+                - 'https://*.google.com'
+                - 'https://*.googleapis.com'
+                - 'https://*.tawk.to'
+                - 'https://*.youtube.com'
+            base-uri:
+                - 'self'
+            worker-src:
+                - 'none'
+            manifest-src:
+                - 'self'
+            media-src:
+                - '*'
