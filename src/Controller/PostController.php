@@ -37,6 +37,7 @@ class PostController extends Controller
 
         $this->denyAccessUnlessGranted('edit', $post);
 
+        /** @var array $post */
         $post = $this->normalize($post);
 
         // This is safe to do here, because we know it's going to be shown on an textarea
