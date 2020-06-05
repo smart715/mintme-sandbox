@@ -37,8 +37,14 @@ class PostController extends Controller
 
         $this->denyAccessUnlessGranted('edit', $post);
 
+        $post = $this->normalize($post);
+
+        // This is safe to do here, because we know it's going to be shown on an textarea
+        // shouldn't be done anywhere else
+        $post['content'] = html_entity_decode($post['content']);
+
         return $this->render('pages/edit_post.html.twig', [
-            'post' => $this->normalize($post),
+            'post' => $post,
         ]);
     }
 }
