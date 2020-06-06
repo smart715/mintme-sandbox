@@ -138,26 +138,20 @@ export default {
             this.deployInterval = setInterval(() => {
                 this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
                 .then((response) => {
-                        return new Promise((resolve, reject) => {
                         if (response.data.deployed === true) {
                             clearInterval(this.deployInterval);
-                            resolve();
                             this.status = tokenDeploymentStatus.deployed;
                             this.deployed = true;
-                            this.$emit('deployed');
+                            this.showPending = false;
+                            this.$emit('deployed', this.deployed);
                             this.notifySuccess('Token has been successfully deployed');
                         }
                         this.retryCount++;
                         if (this.retryCount >= this.retryCountLimit) {
                             clearInterval(this.deployInterval);
-                            reject();
                         }
-                    });
                 }, (error) => {
                     this.notifyError('An error has occurred, please try again later');
-                })
-                .then(() => {
-                    this.showPending = false;
                 });
             }, 60000);
         },

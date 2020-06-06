@@ -17,7 +17,7 @@
                 :release-address="releaseAddress"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
-                @token-deployed="$emit('token-deployed')"
+                @token-deployed="$emit('token-deployed', true)"
                 @update-release-address="updateReleaseAddress"
                 :airdrop-params="airdropParams"
             />
