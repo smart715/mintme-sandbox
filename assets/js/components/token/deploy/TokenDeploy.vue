@@ -159,7 +159,6 @@ export default {
                 .then(() => {
                     this.showPending = false;
                 });
-
             }, 60000);
         },
     },
