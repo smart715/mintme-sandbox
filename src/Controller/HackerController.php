@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -17,7 +18,6 @@ use FOS\UserBundle\FOSUserEvents;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -127,11 +127,18 @@ class HackerController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $email = $form->get('email')->getData();
+            $nickname = $form->get('nickname')->getData();
 
             if ($userManager->findUserByEmail($email)) {
                 $this->addFlash('danger', 'Email already used');
             } else {
-                return $this->doQuickRegistration($request, $userManager, $passwordEncoder, $email);
+                return $this->doQuickRegistration(
+                    $request,
+                    $userManager,
+                    $passwordEncoder,
+                    $email,
+                    $nickname
+                );
             }
         }
 
@@ -152,8 +159,10 @@ class HackerController extends AbstractController
         Request $request,
         UserManagerInterface $userManager,
         UserPasswordEncoderInterface $passwordEncoder,
-        string $email
+        string $email,
+        string $nickname
     ): RedirectResponse {
+        /** @var User $user */
         $user = $userManager->createUser();
         $user->setEmail($email);
         $user->setPassword(
@@ -162,6 +171,11 @@ class HackerController extends AbstractController
                 $this->quickRegistrationPassword
             )
         );
+
+        $profile = new Profile($user);
+        $profile->setNickname($nickname);
+        $user->setProfile($profile);
+
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
         $em->flush();
