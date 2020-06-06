@@ -39,6 +39,12 @@ export default {
         isOwner: Boolean,
         statusProp: String,
     },
+    watch: {
+        showPending: function() {
+            console.log('deployed for icon is' + val);
+            this.$emit('deployed', true);
+        },
+    },
     computed: {
         deployed: function() {
             return tokenDeploymentStatus.deployed === this.statusProp;

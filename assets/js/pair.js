@@ -23,7 +23,6 @@ new Vue({
       tokenName: null,
       tokenPending: null,
       tokenDeployed: null,
-      reRenderView: 0,
     };
   },
   components: {
@@ -36,6 +35,14 @@ new Vue({
     TokenDeployIcon,
     TopHolders,
     TokenPointsProgress,
+  },
+  watch: {
+    tokenPending: function(val) {
+      console.log('pair new value of pending ' + val);
+    },
+    tokenDeployed: function(val) {
+      console.log('pair new value of deployed ' + val);
+    },
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -58,7 +65,6 @@ new Vue({
     setTokenDeployed: function(val) {
       console.log('setTokenDeployed is' + val);
       this.tokenDeployed = val;
-      this.reRenderView++;
     },
     getTokenStatus: function(status) {
       return true === this.tokenDeployed ? tokenDeploymentStatus.deployed :

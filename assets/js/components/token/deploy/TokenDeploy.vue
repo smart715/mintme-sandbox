@@ -130,7 +130,7 @@ export default {
         },
     },
     watch: {
-        statusProp: function() {
+        notDeployed: function() {
             this.showPending = true;
             this.deployed = false;
 
