@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\Controller\Traits\RefererTrait;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
+use App\Security\PathRoles;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -73,10 +75,19 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/logout_success", name="logout_success") */
-    public function postLogoutRedirectAction(): Response
+    public function postLogoutRedirectAction(PathRoles $pathRoles): Response
     {
         $hasAuthenticated = $this->session->get('has_authenticated');
+        $referer = $this->session->get('logout_referer');
         $this->session->clear();
+
+        if ($referer) {
+            $roles = $pathRoles->getRoles(Request::create($referer));
+
+            if (null === $roles && $this->noRedirectToMainPage($referer)) {
+                return $this->redirect($referer);
+            }
+        }
 
         return $hasAuthenticated
             ? $this->redirectToRoute("homepage")
@@ -122,5 +133,10 @@ class SecurityController extends FOSSecurityController
         return [
             $this->generateUrl('nelmio_api_doc.swagger_ui', [], UrlGeneratorInterface::ABSOLUTE_URL) => 'settings',
         ];
+    }
+
+    public function pageNotFoundAction(): void
+    {
+        throw new NotFoundHttpException();
     }
 }

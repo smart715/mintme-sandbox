@@ -4,7 +4,6 @@ import TraiderHoveredMixin from '../../js/mixins/trader_hovered';
 
 describe('TraiderHoveredMixin', function() {
     const $url = 'URL';
-    const $anon = 'Anonymous';
     const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
         mixins: [TraiderHoveredMixin],
@@ -18,21 +17,21 @@ describe('TraiderHoveredMixin', function() {
 
     let timestamp = Date.now();
     let orders = [
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {firstName: 'User1', lastName: 'Test1', page_url: 'test-user'}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {firstName: 'User1', lastName: 'Test1', page_url: 'test-user'}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {firstName: 'User1', lastName: 'Test1', page_url: 'test-user'}}},
-        {price: '0.02', createdTimestamp: timestamp, maker: {id: 2, profile: {firstName: 'User2', lastName: 'Test2', page_url: 'test-user', anonymous: true}}},
-        {price: '0.03', createdTimestamp: timestamp, maker: {id: 3, profile: {firstName: 'User3', lastName: 'Test3', page_url: 'test-user', anonymous: true}}},
-        {price: '0.05', createdTimestamp: timestamp, maker: {id: 4, profile: {firstName: 'User4', lastName: 'Test4', page_url: 'test-user', anonymous: false}}},
-        {price: '0.03', createdTimestamp: timestamp, maker: {id: 5, profile: null}},
-        {price: '0.01', createdTimestamp: timestamp - 180, maker: {id: 6, profile: {firstName: 'User6', lastName: 'Test6', page_url: 'test-user'}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 7, profile: {firstName: 'User7', lastName: 'Test7', page_url: 'test-user', anonymous: true}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 8, profile: {firstName: 'User8', lastName: 'Test8', page_url: 'test-user'}}},
-        {price: '0.01', createdTimestamp: timestamp - 150, maker: {id: 9, profile: {firstName: 'User9', lastName: 'Test9', page_url: 'test-user', anonymous: false}}},
-        {price: '0.05', createdTimestamp: timestamp, maker: {id: 10, profile: {firstName: 'User10', lastName: 'Test10', page_url: 'test-user', anonymous: true}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 11, profile: {firstName: 'User11', lastName: 'Test11', page_url: 'test-user', anonymous: true}}},
-        {price: '0.03', createdTimestamp: timestamp, maker: {id: 12, profile: {firstName: 'User12', lastName: 'Test12', page_url: 'test-user', anonymous: true}}},
-        {price: '0.01', createdTimestamp: timestamp, maker: {id: 13, profile: {firstName: 'User13', lastName: 'Test13', page_url: 'test-user', anonymous: true}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 1, profile: {nickname: 'user1'}}},
+        {price: '0.02', createdTimestamp: timestamp, maker: {id: 2, profile: {nickname: 'user2'}}},
+        {price: '0.03', createdTimestamp: timestamp, maker: {id: 3, profile: {nickname: 'user3'}}},
+        {price: '0.05', createdTimestamp: timestamp, maker: {id: 4, profile: {nickname: 'user4'}}},
+        {price: '0.03', createdTimestamp: timestamp, maker: {id: 5, profile: {nickname: 'user5'}}},
+        {price: '0.01', createdTimestamp: timestamp - 180, maker: {id: 6, profile: {nickname: 'user6'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 7, profile: {nickname: 'user7'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 8, profile: {nickname: 'user8'}}},
+        {price: '0.01', createdTimestamp: timestamp - 150, maker: {id: 9, profile: {nickname: 'user9'}}},
+        {price: '0.05', createdTimestamp: timestamp, maker: {id: 10, profile: {nickname: 'user10'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 11, profile: {nickname: 'user11'}}},
+        {price: '0.03', createdTimestamp: timestamp, maker: {id: 12, profile: {nickname: 'user12'}}},
+        {price: '0.01', createdTimestamp: timestamp, maker: {id: 13, profile: {nickname: 'user13'}}},
     ];
 
     it('should show tooltip content', () => {
@@ -51,31 +50,17 @@ describe('TraiderHoveredMixin', function() {
         let order = {
             maker: {
                 profile: {
-                    firstName: 'User',
-                    lastName: 'Test',
-                    page_url: 'test-user',
+                    nickname: 'foo',
                 },
             },
         };
-        let link = '<a href="' + $url + '">User Test</a>';
+        let link = '<a href="' + $url + '">foo</a>';
 
         expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal(link);
     });
 
-    it('should not create link to trader\'s profile from order data for anonymous', () => {
-        let order = {
-            maker: {
-                profile: {
-                    anonymous: true,
-                },
-            },
-        };
-
-        expect(wrapper.vm.createTraderLinkFromOrder(order)).to.be.equal($anon);
-    });
-
     it('should contain link to trader\'s profile that is owner of three orders with same price', () => {
-        let link = '<a href="' + $url + '">User1 Test1</a>';
+        let link = '<a href="' + $url + '">user1</a>';
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 3),
             basePrecision,
@@ -85,28 +70,13 @@ describe('TraiderHoveredMixin', function() {
         expect(wrapper.vm.tooltipData).to.be.equal(link);
     });
 
-    it('should contain two links to trader\'s profiles and one Anonymous for price 0.01', () => {
-        let link1 = '<a href="' + $url + '">User1 Test1</a>';
-        let link6 = '<a href="' + $url + '">User6 Test6</a>';
-
-        wrapper.vm.mouseoverHandler(
-            orders.slice(0, 9),
-            basePrecision,
-            '0.01'
-        );
-
-        expect(wrapper.vm.tooltipData).to.contain(link1);
-        expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
-        expect(wrapper.vm.tooltipData).to.be.equal([link6, link1, $anon].join(', '));
-    });
-
     it('should contain five links to trader\'s profiles `and 1 more.` for price 0.01', () => {
-        let link1 = '<a href="' + $url + '">User1 Test1</a>';
-        let link6 = '<a href="' + $url + '">User6 Test6</a>';
-        let link8 = '<a href="' + $url + '">User8 Test8</a>';
-        let link9 = '<a href="' + $url + '">User9 Test9</a>';
-        let link11 = '<a href="' + $url + '">User11 Test11</a>';
+        let link1 = '<a href="' + $url + '">user1</a>';
+        let link6 = '<a href="' + $url + '">user6</a>';
+        let link7 = '<a href="' + $url + '">user7</a>';
+        let link8 = '<a href="' + $url + '">user8</a>';
+        let link9 = '<a href="' + $url + '">user9</a>';
+        let link11 = '<a href="' + $url + '">user11</a>';
 
         wrapper.vm.mouseoverHandler(
             orders.slice(0, 13),
@@ -116,24 +86,25 @@ describe('TraiderHoveredMixin', function() {
 
         expect(wrapper.vm.tooltipData).to.contain(link1);
         expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
+        expect(wrapper.vm.tooltipData).to.contain(link7);
         expect(wrapper.vm.tooltipData).to.contain(link8);
         expect(wrapper.vm.tooltipData).to.contain(link9);
         expect(wrapper.vm.tooltipData).to.not.contain(link11);
         expect(wrapper.vm.tooltipData).to.contain('and 1 more.');
 
-        let tooltipData = [link6, link9, link1, $anon, link8].join(', ');
+        let tooltipData = [link6, link9, link1, link7, link8].join(', ');
         tooltipData += ' and 1 more.';
         expect(wrapper.vm.tooltipData).to.be.equal(tooltipData);
     });
 
     it('should contain five links to trader\'s profiles `and 2 more.` for price 0.01', () => {
-        let link1 = '<a href="' + $url + '">User1 Test1</a>';
-        let link6 = '<a href="' + $url + '">User6 Test6</a>';
-        let link8 = '<a href="' + $url + '">User8 Test8</a>';
-        let link9 = '<a href="' + $url + '">User9 Test9</a>';
-        let link11 = '<a href="' + $url + '">User11 Test11</a>';
-        let link13 = '<a href="' + $url + '">User13 Test13</a>';
+        let link1 = '<a href="' + $url + '">user1</a>';
+        let link6 = '<a href="' + $url + '">user6</a>';
+        let link7 = '<a href="' + $url + '">user7</a>';
+        let link8 = '<a href="' + $url + '">user8</a>';
+        let link9 = '<a href="' + $url + '">user9</a>';
+        let link11 = '<a href="' + $url + '">user11</a>';
+        let link13 = '<a href="' + $url + '">user13</a>';
 
         wrapper.vm.mouseoverHandler(
             orders,
@@ -143,26 +114,15 @@ describe('TraiderHoveredMixin', function() {
 
         expect(wrapper.vm.tooltipData).to.contain(link1);
         expect(wrapper.vm.tooltipData).to.contain(link6);
-        expect(wrapper.vm.tooltipData).to.contain($anon);
         expect(wrapper.vm.tooltipData).to.contain(link8);
         expect(wrapper.vm.tooltipData).to.contain(link9);
         expect(wrapper.vm.tooltipData).to.not.contain(link11);
         expect(wrapper.vm.tooltipData).to.not.contain(link13);
         expect(wrapper.vm.tooltipData).to.contain('and 2 more.');
 
-        let tooltipData = [link6, link9, link1, $anon, link8].join(', ');
+        let tooltipData = [link6, link9, link1, link7, link8].join(', ');
         tooltipData += ' and 2 more.';
         expect(wrapper.vm.tooltipData).to.be.equal(tooltipData);
-    });
-
-    it('should contain three Anonymous for anonymous owner and price 0.03', () => {
-        wrapper.vm.mouseoverHandler(
-            orders,
-            basePrecision,
-            '0.03'
-        );
-
-        expect(wrapper.vm.tooltipData).to.be.equal('Anonymous, Anonymous, Anonymous');
     });
 
     it('should contain link to owner profile only for not existent price 0.476', () => {

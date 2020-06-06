@@ -74,7 +74,7 @@
     })();
     Tawk_API.onLoad = function(){
         Tawk_API.setAttributes({
-            'name'  : '{{ app.user.profile.firstName|default('') }}',
+            'name'  : '{{ app.user.profile.nickname|default('') }}',
             'email' : '{{ app.user.username|default('') }}',
             'hash'  : '{{ app.user.getTawkHash(tawk_api_key)|default('') }}',
             'user' : '{{ app.user.username|default('') }}',
