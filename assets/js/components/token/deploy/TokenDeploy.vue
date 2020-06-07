@@ -101,9 +101,6 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
-            deployInterval: null,
-            retryCount: 0,
-            retryCountLimit: 10,
         };
     },
     computed: {
