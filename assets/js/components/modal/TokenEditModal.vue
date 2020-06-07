@@ -160,8 +160,8 @@ export default {
             reRenderDeploy: 0,
         };
     },
-    updated: function() {
-        console.log('updated modal, val of tokendeployed is ' + this.isTokenDeployed);
+    beforeDestroy: function() {
+        console.log('befroedestroy modal, val of tokendeployed is ' + this.isTokenDeployed);
         if (this.isTokenDeployed = true) {
             this.reRenderDeploy++;
         };

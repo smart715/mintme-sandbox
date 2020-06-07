@@ -69,13 +69,13 @@ describe('TokenEditModal', () => {
         expect(wrapper.vm.isTokenDeployed).to.be.true;
     });
 
-    // it('should be true when the function releasePeriodUpdated() is called', () => {
-    //     const wrapper = shallowMount(TokenEditModal, {
-    //         propsData: propsForTestCorrectlyRenders,
-    //     });
-    //     wrapper.vm.releasePeriodUpdated();
-    //     expect(wrapper.vm.hasReleasePeriod).to.be.true;
-    // });
+    it('should be true when the function releasePeriodUpdated() is called', () => {
+        const wrapper = shallowMount(TokenEditModal, {
+            propsData: propsForTestCorrectlyRenders,
+        });
+        wrapper.vm.releasePeriodUpdated();
+        expect(wrapper.vm.hasReleasePeriod).to.be.true;
+    });
 
     it('should refresh sliders for "released-slider" and "release-period-slider" refs', () => {
         const wrapper = shallowMount(TokenEditModal, {
