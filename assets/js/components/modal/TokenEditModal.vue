@@ -161,7 +161,6 @@ export default {
         };
     },
     beforeUpdate: function() {
-        console.log('beforeupdate modal, val of tokendeployed is ' + this.isTokenDeployed);
         if (this.isTokenDeployed = true) {
             this.reRenderDeploy++;
         };
