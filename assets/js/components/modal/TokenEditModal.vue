@@ -160,12 +160,11 @@ export default {
             reRenderDeploy: 0,
         };
     },
-    mounted: function() {
-        console.log('mounted modal, val of statusprop is ' + this.statusProp);
-    },
     updated: function() {
-        console.log('updated modal, val of statusprop is ' + this.statusProp);
-        this.reRenderDeploy++;
+        console.log('updated modal, val of tokendeployed is ' + this.isTokenDeployed);
+        if (this.isTokenDeployed = true) {
+            this.reRenderDeploy++;
+        };
     },
     computed: {
         isTokenNotDeployed: function() {
