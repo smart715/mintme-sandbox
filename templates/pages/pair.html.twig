@@ -104,7 +104,6 @@
                                     <token-deploy-icon
                                             :is-owner="{{ isOwner }}"
                                             :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                            @deployed="setTokenDeployed"
                                     />
                                 </div>
                             </li>
@@ -137,7 +136,6 @@
                                         websocket-url="{{ global_websocket_url }}"
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
-                                        @token-deployed="setTokenDeployed"
                                         :airdrop-params="{{ airdrop_params | json_encode }}"
                                 />
                             </div>

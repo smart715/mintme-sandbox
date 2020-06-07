@@ -129,33 +129,6 @@ export default {
             return new Decimal(this.webCost).greaterThan(this.balance);
         },
     },
-    watch: {
-        notDeployed: function() {
-            this.showPending = true;
-            this.deployed = false;
-
-            clearInterval(this.deployInterval);
-            this.deployInterval = setInterval(() => {
-                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
-                .then((response) => {
-                        if (response.data.deployed === true) {
-                            clearInterval(this.deployInterval);
-                            this.status = tokenDeploymentStatus.deployed;
-                            this.deployed = true;
-                            this.showPending = false;
-                            this.$emit('deployed', this.deployed);
-                            this.notifySuccess('Token has been successfully deployed');
-                        }
-                        this.retryCount++;
-                        if (this.retryCount >= this.retryCountLimit) {
-                            clearInterval(this.deployInterval);
-                        }
-                }, (error) => {
-                    this.notifyError('An error has occurred, please try again later');
-                });
-            }, 60000);
-        },
-    },
     methods: {
         fetchBalances: function() {
             this.$axios.retry.get(this.$routing.generate('token_deploy_balances', {
