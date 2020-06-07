@@ -157,7 +157,7 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
-            reRenderDeploy: 0;
+            reRenderDeploy: 0,
         };
     },
     mounted: function() {
