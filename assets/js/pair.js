@@ -9,11 +9,9 @@ import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
-import {NotificationMixin} from './mixins/notification';
 
 new Vue({
   el: '#token',
-  mixins: [NotificationMixin],
   data() {
     return {
       tabIndex: 0,
