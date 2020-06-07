@@ -158,6 +158,12 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
         };
     },
+    mounted: function() {
+        console.log('mounted modal, val of statusprop is ' + this.statusProp);
+    },
+    updated: function() {
+        console.log('updated modal, val of statusprop is ' + this.statusProp);
+    },
     computed: {
         isTokenNotDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.statusProp;
