@@ -26,7 +26,7 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
-      reRenderTokenName: 0,
+      reRenderIcon: 0,
     };
   },
   components: {
@@ -51,7 +51,7 @@ new Vue({
                     clearInterval(this.deployInterval);
                     this.tokenDeployed = true;
                     this.tokenPending = null;
-                    this.reRenderTokenName++;
+                    this.reRenderIcon++;
                 }
                 this.retryCount++;
                 if (this.retryCount >= this.retryCountLimit) {

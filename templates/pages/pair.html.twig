@@ -104,6 +104,7 @@
                                     <token-deploy-icon
                                             :is-owner="{{ isOwner }}"
                                             :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                            :key="reRenderIcon"
                                     />
                                 </div>
                             </li>
@@ -137,7 +138,6 @@
                                         release-address="{{ token.mintDestination }}"
                                         @token-deploy-pending="setTokenPending"
                                         :airdrop-params="{{ airdrop_params | json_encode }}"
-                                        :key="reRenderTokenName"
                                 />
                             </div>
                         </li>
