@@ -39,6 +39,7 @@
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
+                                    :key="reRenderDeploy"
                                 />
                             </template>
                         </faq-item>
@@ -156,6 +157,7 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
+            reRenderDeploy: 0;
         };
     },
     mounted: function() {
@@ -163,6 +165,7 @@ export default {
     },
     updated: function() {
         console.log('updated modal, val of statusprop is ' + this.statusProp);
+        this.reRenderDeploy++;
     },
     computed: {
         isTokenNotDeployed: function() {
