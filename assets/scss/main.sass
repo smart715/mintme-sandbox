@@ -901,6 +901,17 @@ input[type=search]::-webkit-search-cancel-button
 .form-control-btn.is-invalid
   background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
 
+.bootstrap-datetimepicker-widget
+  table
+    thead tr:first-child th:hover,
+    td.day:hover,
+    td.hour:hover,
+    td.minute:hover,
+    td.second:hover,
+    td span:hover,
+    td i:hover
+      color: $blue !important
+
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large
     width: 100%
