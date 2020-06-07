@@ -111,7 +111,7 @@ export default {
             return tokenDeploymentStatus.pending === this.status;
         },
         deployed: function() {
-            return tokenDeploymentStatus.deployed === this.status;
+            return tokenDeploymentStatus.deployed === this.statusProp;
         },
         showPending: function() {
             return this.isOwner && this.pending;

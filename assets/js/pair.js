@@ -9,9 +9,11 @@ import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
+import {NotificationMixin} from './mixins/notification';
 
 new Vue({
   el: '#token',
+  mixins: [NotificationMixin],
   data() {
     return {
       tabIndex: 0,
@@ -41,31 +43,26 @@ new Vue({
   },
   watch: {
     tokenPending: function(val) {
-      console.log('pair new value of tokenpending true? ' + val);
-            this.tokenPending = val;
-            clearInterval(this.deployInterval);
-            this.deployInterval = setInterval(() => {
-                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
-                .then((response) => {
-                        if (response.data.deployed === true) {
-                            clearInterval(this.deployInterval);
-                            this.tokenDeployed = true;
-                            this.tokenPending = null;
-                            this.notifySuccess('Token has been successfully deployed');
-                            console.log('value of tokendeployed after watch in pair is ' + this.tokenDeployed);
-                        }
-                        this.retryCount++;
-                        if (this.retryCount >= this.retryCountLimit) {
-                            clearInterval(this.deployInterval);
-                        }
-                }, (error) => {
-                    this.notifyError('An error has occurred, please try again later');
-                });
-            }, 60000);
+          this.tokenPending = val;
+          clearInterval(this.deployInterval);
+          this.deployInterval = setInterval(() => {
+              this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
+              .then((response) => {
+                if (response.data.deployed === true) {
+                    clearInterval(this.deployInterval);
+                    this.tokenDeployed = true;
+                    this.tokenPending = null;
+                    this.notifySuccess('Token has been successfully deployed');
+                }
+                this.retryCount++;
+                if (this.retryCount >= this.retryCountLimit) {
+                    clearInterval(this.deployInterval);
+                }
+              }, (error) => {
+                  this.notifyError('An error has occurred, please try again later');
+              });
+          }, 60000);
         },
-    tokenDeployed: function(val) {
-      console.log('pair new value of tokendeployed true? ' + val);
-    },
   },
   methods: {
     descriptionUpdated: function(val) {
