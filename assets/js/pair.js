@@ -26,7 +26,6 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
-      reRenderIcon: 0,
     };
   },
   components: {
@@ -42,26 +41,25 @@ new Vue({
   },
   watch: {
     tokenPending: function(val) {
-          this.tokenPending = val;
-          clearInterval(this.deployInterval);
-          this.deployInterval = setInterval(() => {
-              this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
-              .then((response) => {
-                if (response.data.deployed === true) {
-                    clearInterval(this.deployInterval);
-                    this.tokenDeployed = true;
-                    this.tokenPending = null;
-                    this.reRenderIcon++;
-                }
-                this.retryCount++;
-                if (this.retryCount >= this.retryCountLimit) {
-                    clearInterval(this.deployInterval);
-                }
-              }, (error) => {
-                  this.notifyError('An error has occurred, please try again later');
-              });
-          }, 60000);
-        },
+      this.tokenPending = val;
+      clearInterval(this.deployInterval);
+      this.deployInterval = setInterval(() => {
+          this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
+          .then((response) => {
+            if (response.data.deployed === true) {
+                clearInterval(this.deployInterval);
+                this.tokenDeployed = true;
+                this.tokenPending = null;
+            }
+            this.retryCount++;
+            if (this.retryCount >= this.retryCountLimit) {
+                clearInterval(this.deployInterval);
+            }
+          }, (error) => {
+              this.notifyError('An error has occurred, please try again later');
+          });
+      }, 60000);
+    },
   },
   methods: {
     descriptionUpdated: function(val) {

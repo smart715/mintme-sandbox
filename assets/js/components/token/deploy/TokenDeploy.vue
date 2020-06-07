@@ -83,7 +83,7 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, HTTP_OK} from '../../../utils/constants';
 
 export default {
     name: 'TokenDeploy',
@@ -101,6 +101,9 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
+            deployInterval: null,
+            retryCount: 0,
+            retryCountLimit: 10,
         };
     },
     computed: {
@@ -124,6 +127,30 @@ export default {
         },
         costExceed: function() {
             return new Decimal(this.webCost).greaterThan(this.balance);
+        },
+    },
+    watch: {
+        statusProp: function() {
+            this.showPending = true;
+            this.deployed = false;
+            clearInterval(this.deployInterval);
+            this.deployInterval = setInterval(() => {
+                this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.name}))
+                .then((response) => {
+                    if (response.status === HTTP_OK) {
+                        clearInterval(this.deployInterval);
+                        this.deployed = true;
+                        this.showPending = false;
+                        this.notifySuccess('Token has been successfully deployed');
+                    }
+                    this.retryCount++;
+                    if (this.retryCount >= this.retryCountLimit) {
+                        clearInterval(this.deployInterval);
+                    }
+                }, (error) => {
+                    this.notifyError('An error has occurred, please try again later');
+                });
+            }, 60000);
         },
     },
     methods: {
