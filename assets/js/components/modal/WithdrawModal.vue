@@ -70,7 +70,7 @@
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="overflow-wrap-break-word word-break-all">
+                    <span class="overflow-wrap-break-word word-break-all float-right">
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
                     </span>
                 </div>
