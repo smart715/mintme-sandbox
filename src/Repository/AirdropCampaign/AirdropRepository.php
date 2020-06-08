@@ -13,13 +13,12 @@ class AirdropRepository extends ServiceEntityRepository
         parent::__construct($registry, Airdrop::class);
     }
 
-    public function updateOutdatedAirdrops(): void
+    public function getOutdatedAirdrops(): array
     {
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->executeUpdate('
-            UPDATE airdrop
-            SET status = 0
-            WHERE status = 1 AND end_date IS NOT NULL AND end_date < CURRENT_TIMESTAMP();
-        ');
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.status = :status ANd a.endDate < CURRENT_TIMESTAMP()')
+            ->setParameter('status', Airdrop::STATUS_ACTIVE)
+            ->getQuery()
+            ->getResult();
     }
 }
