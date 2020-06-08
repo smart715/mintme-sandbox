@@ -17,7 +17,7 @@ nelmio_security:
                 - 'self'
                 - 'unsafe-inline'
                 - 'https://*.googleapis.com'
-                - 'https://*.jsdelivr.net'
+                - 'https://cdn.jsdelivr.net/emojione/2.2.7/assets/css/emojione.min.css'
                 - 'https://*.tawk.to'
             connect-src:
                 - 'self'
