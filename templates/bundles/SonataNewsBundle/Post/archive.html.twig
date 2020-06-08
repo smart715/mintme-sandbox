@@ -22,10 +22,12 @@
                             </header>
 
                             <div class="row">
-                                <div class="center-block text-center col-12">
-                                        <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
-                                    {% set i = i+1 %}
-                                </div>
+                                {% if post.image != null %}
+                                    <div class="center-block text-center col-12">
+                                            <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
+                                        {% set i = i+1 %}
+                                    </div>
+                                {% endif %}
                                 <p class="mt-4 mb-1 col-12 word-break">
                                     {{ post.abstract }}
                                 </p>
