@@ -262,7 +262,6 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
-
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
 
         $countUpdated = $airdropManager->updateOutdatedAirdrops();
