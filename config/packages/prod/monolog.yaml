@@ -47,6 +47,11 @@ monolog:
             path: "%kernel.logs_dir%/exchange.log"
             level: info
             channels: ['exchange']
+        security:
+            type: stream
+            path: "%kernel.logs_dir%/security.log"
+            level: error
+            channels: ['security']
         user_action:
             type: stream
             path: "%kernel.logs_dir%/user_action.log"
