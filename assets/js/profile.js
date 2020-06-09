@@ -67,29 +67,17 @@ new Vue({
             if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
-                  // this means only chinese characters are typed
                     this.firstNameAux = false;
                 } else {
-                    // this means regular characters are typed
-                    if (this.firstName.length < 2) {
-                        this.firstNameAux = true;
-                    } else {
-                        this.firstNameAux = false;
-                    }
+                    this.firstNameAux = this.firstName.length < 2;
                 }
             }
             if (event.target.id ==='profile_lastName') {
                 let hasChinese = this.lastName.match(REGEX_CHINESE);
                 if (hasChinese) {
-                    // this means only chinese characters are typed
                     this.lastNameAux = false;
                 } else {
-                    // this means regular characters are typed
-                    if (this.lastName.length < 2) {
-                        this.lastNameAux = true;
-                    } else {
-                        this.lastNameAux = false;
-                    }
+                    this.lastNameAux = this.lastName.length < 2;
                 }
             }
         },
@@ -154,12 +142,10 @@ new Vue({
             firstName: {
                 required: (val) => !nameRequired(val, this.lastName),
                 helpers: allNames,
-                // minLength: minLength(2),
             },
             lastName: {
                 required: (val) => !nameRequired(val, this.firstName),
                 helpers: allNames,
-                // minLength: minLength(2),
             },
             city: {
                 helpers: names,
