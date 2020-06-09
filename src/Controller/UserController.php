@@ -14,6 +14,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -323,23 +324,20 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     /**
      * @Route("user/unsubscribe/key/{key}/mail/{mail}", name="unsubscribe")
      */
-    public function unsubscribe(Request $request, string $key, string $mail): Response
-    {
+    public function unsubscribe(
+        Request $request,
+        string $key,
+        string $mail,
+        LoggerInterface $unsubscribeLogger
+    ): Response {
         $form = $this->createForm(UnsubscribeType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $content = sprintf("%s %s\n", $mail, date('Y-m-d H:i:s'));
 
-            $file = sprintf("%s/%s", dirname(__DIR__). '/../var/log', 'unsubscribers.txt');
-            $fileSystem = new Filesystem();
-
             try {
-                if ($fileSystem->exists($file)) {
-                    $fileSystem->appendToFile($file, $content);
-                } else {
-                    $fileSystem->dumpFile($file, $content);
-                }
+                $unsubscribeLogger->info($content);
             } catch (\Throwable $e) {
                 $form->addError(new FormError("Error when unsubscribing {$mail}"));
 
