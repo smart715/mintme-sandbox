@@ -84,16 +84,4 @@ describe('TokenWebsiteAddress', () => {
         });
         expect(wrapper.find('#website-link').text()).to.equal(wrapper.vm.currentWebsite);
     });
-
-    it('show truncated link when and too long', () => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenWebsiteAddress, {
-            localVue,
-            propsData: {
-                currentWebsite: 'https://example.com'.padEnd(100, '0'),
-                editingWebsite: false,
-            },
-        });
-        expect(wrapper.find('#website-link').text()).to.equal('https://example.com0000000000000000...');
-    });
 });
