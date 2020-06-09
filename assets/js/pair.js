@@ -47,9 +47,9 @@ new Vue({
           this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
           .then((response) => {
             if (response.data.deployed === true) {
-                clearInterval(this.deployInterval);
                 this.tokenDeployed = true;
-                this.tokenPending = null;
+                this.tokenPending = false;
+                clearInterval(this.deployInterval);
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
@@ -80,8 +80,8 @@ new Vue({
       this.tokenPending = true;
     },
     getTokenStatus: function(status) {
-      return true === this.tokenDeployed ? tokenDeploymentStatus.deployed :
-             true === this.tokenPending ? tokenDeploymentStatus.pending :
+      return this.tokenDeployed ? tokenDeploymentStatus.deployed :
+             this.tokenPending ? tokenDeploymentStatus.pending :
              status;
     },
     facebookUpdated: function(val) {
