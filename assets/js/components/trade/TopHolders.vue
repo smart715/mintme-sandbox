@@ -24,13 +24,6 @@
                     </div>
                 </template>
             </div>
-            <div class="text-center pb-2" v-if="showDownArrow">
-                <img
-                    src="../../../img/down-arrows.png"
-                    class="icon-arrows-down c-pointer"
-                    alt="arrow down"
-                    @click="scrollDown">
-            </div>
         </div>
     </div>
 </template>
@@ -72,9 +65,6 @@ export default {
         };
     },
     computed: {
-        showDownArrow: function() {
-            return null !== this.traders && this.traders.length > 7;
-        },
         loaded: function() {
             return null !== this.traders;
         },
