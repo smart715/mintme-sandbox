@@ -42,7 +42,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(CryptoManagerInterface::class)
         );
 
-        $upw->expireHours = 1;
+        $upw->expirationTime = 1;
 
         $application->add($upw);
 
@@ -75,7 +75,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(CryptoManagerInterface::class)
         );
 
-        $upw->expireHours = 1;
+        $upw->expirationTime = 1;
 
         $application->add($upw);
 

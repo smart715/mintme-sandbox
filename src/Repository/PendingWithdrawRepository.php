@@ -9,8 +9,8 @@ class PendingWithdrawRepository extends AbstractPendingWithdrawRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        int $expireHours
+        int $expirationTime
     ) {
-        parent::__construct($registry, PendingWithdraw::class, $expireHours);
+        parent::__construct($registry, PendingWithdraw::class, $expirationTime);
     }
 }

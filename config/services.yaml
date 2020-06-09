@@ -163,7 +163,7 @@ services:
 
     App\Command\UpdatePendingWithdrawals:
         properties:
-            expireHours: '%withdraw_expiration_time%'
+            expirationTime: '%withdraw_expiration_time%'
         arguments:
             $logger: '@logger'
         tags:
@@ -551,8 +551,8 @@ services:
 
     App\Repository\PendingWithdrawRepository:
         arguments:
-            $expireHours: '%withdraw_expiration_time%'
+            $expirationTime: '%withdraw_expiration_time%'
 
     App\Repository\PendingTokenWithdrawRepository:
         arguments:
-            $expireHours: '%withdraw_expiration_time%'
+            $expirationTime: '%withdraw_expiration_time%'

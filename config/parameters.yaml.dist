@@ -129,5 +129,5 @@ parameters:
     mintme_url: 'mintme.com'
     contact_email: support@mintme.com
 
-    # expiration time for withdraws (in hours)
-    withdraw_expiration_time: 4
+    # expiration time for withdraws (in seconds)
+    withdraw_expiration_time: 14400
