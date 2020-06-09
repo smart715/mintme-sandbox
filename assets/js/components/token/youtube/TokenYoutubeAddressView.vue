@@ -1,15 +1,20 @@
 <template>
-    <div class="d-flex-inline">
-        <div class="display-text">
+    <div class="row">
+        <div class="col text-truncate">
             Youtube:
             <a
                 :href="youTubeUrl"
                 target="_blank"
                 rel="nofollow"
+                v-b-tooltip.hover :title="youTubeUrl"
             >
                 {{ youTubeUrl }}
             </a>
+        </div>
+        <div class="col-auto">
             <div ref="ytButtonContainer" class="d-block-inline"></div>
+        </div>
+        <div class="col-auto social-help">
             <guide>
                 <template slot="header">
                     Youtube
@@ -63,10 +68,3 @@ export default {
     },
 };
 </script>
-
-<style lang="sass" scoped>
-    .display-text
-        display: inline-block
-        width: 100%
-        text-overflow: ellipsis
-</style>
