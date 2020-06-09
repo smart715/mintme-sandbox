@@ -94,16 +94,4 @@ describe('TokenTelegramChannel', () => {
         });
         expect(wrapper.find('#telegram-link').text()).to.equal(wrapper.vm.currentTelegram);
     });
-
-    it('show truncated link when and too long', () => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenTelegramChannel, {
-            localVue,
-            propsData: {
-                currentTelegram: 'https://t.me/joinchat/newtelegram'.padEnd(100, '0'),
-                editingTelegram: false,
-            },
-        });
-        expect(wrapper.find('#telegram-link').text()).to.equal('https://t.me/joinchat/newtelegram00...');
-    });
 });

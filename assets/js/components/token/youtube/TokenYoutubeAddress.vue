@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="d-block mx-0 my-1 p-0">
+    <div class="row">
+        <div class="col text-truncate">
             <a
                 id="channel-link"
                 class="c-pointer"
@@ -12,13 +12,15 @@
                         size="lg"
                     />
                 </span>
-                {{ computedChannel | truncate(35) }}
+                {{ computedChannel }}
             </a>
             <b-tooltip
                 v-if="currentChannelId"
                 target="channel-link"
                 :title="computedChannel"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentChannelId"
                 @click.prevent="deleteChannel"
