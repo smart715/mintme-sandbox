@@ -1,39 +1,41 @@
 <template>
-    <div>
-        <div class="d-flex-inline">
-            <div class="display-text">
-                Facebook:
+    <div class="row">
+        <div class="col text-truncate">
+            Facebook:
+            <a
+                :href="currentAddress"
+                target="_blank"
+                rel="nofollow"
+                v-b-tooltip.hover :title="currentAddress"
+            >
+                {{ currentAddress }}
+            </a>
+        </div>
+        <div class="col-auto">
+            <div
+                class="fb-share-button"
+                :data-href="currentAddress"
+                data-layout="button_count"
+                data-size="small"
+                data-mobile-iframe="true"
+            >
                 <a
-                    :href="currentAddress"
                     target="_blank"
-                    rel="nofollow"
-                >
-                    {{ currentAddress }}
-                </a>
-                <div
-                    class="fb-share-button"
-                    :data-href="currentAddress"
-                    data-layout="button_count"
-                    data-size="small"
-                    data-mobile-iframe="true"
-                >
-                    <a
-                        target="_blank"
-                        :href="'https://www.facebook.com/sharer/sharer.php?u='
-                        +currentAddressEncoded+'&amp;src=sdkpreparse'"
-                        class="fb-xfbml-parse-ignore"
-                    ></a>
-                </div>
-                <guide>
-                    <template slot="header">
-                        Facebook
-                    </template>
-                    <template slot="body">
-                        Link to token creator’s Facebook.
-                        Before adding it, we confirmed ownership.
-                    </template>
-                </guide>
+                    :href="facebookShareButtonUrl"
+                    class="fb-xfbml-parse-ignore"
+                ></a>
             </div>
+        </div>
+        <div class="col-auto social-help">
+            <guide>
+                <template slot="header">
+                    Facebook
+                </template>
+                <template slot="body">
+                    Link to token creator’s Facebook.
+                    Before adding it, we confirmed ownership.
+                </template>
+            </guide>
         </div>
     </div>
 </template>
@@ -57,16 +59,13 @@ export default {
         };
     },
     computed: {
-        currentAddressEncoded: function() {
-            return encodeURIComponent(this.currentAddress);
+        facebookShareButtonUrl: function() {
+            return 'https://www.facebook.com/sharer/sharer.php?u='
+                + encodeURIComponent(this.currentAddress)
+                + '&amp;src=sdkpreparse';
         },
     },
 };
 </script>
 
-<style lang="sass" scoped>
-    .display-text
-        display: inline-block
-        width: 100%
-        text-overflow: ellipsis
-</style>
+
