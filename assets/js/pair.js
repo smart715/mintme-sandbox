@@ -92,7 +92,7 @@ new Vue({
       this.posts.splice(index, 1);
     },
     coalesce: function(a, b) {
-      return a !== null ? a : b;
+      return null !== a ? a : b;
     },
   },
   store,

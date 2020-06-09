@@ -18,12 +18,10 @@ class BetweenValidator extends ConstraintValidator
 
     /**
      * {@inheritDoc}
-     *
      * @param $constraint Between
      */
     public function validate($value, Constraint $constraint): void
     {
-        
         $currency = $value->getCurrency()->getCode();
         $min = (string)$constraint->min;
         $max = (string)$constraint->max;

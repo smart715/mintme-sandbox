@@ -22,13 +22,19 @@ class MoneyTransformer implements DataTransformerInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    /** @inheritdoc */
+    /**
+     * {@inheritdoc}
+     * @param Money $value
+     */
     public function transform($value): string
     {
         return $this->moneyWrapper->format($value);
     }
     
-    /** @inheritdoc */
+    /**
+     * {@inheritdoc}
+     * @param string $value
+     */
     public function reverseTransform($value): Money
     {
         try {
