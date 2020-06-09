@@ -140,12 +140,15 @@ class Exchanger implements ExchangerInterface
 
         $tradeResult = $this->trader->placeOrder($order);
 
-        try {
-            $this->mp->send($market);
-        } catch (Throwable $exception) {
-            $this->logger->error(
-                "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
-            );
+        // check if order status is complete before sending market
+        if (Order::FINISHED_STATUS){
+            try {
+                $this->mp->send($market);
+            } catch (Throwable $exception) {
+                $this->logger->error(
+                    "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
+                );
+            }
         }
 
         $this->logger->info(
