@@ -20,10 +20,6 @@ function mockVue() {
     return localVue;
 };
 
-let truncateTest = function(val, max) {
-    return val.length > max ? val.slice(0, max) + '...' : val;
-};
-
 let propsForTestCorrectlyRenders = {
     channelId: 'testChannelId',
     clientId: 'testClientId',
@@ -48,21 +44,6 @@ describe('TokenYoutubeAddress', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         expect(wrapper.find('b-tooltip').html()).to.contain('testChannelId');
-    });
-
-    it('should truncate long computedChannel string in the link field', () => {
-        const wrapper = shallowMount(TokenYoutubeAddress, {
-            filters: {
-                truncate: function(val, max) {
-                    return truncateTest(val, max);
-                },
-            },
-            mocks: {
-                $routing,
-            },
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.html()).to.contain('https://www.youtube.com/channel/tes...');
     });
 
     it('should compute computedChannel correctly', () => {
