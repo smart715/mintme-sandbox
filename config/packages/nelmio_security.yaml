@@ -1,4 +1,8 @@
 nelmio_security:
+    clickjacking:
+        paths:
+            '^/.*': DENY
+        content_types: []
     csp:
         hosts: []
         content_types: []
