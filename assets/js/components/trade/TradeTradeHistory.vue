@@ -93,13 +93,6 @@
                         </div>
                     </template>
                 </div>
-                <div class="text-center pb-2" v-if="showDownArrow">
-                    <img
-                        src="../../../img/down-arrows.png"
-                        class="icon-arrows-down c-pointer"
-                        alt="arrow down"
-                        @click="scrollDown">
-                </div>
             </div>
         </div>
     </div>
