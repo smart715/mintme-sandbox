@@ -74,7 +74,7 @@
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
                     </span>
                 </div>
-                <div class="col-12 pt-2 text-center">
+                <div class="input-group col-12 pt-2 justify-content-center">
                     <button
                         class="btn btn-primary"
                         :disabled="$v.$anyError || withdrawing"
