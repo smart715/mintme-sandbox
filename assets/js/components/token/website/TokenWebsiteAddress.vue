@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="row">
         <div
             v-if="editing"
             class="form-group my-3"
@@ -36,7 +36,7 @@
         </div>
         <div
             v-else
-            class="d-block mx-0 my-1 p-0"
+            class="col text-truncate"
         >
             <a
                 id="website-link"
@@ -49,13 +49,15 @@
                         size="lg"
                     />
                 </span>
-                {{ computedWebsiteUrl | truncate(35) }}
+                {{ computedWebsiteUrl }}
             </a>
             <b-tooltip
                 v-if="currentWebsite"
                 target="website-link"
                 :title="computedWebsiteUrl"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentWebsite"
                 @click.prevent="deleteWebsite"
