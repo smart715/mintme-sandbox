@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="d-block mx-0 my-1 p-0">
+    <div class="row">
+        <div class="col text-truncate">
             <a
                 id="address-link"
                 class="c-pointer"
@@ -12,13 +12,15 @@
                         size="lg"
                     />
                 </span>
-                {{ computedAddress | truncate(35) }}
+                {{ computedAddress }}
             </a>
             <b-tooltip
                 v-if="address"
                 target="address-link"
                 :title="computedAddress"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="address"
                 @click.prevent="deleteAddress"
