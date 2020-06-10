@@ -70,11 +70,11 @@
                     <label>
                         Total to be withdrawn:
                     </label>
-                    <span class="overflow-wrap-break-word word-break-all">
+                    <span class="overflow-wrap-break-word word-break-all float-right">
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
                     </span>
                 </div>
-                <div class="col-12 pt-2 text-center">
+                <div class="input-group col-12 pt-2 justify-content-center">
                     <button
                         class="btn btn-primary"
                         :disabled="$v.$anyError || withdrawing"
