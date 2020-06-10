@@ -141,7 +141,7 @@ class Exchanger implements ExchangerInterface
         $tradeResult = $this->trader->placeOrder($order);
 
         // check if order status is complete before sending market
-        if ($order->getStatus() === 'finished'){
+        if ('finished' === $order->getStatus()) {
             try {
                 $this->mp->send($market);
             } catch (Throwable $exception) {
