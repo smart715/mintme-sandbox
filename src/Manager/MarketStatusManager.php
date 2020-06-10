@@ -103,28 +103,30 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setFirstResult($firstResult)
             ->setMaxResults($offset - count($predefinedMarketStatus));
 
-        if (!is_null($userId)) {
+        if (null !== $userId) {
             $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.id = :id')
                 ->setParameter('id', $userId);
         }
 
         if (self::DEPLOYED_FIRST === $deployed) {
-            $queryBuilder->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
-                ->orderBy('deployed', 'DESC');
+            $queryBuilder->addSelect(
+                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
+            )
+            ->orderBy('deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $deployed) {
             $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         if (self::SORT_BY_CHANGE === $sort) {
-            $queryBuilder->addSelect("change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change");
+            $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
         }
 
         $sort = isset(self::SORTS_MAP[$sort])
             ? self::SORTS[self::SORTS_MAP[$sort]]
             : self::SORTS[self::SORTS_MAP['monthVolume']];
-        $order = "ASC" === $order
-            ? "ASC"
-            : "DESC";
+        $order = 'ASC' === $order
+            ? 'ASC'
+            : 'DESC';
 
         $queryBuilder->addOrderBy($sort, $order)
             ->addOrderBy('ms.id', 'DESC');
