@@ -19,6 +19,7 @@ use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
@@ -171,7 +172,7 @@ class Exchanger implements ExchangerInterface
         /** @var string $amount */
         $amount = (string) BigDecimal::of($amount)->dividedBy('1', $market->isTokenMarket() ?
             $this->bag->get('token_precision') :
-            $crypto->getShowSubunit());
+            $crypto->getShowSubunit(), RoundingMode::HALF_FLOOR);
 
         return $amount;
     }
@@ -197,8 +198,9 @@ class Exchanger implements ExchangerInterface
         string $amount
     ): bool {
         $token = $this->tm->findByName($token);
+        $profile = $token->getProfile();
 
-        if ($user === $token->getProfile()->getUser()) {
+        if ($profile && $user === $token->getProfile()->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
                 $this->bh->balances($user, [$token])

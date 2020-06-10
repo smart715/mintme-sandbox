@@ -145,8 +145,8 @@ export default {
                     ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
-                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
-                    fee: toMoney(history.fee, history.market.base.subunit),
+                    total: toMoney(this.calculateTotalCost(history), history.market.base.subunit),
+                    fee: this.createTicker(toMoney(history.fee, this.producePrecision(history)), history),
                     pairUrl: this.generatePairUrl(history.market),
                 };
             });
@@ -191,6 +191,17 @@ export default {
 
             return this.$routing.generate('token_show', {name: market.quote.name});
         },
+        createTicker: function(toMoney, history) {
+            return toMoney + ' ' + (history.side === 2 ? history.market.quote.symbol : history.market.base.symbol);
+        },
+        calculateTotalCost: function(history) {
+            return history.side === 1 ? (new Decimal(history.price).times(history.amount)).toString() :
+                (new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString();
+        },
+        producePrecision(history) {
+            return history.side === 2 ? 4 : 8;
+        },
+
     },
 };
 </script>
