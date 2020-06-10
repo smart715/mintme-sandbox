@@ -92,7 +92,7 @@
                         <a href="{{ path('referral-program') }}" class="nav-link">Referrals</a>
                     </li>
                 {% endif %}
-                <li class="nav-item align-self-center {{ route == 'kb' ? 'active' : '' }}">
+                <li class="nav-item align-self-center {{ route starts with 'kb' ? 'active' : '' }}">
                     <a href="{{ path('kb') }}" class="nav-link">Help</a>
                 </li>
                 {% if not app.user %}
@@ -115,7 +115,7 @@
                                     <span>Profile</span>
                                 </a>
                             </li>
-                            <li class="text-center {{ route == 'settings' ? 'active' : '' }}">
+                            <li class="text-center {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}">
                                 <a href="{{ path('settings') }}" class="nav-link">
                                     <span>Settings</span>
                                 </a>
@@ -148,7 +148,7 @@
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile
                                     </a>
-                                    <a class="dropdown-item {{ route == 'settings' ? 'active' : '' }}" href="{{ path('settings') }}">
+                                    <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
                                     </a>
