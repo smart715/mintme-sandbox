@@ -91,6 +91,7 @@
                                         {{ form_row(form.firstName, {'attr':
                                             {
                                                 'v-model.trim': '$v.firstName.$model',
+                                                'v-on:keyup': 'validation',
                                                 'class': 'form-control',
                                                 'ref': 'firstName'
                                             }
@@ -102,13 +103,14 @@
                                     <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
                                         First name can contain only letters, ` and -
                                     </div>
-                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.minLength" class="text-danger text-center">
+                                    <div v-cloak="$v.firstName" v-if="firstNameAux" class="text-danger text-center">
                                         First name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.lastName, {'attr':
                                             {
                                                 'v-model.trim': '$v.lastName.$model',
+                                                'v-on:keyup': 'validation',
                                                 'class': 'form-control',
                                                 'ref': 'lastName'
                                             }
@@ -120,7 +122,7 @@
                                     <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
                                         Last name can contain only letters, ` and -
                                     </div>
-                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.minLength" class="text-danger text-center">
+                                    <div v-cloak="$v.lastName" v-if="lastNameAux" class="text-danger text-center">
                                         Last name must have at least 2 letters
                                     </div>
                                     <div class="pb-1">
