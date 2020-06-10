@@ -238,7 +238,7 @@ describe('Donation', () => {
         expect(wrapper.vm.buttonDisabled).to.be.true;
 
         wrapper.vm.amountToDonate = '5';
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).to.be.false;
 
         wrapper.vm.donationChecking = true;
         expect(wrapper.vm.buttonDisabled).to.be.true;

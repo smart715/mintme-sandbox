@@ -231,7 +231,6 @@ export default {
                 || this.insufficientFunds
                 || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
-                || !parseFloat(this.amountToReceive)
                 || this.donationChecking || this.donationInProgress;
         },
     },
