@@ -151,7 +151,7 @@ class SitemapSubscriber implements EventSubscriberInterface
                 new UrlConcrete(
                     $this->urlGenerator->generate(
                         'profile-view',
-                        ['pageUrl' => $profile->getPageUrl()],
+                        ['nickname' => $profile->getNickname()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     )
                 ),

@@ -18,10 +18,6 @@ function mockVue() {
     return localVue;
 };
 
-let truncateTest = function(val, max) {
-    return val.length > max ? val.slice(0, max) + '...' : val;
-};
-
 describe('TokenFacebookAddress', () => {
     beforeEach(() => {
         moxios.install();
@@ -59,25 +55,6 @@ describe('TokenFacebookAddress', () => {
             },
         });
         expect(wrapper.vm.computedAddress).to.be.equal('foo address');
-    });
-
-    it('should truncate long address in the address field', () => {
-        const wrapper = shallowMount(TokenFacebookAddress, {
-            filters: {
-                truncate: function(val, max) {
-                    return truncateTest(val, max);
-                },
-            },
-            mocks: {
-                $routing,
-            },
-            propsData: {
-                address: 'FooAddressLength01234567890123456789012345',
-                appId: 'foo id',
-                tokenName: 'foo token name',
-            },
-        });
-        expect(wrapper.html()).to.contain('FooAddressLength0123456789012345678...');
     });
 
     it('should be blank when pages array is empty', () => {

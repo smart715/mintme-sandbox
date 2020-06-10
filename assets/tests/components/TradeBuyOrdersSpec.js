@@ -25,7 +25,7 @@ describe('TradeBuyOrders', () => {
             },
             sortBy: 'name',
             sortDesc: true,
-            precision: 8,
+            basePrecision: 8,
         },
     });
 
@@ -34,7 +34,6 @@ describe('TradeBuyOrders', () => {
         amount: toMoney(2),
         sum: 4,
         trader: 'first..',
-        traderFullName: 'firstName lastName',
         traderUrl: 'traderUrl',
         side: 1,
         owner: true,
@@ -48,12 +47,6 @@ describe('TradeBuyOrders', () => {
         expect(wrapper.html().includes('No order was added yet')).to.deep.equal(false);
     });
 
-    it('show arrow if orders > 7', () => {
-        wrapper.vm.ordersList = Array(7).fill(order);
-        expect(wrapper.find('.icon-arrows-down').exists()).to.deep.equal(false);
-        wrapper.vm.ordersList = Array(8).fill(order);
-        expect(wrapper.find('.icon-arrows-down').exists()).to.deep.equal(true);
-    });
     it('show total amount correctly', () => {
         wrapper.vm.ordersList = Array(2).fill(order);
         expect(wrapper.vm.total).to.deep.equal(toMoney(8));

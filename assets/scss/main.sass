@@ -192,6 +192,18 @@ a
 .margin-neg-15
   margin-top: -15px
 
+.success-highlight
+  animation: success-highlight 1000ms ease-out
+  @keyframes success-highlight
+    from
+      background-color: $toast-success-bg
+
+.error-highlight
+  animation: error-highlight 1000ms ease-out
+  @keyframes error-highlight
+    from
+      background-color: $toast-error-bg
+
 .card, .modal, .box
   label
     margin: 0
@@ -611,6 +623,7 @@ nav.top-navbar
   display: none
 
 [v-cloak]
+  display: none
   & > .v-cloak--block
     display: block !important
 

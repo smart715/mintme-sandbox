@@ -94,16 +94,4 @@ describe('TokenDiscordChannel', () => {
         });
         expect(wrapper.find('#discord-link').text()).to.equal(wrapper.vm.currentDiscord);
     });
-
-    it('show truncated link when and too long', () => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenDiscordChannel, {
-            localVue,
-            propsData: {
-                currentDiscord: 'https://discord.gg/newdiscord'.padEnd(100, '0'),
-                editingDiscord: false,
-            },
-        });
-        expect(wrapper.find('#discord-link').text()).to.equal('https://discord.gg/newdiscord000000...');
-    });
 });

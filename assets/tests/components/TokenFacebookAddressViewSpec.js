@@ -8,6 +8,6 @@ describe('TokenFacebookAddressView', () => {
         });
 
         expect(wrapper.findAll('a').at(0).text()).to.equal('facebook_url');
-        expect(wrapper.findAll('a').at(1).attributes('href')).to.equal('https://www.facebook.com/sharer/sharer.php?u=facebook_url&src=sdkpreparse');
+        expect(wrapper.findAll('a').at(1).attributes('href')).to.equal('https://www.facebook.com/sharer/sharer.php?u=facebook_url&amp;src=sdkpreparse');
     });
 });

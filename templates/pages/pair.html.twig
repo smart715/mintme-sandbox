@@ -15,8 +15,8 @@
 
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
-{% set showAirdropCampaign = showAirdropCampaign ? 'true' : 'false' %}
-{% set userAlreadyClaimed = userAlreadyClaimed ? 'true' : 'false' %}
+{% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
+{% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
     <div class="row pt-5 justify-content-center">
@@ -27,7 +27,7 @@
                     v-if="{{ showAirdropCampaign }}"
                     :logged-in="{{ app.user ? 'true' : 'false' }}"
                     :is-owner="{{ isOwner }}"
-                    :token-name="'{{ token.name }}'"
+                    :token-name="'{{ token.name | default }}'"
                     :user-already-claimed="{{ userAlreadyClaimed }}"
                     login-url="{{ absolute_url(path('fos_user_security_login')) }}"
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
@@ -45,12 +45,12 @@
                             <token-introduction-profile
                                     class="col-12 col-lg-6 pr-lg-2"
                                     youtube-client-id="{{ global_youtube_client_id }}"
-                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
+                                    profile-name="{{ profile.nickname }}"
                                     website-url="{{ token.websiteUrl }}"
                                     facebook-url="{{ token.facebookUrl }}"
                                     youtube-channel-id="{{ token.youtubeChannelId }}"
                                     :editable="{{ isOwner }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
+                                    profile-url="{{ absolute_url(path('profile-view', { 'nickname': token.getProfile().getNickname() })) }}"
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                     token-contract-address="{{ token.address }}"
@@ -59,7 +59,7 @@
                                     discord-url="{{ token.discordUrl }}"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated"                                                                                                          
+                                    @updated-youtube="youtubeUpdated"
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
@@ -76,7 +76,7 @@
                                     :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
-                    </b-tab>                    
+                    </b-tab>
                 {% endif %}
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
