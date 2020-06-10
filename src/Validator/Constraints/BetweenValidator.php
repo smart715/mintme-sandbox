@@ -18,6 +18,7 @@ class BetweenValidator extends ConstraintValidator
 
     /**
      * {@inheritDoc}
+     *
      * @param $constraint Between
      */
     public function validate($value, Constraint $constraint): void
