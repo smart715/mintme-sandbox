@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
-use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
@@ -29,9 +28,6 @@ class DonationHandler implements DonationHandlerInterface
     /** @var CryptoRatesFetcherInterface */
     private $cryptoRatesFetcher;
 
-    /** @var CryptoManagerInterface */
-    protected $cryptoManager;
-
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
@@ -43,7 +39,6 @@ class DonationHandler implements DonationHandlerInterface
         MarketNameConverterInterface $marketNameConverter,
         MoneyWrapperInterface $moneyWrapper,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
-        CryptoManagerInterface $cryptoManager,
         BalanceHandlerInterface $balanceHandler,
         array $donationParams
     ) {
@@ -51,7 +46,6 @@ class DonationHandler implements DonationHandlerInterface
         $this->marketNameConverter = $marketNameConverter;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
-        $this->cryptoManager = $cryptoManager;
         $this->balanceHandler = $balanceHandler;
         $this->donationParams = $donationParams;
     }
@@ -65,7 +59,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->checkAmount($donorUser, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
-            $amountObj = $this->convertAmountToWeb($amountObj);
+            $amountObj = $this->getBtcWorthInMintme($amountObj);
         }
 
         $expectedData = $this->donationFetcher->checkDonation(
@@ -92,23 +86,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->checkAmount($donorUser, $amountObj, $currency);
 
         if (Token::BTC_SYMBOL === $currency) {
-            $amountInWeb = $this->convertAmountToWeb($amountObj);
-            $cryptos = $this->cryptoManager->findAllIndexed('symbol');
-
-            $this->balanceHandler->update(
-                $donorUser,
-                Token::getFromCrypto($cryptos[Token::BTC_SYMBOL]),
-                $amountObj->negative(),
-                'donation'
-            );
-            $this->balanceHandler->update(
-                $donorUser,
-                Token::getFromCrypto($cryptos[Token::WEB_SYMBOL]),
-                $amountInWeb,
-                'donation'
-            );
-
-            $amountObj = $amountInWeb;
+            $amountObj = $this->getBtcWorthInMintme($amountObj);
         }
 
         $this->donationFetcher->makeDonation(
@@ -123,7 +101,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
     }
 
-    private function convertAmountToWeb(Money $amount): Money
+    private function getBtcWorthInMintme(Money $amount): Money
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
