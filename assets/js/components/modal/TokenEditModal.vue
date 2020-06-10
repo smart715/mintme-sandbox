@@ -157,12 +157,12 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
-            reRenderAfterDeployComplete: 0,
+            reRenderAfterDeployComplete: null,
         };
     },
     beforeUpdate: function() {
         if (this.isTokenDeployed) {
-            this.reRenderAfterDeployComplete++;
+            this.reRenderAfterDeployComplete = true;
         };
     },
     computed: {
