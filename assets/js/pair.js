@@ -26,8 +26,7 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
-      showContractAddressAfterDeploy: null,
-
+      showContractAddressAfterDeploy: 0,
     };
   },
   components: {
@@ -51,7 +50,7 @@ new Vue({
             if (response.data.deployed === true) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
-                this.showContractAddressAfterDeploy = true;
+                this.showContractAddressAfterDeploy++;
                 clearInterval(this.deployInterval);
             }
             this.retryCount++;
