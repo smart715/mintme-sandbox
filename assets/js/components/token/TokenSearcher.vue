@@ -83,7 +83,7 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return 'search-input form-control pr-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
+            return 'search-input px-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
         },
     },
 };
