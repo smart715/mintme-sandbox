@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -40,6 +42,9 @@ use Throwable;
  */
 class TokenController extends Controller
 {
+
+    use CheckTokenNameBlacklistTrait;
+
     /** @var EntityManagerInterface */
     protected $em;
 
@@ -189,19 +194,6 @@ class TokenController extends Controller
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
-        $name = trim($token->getName());
-        $blacklist = $this->blacklistManager->getList("token");
-
-        foreach ($blacklist as $blist) {
-            if (false !== strpos(strtolower($name), strtolower($blist->getValue()))
-                && (strlen($name) - strlen($blist->getValue())) <= 1) {
-                return $this->json(
-                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-        }
-
         if ($form->isSubmitted() && !$form->isValid()) {
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
@@ -215,16 +207,23 @@ class TokenController extends Controller
             throw new ApiBadRequestException('Invalid argument');
         }
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
-            $profile = $this->profileManager->getProfile($this->getUser());
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->checkTokenNameBlacklist($token->getName())) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
 
             $this->em->beginTransaction();
 
-            if (null !== $profile) {
-                $token->setProfile($profile);
-                $this->em->persist($token);
-                $this->em->flush();
-            }
+            /** @var User $user */
+            $user = $this->getUser();
+            $token->setProfile(
+                $this->profileManager->getProfile($this->getUser()) ?? new Profile($user)
+            );
+            $this->em->persist($token);
+            $this->em->flush();
 
             try {
                 /** @var  \App\Entity\User $user*/
@@ -269,7 +268,6 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => 'Create your own token',
             'form' => $form->createView(),
-            'profileCreated' => $this->isProfileCreated(),
         ]);
     }
 
@@ -323,10 +321,5 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();
-    }
-
-    private function isProfileCreated(): bool
-    {
-        return null !== $this->profileManager->getProfile($this->getUser());
     }
 }

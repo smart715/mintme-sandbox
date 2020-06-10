@@ -24,13 +24,6 @@
                     </div>
                 </template>
             </div>
-            <div class="text-center pb-2" v-if="showDownArrow">
-                <img
-                    src="../../../img/down-arrows.png"
-                    class="icon-arrows-down c-pointer"
-                    alt="arrow down"
-                    @click="scrollDown">
-            </div>
         </div>
     </div>
 </template>
@@ -72,9 +65,6 @@ export default {
         };
     },
     computed: {
-        showDownArrow: function() {
-            return null !== this.traders && this.traders.length > 7;
-        },
         loaded: function() {
             return null !== this.traders;
         },
@@ -93,8 +83,8 @@ export default {
             }))
             .then(({data}) => this.traders = data.map((row) => {
                 return {
-                    trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
-                    url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
+                    trader: row.user.profile.nickname,
+                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
                     date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };

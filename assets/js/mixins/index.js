@@ -9,6 +9,7 @@ import TraderHoveredMixin from './trader_hovered';
 import OrderMixin from './order';
 import LoggerMixin from './logger';
 import PairNameMixin from './pair_name';
+import OrderHighlights from './order_highlights';
 
 export {
     FiltersMixin,
@@ -24,4 +25,5 @@ export {
     OrderMixin,
     LoggerMixin,
     PairNameMixin,
+    OrderHighlights,
 };

@@ -49,12 +49,12 @@ describe('TopHolders', () => {
 
         moxios.stubRequest('top_holders', {status: 200, response: [
             {
-                user: {profile: {firstName: 'foo', lastName: 'bar'}},
+                user: {profile: {nickname: 'foo'}},
                 timestamp: 1563550710,
                 balance: '999',
             },
             {
-                user: {profile: {firstName: 'foo', lastName: 'baz'}},
+                user: {profile: {nickname: 'foo'}},
                 timestamp: 1563550710,
                 balance: '99',
             },
@@ -66,23 +66,6 @@ describe('TopHolders', () => {
             expect(wrapper.find('b-table').exists()).to.be.true;
             done();
         });
-    });
-
-    it('should show arrow button if traders is null or more than 7', () => {
-        const wrapper = mockTopHolders();
-        const trader = {
-                trader: 'foo baz',
-                date: '19.07.2019 05:38:30',
-                amount: 99,
-            };
-
-        expect(wrapper.vm.showDownArrow).to.be.false;
-
-        wrapper.vm.traders = Array(7).fill(trader);
-        expect(wrapper.vm.showDownArrow).to.be.false;
-
-        wrapper.vm.traders = Array(8).fill(trader);
-        expect(wrapper.vm.showDownArrow).to.be.true;
     });
 
     it('should hide the table if there are not traders', () => {

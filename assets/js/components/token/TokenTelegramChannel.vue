@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="row">
         <div
             v-if="editing"
             class="form-group my-3"
@@ -36,7 +36,7 @@
         </div>
         <div
             v-else
-            class="d-block mx-0 my-1 p-0"
+            class="col text-truncate"
         >
             <a
                 id="telegram-link"
@@ -49,13 +49,15 @@
                         size="lg"
                     />
                 </span>
-                {{ computedTelegramUrl | truncate(35) }}
+                {{ computedTelegramUrl }}
             </a>
             <b-tooltip
                 v-if="currentTelegram"
                 target="telegram-link"
                 :title="computedTelegramUrl"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentTelegram"
                 @click.prevent="deleteTelegram"
@@ -120,7 +122,7 @@ export default {
                 this.checkTelegramUrl();
             }
 
-            if (this.showTelegramError) {
+            if (this.telegramError) {
                 return;
             }
 
@@ -150,12 +152,12 @@ export default {
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.notifySuccess(`Telegram invitation link ${state} successfully`);
                         this.editing = false;
-                    } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Can not save telegram', response);
                     }
                     this.submitting = false;
-                });
+                }, (error) => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save telegram', response);
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

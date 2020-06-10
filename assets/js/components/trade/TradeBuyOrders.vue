@@ -23,19 +23,11 @@
                             @row-clicked="orderClicked"
                             :items="tableData"
                             :fields="fields"
+                            :tbody-tr-class="rowClass"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span
-                                        v-if="row.item.isAnonymous"
-                                        class="d-inline-block truncate-name flex-grow-1 c-pointer"
-                                        v-b-tooltip="popoverConfig"
-                                        v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
-                                    >
-                                        {{ row.value }}
-                                    </span>
                                     <a
-                                        v-else
                                         :href="row.item.traderUrl"
                                         class="d-flex flex-row flex-nowrap justify-content-between w-100"
                                         v-b-tooltip="popoverConfig"
@@ -59,16 +51,6 @@
                             <p class="text-center p-5">No order was added yet</p>
                         </div>
                     </div>
-                    <div class="text-center pb-2" v-if="showDownArrow && !loading">
-                        <img
-                            src="../../../img/down-arrows.png"
-                            class="icon-arrows-down c-pointer"
-                            alt="arrow down"
-                            @click="scrollDown">
-                    </div>
-                    <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
                 </template>
                 <template v-else>
                     <div class="p-5 text-center">
@@ -90,6 +72,7 @@ import {
     OrderClickedMixin,
     RebrandingFilterMixin,
     TraderHoveredMixin,
+    OrderHighlights,
 } from '../../mixins/';
 
 export default {
@@ -100,6 +83,7 @@ export default {
         OrderClickedMixin,
         RebrandingFilterMixin,
         TraderHoveredMixin,
+        OrderHighlights,
     ],
     props: {
         fullOrdersList: [Array],
@@ -109,6 +93,10 @@ export default {
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
+        ordersUpdated: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -140,10 +128,25 @@ export default {
                 this.$emit('update-data', {attach, resolve});
             });
         },
+        rowClass: function(item, type) {
+            return 'row' === type && item.highlightClass
+                ? item.highlightClass
+                : '';
+        },
     },
     watch: {
-        ordersList: function(val) {
-            this.tableData = val;
+        ordersList: function(newOrders) {
+            let delayOrdersUpdating = this.ordersUpdated
+                ? this.handleOrderHighlights(this.tableData, newOrders)
+                : false;
+
+            if (delayOrdersUpdating) {
+                setTimeout(()=> this.tableData = newOrders, 1000);
+            } else {
+                this.tableData = newOrders;
+            }
+
+            setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
         },
     },
 };
