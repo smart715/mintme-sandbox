@@ -4,10 +4,13 @@ namespace App\Tests\Command;
 
 use App\Command\UpdatePendingWithdrawals;
 use App\Entity\Crypto;
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
+use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Wallet\Model\Amount;
@@ -100,20 +103,31 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $repo = $this->createMock(PendingWithdrawRepository::class);
-        $repo->expects($this->exactly(2))
+        $repo->expects($this->exactly(1))
             ->method('findAll')
             ->willReturn(array_map(function () {
                 return $this->mockPending();
             }, range(1, $lockCount)));
 
-        $em->method('getRepository')->willReturn($repo);
+        $em->method('getRepository')->with(PendingWithdraw::class)->willReturn($repo);
+
+        $repo = $this->createMock(PendingTokenWithdrawRepository::class);
+        $repo->expects($this->exactly(1))
+            ->method('findAll')
+            ->willReturn(array_map(function () {
+                return $this->mockPending(true);
+            }, range(1, $lockCount)));
+
+        $em->method('getRepository')->with(PendingTokenWithdraw::class)->willReturn($repo);
 
         return $em;
     }
 
-    private function mockPending(): PendingWithdraw
+    private function mockPending(bool $token = false): PendingWithdrawInterface
     {
-        $lock = $this->createMock(PendingWithdraw::class);
+        $lock = $token
+            ? $this->createMock(PendingTokenWithdraw::class)
+            : $this->createMock(PendingWithdraw::class);
 
         $lock->method('getDate')->willReturn(new DateTimeImmutable('now - 1 day'));
         $lock->method('getUser')->willReturn($this->createMock(User::class));
