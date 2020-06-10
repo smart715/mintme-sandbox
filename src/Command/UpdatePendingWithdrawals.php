@@ -7,6 +7,7 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use DateInterval;
@@ -133,7 +134,7 @@ class UpdatePendingWithdrawals extends Command
         return $this->em->getRepository(PendingWithdraw::class);
     }
 
-    private function getPendingTokenWithdrawRepository(): PendingWithdrawRepository
+    private function getPendingTokenWithdrawRepository(): PendingTokenWithdrawRepository
     {
         return $this->em->getRepository(PendingTokenWithdraw::class);
     }
