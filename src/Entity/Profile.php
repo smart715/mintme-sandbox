@@ -6,10 +6,10 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use ZipCodeValidator\Constraints\ZipCode;
 
 /**
@@ -38,7 +38,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @AppAssert\ProfileNameRequired()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -50,7 +49,6 @@ class Profile
      * @ORM\Column(type="string", nullable=true)
      * @AppAssert\ProfileNameRequired()
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
      * @Groups({"API", "Default"})
@@ -284,5 +282,26 @@ class Profile
         return $args->hasChangedField($name)
             && null !== $args->getOldValue($name)
             && ($args->getOldValue($name) || $args->getNewValue($name));
+    }
+    /**
+    * @Assert\Callback
+    */
+    public function validateNames(ExecutionContextInterface $context, ?string $payload): void
+    {
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getFirstName()))) {
+            if (2 > strlen(strval($this->getFirstName()))) {
+                $context->buildViolation('This value is too short. It should have 2 characters or more.')
+                ->atPath('firstName')
+                ->addViolation();
+            }
+        }
+
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getLastName()))) {
+            if (2 > strlen(strval($this->getLastName()))) {
+                $context->buildViolation('This value is too short. It should have 2 characters or more.')
+                ->atPath('lastName')
+                ->addViolation();
+            }
+        }
     }
 }
