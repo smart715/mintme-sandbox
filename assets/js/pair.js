@@ -26,7 +26,6 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
-      showContractAddressAfterDeploy: 0,
     };
   },
   components: {
@@ -50,7 +49,6 @@ new Vue({
             if (response.data.deployed === true) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
-                this.showContractAddressAfterDeploy++;
                 clearInterval(this.deployInterval);
             }
             this.retryCount++;
@@ -85,6 +83,9 @@ new Vue({
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
+    },
+    getTokenContractAddress: function(address) {
+      return this.tokenDeployed ? address : null;
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;

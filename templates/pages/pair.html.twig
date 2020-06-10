@@ -53,14 +53,13 @@
                                     profile-url="{{ absolute_url(path('profile-view', { 'nickname': token.getProfile().getNickname() })) }}"
                                     token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    token-contract-address="{{ token.address }}"
+                                    :token-contract-address="getTokenContractAddress({{ token.address |json_encode }})"
                                     token-name="{{ market.quote.name }}"
                                     telegram-url="{{ token.telegramUrl }}"
                                     discord-url="{{ token.discordUrl }}"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
                                     @updated-youtube="youtubeUpdated"
-                                    :key="showContractAddressAfterDeploy"
                             >
                             </token-introduction-profile>
                             <token-introduction-statistics
