@@ -50,7 +50,6 @@ class ProfileType extends AbstractType
                 'label' => 'First name:',
                 'required' => false,
                 'attr' => [
-                    'minlength' => 2,
                     'maxlength' => 30,
                 ],
             ])
@@ -58,7 +57,6 @@ class ProfileType extends AbstractType
                 'label' => 'Last name:',
                 'required' => false,
                 'attr' => [
-                    'minlength' => 2,
                     'maxlength' => 30,
                 ],
             ])

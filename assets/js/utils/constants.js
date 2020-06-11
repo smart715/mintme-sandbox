@@ -14,6 +14,7 @@ export const tokenNameValidChars = helpers.regex('validChars', /^[-\sA-Za-z0-9]+
 
 export const nickname = helpers.regex('nickname', /^[A-Za-z]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
+export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
 
 export const FORBIDDEN_WORDS = ['token', 'coin'];
 export const HTTP_OK = 200;
@@ -35,6 +36,7 @@ export const GENERAL = {
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const tokSymbol = 'TOK';
+export const webBtcSymbol = 'WEBBTC';
 
 export const cryptoSymbols = [
     webSymbol,

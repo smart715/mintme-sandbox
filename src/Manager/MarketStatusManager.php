@@ -198,4 +198,18 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         return $info;
     }
+
+    /**
+     * Return market status
+     *
+     * @param Market $market
+     * @return MarketStatus|null
+     */
+    public function getMarketStatus(Market $market): ?MarketStatus
+    {
+        return $this->repository->findByBaseQuoteNames(
+            $market->getBase()->getSymbol(),
+            $market->getQuote()->getSymbol()
+        );
+    }
 }

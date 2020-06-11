@@ -1,8 +1,9 @@
 <template>
-        <img :src="loadImage" @load="nextLoad">
+    <img :src="loadImage" @load="nextLoad">
 </template>
 
 <script>
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'NewsImage',
@@ -17,26 +18,33 @@ export default {
     },
     computed: {
         query: function() {
-            return this.$store.state.query.length;
+            return this.query.length;
         },
+        ...mapGetters('newsImages', {
+            query: 'getQuery',
+        }),
     },
     watch: {
         query() {
             if (0 == this.queryNumber) {
                 this.loadImage = this.src;
             }
-            if ((this.queryNumber) === this.$store.state.query[0]) {
+            if ((this.queryNumber) === this.query[0]) {
                 this.loadImage = this.src;
             }
         },
     },
     mounted: function() {
-        this.$store.commit('addOrder', this.queryNumber);
+        this.addOrder(this.queryNumber);
     },
     methods: {
         nextLoad: function() {
-            this.$store.commit('deleteOrder');
+            this.deleteOrder();
         },
+        ...mapMutations('newsImages', [
+            'addOrder',
+            'deleteOrder',
+        ]),
     },
 };
 </script>

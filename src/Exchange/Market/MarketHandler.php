@@ -16,6 +16,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
+use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
 {
@@ -308,14 +309,17 @@ class MarketHandler implements MarketHandlerInterface
             $this->marketNameConverter->convert($market),
             $period
         );
+
+        if (!$result) {
+            throw new InvalidArgumentException();
+        }
+
         $monthResult = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
             self::MONTH_PERIOD
         );
 
-        if (!$result) {
-            throw new InvalidArgumentException();
-        }
+        $buyDepth = $this->getBuyDepth($market);
 
         return new MarketInfo(
             $market->getBase()->getSymbol(),
@@ -351,6 +355,10 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $monthResult['deal'],
                 $this->getSymbol($market->getBase())
+            ),
+            $this->moneyWrapper->parse(
+                $buyDepth,
+                $this->getSymbol($market->getBase())
             )
         );
     }
@@ -360,5 +368,40 @@ class MarketHandler implements MarketHandlerInterface
         return $tradeble instanceof Token
             ? MoneyWrapper::TOK_SYMBOL
             : $tradeble->getSymbol();
+    }
+
+    /**
+     * Get market buy depth
+     *
+     * @param Market $market
+     * @return string
+     */
+    public function getBuyDepth(Market $market): string
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedOrders);
+
+        $zeroDepth = $this->moneyWrapper->parse(
+            '0',
+            $market->isTokenMarket() ? Token::TOK_SYMBOL : $market->getQuote()->getSymbol()
+        );
+
+        /** @var Money $depthAmount */
+        $depthAmount = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->multiply(
+                $this->moneyWrapper->format($order->getAmount())
+            )->add($sum);
+        }, $zeroDepth);
+
+        return $this->moneyWrapper->format($depthAmount);
     }
 }

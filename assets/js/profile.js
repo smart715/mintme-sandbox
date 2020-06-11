@@ -6,8 +6,9 @@ import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
 import Guide from './components/Guide';
-import {names, nickname} from './utils/constants';
+import {names, allNames, nickname} from './utils/constants';
 
+const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
 const nameRequired = function(val, other) {
     return !val && other;
 };
@@ -33,6 +34,8 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
+            firstNameAux: false,
+            lastNameAux: false,
         };
     },
     mounted: function() {
@@ -57,6 +60,25 @@ new Vue({
         toggleZipCodeInputDisabled: function(state) {
             if (this.$refs.zipCode) {
                 this.$refs.zipCode.disabled = state;
+            }
+        },
+
+        validation: function(event) {
+            if (event.target.id ==='profile_firstName') {
+                let hasChinese = this.firstName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                    this.firstNameAux = false;
+                } else {
+                    this.firstNameAux = this.firstName.length < 2;
+                }
+            }
+            if (event.target.id ==='profile_lastName') {
+                let hasChinese = this.lastName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                    this.lastNameAux = false;
+                } else {
+                    this.lastNameAux = this.lastName.length < 2;
+                }
             }
         },
         countryChanged: function() {
@@ -108,7 +130,7 @@ new Vue({
     },
     computed: {
         disableSave: function() {
-            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing;
+            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing || this.firstNameAux || this.lastNameAux;
         },
     },
     validations() {
@@ -119,13 +141,11 @@ new Vue({
             },
             firstName: {
                 required: (val) => !nameRequired(val, this.lastName),
-                helpers: names,
-                minLength: minLength(2),
+                helpers: allNames,
             },
             lastName: {
                 required: (val) => !nameRequired(val, this.firstName),
-                helpers: names,
-                minLength: minLength(2),
+                helpers: allNames,
             },
             city: {
                 helpers: names,
