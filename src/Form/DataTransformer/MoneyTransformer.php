@@ -34,9 +34,7 @@ class MoneyTransformer implements DataTransformerInterface
     
     /**
      * {@inheritdoc}
-    
      *
-    
      * @param string $value
      */
     public function reverseTransform($value): Money
