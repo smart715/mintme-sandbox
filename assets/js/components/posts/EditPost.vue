@@ -3,6 +3,7 @@
         :api-url="$routing.generate('edit_post', {id: post.id})"
         :post="post"
         @save-success="redirect"
+        @cancel="redirect"
     >
         <template v-slot:title>Edit Post</template>
     </post-form>

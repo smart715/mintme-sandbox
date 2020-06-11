@@ -45,8 +45,8 @@
             >
                 Save
             </button>
-            <button v-if="showCancel" class="btn btn-cancel"
-                @click="reset"
+            <button class="btn btn-cancel"
+                @click="cancel"
             >
                 Cancel
             </button>
@@ -90,7 +90,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        showCancel: {
+        resetCancel: {
             type: Boolean,
             default: false,
         },
@@ -202,6 +202,12 @@ export default {
         reset() {
             this.content = '';
             this.amount = '0';
+        },
+        cancel() {
+            this.$emit('cancel');
+            if (this.resetCancel) {
+                this.reset();
+            }
         },
     },
     watch: {
