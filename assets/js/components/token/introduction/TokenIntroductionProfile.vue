@@ -275,7 +275,7 @@ export default {
         console.log(this.tokenContractAddress);
     },
     beforeUpdate: function() {
-        if(isTokenDeployed) {
+        if (isTokenDeployed) {
             console.log(this.tokenContractAddress);
             this.$refs.address.innerText = this.tokenContractAddress;
         }
