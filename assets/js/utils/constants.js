@@ -36,6 +36,7 @@ export const GENERAL = {
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const tokSymbol = 'TOK';
+export const webBtcSymbol = 'WEBBTC';
 
 export const cryptoSymbols = [
     webSymbol,

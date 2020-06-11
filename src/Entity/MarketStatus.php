@@ -74,6 +74,13 @@ class MarketStatus
      */
     private $monthVolume;
 
+    /**
+     * @ORM\Column(type="string")
+     * @SWG\Property(type="number")
+     * @var string
+     */
+    private $buyDepth;
+
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
@@ -82,6 +89,7 @@ class MarketStatus
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
+        $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
     }
 
     /**
@@ -161,7 +169,16 @@ class MarketStatus
         $this->lastPrice = $marketInfo->getLast()->getAmount();
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
+        $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
 
         return $this;
+    }
+
+    /**
+     * @Groups({"API", "dev"})
+     */
+    public function getBuyDepth(): Money
+    {
+        return new Money($this->buyDepth, new Currency($this->crypto->getSymbol()));
     }
 }
