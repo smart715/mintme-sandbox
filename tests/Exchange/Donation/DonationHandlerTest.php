@@ -73,6 +73,7 @@ class DonationHandlerTest extends TestCase
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
+            $this->mockCryptoManager($base),
             $bh,
             $this->donationParams
         );
@@ -123,11 +124,22 @@ class DonationHandlerTest extends TestCase
         /** @var User|MockObject $donorUser */
         $donorUser = $this->createMock(User::class);
 
+        $cryptoManager = $this->mockCryptoManager($webCrypto);
+        $cryptoManager
+            ->expects($this->once())
+            ->method('findAllIndexed')
+            ->with('symbol')
+            ->willReturn([
+                Token::WEB_SYMBOL => $this->mockCrypto(),
+                Token::BTC_SYMBOL => $this->mockCrypto(),
+            ]);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
             $this->mockMoneyWrapper(),
             $this->mockCryptoRatesFetcher(),
+            $cryptoManager,
             $bh,
             $this->donationParams
         );
@@ -160,5 +172,21 @@ class DonationHandlerTest extends TestCase
         ]);
 
         return $crf;
+    }
+
+    /** @return CryptoManagerInterface|MockObject */
+    private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
+    {
+        $manager = $this->createMock(CryptoManagerInterface::class);
+
+        $manager
+            ->method('findBySymbol')
+            ->willReturnCallback(function (string $symbol) use ($crypto) {
+                return $crypto->getSymbol() == $symbol
+                    ? $crypto
+                    : null;
+            });
+
+        return $manager;
     }
 }
