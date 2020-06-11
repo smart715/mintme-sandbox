@@ -902,6 +902,9 @@ input[type=search]::-webkit-search-cancel-button
   background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
 
 .bootstrap-datetimepicker-widget
+  &, &:hover, &:focus, &:active
+    background-color: $secondary-dark
+
   table
     thead tr:first-child th:hover,
     td.day:hover,
@@ -911,6 +914,10 @@ input[type=search]::-webkit-search-cancel-button
     td span:hover,
     td i:hover
       color: $blue !important
+
+  svg
+    color: $white !important
+
 
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large
