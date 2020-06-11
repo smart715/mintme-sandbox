@@ -2,9 +2,11 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
+                :is-token="isToken"
                 class="col"
                 :websocket-url="websocketUrl"
                 :market="market"
+                :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
             />
@@ -108,6 +110,7 @@ export default {
         precision: Number,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        isToken: Boolean,
     },
     data() {
         return {
@@ -116,6 +119,7 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
+            buyDepth: null,
             ordersUpdated: false,
         };
     },
@@ -179,6 +183,7 @@ export default {
                     })).then((result) => {
                         this.buyOrders = this.sortOrders(result.data.buy, false);
                         this.sellOrders = this.sortOrders(result.data.sell, true);
+                        this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not update orders', err);
