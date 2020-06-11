@@ -17,6 +17,8 @@ use App\Utils\Converter\MarketNameConverterInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Throwable;
 
 class MarketHandlerTest extends TestCase
@@ -334,6 +336,8 @@ class MarketHandlerTest extends TestCase
             'deal' => '7',
         ];
 
+        $buyDepth = '100';
+
         $fetcher = $this->mockMarketFetcher();
         $fetcher->method('getMarketInfo')
             ->withConsecutive(
@@ -344,6 +348,9 @@ class MarketHandlerTest extends TestCase
                 ['deal' => '0']
             );
 
+        $fetcher->method('getMarketDepth')
+            ->with('convertedmarket', 2)
+            ->willReturn($buyDepth);
 
         $mh = new MarketHandler(
             $fetcher,
@@ -364,6 +371,8 @@ class MarketHandlerTest extends TestCase
             'low' => $info->getLow()->getAmount(),
             'deal' => $info->getDeal()->getAmount(),
         ]);
+
+        $this->assertEquals($buyDepth, $info->getBuyDepth()->getAmount());
 
         $this->assertEquals('0', $info->getMonthDeal()->getAmount());
     }
