@@ -84,9 +84,6 @@ new Vue({
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
     },
-    getTokenContractAddress: function(address) {
-      return this.tokenDeployed ? address : null;
-    },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
     },
