@@ -100,9 +100,7 @@
                                                     :max-width="'200px'"
                                                 >
                                                     <template slot="body">
-                                                        Amount of tokens you will receive may vary greatly
-                                                        depending on the current situation.
-                                                        It can be much less than suggested here.
+                                                        The number of tokens you will receive may vary slightly, because of other traders' activity.
                                                     </template>
                                                 </guide>
                                             </p>
