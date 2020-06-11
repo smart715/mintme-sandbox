@@ -361,6 +361,7 @@ services:
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
+            $marketConsumerEnabled: "%market_consumer_enabled%"
 
     App\Controller\API\WebSocketController:
         arguments:
@@ -544,7 +545,7 @@ services:
             - { name: 'kernel.event_listener', event: 'kernel.response' }
 
     App\Security\PathRoles:
-        arguments: 
+        arguments:
             $accessMap: '@security.access_map'
 
     App\Form\DataTransformer\MoneyTransformer:
