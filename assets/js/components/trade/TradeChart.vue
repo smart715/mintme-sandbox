@@ -54,6 +54,19 @@
                     <br>
                     {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
+                <div class="my-1 text-center" v-if="isToken">
+                    <span>Buy Depth: </span>
+                    <guide>
+                        <template slot="header">
+                            Buy Depth
+                        </template>
+                        <template slot="body">
+                            Buy depth is amount of buy orders in MINTME on each market. This might better represent token market size than marketcap.
+                        </template>
+                    </guide>
+                    <br>
+                    {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
+                </div>
                 <div class="my-1 text-center text-lg-right">
                     <span>Market Cap: </span>
                     <guide>
@@ -98,7 +111,7 @@ import {
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
-import {WEB} from '../../utils/constants.js';
+import {WEB, webBtcSymbol} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
@@ -108,6 +121,8 @@ export default {
         market: Object,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        buyDepth: String,
+        isToken: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -219,7 +234,7 @@ export default {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
 
-        if ('WEBBTC' === this.market.identifier) {
+        if (webBtcSymbol === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
             });
@@ -314,7 +329,7 @@ export default {
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
             let marketCap;
 
-            if ('WEBBTC' === this.market.identifier && 1e7 === this.supply) {
+            if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
                 this.notifyError('Can not update the market cap for BTC / MINTME');
                 marketCap = 0;
             } else {

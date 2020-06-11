@@ -102,15 +102,30 @@
                         </guide>
                     </template>
                     <template v-slot:[`head(${fields.marketCap.key})`]="data">
-                        {{ data.label|rebranding }}
-                        <guide>
-                            <template slot="header">
-                                Market Cap
+                        <b-dropdown
+                                id="marketCap"
+                                variant="primary"
+                                :lazy="true"
+                        >
+                            <template slot="button-content">
+                                {{ data.label|rebranding }}
                             </template>
-                            <template slot=body>
-                                Market cap based on max supply of 10 million tokens.
-                                Market cap is not shown if 30d volume is lower than
-                                {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
+                            <template>
+                                <b-dropdown-item
+                                        v-for="(option, key) in marketCapOptions"
+                                        :key="key"
+                                        @click="setActiveMarketCap(key)"
+                                >
+                                    {{ option.label|rebranding }}
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                        <guide class="ml-1 mr-2">
+                            <template slot="header">
+                                {{ data.label|rebranding }}
+                            </template>
+                            <template slot="body">
+                                {{ data.field.help|rebranding}}
                             </template>
                         </guide>
                     </template>
@@ -216,6 +231,7 @@ export default {
                 USD: 0,
             },
             activeVolume: 'month',
+            activeMarketCap: 'marketCap',
             marketFilters: {
                 userSelected: false,
                 selectedFilter: 'deployed',
@@ -244,6 +260,19 @@ export default {
                     key: 'monthVolume',
                     label: '30d Volume',
                     help: 'The amount of crypto that has been traded in the last 30 days.',
+                },
+            },
+            marketCapOptions: {
+                marketCap: {
+                    key: 'marketCap',
+                    label: 'Market Cap',
+                    help: 'Market cap based on max supply of 10 million tokens.',
+                },
+                buyDepth: {
+                    key: 'buyDepth',
+                    label: 'Buy Depth',
+                    help: 'Buy depth is amount of buy orders in MINTME on each market. This might better represent ' +
+                    'token market size than marketcap.',
                 },
             },
         };
@@ -309,10 +338,10 @@ export default {
                     formatter: formatMoney,
                 },
                 marketCap: {
-                    label: 'Market Cap',
-                    key: 'marketCap' + ( this.showUsd ? USD.symbol : ''),
+                    ...this.marketCapOptions[this.activeMarketCap],
+                    key: this.marketCapOptions[this.activeMarketCap].key + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(this.marketCapFormatter(value, key, item)),
+                    formatter: 'marketCap' === this.activeMarketCap ? this.marketCapFormatter : formatMoney,
                 },
             };
         },
@@ -321,9 +350,9 @@ export default {
         },
         globalMarketCap: function() {
             if (this.showUsd) {
-                return this.globalMarketCaps[USD.symbol] + ' ' + USD.symbol;
+                return this.globalMarketCaps[USD.symbol] + USD.symbol;
             }
-            return this.globalMarketCaps[BTC.symbol] + ' ' + BTC.symbol;
+            return this.globalMarketCaps[BTC.symbol] + BTC.symbol;
         },
     },
     mounted() {
@@ -463,6 +492,7 @@ export default {
             const marketPrecision = this.markets[marketName].base.subunit;
             const supply = this.markets[marketName].supply;
             const monthVolume = this.markets[marketName].monthVolume;
+            const buyDepth = this.markets[marketName].buyDepth;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -480,6 +510,7 @@ export default {
                 supply,
                 marketPrecision,
                 tokenized,
+                buyDepth,
                 position
             );
 
@@ -496,7 +527,19 @@ export default {
                 dayVolume: marketInfo.deal,
             };
         },
-        getSanitizedMarket: function(currency, token, changePercentage, lastPrice, volume, monthVolume, supply, subunit, tokenized, position) {
+        getSanitizedMarket: function(
+            currency,
+            token,
+            changePercentage,
+            lastPrice,
+            volume,
+            monthVolume,
+            supply,
+            subunit,
+            tokenized,
+            buyDepth,
+            position
+        ) {
             let hiddenName = this.findHiddenName(token);
             let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
                 ? 0
@@ -517,6 +560,7 @@ export default {
                 monthVolumeUSD: this.toUSD(monthVolume, currency),
                 marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
+                buyDepth: this.toMoney(buyDepth) + ' ' + currency,
                 tokenized: tokenized,
                 base: currency,
                 quote: token,
@@ -570,6 +614,7 @@ export default {
                         this.markets[market].supply,
                         this.markets[market].base.subunit,
                         tokenized,
+                        parseFloat(this.markets[market].buyDepth),
                         this.markets[market].position
                     );
                     if (marketOnTopIndex > -1) {
@@ -622,6 +667,7 @@ export default {
                 market.supply,
                 market.base.subunit,
                 tokenized,
+                market.buyDepth,
                 market.position
                 );
 
@@ -706,6 +752,7 @@ export default {
                 market.supply,
                 market.base.subunit,
                 false,
+                market.buyDepth,
                 market.position
             );
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
@@ -741,6 +788,11 @@ export default {
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
             this.sortBy = this.volumes[this.activeVolume].key;
+            this.sortDesc = true;
+        },
+        setActiveMarketCap: function(marketCap) {
+            this.activeMarketCap = marketCap;
+            this.sortBy = this.marketCapOptions[this.activeMarketCap].key;
             this.sortDesc = true;
         },
         setTokenPositions: function(tokens) {
