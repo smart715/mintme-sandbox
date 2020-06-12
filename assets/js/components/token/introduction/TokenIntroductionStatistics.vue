@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 Statistics
                 <guide class="float-right">
@@ -17,6 +17,30 @@
             </div>
             <div class="card-body">
                 <template v-if="loaded">
+                    <div class="row px-3 pb-3">
+                        <div v-if="isTokenDeployed"
+                            class="truncate-address d-flex flex-column align-items-start flex-nowrap mt-auto overflow-auto"
+                        >
+                            <strong class="mr-2">Token contract address:</strong>
+                            <div>
+                                <span>{{ tokenContractAddress }}</span>
+                                <copy-link
+                                    class="c-pointer"
+                                    :content-to-copy="tokenContractAddress"
+                                >
+                                   <font-awesome-icon :icon="['far', 'copy']" />
+                                </copy-link>
+                                <guide>
+                                    <template slot="header">
+                                        Token contract address
+                                    </template>
+                                    <template slot="body">
+                                        Unique token contract address, created when token is deployed to blockchain. It's required when adding token to MintMe Wallet application.
+                                    </template>
+                                </guide>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col pr-1">
                             <div class="font-weight-bold pb-4">
@@ -158,12 +182,14 @@
 </template>
 
 <script>
-import {Decimal} from 'decimal.js';
+import CopyLink from '../../CopyLink';
 import Guide from '../../Guide';
+import {Decimal} from 'decimal.js';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {tokenDeploymentStatus} from '../../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
-
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
 
 const defaultValue = '-';
 
@@ -171,12 +197,16 @@ export default {
     name: 'TokenIntroductionStatistics',
     mixins: [MoneyFilterMixin, NotificationMixin, LoggerMixin],
     components: {
+        CopyLink,
+        FontAwesomeIcon,
         Guide,
     },
     props: {
-        tokenCreated: String,
+        deploymentStatus: String,
         market: Object,
         precision: Number,
+        tokenContractAddress: String,
+        tokenCreated: String,
     },
     data() {
         return {
@@ -280,6 +310,9 @@ export default {
             set(val) {
                 this.setStats(val);
             },
+        },
+        isTokenDeployed: function() {
+            return tokenDeploymentStatus.deployed === this.deploymentStatus;
         },
     },
     filters: {
