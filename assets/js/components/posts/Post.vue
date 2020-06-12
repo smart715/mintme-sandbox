@@ -15,7 +15,7 @@
         <button v-if="showEdit"
             class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
             :disabled="deleteDisabled"
-            @click="deletePost"
+            @click="showModal"
         >
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -33,6 +33,15 @@
                 transform="shrink-4 up-1.5"
             />
         </a>
+        <confirm-modal
+            :visible="isModalVisible"
+            @confirm="deletePost"
+            @close="closeModal"
+        >
+            <p class="text-white modal-title pt-2">
+                Do you really want to delete this post?
+            </p>
+        </confirm-modal>
     </div>
 </template>
 
@@ -43,6 +52,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
+import ConfirmModal from '../modal/ConfirmModal';
 
 library.add(faEdit);
 library.add(faTrash);
@@ -55,6 +65,7 @@ export default {
     ],
     components: {
         BbcodeView,
+        ConfirmModal,
         FontAwesomeIcon,
     },
     props: {
@@ -71,6 +82,7 @@ export default {
     data() {
         return {
             deleteDisabled: false,
+            isModalVisible: false,
         };
     },
     computed: {
@@ -90,6 +102,12 @@ export default {
             .catch(() => {
                 this.notifyError('Error deleting post.');
             });
+        },
+        showModal() {
+            this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
         },
     },
 };
