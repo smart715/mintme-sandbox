@@ -34,9 +34,7 @@ class UpdateOutdatedAirdropsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
         $countUpdated = $this->manager->updateOutdatedAirdrops();
-
         $io->success($countUpdated . ' airdrops updated.');
 
         return 0;
