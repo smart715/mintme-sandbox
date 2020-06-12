@@ -11,6 +11,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
+use App\Manager\MarketStatusManager;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -136,7 +137,7 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\View()
      * @return mixed[]
      */
-    public function getPendingOrders(Market $market, int $page): array
+    public function getPendingOrders(Market $market, MarketStatusManager $marketStatusManager, int $page): array
     {
         $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
             $market,
@@ -148,10 +149,12 @@ class OrdersController extends AbstractFOSRestController
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+        $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
+            'buyDepth' => $buyDepth,
         ];
     }
 

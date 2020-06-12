@@ -97,6 +97,7 @@
                 {% if showTrade %}
                     <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
                         <trade
+                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
                             websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
                             login-url="{{ path('fos_user_security_login') }}"
