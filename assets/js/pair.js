@@ -1,12 +1,14 @@
-import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
-import Trade from './components/trade/Trade';
-import TokenPointsProgress from './components/token/TokenPointsProgress';
-import TokenIntroductionProfile from './components/token/introduction/TokenIntroductionProfile';
-import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
-import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
-import TokenName from './components/token/TokenName';
+import CreatePost from './components/posts/CreatePost';
+import Posts from './components/posts/Posts';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
+import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
+import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
+import TokenName from './components/token/TokenName';
+import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
+import TokenPointsProgress from './components/token/TokenPointsProgress';
+import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
 import TopHolders from './components/trade/TopHolders';
+import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus} from './utils/constants';
 
@@ -15,25 +17,31 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
+      tabs: ['intro', 'trade', 'posts'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
       tokenYoutube: null,
+      tokenDiscord: null,
+      tokenTelegram: null,
       editingName: false,
       tokenName: null,
       tokenPending: null,
+      posts: null,
     };
   },
   components: {
-    TokenOngoingAirdropCampaign,
-    Trade,
-    TokenIntroductionProfile,
-    TokenIntroductionStatistics,
-    TokenIntroductionDescription,
-    TokenName,
+    CreatePost,
+    Posts,
     TokenDeployIcon,
-    TopHolders,
+    TokenIntroductionDescription,
+    TokenIntroductionStatistics,
+    TokenName,
+    TokenOngoingAirdropCampaign,
     TokenPointsProgress,
+    TokenSocialMediaIcons,
+    TopHolders,
+    Trade,
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -45,7 +53,7 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: i ? 'trade' : 'intro',
+              tab: this.tabs[i],
             })
         );
       }
@@ -60,10 +68,31 @@ new Vue({
       this.tokenFacebook = val;
     },
     websiteUpdated: function(val) {
-        this.tokenWebsite = val;
+      this.tokenWebsite = val;
     },
     youtubeUpdated: function(val) {
-        this.tokenYoutube = val;
+      this.tokenYoutube = val;
+    },
+    discordUpdated: function(val) {
+      this.tokenDiscord = val;
+    },
+    telegramUpdated: function(val) {
+      this.tokenTelegram = val;
+    },
+    updatePosts: function() {
+      this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
+      .then((res) => {
+        this.posts = res.data;
+      });
+    },
+    goToPosts: function() {
+      this.tabIndex = 2;
+    },
+    deletePost: function(index) {
+      this.posts.splice(index, 1);
+    },
+    coalesce: function(a, b) {
+      return null !== a ? a : b;
     },
   },
   store,
