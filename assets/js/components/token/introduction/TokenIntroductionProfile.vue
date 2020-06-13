@@ -275,10 +275,10 @@ export default {
         },
     },
     mounted: function() {
-        console.log('profile mountd' + this.tokenContractAddress);
+        console.log('profile mountd' + this.showContractAddress);
     },
     updated: function() {
-            console.log('profile upd' + this.tokenContractAddress);
+            console.log('profile upd' + this.showContractAddress);
     },
     watch: {
         editingUrls: function() {

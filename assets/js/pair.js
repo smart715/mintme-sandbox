@@ -27,7 +27,7 @@ new Vue({
       retryCount: 0,
       retryCountLimit: 10,
       tokenAddressTimeout: null,
-      tokenAddressGenerated: null,
+      tokenAddress: '',
     };
   },
   components: {
@@ -69,14 +69,19 @@ new Vue({
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
           if (response.status === HTTP_OK) {
-            this.tokenAddressGenerated = true;
-            console.log('axios' + response.data.address);
+            this.tokenAddress = response.data.address;
+            console.log('axios' + this.tokenAddress);
             clearTimeout(this.tokenAddressTimeout);
           }
         }, (error) => {
             this.notifyError('An error has occurred, please try again later');
         });
       }, 2000);
+    },
+  },
+  computed: {
+    tokenContractAddress: function() {
+      return this.tokenAddress;
     },
   },
   methods: {
@@ -101,9 +106,6 @@ new Vue({
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
-    },
-    getTokenAddress: function(address) {
-      return this.tokenAddressGenerated ? address : 'empty string';
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
