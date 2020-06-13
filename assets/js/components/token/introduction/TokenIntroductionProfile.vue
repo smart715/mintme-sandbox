@@ -274,12 +274,6 @@ export default {
             return this.tokenContractAddress;
         },
     },
-    mounted: function() {
-        console.log('profile mountd' + this.showContractAddress);
-    },
-    updated: function() {
-            console.log('profile upd' + this.showContractAddress);
-    },
     watch: {
         editingUrls: function() {
             this.toggleEdit(null);
