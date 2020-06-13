@@ -127,7 +127,12 @@ parameters:
 
     #host for urls generated on commands
     mintme_url: 'mintme.com'
+
     contact_email: support@mintme.com
+
+    # enable it to be able to use market consumer for test
+    # this param have to be removed after splitting consumers for all branches.
+    market_consumer_enabled: false
 
     # expiration time for withdraws (in seconds)
     # should be kept to values that represent hours (3600, 7200, etc) unless for testing purposes
