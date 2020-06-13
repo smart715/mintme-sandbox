@@ -98,7 +98,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET"},
-     *     requirements={"tab" = "trade|intro|donation"},
+     *     requirements={"tab" = "trade|intro|donation|posts"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -174,6 +174,7 @@ class TokenController extends Controller
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($user, $token),
+            'posts' => $this->normalize($token->getPosts()),
         ]);
     }
 

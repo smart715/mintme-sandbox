@@ -19,7 +19,25 @@
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
-    <div class="row pt-5 justify-content-center">
+
+    {% if isTokenPage %}
+    <div class="row mt-5 justify-content-center">
+        <div class="col-md-10 d-flex justify-content-end">
+            <token-social-media-icons
+                youtube-client-id="{{ global_youtube_client_id }}"
+                facebook-app-id="{{ global_facebook_app_id }}"
+                token-name="{{ market.quote.name }}"
+                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+            />
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-3 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
             <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
@@ -42,37 +60,33 @@
                                     :editable="{{ isOwner }}"
                                     @updated="descriptionUpdated"
                             ></token-introduction-description>
-                            <token-introduction-profile
-                                    class="col-12 col-lg-6 pr-lg-2"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    profile-name="{{ profile.nickname }}"
-                                    website-url="{{ token.websiteUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    :editable="{{ isOwner }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'nickname': token.getProfile().getNickname() })) }}"
-                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
-                                    :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    token-contract-address="{{ token.address }}"
-                                    token-name="{{ market.quote.name }}"
-                                    telegram-url="{{ token.telegramUrl }}"
-                                    discord-url="{{ token.discordUrl }}"
-                                    @updated-website="websiteUpdated"
-                                    @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated"
+                        </div>
+                        <div class="row">
+                            <posts class="col-12 col-lg-7 pr-lg-1"
+                                :posts="posts || (posts = {{ posts | json_encode }})"
+                                :max="3"
+                                token-name="{{ token.name }}"
+                                token-page
+                                :show-edit="{{ isOwner }}"
+                                @go-to-posts="goToPosts"
+                                @delete-post="deletePost"
                             >
-                            </token-introduction-profile>
+                                <template v-slot:title>Recent posts</template>
+                            </posts>
                             <token-introduction-statistics
-                                class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
+                                class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
                                 release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
                                 twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
                                 token-created="{{ token.getCreated().format('d M Y') }}"
                                 :precision="{{ precision }}"
-                                websocket-url="{{ global_websocket_url }}"
-                            >
-                            </token-introduction-statistics>
+                                :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                token-contract-address="{{ token.address }}"
+
+                            />
+                        </div>
+                        <div class="row">
                             <top-holders
                                     class="col-12 mt-3"
                                     :token-name="{{ market.quote.symbol | json_encode }}">
@@ -112,6 +126,26 @@
                         </div>
                     </b-tab>
                 {% endif %}
+                {% if isTokenPage %}
+                    <b-tab title="Posts" {% if tab == 'posts' %} {{ 'active' }} {% endif %}>
+                        <div class="container-fluid">
+                            {% if is_granted('edit', token) %}
+                                <div class="row justify-content-center">
+                                    <create-post class="col-12 col-md-10 col-lg-8"
+                                        @update-posts="updatePosts"
+                                    />
+                                </div>
+                            {% endif %}
+                            <div class="row mt-3 justify-content-center">
+                                <posts class="col-12 col-md-10 col-lg-8"
+                                    :posts="posts || (posts = {{posts | json_encode}})"
+                                    :show-edit="{{ isOwner }}"
+                                    @delete-post="deletePost"
+                                />
+                            </div>
+                        </div>
+                    </b-tab>
+                {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         {% if token is defined %}
@@ -141,18 +175,30 @@
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <token-name
-                                        :editable="{{ isOwner }}"
-                                        :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
-                                        :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        :precision="{{ precision }}"
-                                        :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                        :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                        websocket-url="{{ global_websocket_url }}"
-                                        release-address="{{ token.mintDestination }}"
-                                        @token-deploy-pending="setTokenPending"
-                                        :airdrop-params="{{ airdrop_params | json_encode }}"
+                                    :editable="{{ isOwner }}"
+                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                                    :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
+                                    identifier="{{ market.quote.identifier }}"
+                                    name="{{ market.quote.name }}"
+                                    :precision="{{ precision }}"
+                                    :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    release-address="{{ token.mintDestination }}"
+                                    facebook-app-id="{{ global_facebook_app_id }}"
+                                    youtube-client-id="{{ global_youtube_client_id }}"
+                                    :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                                    :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                                    :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                                    :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                                    :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+                                    :airdrop-params="{{ airdrop_params | json_encode }}"
+                                    @token-deploy-pending="setTokenPending"
+                                    @updated-website="websiteUpdated"
+                                    @updated-facebook="facebookUpdated"
+                                    @updated-youtube="youtubeUpdated" 
+                                    @updated-discord="discordUpdated"
+                                    @updated-telegram="telegramUpdated"
                                 />
                             </div>
                         </li>

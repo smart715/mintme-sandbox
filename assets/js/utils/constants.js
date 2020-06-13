@@ -55,13 +55,6 @@ export const addressLength = {
     },
 };
 
-// tabIndex: tab
-export const tokenTabs = {
-    0: 'intro',
-    1: 'trade',
-    2: 'donation',
-};
-
 export const WSAPI = {
     order: {
         status: {

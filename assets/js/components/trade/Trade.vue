@@ -72,10 +72,10 @@ import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
 import {
-    WebSocketMixin,
-    NotificationMixin,
+    CheckInputMixin,
     LoggerMixin,
-    InputValidationMixin,
+    NotificationMixin,
+    WebSocketMixin,
 } from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
@@ -84,10 +84,10 @@ const WSAPI = Constants.WSAPI;
 export default {
     name: 'Trade',
     mixins: [
-        WebSocketMixin,
-        NotificationMixin,
+        CheckInputMixin,
         LoggerMixin,
-        InputValidationMixin,
+        NotificationMixin,
+        WebSocketMixin,
     ],
     components: {
         TradeBuyOrder,

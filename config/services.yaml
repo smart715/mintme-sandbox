@@ -555,3 +555,6 @@ services:
     App\Security\PathRoles:
         arguments:
             $accessMap: '@security.access_map'
+
+    App\Form\DataTransformer\MoneyTransformer:
+        shared: false
