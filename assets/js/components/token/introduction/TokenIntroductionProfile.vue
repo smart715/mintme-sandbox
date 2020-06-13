@@ -164,7 +164,7 @@
                         class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto"
                     >
                         <strong class="mr-2">Token contract address:</strong>
-                        <span>{{ tokenContractAddress }}</span>
+                        <span>{{ showContractAddress }}</span>
                         <copy-link
                             class="c-pointer"
                             :content-to-copy="tokenContractAddress"
@@ -270,12 +270,15 @@ export default {
         isTokenDeployed: function() {
             return tokenDeploymentStatus.deployed === this.deploymentStatus;
         },
+        showContractAddress: function() {
+            return this.tokenContractAddress;
+        },
     },
     mounted: function() {
-        console.log(this.tokenContractAddress);
+        console.log('profile mountd' + this.tokenContractAddress);
     },
     updated: function() {
-            console.log(this.tokenContractAddress);
+            console.log('profile upd' + this.tokenContractAddress);
     },
     watch: {
         editingUrls: function() {

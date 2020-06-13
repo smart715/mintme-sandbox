@@ -62,14 +62,15 @@ new Vue({
           });
       }, 60000);
     },
-    tokenDeployed: function() {
+    tokenDeployed: function(val) {
+      console.log('new value of tokendeployed' + val);
       clearTimeout(this.tokenAddressTimeout);
       this.tokenAddressTimeout = setTimeout(() => {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
           if (response.status === HTTP_OK) {
             this.tokenAddressGenerated = true;
-            console.log(this.tokenAddressGenerated);
+            console.log('axios' + response.data.address);
             clearTimeout(this.tokenAddressTimeout);
           }
         }, (error) => {
@@ -102,7 +103,7 @@ new Vue({
              status;
     },
     getTokenAddress: function(address) {
-      return this.tokenAddressGenerated ? address : '';
+      return this.tokenAddressGenerated ? address : 'empty string';
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
