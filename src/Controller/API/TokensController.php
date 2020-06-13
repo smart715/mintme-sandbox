@@ -55,7 +55,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     use CheckTokenNameBlacklistTrait;
 
-
     /** @var EntityManagerInterface */
     private $em;
 
