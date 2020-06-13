@@ -75,7 +75,7 @@ class MarketStatus
     private $monthVolume;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", options={"default": 0})
      * @SWG\Property(type="number")
      * @var string
      */
