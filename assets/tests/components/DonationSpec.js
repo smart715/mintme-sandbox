@@ -337,7 +337,9 @@ describe('Donation', () => {
 
         moxios.stubRequest('check_donation', {
             status: 202,
-            response: '2.5674',
+            response: {
+                amountToReceive: '2.5674',
+            },
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
@@ -346,7 +348,7 @@ describe('Donation', () => {
         expect(wrapper.vm.donationChecking).to.be.true;
 
         moxios.wait(() => {
-            expect(wrapper.vm.amountToReceive).to.be.equal(2.5674);
+            expect(wrapper.vm.amountToReceive).to.be.equal('2.5674');
             expect(wrapper.vm.donationChecking).to.be.false;
             done();
         });

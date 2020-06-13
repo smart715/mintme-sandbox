@@ -150,11 +150,11 @@
 <script>
 import _ from 'lodash';
 import {
+    CheckInputMixin,
     MoneyFilterMixin,
     NotificationMixin,
     LoggerMixin,
     RebrandingFilterMixin,
-    InputValidationMixin,
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
@@ -165,11 +165,11 @@ import {webSymbol, btcSymbol, HTTP_ACCEPTED, HTTP_BAD_REQUEST, BTC, MINTME} from
 export default {
     name: 'Donation',
     mixins: [
+        CheckInputMixin,
         MoneyFilterMixin,
         NotificationMixin,
         LoggerMixin,
         RebrandingFilterMixin,
-        InputValidationMixin,
     ],
     components: {
         Guide,

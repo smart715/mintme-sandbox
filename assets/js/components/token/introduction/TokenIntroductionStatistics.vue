@@ -203,7 +203,6 @@ export default {
         MoneyFilterMixin,
         NotificationMixin,
         LoggerMixin,
-        WebSocketMixin,
     ],
     components: {
         CopyLink,
@@ -274,18 +273,6 @@ export default {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
-
-        this.sendMessage(JSON.stringify({
-            method: 'kline.subscribe',
-            params: [this.market.identifier, 24 * 60 * 60],
-            id: parseInt(Math.random().toString().replace('0.', '')),
-        }));
-
-        this.addMessageHandler((result) => {
-            if ('kline.update' === result.method) {
-                this.donationVolume = result.params[0][8] || 0;
-            }
-        });
     },
     methods: {
         ...mapMutations('tokenStatistics', [
