@@ -77,6 +77,12 @@ new Vue({
       }, 2000);
     },
   },
+  mounted: function() {
+    console.log('pair mnted' + this.tokenAddress);
+  },
+  updated: function() {
+    console.log('pair upd' + this.tokenAddress);
+  },
   methods: {
     descriptionUpdated: function(val) {
       this.tokenDescription = val;

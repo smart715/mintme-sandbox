@@ -279,6 +279,12 @@ export default {
             this.toggleEdit(null);
         },
     },
+    mounted: function() {
+        console.log('profile mounted' + this.showContractAddress);
+    },
+    updated: function() {
+        console.log('profile upd' + this.showContractAddress);
+    },
     methods: {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
