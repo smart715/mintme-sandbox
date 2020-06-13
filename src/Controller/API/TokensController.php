@@ -55,7 +55,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     use CheckTokenNameBlacklistTrait;
 
-
     /** @var EntityManagerInterface */
     private $em;
 
@@ -445,7 +444,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         return $this->view(['deployed' => Token::DEPLOYED === $token->getDeploymentStatus()], Response::HTTP_OK);
     }
 
-        /**
+    /**
      * @Rest\View()
      * @Rest\Get("/{name}/address", name="token_address", options={"expose"=true})
      */
