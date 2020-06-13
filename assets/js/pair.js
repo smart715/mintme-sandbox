@@ -8,7 +8,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
-import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
+import {tokenDeploymentStatus} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -26,8 +26,6 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
-      tokenAddressTimeout: null,
-      tokenAddress: null,
     };
   },
   components: {
@@ -62,26 +60,6 @@ new Vue({
           });
       }, 60000);
     },
-    tokenDeployed: function() {
-      clearTimeout(this.tokenAddressTimeout);
-      this.tokenAddressTimeout = setTimeout(() => {
-        this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
-        .then((response) => {
-          if (response.status === HTTP_OK) {
-            this.tokenAddress = response.data.address;
-            clearTimeout(this.tokenAddressTimeout);
-          }
-        }, (error) => {
-            this.notifyError('An error has occurred, please try again later');
-        });
-      }, 2000);
-    },
-  },
-  mounted: function() {
-    console.log('pair mnted' + this.tokenAddress);
-  },
-  updated: function() {
-    console.log('pair upd' + this.tokenAddress);
   },
   methods: {
     descriptionUpdated: function(val) {

@@ -55,6 +55,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     use CheckTokenNameBlacklistTrait;
 
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -442,21 +443,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         return $this->view(['deployed' => Token::DEPLOYED === $token->getDeploymentStatus()], Response::HTTP_OK);
-    }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/{name}/address", name="token_address", options={"expose"=true})
-     */
-    public function getTokenContractAddress(string $name): View
-    {
-        $token = $this->tokenManager->findByName($name);
-
-        if (!$token) {
-            throw $this->createNotFoundException('Token does not exist');
-        }
-
-        return $this->view(['address' => $token->getAddress()], Response::HTTP_OK);
     }
 
     /**
