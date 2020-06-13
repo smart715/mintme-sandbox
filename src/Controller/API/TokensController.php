@@ -55,7 +55,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     use CheckTokenNameBlacklistTrait;
 
-    
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -445,6 +445,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         return $this->view(['deployed' => Token::DEPLOYED === $token->getDeploymentStatus()], Response::HTTP_OK);
     }
 
+        /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/address", name="token_address", options={"expose"=true})
+     */
+    public function getTokenContractAddress(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['address' => $token->getAddress()], Response::HTTP_OK);
+    }
+
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
@@ -661,7 +676,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             if (!$this->validateEthereumAddress($request->get('address'))) {
                 throw new InvalidAddressException();
             }
-            
+
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
@@ -726,12 +741,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
     }
-    
+
     private function validateEthereumAddress(string $address): bool
     {
         return $this->startsWith($address, '0x') && 42 === strlen($address);
     }
-    
+
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;

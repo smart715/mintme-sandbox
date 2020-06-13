@@ -8,7 +8,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
-import {tokenDeploymentStatus} from './utils/constants';
+import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -26,6 +26,8 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
+      tokenAddressTimeout: null,
+      tokenAddressGenerated: null,
     };
   },
   components: {
@@ -60,6 +62,20 @@ new Vue({
           });
       }, 60000);
     },
+    tokenDeployed: function() {
+      clearTimeout(this.tokenAddressTimeout);
+      this.tokenAddressTimeout = setTimeout(() => {
+        this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
+        .then((response) => {
+          if (response.status === HTTP_OK) {
+            this.tokenAddressGenerated = true;
+            clearTimeout(this.tokenAddressTimeout);
+          }
+        }, (error) => {
+            this.notifyError('An error has occurred, please try again later');
+        });
+      }, 2000);
+    },
   },
   methods: {
     descriptionUpdated: function(val) {
@@ -83,6 +99,9 @@ new Vue({
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
+    },
+    getTokenAddress: function(address) {
+      return this.tokenAddressGenerated ? address : '';
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
