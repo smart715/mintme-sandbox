@@ -4,6 +4,7 @@ namespace App\Exchange\Donation;
 
 use App\Entity\User;
 use App\Exchange\Market;
+use Money\Money;
 
 interface DonationHandlerInterface
 {
@@ -15,4 +16,5 @@ interface DonationHandlerInterface
         string $expectedAmountUser,
         User $donorUser
     ): void;
+    public function getSellOrdersWorth(Money $sellOrdersWorth, string $currency): string;
 }

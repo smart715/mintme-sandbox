@@ -109,11 +109,28 @@
                                             <p class="mb-2">Fee for donation: {{ donationParams.fee }}%</p>
                                             <button
                                                 :disabled="buttonDisabled"
-                                                @click="makeDonation"
+                                                @click="showConfirmationModal"
                                                 class="btn btn-primary btn-donate"
                                             >
                                                 Donate {{ donationCurrency }}
                                             </button>
+                                            <confirm-modal
+                                                :visible="showModal"
+                                                :show-image="false"
+                                                @confirm="makeDonation"
+                                                @cancel="cancelDonation"
+                                                @close="showModal = false">
+                                                <p class="text-white modal-title pt-2 pb-4">
+                                                    Amount donated exceeds the worth of tokens available for sell.
+                                                    You can continue or cancel and adjust donation amount.
+                                                    Alternatively, you could ask token creator to set more sell orders on the market and then retry donation.
+                                                    <br />
+                                                    Do you want to donate {{ amountToDonate }} {{ donationCurrency }}
+                                                    for {{ amountToReceive }} {{ market.quote.name }}
+                                                    worth {{ sellOrdersWorth | toMoney(currencySubunit) | formatMoney }} {{ donationCurrency }}?
+                                                </p>
+                                                <template v-slot:confirm>Continue</template>
+                                            </confirm-modal>
                                         </div>
                                     </div>
                                 </div>
@@ -139,6 +156,7 @@ import {
     RebrandingFilterMixin,
     InputValidationMixin,
 } from '../../mixins';
+import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
@@ -155,6 +173,7 @@ export default {
     ],
     components: {
         Guide,
+        ConfirmModal,
     },
     props: {
         market: Object,
@@ -172,10 +191,12 @@ export default {
             loginFormLoaded: false,
             amountToDonate: 0,
             amountToReceive: 0,
+            sellOrdersWorth: 0,
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
             donationInProgress: false,
+            showModal: false,
         };
     },
     created: function() {
@@ -295,7 +316,8 @@ export default {
                 amount: this.amountToDonate,
             }))
                 .then((res) => {
-                    this.amountToReceive = res.data;
+                    this.amountToReceive = res.data.amountToReceive;
+                    this.sellOrdersWorth = res.data.sellOrdersWorth;
                     this.donationChecking = false;
                 })
                 .catch((err) => {
@@ -311,6 +333,7 @@ export default {
         },
         makeDonation: function() {
             this.donationInProgress = true;
+            this.showModal = false;
 
             this.$axios.single.post(this.$routing.generate('make_donation', {
                 base: this.market.base.symbol,
@@ -354,6 +377,17 @@ export default {
         resetAmount: function() {
             this.amountToDonate = 0;
             this.amountToReceive = 0;
+        },
+        showConfirmationModal: function() {
+            if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersWorth)) {
+                this.showModal = true;
+            } else {
+                this.makeDonation();
+            }
+        },
+        cancelDonation: function() {
+            this.showModal = false;
+            this.resetAmount();
         },
     },
     watch: {

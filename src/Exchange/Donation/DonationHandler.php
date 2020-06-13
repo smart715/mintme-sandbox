@@ -144,6 +144,25 @@ class DonationHandler implements DonationHandlerInterface
         );
     }
 
+    public function getSellOrdersWorth(Money $sellOrdersWorth, string $currency): string
+    {
+        $rates = $this->cryptoRatesFetcher->fetch();
+
+        if (Token::BTC_SYMBOL === $currency) {
+            $sellOrdersWorth = $this->moneyWrapper->convert(
+                $sellOrdersWorth,
+                new Currency(Token::BTC_SYMBOL),
+                new FixedExchange([
+                    Token::WEB_SYMBOL => [
+                        Token::BTC_SYMBOL => $rates[Token::WEB_SYMBOL][Token::BTC_SYMBOL],
+                    ],
+                ])
+            );
+        }
+
+        return $this->moneyWrapper->format($sellOrdersWorth);
+    }
+
     private function calculateFee(Money $amount): Money
     {
         return $amount->multiply($this->getFee());

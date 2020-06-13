@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Entity\User;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -35,8 +36,12 @@ class DonationController extends AbstractFOSRestController
      *     description="Selected currency to donate."
      * )
      */
-    public function checkDonation(Market $market, string $currency, string $amount): View
-    {
+    public function checkDonation(
+        Market $market,
+        string $currency,
+        string $amount,
+        MarketHandlerInterface $marketHandler
+    ): View {
         $amountToReceive = $this->donationHandler->checkDonation(
             $market,
             $currency,
@@ -44,7 +49,13 @@ class DonationController extends AbstractFOSRestController
             $this->getCurrentUser()
         );
 
-        return $this->view($amountToReceive);
+        $sellOrdersWorth = $marketHandler->getSellOrdersWorth($market);
+        $sellOrdersWorth = $this->donationHandler->getSellOrdersWorth($sellOrdersWorth, $currency);
+
+        return $this->view([
+            'amountToReceive' => $amountToReceive,
+            'sellOrdersWorth' => $sellOrdersWorth,
+        ]);
     }
 
     /**
