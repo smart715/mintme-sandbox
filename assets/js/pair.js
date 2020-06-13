@@ -27,7 +27,7 @@ new Vue({
       retryCount: 0,
       retryCountLimit: 10,
       tokenAddressTimeout: null,
-      tokenAddress: '',
+      tokenAddress: null,
     };
   },
   components: {
@@ -75,11 +75,6 @@ new Vue({
             this.notifyError('An error has occurred, please try again later');
         });
       }, 2000);
-    },
-  },
-  computed: {
-    tokenContractAddress: function() {
-      return this.tokenAddress;
     },
   },
   methods: {
