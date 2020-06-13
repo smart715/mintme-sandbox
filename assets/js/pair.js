@@ -69,6 +69,7 @@ new Vue({
         .then((response) => {
           if (response.status === HTTP_OK) {
             this.tokenAddressGenerated = true;
+            console.log(this.tokenAddressGenerated);
             clearTimeout(this.tokenAddressTimeout);
           }
         }, (error) => {
