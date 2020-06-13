@@ -75,11 +75,11 @@ class MarketStatus
     private $monthVolume;
 
     /**
-     * @ORM\Column(type="string", options={"default": 0})
+     * @ORM\Column(type="string")
      * @SWG\Property(type="number")
      * @var string
      */
-    private $buyDepth;
+    private $buyDepth = '0';
 
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
