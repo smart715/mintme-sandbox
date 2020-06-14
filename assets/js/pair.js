@@ -63,10 +63,14 @@ new Vue({
       }, 60000);
     },
   },
+  mounted: function() {
+    if (this.tokenDeployed) {
+      this.fetchAddress();
+    }
+  },
   beforeUpdate: function() {
     if (this.tokenDeployed) {
       this.fetchAddress();
-      console.log('pair updtd');
     }
   },
   methods: {
