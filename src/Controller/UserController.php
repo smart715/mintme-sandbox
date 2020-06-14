@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ApiKey;
+use App\Entity\Unsubscriber;
 use App\Entity\User;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
@@ -329,22 +330,42 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         string $mail,
         LoggerInterface $unsubscribeLogger
     ): Response {
+        if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+            return $this->render('pages/404.html.twig');
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $entityManager->getRepository(Unsubscriber::class);
+
+        if (null !== $repo->findOneBy(['email' => $mail])) {
+            return $this->render('pages/unsubscribe.html.twig', [
+                'mail' => $mail,
+                'alreadyUnsubscribed' => true,
+            ]);
+        }
+
         $form = $this->createForm(UnsubscribeType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $content = sprintf("%s %s\n", $mail, date('Y-m-d H:i:s'));
-
             try {
-                $unsubscribeLogger->info($content);
+                $date = new \DateTimeImmutable();
+                $unsubscriber = new Unsubscriber($mail, $date);
+                $entityManager->persist($unsubscriber);
+                $entityManager->flush();
             } catch (\Throwable $e) {
                 $form->addError(new FormError("Error when unsubscribing {$mail}"));
 
                 return $this->render('pages/unsubscribe.html.twig', [
                     'mail' => $mail,
                     'form' => $form->createView(),
+                    'alreadyUnsubscribed' => false,
                 ]);
             }
+
+            $unsubscribeLogger->info(
+                sprintf("%s %s\n", $mail, $date->format('Y-m-d H:i:s'))
+            );
 
             $this->addFlash('success', "{$mail} was successfully unsubscribed");
 
@@ -353,7 +374,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key
             ? $this->render('pages/unsubscribe.html.twig', [
                 'mail' => $mail,
-                'form' => $form->createView()])
+                'form' => $form->createView(),
+                'alreadyUnsubscribed' => false,
+            ])
             : $this->render('pages/404.html.twig');
         }
     }

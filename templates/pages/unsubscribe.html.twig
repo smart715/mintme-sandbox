@@ -11,20 +11,24 @@
                Unsubscribe
             </div>
             <div class="card-body py-3">
-               {{ form_start(form) }}
-               {{ form_errors(form) }}
-               <div class="row">
-                  <div class="col-12 mb-3">
-                     <span>Do you want to unsubscribe {{ mail }} from our mailing list?</span>
+               {% if alreadyUnsubscribed %}
+                  {{ mail }} has been already unsubscribed.
+               {% else %}
+                  {{ form_start(form) }}
+                  {{ form_errors(form) }}
+                  <div class="row">
+                     <div class="col-12 mb-3">
+                        <span>Do you want to unsubscribe {{ mail }} from our mailing list?</span>
+                     </div>
                   </div>
-               </div>
-               <div class="row">
-                  <div class="col-12">
-                     <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'Yes' }) }}</div>
-                     <div class="float-left"><a href="{{ path('homepage') }}" class="btn-cancel">No</a></div>
+                  <div class="row">
+                     <div class="col-12">
+                        <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'Yes' }) }}</div>
+                        <div class="float-left"><a href="{{ path('homepage') }}" class="btn-cancel">No</a></div>
+                     </div>
                   </div>
-               </div>
-               {{ form_end(form) }}                 								
+                  {{ form_end(form) }}                 								
+               {% endif %}
             </div>
          </div>
       </div>
