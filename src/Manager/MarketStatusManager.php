@@ -24,6 +24,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         'to_number(ms.dayVolume)',
         'change',
         'qt.name',
+        'to_number(ms.buyDepth)',
     ];
 
     private const SORTS_MAP = [
@@ -37,6 +38,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
         'dayVolumeUSD' => 2,
         'change' => 3,
         'pair' => 4,
+        'buyDepth' => 5,
+        'buyDepthUSD' => 5,
     ];
 
     private const SORT_BY_CHANGE = 'change';
