@@ -230,5 +230,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/profile.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/profile.js') }}"></script>
 {% endblock %}
