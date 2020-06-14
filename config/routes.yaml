@@ -4,6 +4,11 @@ NelmioApiDocBundle:
     options:
         2fa_progress: false
 
+nelmio_security:
+    path:     /csp-report
+    defaults: { _controller: nelmio_security.csp_reporter_controller:indexAction }
+    methods:  [POST]
+
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
 
