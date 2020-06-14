@@ -20,7 +20,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Throwable;
+use App\Exchange\Order;
 
 class Exchanger implements ExchangerInterface
 {
@@ -141,7 +141,7 @@ class Exchanger implements ExchangerInterface
         $tradeResult = $this->trader->placeOrder($order);
 
         // check if order status is complete before sending market
-        if ('finished' === Order::FINISHED_STATUS) {
+        if ($order->getStatus() === Order::FINISHED_STATUS) {
             try {
                 $this->mp->send($market);
             } catch (Throwable $exception) {
