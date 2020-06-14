@@ -130,5 +130,9 @@ parameters:
 
     contact_email: support@mintme.com
 
+    # enable it to be able to use market consumer for test
+    # this param have to be removed after splitting consumers for all branches.
+    market_consumer_enabled: false
+
     #HMAC SHA1 key
     hmac_sha_one_key: 'qwerty'
