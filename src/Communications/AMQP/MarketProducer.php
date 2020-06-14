@@ -23,7 +23,7 @@ class MarketProducer implements MarketAMQPInterface
     public function send(Market $market): void
     {
         // TODO: split consumers for all branches.
-        if ($this->config->getOffset() > 0) {
+        if ($this->config->getOffset() > 0 && !$this->config->isMarketConsumerEnabled()) {
             return;
         }
 

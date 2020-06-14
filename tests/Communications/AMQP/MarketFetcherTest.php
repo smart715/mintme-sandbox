@@ -16,6 +16,7 @@ class MarketFetcherTest extends TestCase
 
         $config = $this->createMock(Config::class);
         $config->expects($this->once())->method('getOffset')->willReturn(0);
+        $config->expects($this->never())->method('isMarketConsumerEnabled')->willReturn(false);
 
         $producer = $this->createMock(ProducerInterface::class);
         $producer->expects($this->once())->method('publish');
@@ -30,9 +31,25 @@ class MarketFetcherTest extends TestCase
 
         $config = $this->createMock(Config::class);
         $config->expects($this->once())->method('getOffset')->willReturn(1);
+        $config->expects($this->once())->method('isMarketConsumerEnabled')->willReturn(false);
 
         $producer = $this->createMock(ProducerInterface::class);
         $producer->expects($this->never())->method('publish');
+
+        $mp = new MarketProducer($producer, $config);
+        $mp->send($market);
+    }
+
+    public function testSendOffsetWithAllowedMarketConsumer(): void
+    {
+        $market = $this->createMock(Market::class);
+
+        $config = $this->createMock(Config::class);
+        $config->expects($this->once())->method('getOffset')->willReturn(1);
+        $config->expects($this->once())->method('isMarketConsumerEnabled')->willReturn(true);
+
+        $producer = $this->createMock(ProducerInterface::class);
+        $producer->expects($this->once())->method('publish');
 
         $mp = new MarketProducer($producer, $config);
         $mp->send($market);
