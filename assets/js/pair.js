@@ -64,7 +64,7 @@ new Vue({
     },
   },
   mounted: function() {
-      this.fetchAddress();
+    this.fetchAddress();
   },
   beforeUpdate: function() {
     if (this.tokenDeployed) {
@@ -107,9 +107,6 @@ new Vue({
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
-    },
-    getTokenContractAddress: function(address) {
-      return this.tokenDeployed ? address : '';
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;

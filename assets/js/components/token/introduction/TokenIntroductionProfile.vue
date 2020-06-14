@@ -279,9 +279,6 @@ export default {
             this.toggleEdit(null);
         },
     },
-    updated: function() {
-        console.log('profile updtc' + this.showContractAddress);
-    },
     methods: {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
