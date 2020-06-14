@@ -31,5 +31,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/trading.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/trading.js') }}"></script>
 {% endblock %}
