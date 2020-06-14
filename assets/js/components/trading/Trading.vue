@@ -813,13 +813,9 @@ export default {
         },
         toggleActiveVolume: function(volume) {
             this.activeVolume = volume;
-            this.sortBy = this.volumes[this.activeVolume].key;
-            this.sortDesc = true;
         },
         setActiveMarketCap: function(marketCap) {
             this.activeMarketCap = marketCap;
-            this.sortBy = this.marketCapOptions[this.activeMarketCap].key;
-            this.sortDesc = true;
         },
         setTokenPositions: function(tokens) {
             let positionIndex = 1;
