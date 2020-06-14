@@ -20,6 +20,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Throwable;
 
 class Exchanger implements ExchangerInterface
 {
