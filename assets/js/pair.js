@@ -8,7 +8,7 @@ import TokenName from './components/token/TokenName';
 import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TopHolders from './components/trade/TopHolders';
 import store from './storage';
-import {tokenDeploymentStatus} from './utils/constants';
+import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -26,6 +26,8 @@ new Vue({
       deployInterval: null,
       retryCount: 0,
       retryCountLimit: 10,
+      tokenAddress: null,
+      tokenAddressTimeout: null,
     };
   },
   components: {
@@ -61,7 +63,27 @@ new Vue({
       }, 60000);
     },
   },
+  updated: function() {
+    if (this.tokenDeployed) {
+      this.fetchAddress();
+      console.log('pair updtd');
+    }
+  },
   methods: {
+    fetchAddress: function() {
+      clearTimeout(this.tokenAddressTimeout);
+      this.tokenAddressTimeout = setTimeout(() => {
+        this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
+        .then((response) => {
+          if (response.status === HTTP_OK) {
+            this.tokenAddress = response.data.address;
+            clearTimeout(this.tokenAddressTimeout);
+          }
+        }, (error) => {
+            this.notifyError('An error has occurred, please try again later');
+        });
+      }, 2000);
+    },
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
     },
@@ -83,6 +105,9 @@ new Vue({
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
              this.tokenPending ? tokenDeploymentStatus.pending :
              status;
+    },
+    getTokenContractAddress: function(address) {
+      return this.tokenDeployed ? address : '';
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
