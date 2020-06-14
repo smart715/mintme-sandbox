@@ -15,10 +15,23 @@
                 :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
                 :release-address="releaseAddress"
+                :discord-url="discordUrl"
+                :editable="editable"
+                :facebook-url="facebookUrl"
+                :facebook-app-id="facebookAppId"
+                :telegram-url="telegramUrl"
+                :website-url="websiteUrl"
+                :youtube-client-id="youtubeClientId"
+                :youtube-channel-id="youtubeChannelId"
+                :airdrop-params="airdropParams"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
-                :airdrop-params="airdropParams"
+                @updated-website="$emit('updated-website', $event)"
+                @updated-facebook="$emit('updated-facebook', $event)"
+                @updated-youtube="$emit('updated-youtube', $event)"
+                @updated-discord="$emit('updated-discord', $event)"
+                @updated-telegram="$emit('updated-telegram', $event)"
             />
             <font-awesome-icon
                 class="icon-edit c-pointer align-middle"
@@ -58,6 +71,13 @@ export default {
         websocketUrl: String,
         releaseAddress: String,
         airdropParams: Object,
+        discordUrl: String,
+        facebookUrl: String,
+        facebookAppId: String,
+        telegramUrl: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
     },
     components: {
         FontAwesomeIcon,

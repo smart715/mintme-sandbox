@@ -2,9 +2,11 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
+                :is-token="isToken"
                 class="col"
                 :websocket-url="websocketUrl"
                 :market="market"
+                :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
             />
@@ -69,14 +71,24 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
+import {
+    CheckInputMixin,
+    LoggerMixin,
+    NotificationMixin,
+    WebSocketMixin,
+} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        CheckInputMixin,
+        LoggerMixin,
+        NotificationMixin,
+        WebSocketMixin,
+    ],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -98,6 +110,7 @@ export default {
         precision: Number,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        isToken: Boolean,
     },
     data() {
         return {
@@ -106,6 +119,7 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
+            buyDepth: null,
             ordersUpdated: false,
         };
     },
@@ -157,22 +171,6 @@ export default {
         });
     },
     methods: {
-        checkInput: function(precision) {
-            let selectionStart = event.target.selectionStart;
-            let selectionEnd = event.target.selectionEnd;
-            let amount = event.srcElement.value;
-            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
-                event.preventDefault();
-                return false;
-            }
-
-            return true;
-        },
         /**
          * @param {undefined|{type, isAssigned, resolve}} context
          * @return {Promise}
@@ -185,6 +183,7 @@ export default {
                     })).then((result) => {
                         this.buyOrders = this.sortOrders(result.data.buy, false);
                         this.sellOrders = this.sortOrders(result.data.sell, true);
+                        this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not update orders', err);

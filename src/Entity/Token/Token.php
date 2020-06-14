@@ -4,6 +4,7 @@ namespace App\Entity\Token;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -205,6 +206,13 @@ class Token implements TradebleInterface
      * @var string
      */
     protected $airdropsAmount = '0';
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     * @var ArrayCollection
+     */
+    protected $posts;
 
     public function __construct()
     {
@@ -543,5 +551,22 @@ class Token implements TradebleInterface
         $this->airdropsAmount = $airdropsAmount->getAmount();
 
         return $this;
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getPosts(): array
+    {
+        return $this->posts->toArray();
+    }
+
+    public function getOwner(): ?User
+    {
+        $profile = $this->getProfile();
+
+        return $profile
+            ? $profile->getUser()
+            : null;
     }
 }

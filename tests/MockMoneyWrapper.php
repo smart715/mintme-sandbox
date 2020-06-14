@@ -24,7 +24,10 @@ trait MockMoneyWrapper
         $wrapper = $this->createMock(MoneyWrapperInterface::class);
 
         $wrapper->method('parse')->willReturnCallback(function (string $amount, string $symbol) {
-            return new Money((int)$amount, new Currency($symbol));
+            return new Money(
+                is_numeric($amount) ? (int)$amount : $amount,
+                new Currency($symbol)
+            );
         });
 
         $wrapper->method('format')->willReturnCallback(function (Money $money) {
