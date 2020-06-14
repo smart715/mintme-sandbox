@@ -64,9 +64,7 @@ new Vue({
     },
   },
   mounted: function() {
-    if (this.tokenDeployed) {
       this.fetchAddress();
-    }
   },
   beforeUpdate: function() {
     if (this.tokenDeployed) {
