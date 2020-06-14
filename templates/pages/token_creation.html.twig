@@ -59,9 +59,6 @@
                                     {{ form_widget(form.name, {'attr': {
                                         'v-model': '$v.tokenName.$model',
                                         'class' : 'form-control',
-                                        'oninvalid': 'setCustomValidity("Invalid token name.")',
-                                        'onchange': 'setCustomValidity("")',
-                                        'oninput': 'setCustomValidity("")',
                                     }}) }}
                                 </div>
                             </div>
@@ -96,5 +93,13 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/token_creation.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/token_creation.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}">
+        document.addEventListener('DOMContentLoaded', function () {
+            let tokenCreateName = document.getElementById('token_create_name');
+            tokenCreateName.addEventListener('invalid', tokenCreateName.setCustomValidity("Invalid token name."));
+            tokenCreateName.addEventListener('change', tokenCreateName.setCustomValidity(""));
+            tokenCreateName.addEventListener('input', tokenCreateName.setCustomValidity(""));
+        });
+    </script>
 {% endblock %}

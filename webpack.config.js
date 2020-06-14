@@ -32,7 +32,7 @@ Encore
 
     .enableSassLoader()
 
-    .enableVueLoader()
+    .enableVueLoader(() => {}, {runtimeCompilerBuild: false})
 
     .configureFilenames({
         'images': 'images/[name].[hash:8].[ext]',
