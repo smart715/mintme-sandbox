@@ -14,6 +14,7 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +69,9 @@ class DonationHandlerTest extends TestCase
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
@@ -75,7 +79,8 @@ class DonationHandlerTest extends TestCase
             $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($base),
             $bh,
-            $this->donationParams
+            $this->donationParams,
+            $em
         );
 
         $this->assertEquals(
@@ -134,6 +139,9 @@ class DonationHandlerTest extends TestCase
                 Token::BTC_SYMBOL => $this->mockCrypto(),
             ]);
 
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
@@ -141,7 +149,8 @@ class DonationHandlerTest extends TestCase
             $this->mockCryptoRatesFetcher(),
             $cryptoManager,
             $bh,
-            $this->donationParams
+            $this->donationParams,
+            $em
         );
 
         $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser);

@@ -3,6 +3,7 @@
 namespace App\Exchange\Donation;
 
 use App\Communications\CryptoRatesFetcherInterface;
+use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -11,6 +12,7 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
@@ -38,6 +40,9 @@ class DonationHandler implements DonationHandlerInterface
     /** @var array<int|float> */
     private $donationParams;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
     public function __construct(
         DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
@@ -45,7 +50,8 @@ class DonationHandler implements DonationHandlerInterface
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
         CryptoManagerInterface $cryptoManager,
         BalanceHandlerInterface $balanceHandler,
-        array $donationParams
+        array $donationParams,
+        EntityManagerInterface $em
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -54,6 +60,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->cryptoManager = $cryptoManager;
         $this->balanceHandler = $balanceHandler;
         $this->donationParams = $donationParams;
+        $this->em = $em;
     }
 
     public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): string
@@ -87,26 +94,14 @@ class DonationHandler implements DonationHandlerInterface
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         $this->checkAmount($donorUser, $amountObj, $currency);
-
         /** @var Token $token */
         $token = $market->getQuote();
         /** @var User tokenCreator */
         $tokenCreator = $token->getProfile()->getUser();
+        $feeAmount = $this->calculateFee($amountObj);
+        $amountToDonate = $amountObj->subtract($feeAmount);
 
-        $cryptos = $this->cryptoManager->findAllIndexed('symbol');
-        $this->balanceHandler->update(
-            $donorUser,
-            Token::getFromCrypto($cryptos[$currency]),
-            $amountObj->negative(),
-            'donation'
-        );
-        $amountToDonate = $amountObj->subtract($this->calculateFee($amountObj));
-        $this->balanceHandler->update(
-            $tokenCreator,
-            Token::getFromCrypto($cryptos[$currency]),
-            $amountToDonate,
-            'donation'
-        );
+        $this->sendDonationFunds($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency);
 
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
         $zeroValue = new Money(0, new Currency(Token::WEB_SYMBOL));
@@ -127,21 +122,7 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
-    }
-
-    private function getBtcWorthInMintme(Money $amount): Money
-    {
-        $rates = $this->cryptoRatesFetcher->fetch();
-
-        return $this->moneyWrapper->convert(
-            $amount,
-            new Currency(Token::WEB_SYMBOL),
-            new FixedExchange([
-                Token::BTC_SYMBOL => [
-                    Token::WEB_SYMBOL => 1 / $rates[Token::WEB_SYMBOL][Token::BTC_SYMBOL],
-                ],
-            ])
-        );
+        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
     }
 
     public function getSellOrdersWorth(Money $sellOrdersWorth, string $currency): string
@@ -161,6 +142,64 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         return $this->moneyWrapper->format($sellOrdersWorth);
+    }
+
+    public function saveDonation(
+        User $donor,
+        User $tokenCreator,
+        string $currency,
+        Money $amount,
+        Money $feeAmount,
+        Money $tokenAmount
+    ): void {
+        $donation = new Donation();
+        $donation
+            ->setDonor($donor)
+            ->setTokenCreator($tokenCreator)
+            ->setCurrency($currency)
+            ->setAmount($amount)
+            ->setFeeAmount($feeAmount)
+            ->setTokenAmount($tokenAmount);
+
+        $this->em->persist($donation);
+        $this->em->flush();
+    }
+
+    private function sendDonationFunds(
+        User $donorUser,
+        Money $donationAmount,
+        User $tokenCreator,
+        Money $amountToDonate,
+        string $currency
+    ): void {
+        $cryptos = $this->cryptoManager->findAllIndexed('symbol');
+        $this->balanceHandler->update(
+            $donorUser,
+            Token::getFromCrypto($cryptos[$currency]),
+            $donationAmount->negative(),
+            'donation'
+        );
+        $this->balanceHandler->update(
+            $tokenCreator,
+            Token::getFromCrypto($cryptos[$currency]),
+            $amountToDonate,
+            'donation'
+        );
+    }
+
+    private function getBtcWorthInMintme(Money $amount): Money
+    {
+        $rates = $this->cryptoRatesFetcher->fetch();
+
+        return $this->moneyWrapper->convert(
+            $amount,
+            new Currency(Token::WEB_SYMBOL),
+            new FixedExchange([
+                Token::BTC_SYMBOL => [
+                    Token::WEB_SYMBOL => 1 / $rates[Token::WEB_SYMBOL][Token::BTC_SYMBOL],
+                ],
+            ])
+        );
     }
 
     private function calculateFee(Money $amount): Money
