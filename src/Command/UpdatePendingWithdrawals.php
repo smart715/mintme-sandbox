@@ -108,11 +108,11 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingTokenWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
-
                 $token = $item->getToken();
 
                 if (!isset($token)) {
                     $this->logger->info("[withdrawals] Pending token withdraval error: token not found ... Step has been skipped.");
+
                     continue;
                 }
 
@@ -120,10 +120,9 @@ class UpdatePendingWithdrawals extends Command
 
                 if (!isset($crypto)) {
                     $this->logger->info("[withdrawals] Pending token withdraval error: crypto for token not found ... Step has been skipped.");
+
                     continue;
                 }
-
-
 
                 $fee = $crypto->getFee();
 
