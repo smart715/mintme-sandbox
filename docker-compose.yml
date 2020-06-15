@@ -42,6 +42,7 @@ services:
       - rabbitmq
       - webchain-cli
     volumes:
+      - .docker/deposit:/src
       - .docker/deposit.conf.yaml:/src/config/default.yaml
       - .docker/deposit.env:/src/.env
     networks:
@@ -57,6 +58,7 @@ services:
       - rabbitmq
       - webchain-cli
     volumes:
+      - .docker/tokdeploy/contract-gateway:/src
       - .docker/tokdeploy.yaml:/src/config/default.yaml
       - .docker/tokdeploy.env:/src/.env
       - webchaind_root:/src/webchain_root
