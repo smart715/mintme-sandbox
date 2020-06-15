@@ -9,5 +9,5 @@
 {% block messageContainer %} {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/login.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/login.js') }}"></script>
 {% endblock %}
