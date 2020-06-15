@@ -428,6 +428,9 @@ class MarketHandler implements MarketHandlerInterface
             )->add($sum);
         }, $zeroDepth);
 
-        return $sellOrdersWorth;
+        return $this->moneyWrapper->parse(
+            $this->moneyWrapper->format($sellOrdersWorth),
+            Token::WEB_SYMBOL
+        );
     }
 }
