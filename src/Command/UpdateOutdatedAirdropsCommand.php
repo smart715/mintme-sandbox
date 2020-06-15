@@ -2,9 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\AirdropCampaign\Airdrop;
-use App\Repository\AirdropCampaign\AirdropRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Manager\AirdropCampaignManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,12 +13,12 @@ class UpdateOutdatedAirdropsCommand extends Command
     /** @var string */
     protected static $defaultName = 'app:update-outdated-airdrops';
 
-    /** @var EntityManagerInterface */
-    protected $em;
+    /** @var AirdropCampaignManagerInterface */
+    protected $manager;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(AirdropCampaignManagerInterface $manager)
     {
-        $this->em = $em;
+        $this->manager = $manager;
 
         parent::__construct();
     }
@@ -36,10 +34,8 @@ class UpdateOutdatedAirdropsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        /** @var AirdropRepository $repository */
-        $repository = $this->em->getRepository(Airdrop::class);
-        $repository->updateOutdatedAirdrops();
-        $io->success('Airdrops updated.');
+        $countUpdated = $this->manager->updateOutdatedAirdrops();
+        $io->success($countUpdated . ' airdrops updated.');
 
         return 0;
     }
