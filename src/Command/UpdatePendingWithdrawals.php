@@ -110,10 +110,6 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
-                if (!isset($crypto)) {
-                    continue;
-                }
-
                 $fee = $crypto->getFee();
                 $this->em->beginTransaction();
 
