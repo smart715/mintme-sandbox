@@ -79,7 +79,7 @@ class MarketStatus
      * @SWG\Property(type="number")
      * @var string
      */
-    private $buyDepth;
+    private $buyDepth = '0';
 
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
