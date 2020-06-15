@@ -4,6 +4,7 @@ namespace App\Tests\Command;
 
 use App\Command\UpdatePendingWithdrawals;
 use App\Entity\Crypto;
+use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
