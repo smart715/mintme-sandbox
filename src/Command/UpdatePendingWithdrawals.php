@@ -108,24 +108,34 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingTokenWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
-                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+
+                $token = $item->getToken();
+
+                if (!isset($token)) {
+                    $this->logger->info("[withdrawals] Pending token withdraval error: token not found ... Step has been skipped.");
+                    continue;
+                }
+
+                $crypto = $token->getCrypto();
+
+                if (!isset($crypto)) {
+                    $this->logger->info("[withdrawals] Pending token withdraval error: crypto for token not found ... Step has been skipped.");
+                    continue;
+                }
+
+
 
                 $fee = $crypto->getFee();
-                $this->em->beginTransaction();
 
                 $this->em->beginTransaction();
 
                 try {
                     $this->balanceHandler->deposit(
                         $item->getUser(),
-                        $item->getToken(),
-                        $item->getAmount()->getAmount()
+                        $token,
+                        $item->getAmount()->getAmount()->add($fee)
                     );
-                    $this->balanceHandler->deposit(
-                        $item->getUser(),
-                        Token::getFromCrypto($crypto),
-                        $fee
-                    );
+
                     $this->em->remove($item);
                     $this->em->flush();
                     $this->em->commit();
