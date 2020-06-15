@@ -298,7 +298,7 @@ export default {
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
-            if ('' === this.sortBy){
+            if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
                     if (first.tokenized !== second.tokenized) {
                         return first.tokenized ? -1 : 1;
