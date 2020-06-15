@@ -219,7 +219,7 @@ export default {
     },
     data() {
         return {
-            deployedFirst: true,
+            deployedFirst: ('' === this.sort),
             tableLoading: false,
             markets: null,
             currentPage: this.page,
@@ -298,12 +298,14 @@ export default {
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
-            tokens.sort((first, second) => {
-                if (first.tokenized !== second.tokenized) {
-                    return first.tokenized ? -1 : 1;
-                }
-                return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
-            });
+            if ('' === this.sortBy){
+                tokens.sort((first, second) => {
+                    if (first.tokenized !== second.tokenized) {
+                        return first.tokenized ? -1 : 1;
+                    }
+                    return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
+                });
+            }
             tokens = this.sanitizedMarketsOnTop.concat(tokens);
             tokens = _.map(tokens, (token) => {
                 return _.mapValues(token, (item, key) => {
@@ -387,7 +389,7 @@ export default {
         initialLoad: function() {
             this.loading = true;
             this.fetchGlobalMarketCap();
-            let updateDataPromise = this.updateRawMarkets(this.currentPage, true);
+            let updateDataPromise = this.updateRawMarkets(this.currentPage, this.deployedFirst);
             let conversionRatesPromise = this.fetchConversionRates();
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
