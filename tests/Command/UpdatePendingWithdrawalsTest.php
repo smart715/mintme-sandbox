@@ -5,6 +5,7 @@ namespace App\Tests\Command;
 use App\Command\UpdatePendingWithdrawals;
 use App\Entity\Crypto;
 use App\Entity\PendingWithdraw;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -92,13 +93,20 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $repo = $this->createMock(PendingWithdrawRepository::class);
-        $repo->expects($this->exactly(2))
+        $repo->expects($this->exactly(1))
             ->method('findAll')
             ->willReturn(array_map(function () {
                 return $this->mockPending();
-            }, range(1, $lockCount)));
+            }, range(1, 1)));
 
-        $em->method('getRepository')->willReturn($repo);
+        $repoT = $this->createMock(PendingWithdrawRepository::class);
+        $repoT->expects($this->exactly(1))
+        ->method('findAll')
+        ->willReturn(array_map(function () {
+            return $this->mockPendingToken();
+        }, range(2, $lockCount)));
+
+        $em->method('getRepository')->willReturn($repo, $repoT);
 
         return $em;
     }
@@ -119,6 +127,30 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $crypto->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
 
         $lock->method('getCrypto')->willReturn($crypto);
+
+        return $lock;
+    }
+
+    private function mockPendingToken(): PendingTokenWithdraw
+    {
+        $lock = $this->createMock(PendingTokenWithdraw::class);
+
+        $lock->method('getDate')->willReturn(new DateTimeImmutable('now - 1 day'));
+        $lock->method('getUser')->willReturn($this->createMock(User::class));
+
+        $amount = $this->createMock(Amount::class);
+        $amount->method('getAmount')->willReturn(new Money(1, new Currency('FOO')));
+
+        $lock->method('getAmount')->willReturn($amount);
+
+        $token = $this->createMock(Token::class);
+
+        $crypto = $this->createMock(Crypto::class);
+        $crypto->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
+
+        $token->method('getCrypto')->willReturn($crypto);
+
+        $lock->method('getToken')->willReturn($token);
 
         return $lock;
     }
