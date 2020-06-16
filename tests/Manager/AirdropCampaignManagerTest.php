@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\AirdropCampaignManager;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
+use App\Repository\AirdropCampaign\AirdropRepository;
 use App\Tests\MockMoneyWrapper;
 use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
@@ -236,5 +237,37 @@ class AirdropCampaignManagerTest extends TestCase
 
         $reward = $airdropManager->getAirdropReward($airdrop);
         $this->assertEquals('1', $reward->getAmount());
+    }
+
+    public function testUpdateOutdatedAirdrops(): void
+    {
+        /** @var Token|MockObject */
+        $token = $this->createMock(Token::class);
+        $airdrops = [
+            (new Airdrop())->setToken($token),
+            (new Airdrop())->setToken($token),
+        ];
+
+        /** @var AirdropRepository|MockObject $repository */
+        $repository = $this->createMock(AirdropRepository::class);
+        $repository
+            ->expects($this->once())
+            ->method('getOutdatedAirdrops')
+            ->willReturn($airdrops);
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em
+            ->method('getRepository')
+            ->willReturn($repository);
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        $countUpdated = $airdropManager->updateOutdatedAirdrops();
+
+        $this->assertEquals(2, $countUpdated);
+        $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrops[0]->getStatus());
+        $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrops[1]->getStatus());
     }
 }

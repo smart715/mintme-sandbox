@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
+use App\Repository\AirdropCampaign\AirdropRepository;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -181,6 +182,20 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             $reward,
             MoneyWrapper::TOK_SYMBOL
         );
+    }
+
+    public function updateOutdatedAirdrops(): int
+    {
+        /** @var AirdropRepository $repository */
+        $repository = $this->em->getRepository(Airdrop::class);
+        /** @var Airdrop[] $outdatedAirdrops */
+        $outdatedAirdrops = $repository->getOutdatedAirdrops();
+
+        foreach ($outdatedAirdrops as $outdatedAirdrop) {
+            $this->deleteAirdrop($outdatedAirdrop);
+        }
+
+        return count($outdatedAirdrops);
     }
 
     private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant
