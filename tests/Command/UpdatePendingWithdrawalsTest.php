@@ -30,7 +30,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
-        $lockCount = 10;
+        $emCount = 10;
+        $lockCount = $emCount * 3;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($this->exactly($lockCount))
@@ -38,7 +39,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 
         $application->add(new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
-            $this->mockEm($lockCount),
+            $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $this->createMock(CryptoManagerInterface::class)
@@ -55,14 +56,15 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $application = new Application($kernel);
-        $lockCount = 10;
+        $emCount = 10;
+        $lockCount = $emCount * 2;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($this->exactly($lockCount))
             ->method('deposit')
             ->willThrowException(new Exception());
 
-        $em = $this->mockEm($lockCount);
+        $em = $this->mockEm($emCount);
         $em->expects($this->exactly($lockCount))->method('rollback');
 
         $application->add(new UpdatePendingWithdrawals(
@@ -98,14 +100,14 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             ->method('findAll')
             ->willReturn(array_map(function () {
                 return $this->mockPending();
-            }, range(1, 1)));
+            }, range(1, $lockCount)));
 
         $repoT = $this->createMock(PendingWithdrawRepository::class);
         $repoT->expects($this->exactly(1))
         ->method('findAll')
         ->willReturn(array_map(function () {
             return $this->mockPendingToken();
-        }, range(2, $lockCount)));
+        }, range(1, $lockCount)));
 
         $em->method('getRepository')->willReturn($repo, $repoT);
 
