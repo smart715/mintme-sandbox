@@ -98,10 +98,6 @@ class DonationHandler implements DonationHandlerInterface
         $token = $market->getQuote();
         /** @var User tokenCreator */
         $tokenCreator = $token->getProfile()->getUser();
-        $feeAmount = $this->calculateFee($amountObj);
-        $amountToDonate = $amountObj->subtract($feeAmount);
-
-        $this->sendDonationFunds($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency);
 
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
         $minTokensAmount = $this->moneyWrapper->parse(
@@ -110,20 +106,25 @@ class DonationHandler implements DonationHandlerInterface
         );
 
         if ($expectedAmount->greaterThan($minTokensAmount)) {
+            $donationAmount = $amountObj;
+
             if (Token::BTC_SYMBOL === $currency) {
-                $amountObj = $this->getBtcWorthInMintme($amountObj);
+                $donationAmount = $this->getBtcWorthInMintme($donationAmount);
             }
 
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($amountObj),
+                $this->moneyWrapper->format($donationAmount),
                 $this->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
         }
 
+        $feeAmount = $this->calculateFee($amountObj);
+        $amountToDonate = $amountObj->subtract($feeAmount);
+        $this->sendDonationFunds($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency);
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
         $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
     }
