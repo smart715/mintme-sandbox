@@ -32,21 +32,16 @@ class UpdatePendingWithdrawals extends Command
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
     public function __construct(
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
-        BalanceHandlerInterface $balanceHandler,
-        CryptoManagerInterface $cryptoManager
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
-        $this->cryptoManager = $cryptoManager;
 
         parent::__construct();
     }
@@ -78,14 +73,22 @@ class UpdatePendingWithdrawals extends Command
                 $crypto = $item->getCrypto();
 
                 $fee = $crypto->getFee();
+                $token = Token::getFromCrypto($crypto);
                 $this->em->beginTransaction();
 
                 try {
                     $this->balanceHandler->deposit(
                         $item->getUser(),
-                        Token::getFromCrypto($crypto),
-                        $item->getAmount()->getAmount()->add($fee)
+                        $token,
+                        $item->getAmount()->getAmount()
                     );
+
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $token,
+                        $fee
+                    );
+
                     $this->em->remove($item);
                     $this->em->flush();
                     $this->em->commit();
@@ -110,20 +113,6 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $token = $item->getToken();
 
-                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-                if (!$crypto) {
-                    $crypto = $token->getCrypto();
-
-                    if (!isset($crypto)) {
-                        $this->logger->info("[withdrawals] Pending token withdraval (0) error: crypto for token not found ... Step has been skipped.");
-
-                        continue;
-                    }
-                }
-
-                $fee = $crypto->getFee();
-
                 $this->em->beginTransaction();
 
                 try {
@@ -131,12 +120,6 @@ class UpdatePendingWithdrawals extends Command
                         $item->getUser(),
                         $token,
                         $item->getAmount()->getAmount()
-                    );
-
-                    $this->balanceHandler->deposit(
-                        $item->getUser(),
-                        $token,
-                        $fee
                     );
 
                     $this->em->remove($item);
