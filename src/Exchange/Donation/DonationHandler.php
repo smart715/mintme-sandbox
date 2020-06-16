@@ -104,9 +104,9 @@ class DonationHandler implements DonationHandlerInterface
         $this->sendDonationFunds($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency);
 
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
-        $minTokensAmount = new Money(
+        $minTokensAmount = $this->moneyWrapper->parse(
             (string)$this->donationParams['minTokensAmount'],
-            new Currency(Token::WEB_SYMBOL)
+            Token::WEB_SYMBOL
         );
 
         if ($expectedAmount->greaterThan($minTokensAmount)) {
