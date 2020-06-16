@@ -163,9 +163,6 @@ export default {
     mounted: function() {
         this.loadTokenBalance();
         this.loadAirdropCampaign();
-        setInterval(() => {
-            console.log(document.getElementById('collapse-end-date').innerHTML);
-        }, 1000);
     },
     computed: {
         minTokensAmount: function() {
