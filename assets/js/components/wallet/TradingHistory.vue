@@ -192,7 +192,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name});
         },
         createTicker: function(toMoney, history) {
-            return toMoney + ' ' + (history.side === 2 ? history.market.quote.symbol : history.market.base.symbol);
+            return toMoney + ' ' + (history.side === 2 ? this.rebrandingFunc(history.market.quote.symbol) : this.rebrandingFunc(history.market.base.symbol));
         },
         calculateTotalCost: function(history) {
             return history.side === 1 ? (new Decimal(history.price).times(history.amount)).toString() :
