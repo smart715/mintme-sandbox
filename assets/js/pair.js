@@ -44,27 +44,14 @@ new Vue({
   watch: {
     tokenPending: function(val) {
       this.tokenPending = val;
-      clearInterval(this.deployInterval);
-      this.deployInterval = setInterval(() => {
-          this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
-          .then((response) => {
-            if (response.data.deployed === true) {
-                this.tokenDeployed = true;
-                this.tokenPending = false;
-                clearInterval(this.deployInterval);
-            }
-            this.retryCount++;
-            if (this.retryCount >= this.retryCountLimit) {
-                clearInterval(this.deployInterval);
-            }
-          }, (error) => {
-              this.notifyError('An error has occurred, please try again later');
-          });
-      }, 60000);
+      this.showTokenDeployed();
     },
   },
   mounted: function() {
     this.fetchAddress();
+    if (this.tokenPending) {
+      this.showTokenDeployed();
+    }
   },
   beforeUpdate: function() {
     if (this.tokenDeployed) {
@@ -85,6 +72,25 @@ new Vue({
             this.notifyError('An error has occurred, please try again later');
         });
       }, 2000);
+    },
+    showTokenDeployed: function() {
+      clearInterval(this.deployInterval);
+      this.deployInterval = setInterval(() => {
+          this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
+          .then((response) => {
+            if (response.data.deployed === true) {
+                this.tokenDeployed = true;
+                this.tokenPending = false;
+                clearInterval(this.deployInterval);
+            }
+            this.retryCount++;
+            if (this.retryCount >= this.retryCountLimit) {
+                clearInterval(this.deployInterval);
+            }
+          }, (error) => {
+              this.notifyError('An error has occurred, please try again later');
+          });
+      }, 60000);
     },
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
