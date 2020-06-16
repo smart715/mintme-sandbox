@@ -173,6 +173,7 @@ export default {
             this.$v.$reset();
             this.amount = 0;
             this.address = '';
+            this.code = '';
             this.$emit('close');
         },
         onWithdraw: function() {

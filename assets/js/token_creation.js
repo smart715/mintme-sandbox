@@ -1,4 +1,3 @@
-import Modal from './components/modal/Modal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
 import {
@@ -13,9 +12,6 @@ import {
 new Vue({
     el: '#token',
     mixins: [NotificationMixin],
-    components: {
-        Modal,
-    },
     data() {
         return {
             domLoaded: false,
@@ -86,10 +82,8 @@ new Vue({
                         location.href = this.$routing.generate('token_show', {
                             name: this.tokenName,
                         });
-                        this.showTwoFactorModal = false;
-                        this.closeModal();
-                }
-                    }, (err) => this.notifyError(err.response.data.message));
+                    }
+                }, (err) => this.notifyError(err.response.data.message));
         },
     },
     mounted: function() {
