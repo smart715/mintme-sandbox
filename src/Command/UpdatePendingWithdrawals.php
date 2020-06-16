@@ -130,7 +130,13 @@ class UpdatePendingWithdrawals extends Command
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
-                        $item->getAmount()->getAmount()->add($fee)
+                        $item->getAmount()->getAmount()
+                    );
+
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $token,
+                        $fee
                     );
 
                     $this->em->remove($item);
