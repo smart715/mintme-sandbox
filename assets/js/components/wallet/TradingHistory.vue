@@ -47,7 +47,7 @@
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI, BTC, MINTME} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -192,14 +192,17 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name});
         },
         createTicker: function(toMoney, history) {
-            return toMoney + ' ' + (history.side === 2 ? this.rebrandingFunc(history.market.quote.symbol) : this.rebrandingFunc(history.market.base.symbol));
+            return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
+                ? this.rebrandingFunc(history.market.quote.symbol)
+                : this.rebrandingFunc(history.market.base.symbol));
         },
         calculateTotalCost: function(history) {
-            return history.side === 1 ? (new Decimal(history.price).times(history.amount)).toString() :
-                (new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString();
+            return WSAPI.order.type.SELL === history.side
+                ? (new Decimal(history.price).times(history.amount)).toString()
+                : (new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString();
         },
         producePrecision(history) {
-            return history.side === 2 ? 4 : 8;
+            return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
         },
 
     },
