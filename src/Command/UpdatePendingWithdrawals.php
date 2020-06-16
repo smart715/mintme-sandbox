@@ -89,6 +89,9 @@ class UpdatePendingWithdrawals extends Command
                         $fee
                     );
 
+                    $this->logger->info("[withdrawals] Pending withdraval log: ".$fee->getAmount());
+                    $this->logger->info("[withdrawals] Pending withdraval log: ".print_r($token, true));
+
                     $this->em->remove($item);
                     $this->em->flush();
                     $this->em->commit();
