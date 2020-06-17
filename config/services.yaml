@@ -166,6 +166,8 @@ services:
             - { name: monolog.logger, channel: cron }
 
     App\Command\UpdatePendingWithdrawals:
+        properties:
+            expirationTime: '%withdraw_expiration_time%'
         arguments:
             $logger: '@logger'
         tags:
@@ -558,3 +560,11 @@ services:
 
     App\Form\DataTransformer\MoneyTransformer:
         shared: false
+
+    App\Repository\PendingWithdrawRepository:
+        arguments:
+            $expirationTime: '%withdraw_expiration_time%'
+
+    App\Repository\PendingTokenWithdrawRepository:
+        arguments:
+            $expirationTime: '%withdraw_expiration_time%'
