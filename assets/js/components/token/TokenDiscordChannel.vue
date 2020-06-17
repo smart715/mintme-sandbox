@@ -2,7 +2,7 @@
     <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3 px-3"
+            class="form-group col-12"
         >
             <label for="discord-err">Discord address:</label>
             <input

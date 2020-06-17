@@ -2,7 +2,7 @@
     <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3 px-3"
+            class="form-group col-12"
         >
             <label id="website-err-label" for="website-err">Website address:</label>
             <input
