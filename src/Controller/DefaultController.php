@@ -13,18 +13,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/test",
-     *     name="test",
-     *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
-     * )
-     */
-    public function test(\App\Manager\UserManagerInterface $um): Response
-    {
-        $a = $um->findUsers();
-        dd($a);
-    }
-
-    /**
      * @Route("/",
      *     name="homepage",
      *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
