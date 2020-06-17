@@ -24,6 +24,7 @@
 @import 'icons'
 @import 'sign-up-landing'
 @import 'spinner'
+@import 'posts'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -119,6 +120,10 @@ a
   border-style: solid
   border-color: transparent
   color: $color-link
+
+  &:hover
+    color: $color-link-hover
+    text-decoration: underline
 
 .faq-block
   a:hover
@@ -363,6 +368,7 @@ a
     padding-top: 0.35rem
     padding-bottom: 0.35rem
     vertical-align: middle
+    padding-left: calc(0.75rem + 0.65em)
 
     &:first-child
       padding-left: 1.5rem
@@ -717,6 +723,10 @@ nav.top-navbar
   right: 0 !important
   -webkit-transform: none !important
   transform: none !important
+  pointer-events: none
+
+.toasted
+  pointer-events: auto
 
 .airdrop-container
   background: #152d47 !important

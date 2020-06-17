@@ -1,14 +1,39 @@
 <div class="row pt-5 justify-content-center" v-if="false">
+    {% if isTokenPage %}
     <div class="col-md-10">
         <div class="tabs tabs-theme transparent">
-            <div class="">
+            <div>
                 <ul role="tablist" class="nav nav-tabs">
-                    <li role="presentation" class="nav-item"><a role="tab" aria-selected="true" aria-setsize="2"
-                                                                aria-posinset="1" target="_self" href="#"
-                                                                class="nav-link active">Introduction</a></li>
-                    <li role="presentation" class="nav-item"><a role="tab" aria-selected="false" aria-setsize="2"
-                                                                aria-posinset="2" target="_self" href="#"
-                                                                class="nav-link">Trade</a></li>
+                    <li role="presentation" class="nav-item">
+                        <a role="tab"
+                            aria-selected="true"
+                            aria-setsize="2"
+                            aria-posinset="1" target="_self" href="#"
+                            class="nav-link active"
+                        >
+                            Introduction
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2" target="_self" href="#"
+                            class="nav-link"
+                        >
+                            Trade
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2" target="_self" href="#"
+                            class="nav-link"
+                        >
+                            Posts
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <div class="nav-link pr-md-0">
                             <div>
@@ -55,38 +80,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-6 pr-lg-2">
+                        <div class="col-12 col-lg-7 pr-lg-1">
                             <div class="card h-100">
-                                <div class="card-header truncate-name">
-                                    <span>&nbsp;</span>
+                                <div class="card-header">
+                                    Recent posts
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex flex-column h-100">
-                                        <div><a href="#">Visit
-                                                token's creator profile</a></div>
-                                        <div class="pb-1 pt-4 flex-grow-1 mb-2">
-                                            <div class="col-12 my-3 text-left d-flex align-items-center">
-                                                <div id="share" class="dropdown btn-group b-dropdown mt-3">
-                                                    <button type="button"
-                                                            class="btn dropdown-toggle btn-primary">Share
-                                                    </button>
-                                                </div>
-                                                <div class="tooltip-static tooltip-static-left">
-                                                    Do you want this token to grow? Spread the word!
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="row justify-content-start pl-4"></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="p-5 text-center">
+                                        <i class="vld-icon"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div
-                                class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2">
+                        <div class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
                                     Statistics
@@ -120,4 +126,82 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="col-md-10">
+        <div class="row mb-3 v-cloak--block"></div>
+        <div class="tabs tabs-theme transparent" id="__BVID__33">
+            <div>
+                <ul role="tablist" class="nav nav-tabs" id="__BVID__33__BV_tab_controls_">
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="true"
+                            aria-setsize="1"
+                            aria-posinset="1"
+                            target="_self"
+                            href="#"
+                            class="nav-link active"
+                            id="__BVID__35___BV_tab_button__"
+                            aria-controls="__BVID__35">
+                            Trade
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content" id="__BVID__33__BV_tab_container_">
+                <div
+                    role="tabpanel"
+                    aria-hidden="false"
+                    class="tab-pane active"
+                    id="__BVID__35"
+                    aria-labelledby="__BVID__35___BV_tab_button__">
+                    <div class="container-fluid px-0">
+                        <div class="row">
+                            <div class="card col">
+                                <div class="card-body p-2">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div
+                                                class="m-2 ve-candle"
+                                                style="width: auto; height: 400px; position: relative;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row trade-orders">
+                            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
+                                <div class="h-100">
+                                    <div class="card h-100">
+                                        <div class="card-header text-left">
+                                            Buy Order
+                                        </div>
+                                        <div class="card-body" style="height: 200px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6 pl-lg-2 mt-3">
+                                <div class="h-100">
+                                    <div class="card h-100">
+                                        <div class="card-header text-left">Sell Order</div>
+                                        <div class="card-body" style="height: 200px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-header">Trade History</div>
+                                    <div class="card-body p-0" style="height: 200px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>

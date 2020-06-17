@@ -49,5 +49,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/wallet.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/wallet.js') }}"></script>
 {% endblock %}
