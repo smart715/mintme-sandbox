@@ -25,7 +25,7 @@ new Vue({
       tokenDeployed: null,
       deployInterval: null,
       retryCount: 0,
-      retryCountLimit: 10,
+      retryCountLimit: 15,
       tokenAddress: null,
       tokenAddressTimeout: null,
     };
@@ -42,18 +42,17 @@ new Vue({
     TokenPointsProgress,
   },
   watch: {
-    tokenPending: function(val) {
-      this.tokenPending = val;
-      this.showTokenDeployed();
+    tokenPending: function() {
+      this.checkTokenDeployment();
     },
   },
   mounted: function() {
     this.fetchAddress();
-    if (this.tokenPending) {
-      this.showTokenDeployed();
-    }
   },
   beforeUpdate: function() {
+    if (this.tokenPending) {
+      this.checkTokenDeployment();
+    }
     if (this.tokenDeployed) {
       this.fetchAddress();
     }
@@ -73,18 +72,21 @@ new Vue({
         });
       }, 2000);
     },
-    showTokenDeployed: function() {
+    checkTokenDeployment: function() {
       clearInterval(this.deployInterval);
       this.deployInterval = setInterval(() => {
           this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
           .then((response) => {
-            if (response.data.deployed === true) {
+            if (response.data.deployed === tokenDeploymentStatus.deployed) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
                 clearInterval(this.deployInterval);
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
+                this.notifyError('The token could not be deployed, Please try again later');
+                this.tokenPending = false;
+                this.tokenDeployed = false;
                 clearInterval(this.deployInterval);
             }
           }, (error) => {
@@ -111,8 +113,8 @@ new Vue({
     },
     getTokenStatus: function(status) {
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :
-             this.tokenPending ? tokenDeploymentStatus.pending :
-             status;
+             (this.tokenPending ? tokenDeploymentStatus.pending :
+             status);
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
