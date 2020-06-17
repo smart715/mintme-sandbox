@@ -54,11 +54,6 @@ new Vue({
       this.fetchAddress();
     }
   },
-  updated: function() {
-    if (this.tokenPending) {
-      this.checkTokenDeployment();
-    }
-  },
   methods: {
     fetchAddress: function() {
       clearTimeout(this.tokenAddressTimeout);
