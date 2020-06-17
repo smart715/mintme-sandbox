@@ -20,8 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class PendingWithdraw implements PendingWithdrawInterface
 {
-    public const EXPIRES_HOURS = 4;
-
     /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
