@@ -14,7 +14,7 @@
                 <div class="center-block text-center col-12">
                     {% media post.image, 'wide' with {'class': 'img-fluid'} %}
                 </div>
-                <div class="col-12 mt-4 post word-break">
+                <div class="col-12 mt-4 word-break">
                     {{ post.content|safeHtml|raw }}
                 </div>
             </div>
