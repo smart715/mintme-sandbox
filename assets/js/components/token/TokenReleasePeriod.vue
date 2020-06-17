@@ -91,7 +91,7 @@ export default {
     data() {
         return {
             loading: true,
-            released: 0,
+            released: 1,
             releasePeriod: 0,
             hasLockin: false,
         };
