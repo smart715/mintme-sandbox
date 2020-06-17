@@ -2,7 +2,7 @@
     <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3"
+            class="form-group my-3 px-3"
         >
             <label id="website-err-label" for="website-err">Website address:</label>
             <input
@@ -19,7 +19,7 @@
             >
                 Please provide a valid URL.
             </div>
-            <div class="col-12 text-left mt-3">
+            <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editWebsite"
