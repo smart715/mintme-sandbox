@@ -50,11 +50,13 @@ new Vue({
     this.fetchAddress();
   },
   beforeUpdate: function() {
-    if (this.tokenPending) {
-      this.checkTokenDeployment();
-    }
     if (this.tokenDeployed) {
       this.fetchAddress();
+    }
+  },
+  updated: function() {
+    if (this.tokenPending) {
+      this.checkTokenDeployment();
     }
   },
   methods: {
