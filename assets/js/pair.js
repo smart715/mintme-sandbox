@@ -32,7 +32,6 @@ new Vue({
       retryCount: 0,
       retryCountLimit: 15,
       tokenAddress: null,
-      tokenAddressTimeout: null,
       posts: null,
     };
   },
@@ -49,33 +48,16 @@ new Vue({
     TopHolders,
     Trade,
   },
-  watch: {
-    tokenPending: function() {
-      this.checkTokenDeployment();
-    },
-  },
-  mounted: function() {
-    this.fetchAddress();
-  },
-  beforeUpdate: function() {
-    if (this.tokenDeployed) {
-      this.fetchAddress();
-    }
-  },
   methods: {
     fetchAddress: function() {
-      clearTimeout(this.tokenAddressTimeout);
-      this.tokenAddressTimeout = setTimeout(() => {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
           if (response.status === HTTP_OK) {
             this.tokenAddress = response.data.address;
-            clearTimeout(this.tokenAddressTimeout);
           }
         }, (error) => {
             this.notifyError('An error has occurred, please try again later');
         });
-      }, 2000);
     },
     checkTokenDeployment: function() {
       clearInterval(this.deployInterval);
@@ -89,13 +71,17 @@ new Vue({
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
-                this.notifyError('The token could not be deployed, Please try again later');
+                this.notifyError('The token could not be deployed, please try again later');
                 this.tokenPending = false;
                 this.tokenDeployed = false;
                 clearInterval(this.deployInterval);
             }
-          }, (error) => {
-              this.notifyError('An error has occurred, please try again later');
+          })
+          .then(() => {
+            this.fetchAddress();
+          })
+          .catch((error) => {
+            this.notifyError('An error has occured, please try again later');
           });
       }, 60000);
     },
@@ -115,6 +101,7 @@ new Vue({
     },
     setTokenPending: function() {
       this.tokenPending = true;
+      this.checkTokenDeployment();
     },
     getTokenStatus: function(status) {
       return this.tokenDeployed ? tokenDeploymentStatus.deployed :

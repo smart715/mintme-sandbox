@@ -82,8 +82,7 @@
                                     token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    :token-contract-address="tokenAddress"
-
+                                    :token-contract-address="tokenAddress || (tokenAddress = '{{ token.address }}'"
                             />
                         </div>
                         <div class="row">
