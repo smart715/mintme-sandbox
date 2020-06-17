@@ -82,9 +82,18 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
-    public function getMarketsCount(): int
+    public function getMarketsCount(int $deployed = 0): int
     {
-        return $this->repository->count([]);
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('COUNT(ms)')
+            ->from(MarketStatus::class, 'ms');
+
+        if (self::DEPLOYED_ONLY === $deployed) {
+            $qb->join('ms.quoteToken', 'qt')
+                ->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        }
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
     /** {@inheritDoc} */

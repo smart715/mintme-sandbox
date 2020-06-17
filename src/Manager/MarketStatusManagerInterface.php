@@ -8,7 +8,7 @@ use App\Exchange\Market;
 
 interface MarketStatusManagerInterface
 {
-    public function getMarketsCount(): int;
+    public function getMarketsCount(int $deployed = 0): int;
 
     /** @return array<MarketStatus> */
     public function getMarketsInfo(

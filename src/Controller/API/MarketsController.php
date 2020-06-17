@@ -61,18 +61,20 @@ class MarketsController extends APIController
             ? $user->getId()
             : null;
 
+        $deployed = (int)$request->get('deployed');
+
         $markets = $marketStatusManager->getMarketsInfo(
             $page,
             self::OFFSET,
             $request->get('sort'),
             $request->get('order'),
-            (int)$request->get('deployed'),
+            $deployed,
             $user
         );
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
-            'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
+            'rows' => $marketStatusManager->getMarketsCount($deployed),
             'limit' => self::OFFSET,
         ]);
     }
