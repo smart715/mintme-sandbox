@@ -134,6 +134,7 @@
             :twofa="twofa"
             :subunit="withdraw.subunit"
             :no-close="true"
+            :expiration-time="expirationTime"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -185,6 +186,7 @@ export default {
         tradingUrl: String,
         depositMore: String,
         twofa: String,
+        expirationTime: Number,
     },
     data() {
         return {
