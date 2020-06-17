@@ -2,15 +2,15 @@
 
 namespace App\Repository;
 
-use App\Entity\PendingWithdraw;
+use App\Entity\PendingTokenWithdraw;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-class PendingWithdrawRepository extends AbstractPendingWithdrawRepository
+class PendingTokenWithdrawRepository extends AbstractPendingWithdrawRepository
 {
     public function __construct(
         ManagerRegistry $registry,
         int $expirationTime
     ) {
-        parent::__construct($registry, PendingWithdraw::class, $expirationTime);
+        parent::__construct($registry, PendingTokenWithdraw::class, $expirationTime);
     }
 }
