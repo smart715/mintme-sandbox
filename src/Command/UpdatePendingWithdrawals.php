@@ -7,6 +7,7 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use DateInterval;
@@ -34,6 +35,9 @@ class UpdatePendingWithdrawals extends Command
 
     /** @var CryptoManagerInterface */
     private $cryptoManager;
+
+    /** @var int */
+    public $expirationTime;
 
     public function __construct(
         LoggerInterface $logger,
@@ -65,7 +69,7 @@ class UpdatePendingWithdrawals extends Command
     {
         $this->logger->info('[withdrawals] Update job started..');
 
-        $expires = new DateInterval('PT'.PendingWithdraw::EXPIRES_HOURS.'H');
+        $expires = new DateInterval('PT'.$this->expirationTime.'S');
 
         /** @var PendingWithdraw $item */
         foreach ($this->getPendingWithdrawRepository()->findAll() as $item) {
@@ -130,7 +134,7 @@ class UpdatePendingWithdrawals extends Command
         return $this->em->getRepository(PendingWithdraw::class);
     }
 
-    private function getPendingTokenWithdrawRepository(): PendingWithdrawRepository
+    private function getPendingTokenWithdrawRepository(): PendingTokenWithdrawRepository
     {
         return $this->em->getRepository(PendingTokenWithdraw::class);
     }
