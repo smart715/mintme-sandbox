@@ -422,9 +422,6 @@
     "phpstan/phpstan-symfony": {
         "version": "0.12.6"
     },
-    "piwik/device-detector": {
-        "version": "3.12.5"
-    },
     "pragmarx/random": {
         "version": "v0.2.2"
     },
@@ -979,6 +976,9 @@
     },
     "twig/twig": {
         "version": "v2.12.5"
+    },
+    "ua-parser/uap-php": {
+        "version": "v3.9.8"
     },
     "vasek-purchart/doctrine-date-time-immutable-types": {
         "version": "1.0"
