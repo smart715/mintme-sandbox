@@ -94,7 +94,7 @@ class ExchangerTest extends TestCase
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
             $this->mockMoneyWrapper(),
-            $this->mockMarketProducer($this->never()),
+            $this->mockMarketProducer($this->once()),
             $this->mockBalanceHandler($this->once(), $user, $tok),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
@@ -120,7 +120,7 @@ class ExchangerTest extends TestCase
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
             $this->mockMoneyWrapper(),
-            $this->mockMarketProducer($this->never()),
+            $this->mockMarketProducer($this->once()),
             $this->mockBalanceHandler($this->once(), $user, $tok),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
