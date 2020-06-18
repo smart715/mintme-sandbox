@@ -9,6 +9,8 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
+use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Wallet\Model\Amount;
@@ -36,12 +38,16 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $handler->expects($this->exactly($lockCount))
             ->method('deposit');
 
-        $application->add(new UpdatePendingWithdrawals(
+        $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
             $handler
-        ));
+        );
+
+        $upw->expirationTime = 1;
+
+        $application->add($upw);
 
         $command = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
@@ -65,12 +71,16 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $em = $this->mockEm($emCount);
         $em->expects($this->exactly($lockCount))->method('rollback');
 
-        $application->add(new UpdatePendingWithdrawals(
+        $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
             $handler
-        ));
+        );
+
+        $upw->expirationTime = 1;
+
+        $application->add($upw);
 
         $command = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
