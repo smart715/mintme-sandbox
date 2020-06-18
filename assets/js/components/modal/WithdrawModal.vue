@@ -118,6 +118,7 @@ export default {
         subunit: Number,
         twofa: String,
         noClose: Boolean,
+        expirationTime: Number,
     },
     data() {
         return {
@@ -173,6 +174,7 @@ export default {
             this.$v.$reset();
             this.amount = 0;
             this.address = '';
+            this.code = '';
             this.$emit('close');
         },
         onWithdraw: function() {
@@ -196,7 +198,7 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.notifySuccess('Confirmation email has been sent to your email. It will expire in 4 hours.');
+                this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
                 this.closeModal();
             })
             .catch((error) => {
