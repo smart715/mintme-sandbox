@@ -1,9 +1,6 @@
 import AOS from 'aos';
-import Vue from 'vue';
 import NewsImage from './components/NewsImage';
 import store from './storage';
-
-window.Vue = Vue;
 
 AOS.init({
     easing: 'ease-out-back',
