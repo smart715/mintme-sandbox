@@ -68,6 +68,7 @@ new Vue({
                 this.tokenDeployed = true;
                 this.tokenPending = false;
                 clearInterval(this.deployInterval);
+                this.fetchAddress();
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
@@ -76,9 +77,6 @@ new Vue({
                 this.tokenDeployed = false;
                 clearInterval(this.deployInterval);
             }
-          })
-          .then(() => {
-            this.fetchAddress();
           })
           .catch((error) => {
             this.notifyError('An error has occured, please try again later');
