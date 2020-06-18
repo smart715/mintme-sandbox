@@ -136,6 +136,7 @@ class Exchanger implements ExchangerInterface
             Order::PENDING_STATUS,
             $fee,
             null,
+            null,
             $user->getReferrencer() ? (int)$user->getReferrencer()->getId() : 0
         );
 
