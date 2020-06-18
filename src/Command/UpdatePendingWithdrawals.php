@@ -6,7 +6,6 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
@@ -97,6 +96,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->flush();
                     $this->em->commit();
                     $pendingCount++;
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval ({$item->getSymbol()}) returns.");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
                     $this->logger->info("[withdrawals] Pending withdraval error: $message ...");
@@ -130,6 +130,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->flush();
                     $this->em->commit();
                     $pendingCount++;
+                    $this->logger->info("[withdrawals] $pendingCount Pending token withdraval ({$item->getSymbol()}) returns.");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
                     $this->logger->info("[withdrawals] Pending token withdraval error: $message ...");
@@ -152,6 +153,6 @@ class UpdatePendingWithdrawals extends Command
 
     private function getPendingTokenWithdrawRepository(): PendingTokenWithdrawRepository
     {
-        return $this->em->getRepository(PendingTokenWithdraw::class);
+        return $this->em->getRepository(PendingTokenWithdrawRepository::class);
     }
 }

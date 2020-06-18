@@ -9,7 +9,6 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
@@ -109,7 +108,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
                 return $this->mockPending();
             }, range(1, $lockCount)));
 
-        $repoT = $this->createMock(PendingWithdrawRepository::class);
+        $repoT = $this->createMock(PendingTokenWithdrawRepository::class);
         $repoT->expects($this->exactly(1))
         ->method('findAll')
         ->willReturn(array_map(function () {
