@@ -977,9 +977,6 @@
     "twig/twig": {
         "version": "v2.12.5"
     },
-    "ua-parser/uap-php": {
-        "version": "v3.9.8"
-    },
     "vasek-purchart/doctrine-date-time-immutable-types": {
         "version": "1.0"
     },
