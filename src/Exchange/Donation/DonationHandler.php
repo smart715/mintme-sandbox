@@ -90,7 +90,8 @@ class DonationHandler implements DonationHandlerInterface
         string $currency,
         string $amount,
         string $expectedAmount,
-        User $donorUser
+        User $donorUser,
+        Money $sellOrdersWorth
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         $this->checkAmount($donorUser, $amountObj, $currency);
@@ -105,11 +106,20 @@ class DonationHandler implements DonationHandlerInterface
             Token::WEB_SYMBOL
         );
 
-        if ($expectedAmount->greaterThan($minTokensAmount)) {
-            $donationAmount = $amountObj;
+        $donationAmount = $amountObj;
 
+        if (Token::BTC_SYMBOL === $currency) {
+            $donationAmount = $this->getBtcWorthInMintme($donationAmount);
+        }
+
+        if ($expectedAmount->greaterThan($minTokensAmount) && $sellOrdersWorth->greaterThanOrEqual($donationAmount)) {
+            // Token creator has available sell orders, enough for donation (using donation API)
+            // Fee is taking by donation viabtc API
+            $feeAmount = new Money(0, new Currency($currency));
+
+            // Convert BTC to MINTME. viabtc API using real user's funds in MINTME only.
             if (Token::BTC_SYMBOL === $currency) {
-                $donationAmount = $this->getBtcWorthInMintme($donationAmount);
+                $this->sendAmountFromUserToUser($donorUser, $amountObj, $donorUser, $donationAmount, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
             }
 
             $this->donationFetcher->makeDonation(
@@ -120,29 +130,60 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
+            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
+        } elseif ($expectedAmount->greaterThan($minTokensAmount) && $expectedAmount->isPositive() && $sellOrdersWorth->lessThan($donationAmount)) {
+            // Token creator has available sell orders, NOT enough for donation (using donation API)
+            // So part of donation funds (equal to sell orders worth) is sending via donation viabtc API
+            // Another part is sending from user to user
+            if (Token::BTC_SYMBOL === $currency) {
+                $sellOrdersWorthInBtc = $this->getMintmeWorthInBtc($sellOrdersWorth);
+                // Convert BTC to MINTME. viabtc API using real user's funds in MINTME only.
+                $this->sendAmountFromUserToUser($donorUser, $sellOrdersWorthInBtc, $donorUser, $sellOrdersWorth, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
+                $this->donationFetcher->makeDonation(
+                    $donorUser->getId(),
+                    $this->marketNameConverter->convert($market),
+                    $this->moneyWrapper->format($sellOrdersWorth),
+                    $this->getFee(),
+                    $this->moneyWrapper->format($expectedAmount),
+                    $tokenCreator->getId()
+                );
+
+                // Calculate left funds and send from user to user.
+                $donationAmountLeftInBtc = $amountObj->subtract($sellOrdersWorthInBtc);
+                $feeAmount = $this->calculateFee($donationAmountLeftInBtc);
+                $amountToDonate = $donationAmountLeftInBtc->subtract($feeAmount);
+                $this->sendAmountFromUserToUser($donorUser, $donationAmountLeftInBtc, $donorUser, $amountToDonate, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
+                $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
+            } else {
+                $amountToSendManually = $donationAmount->subtract($sellOrdersWorth);
+                $this->donationFetcher->makeDonation(
+                    $donorUser->getId(),
+                    $this->marketNameConverter->convert($market),
+                    $this->moneyWrapper->format($sellOrdersWorth),
+                    $this->getFee(),
+                    $this->moneyWrapper->format($expectedAmount),
+                    $tokenCreator->getId()
+                );
+                $feeAmount = $this->calculateFee($amountToSendManually);
+                $amountToDonate = $amountToSendManually->subtract($feeAmount);
+                $this->sendAmountFromUserToUser($donorUser, $amountToSendManually, $tokenCreator, $amountToDonate, $currency, $currency);
+                $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
+            }
+        } else {
+            // Token creator has no sell orders available. Send funds from user to user.
+            $feeAmount = $this->calculateFee($amountObj);
+            $amountToDonate = $amountObj->subtract($feeAmount);
+            $this->sendAmountFromUserToUser($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency, $currency);
+            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         }
 
-        $feeAmount = $this->calculateFee($amountObj);
-        $amountToDonate = $amountObj->subtract($feeAmount);
-        $this->sendDonationFunds($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency);
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
-        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
     }
 
     public function getSellOrdersWorth(Money $sellOrdersWorth, string $currency): string
     {
-        $rates = $this->cryptoRatesFetcher->fetch();
-
         if (Token::BTC_SYMBOL === $currency) {
-            $sellOrdersWorth = $this->moneyWrapper->convert(
-                $sellOrdersWorth,
-                new Currency(Token::BTC_SYMBOL),
-                new FixedExchange([
-                    Token::WEB_SYMBOL => [
-                        Token::BTC_SYMBOL => $rates[Token::WEB_SYMBOL][Token::BTC_SYMBOL],
-                    ],
-                ])
-            );
+            $sellOrdersWorth = $this->getMintmeWorthInBtc($sellOrdersWorth);
         }
 
         return $this->moneyWrapper->format($sellOrdersWorth);
@@ -169,34 +210,50 @@ class DonationHandler implements DonationHandlerInterface
         $this->em->flush();
     }
 
-    private function sendDonationFunds(
-        User $donorUser,
+    private function sendAmountFromUserToUser(
+        User $withdrawFromUser,
         Money $donationAmount,
-        User $tokenCreator,
+        User $depositToUser,
         Money $amountToDonate,
-        string $currency
+        string $withdrawCurrency,
+        string $depositCurrency
     ): void {
         $cryptos = $this->cryptoManager->findAllIndexed('symbol');
         $this->balanceHandler->update(
-            $donorUser,
-            Token::getFromCrypto($cryptos[$currency]),
+            $withdrawFromUser,
+            Token::getFromCrypto($cryptos[$withdrawCurrency]),
             $donationAmount->negative(),
             'donation'
         );
         $this->balanceHandler->update(
-            $tokenCreator,
-            Token::getFromCrypto($cryptos[$currency]),
+            $depositToUser,
+            Token::getFromCrypto($cryptos[$depositCurrency]),
             $amountToDonate,
             'donation'
         );
     }
 
-    private function getBtcWorthInMintme(Money $amount): Money
+    private function getMintmeWorthInBtc(Money $amountInBtc): Money
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
         return $this->moneyWrapper->convert(
-            $amount,
+            $amountInBtc,
+            new Currency(Token::BTC_SYMBOL),
+            new FixedExchange([
+                Token::WEB_SYMBOL => [
+                    Token::BTC_SYMBOL => $rates[Token::WEB_SYMBOL][Token::BTC_SYMBOL],
+                ],
+            ])
+        );
+    }
+
+    private function getBtcWorthInMintme(Money $amountInMintme): Money
+    {
+        $rates = $this->cryptoRatesFetcher->fetch();
+
+        return $this->moneyWrapper->convert(
+            $amountInMintme,
             new Currency(Token::WEB_SYMBOL),
             new FixedExchange([
                 Token::BTC_SYMBOL => [

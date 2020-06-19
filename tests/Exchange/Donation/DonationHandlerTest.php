@@ -15,6 +15,8 @@ use App\Manager\CryptoManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -153,7 +155,8 @@ class DonationHandlerTest extends TestCase
             $em
         );
 
-        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser);
+        $sellOrdersWorth = new Money(0, new Currency(Token::WEB_SYMBOL));
+        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser, $sellOrdersWorth);
         $this->assertTrue(true);
     }
 

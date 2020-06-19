@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -20,9 +21,13 @@ class DonationController extends AbstractFOSRestController
     /** @var DonationHandlerInterface */
     protected $donationHandler;
 
-    public function __construct(DonationHandlerInterface $donationHandler)
+    /** @var MarketHandlerInterface */
+    protected $marketHandler;
+
+    public function __construct(DonationHandlerInterface $donationHandler, MarketHandlerInterface $marketHandler)
     {
         $this->donationHandler = $donationHandler;
+        $this->marketHandler = $marketHandler;
     }
 
     /**
@@ -39,8 +44,7 @@ class DonationController extends AbstractFOSRestController
     public function checkDonation(
         Market $market,
         string $currency,
-        string $amount,
-        MarketHandlerInterface $marketHandler
+        string $amount
     ): View {
         $amountToReceive = $this->donationHandler->checkDonation(
             $market,
@@ -49,8 +53,10 @@ class DonationController extends AbstractFOSRestController
             $this->getCurrentUser()
         );
 
-        $sellOrdersWorth = $marketHandler->getSellOrdersWorth($market);
-        $sellOrdersWorth = $this->donationHandler->getSellOrdersWorth($sellOrdersWorth, $currency);
+        $sellOrdersWorth = $this->donationHandler->getSellOrdersWorth(
+            $this->getSellOrdersWorth($market),
+            $currency
+        );
 
         return $this->view([
             'amountToReceive' => $amountToReceive,
@@ -81,7 +87,8 @@ class DonationController extends AbstractFOSRestController
             $request->get('currency'),
             (string)$request->get('amount'),
             (string)$request->get('expected_count_to_receive'),
-            $this->getCurrentUser()
+            $this->getCurrentUser(),
+            $this->getSellOrdersWorth($market)
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
@@ -97,5 +104,10 @@ class DonationController extends AbstractFOSRestController
         }
 
         return $user;
+    }
+
+    private function getSellOrdersWorth(Market $market): Money
+    {
+        return $this->marketHandler->getSellOrdersWorth($market);
     }
 }
