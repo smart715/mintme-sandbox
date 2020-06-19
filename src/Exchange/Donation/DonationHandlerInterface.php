@@ -8,16 +8,15 @@ use Money\Money;
 
 interface DonationHandlerInterface
 {
-    public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): string;
+    public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): array;
     public function makeDonation(
         Market $market,
         string $currency,
         string $amount,
         string $expectedAmountUser,
-        User $donorUser,
-        Money $sellOrdersWorth
+        User $donorUser
     ): void;
-    public function getSellOrdersWorth(Money $sellOrdersWorth, string $currency): string;
+    public function getTokensWorth(string $sellOrdersWorth, string $currency): string;
     public function saveDonation(
         User $donor,
         User $tokenCreator,

@@ -46,21 +46,19 @@ class DonationController extends AbstractFOSRestController
         string $currency,
         string $amount
     ): View {
-        $amountToReceive = $this->donationHandler->checkDonation(
+        $data = $this->donationHandler->checkDonation(
             $market,
             $currency,
             $amount,
             $this->getCurrentUser()
         );
 
-        $sellOrdersWorth = $this->donationHandler->getSellOrdersWorth(
-            $this->getSellOrdersWorth($market),
-            $currency
-        );
+        $tokensWorth = $data[1] ?? '0';
+        $tokensWorth = $this->donationHandler->getTokensWorth($tokensWorth, $currency);
 
         return $this->view([
-            'amountToReceive' => $amountToReceive,
-            'sellOrdersWorth' => $sellOrdersWorth,
+            'amountToReceive' => $data[0] ?? '0',
+            'tokensWorth' => $tokensWorth,
         ]);
     }
 
@@ -87,8 +85,7 @@ class DonationController extends AbstractFOSRestController
             $request->get('currency'),
             (string)$request->get('amount'),
             (string)$request->get('expected_count_to_receive'),
-            $this->getCurrentUser(),
-            $this->getSellOrdersWorth($market)
+            $this->getCurrentUser()
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);
@@ -104,10 +101,5 @@ class DonationController extends AbstractFOSRestController
         }
 
         return $user;
-    }
-
-    private function getSellOrdersWorth(Market $market): Money
-    {
-        return $this->marketHandler->getSellOrdersWorth($market);
     }
 }

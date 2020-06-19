@@ -155,8 +155,7 @@ class DonationHandlerTest extends TestCase
             $em
         );
 
-        $sellOrdersWorth = new Money(0, new Currency(Token::WEB_SYMBOL));
-        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser, $sellOrdersWorth);
+        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser);
         $this->assertTrue(true);
     }
 

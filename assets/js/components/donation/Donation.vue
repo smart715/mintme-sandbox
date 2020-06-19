@@ -127,7 +127,7 @@
                                                     <br />
                                                     Do you want to donate {{ amountToDonate }} {{ donationCurrency }}
                                                     for {{ amountToReceive }} {{ market.quote.name }}
-                                                    worth {{ sellOrdersWorth | toMoney(currencySubunit) | formatMoney }} {{ donationCurrency }}?
+                                                    worth {{ tokensWorth | toMoney(currencySubunit) | formatMoney }} {{ donationCurrency }}?
                                                 </p>
                                                 <template v-slot:confirm>Continue</template>
                                             </confirm-modal>
@@ -191,7 +191,7 @@ export default {
             loginFormLoaded: false,
             amountToDonate: 0,
             amountToReceive: 0,
-            sellOrdersWorth: 0,
+            tokensWorth: 0,
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
@@ -317,7 +317,7 @@ export default {
             }))
                 .then((res) => {
                     this.amountToReceive = res.data.amountToReceive;
-                    this.sellOrdersWorth = res.data.sellOrdersWorth;
+                    this.tokensWorth = res.data.tokensWorth;
                     this.donationChecking = false;
                 })
                 .catch((err) => {
@@ -379,7 +379,7 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
-            if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersWorth)) {
+            if ((new Decimal(this.amountToDonate)).greaterThan(this.tokensWorth)) {
                 this.showModal = true;
             } else {
                 this.makeDonation();

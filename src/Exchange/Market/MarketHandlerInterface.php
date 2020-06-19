@@ -42,5 +42,4 @@ interface MarketHandlerInterface
     public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order;
     public function getPendingOrder(Market $market, int $id): Order;
     public function getBuyDepth(Market $market): string;
-    public function getSellOrdersWorth(Market $market): Money;
 }
