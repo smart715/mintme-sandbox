@@ -11,7 +11,7 @@ import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
 import TopHolders from './components/trade/TopHolders';
 import Trade from './components/trade/Trade';
 import store from './storage';
-import {tokenDeploymentStatus} from './utils/constants';
+import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -28,6 +28,11 @@ new Vue({
       editingName: false,
       tokenName: null,
       tokenPending: null,
+      tokenDeployed: null,
+      deployInterval: null,
+      retryCount: 0,
+      retryCountLimit: 15,
+      tokenAddress: null,
       posts: null,
     };
   },
@@ -46,6 +51,40 @@ new Vue({
     Trade,
   },
   methods: {
+    fetchAddress: function() {
+        this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
+        .then((response) => {
+          if (response.status === HTTP_OK) {
+            this.tokenAddress = response.data.address;
+          }
+        }, (error) => {
+            this.notifyError('An error has occurred, please try again later');
+        });
+    },
+    checkTokenDeployment: function() {
+      clearInterval(this.deployInterval);
+      this.deployInterval = setInterval(() => {
+          this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
+          .then((response) => {
+            if (response.data.deployed === tokenDeploymentStatus.deployed) {
+                this.tokenDeployed = true;
+                this.tokenPending = false;
+                clearInterval(this.deployInterval);
+                this.fetchAddress();
+            }
+            this.retryCount++;
+            if (this.retryCount >= this.retryCountLimit) {
+                this.notifyError('The token could not be deployed, please try again later');
+                this.tokenPending = false;
+                this.tokenDeployed = false;
+                clearInterval(this.deployInterval);
+            }
+          })
+          .catch((error) => {
+            this.notifyError('An error has occured, please try again later');
+          });
+      }, 60000);
+    },
     descriptionUpdated: function(val) {
       this.tokenDescription = val;
     },
@@ -62,9 +101,12 @@ new Vue({
     },
     setTokenPending: function() {
       this.tokenPending = true;
+      this.checkTokenDeployment();
     },
     getTokenStatus: function(status) {
-      return true === this.tokenPending ? tokenDeploymentStatus.pending : status;
+      return this.tokenDeployed ? tokenDeploymentStatus.deployed :
+             (this.tokenPending ? tokenDeploymentStatus.pending :
+             status);
     },
     facebookUpdated: function(val) {
       this.tokenFacebook = val;
