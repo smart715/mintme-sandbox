@@ -110,9 +110,9 @@ describe('TokenDeploy', () => {
     });
 
     it('deploy() function should work correctly', (done) => {
-        const wrapper = mockTokenDeploy(true, true, 'not-deployed');
+        const wrapper = mockTokenDeploy(true, true, 'pending');
         wrapper.vm.deploy();
-        expect(wrapper.vm.status).to.deep.equal('not-deployed');
+        expect(wrapper.vm.status).to.deep.equal('pending');
 
         moxios.stubRequest('token_deploy', {status: 200, response: true});
 

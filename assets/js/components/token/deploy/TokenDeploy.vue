@@ -50,7 +50,13 @@
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
-                    Deploy is pending.
+                    <font-awesome-icon
+                        icon="circle-notch"
+                        spin
+                        class="loading-spinner"
+                        fixed-width
+                    />
+                    Deployment is pending. It may take a few moments.
                 </p>
             </div>
             <div
