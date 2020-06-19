@@ -153,6 +153,6 @@ class UpdatePendingWithdrawals extends Command
 
     private function getPendingTokenWithdrawRepository(): PendingTokenWithdrawRepository
     {
-        return $this->em->getRepository(PendingTokenWithdrawRepository::class);
+        return $this->em->getRepository(PendingTokenWithdraw::class);
     }
 }
