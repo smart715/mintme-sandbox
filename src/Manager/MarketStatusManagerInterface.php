@@ -10,6 +10,8 @@ interface MarketStatusManagerInterface
 {
     public function getMarketsCount(int $deployed = 0): int;
 
+    public function getUserRelatedMarketsCount(int $userId): int;
+
     /** @return array<MarketStatus> */
     public function getMarketsInfo(
         int $offset,

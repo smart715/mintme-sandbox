@@ -96,6 +96,18 @@ class MarketStatusManager implements MarketStatusManagerInterface
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+    public function getUserRelatedMarketsCount(int $userId): int
+    {
+        return (int)$this->em->createQueryBuilder()
+            ->select('COUNT(ms)')
+            ->from(MarketStatus::class, 'ms')
+            ->join('ms.quoteToken', 'qt')
+            ->innerJoin('qt.users', 'u', 'WITH', 'u.id = :id')
+            ->setParameter('id', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /** {@inheritDoc} */
     public function getMarketsInfo(
         int $page,

@@ -74,7 +74,9 @@ class MarketsController extends APIController
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
-            'rows' => $marketStatusManager->getMarketsCount($deployed),
+            'rows' => $user
+                ? $marketStatusManager->getUserRelatedMarketsCount($user)
+                : $marketStatusManager->getMarketsCount($deployed),
             'limit' => self::OFFSET,
         ]);
     }
