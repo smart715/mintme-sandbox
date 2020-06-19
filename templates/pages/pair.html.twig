@@ -82,8 +82,7 @@
                                     token-created="{{ token.getCreated().format('d M Y') }}"
                                     :precision="{{ precision }}"
                                     :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    token-contract-address="{{ token.address }}"
-
+                                    :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                             />
                         </div>
                         <div class="row">
@@ -183,7 +182,7 @@
                                     @token-deploy-pending="setTokenPending"
                                     @updated-website="websiteUpdated"
                                     @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated" 
+                                    @updated-youtube="youtubeUpdated"
                                     @updated-discord="discordUpdated"
                                     @updated-telegram="telegramUpdated"
                                 />
