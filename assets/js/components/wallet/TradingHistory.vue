@@ -190,10 +190,11 @@ export default {
                 return this.$routing.generate('coin', {
                     base: this.rebrandingFunc(market.base.symbol),
                     quote: this.rebrandingFunc(market.quote.symbol),
+                    tab: 'trade',
                 });
             }
 
-            return this.$routing.generate('token_show', {name: market.quote.name});
+            return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
     },
 };
