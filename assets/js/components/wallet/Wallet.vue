@@ -407,7 +407,7 @@ export default {
             return Object.values(tokens);
         },
         generatePairUrl: function(market) {
-            return this.$routing.generate('token_show', {name: market.name});
+            return this.$routing.generate('token_show', {name: market.name, tab: 'trade'});
         },
         generateCoinUrl: function(coin) {
             let params = {
