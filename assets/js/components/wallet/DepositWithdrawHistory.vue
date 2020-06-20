@@ -196,11 +196,12 @@ export default {
                 let params = {
                     base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
                     quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
+                    tab: 'trade',
                 };
                 return this.$routing.generate('coin', params);
             }
 
-            return this.$routing.generate('token_show', {name: quote.name});
+            return this.$routing.generate('token_show', {name: quote.name, tab: 'trade'});
         },
     },
 };
