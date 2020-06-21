@@ -55,7 +55,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     use CheckTokenNameBlacklistTrait;
 
-    
     /** @var EntityManagerInterface */
     private $em;
 
@@ -432,6 +431,36 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/is_deployed", name="is_token_deployed", options={"expose"=true})
+     */
+    public function isTokenDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/address", name="token_address", options={"expose"=true})
+     */
+    public function getTokenContractAddress(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['address' => $token->getAddress()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
@@ -646,7 +675,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             if (!$this->validateEthereumAddress($request->get('address'))) {
                 throw new InvalidAddressException();
             }
-            
+
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
@@ -711,12 +740,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
     }
-    
+
     private function validateEthereumAddress(string $address): bool
     {
         return $this->startsWith($address, '0x') && 42 === strlen($address);
     }
-    
+
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;
