@@ -102,7 +102,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->select('COUNT(ms)')
             ->from(MarketStatus::class, 'ms')
             ->join('ms.quoteToken', 'qt')
-            ->innerJoin('qt.users', 'u', 'WITH', 'u.user_id = :id')
+            ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
             ->setParameter('id', $userId)
             ->getQuery()
             ->getSingleScalarResult();
@@ -128,7 +128,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setMaxResults($offset - count($predefinedMarketStatus));
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user_id = :id')
+            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
                 ->setParameter('id', $userId);
         }
 
