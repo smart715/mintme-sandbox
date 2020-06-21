@@ -16,12 +16,10 @@
             >
             </autocomplete>
         </div>
-        <div v-if="!!input" class="input-group-append clear-search-icon">
-            <span class="input-group-text text-white ml-2">
+        <div class="input-group-append position-relative">
+            <div v-if="!!input" class="clear-search-icon">
                 <font-awesome-icon size="xs" @click="clearSearch" class="c-pointer" icon="times"></font-awesome-icon>
-            </span>
-        </div>
-        <div class="input-group-append">
+            </div>
             <span class="input-group-text text-white">
                 <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
