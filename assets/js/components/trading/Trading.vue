@@ -210,7 +210,6 @@ export default {
     },
     data() {
         return {
-            marketUpdateTimeout: null,
             markets: null,
             currentPage: this.page,
             perPage: 25,
