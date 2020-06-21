@@ -71,8 +71,6 @@ class MarketConsumer implements ConsumerInterface
             '[market-consumer] Received a market updation message for '. $this->marketNameConverter->convert($market)
         );
 
-        sleep(5);
-
         try {
             $this->statusManager->updateMarketStatus($market);
         } catch (Throwable $exception) {

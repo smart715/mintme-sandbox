@@ -444,7 +444,6 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                this.marketUpdateTimeout = this.setTimeout(() => {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {
@@ -455,7 +454,6 @@ export default {
                                     id: parseInt(Math.random().toString().replace('0.', '')),
                                 });
                                 this.sendMessage(request);
-                                clearTimeout(this.marketUpdateTimeout);
                             });
                         }
                         this.currentPage = page;
@@ -471,14 +469,12 @@ export default {
                         }
 
                         resolve();
-                        clearTimeout(this.marketUpdateTimeout);
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
-                }, 10000);
             });
         },
         sanitizeMarket: function(marketData) {
