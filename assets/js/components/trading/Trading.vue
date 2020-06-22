@@ -475,7 +475,7 @@ export default {
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
-                }, 5000);
+                }, 10000);
             });
         },
         sanitizeMarket: function(marketData) {
