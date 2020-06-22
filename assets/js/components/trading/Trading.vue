@@ -443,7 +443,8 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                this.$axios.retry.get(this.$routing.generate('markets_info', params))
+                setTimeout(() => {
+                    this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (null !== this.markets) {
                             this.addOnOpenHandler(() => {
@@ -468,6 +469,7 @@ export default {
                         }
 
                         resolve();
+                }, 5000);
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
