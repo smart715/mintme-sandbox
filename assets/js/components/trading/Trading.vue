@@ -469,13 +469,13 @@ export default {
                         }
 
                         resolve();
-                }, 5000);
                     })
                     .catch((err) => {
                         this.notifyError('Can not update the markets data. Try again later.');
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
+                }, 5000);
             });
         },
         sanitizeMarket: function(marketData) {
