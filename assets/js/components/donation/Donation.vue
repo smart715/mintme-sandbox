@@ -81,7 +81,7 @@
                                                 </div>
                                             </div>
                                             <div
-                                                v-if="balanceLoaded && !isAmountValid && !insufficientFunds"
+                                                v-if="insufficientFundsError"
                                                 class="w-100 mt-1 text-danger">
                                                 Minimum amount of {{ donationCurrency }} {{ currencyMinAmount }}.
                                             </div>
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import debounce from 'lodash/debounce';
 import {
     CheckInputMixin,
     MoneyFilterMixin,
@@ -200,7 +200,7 @@ export default {
         };
     },
     created: function() {
-        this.debouncedCheck = _.debounce(this.checkDonation, 500);
+        this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     computed: {
         donationCurrency: function() {
@@ -212,7 +212,7 @@ export default {
             });
         },
         isCurrencySelected: function() {
-            return [webSymbol, btcSymbol].includes(this.selectedCurrency);
+            return Object.values(this.options).includes(this.selectedCurrency);
         },
         dropdownText: function() {
             return this.isCurrencySelected
@@ -227,7 +227,7 @@ export default {
         currencyMinAmount: function() {
             return btcSymbol === this.selectedCurrency
                 ? this.donationParams.minBtcAmount
-                : this.donationParams.minWebAmount;
+                : this.donationParams.minMintmeAmount;
         },
         minTotalPrice: function() {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
@@ -240,6 +240,9 @@ export default {
                     (this.amountToDonate > 0 && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
                 );
         },
+        insufficientFundsError: function() {
+            return this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
+        },
         isAmountValid: function() {
             return !!parseFloat(this.amountToDonate)
                 && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
@@ -250,7 +253,8 @@ export default {
                 || this.insufficientFunds
                 || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
-                || this.donationChecking || this.donationInProgress;
+                || this.donationChecking
+                || this.donationInProgress;
         },
     },
     mounted() {

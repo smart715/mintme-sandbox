@@ -83,6 +83,7 @@
                                 :precision="{{ precision }}"
                                 :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                                websocket-url="{{ global_websocket_url }}"
                             />
                         </div>
                         <div class="row">

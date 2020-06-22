@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
 use App\Exchange\Config\Config;
+use App\Exchange\Donation\Model\CheckDonationResult;
 
 class DonationFetcher implements DonationFetcherInterface
 {
@@ -24,8 +25,12 @@ class DonationFetcher implements DonationFetcherInterface
         $this->config = $config;
     }
 
-    public function checkDonation(string $marketName, string $amount, string $fee, int $tokenCreatorId): array
-    {
+    public function checkDonation(
+        string $marketName,
+        string $amount,
+        string $fee,
+        int $tokenCreatorId
+    ): CheckDonationResult {
         $response = $this->jsonRpc->send(self::CHECK_DONATION_METHOD, [
             $marketName,
             $amount,
@@ -34,8 +39,13 @@ class DonationFetcher implements DonationFetcherInterface
         ]);
 
         $this->checkResponseForError($response);
+        /** @var array<string> $result */
+        $result = $response->getResult();
 
-        return $response->getResult();
+        return new CheckDonationResult(
+            $result[0] ?? '0',
+            $result[1] ?? '0'
+        );
     }
 
     public function makeDonation(

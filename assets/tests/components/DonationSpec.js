@@ -178,7 +178,7 @@ describe('Donation', () => {
                 donationParams: {
                     fee: 1,
                     minBtcAmount: 0.000001,
-                    minWebAmount: 0.0001,
+                    minMintmeAmount: 0.0001,
                 },
             },
         });
@@ -330,7 +330,7 @@ describe('Donation', () => {
                 },
                 donationParams: {
                     minBtcAmount: '0.000001',
-                    minWebAmount: '0.0001',
+                    minMintmeAmount: '0.0001',
                 },
             },
         });
@@ -410,7 +410,7 @@ describe('Donation', () => {
                 },
                 donationParams: {
                     minBtcAmount: '0.000001',
-                    minWebAmount: '0.0001',
+                    minMintmeAmount: '0.0001',
                 },
             },
         });

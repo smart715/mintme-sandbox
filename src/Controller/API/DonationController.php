@@ -5,12 +5,10 @@ namespace App\Controller\API;
 use App\Entity\User;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
-use App\Exchange\Market\MarketHandlerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Money\Money;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,13 +19,9 @@ class DonationController extends AbstractFOSRestController
     /** @var DonationHandlerInterface */
     protected $donationHandler;
 
-    /** @var MarketHandlerInterface */
-    protected $marketHandler;
-
-    public function __construct(DonationHandlerInterface $donationHandler, MarketHandlerInterface $marketHandler)
+    public function __construct(DonationHandlerInterface $donationHandler)
     {
         $this->donationHandler = $donationHandler;
-        $this->marketHandler = $marketHandler;
     }
 
     /**
@@ -46,18 +40,18 @@ class DonationController extends AbstractFOSRestController
         string $currency,
         string $amount
     ): View {
-        $data = $this->donationHandler->checkDonation(
+        $user = $this->getCurrentUser();
+        $checkDonationResult = $this->donationHandler->checkDonation(
             $market,
             $currency,
             $amount,
-            $this->getCurrentUser()
+            $user
         );
 
-        $tokensWorth = $data[1] ?? '0';
-        $tokensWorth = $this->donationHandler->getTokensWorth($tokensWorth, $currency);
+        $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
 
         return $this->view([
-            'amountToReceive' => $data[0] ?? '0',
+            'amountToReceive' => $checkDonationResult->getExpectedTokens(),
             'tokensWorth' => $tokensWorth,
         ]);
     }
@@ -80,12 +74,14 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
+        $user = $this->getCurrentUser();
+
         $this->donationHandler->makeDonation(
             $market,
             $request->get('currency'),
             (string)$request->get('amount'),
             (string)$request->get('expected_count_to_receive'),
-            $this->getCurrentUser()
+            $user
         );
 
         return $this->view(null, Response::HTTP_ACCEPTED);

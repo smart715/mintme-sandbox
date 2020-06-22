@@ -20,7 +20,7 @@ final class Version20200614175248 extends AbstractMigration
                 id INT AUTO_INCREMENT NOT NULL,
                 donor_id INT NOT NULL,
                 token_creator_id INT NOT NULL,
-                currency VARCHAR(5) NOT NULL,
+                currency VARCHAR(6) NOT NULL,
                 amount VARCHAR(255) NOT NULL,
                 fee_amount VARCHAR(255) NOT NULL,
                 token_amount VARCHAR(255) DEFAULT \'0\',

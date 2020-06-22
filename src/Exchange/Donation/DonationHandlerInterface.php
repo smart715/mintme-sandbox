@@ -3,12 +3,18 @@
 namespace App\Exchange\Donation;
 
 use App\Entity\User;
+use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
 use Money\Money;
 
 interface DonationHandlerInterface
 {
-    public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): array;
+    public function checkDonation(
+        Market $market,
+        string $currency,
+        string $amount,
+        User $donorUser
+    ): CheckDonationResult;
     public function makeDonation(
         Market $market,
         string $currency,

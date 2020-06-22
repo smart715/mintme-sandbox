@@ -97,7 +97,7 @@
                             </div>
                             <div class="pb-1">
                                 Donation volume: <br />
-                                {{ tokeDonationVolume }}
+                                {{ donationVolume }}
                             </div>
                         </div>
                         <div class="col px-1">
@@ -193,7 +193,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, MoneyFilterMixin, NotificationMixin, WebSocketMixin} from '../../../mixins';
 
 const defaultValue = '-';
 
@@ -203,6 +203,7 @@ export default {
         MoneyFilterMixin,
         NotificationMixin,
         LoggerMixin,
+        WebSocketMixin,
     ],
     components: {
         CopyLink,
@@ -215,6 +216,7 @@ export default {
         precision: Number,
         tokenContractAddress: String,
         tokenCreated: String,
+        websocketUrl: String,
     },
     data() {
         return {
@@ -273,6 +275,18 @@ export default {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
+
+        this.sendMessage(JSON.stringify({
+            method: 'kline.subscribe',
+            params: [this.market.identifier, 24 * 60 * 60],
+            id: parseInt(Math.random().toString().replace('0.', '')),
+        }));
+
+        this.addMessageHandler((result) => {
+            if ('kline.update' === result.method) {
+                this.donationVolume = result.params[0][8] || 0;
+            }
+        });
     },
     methods: {
         ...mapMutations('tokenStatistics', [
@@ -286,9 +300,6 @@ export default {
         },
         walletBalance: function() {
             return this.stats.releasedAmount !== '-' ? toMoney(this.stats.releasedAmount) : toMoney(this.tokenExchangeAmount);
-        },
-        tokeDonationVolume: function() {
-            return this.donationVolume;
         },
         activeOrdersSum: function() {
             let sum = new Decimal(0);

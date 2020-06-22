@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -39,7 +38,7 @@ class Donation
     private $tokenCreator;
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @ORM\Column(type="string", length=6)
      * @var string
      */
     private $currency;

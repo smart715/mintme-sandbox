@@ -8,6 +8,7 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\DonationFetcherInterface;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Market;
@@ -30,7 +31,7 @@ class DonationHandlerTest extends TestCase
         'donation' => [
             'fee' => 1,
             'minBtcAmount' => 0.000001,
-            'minWebAmount' => 0.0001,
+            'minMintmeAmount' => 0.0001,
         ],
     ];
 
@@ -74,14 +75,17 @@ class DonationHandlerTest extends TestCase
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
 
+        $moneyWrapper = $this->mockMoneyWrapper();
+        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
-            $this->mockMoneyWrapper(),
+            $moneyWrapper,
             $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($base),
             $bh,
-            $this->donationParams,
+            $donationConfig,
             $em
         );
 
@@ -144,14 +148,17 @@ class DonationHandlerTest extends TestCase
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
 
+        $moneyWrapper = $this->mockMoneyWrapper();
+        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
+
         $donationHandler = new DonationHandler(
             $fetcher,
             $marketNameConverter,
-            $this->mockMoneyWrapper(),
+            $moneyWrapper,
             $this->mockCryptoRatesFetcher(),
             $cryptoManager,
             $bh,
-            $this->donationParams,
+            $donationConfig,
             $em
         );
 

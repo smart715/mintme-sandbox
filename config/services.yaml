@@ -546,10 +546,6 @@ services:
         arguments:
             $airdropParams: '%airdrop_params%'
 
-    App\Exchange\Donation\DonationHandler:
-        arguments:
-            $donationParams: '%donation%'
-
     App\EventListener\NoCacheListener:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.response' }
@@ -568,3 +564,7 @@ services:
     App\Repository\PendingTokenWithdrawRepository:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
+
+    App\Exchange\Config\DonationConfig:
+        arguments:
+            $donationParams: '%donation%'
