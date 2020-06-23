@@ -31,7 +31,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $kernel = self::bootKernel();
         $application = new Application($kernel);
         $emCount = 10;
-        $lockCount = $emCount * 3;
+        $lockCount = $emCount * 4;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($this->exactly($lockCount))

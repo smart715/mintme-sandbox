@@ -117,6 +117,12 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $token = $item->getToken();
 
+                $crypto = $token->getCrypto();
+
+                $fee = $crypto->getFee();
+
+                $feeToken = Token::getFromSymbol(Token::WEB_SYMBOL);
+
                 $this->em->beginTransaction();
 
                 try {
@@ -124,6 +130,12 @@ class UpdatePendingWithdrawals extends Command
                         $item->getUser(),
                         $token,
                         $item->getAmount()->getAmount()
+                    );
+
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $feeToken,
+                        $fee
                     );
 
                     $this->em->remove($item);
