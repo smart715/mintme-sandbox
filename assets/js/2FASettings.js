@@ -3,6 +3,6 @@ new Vue({
     methods: {
         BlurLink: function(e) {
             e.target.blur();
-        }
-    }
+        },
+    },
 });
