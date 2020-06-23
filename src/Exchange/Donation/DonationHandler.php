@@ -94,7 +94,8 @@ class DonationHandler implements DonationHandlerInterface
         string $currency,
         string $amount,
         string $expectedAmount,
-        User $donorUser
+        User $donorUser,
+        Money $sellOrdersSummary
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         $this->checkAmount($donorUser, $amountObj, $currency);
@@ -130,9 +131,9 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         $twoWayDonation = $expectedAmount->greaterThan($minTokensAmount)
-            && $expectedAmount->isPositive() && $tokensWorth->lessThan($donationAmount);
+            && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationAmount);
 
-        if ($expectedAmount->greaterThan($minTokensAmount) && $tokensWorth->greaterThanOrEqual($donationAmount)) {
+        if ($expectedAmount->greaterThan($minTokensAmount) && $sellOrdersSummary->greaterThanOrEqual($donationAmount)) {
             // Donate using donation viabtc API (token creator has available sell orders)
             $feeAmount = new Money(0, new Currency($currency));
 

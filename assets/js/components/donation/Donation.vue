@@ -192,6 +192,7 @@ export default {
             amountToDonate: 0,
             amountToReceive: 0,
             tokensWorth: 0,
+            sellOrdersSummary: 0,
             donationChecking: false,
             balanceLoaded: false,
             balance: 0,
@@ -322,6 +323,7 @@ export default {
                 .then((res) => {
                     this.amountToReceive = res.data.amountToReceive;
                     this.tokensWorth = res.data.tokensWorth;
+                    this.sellOrdersSummary = res.data.sellOrdersSummary;
                     this.donationChecking = false;
                 })
                 .catch((err) => {
@@ -383,7 +385,7 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
-            if ((new Decimal(this.amountToDonate)).greaterThan(this.tokensWorth)) {
+            if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersSummary)) {
                 this.showModal = true;
             } else {
                 this.makeDonation();

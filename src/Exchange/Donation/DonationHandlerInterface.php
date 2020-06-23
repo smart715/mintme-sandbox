@@ -20,7 +20,8 @@ interface DonationHandlerInterface
         string $currency,
         string $amount,
         string $expectedAmountUser,
-        User $donorUser
+        User $donorUser,
+        Money $sellOrdersSummary
     ): void;
     public function getTokensWorth(string $sellOrdersWorth, string $currency): string;
     public function saveDonation(

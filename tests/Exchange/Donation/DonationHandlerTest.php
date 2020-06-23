@@ -123,10 +123,11 @@ class DonationHandlerTest extends TestCase
             ->with($market)
             ->willReturn('TOK000000000567WEB');
 
+        $sellOrdersSummary = new Money(0, new Currency(Token::WEB_SYMBOL));
         $fetcher = $this->createMock(DonationFetcherInterface::class);
         $fetcher
             ->method('makeDonation')
-            ->with('TOK000000000567WEB', '375000000000', '1', '20000', 3);
+            ->with('TOK000000000567WEB', '375000000000', '1', '20000', 3, $sellOrdersSummary);
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
@@ -162,7 +163,7 @@ class DonationHandlerTest extends TestCase
             $em
         );
 
-        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser);
+        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser, $sellOrdersSummary);
         $this->assertTrue(true);
     }
 

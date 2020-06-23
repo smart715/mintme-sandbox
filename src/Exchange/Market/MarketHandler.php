@@ -404,4 +404,30 @@ class MarketHandler implements MarketHandlerInterface
 
         return $this->moneyWrapper->format($depthAmount);
     }
+
+    public function getSellOrdersSummary(Market $market): Money
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedOrders);
+
+        $zeroDepth = $this->moneyWrapper->parse('0', Token::WEB_SYMBOL);
+
+        /** @var Money $sellOrdersWorth */
+        $sellOrdersWorth = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->multiply(
+                $this->moneyWrapper->format($order->getAmount())
+            )->add($sum);
+        }, $zeroDepth);
+
+        return $sellOrdersWorth;
+    }
 }

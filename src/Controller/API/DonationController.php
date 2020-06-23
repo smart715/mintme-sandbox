@@ -6,6 +6,7 @@ use App\Communications\Exception\FetchException;
 use App\Entity\User;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\DonationLogger;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -21,12 +22,19 @@ class DonationController extends AbstractFOSRestController
     /** @var DonationHandlerInterface */
     protected $donationHandler;
 
+    /** @var MarketHandlerInterface */
+    protected $marketHandler;
+
     /** @var DonationLogger */
     protected $logger;
 
-    public function __construct(DonationHandlerInterface $donationHandler, DonationLogger $logger)
-    {
+    public function __construct(
+        DonationHandlerInterface $donationHandler,
+        MarketHandlerInterface $marketHandler,
+        DonationLogger $logger
+    ) {
         $this->donationHandler = $donationHandler;
+        $this->marketHandler = $marketHandler;
         $this->logger = $logger;
     }
 
@@ -56,10 +64,13 @@ class DonationController extends AbstractFOSRestController
             );
 
             $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
+            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
+            $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary->getAmount(), $currency);
 
             return $this->view([
                 'amountToReceive' => $checkDonationResult->getExpectedTokens(),
                 'tokensWorth' => $tokensWorth,
+                'sellOrdersSummary' => $sellOrdersSummary,
             ]);
         } catch (\Throwable $ex) {
             $message = $ex->getMessage();
@@ -101,13 +112,15 @@ class DonationController extends AbstractFOSRestController
     {
         try {
             $user = $this->getCurrentUser();
+            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
 
             $this->donationHandler->makeDonation(
                 $market,
                 $request->get('currency'),
                 (string)$request->get('amount'),
                 (string)$request->get('expected_count_to_receive'),
-                $user
+                $user,
+                $sellOrdersSummary
             );
 
             return $this->view(null, Response::HTTP_ACCEPTED);
