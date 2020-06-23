@@ -9,7 +9,9 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManager;
 use App\Manager\CryptoManagerInterface;
+use App\Repository\CryptoRepository;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
@@ -29,10 +31,10 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 {
     public function testExecute(): void
     {
-        $kernel = self::bootKernel();
+        $kernel      = self::bootKernel();
         $application = new Application($kernel);
-        $emCount = 10;
-        $lockCount = $emCount * 2;
+        $emCount     = 10;
+        $lockCount   = $emCount * 2;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($this->exactly($lockCount))
@@ -42,15 +44,14 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(LoggerInterface::class),
             $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
-            $handler,
-            $this->createMock(CryptoManagerInterface::class)
+            $handler
         );
 
         $upw->expirationTime = 1;
 
         $application->add($upw);
 
-        $command = $application->find('app:update-pending-withdrawals');
+        $command       = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
@@ -59,10 +60,10 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 
     public function testExecuteWithException(): void
     {
-        $kernel = self::bootKernel();
+        $kernel      = self::bootKernel();
         $application = new Application($kernel);
-        $emCount = 10;
-        $lockCount = $emCount;
+        $emCount     = 10;
+        $lockCount   = $emCount;
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->expects($this->exactly($lockCount))
@@ -70,21 +71,20 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             ->willThrowException(new Exception());
 
         $em = $this->mockEm($emCount);
-        $em->expects($this->exactly($lockCount))->method('rollback');
+        $em->expects($this->exactly($lockCount * 2))->method('rollback');
 
         $upw = new UpdatePendingWithdrawals(
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
-            $handler,
-            $this->createMock(CryptoManagerInterface::class)
+            $handler
         );
 
         $upw->expirationTime = 1;
 
         $application->add($upw);
 
-        $command = $application->find('app:update-pending-withdrawals');
+        $command       = $application->find('app:update-pending-withdrawals');
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([]);
@@ -113,12 +113,19 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 
         $repoT = $this->createMock(PendingTokenWithdrawRepository::class);
         $repoT->expects($this->exactly(1))
-        ->method('findAll')
-        ->willReturn(array_map(function () {
-            return $this->mockPendingToken();
-        }, range(1, $lockCount)));
+            ->method('findAll')
+            ->willReturn(array_map(function () {
+                return $this->mockPendingToken();
+            }, range(1, $lockCount)));
 
-        $em->method('getRepository')->willReturn($repo, $repoT);
+        $repoC = $this->createMock(CryptoRepository::class);
+        $repoC->expects($this->exactly(1))
+            ->method('findAll')
+            ->willReturn(array_map(function () {
+                return $this->mockCrypto();
+            }, range(1, $lockCount)));
+
+        $em->method('getRepository')->willReturn($repo, $repoT, $repoC);
 
         return $em;
     }
@@ -163,6 +170,16 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $token->method('getCrypto')->willReturn($crypto);
 
         $lock->method('getToken')->willReturn($token);
+
+        return $lock;
+    }
+
+    private function mockCrypto(): Crypto
+    {
+        $lock = $this->createMock(Crypto::class);
+
+        $lock->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
+        $lock->method('getName')->willReturn(Token::WEB_SYMBOL);
 
         return $lock;
     }

@@ -6,6 +6,7 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManager;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
@@ -33,9 +34,6 @@ class UpdatePendingWithdrawals extends Command
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
     /** @var int */
     public $expirationTime;
 
@@ -43,14 +41,12 @@ class UpdatePendingWithdrawals extends Command
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
-        BalanceHandlerInterface $balanceHandler,
-        CryptoManagerInterface $crypto
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
-        $this->cryptoManager = $crypto;
 
         parent::__construct();
     }
@@ -123,23 +119,23 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $token = $item->getToken();
 
-                foreach ($this->cryptoManager->findAll() as $cr) {
-                    $this->logger->info("[withdrawals] {$cr->getSymbol()} --- {$cr->getName()}");
-                }
-
-                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-                if (!$crypto) {
-                    continue;
-                }
-
-                $fee = $crypto->getFee();
-
-                $feeToken = Token::getFromCrypto($crypto);
-
                 $this->em->beginTransaction();
 
                 try {
+                    $cmi = $this->getCryptoManager();
+
+                    $cryptos = $cmi->findAll();
+
+                    foreach ($cryptos as $cr) {
+                        $this->logger->info("[withdrawals] {$cr->getSymbol()} --- {$cr->getName()}");
+                    }
+
+                    $crypto = $cmi->findBySymbol(Token::WEB_SYMBOL);
+
+                    $fee = $crypto->getFee();
+
+                    $feeToken = Token::getFromCrypto($crypto);
+
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
@@ -180,5 +176,10 @@ class UpdatePendingWithdrawals extends Command
     private function getPendingTokenWithdrawRepository(): PendingTokenWithdrawRepository
     {
         return $this->em->getRepository(PendingTokenWithdraw::class);
+    }
+
+    private function getCryptoManager(): CryptoManagerInterface
+    {
+        return new CryptoManager($this->em);
     }
 }
