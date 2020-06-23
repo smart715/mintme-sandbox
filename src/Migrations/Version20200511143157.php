@@ -29,7 +29,7 @@ END;
 SQL;
 
         $sql2 = <<< SQL
-CREATE FUNCTION change_percentage (last_price VARCHAR(255), open_price VARCHAR(255)) RETURNS DECIMAL(3,2) DETERMINISTIC
+CREATE FUNCTION change_percentage (last_price VARCHAR(255), open_price VARCHAR(255)) RETURNS DECIMAL(16,2) DETERMINISTIC
 BEGIN
     DECLARE open_price1 BIGINT SIGNED;
     DECLARE last_price1 BIGINT SIGNED;
@@ -38,7 +38,7 @@ BEGIN
 
     RETURN CASE WHEN open_price1 = 0
         THEN 0
-        ELSE CAST(((last_price1 - open_price1) / open_price1) AS DECIMAL(14, 2))
+        ELSE CAST(((last_price1 - open_price1) / open_price1) AS DECIMAL(16, 2))
         END;
 END;
 SQL;
