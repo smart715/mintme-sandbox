@@ -9,6 +9,7 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
@@ -41,7 +42,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(LoggerInterface::class),
             $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
-            $handler
+            $handler,
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $upw->expirationTime = 1;
@@ -74,7 +76,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->createMock(LoggerInterface::class),
             $em,
             $this->mockDate(new DateTimeImmutable()),
-            $handler
+            $handler,
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $upw->expirationTime = 1;
