@@ -1,9 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ profile.nickname }}
-    {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
-    profile | mintMe
+    {% if profile.anonymous %}
+        {{ profile.nickname }}'s profile | mintMe
+    {% else %}
+        {{ profile.nickname }}
+        {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
+         profile | mintMe
+    {% endif %} 
 {% endblock %}
 
 {% block tokenDescription %}
