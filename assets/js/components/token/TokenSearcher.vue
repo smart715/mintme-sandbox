@@ -17,7 +17,7 @@
             </autocomplete>
         </div>
         <div class="input-group-append position-relative">
-            <div v-if="!!input" class="clear-search-icon">
+            <div v-if="input" class="clear-search-icon">
                 <font-awesome-icon size="xs" @click="clearSearch" class="c-pointer" icon="times"></font-awesome-icon>
             </div>
             <span class="input-group-text text-white">
