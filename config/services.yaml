@@ -568,3 +568,8 @@ services:
     App\Exchange\Config\DonationConfig:
         arguments:
             $donationParams: '%donation%'
+
+    App\Logger\DonationLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: donation }

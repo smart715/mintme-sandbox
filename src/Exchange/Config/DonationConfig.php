@@ -26,9 +26,7 @@ class DonationConfig
     {
         $fee = $this->donationParams['fee'] ?? 0;
 
-        return 0 === $fee
-            ? '0'
-            : (string)($fee / 100);
+        return (string)($fee / 100);
     }
 
     public function getMinBtcAmount(): Money

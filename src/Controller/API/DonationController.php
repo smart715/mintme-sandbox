@@ -2,9 +2,11 @@
 
 namespace App\Controller\API;
 
+use App\Communications\Exception\FetchException;
 use App\Entity\User;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
+use App\Logger\DonationLogger;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -19,9 +21,13 @@ class DonationController extends AbstractFOSRestController
     /** @var DonationHandlerInterface */
     protected $donationHandler;
 
-    public function __construct(DonationHandlerInterface $donationHandler)
+    /** @var DonationLogger */
+    protected $logger;
+
+    public function __construct(DonationHandlerInterface $donationHandler, DonationLogger $logger)
     {
         $this->donationHandler = $donationHandler;
+        $this->logger = $logger;
     }
 
     /**
@@ -40,20 +46,39 @@ class DonationController extends AbstractFOSRestController
         string $currency,
         string $amount
     ): View {
-        $user = $this->getCurrentUser();
-        $checkDonationResult = $this->donationHandler->checkDonation(
-            $market,
-            $currency,
-            $amount,
-            $user
-        );
+        try {
+            $user = $this->getCurrentUser();
+            $checkDonationResult = $this->donationHandler->checkDonation(
+                $market,
+                $currency,
+                $amount,
+                $user
+            );
 
-        $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
+            $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
 
-        return $this->view([
-            'amountToReceive' => $checkDonationResult->getExpectedTokens(),
-            'tokensWorth' => $tokensWorth,
-        ]);
+            return $this->view([
+                'amountToReceive' => $checkDonationResult->getExpectedTokens(),
+                'tokensWorth' => $tokensWorth,
+            ]);
+        } catch (\Throwable $ex) {
+            $message = $ex->getMessage();
+
+            $this->logger->error(
+                '[check_donation] Failed to check donation.',
+                [
+                    'message' => $message,
+                    'code' => $ex->getCode(),
+                    'market' => $market,
+                    'currency' => $currency,
+                    'amount' => $amount,
+                ]
+            );
+
+            return $this->view([
+                'error' => $message,
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -74,17 +99,34 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
-        $user = $this->getCurrentUser();
+        try {
+            $user = $this->getCurrentUser();
 
-        $this->donationHandler->makeDonation(
-            $market,
-            $request->get('currency'),
-            (string)$request->get('amount'),
-            (string)$request->get('expected_count_to_receive'),
-            $user
-        );
+            $this->donationHandler->makeDonation(
+                $market,
+                $request->get('currency'),
+                (string)$request->get('amount'),
+                (string)$request->get('expected_count_to_receive'),
+                $user
+            );
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+            return $this->view(null, Response::HTTP_ACCEPTED);
+        } catch (\Throwable $ex) {
+            $message = $ex->getMessage();
+
+            $this->logger->error(
+                '[make_donation] Failed to make donation.',
+                [
+                    'message' => $message,
+                    'code' => $ex->getCode(),
+                    'market' => $market,
+                ]
+            );
+
+            return $this->view([
+                'error' => $message,
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     private function getCurrentUser(): User

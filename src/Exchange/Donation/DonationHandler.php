@@ -65,8 +65,12 @@ class DonationHandler implements DonationHandlerInterface
         $this->em = $em;
     }
 
-    public function checkDonation(Market $market, string $currency, string $amount, User $donorUser): CheckDonationResult
-    {
+    public function checkDonation(
+        Market $market,
+        string $currency,
+        string $amount,
+        User $donorUser
+    ): CheckDonationResult {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         /** @var Token $token */
         $token = $market->getQuote();
@@ -125,14 +129,22 @@ class DonationHandler implements DonationHandlerInterface
             $donationAmount = $this->getBtcWorthInMintme($donationAmount);
         }
 
+        $twoWayDonation = $expectedAmount->greaterThan($minTokensAmount)
+            && $expectedAmount->isPositive() && $tokensWorth->lessThan($donationAmount);
+
         if ($expectedAmount->greaterThan($minTokensAmount) && $tokensWorth->greaterThanOrEqual($donationAmount)) {
-            // Token creator has available sell orders, enough for donation (using donation API)
-            // Fee is taking by donation viabtc API
+            // Donate using donation viabtc API (token creator has available sell orders)
             $feeAmount = new Money(0, new Currency($currency));
 
-            // Convert BTC to MINTME. viabtc API using real user's funds in MINTME only.
             if (Token::BTC_SYMBOL === $currency) {
-                $this->sendAmountFromUserToUser($donorUser, $amountObj, $donorUser, $donationAmount, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
+                $this->sendAmountFromUserToUser(
+                    $donorUser,
+                    $amountObj,
+                    $donorUser,
+                    $donationAmount,
+                    Token::BTC_SYMBOL,
+                    Token::WEB_SYMBOL
+                );
             }
 
             $this->donationFetcher->makeDonation(
@@ -144,49 +156,72 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
-        } elseif ($expectedAmount->greaterThan($minTokensAmount) && $expectedAmount->isPositive() && $tokensWorth->lessThan($donationAmount)) {
-            // Token creator has available sell orders, NOT enough for donation (using donation API)
-            // So part of donation funds (equal to sell orders worth) is sending via donation viabtc API
-            // Another part is sending from user to user
-            if (Token::BTC_SYMBOL === $currency) {
-                $tokensWorthInBtc = $this->getMintmeWorthInBtc($tokensWorth);
-                // Convert BTC to MINTME. viabtc API using real user's funds in MINTME only.
-                $this->sendAmountFromUserToUser($donorUser, $tokensWorthInBtc, $donorUser, $tokensWorth, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
-                $this->donationFetcher->makeDonation(
-                    $donorUser->getId(),
-                    $this->marketNameConverter->convert($market),
-                    $this->moneyWrapper->format($tokensWorth),
-                    $this->donationConfig->getFee(),
-                    $this->moneyWrapper->format($expectedAmount),
-                    $tokenCreator->getId()
-                );
+        } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
+            // Donate BTC using donation viabtc API AND donation from user to user.
+            $tokensWorthInBtc = $this->getMintmeWorthInBtc($tokensWorth);
+            $this->sendAmountFromUserToUser(
+                $donorUser,
+                $tokensWorthInBtc,
+                $donorUser,
+                $tokensWorth,
+                Token::BTC_SYMBOL,
+                Token::WEB_SYMBOL
+            );
+            $this->donationFetcher->makeDonation(
+                $donorUser->getId(),
+                $this->marketNameConverter->convert($market),
+                $this->moneyWrapper->format($tokensWorth),
+                $this->donationConfig->getFee(),
+                $this->moneyWrapper->format($expectedAmount),
+                $tokenCreator->getId()
+            );
 
-                // Calculate left funds and send from user to user.
-                $donationAmountLeftInBtc = $amountObj->subtract($tokensWorthInBtc);
-                $feeAmount = $this->calculateFee($donationAmountLeftInBtc);
-                $amountToDonate = $donationAmountLeftInBtc->subtract($feeAmount);
-                $this->sendAmountFromUserToUser($donorUser, $donationAmountLeftInBtc, $donorUser, $amountToDonate, Token::BTC_SYMBOL, Token::WEB_SYMBOL);
-                $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
-            } else {
-                $amountToSendManually = $donationAmount->subtract($tokensWorth);
-                $this->donationFetcher->makeDonation(
-                    $donorUser->getId(),
-                    $this->marketNameConverter->convert($market),
-                    $this->moneyWrapper->format($tokensWorth),
-                    $this->donationConfig->getFee(),
-                    $this->moneyWrapper->format($expectedAmount),
-                    $tokenCreator->getId()
-                );
-                $feeAmount = $this->calculateFee($amountToSendManually);
-                $amountToDonate = $amountToSendManually->subtract($feeAmount);
-                $this->sendAmountFromUserToUser($donorUser, $amountToSendManually, $tokenCreator, $amountToDonate, $currency, $currency);
-                $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
-            }
+            $donationAmountLeftInBtc = $amountObj->subtract($tokensWorthInBtc);
+            $feeAmount = $this->calculateFee($donationAmountLeftInBtc);
+            $amountToDonate = $donationAmountLeftInBtc->subtract($feeAmount);
+            $this->sendAmountFromUserToUser(
+                $donorUser,
+                $donationAmountLeftInBtc,
+                $donorUser,
+                $amountToDonate,
+                Token::BTC_SYMBOL,
+                Token::WEB_SYMBOL
+            );
+            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
+        } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
+            // Donate MINTME using donation viabtc API AND donation from user to user.
+            $amountToSendManually = $donationAmount->subtract($tokensWorth);
+            $this->donationFetcher->makeDonation(
+                $donorUser->getId(),
+                $this->marketNameConverter->convert($market),
+                $this->moneyWrapper->format($tokensWorth),
+                $this->donationConfig->getFee(),
+                $this->moneyWrapper->format($expectedAmount),
+                $tokenCreator->getId()
+            );
+            $feeAmount = $this->calculateFee($amountToSendManually);
+            $amountToDonate = $amountToSendManually->subtract($feeAmount);
+            $this->sendAmountFromUserToUser(
+                $donorUser,
+                $amountToSendManually,
+                $tokenCreator,
+                $amountToDonate,
+                $currency,
+                $currency
+            );
+            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } else {
-            // Token creator has no sell orders available. Send funds from user to user.
+            // Donate (send) funds from user to user (token creator has no sell orders).
             $feeAmount = $this->calculateFee($amountObj);
             $amountToDonate = $amountObj->subtract($feeAmount);
-            $this->sendAmountFromUserToUser($donorUser, $amountObj, $tokenCreator, $amountToDonate, $currency, $currency);
+            $this->sendAmountFromUserToUser(
+                $donorUser,
+                $amountObj,
+                $tokenCreator,
+                $amountToDonate,
+                $currency,
+                $currency
+            );
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         }
 
