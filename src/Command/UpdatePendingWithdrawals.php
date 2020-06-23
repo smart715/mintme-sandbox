@@ -121,7 +121,7 @@ class UpdatePendingWithdrawals extends Command
 
                 $fee = $crypto->getFee();
 
-                $feeToken = Token::getFromSymbol(Token::WEB_SYMBOL);
+                $feeToken = Token::getFromCrypto($crypto);
 
                 $this->em->beginTransaction();
 
