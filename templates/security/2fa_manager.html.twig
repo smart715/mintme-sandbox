@@ -34,3 +34,6 @@
         {% include 'security/2fa_settings.html.twig' %}
     {% endif %}
 {% endblock %}
+{% block pagescripts %}
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/2FASettings.js') }}"></script>
+{% endblock %}
