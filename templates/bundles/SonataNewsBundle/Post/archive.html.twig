@@ -12,7 +12,7 @@
                 <div id="news-selector">
                     {% set i = 0 %}
                     {% for post in pager.getResults() %}
-                        <div class="news-box p-4 mb-5">
+                        <div class="news-box p-4 mb-5" data-aos="fade-up">
                             <header>
                                 <h2 class="word-break">
                                     <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{{ post.title }}</a>
@@ -67,6 +67,6 @@
         </div>
     </div>
 {% endblock %}
-{% block javascripts %}
-<script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/news.js') }}"></script>
+{% block pagescripts %}
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/news.js') }}"></script>
 {% endblock %}

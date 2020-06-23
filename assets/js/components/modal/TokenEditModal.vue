@@ -64,6 +64,7 @@
                                     :status-prop="statusProp"
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
+                                    :key="tokenDeployKey"
                                 />
                             </template>
                         </faq-item>
@@ -191,6 +192,12 @@ export default {
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
+            tokenDeployKey: 0,
+        };
+    },
+    beforeUpdate: function() {
+        if (this.isTokenDeployed) {
+            this.tokenDeployKey++;
         };
     },
     computed: {
