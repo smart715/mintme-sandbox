@@ -124,7 +124,6 @@ class DonationHandler implements DonationHandlerInterface
             $checkDonationResult->getExpectedTokens(),
             Token::WEB_SYMBOL
         );
-        $tokensWorth = $this->moneyWrapper->parse($checkDonationResult->getTokensWorth(), Token::WEB_SYMBOL);
 
         // Check expected tokens amount.
         if ($currentExpectedAmount->lessThan($expectedAmount)) {
@@ -160,25 +159,25 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
-            $tokensWorthInBtc = $this->getMintmeWorthInBtc($tokensWorth);
+            $sellOrdersSummaryInBtc = $this->getMintmeWorthInBtc($sellOrdersSummary);
             $this->sendAmountFromUserToUser(
                 $donorUser,
-                $tokensWorthInBtc,
+                $sellOrdersSummaryInBtc,
                 $donorUser,
-                $tokensWorth,
+                $sellOrdersSummary,
                 Token::BTC_SYMBOL,
                 Token::WEB_SYMBOL
             );
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($tokensWorth),
+                $this->moneyWrapper->format($sellOrdersSummary),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
 
-            $donationAmountLeftInBtc = $amountObj->subtract($tokensWorthInBtc);
+            $donationAmountLeftInBtc = $amountObj->subtract($sellOrdersSummaryInBtc);
             $feeAmount = $this->calculateFee($donationAmountLeftInBtc);
             $amountToDonate = $donationAmountLeftInBtc->subtract($feeAmount);
             $this->sendAmountFromUserToUser(
@@ -192,11 +191,12 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
-            $amountToSendManually = $donationAmount->subtract($tokensWorth);
+            $amountToSendManually = $donationAmount->subtract($sellOrdersSummary);
+
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($tokensWorth),
+                $this->moneyWrapper->format($sellOrdersSummary),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()

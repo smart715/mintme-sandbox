@@ -65,7 +65,7 @@ class DonationController extends AbstractFOSRestController
 
             $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
-            $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary->getAmount(), $currency);
+            $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary, $currency);
 
             return $this->view([
                 'amountToReceive' => $checkDonationResult->getExpectedTokens(),
@@ -120,7 +120,7 @@ class DonationController extends AbstractFOSRestController
                 (string)$request->get('amount'),
                 (string)$request->get('expected_count_to_receive'),
                 $user,
-                $sellOrdersSummary->getAmount()
+                $sellOrdersSummary
             );
 
             return $this->view(null, Response::HTTP_ACCEPTED);

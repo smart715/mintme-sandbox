@@ -405,7 +405,7 @@ class MarketHandler implements MarketHandlerInterface
         return $this->moneyWrapper->format($depthAmount);
     }
 
-    public function getSellOrdersSummary(Market $market): Money
+    public function getSellOrdersSummary(Market $market): string
     {
         $offset = 0;
         $limit = 100;
@@ -421,13 +421,13 @@ class MarketHandler implements MarketHandlerInterface
 
         $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
 
-        /** @var Money $sellOrdersWorth */
-        $sellOrdersWorth = array_reduce($orders, function (Money $sum, Order $order) {
+        /** @var Money $sellOrdersSum */
+        $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
             return $order->getPrice()->multiply(
                 $this->moneyWrapper->format($order->getAmount())
             )->add($sum);
         }, $zeroDepth);
 
-        return $sellOrdersWorth;
+        return $this->moneyWrapper->format($sellOrdersSum);
     }
 }
