@@ -123,7 +123,9 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $token = $item->getToken();
 
-                $this->logger->info(print_r($this->cryptoManager->findAll(), true));
+                foreach ($this->cryptoManager->findAll() as $cr) {
+                    $this->logger->info("[withdrawals] {$cr->getSymbol()} --- {$cr->getName()}");
+                }
 
                 $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
