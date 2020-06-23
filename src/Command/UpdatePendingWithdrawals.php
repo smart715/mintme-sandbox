@@ -124,12 +124,6 @@ class UpdatePendingWithdrawals extends Command
                 try {
                     $cmi = $this->getCryptoManager();
 
-                    $cryptos = $cmi->findAll();
-
-                    foreach ($cryptos as $cr) {
-                        $this->logger->info("[withdrawals] {$cr->getSymbol()} --- {$cr->getName()}");
-                    }
-
                     $crypto = $cmi->findBySymbol(Token::WEB_SYMBOL);
 
                     $fee = $crypto->getFee();
