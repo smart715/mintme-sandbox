@@ -120,7 +120,7 @@ class DonationController extends AbstractFOSRestController
                 (string)$request->get('amount'),
                 (string)$request->get('expected_count_to_receive'),
                 $user,
-                $sellOrdersSummary
+                $sellOrdersSummary->getAmount()
             );
 
             return $this->view(null, Response::HTTP_ACCEPTED);

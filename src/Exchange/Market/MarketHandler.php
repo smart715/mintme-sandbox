@@ -419,7 +419,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $orders = array_merge([], ...$paginatedOrders);
 
-        $zeroDepth = $this->moneyWrapper->parse('0', Token::WEB_SYMBOL);
+        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
 
         /** @var Money $sellOrdersWorth */
         $sellOrdersWorth = array_reduce($orders, function (Money $sum, Order $order) {

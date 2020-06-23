@@ -95,7 +95,7 @@ class DonationHandler implements DonationHandlerInterface
         string $amount,
         string $expectedAmount,
         User $donorUser,
-        Money $sellOrdersSummary
+        string $sellOrdersSummary
     ): void {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         $this->checkAmount($donorUser, $amountObj, $currency);
@@ -104,6 +104,7 @@ class DonationHandler implements DonationHandlerInterface
         /** @var User tokenCreator */
         $tokenCreator = $token->getProfile()->getUser();
 
+        $sellOrdersSummary = $this->moneyWrapper->parse($sellOrdersSummary, Token::WEB_SYMBOL);
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
         $minTokensAmount = $this->donationConfig->getMinTokensAmount();
         $donationAmount = $amountObj;
