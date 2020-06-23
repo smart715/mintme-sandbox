@@ -120,7 +120,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
 
         $repoC = $this->createMock(CryptoRepository::class);
         $repoC->expects($this->exactly(1))
-            ->method('findAll')
+            ->method('findBySymbol')
             ->willReturn(array_map(function () {
                 return $this->mockCrypto();
             }, range(1, $lockCount)));
