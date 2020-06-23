@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
+use App\Manager\CryptoManagerInterface;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
@@ -32,6 +33,9 @@ class UpdatePendingWithdrawals extends Command
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     /** @var int */
     public $expirationTime;
 
@@ -39,12 +43,14 @@ class UpdatePendingWithdrawals extends Command
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        CryptoManagerInterface $crypto
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
+        $this->cryptoManager = $crypto;
 
         parent::__construct();
     }
@@ -117,7 +123,7 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $token = $item->getToken();
 
-                $crypto = $token->getCrypto();
+                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
                 $fee = $crypto->getFee();
 
