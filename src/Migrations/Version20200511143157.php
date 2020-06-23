@@ -38,7 +38,7 @@ BEGIN
 
     RETURN CASE WHEN open_price1 = 0
         THEN 0
-        ELSE CAST(((last_price1 - open_price1) / open_price1) AS DECIMAL(3, 2))
+        ELSE CAST(((last_price1 - open_price1) / open_price1) AS DECIMAL(14, 2))
         END;
 END;
 SQL;

@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 
+// SQL code for user-defined function change_percentage can be found on migration Version20200511143157
 class ChangePercentage extends FunctionNode
 {
     /** @var PathExpression|null */
