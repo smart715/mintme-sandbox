@@ -14,6 +14,7 @@ import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
+import Avatar from './components/Avatar';
 import {directive as onClickaway} from 'vue-clickaway';
 import Notification from './components/Notification';
 import sanitizeHtml from './sanitize_html';
@@ -92,6 +93,7 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
+        Avatar,
     },
     methods: {
         toggleNavbarMenu: function() {
