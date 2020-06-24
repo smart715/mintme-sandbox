@@ -76,28 +76,30 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
-                $crypto = $item->getCrypto();
-
-                $fee   = $crypto->getFee();
-                $token = Token::getFromCrypto($crypto);
                 $this->em->beginTransaction();
 
                 try {
+                    $crypto = $item->getCrypto();
+
+                    $fee   = $crypto->getFee();
+                    $token = Token::getFromCrypto($crypto);
+                    $user = $item->getUser();
+
                     $this->balanceHandler->deposit(
-                        $item->getUser(),
+                        $user,
                         $token,
                         $item->getAmount()->getAmount()
                     );
 
                     $this->balanceHandler->deposit(
-                        $item->getUser(),
+                        $user,
                         $token,
                         $fee
                     );
 
                     $this->em->remove($item);
                     $this->em->flush();
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval to {$token->getName()} {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
                     $pendingCount++;
                 } catch (Throwable $exception) {
