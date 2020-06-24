@@ -16,8 +16,8 @@
             </v-clamp>
         </a>
         <img
-            src="../../../img/avatar.png"
-            class="d-block"
+            :src="img"
+            class="d-block rounded-circle"
             alt="avatar">
     </div>
 </template>
@@ -38,6 +38,7 @@ export default {
     props: {
         value: String,
         url: String,
+        img: String,
     },
     methods: {
         updateTooltip: function(val) {
