@@ -4,6 +4,8 @@ namespace App\Entity\Token;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\Image;
+use App\Entity\ImagineInterface;
 use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
@@ -26,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class Token implements TradebleInterface
+class Token implements TradebleInterface, ImagineInterface
 {
     public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
@@ -185,6 +187,14 @@ class Token implements TradebleInterface
     protected $withdrawn = '0';
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+     * @Groups({"Default", "API"})
+     * @var Image
+     */
+    protected $image;
+
+     /**
      * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
@@ -488,6 +498,16 @@ class Token implements TradebleInterface
         $this->withdrawn = $withdrawn;
 
         return $this;
+    }
+
+    public function setImage(Image $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): Image
+    {
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL);
     }
 
     public function getMintedAmount(): Money
