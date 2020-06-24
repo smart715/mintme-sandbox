@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 /* Cron job added to DB. */
+
 class UpdatePendingWithdrawals extends Command
 {
     /** @var LoggerInterface */
@@ -35,7 +36,7 @@ class UpdatePendingWithdrawals extends Command
     private $balanceHandler;
 
     /** @var int */
-    public $expirationTime;
+    public $withdrawExpirationTime;
 
     public function __construct(
         LoggerInterface $logger,
@@ -43,9 +44,9 @@ class UpdatePendingWithdrawals extends Command
         DateTime $dateTime,
         BalanceHandlerInterface $balanceHandler
     ) {
-        $this->logger = $logger;
-        $this->em = $entityManager;
-        $this->date = $dateTime;
+        $this->logger         = $logger;
+        $this->em             = $entityManager;
+        $this->date           = $dateTime;
         $this->balanceHandler = $balanceHandler;
 
         parent::__construct();
@@ -65,11 +66,11 @@ class UpdatePendingWithdrawals extends Command
     {
         $this->logger->info('[withdrawals] Update job started..');
 
-        $expires = new DateInterval('PT'.$this->expirationTime.'S');
+        $expires = new DateInterval('PT' . $this->withdrawExpirationTime . 'S');
 
         $items = $this->getPendingWithdrawRepository()->findAll();
 
-        $itemsCount = count($items);
+        $itemsCount   = count($items);
         $pendingCount = 0;
 
         /** @var PendingWithdraw $item */
@@ -77,7 +78,7 @@ class UpdatePendingWithdrawals extends Command
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $crypto = $item->getCrypto();
 
-                $fee = $crypto->getFee();
+                $fee   = $crypto->getFee();
                 $token = Token::getFromCrypto($crypto);
                 $this->em->beginTransaction();
 
@@ -111,7 +112,7 @@ class UpdatePendingWithdrawals extends Command
 
         $items = $this->getPendingTokenWithdrawRepository()->findAll();
 
-        $itemsCount = count($items);
+        $itemsCount   = count($items);
         $pendingCount = 0;
 
         /** @var PendingTokenWithdraw $item */

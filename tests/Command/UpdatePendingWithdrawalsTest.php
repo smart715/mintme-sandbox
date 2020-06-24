@@ -47,7 +47,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $handler
         );
 
-        $upw->expirationTime = 1;
+        $upw->withdrawExpirationTime = 1;
 
         $application->add($upw);
 
@@ -80,7 +80,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $handler
         );
 
-        $upw->expirationTime = 1;
+        $upw->withdrawExpirationTime = 1;
 
         $application->add($upw);
 
