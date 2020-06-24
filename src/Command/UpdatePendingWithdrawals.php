@@ -36,7 +36,7 @@ class UpdatePendingWithdrawals extends Command
     private $balanceHandler;
 
     /** @var int */
-    public $withdrawExpirationTime;
+    public $expirationTime;
 
     public function __construct(
         LoggerInterface $logger,
@@ -64,9 +64,9 @@ class UpdatePendingWithdrawals extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger->info('[withdrawals] Update job started..');
+        $this->logger->info("[withdrawals] Update job started with expiration time: {$this->expirationTime}S.. ");
 
-        $expires = new DateInterval('PT' . $this->withdrawExpirationTime . 'S');
+        $expires = new DateInterval('PT' . $this->expirationTime . 'S');
 
         $items = $this->getPendingWithdrawRepository()->findAll();
 
