@@ -321,11 +321,27 @@
     "lcobucci/jwt": {
         "version": "3.3.1"
     },
+    "liip/imagine-bundle": {
+        "version": "1.8",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.8",
+            "ref": "1d42bc3f713130582e6e0c475c49bc327ab0a2a2"
+        },
+        "files": [
+            "config/packages/liip_imagine.yaml",
+            "config/routes/liip_imagine.yaml"
+        ]
+    },
     "liuggio/fastest": {
         "version": "v1.6.1"
     },
     "michelf/php-markdown": {
         "version": "1.9.0"
+    },
+    "mikey179/vfsstream": {
+        "version": "v1.6.8"
     },
     "moneyphp/money": {
         "version": "v3.3.1"

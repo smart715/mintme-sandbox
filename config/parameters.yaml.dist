@@ -115,11 +115,15 @@ parameters:
     # max top holders for each token
     top_holders: 10
 
+    # where to store images
+    images_path: "/uploads/images"
+
     airdrop_params:
         min_tokens_amount: 0.01
         min_participants_amount: 100
         max_participants_amount: 999999
         min_token_reward: 0.0001
+
     # forward proxy for hiding real mintme server IP when verifying token owner's website
     # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
     # to disable the proxy, set empty string ''

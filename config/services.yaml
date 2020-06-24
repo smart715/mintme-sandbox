@@ -433,6 +433,12 @@ services:
         tags:
             - { name: monolog.logger, channel: front_end }
 
+    App\EntityListener\ImageListener:
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postLoad, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
+
     logout_listner:
         class: App\EventListener\LogoutListener
 
@@ -511,6 +517,8 @@ services:
             $rpc: '@coinmarketcap.rest_rpc'
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
+
+    App\Manager\ImageManagerInterface: '@App\Manager\ImageManager'
 
     app.emailCanonicalizer:
         class: App\Canonicalizer\EmailCanonicalizer
