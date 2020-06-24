@@ -10,8 +10,8 @@
                         <div class='row'>
                             <div class="col-12 pb-2 text-white text-center">
                                 Download the Google Authenticator application from
-                                <a class="text-blue" @click="BlurLink" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
-                                <a class="text-blue" @click="BlurLink" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
+                                <a class="text-blue" @click="BlurLink" @focus="BlurLink" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
+                                <a class="text-blue" @click="BlurLink" @focus="BlurLink" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
                             </div>
                             <div class="col-12 pb-2 text-center">
                                 <img src="{{ qr_code_data_uri(imgUrl) }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode">
