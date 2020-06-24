@@ -16,7 +16,7 @@
             </div>
             <div class="card-body">
                 <div v-if="balanceLoaded" class="row">
-                    <div class="col-12">
+                    <div v-if="loggedIn" class="col-12">
                         <label
                             for="sell-price-input"
                             class="text-white">
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 pt-2">
+                    <div v-if="loggedIn" class="col-12 pt-2">
                         <label
                             for="sell-price-amount"
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
@@ -132,7 +132,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 pt-2">
+                    <div v-if="loggedIn" class="col-12 pt-2">
                         Total Price:
                         {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
