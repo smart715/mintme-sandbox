@@ -210,6 +210,7 @@ export default {
     },
     data() {
         return {
+            newOrderExists: null,
             markets: null,
             currentPage: this.page,
             perPage: 25,
@@ -443,39 +444,65 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                setTimeout(() => {
-                    this.$axios.retry.get(this.$routing.generate('markets_info', params))
-                    .then((res) => {
-                        if (null !== this.markets) {
-                            this.addOnOpenHandler(() => {
-                                const request = JSON.stringify({
-                                    method: 'state.unsubscribe',
-                                    params: [],
-                                    id: parseInt(Math.random().toString().replace('0.', '')),
-                                });
-                                this.sendMessage(request);
+                this.$axios.retry.get(this.$routing.generate('markets_info', params))
+                .then((res) => {
+                    if (null !== this.markets) {
+                        this.addOnOpenHandler(() => {
+                            const request = JSON.stringify({
+                                method: 'state.unsubscribe',
+                                params: [],
+                                id: parseInt(Math.random().toString().replace('0.', '')),
                             });
-                        }
+                            this.sendMessage(request);
+                        });
+                    }
+                    return new Promise((resolve, reject) => {
+                        res.data.markets.forEach((market) => {
+                            this.axios.retry.get(this.$routing.generate('executed_orders', {
+                                base: market.base.symbol,
+                                quote: market.quote.symbol,
+                                id: 0,
+                            }))
+                            .then((response) => {
+                                if (response.data.result.length > 0) {
+                                    this.newOrderExists = true;
+                                    resolve();
+                                } else (reject());
+                            })
+                            .catch((error) => {
+                                this.notifyError('Could not check new orders, please try again later');
+                            });
+                        });
+                    });
+
+                    if (this.newOrderExists) {
                         this.currentPage = page;
                         this.markets = res.data.markets;
                         this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
+                    } else {
+                        setTimeout(() => {
+                            this.currentPage = page;
+                            this.markets = res.data.markets;
+                            this.perPage = res.data.limit;
+                            this.totalRows = res.data.rows;
+                        }, 2000);
+                    }
 
-                        if (window.history.replaceState) {
-                            // prevents browser from storing history with each change:
-                            window.history.replaceState(
-                                {page}, document.title, this.$routing.generate('trading', {page})
-                            );
-                        }
+                    if (window.history.replaceState) {
+                        // prevents browser from storing history with each change:
+                        window.history.replaceState(
+                            {page}, document.title, this.$routing.generate('trading', {page})
+                        );
+                    }
 
-                        resolve();
-                    })
-                    .catch((err) => {
-                        this.notifyError('Can not update the markets data. Try again later.');
-                        this.sendLogs('error', 'Can not update the markets data', err);
-                        reject(err);
-                    });
-                }, 6000);
+                    resolve();
+                })
+                .catch((err) => {
+                    this.notifyError('Can not update the markets data. Try again later.');
+                    this.sendLogs('error', 'Can not update the markets data', err);
+                    reject(err);
+                });
             });
         },
         sanitizeMarket: function(marketData) {
