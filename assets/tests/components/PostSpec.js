@@ -27,6 +27,7 @@ const testPost = {
         lastName: 'Doe',
         page_url: 'testPageUrl',
         nickname: 'John',
+        image: 'avatar_small',
     },
     token: {
         name: 'tok',
