@@ -22,22 +22,56 @@
 
     {% if isTokenPage %}
     <div class="row mt-5 justify-content-center">
-        <div class="col-md-10 d-flex justify-content-end">
-            <token-social-media-icons
-                youtube-client-id="{{ global_youtube_client_id }}"
+        <div class="col-md-10 d-flex justify-content-between">
+            <token-avatar
+                class="ml-2"
+                :is-owner="{{ isOwner }}"
+                :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
+                identifier="{{ market.quote.identifier }}"
+                name="{{ market.quote.name }}"
+                :precision="{{ precision }}"
+                :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                websocket-url="{{ global_websocket_url }}"
+                release-address="{{ token.mintDestination }}"
                 facebook-app-id="{{ global_facebook_app_id }}"
-                token-name="{{ market.quote.name }}"
-                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
-                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
-                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                youtube-client-id="{{ global_youtube_client_id }}"
                 :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
                 :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+                :airdrop-params="{{ airdrop_params | json_encode }}"
+                @token-deploy-pending="setTokenPending"
+                @updated-website="websiteUpdated"
+                @updated-facebook="facebookUpdated"
+                @updated-youtube="youtubeUpdated"
+                @updated-discord="discordUpdated"
+                @updated-telegram="telegramUpdated"
+                image="{{ token.image.url | imagine_filter('avatar_large') }}"
+                profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
+                profile-name="{{ profile.firstName }}"
+                profile-lastname="{{ profile.lastname }}"
+                profile-description="{{ profile.description }}"
+                profile-anonymously="{{ profile.anonymous }}"
+                :token-description="tokenDescription"
+                :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
+                :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
+                :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
+            ></token-avatar>
+            <token-social-media-icons
+                    youtube-client-id="{{ global_youtube_client_id }}"
+                    facebook-app-id="{{ global_facebook_app_id }}"
+                    token-name="{{ market.quote.name }}"
+                    :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                    :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                    :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                    :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                    :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
             />
         </div>
     </div>
     {% endif %}
 
-    <div class="row mt-3 justify-content-center">
+    <div class="row mt-1 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
             <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
@@ -51,7 +85,11 @@
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
-                    <b-tab title="Introduction" {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}>
+                    <b-tab
+                        title="Introduction"
+                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
+                        {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
+                    >
                         <div class="row">
                             <token-introduction-description
                                     class="col-12 pb-3"
@@ -147,62 +185,7 @@
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
-                    {% if isTokenPage %}
-                        {% if token is defined %}
-                            <li class="nav-item">
-                                <div class="nav-link pr-md-0">
-                                    <token-deploy-icon
-                                            :is-owner="{{ isOwner }}"
-                                            :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    />
-                                </div>
-                            </li>
-                            <li class="nav-item-circle-progress">
-                                <token-points-progress
-                                    profile-name="{{ profile.firstName }}"
-                                    profile-lastname="{{ profile.lastname  }}"
-                                    profile-description="{{ profile.description }}"
-                                    profile-anonymously="{{ profile.anonymous }}"
-                                    :token-description="tokenDescription"
-                                    :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
-                                    :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
-                                    :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
-                                    token-status="{{ token.getDeploymentStatus }}"
-                                >
-                                </token-points-progress>
-                            </li>
-                        {% endif %}
-                        <li class="nav-item-token">
-                            <div class="nav-link-token">
-                                <token-name
-                                    :editable="{{ isOwner }}"
-                                    :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
-                                    :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                                    identifier="{{ market.quote.identifier }}"
-                                    name="{{ market.quote.name }}"
-                                    :precision="{{ precision }}"
-                                    :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
-                                    websocket-url="{{ global_websocket_url }}"
-                                    release-address="{{ token.mintDestination }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
-                                    :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
-                                    :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
-                                    :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
-                                    :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
-                                    :airdrop-params="{{ airdrop_params | json_encode }}"
-                                    @token-deploy-pending="setTokenPending"
-                                    @updated-website="websiteUpdated"
-                                    @updated-facebook="facebookUpdated"
-                                    @updated-youtube="youtubeUpdated"
-                                    @updated-discord="discordUpdated"
-                                    @updated-telegram="telegramUpdated"
-                                />
-                            </div>
-                        </li>
-                    {% else %}
+                    {% if not isTokenPage %}
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <div class="truncate-token">

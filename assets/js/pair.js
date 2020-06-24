@@ -1,13 +1,11 @@
 import CreatePost from './components/posts/CreatePost';
 import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
-import TokenDeployIcon from './components/token/deploy/TokenDeployIcon';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
-import TokenName from './components/token/TokenName';
 import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
-import TokenPointsProgress from './components/token/TokenPointsProgress';
 import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
+import TokenAvatar from './components/token/TokenAvatar';
 import TopHolders from './components/trade/TopHolders';
 import Trade from './components/trade/Trade';
 import store from './storage';
@@ -40,12 +38,10 @@ new Vue({
     CreatePost,
     Donation,
     Posts,
-    TokenDeployIcon,
     TokenIntroductionDescription,
+    TokenAvatar,
     TokenIntroductionStatistics,
-    TokenName,
     TokenOngoingAirdropCampaign,
-    TokenPointsProgress,
     TokenSocialMediaIcons,
     TopHolders,
     Trade,

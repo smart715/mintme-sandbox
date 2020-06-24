@@ -1,16 +1,24 @@
 <template>
 <div>
-    <circle-progress
-        class="circle-progress"
-        :points-gained=tokenPointsGained
-        :total-points=18
-    >
-    </circle-progress>
+    <guide>
+        <template slot="icon">
+            <circle-progress
+                class="circle-progress"
+                :points-gained=tokenPointsGained
+                :total-points=18
+            />
+        </template>
+        <template slot="body">
+            The more information you provide about your token and profile,
+            the higher this number will be. Also you get big boost if you deploy your token to blockchain.
+        </template>
+    </guide>
 </div>
 </template>
 
 <script>
 import CircleProgress from '../../components/CircleProgress';
+import Guide from '../Guide';
 import {mapGetters} from 'vuex';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
@@ -29,6 +37,7 @@ export default {
     },
     components: {
         CircleProgress,
+        Guide,
     },
     data() {
         return {

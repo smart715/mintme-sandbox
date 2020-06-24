@@ -134,6 +134,7 @@ export default {
                     orderId: order.id,
                     ownerId: order.maker.id,
                     highlightClass: '',
+                    traderAvatar: order.maker.profile.image.avatar_small,
                 };
             });
         },

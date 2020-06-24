@@ -49,8 +49,8 @@
                                             {{ row.value }}
                                         </span>
                                         <img
-                                            src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0"
+                                            :src="row.item.makerAvatar"
+                                            class="rounded-circle d-block flex-grow-0"
                                             alt="avatar">
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -65,8 +65,8 @@
                                             {{ row.value }}
                                         </span>
                                         <img
-                                            src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0"
+                                            :src="row.item.takerAvatar"
+                                            class="rounded-circle d-block flex-grow-0"
                                             alt="avatar">
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -184,6 +184,8 @@ export default {
                         new Decimal(order.price).mul(order.amount).toString(),
                         this.market.base.subunit
                     ),
+                    makerAvatar: order.maker.profile.image.avatar_small,
+                    takerAvatar: order.taker.profile.image.avatar_small,
                 };
             }) : [];
         },
