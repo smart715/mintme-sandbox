@@ -1,49 +1,57 @@
-<div class="row pt-5 justify-content-center" v-if="false">
+{% if isTokenPage %}
+<div class="row mt-5 justify-content-center" v-if="false">
+    <div class="col-md-10 d-flex justify-content-between">
+        <div class="token-avatar ml-2">
+            <div class="d-flex flex-column">
+                <div class="d-flex align-items-center token-name">
+                    <div class="avatar avatar__large"></div>
+                </div>
+                <div>
+                    Visit token's creator profile
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row pt-1 justify-content-center" v-if="false">
     {% if isTokenPage %}
     <div class="col-md-10">
         <div class="tabs tabs-theme transparent">
             <div>
                 <ul role="tablist" class="nav nav-tabs">
-                    <li role="presentation" class="nav-item">
-                        <a role="tab"
-                            aria-selected="true"
+                    <li role="presentation"
+                        class="nav-item {% if isTokenPage %} token-avatar-left {% endif %}">
+                        <a
+                            role="tab" aria-selected="true"
                             aria-setsize="2"
                             aria-posinset="1" target="_self" href="#"
-                            class="nav-link active"
-                        >
+                            class="nav-link active">
                             Introduction
                         </a>
                     </li>
-                    <li role="presentation" class="nav-item">
-                        <a role="tab"
+                    <li
+                        role="presentation" class="nav-item">
+                        <a
+                            role="tab"
                             aria-selected="false"
                             aria-setsize="2"
-                            aria-posinset="2" target="_self" href="#"
-                            class="nav-link"
-                        >
+                            aria-posinset="2"
+                            target="_self" href="#"
+                            class="nav-link">
                             Trade
                         </a>
                     </li>
                     <li role="presentation" class="nav-item">
                         <a role="tab"
-                            aria-selected="false"
-                            aria-setsize="2"
-                            aria-posinset="2" target="_self" href="#"
-                            class="nav-link"
+                           aria-selected="false"
+                           aria-setsize="2"
+                           aria-posinset="2" target="_self" href="#"
+                           class="nav-link"
                         >
                             Posts
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <div class="nav-link pr-md-0">
-                            <div>
-                                <div class="not-deployed-icon">
-                                    <div class="d-inline">
-                                        <a data-tippy="" class="mtcoin"></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </li>
                     <li class="nav-item-token">
                         <div class="nav-link-token">

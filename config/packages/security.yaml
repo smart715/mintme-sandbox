@@ -68,6 +68,7 @@ security:
 
     access_control:
         - { path: ^/dev/api,                                        role: ROLE_API }
+        - { path: ^/api/media/upload,                               role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$,             role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$,                role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/deploy,                 role: ROLE_USER }
