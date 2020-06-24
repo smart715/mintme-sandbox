@@ -97,9 +97,9 @@ class UpdatePendingWithdrawals extends Command
 
                     $this->em->remove($item);
                     $this->em->flush();
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval to {$token->getName()} addr: {$token->getAddress()} {$token->getCrypto()->getSymbol()} ({$item->getSymbol()} ({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
                     $pendingCount++;
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
                     $this->logger->info("[withdrawals] Pending withdraval error: $message ...");
