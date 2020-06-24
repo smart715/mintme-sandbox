@@ -44,13 +44,13 @@ class ProfileController extends AbstractFOSRestController
                 $replace = ['\d', '[a-z]', '\s'];
 
                 foreach ($patterns as &$pattern) {
-                    $pattern = '('.str_replace($search, $replace, $pattern).')';
+                    $pattern = '(' . str_replace($search, $replace, $pattern) . ')';
                 }
 
                 $finalPattern = implode('|', $patterns);
 
                 if (count($patterns) > 1) {
-                    $finalPattern = '('.$finalPattern.')';
+                    $finalPattern = '(' . $finalPattern . ')';
                 }
             }
         }
