@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
@@ -15,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @UniqueEntity("symbol")
  * @codeCoverageIgnore
  */
-class Crypto implements TradebleInterface
+class Crypto implements TradebleInterface, ImagineInterface
 {
     /**
      * @ORM\Id()
@@ -72,6 +73,18 @@ class Crypto implements TradebleInterface
      * @var ArrayCollection
      */
     protected $users;
+
+    /**
+     * @ORM\Column(type="string", options={"default" : ""})
+     * @var string
+     */
+    protected $imagePath = '';
+
+    /**
+     * @Groups({"Default", "API"})
+     * @var Image
+     */
+    protected $image;
 
     public function getId(): int
     {
@@ -134,5 +147,15 @@ class Crypto implements TradebleInterface
     public function getFee(): Money
     {
         return new Money($this->fee, new Currency($this->getSymbol()));
+    }
+
+    public function setImage(Image $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): Image
+    {
+        return Image::defaultImage($this->imagePath);
     }
 }
