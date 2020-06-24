@@ -131,27 +131,11 @@
                     </template>
                     <template v-slot:cell(pair)="row">
                         <div>
-                            <a :href="row.item.tokenUrl" class="text-white"
-                               :disabled.sync="row.value.length <= 20"
-                               v-b-tooltip.hover :title="row.value">
-                                <span v-if="showFullPair(row.value)">
-                                    <avatar
-                                        :image="row.item.baseImage"
-                                        type="token"
-                                        size="small" :symbol="row.item.base"
-                                        class="d-inline"
-                                        :key="row.item.baseImage"
-                                    />
-                                    {{ row.item.base }}/
-                                </span>
-                                <avatar
-                                    :image="row.item.quoteImage"
-                                    type="token"
-                                    size="small"
-                                    class="d-inline"
-                                    :key="row.item.quoteImage"
-                                />
-                                {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                            <a v-if="row.value.length > 22" :href="row.item.tokenUrl" class="text-white" v-b-tooltip.hover :title="row.value">
+                                {{ row.value | truncate(22) }}
+                            </a>
+                            <a v-else :href="row.item.tokenUrl" class="text-white">
+                                {{ row.value }}
                             </a>
                             <guide
                                 placement="top"
@@ -204,7 +188,6 @@
 <script>
 import _ from 'lodash';
 import Guide from '../Guide';
-import Avatar from '../Avatar';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
@@ -224,7 +207,6 @@ export default {
     },
     components: {
         Guide,
-        Avatar,
     },
     data() {
         return {
@@ -378,9 +360,6 @@ export default {
         this.fetchData();
     },
     methods: {
-        showFullPair: function(pair) {
-            return pair.indexOf('/') !== -1;
-        },
         toggleFilter: function(value) {
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
@@ -478,7 +457,9 @@ export default {
                         });
                     }
                     return new Promise((resolve, reject) => {
-                        res.data.markets.forEach((market) => {
+                        console.log(res.data.markets);
+                        let markets = res.data.markets;
+                        markets.forEach((market) => {
                             this.axios.retry.get(this.$routing.generate('executed_orders', {
                                 base: market.base.symbol,
                                 quote: market.quote.symbol,
@@ -550,9 +531,6 @@ export default {
 
             const position = this.markets[marketName].position;
 
-            const baseImage = this.markets[marketName].base.image.avatar_small;
-            const quoteImage = this.markets[marketName].quote.image.avatar_small;
-
             const market = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
@@ -564,9 +542,7 @@ export default {
                 marketPrecision,
                 tokenized,
                 buyDepth,
-                position,
-                baseImage,
-                quoteImage
+                position
             );
 
             if (marketOnTopIndex > -1) {
@@ -593,9 +569,7 @@ export default {
             subunit,
             tokenized,
             buyDepth,
-            position,
-            baseImage,
-            quoteImage
+            position
         ) {
             let hiddenName = this.findHiddenName(token);
             let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
@@ -621,8 +595,6 @@ export default {
                 tokenized: tokenized,
                 base: currency,
                 quote: token,
-                baseImage,
-                quoteImage,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -674,9 +646,7 @@ export default {
                         this.markets[market].base.subunit,
                         tokenized,
                         parseFloat(this.markets[market].buyDepth),
-                        this.markets[market].position,
-                        this.markets[market].base.image.avatar_small,
-                        this.markets[market].quote.image.avatar_small
+                        this.markets[market].position
                     );
                     if (marketOnTopIndex > -1) {
                         Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -729,9 +699,7 @@ export default {
                 market.base.subunit,
                 tokenized,
                 market.buyDepth,
-                market.position,
-                market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.position
                 );
 
             if (marketOnTopIndex > -1) {
@@ -816,9 +784,7 @@ export default {
                 market.base.subunit,
                 false,
                 market.buyDepth,
-                market.position,
-                market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.position
             );
             Vue.set(this.sanitizedMarketsOnTop, 0, market);
         },
