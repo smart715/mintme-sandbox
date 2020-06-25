@@ -35,3 +35,4 @@ doctrine:
             numeric_functions:
                 change_percentage: App\Utils\ChangePercentage
                 to_number: App\Utils\ToNumber
+                marketcap: App\Utils\Marketcap

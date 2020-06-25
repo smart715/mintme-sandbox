@@ -568,3 +568,7 @@ services:
     App\Repository\PendingTokenWithdrawRepository:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
+
+    App\Manager\MarketStatusManager:
+        properties:
+            minVolumeForMarketcap: '%minimum_volume_for_marketcap%'

@@ -25,13 +25,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
         'change',
         'qt.name',
         'to_number(ms.buyDepth)',
+        'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)',
     ];
 
     private const SORTS_MAP = [
         'lastPrice' => 0,
         'lastPriceUSD' => 0,
-        'marketCap' => 0,
-        'marketCapUSD' => 0,
         'monthVolume' => 1,
         'monthVolumeUSD' => 1,
         'dayVolume' => 2,
@@ -40,9 +39,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
         'pair' => 4,
         'buyDepth' => 5,
         'buyDepthUSD' => 5,
+        'marketCap' => 6,
+        'marketCapUSD' => 6,
     ];
 
     private const SORT_BY_CHANGE = 'change';
+
+    private const SORT_BY_MARKETCAP = ['marketCap', 'marketCapUSD'];
 
     private const DEPLOYED_FIRST = 1;
     private const DEPLOYED_ONLY = 2;
@@ -64,6 +67,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /** @var EntityManagerInterface */
     private $em;
+
+    /** @var int */
+    public $minVolumeForMarketcap;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -143,6 +149,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         if (self::SORT_BY_CHANGE === $sort) {
             $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
+        }
+
+        if (in_array($sort, self::SORT_BY_MARKETCAP)) {
+            $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
         }
 
         $sort = isset(self::SORTS_MAP[$sort])

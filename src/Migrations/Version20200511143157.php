@@ -42,8 +42,24 @@ BEGIN
         END;
 END;
 SQL;
+
+        $sql3 = <<< SQL
+CREATE FUNCTION marketcap (last_price VARCHAR(255), month_volume VARCHAR(255), min_volume BIGINT SIGNED) RETURNS BIGINT SIGNED DETERMINISTIC
+BEGIN
+    DECLARE last_price1 BIGINT SIGNED;
+    DECLARE month_volume1 BIGINT SIGNED;
+    SELECT to_number(last_price) INTO last_price1;
+    SELECT to_number(month_volume) INTO month_volume1;
+
+    RETURN CASE WHEN month_volume1 >= min_volume
+        THEN last_price1
+        ELSE 0
+        END;
+END;
+SQL;
         $this->addSql($sql1);
         $this->addSql($sql2);
+        $this->addSql($sql3);
     }
 
     public function down(Schema $schema) : void
@@ -51,5 +67,6 @@ SQL;
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
         $this->addSql("DROP FUNCTION IF EXISTS change_percentage");
         $this->addSql("DROP FUNCTION IF EXISTS to_number");
+        $this->addSql("DROP FUNCTION IF EXISTS marketcap");
     }
 }
