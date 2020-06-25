@@ -176,5 +176,4 @@ class UpdatePendingWithdrawals extends Command
     {
         return $this->em->getRepository(PendingTokenWithdraw::class);
     }
-
 }
