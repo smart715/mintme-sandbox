@@ -456,13 +456,19 @@ export default {
                             this.sendMessage(request);
                         });
                     }
-                    return new Promise((resolve, reject) => {
-                        console.log(res.data.markets);
-                        let markets = res.data.markets;
-                        markets.forEach((market) => {
+
+                    let marketsObj = res.data.markets;
+                    let marketsArr = [];
+                    Object.keys(marketsObj).forEach((key) => {
+                        marketsArr.push(marketsObj[key]);
+                        console.log(marketsArr);
+                    });
+
+                    let checkOrderPromise = new Promise((resolve, reject) => {
+                        marketsArr.forEach((element) => {
                             this.axios.retry.get(this.$routing.generate('executed_orders', {
-                                base: market.base.symbol,
-                                quote: market.quote.symbol,
+                                base: marketsArr[element].base.symbol,
+                                quote: marketsArr[element].quote.symbol,
                                 id: 0,
                             }))
                             .then((response) => {
@@ -476,7 +482,7 @@ export default {
                             });
                         });
                     });
-
+                    console.log('new order exists is' + checkOrderPromise.resolve());
                     if (this.newOrderExists) {
                         this.currentPage = page;
                         this.markets = res.data.markets;
