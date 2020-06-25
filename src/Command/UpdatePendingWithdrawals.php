@@ -34,6 +34,9 @@ class UpdatePendingWithdrawals extends Command
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     /** @var int */
     public $expirationTime;
 
@@ -41,12 +44,14 @@ class UpdatePendingWithdrawals extends Command
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
+        $this->cryptoManager = $cryptoManager;
 
         parent::__construct();
     }
@@ -122,7 +127,7 @@ class UpdatePendingWithdrawals extends Command
                 $this->em->beginTransaction();
 
                 try {
-                    $cmi = $this->getCryptoManager();
+                    $cmi = $this->cryptoManager;
 
                     $crypto = $cmi->findBySymbol(Token::WEB_SYMBOL);
 
@@ -172,8 +177,4 @@ class UpdatePendingWithdrawals extends Command
         return $this->em->getRepository(PendingTokenWithdraw::class);
     }
 
-    private function getCryptoManager(): CryptoManagerInterface
-    {
-        return new CryptoManager($this->em);
-    }
 }
