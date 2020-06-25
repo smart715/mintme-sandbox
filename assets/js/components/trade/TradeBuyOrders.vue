@@ -37,8 +37,8 @@
                                             {{ row.value }}
                                         </span>
                                         <img
-                                            src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0 pointer-events-none"
+                                            :src="row.item.traderAvatar"
+                                            class="rounded-circle d-block flex-grow-0 pointer-events-none"
                                             alt="avatar">
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">

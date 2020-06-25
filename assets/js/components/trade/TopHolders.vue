@@ -11,7 +11,7 @@
                     :items="traders"
                     :fields="fields">
                     <template v-slot:cell(trader)="row">
-                        <holder-name :value="row.value" :url="row.item.url"/>
+                        <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
                     </template>
                 </b-table>
                     <div v-else>
@@ -84,6 +84,7 @@ export default {
             .then(({data}) => this.traders = data.map((row) => {
                 return {
                     trader: row.user.profile.nickname,
+                    traderAvatar: row.user.profile.image.avatar_small,
                     url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
                     date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),

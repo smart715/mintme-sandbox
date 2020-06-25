@@ -1,6 +1,7 @@
 import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
+import Avatar from './components/Avatar.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
 import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
@@ -20,6 +21,7 @@ new Vue({
         BbcodeHelp,
         BbcodeView,
         LimitedTextarea,
+        Avatar,
         Guide,
     },
     data() {

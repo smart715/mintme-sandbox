@@ -17,7 +17,7 @@ use ZipCodeValidator\Constraints\ZipCode;
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class Profile
+class Profile implements ImagineInterface
 {
     /**
      * @ORM\Id()
@@ -119,6 +119,14 @@ class Profile
      * @var string|null
      */
     protected $zipCode;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+     * @Groups({"Default", "API"})
+     * @var Image
+     */
+    protected $image;
 
     public function __construct(User $user)
     {
@@ -283,6 +291,17 @@ class Profile
             && null !== $args->getOldValue($name)
             && ($args->getOldValue($name) || $args->getNewValue($name));
     }
+
+    public function setImage(Image $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): Image
+    {
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+    }
+
     /**
     * @Assert\Callback
     */
