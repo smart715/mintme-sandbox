@@ -112,6 +112,25 @@ a
   &:hover
     color: $color-link-hover
 
+.app-link
+  color: $color-link
+  hidefocus: true
+
+  &:hover
+    color: $color-link-hover
+  
+  &:focus
+    color: $color-link
+  
+  @media (hover: none)
+    &:hover
+      color: $color-link
+      text-decoration: none
+
+    &:focus
+      color: $color-link
+      text-decoration: none
+
 .btn-cancel
   display: inline-block
   padding: .25rem 1rem
