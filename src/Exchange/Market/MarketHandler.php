@@ -194,6 +194,15 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
+    public function getOrdersDepth(Market $market, int $limit = 100, string $interval = '0'): array
+    {
+        return $this->marketFetcher->getOrdersDepth(
+            $this->marketNameConverter->convert($market),
+            $limit,
+            $interval
+        );
+    }
+
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
