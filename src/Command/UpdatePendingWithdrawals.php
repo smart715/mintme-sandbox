@@ -20,7 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
 /* Cron job added to DB. */
-
 class UpdatePendingWithdrawals extends Command
 {
     /** @var LoggerInterface */
@@ -44,9 +43,9 @@ class UpdatePendingWithdrawals extends Command
         DateTime $dateTime,
         BalanceHandlerInterface $balanceHandler
     ) {
-        $this->logger         = $logger;
-        $this->em             = $entityManager;
-        $this->date           = $dateTime;
+        $this->logger = $logger;
+        $this->em = $entityManager;
+        $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
 
         parent::__construct();
@@ -70,7 +69,7 @@ class UpdatePendingWithdrawals extends Command
 
         $items = $this->getPendingWithdrawRepository()->findAll();
 
-        $itemsCount   = count($items);
+        $itemsCount = count($items);
         $pendingCount = 0;
 
         /** @var PendingWithdraw $item */
@@ -112,7 +111,7 @@ class UpdatePendingWithdrawals extends Command
 
         $items = $this->getPendingTokenWithdrawRepository()->findAll();
 
-        $itemsCount   = count($items);
+        $itemsCount = count($items);
         $pendingCount = 0;
 
         /** @var PendingTokenWithdraw $item */
