@@ -6,7 +6,6 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Manager\CryptoManager;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
@@ -127,9 +126,7 @@ class UpdatePendingWithdrawals extends Command
                 $this->em->beginTransaction();
 
                 try {
-                    $cmi = $this->cryptoManager;
-
-                    $crypto = $cmi->findBySymbol(Token::WEB_SYMBOL);
+                    $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
                     $fee = $crypto->getFee();
 
