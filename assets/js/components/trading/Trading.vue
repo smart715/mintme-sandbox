@@ -374,7 +374,9 @@ export default {
         },
     },
     mounted() {
-        this.fetchData();
+        setTimeout(() => {
+            this.fetchData();
+        }, 2000);
     },
     methods: {
         showFullPair: function(pair) {
@@ -453,7 +455,7 @@ export default {
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
             return pair ? 0 : b[key].localeCompare(a[key]);
         },
-         updateData: function(page) {
+        updateData: function(page) {
             return new Promise((resolve, reject) => {
                 let params = {page};
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
@@ -476,49 +478,10 @@ export default {
                             this.sendMessage(request);
                         });
                     }
-
-                    let marketsObj = res.data.markets;
-                    let marketsArr = [];
-                    Object.keys(marketsObj).forEach((key) => {
-                        marketsArr.push(marketsObj[key]);
-                        console.log(marketsArr);
-                    });
-                    console.log(marketsArr);
-
-                    let checkOrderPromise = new Promise((resolve, reject) => {
-                        marketsArr.forEach((element) => {
-                            this.$axios.retry.get(this.$routing.generate('executed_orders', {
-                                base: marketsArr[element].base.symbol,
-                                quote: marketsArr[element].quote.symbol,
-                                id: 0,
-                            }))
-                            .then((response) => {
-                                console.log(response.data);
-                                if (response.data.length > 0) {
-                                    this.newOrderExists = true;
-                                    resolve('success');
-                                } else (reject());
-                            })
-                            .catch((error) => {
-                                this.notifyError('Could not check new orders, please try again later');
-                            });
-                        });
-                    });
-                    console.log('new order exists is' + checkOrderPromise.resolve('success'));
-                    console.log('new order boolean' + this.newOrderExists);
-                    if (this.newOrderExists) {
-                        this.currentPage = page;
-                        this.markets = res.data.markets;
-                        this.perPage = res.data.limit;
-                        this.totalRows = res.data.rows;
-                    } else {
-                        setTimeout(() => {
-                            this.currentPage = page;
-                            this.markets = res.data.markets;
-                            this.perPage = res.data.limit;
-                            this.totalRows = res.data.rows;
-                        }, 2000);
-                    }
+                    this.currentPage = page;
+                    this.markets = res.data.markets;
+                    this.perPage = res.data.limit;
+                    this.totalRows = res.data.rows;
 
                     if (window.history.replaceState) {
                         // prevents browser from storing history with each change:
