@@ -199,7 +199,7 @@ export default {
                 : this.rebrandingFunc(history.market.base.symbol));
         },
         calculateTotalCost: function(history) {
-            return (new Decimal(history.price).times(history.amount)).toString()
+            return (new Decimal(history.price).times(history.amount)).toString();
         },
         producePrecision(history) {
             return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
