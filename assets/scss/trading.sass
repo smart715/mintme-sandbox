@@ -35,3 +35,24 @@
   .holder-name
     width: calc(100% - 2em)
     min-width: 70px
+
+#token
+  ul.nav .token-avatar-left
+    margin-left: $token-avatar-margin-left
+    background: transparent
+    z-index: 99
+
+    a
+      background: transparent
+
+  .token-avatar
+    z-index: 9
+    margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
+
+    .avatar
+      position: absolute
+      transform: translateY(30px)
+      border-radius: 50%
+      width: 120px
+      height: 120px
+      left: 20px

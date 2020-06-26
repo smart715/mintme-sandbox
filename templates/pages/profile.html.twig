@@ -1,9 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ profile.nickname }}
-    {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
-    profile | mintMe
+    {% if profile.anonymous %}
+        {{ profile.nickname }}'s profile | mintMe
+    {% else %}
+        {{ profile.nickname }}
+        {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
+         profile | mintMe
+    {% endif %} 
 {% endblock %}
 
 {% block tokenDescription %}
@@ -38,6 +42,14 @@
                         {%- else -%}
                             <div v-if="!showEditForm" class="row">
                             <div class="col-12">
+                                <div class="float-left mr-2" style="max-width: 50%;">
+                                    <avatar
+                                        type="profile"
+                                        size="large"
+                                        image="{{ profile.image.url | imagine_filter('avatar_large') }}"
+                                        :editable="{{ canEdit ? 'true' : 'false' }}"
+                                    ></avatar>
+                                </div>
                                 {% if profile.firstname is not empty %}
                                     <div class="pb-1">
                                         Full name: {{ profile.firstname() }} {{ profile.lastname() }}

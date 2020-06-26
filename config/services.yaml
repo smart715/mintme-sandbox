@@ -6,6 +6,7 @@ parameters:
     router.request_context.host: '%mintme_url%'
     router.request_context.base_url: ''
     asset.request_context.base_path: '%router.request_context.base_url%'
+    old_sound_rabbit_mq.consumer.class: 'App\RabbitMq\Consumer'
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -433,6 +434,12 @@ services:
         tags:
             - { name: monolog.logger, channel: front_end }
 
+    App\EntityListener\ImageListener:
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postLoad, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
+
     logout_listner:
         class: App\EventListener\LogoutListener
 
@@ -512,6 +519,8 @@ services:
 
     App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
 
+    App\Manager\ImageManagerInterface: '@App\Manager\ImageManager'
+
     app.emailCanonicalizer:
         class: App\Canonicalizer\EmailCanonicalizer
         public: false
@@ -560,3 +569,6 @@ services:
     App\Repository\PendingTokenWithdrawRepository:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
+
+    old_sound_rabbit_mq.consumer_command:
+        class: App\Command\ConsumerCommand
