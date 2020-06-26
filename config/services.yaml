@@ -6,6 +6,7 @@ parameters:
     router.request_context.host: '%mintme_url%'
     router.request_context.base_url: ''
     asset.request_context.base_path: '%router.request_context.base_url%'
+    old_sound_rabbit_mq.consumer.class: 'App\RabbitMq\Consumer'
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -581,3 +582,6 @@ services:
         autowire: true
         tags:
             - { name: monolog.logger, channel: donation }
+
+    old_sound_rabbit_mq.consumer_command:
+        class: App\Command\ConsumerCommand
