@@ -10,7 +10,13 @@
             <meta name="description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.">
             <meta property="og:description" content="MintMe is blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents success of your project.">
         {% endblock %}
-        {% include 'head.html.twig' %}
+        {% if metaImage is defined %}
+            {% embed 'head.html.twig' %}
+                {% block metaImage %}{{ metaImage }}{% endblock %}
+            {% endembed %}
+        {% else %}
+            {% include 'head.html.twig' %}
+        {% endif %}
         <title>
             {% block title %}mintMe{% endblock %}
         </title>
