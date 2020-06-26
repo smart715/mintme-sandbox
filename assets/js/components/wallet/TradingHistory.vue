@@ -163,6 +163,7 @@ export default {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
+                        console.log(res);
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
                         if (this.tableData === null) {
                             this.tableData = res.data;
@@ -198,9 +199,7 @@ export default {
                 : this.rebrandingFunc(history.market.base.symbol));
         },
         calculateTotalCost: function(history) {
-            return WSAPI.order.type.SELL === history.side
-                ? (new Decimal(history.price).times(history.amount)).toString()
-                : (new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString();
+            return (new Decimal(history.price).times(history.amount)).toString()
         },
         producePrecision(history) {
             return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
