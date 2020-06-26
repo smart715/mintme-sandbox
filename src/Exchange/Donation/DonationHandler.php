@@ -159,6 +159,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
+            $sellOrdersSummary = $this->addFeeToTokensWorth($sellOrdersSummary);
             $sellOrdersSummaryInBtc = $this->getMintmeWorthInBtc($sellOrdersSummary);
             $this->sendAmountFromUserToUser(
                 $donorUser,
@@ -191,6 +192,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
+            $sellOrdersSummary = $this->addFeeToTokensWorth($sellOrdersSummary);
             $amountToSendManually = $donationAmount->subtract($sellOrdersSummary);
 
             $this->donationFetcher->makeDonation(
@@ -334,5 +336,12 @@ class DonationHandler implements DonationHandlerInterface
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }
+    }
+
+    private function addFeeToTokensWorth(Money $sellOrdersSummary): Money
+    {
+        $ordersFee = $this->calculateFee($sellOrdersSummary);
+
+        return $sellOrdersSummary->add($ordersFee);
     }
 }
