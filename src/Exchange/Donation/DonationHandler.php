@@ -159,7 +159,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
-            $sellOrdersSummary = $this->addFeeToTokensWorth($sellOrdersSummary);
+            $expectedAmount = $this->subtractFeeFromExpectedTokens($expectedAmount);
             $sellOrdersSummaryInBtc = $this->getMintmeWorthInBtc($sellOrdersSummary);
             $this->sendAmountFromUserToUser(
                 $donorUser,
@@ -192,7 +192,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
-            $sellOrdersSummary = $this->addFeeToTokensWorth($sellOrdersSummary);
+            $expectedAmount = $this->subtractFeeFromExpectedTokens($expectedAmount);
             $amountToSendManually = $donationAmount->subtract($sellOrdersSummary);
 
             $this->donationFetcher->makeDonation(
@@ -338,10 +338,10 @@ class DonationHandler implements DonationHandlerInterface
         }
     }
 
-    private function addFeeToTokensWorth(Money $sellOrdersSummary): Money
+    private function subtractFeeFromExpectedTokens(Money $expectedAmount): Money
     {
-        $ordersFee = $this->calculateFee($sellOrdersSummary);
+        $fee = $this->calculateFee($expectedAmount);
 
-        return $sellOrdersSummary->add($ordersFee);
+        return $expectedAmount->subtract($fee);
     }
 }
