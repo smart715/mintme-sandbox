@@ -67,62 +67,97 @@ class UpdatePendingWithdrawals extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger->info('[withdrawals] Update job started..');
+        $this->logger->info("[withdrawals] Update job started with expiration time: {$this->expirationTime}S.. ");
 
-        $expires = new DateInterval('PT'.$this->expirationTime.'S');
+        $expires = new DateInterval('PT' . $this->expirationTime . 'S');
+
+        $items = $this->getPendingWithdrawRepository()->findAll();
+
+        $itemsCount = count($items);
+        $pendingCount = 0;
 
         /** @var PendingWithdraw $item */
-        foreach ($this->getPendingWithdrawRepository()->findAll() as $item) {
+        foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
+                $crypto = $item->getCrypto();
+
+                $fee   = $crypto->getFee();
+                $token = Token::getFromCrypto($crypto);
                 $this->em->beginTransaction();
 
                 try {
-                    $this->em->remove($item);
-                    $this->em->flush();
                     $this->balanceHandler->deposit(
                         $item->getUser(),
-                        Token::getFromCrypto($item->getCrypto()),
-                        $item->getAmount()->getAmount()->add($item->getCrypto()->getFee())
-                    );
-                } catch (Throwable $exception) {
-                    $this->em->rollback();
-                }
-
-                $this->em->commit();
-            }
-        }
-
-        /** @var PendingTokenWithdraw $item */
-        foreach ($this->getPendingTokenWithdrawRepository()->findAll() as $item) {
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-            if (!$crypto) {
-                return 0;
-            }
-
-            if ($item->getDate()->add($expires) < $this->date->now()) {
-                $this->em->beginTransaction();
-
-                try {
-                    $this->em->remove($item);
-                    $this->em->flush();
-                    $this->balanceHandler->deposit(
-                        $item->getUser(),
-                        $item->getToken(),
+                        $token,
                         $item->getAmount()->getAmount()
                     );
+
                     $this->balanceHandler->deposit(
                         $item->getUser(),
-                        Token::getFromCrypto($crypto),
-                        $crypto->getFee()
+                        $token,
+                        $fee
                     );
+
+                    $this->em->remove($item);
+                    $this->em->flush();
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                    $this->em->commit();
+                    $pendingCount++;
                 } catch (Throwable $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending withdraval error: $message ...");
                     $this->em->rollback();
                 }
-
-                $this->em->commit();
             }
         }
+
+        $this->logger->info("[withdrawals] Pending withdraval total: $itemsCount, deleted: $pendingCount ..");
+
+        $items = $this->getPendingTokenWithdrawRepository()->findAll();
+
+        $itemsCount = count($items);
+        $pendingCount = 0;
+
+        /** @var PendingTokenWithdraw $item */
+        foreach ($items as $item) {
+            if ($item->getDate()->add($expires) < $this->date->now()) {
+                $token = $item->getToken();
+
+                $this->em->beginTransaction();
+
+                try {
+                    $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+
+                    $fee = $crypto->getFee();
+
+                    $feeToken = Token::getFromCrypto($crypto);
+
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $token,
+                        $item->getAmount()->getAmount()
+                    );
+
+                    $this->balanceHandler->deposit(
+                        $item->getUser(),
+                        $feeToken,
+                        $fee
+                    );
+
+                    $this->em->remove($item);
+                    $this->em->flush();
+                    $this->em->commit();
+                    $pendingCount++;
+                    $this->logger->info("[withdrawals] $pendingCount Pending token withdraval ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
+                } catch (Throwable $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdraval error: $message ...");
+                    $this->em->rollback();
+                }
+            }
+        }
+
+        $this->logger->info("[withdrawals] Pending token withdraval total: $itemsCount, deleted: $pendingCount ..");
 
         $this->logger->info('[withdrawals] Update job finished..');
 
