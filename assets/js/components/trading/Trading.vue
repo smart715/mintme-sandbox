@@ -405,23 +405,22 @@ export default {
 
             Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
                 .then((res) => {
+                    if (
+                        Object.keys(this.markets).length === 1
+                        && !this.marketFilters.userSelected
+                        && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    ) {
+                        this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
+                        this.fetchData();
+                        return;
+                    }
+                    this.updateDataWithMarkets();
                     return new Promise((resolve, reject) => {
                         setTimeout(() => {
-                            if (
-                                Object.keys(this.markets).length === 1
-                                && !this.marketFilters.userSelected
-                                && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
-                            ) {
-                                this.marketFilters.selectedFilter = this.marketFilters.options.all.key;
-                                this.fetchData();
-                                return;
-                            }
-                            this.updateDataWithMarkets();
                             this.loading = false;
                             resolve();
                         }, 1500);
-                    });
-                    this.addMessageHandler((result) => {
+                        this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
                             this.requestMonthInfo(result.params[0]);
@@ -430,6 +429,7 @@ export default {
                         }
                     });
                 });
+            });
         },
         sortCompare: function(a, b, key) {
             let pair = false;
@@ -468,39 +468,37 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                setTimeout(() => {
-                    this.$axios.retry.get(this.$routing.generate('markets_info', params))
-                    .then((res) => {
-                        if (null !== this.markets) {
-                            this.addOnOpenHandler(() => {
-                                const request = JSON.stringify({
-                                    method: 'state.unsubscribe',
-                                    params: [],
-                                    id: parseInt(Math.random().toString().replace('0.', '')),
-                                });
-                                this.sendMessage(request);
+                this.$axios.retry.get(this.$routing.generate('markets_info', params))
+                .then((res) => {
+                    if (null !== this.markets) {
+                        this.addOnOpenHandler(() => {
+                            const request = JSON.stringify({
+                                method: 'state.unsubscribe',
+                                params: [],
+                                id: parseInt(Math.random().toString().replace('0.', '')),
                             });
-                        }
-                        this.currentPage = page;
-                        this.markets = res.data.markets;
-                        this.perPage = res.data.limit;
-                        this.totalRows = res.data.rows;
+                            this.sendMessage(request);
+                        });
+                    }
+                    this.currentPage = page;
+                    this.markets = res.data.markets;
+                    this.perPage = res.data.limit;
+                    this.totalRows = res.data.rows;
 
-                        if (window.history.replaceState) {
-                            // prevents browser from storing history with each change:
-                            window.history.replaceState(
-                                {page}, document.title, this.$routing.generate('trading', {page})
-                            );
-                        }
+                    if (window.history.replaceState) {
+                        // prevents browser from storing history with each change:
+                        window.history.replaceState(
+                            {page}, document.title, this.$routing.generate('trading', {page})
+                        );
+                    }
 
-                        resolve();
-                    })
-                    .catch((err) => {
-                        this.notifyError('Can not update the markets data. Try again later.');
-                        this.sendLogs('error', 'Can not update the markets data', err);
-                        reject(err);
-                    });
-                }, 5000);
+                    resolve();
+                })
+                .catch((err) => {
+                    this.notifyError('Can not update the markets data. Try again later.');
+                    this.sendLogs('error', 'Can not update the markets data', err);
+                    reject(err);
+                });
             });
         },
         sanitizeMarket: function(marketData) {
