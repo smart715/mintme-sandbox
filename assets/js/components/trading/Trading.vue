@@ -420,7 +420,7 @@ export default {
                             this.loading = false;
                             resolve();
                         }, 1500);
-                    })
+                    });
                     this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
