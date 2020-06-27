@@ -42,6 +42,9 @@ parameters:
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
 
+    # Percentage of reward. e.g 0.4 means 40% of reward
+    deployment_cost: 0.1
+
     google_tracking_id: 'UA-2289508-20'
 
     tawk_api_key: '328536796c72787602bf8a9c6c59045f456d434c'
