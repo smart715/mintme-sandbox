@@ -581,7 +581,7 @@ export default {
                 Vue.set(this.sanitizedMarkets, marketName, sanitizedMarket);
             }
 
-            market = {
+            this.markets[marketName] = {
                 ...market,
                 openPrice: marketInfo.open,
                 lastPrice: marketInfo.last,
