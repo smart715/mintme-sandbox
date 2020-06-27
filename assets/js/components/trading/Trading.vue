@@ -559,7 +559,7 @@ export default {
             const baseImage = market.base.image.avatar_small;
             const quoteImage = market.quote.image.avatar_small;
 
-            const market = this.getSanitizedMarket(
+            const sanitizedMarket = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
                 changePercentage,
@@ -576,9 +576,9 @@ export default {
             );
 
             if (marketOnTopIndex > -1) {
-                Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, market);
+                Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
             } else {
-                Vue.set(this.sanitizedMarkets, marketName, market);
+                Vue.set(this.sanitizedMarkets, marketName, sanitizedMarket);
             }
 
             market = {
