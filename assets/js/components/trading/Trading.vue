@@ -374,9 +374,7 @@ export default {
         },
     },
     mounted() {
-        setTimeout(() => {
-            this.fetchData();
-        }, 2000);
+        this.fetchData();
     },
     methods: {
         showFullPair: function(pair) {
@@ -466,37 +464,39 @@ export default {
                     params.deployed = 1;
                 }
                 this.loading = true;
-                this.$axios.retry.get(this.$routing.generate('markets_info', params))
-                .then((res) => {
-                    if (null !== this.markets) {
-                        this.addOnOpenHandler(() => {
-                            const request = JSON.stringify({
-                                method: 'state.unsubscribe',
-                                params: [],
-                                id: parseInt(Math.random().toString().replace('0.', '')),
+                setTimeout(() => {
+                    this.$axios.retry.get(this.$routing.generate('markets_info', params))
+                    .then((res) => {
+                        if (null !== this.markets) {
+                            this.addOnOpenHandler(() => {
+                                const request = JSON.stringify({
+                                    method: 'state.unsubscribe',
+                                    params: [],
+                                    id: parseInt(Math.random().toString().replace('0.', '')),
+                                });
+                                this.sendMessage(request);
                             });
-                            this.sendMessage(request);
-                        });
-                    }
-                    this.currentPage = page;
-                    this.markets = res.data.markets;
-                    this.perPage = res.data.limit;
-                    this.totalRows = res.data.rows;
+                        }
+                        this.currentPage = page;
+                        this.markets = res.data.markets;
+                        this.perPage = res.data.limit;
+                        this.totalRows = res.data.rows;
 
-                    if (window.history.replaceState) {
-                        // prevents browser from storing history with each change:
-                        window.history.replaceState(
-                            {page}, document.title, this.$routing.generate('trading', {page})
-                        );
-                    }
+                        if (window.history.replaceState) {
+                            // prevents browser from storing history with each change:
+                            window.history.replaceState(
+                                {page}, document.title, this.$routing.generate('trading', {page})
+                            );
+                        }
 
-                    resolve();
-                })
-                .catch((err) => {
-                    this.notifyError('Can not update the markets data. Try again later.');
-                    this.sendLogs('error', 'Can not update the markets data', err);
-                    reject(err);
-                });
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.notifyError('Can not update the markets data. Try again later.');
+                        this.sendLogs('error', 'Can not update the markets data', err);
+                        reject(err);
+                    });
+                }, 2000);
             });
         },
         sanitizeMarket: function(marketData) {
@@ -728,21 +728,23 @@ export default {
         },
         fetchConversionRates: function() {
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(this.$routing.generate('exchange_rates'))
-                .then((res) => {
-                    if (!(res.data && Object.keys(res.data).length)) {
-                        return Promise.reject();
-                    }
+                setTimeout(() => {
+                    this.$axios.retry.get(this.$routing.generate('exchange_rates'))
+                    .then((res) => {
+                        if (!(res.data && Object.keys(res.data).length)) {
+                            return Promise.reject();
+                        }
 
-                    this.conversionRates = res.data;
-                    resolve();
-                })
-                .catch((err) => {
-                    this.$emit('disable-usd');
-                    this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
-                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
-                    reject();
-                });
+                        this.conversionRates = res.data;
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$emit('disable-usd');
+                        this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                        this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
+                        reject();
+                    });
+                }, 2000);
             });
         },
         toUSD: function(amount, currency, subunit = false) {
