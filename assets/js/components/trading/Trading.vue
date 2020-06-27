@@ -414,12 +414,13 @@ export default {
                         this.fetchData();
                         return;
                     }
-                    this.updateDataWithMarkets();
+
                     return new Promise((resolve, reject) => {
                         setTimeout(() => {
+                            this.updateDataWithMarkets();
                             this.loading = false;
                             resolve();
-                        }, 1500);
+                        }, 1000);
                         this.addMessageHandler((result) => {
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
