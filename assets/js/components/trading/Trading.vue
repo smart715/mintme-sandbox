@@ -531,26 +531,33 @@ export default {
             }
 
             const marketName = marketData.params[0];
+            const market = this.markets[marketName];
+
+            if (!market) {
+                return;
+            }
+
             const marketInfo = marketData.params[1];
 
             const marketLastPrice = parseFloat(marketInfo.last);
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
 
-            const marketCurrency = this.markets[marketName].base.symbol;
-            const marketToken = this.markets[marketName].quote.symbol;
-            const marketPrecision = this.markets[marketName].base.subunit;
-            const supply = this.markets[marketName].supply;
-            const monthVolume = this.markets[marketName].monthVolume;
-            const buyDepth = this.markets[marketName].buyDepth;
+
+            const marketCurrency = market.base.symbol;
+            const marketToken = market.quote.symbol;
+            const marketPrecision = market.base.subunit;
+            const supply = market.supply;
+            const monthVolume = market.monthVolume;
+            const buyDepth = market.buyDepth;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
-            const tokenized = this.markets[marketName].quote.deploymentStatus === tokenDeploymentStatus.deployed;
+            const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
-            const position = this.markets[marketName].position;
+            const position = market.position;
 
-            const baseImage = this.markets[marketName].base.image.avatar_small;
-            const quoteImage = this.markets[marketName].quote.image.avatar_small;
+            const baseImage = market.base.image.avatar_small;
+            const quoteImage = market.quote.image.avatar_small;
 
             const market = this.getSanitizedMarket(
                 marketCurrency,
@@ -574,8 +581,8 @@ export default {
                 Vue.set(this.sanitizedMarkets, marketName, market);
             }
 
-            this.markets[marketName] = {
-                ...this.markets[marketName],
+            market = {
+                ...market,
                 openPrice: marketInfo.open,
                 lastPrice: marketInfo.last,
                 dayVolume: marketInfo.deal,
@@ -711,6 +718,11 @@ export default {
         updateMonthVolume: function(requestId, marketInfo) {
             const marketName = this.stateQueriesIdsTokensMap.get(requestId);
             const market = this.markets[marketName];
+
+            if (!market) {
+                return;
+            }
+
             const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
             const marketOnTopIndex = this.getMarketOnTopIndex(market.base.symbol, market.quote.symbol);
 
@@ -740,6 +752,10 @@ export default {
             }
         },
         requestMonthInfo: function(market) {
+            if (!this.markets[market]) {
+                return;
+            }
+
             let id = parseInt(Math.random().toString().replace('0.', ''));
             this.sendMessage(JSON.stringify({
                 method: 'state.query',
