@@ -414,11 +414,10 @@ export default {
                         this.fetchData();
                         return;
                     }
-
+                    this.loading = false;
                     return new Promise((resolve, reject) => {
                         setTimeout(() => {
                             this.updateDataWithMarkets();
-                            this.loading = false;
                             resolve();
                         }, 1000);
                         this.addMessageHandler((result) => {
