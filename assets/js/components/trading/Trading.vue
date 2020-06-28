@@ -414,17 +414,17 @@ export default {
                         this.fetchData();
                         return;
                     }
-                    this.addMessageHandler((result) => {
+                    this.updateDataWithMarkets();
+                    return new Promise((resolve, reject) => {
+                        this.loading = false;
+                        this.addMessageHandler((result) => {
                             if ('state.update' === result.method) {
                                 this.sanitizeMarket(result);
                                 this.requestMonthInfo(result.params[0]);
                             } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
                                 this.updateMonthVolume(result.id, result.result);
                             }
-                    });
-                    return new Promise((resolve, reject) => {
-                        this.loading = false;
-                        this.updateDataWithMarkets();
+                        });
                         resolve();
                     });
                 });
