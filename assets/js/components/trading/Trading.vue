@@ -416,16 +416,18 @@ export default {
                     }
                     this.updateDataWithMarkets();
                     return new Promise((resolve, reject) => {
-                        this.loading = false;
-                        this.addMessageHandler((result) => {
-                            if ('state.update' === result.method) {
-                                this.sanitizeMarket(result);
-                                this.requestMonthInfo(result.params[0]);
-                            } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                                this.updateMonthVolume(result.id, result.result);
-                            }
-                        });
-                        resolve();
+                        setTimeout(() => {
+                            this.loading = false;
+                            this.addMessageHandler((result) => {
+                                if ('state.update' === result.method) {
+                                    this.sanitizeMarket(result);
+                                    this.requestMonthInfo(result.params[0]);
+                                } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                                    this.updateMonthVolume(result.id, result.result);
+                                }
+                            });
+                            resolve();
+                        }, 1000);
                     });
                 });
         },
