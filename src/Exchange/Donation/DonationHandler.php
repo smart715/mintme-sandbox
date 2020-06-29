@@ -185,7 +185,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->sendAmountFromUserToUser(
                 $donorUser,
                 $donationAmountLeftInBtc,
-                $donorUser,
+                $tokenCreator,
                 $amountToDonate,
                 $currency,
                 $currency
