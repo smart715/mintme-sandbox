@@ -21,7 +21,6 @@ Encore
     .addEntry('mail', './assets/scss/mail.sass')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
-    .addEntry('2FASettings', './assets/js/2FASettings.js')
     
     .enablePostCssLoader()
 
