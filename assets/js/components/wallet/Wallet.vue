@@ -21,7 +21,7 @@
                     {{ data.value | toMoney(data.item.subunit) | formatMoney }}
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div class="row">
+                    <div class="row pl-2">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
@@ -75,8 +75,8 @@
                 </template>
                 <template v-slot:cell(action)="data">
                     <div
-                        v-if="data.item.deployed"
-                        class="row">
+                        
+                        class="row pl-2">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit, true)">
                             <div><i class="icon-deposit"></i></div>

@@ -54,7 +54,7 @@
                 />
             </div>
             <div>
-                <a :href="profileUrl">
+                <a style="padding-left:2px" :href="profileUrl">
                     Visit token's creator profile
                 </a>
             </div>
