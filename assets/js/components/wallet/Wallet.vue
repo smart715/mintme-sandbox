@@ -75,7 +75,6 @@
                 </template>
                 <template v-slot:cell(action)="data">
                     <div
-                        
                         class="row pl-2">
                         <div class="d-flex flex-row c-pointer pl-2"
                             @click="openDeposit(data.item.name, data.item.subunit, true)">
