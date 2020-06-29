@@ -159,7 +159,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
-            $expectedAmount = $this->subtractFeeFromExpectedTokens($expectedAmount);
+            $sellOrdersSummary = $this->calculateAmountWithFee($sellOrdersSummary);
             $sellOrdersSummaryInBtc = $this->getMintmeWorthInBtc($sellOrdersSummary);
             $this->sendAmountFromUserToUser(
                 $donorUser,
@@ -169,6 +169,7 @@ class DonationHandler implements DonationHandlerInterface
                 Token::BTC_SYMBOL,
                 Token::WEB_SYMBOL
             );
+
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
@@ -192,7 +193,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
-            $expectedAmount = $this->subtractFeeFromExpectedTokens($expectedAmount);
+            $sellOrdersSummary = $this->calculateAmountWithFee($sellOrdersSummary);
             $amountToSendManually = $donationAmount->subtract($sellOrdersSummary);
 
             $this->donationFetcher->makeDonation(
@@ -338,10 +339,10 @@ class DonationHandler implements DonationHandlerInterface
         }
     }
 
-    private function subtractFeeFromExpectedTokens(Money $expectedAmount): Money
+    private function calculateAmountWithFee(Money $amount): Money
     {
-        $fee = $this->calculateFee($expectedAmount);
+        $divisor = 1 - (float)$this->donationConfig->getFee();
 
-        return $expectedAmount->subtract($fee);
+        return $amount->divide($divisor);
     }
 }
