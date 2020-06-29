@@ -163,7 +163,6 @@ export default {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
                     .then((res) => {
-                        console.log(res);
                         res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
                         if (this.tableData === null) {
                             this.tableData = res.data;
