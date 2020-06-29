@@ -187,8 +187,8 @@ class DonationHandler implements DonationHandlerInterface
                 $donationAmountLeftInBtc,
                 $donorUser,
                 $amountToDonate,
-                Token::BTC_SYMBOL,
-                Token::WEB_SYMBOL
+                $currency,
+                $currency
             );
             $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {

@@ -160,7 +160,7 @@ import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {webSymbol, btcSymbol, HTTP_ACCEPTED, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
+import {webSymbol, btcSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'Donation',
@@ -255,7 +255,8 @@ export default {
                 || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
                 || this.donationChecking
-                || this.donationInProgress;
+                || this.donationInProgress
+                || this.insufficientFundsError;
         },
     },
     mounted() {
@@ -288,9 +289,9 @@ export default {
                         });
                     });
                 })
-                .catch((err) => {
+                .catch((error) => {
                     this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not load tab content.', err);
+                    this.sendLogs('error', 'Can not load tab content.', error);
                 });
         },
         getTokenBalance: function() {
@@ -299,9 +300,9 @@ export default {
                     this.balance = res.data;
                     this.balanceLoaded = true;
                 })
-                .catch((err) => {
+                .catch((error) => {
                     this.notifyError('Can not load balance. Try again later.');
-                    this.sendLogs('error', 'Can not load crypto balance.', err);
+                    this.sendLogs('error', 'Can not load crypto balance.', error);
                 });
         },
         checkAmountInput: function() {
@@ -329,15 +330,15 @@ export default {
                     this.sellOrdersSummary = res.data.sellOrdersSummary;
                     this.donationChecking = false;
                 })
-                .catch((err) => {
-                    if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
-                        this.notifyError(err.response.data.message);
+                .catch((error) => {
+                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
+                        this.notifyError(error.response.data.message);
                     } else {
                         this.notifyError('Can not to calculate amount of tokens. Try again later.');
                     }
 
                     this.donationChecking = false;
-                    this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', err);
+                    this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 });
         },
         makeDonation: function() {
@@ -353,28 +354,25 @@ export default {
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {
-                    if (HTTP_ACCEPTED === response.status) {
-                        this.donationInProgress = false;
-                        this.notifySuccess(
-                            'Congratulations! Donation has been successfully made. '
-                            + 'You have received ' + this.amountToReceive + ' tokens.'
-                        );
+                    this.donationInProgress = false;
+                    this.notifySuccess(
+                        'Congratulations! Donation has been successfully made. '
+                        + 'You have received ' + this.amountToReceive + ' tokens.'
+                    );
 
-                        this.resetAmount();
-                        this.balanceLoaded = false;
-                        this.getTokenBalance();
-                    }
-                }, (error) => {
-                    if (!error.response) {
-                        this.notifyError('Network error');
-                        this.sendLogs('error', 'Make donation code network error.', error);
+                    this.resetAmount();
+                    this.balanceLoaded = false;
+                    this.getTokenBalance();
+                })
+                .catch((error) => {
+                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
+                        this.notifyError(error.response.data.message);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
-                        this.sendLogs('error', 'Can not make donation.', error);
                     } else {
                         this.notifyError('An error has occurred, please try again later.');
-                        this.sendLogs('error', 'An error has occurred, please try again later.', error);
                     }
+                    this.sendLogs('error', 'Can not make donation.', error);
                 });
         },
         all: function() {

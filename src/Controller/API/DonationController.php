@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -124,6 +125,10 @@ class DonationController extends AbstractFOSRestController
             );
 
             return $this->view(null, Response::HTTP_ACCEPTED);
+        } catch (ApiBadRequestException $ex) {
+            return $this->view([
+                'message' => $ex->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $ex) {
             $message = $ex->getMessage();
 
