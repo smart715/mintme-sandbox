@@ -281,8 +281,11 @@ export default {
                     this.loginFormLoaded = true;
 
                     let captchaContainer = document.querySelector('.g-recaptcha');
-                    grecaptcha.render(captchaContainer, {
-                        'sitekey': this.googleRecaptchaSiteKey,
+                    let googleRecaptchaSiteKey = this.googleRecaptchaSiteKey;
+                    grecaptcha.ready(function() {
+                        grecaptcha.render(captchaContainer, {
+                            'sitekey': googleRecaptchaSiteKey,
+                        });
                     });
                 })
                 .catch((err) => {
