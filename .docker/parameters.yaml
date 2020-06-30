@@ -51,3 +51,4 @@ parameters:
     docs_path: /docs
     password_reset_expiration_time: 3600
     password_reset_retry_time: 3600
+    enable_google_analytics: false
