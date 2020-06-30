@@ -34,7 +34,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom border-top">
+                    <div class="row faq-block mx-0 border-bottom">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                                 Token release period
