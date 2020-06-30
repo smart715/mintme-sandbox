@@ -111,6 +111,20 @@ a
 
   &:hover
     color: $color-link-hover
+      
+  @media (hover: none)
+    &:hover
+      color: $color-link
+      text-decoration: none
+
+    &:focus
+      color: $color-link
+      text-decoration: none
+
+    &:active 
+      color: $color-link-hover
+      transition: color 0s
+      text-decoration: underline
 
 .btn-cancel
   display: inline-block
