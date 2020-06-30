@@ -60,8 +60,11 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
-    gtag('config', '{{ google_tracking_id }}');
+    {% if enable_google_analytics  %}
+        gtag('config', '{{ google_tracking_id }}');
+    {% else %}
+        gtag('config', 'GA_MEASUREMENT_ID', { 'send_page_view': false });
+    {% endif %}
 </script>
 
 <!--Start of Tawk.to Script-->
