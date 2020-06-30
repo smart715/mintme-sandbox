@@ -193,6 +193,9 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(toMoney, history) {
+            if (history.market.identifier !== 'WEBBTC') {
+                return toMoney + ' MINTME';
+            }
             return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
                 ? this.rebrandingFunc(history.market.quote.symbol)
                 : this.rebrandingFunc(history.market.base.symbol));
