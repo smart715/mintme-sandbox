@@ -157,7 +157,7 @@ class MarketFetcherTest extends TestCase
         $this->assertEquals(
             array_map(function (array $arr) use ($offset) {
                 $arr['id'] -= $offset;
-                
+
                 return $arr;
             }, $rpcResult['records']),
             $marketFetcher->getUserExecutedHistory(
@@ -231,9 +231,10 @@ class MarketFetcherTest extends TestCase
             $this->expectException(FetchException::class);
         }
 
+        $ourOrders = $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::SELL);
         $this->assertEquals(
             $rpcResult['orders'],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::SELL)
+            $ourOrders
         );
     }
 
@@ -280,9 +281,10 @@ class MarketFetcherTest extends TestCase
             $this->expectException(FetchException::class);
         }
 
+        $ourOrders = $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::BUY);
         $this->assertEquals(
             $rpcResult['orders'],
-            $marketFetcher->getPendingOrders('TOK000000000001WEB', 0, 100, Market\MarketHandler::BUY)
+            $ourOrders
         );
     }
 
