@@ -22,7 +22,7 @@
                             <div class="row">
                                 <strong class="mr-2">Token contract address:</strong>
                             </div>
-                            <div class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto">
+                            <div class="row truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto">
                                 <span>{{ tokenContractAddress }}</span>
                                 <copy-link
                                     class="c-pointer"
