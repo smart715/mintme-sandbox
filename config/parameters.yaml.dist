@@ -42,10 +42,7 @@ parameters:
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
 
-    # Percentage of reward. e.g 0.4 means 40% of reward
-    deployment_cost: 0.1
-
-    google_tracking_id: 'UA-2289508-20'
+    google_tracking_id: 'UA-2289508-22'
 
     tawk_api_key: '328536796c72787602bf8a9c6c59045f456d434c'
 
@@ -144,3 +141,7 @@ parameters:
     # expiration time for withdraws (in seconds)
     # should be kept to values that represent hours (3600, 7200, etc) unless for testing purposes
     withdraw_expiration_time: 14400
+
+    # enable sending web site visit stats to google, should only be enabled for prod,
+    # default value is disabled (false)
+    enable_google_analytics: false
