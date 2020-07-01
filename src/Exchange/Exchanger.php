@@ -171,9 +171,13 @@ class Exchanger implements ExchangerInterface
             $market->getQuote();
 
         /** @var string $amount */
-        $amount = (string) BigDecimal::of($amount)->dividedBy('1', $market->isTokenMarket() ?
-            $this->bag->get('token_precision') :
-            $crypto->getShowSubunit(), RoundingMode::HALF_FLOOR);
+        $amount = (string) BigDecimal::of($amount)->dividedBy(
+            '1',
+            $market->isTokenMarket()
+                ? $this->bag->get('token_precision')
+                : $crypto->getShowSubunit(),
+            RoundingMode::UP
+        );
 
         return $amount;
     }
@@ -201,7 +205,7 @@ class Exchanger implements ExchangerInterface
         $token = $this->tm->findByName($token);
         $profile = $token->getProfile();
 
-        if ($profile && $user === $token->getProfile()->getUser()) {
+        if ($profile && $user === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
                 $this->bh->balances($user, [$token])
