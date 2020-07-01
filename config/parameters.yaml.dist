@@ -141,3 +141,7 @@ parameters:
     # expiration time for withdraws (in seconds)
     # should be kept to values that represent hours (3600, 7200, etc) unless for testing purposes
     withdraw_expiration_time: 14400
+
+    # enable sending web site visit stats to google, should only be enabled for prod,
+    # default value is disabled (false)
+    enable_google_analytics: false
