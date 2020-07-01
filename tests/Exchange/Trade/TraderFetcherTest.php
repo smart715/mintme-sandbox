@@ -84,6 +84,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $tradeResult,
+            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -110,6 +111,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             TradeResult::FAILED,
+            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -143,6 +145,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $finishedOrders,
+            /** @phpstan-ignore-next-line */
             $trader->getFinishedOrders(...$params)
         );
     }
@@ -166,7 +169,7 @@ class TraderFetcherTest extends TestCase
         $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
 
         $this->expectException(FetchException::class);
-
+        /** @phpstan-ignore-next-line */
         $trader->getFinishedOrders(...$params);
     }
 
@@ -199,6 +202,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $pendingOrders,
+            /** @phpstan-ignore-next-line */
             $trader->getPendingOrders(...$params)
         );
     }
@@ -222,6 +226,7 @@ class TraderFetcherTest extends TestCase
         $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
         $this->expectException(FetchException::class);
 
+        /** @phpstan-ignore-next-line */
         $trader->getPendingOrders(...$params);
     }
 

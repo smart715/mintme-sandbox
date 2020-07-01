@@ -32,3 +32,5 @@ doctrine:
         dql:
             string_functions:
                 replace: Oro\ORM\Query\AST\Functions\String\Replace
+            datetime_functions:
+                utc_timestamp: App\Utils\UtcTimestamp
