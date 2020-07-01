@@ -19,7 +19,7 @@
                 <template v-if="loaded">
                     <div class="row px-3 pb-3">
                         <div v-if="isTokenDeployed"
-                            class="truncate-address d-flex flex-column align-items-start flex-nowrap mt-auto overflow-auto"
+                            class="truncate-address d-flex flex-column align-items-start flex-nowrap mt-auto"
                         >
                             <strong class="mr-2">Token contract address:</strong>
                             <div>
