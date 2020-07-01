@@ -22,8 +22,9 @@ update_repository_redmine_training.abchosting.org:
     - training.abchosting.org
 
 before_script:
+  - export PATH=/usr/local/php74:$PATH
   - shopt -s expand_aliases
-  - alias php='/usr/bin/php7.2'
+  - alias php='/usr/bin/php7.4'
   - alias npm='/usr/local/bin/npm'
 
 tests_php:
