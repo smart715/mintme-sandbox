@@ -135,8 +135,6 @@ class DonationHandler implements DonationHandlerInterface
 
         if ($expectedAmount->greaterThan($minTokensAmount) && $sellOrdersSummary->greaterThanOrEqual($donationAmount)) {
             // Donate using donation viabtc API (token creator has available sell orders)
-            $feeAmount = new Money(0, new Currency($currency));
-
             if (Token::BTC_SYMBOL === $currency) {
                 $this->sendAmountFromUserToUser(
                     $donorUser,
@@ -156,7 +154,6 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
-            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         } elseif (Token::BTC_SYMBOL === $currency && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $sellOrdersSummary = $this->calculateAmountWithFee($sellOrdersSummary);
@@ -180,8 +177,8 @@ class DonationHandler implements DonationHandlerInterface
             );
 
             $donationAmountLeftInBtc = $amountObj->subtract($sellOrdersSummaryInBtc);
-            $feeAmount = $this->calculateFee($donationAmountLeftInBtc);
-            $amountToDonate = $donationAmountLeftInBtc->subtract($feeAmount);
+            $feeFromDonationAmount = $this->calculateFee($donationAmountLeftInBtc);
+            $amountToDonate = $donationAmountLeftInBtc->subtract($feeFromDonationAmount);
             $this->sendAmountFromUserToUser(
                 $donorUser,
                 $donationAmountLeftInBtc,
@@ -190,7 +187,6 @@ class DonationHandler implements DonationHandlerInterface
                 $currency,
                 $currency
             );
-            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
             $sellOrdersSummary = $this->calculateAmountWithFee($sellOrdersSummary);
@@ -204,8 +200,8 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
-            $feeAmount = $this->calculateFee($amountToSendManually);
-            $amountToDonate = $amountToSendManually->subtract($feeAmount);
+            $feeFromDonationAmount = $this->calculateFee($amountToSendManually);
+            $amountToDonate = $amountToSendManually->subtract($feeFromDonationAmount);
             $this->sendAmountFromUserToUser(
                 $donorUser,
                 $amountToSendManually,
@@ -214,11 +210,10 @@ class DonationHandler implements DonationHandlerInterface
                 $currency,
                 $currency
             );
-            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         } else {
             // Donate (send) funds from user to user (token creator has no sell orders).
-            $feeAmount = $this->calculateFee($amountObj);
-            $amountToDonate = $amountObj->subtract($feeAmount);
+            $feeFromDonationAmount = $this->calculateFee($amountObj);
+            $amountToDonate = $amountObj->subtract($feeFromDonationAmount);
             $this->sendAmountFromUserToUser(
                 $donorUser,
                 $amountObj,
@@ -227,9 +222,10 @@ class DonationHandler implements DonationHandlerInterface
                 $currency,
                 $currency
             );
-            $this->saveDonation($donorUser, $tokenCreator, $currency, $amountToDonate, $feeAmount, $expectedAmount);
         }
 
+        $feeAmount = $this->calculateFee($amountObj);
+        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount);
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
     }
 
