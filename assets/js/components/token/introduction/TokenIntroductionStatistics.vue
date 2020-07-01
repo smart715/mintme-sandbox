@@ -17,12 +17,12 @@
             </div>
             <div class="card-body">
                 <template v-if="loaded">
-                    <div class="row px-3 pb-3">
-                        <div v-if="isTokenDeployed"
-                            class="truncate-address d-flex flex-column align-items-start flex-nowrap mt-auto overflow-auto"
-                        >
-                            <strong class="mr-2">Token contract address:</strong>
-                            <div>
+                    <div class="d-flex flex-column px-3 pb-3">
+                        <div v-if="isTokenDeployed">
+                            <div class="row">
+                                <strong class="mr-2">Token contract address:</strong>
+                            </div>
+                            <div class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto">
                                 <span>{{ tokenContractAddress }}</span>
                                 <copy-link
                                     class="c-pointer"
