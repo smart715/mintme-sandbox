@@ -4,7 +4,7 @@
     "type": "project",
     "license": "proprietary",
     "require": {
-        "php": "~7.2",
+        "php": "~7.4",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
@@ -13,6 +13,7 @@
         "brick/math": "^0.8.14",
         "cron/cron-bundle": "^2.4",
         "doctrine/doctrine-fixtures-bundle": "^3.3",
+        "doctrine/doctrine-migrations-bundle": "^2.0",
         "endroid/qr-code-bundle": "^3.4",
         "excelwebzone/recaptcha-bundle": "^1.5",
         "ezyang/htmlpurifier": "^4.12",
@@ -49,7 +50,7 @@
         "sonata-project/doctrine-orm-admin-bundle": "^3",
         "sonata-project/formatter-bundle": "^4",
         "sonata-project/intl-bundle": "^2",
-        "sonata-project/media-bundle": "^3",
+        "sonata-project/media-bundle": "^3.24",
         "sonata-project/news-bundle": "^3",
         "symfony/asset": "^4.4",
         "symfony/console": "^4.4",
@@ -88,7 +89,7 @@
         "symfony/test-pack": "^1.0",
         "symfony/var-dumper": "^4.4",
         "symfony/web-server-bundle": "^4.4",
-        "vimeo/psalm": "^3.9"
+        "vimeo/psalm": "3.11.2"
     },
     "config": {
         "preferred-install": {

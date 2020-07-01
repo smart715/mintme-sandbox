@@ -17,9 +17,13 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->getRepository()->find($id);
     }
 
+    /** @psalm-suppress ImplementedReturnTypeMismatch  */
     public function getRepository(): UserRepository
     {
-        return parent::getRepository();
+        /** @var UserRepository $repository */
+        $repository = parent::getRepository();
+
+        return $repository;
     }
 
     public function findByReferralCode(string $code): ?User
