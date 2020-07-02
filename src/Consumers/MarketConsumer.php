@@ -72,6 +72,7 @@ class MarketConsumer implements ConsumerInterface
         );
 
         try {
+            sleep(10);
             $this->statusManager->updateMarketStatus($market);
         } catch (Throwable $exception) {
             $this->logger->error(
