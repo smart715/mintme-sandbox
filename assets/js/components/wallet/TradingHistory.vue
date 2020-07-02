@@ -47,7 +47,7 @@
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI, BTC, MINTME} from '../../utils/constants';
+import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -193,7 +193,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(toMoney, history) {
-            if (history.market.identifier !== 'WEBBTC') {
+            if (history.market.identifier !== webBtcSymbol) {
                 return toMoney + ' MINTME';
             }
             return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
@@ -204,6 +204,9 @@ export default {
             return (new Decimal(history.price).times(history.amount)).toString();
         },
         producePrecision(history) {
+            if (history.market.identifier !== webBtcSymbol) {
+                return MINTME.subunit;
+            }
             return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
         },
 
