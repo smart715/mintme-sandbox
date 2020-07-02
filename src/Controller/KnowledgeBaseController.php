@@ -36,9 +36,11 @@ class KnowledgeBaseController extends Controller
         if (!$article) {
             throw new NotFoundKnowledgeBaseException();
         }
+        $metaDescription = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($article->getDescription()))))));
 
         return $this->render('pages/knowledge_base_show.html.twig', [
            'article' => $article,
+           'metaDescription' => substr($metaDescription, 0, 200),
         ]);
     }
 }
