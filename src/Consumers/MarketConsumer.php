@@ -55,6 +55,7 @@ class MarketConsumer implements ConsumerInterface
         }
 
         try {
+            sleep(10);
             /** @var ?Market $market */
             $market = unserialize($msg->body);
         } catch (Throwable $exception) {
