@@ -93,8 +93,8 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/token_creation.js') }}"></script>
-    <script nonce="{{ csp_nonce('script') }}">
+    <script src="{{ asset('build/token_creation.js') }}"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             let tokenCreateName = document.getElementById('token_create_name');
             tokenCreateName.addEventListener('invalid', tokenCreateName.setCustomValidity("Invalid token name."));
