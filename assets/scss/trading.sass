@@ -1,3 +1,11 @@
+.top-holders
+  td:not(:first-child)
+    white-space: nowrap
+
+  .holder-name
+    width: calc(100% - 2em)
+    min-width: 70px
+
 .trading-table
   .table
     tbody
@@ -5,6 +13,8 @@
         border-bottom: 1px solid
         border-top: 1px solid
         border-color: #7791A3
+      td
+        padding-left: calc(0.75rem + 0.65em)
 
 .dropdown-item:hover
   background-color: darkgray
@@ -29,14 +39,6 @@
             display: table-cell !important
         td
           padding-left: calc(0.75rem + 0.65em)
-
-.top-holders
-  td:not(:first-child)
-    white-space: nowrap
-
-  .holder-name
-    width: calc(100% - 2em)
-    min-width: 70px
 
 #token
   ul.nav .token-avatar-left

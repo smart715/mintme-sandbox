@@ -1,6 +1,6 @@
 <template>
     <div class="trading">
-        <div class="card-header">
+        <div class="card-header pr-4">
             <span>Trading</span>
                 <b-dropdown
                     id="currency"
@@ -30,7 +30,7 @@
         <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
             <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
             <b-dropdown
-                v-if="userId" class="float-right pr-3"
+                v-if="userId" class="float-right pr-4"
                 id="customFilter"
                 variant="primary"
                 v-model="marketFilters.selectedFilter"

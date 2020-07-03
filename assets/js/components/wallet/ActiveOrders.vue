@@ -1,7 +1,7 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="active-orders table-responsive table-restricted" ref="table">
                 <b-table
                     thead-class="trading-head"
                     ref="btable"
