@@ -158,9 +158,9 @@ class DonationHandler implements DonationHandlerInterface
             if (Token::BTC_SYMBOL === $currency) {
                 $this->sendAmountFromUserToUser(
                     $tokenCreator,
-                    $sellOrdersSummary,
+                    $expectedAmount,
                     $tokenCreator,
-                    $this->getMintmeWorthInBtc($sellOrdersSummary),
+                    $this->getMintmeWorthInBtc($expectedAmount),
                     Token::WEB_SYMBOL,
                     Token::BTC_SYMBOL
                 );
