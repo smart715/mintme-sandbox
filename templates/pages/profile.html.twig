@@ -7,7 +7,7 @@
         {{ profile.nickname }}
         {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
          profile | mintMe
-    {% endif %} 
+    {% endif %}
 {% endblock %}
 
 {% block tokenDescription %}
@@ -242,5 +242,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/profile.js') }}"></script>
+    <script src="{{ asset('build/profile.js') }}"></script>
 {% endblock %}
