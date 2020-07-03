@@ -42,7 +42,13 @@ class MarketDelayedProducer extends Producer
         $args = new AMQPTable(['x-delayed-type' => 'fanout']);
         $this->getChannel()->exchange_declare(
             self::MARKET_EXCHANGE_NAME,
-            'x-delayed-mesage', false, true, false, false, false,$args,
+            'x-delayed-mesage',
+            false,
+            true,
+            false,
+            false,
+            false,
+            $args,
         );
 
         $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_EXCHANGE_NAME);
