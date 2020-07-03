@@ -19,18 +19,16 @@ class MarketDelayedProducer extends Producer
     private const QUEUE_IS_NOWAIT       = false;
 
     /** @inheritDoc */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null): void
+    public function publish($msgBody, $routingKey = '', $additionalProperties = ['delivery_mode' => AMPQMessage::DELIVERY_MODE_PERSISTENT], ?array $headers = null): void
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
 
         $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
-
-        if (!empty($headers)) {
-            $headersTable = new AMQPTable($headers);
-            $msg->set('application_headers', $headersTable);
-        }
+        $delay = 15000;
+        $headersTable = new AMQPTable(['x-delay' => $delay]);
+        $msg->set('application_headers', $headersTable);
 
         $this->getChannel()->queue_declare(
             self::MARKET_DELAYED_QUQUE_NAME,
@@ -39,16 +37,16 @@ class MarketDelayedProducer extends Producer
             self::QUEUE_IS_EXCLUSIVE,
             self::QUEUE_IS_AUTO_DELETE,
             self::QUEUE_IS_NOWAIT,
-            [
-                'x-dead-letter-exchange' => [
-                    'S', self::MARKET_EXCHANGE_NAME,
-                ],
-                'x-message-ttl' => ['I', 15000],
-            ]
         );
 
-        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, $this->exchangeOptions['name']);
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
+        $args = new AMQPTable(['x-delayed-type' => 'fanout']);
+        $this->getChannel()->exchange_declare(
+            self::MARKET_EXCHANGE_NAME,
+            'x-delayed-mesage', false, true, false, false, false,$args,
+        );
+
+        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_EXCHANGE_NAME);
+        $this->getChannel()->basic_publish($msg, self::MARKET_EXCHANGE_NAME, $routingKey);
 
         $this->logger->debug('[Market] Delayed message published', [
             'amqp' => [
