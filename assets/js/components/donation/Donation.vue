@@ -328,7 +328,6 @@ export default {
                     this.amountToReceive = res.data.amountToReceive;
                     this.tokensWorth = res.data.tokensWorth;
                     this.sellOrdersSummary = res.data.sellOrdersSummary;
-                    this.donationChecking = false;
                 })
                 .catch((error) => {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
@@ -337,9 +336,9 @@ export default {
                         this.notifyError('Can not to calculate amount of tokens. Try again later.');
                     }
 
-                    this.donationChecking = false;
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
-                });
+                })
+                .then(() => this.donationChecking = false);
         },
         makeDonation: function() {
             this.donationInProgress = true;
@@ -354,7 +353,6 @@ export default {
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {
-                    this.donationInProgress = false;
                     this.notifySuccess(
                         'Congratulations! Donation has been successfully made. '
                         + 'You have received ' + this.amountToReceive + ' tokens.'
@@ -373,7 +371,8 @@ export default {
                         this.notifyError('An error has occurred, please try again later.');
                     }
                     this.sendLogs('error', 'Can not make donation.', error);
-                });
+                })
+                .then(() => this.donationInProgress = false);
         },
         all: function() {
             this.amountToDonate = toMoney(this.balance, this.currencySubunit);
