@@ -42,7 +42,7 @@ parameters:
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
     donation:
-        fee: 1
+        fee: 5
         minBtcAmount: 0.000001
         minMintmeAmount: 0.0001
         minTokensAmount: 0.0001
