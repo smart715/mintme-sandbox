@@ -222,6 +222,9 @@ describe('Donation', () => {
                         subunit: 4,
                     },
                 },
+                donationParams: {
+                    minMintmeAmount: 0.0001,
+                },
             },
         });
 
@@ -388,9 +391,11 @@ describe('Donation', () => {
         moxios.wait(() => {
             expect(wrapper.vm.amountToDonate).to.be.equal(0);
             expect(wrapper.vm.amountToReceive).to.be.equal(0);
-            expect(wrapper.vm.donationInProgress).to.be.false;
             expect(wrapper.vm.balanceLoaded).to.be.false;
-            done();
+            Vue.nextTick(() => {
+                expect(wrapper.vm.donationInProgress).to.be.false;
+                done();
+            });
         });
     });
 
