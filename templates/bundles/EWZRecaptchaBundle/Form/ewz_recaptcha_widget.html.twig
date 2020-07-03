@@ -6,7 +6,7 @@
                 {% set options = attr.options|merge({'callback': 'onReCaptchaSuccess'}) %}
                 {% set attr = attr|merge({'options': options}) %}
 
-                <script nonce="{{ csp_nonce('script') }}" type="text/javascript">
+                <script type="text/javascript">
                     var onReCaptchaSuccess = function() {
                         var errorDivs = document.getElementsByClassName('recaptcha-error');
                         if (errorDivs.length) {
@@ -32,7 +32,7 @@
             {% endif %}
 
             {%- if attr.options.injectScript is not defined or attr.options.injectScript %}
-            <script nonce="{{ csp_nonce('script') }}" type="text/javascript" src="{{ form.vars.url_challenge }}"
+            <script type="text/javascript" src="{{ form.vars.url_challenge }}"
                 {%- if attr.options.defer is defined and attr.options.defer %} defer{% endif -%}
                 {%- if attr.options.async is defined and attr.options.async %} async{% endif -%}
             ></script>
@@ -68,7 +68,7 @@
         {% else %}
             <div id="ewz_recaptcha_div"></div>
 
-            <script nonce="{{ csp_nonce('script') }}" type="text/javascript">
+            <script type="text/javascript">
             (function() {
                 var script = document.createElement('script');
                 script.type = 'text/javascript';
