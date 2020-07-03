@@ -219,13 +219,13 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script nonce="{{ csp_nonce('script') }}" src="https://apis.google.com/js/platform.js"></script>
-    <script nonce="{{ csp_nonce('script') }}" src="https://apis.google.com/js/api.js"></script>
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     {% if not app.user %}
-        <script nonce="{{ csp_nonce('script') }}" src="https://www.google.com/recaptcha/api.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
-    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('build/pair.js') }}"></script>
-    <script nonce="{{ csp_nonce('script') }}">
+    <script src="{{ asset('build/pair.js') }}"></script>
+    <script>
         window.fbAsyncInit = () => {
             FB.init({
                 appId: '{{ global_facebook_app_id }}',
@@ -235,5 +235,5 @@
             });
         };
     </script>
-    <script nonce="{{ csp_nonce('script') }}" async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% if recaptcha.vars.url_challenge is defined %}
-<script nonce="{{ csp_nonce('script') }}" type="text/javascript" src="{{ recaptcha.vars.url_challenge }}"
+<script type="text/javascript" src="{{ recaptcha.vars.url_challenge }}"
         {%- if recaptcha.vars.attr.options.defer is defined and recaptcha.vars.attr.options.defer %} defer{% endif -%}
         {%- if recaptcha.vars.attr.options.async is defined and recaptcha.vars.attr.options.async %} async{% endif -%}
 ></script>

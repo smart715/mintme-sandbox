@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+{% apply
+    replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+    raw
+%}
 <html lang="en">
     <head>
         {% block stylesheets %}
@@ -50,3 +54,4 @@
         {% endblock %}
     </body>
 </html>
+{% endapply %}
