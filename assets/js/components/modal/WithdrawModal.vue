@@ -5,7 +5,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center overflow-wrap-break-word word-break-all">
-                <h3 class="modal-title col-12">WITHDRAW ({{ currency | rebranding }})</h3>
+                <h3 class="col-12 modal-title">WITHDRAW ({{ currency | rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
                         Address:
