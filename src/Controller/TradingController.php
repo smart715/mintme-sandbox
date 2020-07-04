@@ -47,7 +47,7 @@ class TradingController extends Controller
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
             'page' => $page,
             'sort' => $request->query->get('sort'),
-            'order' => 'ASC' === $request->query->get('order') ? false : true,
+            'order' => 'ASC' !== $request->query->get('order'),
         ]);
     }
 
