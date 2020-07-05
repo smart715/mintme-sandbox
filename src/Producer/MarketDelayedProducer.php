@@ -25,12 +25,14 @@ class MarketDelayedProducer extends Producer
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
+
         $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
 
         if (!empty($headers)) {
             $headersTable = new AMQPTable($headers);
             $msg->set('application_headers', $headersTable);
         }
+
         // declare market queue and bind to exchange
         $this->getChannel()->queue_declare(
             self::MARKET_QUQUE_NAME,
@@ -51,11 +53,10 @@ class MarketDelayedProducer extends Producer
             self::QUEUE_IS_AUTO_DELETE,
             self::QUEUE_IS_NOWAIT,
             [
-			    'x-message-ttl' => ['I', 15000],
+                'x-message-ttl' => ['I', 15000],
                 'x-dead-letter-exchange' => [
                     'S', self::MARKET_EXCHANGE_NAME, // sends message from market delayed queue to market queise after 15s
                 ],
-
             ]
         );
 
