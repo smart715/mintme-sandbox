@@ -59,9 +59,9 @@ class MarketDelayedProducer extends Producer
             ]
         );
 
-        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, $this.exchangeOptions['name']);
+        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, $this->exchangeOptions['name']);
 
-        $this->getChannel()->basic_publish($msg, $this.exchangeOptions['name'], $routingKey);
+        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
 
         $this->logger->debug('[Market] Delayed message published', [
             'amqp' => [
