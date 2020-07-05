@@ -9,8 +9,8 @@ use PhpAmqpLib\Wire\AMQPTable;
 /** @codeCoverageIgnore */
 class MarketDelayedProducer extends Producer
 {
-    private const MARKET_DELAYED_QUQUE_NAME     = 'market-delayed';
-    private const MARKET_EXCHANGE_NAME          = 'market';
+    private const MARKET_DELAYED_QUQUE_NAME = 'market';
+    private const MARKET_DELAYED_EXCHANGE_NAME = 'market';
 
     private const QUEUE_IS_PASSIVE      = false;
     private const QUEUE_IS_DURABLE      = true;
@@ -40,7 +40,7 @@ class MarketDelayedProducer extends Producer
         );
 
         $this->getChannel()->exchange_declare(
-            self::MARKET_EXCHANGE_NAME,
+            self::MARKET_DELAYED_EXCHANGE_NAME,
             'x-delayed-mesage',
             false,
             true,
@@ -50,8 +50,8 @@ class MarketDelayedProducer extends Producer
             ['x-delayed-type' => 'fanout'],
         );
 
-        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_EXCHANGE_NAME);
-        $this->getChannel()->basic_publish($msg, self::MARKET_EXCHANGE_NAME, $routingKey);
+        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_DELAYED_EXCHANGE_NAME);
+        $this->getChannel()->basic_publish($msg, self::MARKET_DELAYED_EXCHANGE_NAME, $routingKey);
 
         $this->logger->debug('[Market] Delayed message published', [
             'amqp' => [
