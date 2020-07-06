@@ -194,7 +194,7 @@ export default {
         },
         createTicker: function(toMoney, history) {
             if (history.market.identifier !== webBtcSymbol) {
-                return toMoney + MINTME.symbol;
+                return toMoney + ' ' + MINTME.symbol;
             }
             return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
                 ? this.rebrandingFunc(history.market.quote.symbol)
