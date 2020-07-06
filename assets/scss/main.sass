@@ -320,14 +320,12 @@ a
 
     .donation-body
       background: $donation-body-bg
-      .form-group
-        margin-bottom: 1rem !important
-        label
-          padding-bottom: 0 !important
-          margin-bottom: 0.5rem !important
       p.info
         line-height: 1 !important
         margin-bottom: 2rem !important
+      @media (max-width: 400px)
+        p.text-nowrap
+          white-space: unset !important
 
     &.transparent
       background-color: transparent
