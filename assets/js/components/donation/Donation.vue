@@ -94,15 +94,17 @@
                                                     class="loading-spinner" fixed-width
                                                 />
                                                 <span v-else>{{ amountToReceive }}</span>
-                                                tokens
-                                                <guide
-                                                    :placement="'right-start'"
-                                                    :max-width="'200px'"
-                                                >
-                                                    <template slot="body">
-                                                        The number of tokens you will receive may vary slightly, because of other traders' activity.
-                                                    </template>
-                                                </guide>
+                                                <span class="text-nowrap">
+                                                    tokens
+                                                    <guide
+                                                        :placement="'right-start'"
+                                                        :max-width="'200px'"
+                                                    >
+                                                        <template slot="body">
+                                                            The number of tokens you will receive may vary slightly, because of other traders' activity.
+                                                        </template>
+                                                    </guide>
+                                                </span>
                                             </p>
                                         </div>
                                         <div>
