@@ -23,10 +23,12 @@
 
                             <div class="row">
                                 {% if post.image != null %}
-                                    <div class="center-block text-center col-12">
-                                            <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
-                                        {% set i = i+1 %}
-                                    </div>
+                                    <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
+                                        <div class="center-block text-center col-12">
+                                                <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
+                                            {% set i = i+1 %}
+                                        </div>
+                                    </a>
                                 {% endif %}
                                 <p class="mt-4 mb-1 col-12 word-break">
                                     {{ post.abstract }}
