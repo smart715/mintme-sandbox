@@ -4,6 +4,7 @@ namespace App\Wallet\Money;
 
 use App\Manager\CryptoManagerInterface;
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Money\Converter;
 use Money\Currencies;
 use Money\Currencies\CurrencyList;
@@ -66,10 +67,13 @@ final class MoneyWrapper implements MoneyWrapperInterface
         if (preg_match($regEx, $notation, $matches)) {
             $scale = $this->getRepository()->subunitFor(new Currency($symbol));
 
-            $power = $matches['right'] < 0 ?
-            BigDecimal::one()->
-                dividedBy(BigDecimal::of(10)->power(-(int)$matches['right']), $scale) :
-            BigDecimal::of(10)->power((int)$matches['right']);
+            $power = $matches['right'] < 0
+            ? BigDecimal::one()->dividedBy(
+                BigDecimal::of(10)->power(-(int)$matches['right']),
+                $scale,
+                RoundingMode::DOWN
+            )
+            : BigDecimal::of(10)->power((int)$matches['right']);
 
             return (string) BigDecimal::of($matches['left'])->multipliedBy($power);
         }
