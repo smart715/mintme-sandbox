@@ -16,13 +16,13 @@
 {% endblock stylesheets %}
 
 {% block javascripts %}
-    <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
-    <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
     {% include 'scripts.html.twig' %}
 {% endblock javascripts %}
 
 {% block swagger_initialization %}
-    <script src="{{ asset('bundles/nelmioapidoc/init-swagger-ui.js') }}"></script>
+    <script nonce="{{ csp_nonce('script') }}" src="{{ asset('bundles/nelmioapidoc/init-swagger-ui.js') }}"></script>
 {% endblock swagger_initialization %}
 
 {% block header %}
