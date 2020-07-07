@@ -8,6 +8,7 @@ use App\Entity\Image;
 use App\Entity\ImagineInterface;
 use App\Entity\Post;
 use App\Entity\Profile;
+use App\Entity\RewardDeployToken;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
@@ -223,6 +224,11 @@ class Token implements TradebleInterface, ImagineInterface
      * @var ArrayCollection
      */
     protected $posts;
+
+    /**
+     * @ORM\OneToOne(targetEntity=RewardDeployToken::class, mappedBy="token_id", cascade={"persist", "remove"})
+     */
+    private $rewardDeploy;
 
     public function __construct()
     {
@@ -588,5 +594,22 @@ class Token implements TradebleInterface, ImagineInterface
         return $profile
             ? $profile->getUser()
             : null;
+    }
+
+    public function getRewardDeploy(): ?RewardDeployToken
+    {
+        return $this->rewardDeploy;
+    }
+
+    public function setRewardDeploy(RewardDeployToken $rewardDeploy): self
+    {
+        $this->rewardDeploy = $rewardDeploy;
+
+        // set the owning side of the relation if necessary
+        if ($rewardDeploy->getTokenId() !== $this) {
+            $rewardDeploy->setTokenId($this);
+        }
+
+        return $this;
     }
 }

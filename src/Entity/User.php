@@ -176,6 +176,11 @@ class User extends BaseUser implements
      */
     private $bonus;
 
+    /**
+     * @ORM\OneToOne(targetEntity=RewardDeployToken::class, mappedBy="user_id", cascade={"persist", "remove"})
+     */
+    private $rewardDeploy;
+
     /** @codeCoverageIgnore
      * @return array
      */
@@ -464,5 +469,22 @@ class User extends BaseUser implements
     public function setBonus(?Bonus $bonus): void
     {
         $this->bonus= $bonus;
+    }
+
+    public function getRewardDeploy(): ?RewardDeployToken
+    {
+        return $this->rewardDeploy;
+    }
+
+    public function setRewardDeploy(RewardDeployToken $rewardDeploy): self
+    {
+        $this->rewardDeploy = $rewardDeploy;
+
+        // set the owning side of the relation if necessary
+        if ($rewardDeploy->getUserId() !== $this) {
+            $rewardDeploy->setUserId($this);
+        }
+
+        return $this;
     }
 }
