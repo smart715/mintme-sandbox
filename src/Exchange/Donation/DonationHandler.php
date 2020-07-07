@@ -117,7 +117,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->marketNameConverter->convert($market),
             $this->moneyWrapper->format($donationAmount),
             $this->donationConfig->getFee(),
-            $token->getProfile()->getUser()->getId()
+            $tokenCreator->getId()
         );
 
         $currentExpectedAmount = $this->moneyWrapper->parse(

@@ -3,7 +3,6 @@
 namespace App\Exchange\Config;
 
 use App\Entity\Token\Token;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
 

@@ -73,6 +73,10 @@ class DonationController extends AbstractFOSRestController
                 'tokensWorth' => $tokensWorth,
                 'sellOrdersSummary' => $sellOrdersSummary,
             ]);
+        } catch (ApiBadRequestException $ex) {
+            return $this->view([
+                'message' => $ex->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $ex) {
             $message = $ex->getMessage();
 

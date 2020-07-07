@@ -91,7 +91,8 @@
                                                     v-if="donationChecking"
                                                     icon="circle-notch"
                                                     spin
-                                                    class="loading-spinner" fixed-width
+                                                    class="loading-spinner"
+                                                    fixed-width
                                                 />
                                                 <span v-else>{{ amountToReceive }}</span>
                                                 <span class="text-nowrap">
