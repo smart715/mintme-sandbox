@@ -41,7 +41,7 @@ describe('Post', () => {
         });
 
         expect(wrapper.findAll('post-stub').length).to.equals(0);
-        expect(wrapper.find('.posts').html()).to.contain('Nothing\'s here');
+        expect(wrapper.find('.posts').html()).to.contain('The token creator has not added any posts yet.');
     });
 
     it('shows posts if posts is not empty', () => {
