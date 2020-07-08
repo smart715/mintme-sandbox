@@ -114,7 +114,7 @@ class TokenController extends Controller
         }
 
         if ($request->get('alert')) {
-          $this->addFlash('success', 'Token has been created successfully');
+            $this->addFlash('success', 'Token has been created successfully');
         }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
