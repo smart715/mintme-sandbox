@@ -40,7 +40,7 @@
                 @click="editToken"
             />
         </template>
-        <span>
+        <span class="font-size-18px">
             {{ currentName }}
         </span>
     </div>
