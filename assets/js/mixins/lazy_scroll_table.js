@@ -6,11 +6,6 @@ export default {
             _scrollListenerStarted: false,
         };
     },
-    computed: {
-        showDownArrow: function() {
-            return (Array.isArray(this.tableData) && this.tableData.length > 7);
-        },
-    },
     methods: {
         updateTableData: function(attach = false) {},
         startScrollListening: function() {
