@@ -14,7 +14,7 @@
                 />
             </template>
             <div v-else>
-                Nothing's here
+                The token creator has not added any posts yet.
             </div>
             <a v-if="showReadMore"
                 class="align-self-start"
