@@ -459,11 +459,13 @@ export default {
                 page = page === null ? this.currentPage : page;
                 deployedFirst = deployedFirst === null ? this.deployedFirst : deployedFirst;
 
+                let sort = this.sortBy.replace(USD.symbol, '');
+
                 // So that 'pair' column will be sorted A-Z on first click (which is DESC and would be Z-A)
-                let order = this.sortBy === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
+                let order = sort === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
                 let params = {
                     page,
-                    sort: this.sortBy,
+                    sort,
                     order: order ? 'DESC' : 'ASC',
                 };
 
@@ -510,7 +512,7 @@ export default {
                             window.history.replaceState(
                                 {page}, document.title, this.$routing.generate('trading', {
                                     page,
-                                    sort: this.sortBy,
+                                    sort,
                                     order: (this.sortDesc ? 'DESC' : 'ASC'),
                                 })
                             );
