@@ -47,7 +47,7 @@
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI} from '../../utils/constants';
+import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -145,8 +145,8 @@ export default {
                     ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
-                    total: toMoney((new Decimal(history.price).times(history.amount)).add(new Decimal(history.fee)).toString(), history.market.base.subunit),
-                    fee: toMoney(history.fee, history.market.base.subunit),
+                    total: toMoney(this.calculateTotalCost(history), history.market.base.subunit),
+                    fee: this.createTicker(toMoney(history.fee, this.producePrecision(history)), history),
                     pairUrl: this.generatePairUrl(history.market),
                 };
             });
@@ -192,6 +192,24 @@ export default {
 
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
+        createTicker: function(toMoney, history) {
+            if (history.market.identifier !== webBtcSymbol) {
+                return toMoney + ' ' + MINTME.symbol;
+            }
+            return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
+                ? this.rebrandingFunc(history.market.quote.symbol)
+                : this.rebrandingFunc(history.market.base.symbol));
+        },
+        calculateTotalCost: function(history) {
+            return (new Decimal(history.price).times(history.amount)).toString();
+        },
+        producePrecision(history) {
+            if (history.market.identifier !== webBtcSymbol) {
+                return MINTME.subunit;
+            }
+            return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
+        },
+
     },
 };
 </script>
