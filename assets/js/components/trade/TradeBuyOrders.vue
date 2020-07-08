@@ -17,7 +17,7 @@
             </div>
             <div class="card-body p-0">
                 <template v-if="ordersLoaded">
-                    <div class="table-responsive fixed-head-table">
+                    <div class="table-responsive fixed-head-table mb-0">
                         <b-table v-if="hasOrders"
                             ref="table"
                             @row-clicked="orderClicked"
