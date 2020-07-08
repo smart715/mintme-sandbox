@@ -79,73 +79,115 @@ php bin/console rabbitmq:consumer contract_update &
 to listen for updating mintDestination
 
 Development
------------
+------------
 
-### Requirements:
+## Docker
 
-* [Docker](https://docs.docker.com/install/#backporting) 
-* [Docker Compose](https://docs.docker.com/compose/install/#install-compose)
+### Requirements
 
-### Installation:
+1. To run MintMe in Docker, you will need a Linux or Mac OS, it just doesn't work on Windows.
+2. You will need 2 packages (follow the installation instructions for your distribution):
+   - [Docker](https://docs.docker.com/engine/install/) 
+   - [Docker Compose](https://docs.docker.com/compose/install/)
+3. Time on your local machine MUST be synchronized with the global time. If you have a difference in even 30 seconds, webchain in Docker will not work.
 
-1. Clone this repository and checkout needed branch;
-2. Pull submodule repositories and also configure amount of tokens for viabtc service with `./docker-prepare.sh`
+### Installation
 
-You may need to replace `localhost` DNS with your docker-machine 
-ip address in case of using `docker-toolbox`.  
-Also you should check your config files in nested projects. It should contains references to 
-services running by itself. \
-If you'd like to change deposit/withdraw address you need optionaly change .docker configs. 
+1. Add your SSH open key to GitLab
+2. Clone MintMe panel repo from GitLab
+3. Clone Git [submodules](https://www.atlassian.com/git/tutorials/git-submodule) ```git submodule update --init --remote --recursive```
+4. Start Docker containers with docker-compose (do not close the terminal window)
+   ```shell script
+   cd panel
+   sudo docker-compose up
+   ```
+5. Wait for the containers to build (only at the first run, usually about 40 minutes)
+6. Wait for all the containers to start (usually about 5 minutes)
+7. Wait for webchain to synchronize (usually about 1 hour at the first run, 5 minutes otherwise)
 
-### Example:
+#### How to completely reinstall MintMe environment in Docker
 
-```yaml
-database_host: http://db:3306 # We are replacing actual ip with a service alias `db`
-```
+1. Stop all running containers
+   ```shell script
+   cd panel
+   sudo docker-compose stop
+   ```
+   or `Ctrl + c` in the docker-compose terminal window.
+   
+2. Remove all volumes
+   ```shell script
+   sudo docker volume prune
+   ```
+
+3. Remove all containers
+   ```shell script
+   sudo docker system prune -a
+   ```
+   
+4. Remove the old dir with MintMe panel from your computer (or just rename it in case you have some not pushed commits you want to keep)
+   ```shell script
+   cd ..
+   sudo rm -r panel
+   ```
+
+5. Follow the installation steps from above
 
 ### Usage:
 
-1. Run `sudo docker-compose up -d` to setup a services cluster in background, if you would like to see logs output then start it with `sudo docker-compose up`.
-2. Wait until all services aren't started
-3. Check panel with `localhost` or docker-machine ip
-4. For checking logs type `docker-compose logs` in your repository folder , also you can see available containers with `sudo docker-compose ps` ,
-to check logs of specific container run `sudo docker logs container_name` where container_name is one of available containers 
-or `sudo docker-compose logs service_name` where service_name is one of available services which are described in `docker-compose.yml` 
+#### Docker host or Docker container
 
-example output of available containers with `sudo docker-compose ps`
-```
-btc-kafka              start-kafka.sh                   Up      0.0.0.0:19092->9092/tcp                                                                                  
-btc-mysql              docker-entrypoint.sh mysqld      Up      0.0.0.0:13306->3306/tcp                                                                                  
-btc-redis-master       docker-entrypoint.sh redis ...   Up      0.0.0.0:16379->6379/tcp                                                                                  
-btc-redis-sentinel     /docker-entrypoint.sh            Up      0.0.0.0:26379->26379/tcp, 6379/tcp                                                                       
-btc-redis-slave        docker-entrypoint.sh redis ...   Up      0.0.0.0:16380->6379/tcp                                                                                  
-btc-service            docker-entrypoint.sh             Up      127.0.0.1:14444->4444/tcp, 127.0.0.1:17316->7316/tcp, 127.0.0.1:17317->7317/tcp,                         
-                                                                127.0.0.1:17416->7416/tcp, 127.0.0.1:17424->7424/tcp, 127.0.0.1:18080->8080/tcp,                         
-                                                                127.0.0.1:18081->8081/tcp, 127.0.0.1:18091->8091/tcp, 127.0.0.1:18364->8364/tcp                          
-btc-zookeeper          /bin/sh -c /usr/sbin/sshd  ...   Up      0.0.0.0:12181->2181/tcp, 22/tcp, 2888/tcp, 3888/tcp                                                      
-panel_db_1             docker-entrypoint.sh mysqld      Up      0.0.0.0:3306->3306/tcp                                                                                   
-panel_deposit_1        docker-entrypoint.sh             Up      0.0.0.0:3000->3000/tcp                                                                                   
-panel_electrum_1       docker-entrypoint.sh             Up      0.0.0.0:7777->7777/tcp                                                                                   
-panel_nginx_1          nginx-debug -g daemon off;       Up      0.0.0.0:16614->16614/tcp, 0.0.0.0:80->80/tcp, 0.0.0.0:8000->8000/tcp, 0.0.0.0:8008->8008/tcp             
-panel_panel_1          app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
-panel_rabbitmq_1       docker-entrypoint.sh rabbi ...   Up      15671/tcp, 0.0.0.0:15672->15672/tcp, 25672/tcp, 4369/tcp, 5671/tcp, 0.0.0.0:5672->5672/tcp               
-panel_webchain-cli_1   webchain-cli -v --base-pat ...   Up      0.0.0.0:1920->1920/tcp                                                                                   
-panel_webchaind_1      docker-entrypoint.sh             Up      31440/tcp, 31440/udp, 0.0.0.0:39573->39573/tcp                                                           
-panel_withdraw_1       app-docker-entrypoint.sh         Up      9000/tcp                                                                                                 
-```
-5. To stop services if they are running in foreground mode type `ctrl+c` or `sudo docker-compose stop` for background mode
-6. You can connect to mysql server with `mysql -u root -p --protocol=tcp`
+You can run commands from either your [Docker host or Docker container](https://docs.docker.com/get-started/overview/#docker-architecture)
+To run a command inside a Docker container, use [docker exec](https://docs.docker.com/engine/reference/commandline/exec/)
 
-### PS:
+For example, to enter **panel** container terminal prompt `sudo docker exec -it panel_panel_1 /bin/bash`
 
-I really don't recommend to use it on Windows. I warned you ;)
+Usually, you want to run your Git commands from Docker host and NPM, Composer and Symfony console commands - from Docker container.
+ 
+This way you don't need to install NMP and Composer on your Docker host or deal with permissions problems caused by running them from the host.
 
+#### Accessing running containers
+
+##### Web interface
+
+The panel web interface is available from your Docker host at https://localhost after the docker *panel* container starts completely. It usually takes about 5 minutes.
+
+##### Database
+
+You can access panel SQL database from your Docker host with `--protocol=tcp` parameter: `mysql -u root -p --protocol=tcp`. Default password is *root*.
+
+Redis database can be accessed on port *16379* from Docker host with either [redic-cli](https://redis.io/topics/rediscli) or [Medis](https://github.com/luin/medis).
+
+##### RabbitMQ
+
+You can access RabbitMQ web interface from your Docker host on port *15672* http://localhost:15672/
+
+##### Container logs
+
+Use [docker logs](https://docs.docker.com/engine/reference/commandline/logs/) or [docker-compose logs](https://docs.docker.com/compose/reference/logs/) to access the logs output of a running container.
+
+Some advanced logs are not directed to the standard output, but go to files instead. Use Docker [docker exec](https://docs.docker.com/engine/reference/commandline/exec/) to access the container file system.
+
+To use `docker logs` or `docker exec`, you need to know the name or id of the container, you can get these by running either [docker ps](https://docs.docker.com/engine/reference/commandline/ps/) or [docke-compose ps](https://docs.docker.com/compose/reference/ps/).
+
+The most useful logs and their location:
+
+Log | Location | Command
+--- | --- | ---
+web panel | */var/www/html/panel/var/log* | `sudo docker exec -it panel_panel_1 /bin/bash`
+via btc | */var/log/trade* | `sudo docker exec -it btc-service /bin/bash`
+webchain | */root/.webchain/morden/log* | `sudo docker exec -it panel_webchain_1 /bin/bash`
+
+To search for a text string in logs in terminal, use [grep](https://en.wikipedia.org/wiki/Grep). 
+
+For example, to seach for text *error*, in case-insensitive way, in all text files in */var/log/trade* directory, run `grep -R -i "error" /var/log/trade`.
 
 Contribution
 ------------
 1. Take an issue from the [Redmine](https://redmine.abchosting.org/projects/mintme/issues);
 2. On top of the current version's branch (e.g. `v1.0.1`) create branch named `issue-xxxx` where `xxxx` is the issue number (e.g. `issue-3483`);
 3. Create a merge request for your branch to the current version's branch in [GitLab](https://gitlab.abchosting.org/abc-hosting/cryptocurrencies/mintme/merge_requests/new).
+
+Read more about it in [this wiki article](https://redmine.abchosting.org/projects/mintme/wiki/Procedures_for_developers).
 
 Makefile commands
 ----------
