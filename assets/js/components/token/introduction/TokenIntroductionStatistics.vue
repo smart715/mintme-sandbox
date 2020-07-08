@@ -30,7 +30,7 @@
                                 >
                                    <font-awesome-icon :icon="['far', 'copy']" />
                                 </copy-link>
-                                <guide>
+                                <guide class="token-address-info">
                                     <template slot="header">
                                         Token contract address
                                     </template>
