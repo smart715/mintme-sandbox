@@ -49,21 +49,27 @@
   border: none
   padding: 0.5rem 0.2rem
 
-.icon-arrows-down
-  height: 18px
-
 .fixed-head-table
   thead
     tr
+      display: table
       width: 100%
       table-layout: fixed
       justify-content: space-between
 
       th
-        width: auto
+        width: 100px
 
-        @include media-breakpoint-down(md)
-          width: 100px
+  tbody
+    max-height: 17.7rem
+    display: block
+    width: 100%
+    position: relative
+
+    tr
+      width: 100%
+      table-layout: fixed
+      display: table
 
 .social-help
   padding-left: 0
