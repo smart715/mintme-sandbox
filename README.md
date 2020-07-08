@@ -95,12 +95,12 @@ Development
 
 1. Add your SSH open key to GitLab
 2. Clone MintMe panel repo from GitLab
-3. Clone Git [submodules](https://www.atlassian.com/git/tutorials/git-submodule) ```git submodule update --init --remote --recursive```
-4. Start Docker containers with docker-compose (do not close the terminal window)
+3. Clone Git [submodules](https://www.atlassian.com/git/tutorials/git-submodule)
    ```shell script
    cd panel
-   sudo docker-compose up
+   git submodule update --init --remote --recursive
    ```
+4. Start Docker containers with docker-compose (do not close the terminal window) ```sudo docker-compose up```
 5. Wait for the containers to build (only at the first run, usually about 40 minutes)
 6. Wait for all the containers to start (usually about 5 minutes)
 7. Wait for webchain to synchronize (usually about 1 hour at the first run, 5 minutes otherwise)
@@ -136,7 +136,8 @@ Development
 
 #### Docker host or Docker container
 
-You can run commands from either your [Docker host or Docker container](https://docs.docker.com/get-started/overview/#docker-architecture)
+You can run commands from either your [Docker host or Docker container](https://docs.docker.com/get-started/overview/#docker-architecture).
+
 To run a command inside a Docker container, use [docker exec](https://docs.docker.com/engine/reference/commandline/exec/)
 
 For example, to enter **panel** container terminal prompt `sudo docker exec -it panel_panel_1 /bin/bash`
@@ -203,4 +204,3 @@ syntax_correction         |perform corrections for phpcs linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 correct                   |run all correction commands above
-  
