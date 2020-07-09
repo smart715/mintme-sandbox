@@ -36,7 +36,7 @@ class TradingController extends Controller
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
 
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $this->getTokenRepository()->count([]),
+            'tokensCount' => $this->getTokenRepository()->count(['isBlocked' => false]),
             'btcImage' => $btcCrypto->getImage(),
             'mintmeImage' => $webCrypto->getImage(),
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),

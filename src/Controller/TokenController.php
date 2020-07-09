@@ -130,7 +130,7 @@ class TokenController extends Controller
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
         }
 
@@ -231,7 +231,7 @@ class TokenController extends Controller
             $this->em->flush();
 
             try {
-                /** @var  \App\Entity\User $user*/
+                /** @var User $user*/
                 $user = $this->getUser();
 
                 $balanceHandler->deposit(

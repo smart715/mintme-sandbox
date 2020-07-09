@@ -14,16 +14,21 @@
                 sort-icon-left
             >
                 <template v-slot:cell(symbol)="data">
-                    <a v-if="data.item.symbol.length > 17" :href="data.item.url" class="text-white">
-                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
-                            {{ data.item.symbol | truncate(17) }}
-                        </span>
-                    </a>
-                    <a v-else :href="data.item.url" class="text-white">
-                        <span>
-                            {{ data.item.symbol }}
-                        </span>
-                    </a>
+                    <span v-if="!data.item.tradable.blocked">
+                        <a :href="data.item.url" class="text-white">
+                            <span
+                                v-if="data.item.symbol.length > 17"
+                                v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                                {{ data.item.symbol | truncate(17) }}
+                            </span>
+                            <span v-else>
+                                {{ data.item.symbol }}
+                            </span>
+                        </a>
+                    </span>
+                    <span v-else class="text-muted">
+                        {{ data.item.symbol }}
+                    </span>
                 </template>
                 <template v-slot:cell(toAddress)="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">

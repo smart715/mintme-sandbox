@@ -22,7 +22,9 @@
                 </template>
                 <template v-slot:cell(action)="data">
                     <div class="row">
-                        <div class="d-flex flex-row c-pointer pl-2"
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
@@ -31,6 +33,7 @@
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -60,14 +63,28 @@
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
                     <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                        <a :href="generatePairUrl(data.item)" class="text-white">
-                            {{ data.item.name | truncate(17) }}
-                        </a>
+                        <span v-if="data.item.blocked">
+                            <span class="text-muted">
+                                {{ data.item.name | truncate(17) }}
+                            </span>
+                        </span>
+                        <span v-else>
+                            <a :href="generatePairUrl(data.item)" class="text-white">
+                                {{ data.item.name | truncate(17) }}
+                            </a>
+                        </span>
                     </div>
                     <div v-else>
-                        <a :href="generatePairUrl(data.item)" class="text-white">
-                            {{ data.item.name }}
-                        </a>
+                        <span v-if="data.item.blocked">
+                            <span class="text-muted">
+                                {{ data.item.name | truncate(17) }}
+                            </span>
+                        </span>
+                        <span v-else>
+                            <a :href="generatePairUrl(data.item)" class="text-white">
+                                {{ data.item.name }}
+                            </a>
+                        </span>
                     </div>
                 </template>
                 <template v-slot:cell(available)="data">
@@ -77,8 +94,10 @@
                     <div
                         v-if="data.item.deployed"
                         class="row">
-                        <div class="d-flex flex-row c-pointer pl-2"
-                            @click="openDeposit(data.item.name, data.item.subunit, true)">
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': data.item.blocked}"
+                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Deposit</span>
@@ -86,12 +105,14 @@
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': data.item.blocked}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
                                         data.item.subunit,
-                                        true)"
+                                        true,
+                                        data.item.blocked)"
                         >
                             <div><i class="icon-withdraw"></i></div>
                             <div>
@@ -187,6 +208,7 @@ export default {
         depositMore: String,
         twofa: String,
         expirationTime: Number,
+        isUserBlocked: Boolean,
     },
     data() {
         return {
@@ -305,7 +327,10 @@ export default {
         });
     },
     methods: {
-        openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+            if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
+                return;
+            }
             if (!this.twofa) {
                 this.notifyInfo('Please enable 2FA before withdrawing');
                 return;
@@ -325,7 +350,10 @@ export default {
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit, isToken = false) {
+        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+            if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
+                return;
+            }
             this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
                 || 'Loading..';
             this.depositDescription = `Send ${currency} to the address above.`;
@@ -356,7 +384,8 @@ export default {
                 [webSymbol, btcSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
-                this.depositAddresses.hasOwnProperty(this.depositMore)
+                this.depositAddresses.hasOwnProperty(this.depositMore) &&
+                !this.isUserBlocked
             ) {
                 if (window.history.replaceState) {
                     window.history.replaceState(
