@@ -85,6 +85,20 @@ class WalletController extends Controller
             );
         }
 
+        $isBlocked = $pendingWithdraw instanceof PendingWithdraw
+            ? $pendingWithdraw->getUser()->isBlocked()
+            : ($pendingWithdraw instanceof PendingTokenWithdraw
+                ? $pendingWithdraw->getToken()->isBlocked()
+                : false
+            );
+
+        if ($isBlocked) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Account or token was blocked. Withdrawing is not possible'
+            );
+        }
+
         $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
 
         try {
