@@ -85,7 +85,7 @@ class ProfileController extends Controller
             return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $profile  = new Profile($user);
@@ -117,7 +117,7 @@ class ProfileController extends Controller
         FormInterface $form,
         bool $showEdit
     ): Response {
-        /** @var  User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $profileDescription = preg_replace(

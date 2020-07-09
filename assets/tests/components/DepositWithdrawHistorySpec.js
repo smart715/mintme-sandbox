@@ -40,7 +40,7 @@ function mockVue() {
 
 const tableData = [
     {
-        tradable: {name: 'testName', symbol: 'testWEB'},
+        tradable: {name: 'testName', symbol: 'testWEB', blocked: true},
         url: 'testUrl',
         date: moment([2020, 5, 20, 19, 44, 20]),
         fee: '0.500000000000000000',
@@ -61,7 +61,7 @@ const tableData = [
 
 const expectTableData = [
     {
-        tradable: {name: 'testName', symbol: 'testWEB'},
+        tradable: {name: 'testName', symbol: 'testWEB', blocked: true},
         url: 'token_show-testName',
         date: '20.06.2020 19:44:20',
         fee: '0.5',

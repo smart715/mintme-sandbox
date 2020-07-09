@@ -335,7 +335,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new AccessDeniedHttpException();
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         try {
@@ -533,7 +533,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
         $message = null;
 
@@ -592,7 +592,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
-            /** @var  \App\Entity\User $user*/
+            /** @var User $user*/
             $user = $this->getUser();
 
             $balances = [
@@ -637,7 +637,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         try {
-            /** @var  \App\Entity\User $user*/
+            /** @var User $user*/
             $user = $this->getUser();
 
             $deployment->execute($user, $token);
