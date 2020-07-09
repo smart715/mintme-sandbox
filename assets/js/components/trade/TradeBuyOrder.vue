@@ -32,7 +32,7 @@
                                     The price at which you want to buy one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
-                        </div>    
+                        </div>
                         <div class="d-flex">
                             <input
                                 v-model="buyPrice"
