@@ -69,7 +69,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
                 $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
                 Token::DEPLOYED === $token->getDeploymentStatus(),
-                $owner
+                $owner,
+                $token->isBlocked()
             );
         }
 
