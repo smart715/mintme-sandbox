@@ -19,28 +19,13 @@ use InvalidArgumentException;
 class MarketStatusManager implements MarketStatusManagerInterface
 {
     private const SORTS = [
-        'to_number(ms.lastPrice)',
-        'to_number(ms.monthVolume)',
-        'to_number(ms.dayVolume)',
-        'change',
-        'qt.name',
-        'to_number(ms.buyDepth)',
-        'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)',
-    ];
-
-    private const SORTS_MAP = [
-        'lastPrice' => 0,
-        'lastPriceUSD' => 0,
-        'monthVolume' => 1,
-        'monthVolumeUSD' => 1,
-        'dayVolume' => 2,
-        'dayVolumeUSD' => 2,
-        'change' => 3,
-        'pair' => 4,
-        'buyDepth' => 5,
-        'buyDepthUSD' => 5,
-        'marketCap' => 6,
-        'marketCapUSD' => 6,
+        'lastPrice' => 'to_number(ms.lastPrice)',
+        'monthVolume' => 'to_number(ms.monthVolume)',
+        'dayVolume' => 'to_number(ms.dayVolume)',
+        'change' => 'change',
+        'pair' => 'qt.name',
+        'buyDepth' => 'to_number(ms.buyDepth)',
+        'marketCap' => 'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)',
     ];
 
     private const SORT_BY_CHANGE = 'change';
@@ -155,9 +140,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
         }
 
-        $sort = isset(self::SORTS_MAP[$sort])
-            ? self::SORTS[self::SORTS_MAP[$sort]]
-            : self::SORTS[self::SORTS_MAP['monthVolume']];
+        $sort = self::SORTS[$sort] ?? self::SORTS['monthVolume'];
         $order = 'ASC' === $order
             ? 'ASC'
             : 'DESC';
