@@ -829,12 +829,11 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
   text-overflow: ellipsis
 
 .truncate-address
-  .token-address-info
-    @include media-breakpoint-down(md)
-      width: 230px
+  .token-address-buttons
+    display: flex
+    padding-left: 6px
 
   span
-    width: 100%
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis

@@ -22,22 +22,24 @@
                             <div class="row">
                                 <strong class="mr-2">Token contract address:</strong>
                             </div>
-                            <div class="row truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto">
+                            <div class="row truncate-address d-flex flex-row flex-nowrap mt-auto">
                                 <span>{{ tokenContractAddress }}</span>
-                                <copy-link
-                                    class="c-pointer"
-                                    :content-to-copy="tokenContractAddress"
-                                >
-                                   <font-awesome-icon :icon="['far', 'copy']" />
-                                </copy-link>
-                                <guide class="token-address-info">
-                                    <template slot="header">
-                                        Token contract address
-                                    </template>
-                                    <template slot="body">
-                                        Unique token contract address, created when token is deployed to blockchain. It's required when adding token to MintMe Wallet application.
-                                    </template>
-                                </guide>
+                                <div  class="token-address-buttons">
+                                    <copy-link
+                                        class="c-pointer"
+                                        :content-to-copy="tokenContractAddress"
+                                    >
+                                        <font-awesome-icon :icon="['far', 'copy']" />
+                                    </copy-link>
+                                    <guide>
+                                        <template slot="header">
+                                            Token contract address
+                                        </template>
+                                        <template slot="body">
+                                            Unique token contract address, created when token is deployed to blockchain. It's required when adding token to MintMe Wallet application.
+                                        </template>
+                                    </guide>
+                                </div>
                             </div>
                         </div>
                     </div>
