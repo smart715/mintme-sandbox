@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Controller\TwoFactorAuthenticatedController;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -52,7 +53,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         int $page,
         WalletInterface $wallet
     ): array {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         return $wallet->getWithdrawDepositHistory(
@@ -91,8 +92,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
+
+        $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
 
         try {
             $pendingWithdraw = $wallet->withdrawInit(
@@ -129,15 +132,19 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
-         $depositAddresses = $depositCommunicator->getDepositCredentials(
-             $user,
-             $cryptoManager->findAll()
-         );
+        $depositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
+            $user,
+            $cryptoManager->findAll()
+        ) : [];
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($user);
+        $isBlockedToken = $user->getProfile()->getToken()
+            ? $user->getProfile()->getToken()->isBlocked()
+            : false;
+
+        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
         return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
     }
@@ -176,7 +183,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw new InvalidArgumentException();
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         return $this->view([

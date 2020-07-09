@@ -28,8 +28,12 @@ class UserActionProcessor
 
     public function __invoke(array $record): array
     {
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
         $record['extra']['username'] = $this->getUsername();
-        $record['extra']['ip_address'] = $this->requestStack->getCurrentRequest()->getClientIp();
+        $record['extra']['ip_address'] = $currentRequest
+            ? $currentRequest->getClientIp()
+            : 'localhost';
 
         return $record;
     }

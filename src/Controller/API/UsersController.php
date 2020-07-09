@@ -106,7 +106,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function invalidateApiKeys(): void
     {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $keys = $user->getApiKey();
@@ -126,7 +126,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function createApiClient(): array
     {
-        /** @var  \App\Entity\User|null $user*/
+        /** @var User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -185,7 +185,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function changePassOnTwoFaActive(Request $request): Response
     {
-        /** @var  \App\Entity\User|null $user*/
+        /** @var User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
@@ -226,7 +226,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
      */
     public function checkUserPassword(Request $request): Response
     {
-        /** @var  \App\Entity\User|null $user*/
+        /** @var User|null $user*/
         $user = $this->getUser();
 
         if (!$user) {
