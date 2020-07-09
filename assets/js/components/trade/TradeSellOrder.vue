@@ -17,10 +17,12 @@
             <div class="card-body">
                 <div v-if="balanceLoaded" class="row">
                     <div v-if="loggedIn" class="col-12">
-                        <label
-                            for="sell-price-input"
-                            class="text-white">
-                            Price in {{ market.base.symbol | rebranding }}:
+                        <div class="form-group">
+                            <label
+                                for="sell-price-input"
+                                class="text-white">
+                                Price in {{ market.base.symbol | rebranding }}:
+                            </label>
                             <guide>
                                 <template slot="header">
                                     Price in {{ market.base.symbol | rebranding }}
@@ -29,7 +31,7 @@
                                     The price at which you want to sell one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
-                        </label>
+                        </div>
                         <div class="d-flex">
                             <input
                                 v-model="sellPrice"
