@@ -30,7 +30,7 @@ interface TokenManagerInterface
     public function getTokensByPattern(string $pattern): array;
 
     public function isExisted(string $tokenName): bool;
-    
+
     /** @return Token[] */
     public function getDeployedTokens(): array;
 }
