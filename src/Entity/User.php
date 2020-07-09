@@ -163,18 +163,24 @@ class User extends BaseUser implements
      */
     protected $clients;
 
-    /** @codeCoverageIgnore */
-    public function getApiKey(): ?ApiKey
-    {
-        return $this->apiKey;
-    }
-
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
      * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
      * @var Bonus|null
      */
-    private $bonus;
+    protected $bonus;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
+    /** @codeCoverageIgnore */
+    public function getApiKey(): ?ApiKey
+    {
+        return $this->apiKey;
+    }
 
     /** @codeCoverageIgnore
      * @return array
@@ -464,5 +470,17 @@ class User extends BaseUser implements
     public function setBonus(?Bonus $bonus): void
     {
         $this->bonus= $bonus;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
+
+        return $this;
     }
 }

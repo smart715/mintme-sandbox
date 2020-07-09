@@ -3,6 +3,7 @@
 namespace App\Consumers;
 
 use App\Consumers\Helpers\DBConnection;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
@@ -89,7 +90,7 @@ class DepositConsumer implements ConsumerInterface
         )) {
             return false;
         }
-        
+
         $this->em->clear();
 
         $this->logger->info('[deposit-consumer] Received new message: '.json_encode($msg->body));
@@ -128,6 +129,18 @@ class DepositConsumer implements ConsumerInterface
 
             if (!$tradable) {
                 $this->logger->info('[deposit-consumer] Invalid crypto "'.$clbResult->getCrypto().'" given');
+
+                return true;
+            }
+
+            if ($tradable instanceof Token && $tradable->isBlocked()) {
+                $this->logger->info('[deposit-consumer] Deposit token to user with blocked token. Cancelled.');
+
+                return true;
+            }
+
+            if ($tradable instanceof Crypto && $user->isBlocked()) {
+                $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
 
                 return true;
             }
