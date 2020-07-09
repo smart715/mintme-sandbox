@@ -17,14 +17,21 @@
                 >
                     <template v-slot:cell(name)="row">
                         <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.truncate }}
-                            </a>
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
                         </div>
                     </template>
                     <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
-                            <span class="icon-cancel c-pointer"></span>
+                            <span class="icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
                         </a>
                     </template>
                 </b-table>
@@ -83,7 +90,10 @@ export default {
         OrderMixin,
     ],
     components: {ConfirmModal},
-    props: {userId: Number},
+    props: {
+        userId: Number,
+        isUserBlocked: Boolean,
+    },
     data() {
         return {
             markets: null,
@@ -184,6 +194,8 @@ export default {
                     }),
                     id: order.id,
                     pairUrl: this.generatePairUrl(order.market),
+                    blocked: order.market.quote.hasOwnProperty('blocked') ? order.market.quote.blocked : this.isUserBlocked,
+                    isCryptoMarket: !order.market.base.exchangeble,
                 };
             });
         },
@@ -257,9 +269,12 @@ export default {
             }
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        removeOrderModal: function(row) {
-            this.currentRow = row;
-            this.actionUrl = row.action;
+        removeOrderModal: function(item) {
+            if (item.blocked) {
+                return;
+            }
+            this.currentRow = item;
+            this.actionUrl = item.action;
             this.switchConfirmModal(true);
         },
         switchConfirmModal: function(val) {
