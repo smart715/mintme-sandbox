@@ -37,6 +37,7 @@ parameters:
         username: electrum
         password: changeme
     bitcoin_transfer_options: {  }
+    bitcoin_duplicate_transactions_interval: 2
     payment_retry_delay_minutes: 2
 doctrine:
     host: db
