@@ -67,7 +67,9 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        /** @var  \App\Entity\User $currentUser */
+        $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+
+        /** @var User $currentUser */
         $currentUser = $this->getUser();
 
         foreach ($request->get('orderData') as $id) {
@@ -103,10 +105,12 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
-        /** @var  \App\Entity\User $currentUser */
+        /** @var User $currentUser */
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
         $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
+
+        $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
         if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
@@ -179,7 +183,7 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $markets = $this->marketManager->createUserRelated($user);

@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\User;
 
 use App\Controller\Dev\API\DevApiController;
+use App\Entity\User;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -101,7 +102,7 @@ class OrdersController extends DevApiController
      */
     public function getActiveOrders(ParamFetcherInterface $request): array
     {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
 
@@ -154,7 +155,7 @@ class OrdersController extends DevApiController
      */
     public function getFinishedOrders(ParamFetcherInterface $request): array
     {
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $markets = $this->marketFactory->createUserRelated($user);
@@ -231,7 +232,7 @@ class OrdersController extends DevApiController
 
         $market = new Market($base, $quote);
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $tradeResult = $exchanger->placeOrder(
@@ -278,7 +279,7 @@ class OrdersController extends DevApiController
             throw new ApiNotFoundException('Market not found');
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $order = Order::createCancelOrder($id, $user, new Market($base, $quote));

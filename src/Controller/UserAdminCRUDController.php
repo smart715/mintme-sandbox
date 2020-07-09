@@ -26,14 +26,14 @@ class UserAdminCRUDController extends Controller
         MailerInterface $mailer
     ): RedirectResponse {
         $id = $request->get($this->admin->getIdParameter());
-        /** @var  \App\Entity\User|null $user*/
+        /** @var User|null $user*/
         $user = $this->admin->getObject($id);
 
         if (!$user) {
             throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
         }
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
 
         $this->sendResettingEmailMessage($user, $userManager, $tokenGenerator, $mailer);
 
