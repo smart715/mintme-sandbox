@@ -43,6 +43,7 @@ class TokenRepository extends EntityRepository
     {
         return $this->createQueryBuilder('token')
             ->where('LOWER(token.name) LIKE LOWER(:like)')
+            ->andWhere('token.isBlocked=false')
             ->setParameter('like', "$pattern%")
             ->orderBy('token.name', 'ASC')
             ->setMaxResults(10)
