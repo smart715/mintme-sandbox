@@ -98,6 +98,14 @@
                             <div class="pb-1">
                                 Donation volume: <br />
                                 {{ donationVolume }}
+                                <guide>
+                                    <template slot="header">
+                                        Donation volume
+                                    </template>
+                                    <template slot="body">
+                                        Donated tokens summary.
+                                    </template>
+                                </guide>
                             </div>
                         </div>
                         <div class="col px-1">
@@ -275,6 +283,16 @@ export default {
                 this.notifyError('Can not load statistic data. Try again later');
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
+
+        this.$axios.retry.get(this.$routing.generate('market_status', {
+            base: this.market.base.symbol,
+            quote: this.market.quote.symbol,
+        })).then((res) => {
+            this.donationVolume = result.data['volumeDonation'] || 0;
+        }).catch((err) => {
+            this.notifyError('Service unavailable now. Can not load donation volume.');
+            this.sendLogs('error', 'Can not load market status', err);
+        });
 
         this.sendMessage(JSON.stringify({
             method: 'kline.subscribe',

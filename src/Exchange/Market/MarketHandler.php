@@ -185,6 +185,15 @@ class MarketHandler implements MarketHandlerInterface
         }, $stats);
     }
 
+    /** {@inheritdoc} */
+    public function getMarketStatus(Market $market, int $period = 86400): array
+    {
+        return $this->marketFetcher->getMarketInfo(
+            $this->marketNameConverter->convert($market),
+            $period
+        );
+    }
+
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {

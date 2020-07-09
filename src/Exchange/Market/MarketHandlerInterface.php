@@ -43,4 +43,5 @@ interface MarketHandlerInterface
     public function getPendingOrder(Market $market, int $id): Order;
     public function getBuyDepth(Market $market): string;
     public function getSellOrdersSummary(Market $market): string;
+    public function getMarketStatus(Market $market, int $period = 86400): array;
 }
