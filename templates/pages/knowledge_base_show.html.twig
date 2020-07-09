@@ -2,6 +2,11 @@
 
 {% block title %}{{ article.title }} | mintMe{% endblock %}
 
+{% block tokenDescription %}
+    <meta property="og:description" content="{{ metaDescription }}">
+    <meta name="description" content="{{ metaDescription }}">
+{% endblock %}
+
 {% set metaTitle = article.title %}
 
 {% block content %}
@@ -9,9 +14,9 @@
         <div class="row justify-content-center">
             <div class="article col-md-9 card-fixed-large p-3">
                 <header>
-                    <h2 class="word-break">
+                    <h1 class="word-break">
                         {{ article.title }}
-                    </h2>
+                    </h1>
                 </header>
                 <div class="pt-2 pb-4 text-break">
                     {{ article.description | raw }}
