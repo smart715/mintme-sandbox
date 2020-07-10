@@ -20,6 +20,7 @@ monolog:
             path: "%kernel.logs_dir%/donation.log"
             level: error
             channels: ['donation']
+            formatter: monolog.formatter.donation
         rabbitmq:
             type: stream
             path: "%kernel.logs_dir%/rabbitmq.log"

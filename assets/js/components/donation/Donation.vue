@@ -203,9 +203,6 @@ export default {
             showModal: false,
         };
     },
-    created: function() {
-        this.debouncedCheck = debounce(this.checkDonation, 500);
-    },
     computed: {
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
@@ -268,6 +265,8 @@ export default {
         } else {
             this.loginFormLoaded = true;
         }
+
+        this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
         onSelect: function(newCurrency) {

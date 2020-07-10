@@ -578,6 +578,17 @@ services:
         arguments:
             $donationParams: '%donation%'
 
+    App\Logger\DonationProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: donation }
+
+    monolog.formatter.donation:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
     App\Logger\DonationLogger:
         autowire: true
         tags:

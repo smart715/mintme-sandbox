@@ -288,7 +288,7 @@ export default {
             base: this.market.base.symbol,
             quote: this.market.quote.symbol,
         })).then((res) => {
-            this.donationVolume = res.data['volumeDonation'] || 0;
+            this.donationVolume = res.data.volumeDonation || 0;
         }).catch((err) => {
             this.notifyError('Service unavailable now. Can not load donation volume.');
             this.sendLogs('error', 'Can not load market status', err);
