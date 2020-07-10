@@ -33,7 +33,7 @@
                             @keypress="checkAmount"
                             @paste="checkAmount"
                             :class="{ 'is-invalid': $v.amount.$error }"
-                            class="form-control text-left input-custom-padding">
+                            class="form-control form-control-btn text-left input-custom-padding">
                         <button
                             class="btn btn-primary btn-input float-right"
                             type="button"
