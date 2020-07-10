@@ -16,14 +16,29 @@
                         <div v-if="row.value.full.length > 17"
                             v-b-tooltip="{title: row.value.full, boundary: 'viewport'}"
                         >
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.truncate }}
-                            </a>
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
+
                         </div>
                         <div v-else>
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.full }}
-                            </a>
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
                         </div>
                     </template>
                 </b-table>
@@ -148,6 +163,7 @@ export default {
                     total: toMoney(this.calculateTotalCost(history), history.market.base.subunit),
                     fee: this.createTicker(toMoney(history.fee, this.producePrecision(history)), history),
                     pairUrl: this.generatePairUrl(history.market),
+                    blocked: history.market.quote.hasOwnProperty('blocked') ? history.market.quote.blocked : false,
                 };
             });
         },
