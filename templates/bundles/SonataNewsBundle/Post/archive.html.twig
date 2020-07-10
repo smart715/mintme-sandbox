@@ -24,8 +24,10 @@
                             <div class="row">
                                 {% if post.image != null %}
                                     <div class="center-block text-center col-12">
+                                        <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
                                             <news-image src="{{ url('homepage') }}{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
                                         {% set i = i+1 %}
+                                        </a>
                                     </div>
                                 {% endif %}
                                 <p class="mt-4 mb-1 col-12 word-break">

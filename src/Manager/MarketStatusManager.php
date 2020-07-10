@@ -115,6 +115,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
             ->setFirstResult($firstResult)
             ->setMaxResults($offset - count($predefinedMarketStatus));
 
@@ -217,8 +218,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $markets = $this->marketFactory->createUserRelated($user, $deployed);
 
         foreach ($markets as $market) {
-            if ($market->getQuote() instanceof Token) {
-                array_push($userTokenIds, $market->getQuote()->getId());
+            /** @var Token $token */
+            $token = $market->getQuote();
+
+            if ($token instanceof Token && !$token->isBlocked()) {
+                array_push($userTokenIds, $token->getId());
             }
         }
 
