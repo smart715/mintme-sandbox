@@ -28,7 +28,7 @@
 {% block header %}
 {% endblock header %}
 
-{% block swagger_ui %}
+{% block swagger_ui|replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'}) %}
     <div class="content-wrapper d-flex flex-column">
         {% include 'topnav.html.twig' %}
         <main class="flex-fill content">
@@ -77,6 +77,6 @@
     </div>
 {% endblock %}
 
-{% block meta %}
+{% block meta|replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'}) %}
     {% include 'head.html.twig' %}
 {% endblock %}
