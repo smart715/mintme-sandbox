@@ -88,18 +88,19 @@ body
   font-weight: 800
 
 .img-reduced
+  max-width: 70%
   @include media-breakpoint-up(md)
-    max-width: 80%
-  @include media-breakpoint-up(xl)
     max-width: 60%
+  @include media-breakpoint-up(lg)
+    max-width: 80%
 
 .index-bg
   min-height: 100vh
-  margin-top: -6.5%
-  padding-top: 6.5%
+  margin-top: -4.5%
+  padding-top: 4.5%
   background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
   background-size: 100% auto
-  @include media-breakpoint-down(xs)
+  @include media-breakpoint-down(sm)
     background: linear-gradient($secondary-dark 50%, transparent)
 
 a
@@ -173,6 +174,7 @@ a
   background: $color-tooltip
   padding: .125rem
   font-size: .875em
+  text-align: center
   vertical-align: middle
 
   &.square
@@ -239,6 +241,12 @@ a
     border-radius: 0
     border: none
     height: calc(2.0rem + 2px)
+    transition: all .3s ease
+
+  input:not([type=button]):not([type=submit]):not([type=reset])
+    &:focus
+      background-color: $input-focus !important
+      box-shadow: none !important
 
   textarea
     height: auto
@@ -264,6 +272,8 @@ a
     background: $card-header-bg
     color: $dark-white
     padding: 0.75rem 1.25rem
+    &[role=tab]
+        background: $secondary-dark
 
     @include font-scale(md)
 
@@ -303,13 +313,57 @@ a
                 vertical-align: bottom
 
 .btn-primary
-  color: $white
-  background-color: #007DC0
-  border-color: #007DC0
-
-  @include media-breakpoint-down(sm)
+  color: $dark-white
+  background-color: transparent
+  border-color: $dark-white
+  &:hover
+    color: $secondary
+    background-color: $dark-white
+    border-color: $dark-white
+  &:disabled
     &:hover
-      background-color: #007DC0
+      color: inherit
+      background-color: $primary
+      border-color: $primary
+  &.dropdown-toggle
+    background-color: transparent !important
+    border-color: $dark-white !important
+    &:hover
+      color: $secondary !important
+      background-color: $dark-white !important
+
+.btn-big
+  @include media-breakpoint-up(lg)
+    font-size: 1.4rem
+  @include media-breakpoint-up(xl)
+    font-size: 2rem
+
+.btn-ghost
+  border-color: $dark-white
+  background: transparent
+  color: $dark-white
+  transition: all .3s ease
+  &:hover
+    background: $dark-white
+    color: $secondary
+  &.ghost-alt
+    &:hover
+      color: $primary-light
+
+.bright-on-hover
+  transition: all .3s ease
+  &:hover
+    filter: brightness(1.2)
+
+.dropdown-menu
+  color: $dark-white
+  background-color: $secondary
+  border: 1px solid $dark-white
+  .dropdown-item
+    color: $dark-white
+    &:hover
+      color: $gold
+      background-color: transparent
 
 .circle-progress
   div.circle
@@ -411,7 +465,7 @@ a
   .page-item
     .page-link
       background: none
-      color: $color-link
+      color: $dark-white
       line-height: 13px
 
   .active
@@ -446,7 +500,7 @@ a
           cursor: default
 
       .active
-        color: $color-link
+        color: $gold
 
   .tab-content
     flex: 1 1 auto
@@ -501,7 +555,7 @@ a
         @include font-scale(md)
 
         &.active
-          color: $color-link
+          color: $gold
 
         &.active::after
           content: ' '
@@ -528,7 +582,7 @@ a
           @include font-scale(md)
 
           &.active
-            color: $color-link
+            color: $gold
 
           &.active::after
             content: ' '
@@ -800,6 +854,9 @@ meter
 input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
   cursor: url('../img/input-cursor.png'), auto
 
+input[type=search]::-webkit-search-cancel-button
+  -webkit-appearance: none
+
 .no-bg-img
   background-image: none !important
 
@@ -851,6 +908,28 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
 .card-fixed-large
   width: 100%
   max-width: 981px
+
+.markitup-dropdown li a:hover
+    background: $primary
+
+.form-control-btn.is-invalid
+  background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
+
+.bootstrap-datetimepicker-widget
+  &, &:hover, &:focus, &:active
+    background-color: $secondary-dark
+
+  table
+    thead tr:first-child th:hover,
+    td.day:hover,
+    td.hour:hover,
+    td.minute:hover,
+    td.second:hover,
+    td span:hover,
+    td i:hover,
+    svg
+      color: $blue !important
+
 
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large

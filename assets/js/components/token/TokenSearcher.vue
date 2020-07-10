@@ -2,6 +2,8 @@
     <div class="input-group">
         <div ref="tokenSearch" @keyup.enter="onItemSelected">
             <autocomplete
+                    ref="searchInput"
+                    :value="searchValue"
                     :input-class="inputClass"
                     placeholder="Search for the token"
                     :auto-select-one-item="false"
@@ -14,8 +16,11 @@
             >
             </autocomplete>
         </div>
-        <div class="input-group-append">
-            <span class="input-group-text text-white ml-2">
+        <div class="input-group-append position-relative ml-2">
+            <div v-if="input" class="clear-search-icon">
+                <font-awesome-icon size="xs" @click="clearSearch" class="c-pointer" icon="times"></font-awesome-icon>
+            </div>
+            <span class="input-group-text text-white">
                 <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
         </div>
@@ -41,6 +46,7 @@ export default {
         return {
             validName: true,
             input: '',
+            searchValue: undefined,
             items: [],
             inputAttrs: {
                 maxlength: 60,
@@ -79,6 +85,14 @@ export default {
             this.validName = tokenRegEx.test(val);
             this.input = val;
             this.items = [];
+        },
+        clearSearch: function() {
+            this.input = '';
+            this.searchValue = '';
+            this.items = [];
+            this.$nextTick(() => {
+                this.searchValue = undefined;
+            });
         },
     },
     computed: {
