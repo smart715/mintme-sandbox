@@ -53,7 +53,7 @@
                                         {{ market.quote | rebranding }} :
                                     </span>
                                     <span class="text-white">
-                                        <span class="text-nowrap p-1">
+                                        <span class="text-nowrap p-0">
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                                 <guide>
                                                     <template slot="header">
