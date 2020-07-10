@@ -10,13 +10,12 @@
                     :lazy="true"
                 >
                     <template slot="button-content">
-                        Currency:
                         <span v-if="showUsd">
-                    USD
-                </span>
+                            USD
+                        </span>
                         <span v-else>
-                    Crypto
-                </span>
+                            Crypto
+                        </span>
                     </template>
                     <template>
                         <b-dropdown-item @click="toggleUsd(false)">
