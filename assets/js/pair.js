@@ -47,7 +47,7 @@ new Vue({
     Trade,
   },
   mounted() {
-      let aux = this.$refs["tokenAvatar"].$attrs["showsuccess"];
+      let aux = this.$refs['tokenAvatar'].$attrs['showsuccess'];
       if (aux) {
           this.notifySuccess('Token has been created successfully');
       }
