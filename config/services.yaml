@@ -572,3 +572,7 @@ services:
 
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
+
+    App\Manager\MarketStatusManager:
+        properties:
+            minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
