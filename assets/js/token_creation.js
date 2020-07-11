@@ -73,7 +73,7 @@ new Vue({
         },
         createToken: function(e) {
             e.preventDefault();
-            let frm = document.querySelector('form');
+            let frm = document.querySelector('form[name="token_create"]');
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
                 .then((res) => {

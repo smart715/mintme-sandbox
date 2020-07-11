@@ -69,7 +69,7 @@ class HackerController extends AbstractController
         $amount = self::BTC_SYMBOL === $crypto->getSymbol() ?
             '0.001' : '100';
 
-        /** @var  \App\Entity\User $user*/
+        /** @var User $user*/
         $user = $this->getUser();
 
         $balanceHandler->deposit(

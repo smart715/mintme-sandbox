@@ -70,6 +70,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
                     ->join('ms.quoteToken', 'qt')
                     ->where('qt IS NOT NULL')
+                    ->andWhere('qt.isBlocked=false')
                     ->orderBy('deployed', 'DESC')
                     ->addOrderBy('ms.lastPrice', 'DESC')
                     ->setFirstResult($offset)
@@ -141,8 +142,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $markets = $this->marketFactory->createUserRelated($user, $deployed);
 
         foreach ($markets as $market) {
-            if ($market->getQuote() instanceof Token) {
-                array_push($userTokenIds, $market->getQuote()->getId());
+            /** @var Token $token */
+            $token = $market->getQuote();
+
+            if ($token instanceof Token && !$token->isBlocked()) {
+                array_push($userTokenIds, $token->getId());
             }
         }
 
