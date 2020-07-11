@@ -113,10 +113,6 @@ class TokenController extends Controller
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
-        if ($request->get('alert')) {
-            $this->addFlash('success', 'Token has been created successfully');
-        }
-
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
@@ -159,6 +155,7 @@ class TokenController extends Controller
         $user = $this->getUser();
 
         return $this->render('pages/pair.html.twig', [
+            'showSuccessAlert' => $request->get('alert', false),
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
