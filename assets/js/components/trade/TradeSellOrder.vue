@@ -105,9 +105,9 @@
                                 tabindex="9"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <label
+                                <div
                                     v-if="!disabledMarketPrice"
-                                   class="custom-control custom-checkbox pb-0">
+                                    class="form-group custom-control custom-checkbox pb-0">
                                     <input
                                         v-model.number="useMarketPrice"
                                         step="0.00000001"
@@ -120,17 +120,17 @@
                                         class="custom-control-label pb-0"
                                         for="sell-price">
                                         Market Price
-                                        <guide>
-                                            <template slot="header">
-                                                Market Price
-                                            </template>
-                                            <template slot="body">
-                                                Checking this box fetches current best market price
-                                                for which you can sell {{ market.quote.symbol | rebranding }}.
-                                            </template>
-                                        </guide>
                                     </label>
-                                </label>
+                                    <guide>
+                                        <template slot="header">
+                                            Market Price
+                                        </template>
+                                        <template slot="body">
+                                            Checking this box fetches current best market price
+                                            for which you can sell {{ market.quote.symbol | rebranding }}.
+                                        </template>
+                                    </guide>
+                                </div>
                             </div>
                         </div>
                     </div>
