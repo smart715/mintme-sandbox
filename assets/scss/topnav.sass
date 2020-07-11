@@ -3,7 +3,12 @@
 @import '~v-autocomplete/dist/v-autocomplete.css'
 
 .top-navbar
-  background: transparent
+  background: $secondary
+  @include media-breakpoint-up(lg)
+    background: transparent
+
+  .navbar-toggler
+    outline: none
 
   a
     color: $color-nav
@@ -24,27 +29,41 @@
     background-image: $navbar-light-toggler-icon-bg
 
   .mintme-logo
-    width: 222px
-    height: 75px
+    max-height: 42px
+    @include media-breakpoint-up(md)
+      max-height: 48px
+    @include media-breakpoint-up(xl)
+      max-height: 56px
 
   .search
     @include media-breakpoint-down(lg)
       min-width: 17rem
 
   .search-input
-    background-color: $grey-dark
+    background-color: $search-input
     color: $white
     border: none
-    min-width: 25rem
+    width: 60vw
     height: 2.0rem
+    transition: all .3s ease
+
+    &:focus
+      background-color: $input-focus
+      box-shadow: none !important
 
     &::placeholder
       color: lighten($white, 5%)
       opacity: 1
       font-size: 0.8rem
 
-    @include media-breakpoint-down(lg)
-      min-width: 12rem
+    @include media-breakpoint-up(md)
+      width: 45vw
+
+    @include media-breakpoint-up(lg)
+      width: 15rem
+
+    @include media-breakpoint-up(xl)
+      width: 25rem
 
   .search-icon
     width: 28px
@@ -54,6 +73,11 @@
     padding-right: 2px
     padding-bottom: 8px
     margin-left: 6px
+
+  .clear-search-icon
+    position: absolute
+    right: 40px
+    top: 7px
 
   .v-autocomplete
     .v-autocomplete-list
@@ -72,6 +96,12 @@
 
       .v-autocomplete-item-active
         background-color: $primary
+
+  @include media-breakpoint-between(sm, md)
+    .navbar-nav
+      flex-wrap: wrap
+      justify-content: center
+      text-align: center
 
   .input-group-text
     background: none
