@@ -7,6 +7,7 @@ use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use Money\Money;
 
 interface MarketHandlerInterface
 {
@@ -41,4 +42,6 @@ interface MarketHandlerInterface
     public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order;
     public function getPendingOrder(Market $market, int $id): Order;
     public function getBuyDepth(Market $market): string;
+    public function getSellOrdersSummary(Market $market): string;
+    public function getMarketStatus(Market $market, int $period = 86400): array;
 }

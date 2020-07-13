@@ -1,11 +1,11 @@
 monolog:
-    channels: ['user_action', 'front_end']
+    channels: ['user_action', 'front_end', 'donation']
     handlers:
         main:
             type: fingers_crossed
             action_level: error
             handler: nested
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
@@ -22,6 +22,12 @@ monolog:
             path: "%kernel.logs_dir%/cron.log"
             level: info
             channels: ['cron']
+        donation:
+            type: stream
+            path: "%kernel.logs_dir%/donation.log"
+            level: error
+            channels: ['donation']
+            formatter: monolog.formatter.donation
         rabbitmq:
             type: stream
             path: "%kernel.logs_dir%/rabbitmq.log"
