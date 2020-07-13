@@ -75,4 +75,4 @@ monolog:
             path: "%kernel.logs_dir%/unsubscribers.txt"
             level: info
             channels: ['unsubscribe']
-            formatter: App\Logger\UnsubscribeFormatter
+            formatter: monolog.formatter.unsubscribe

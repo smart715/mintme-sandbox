@@ -322,7 +322,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Route("user/unsubscribe/key/{key}/mail/{mail}", name="unsubscribe")
+     * @Route("user/unsubscribe/{key}/{mail}", name="unsubscribe")
      */
     public function unsubscribe(
         Request $request,
@@ -337,7 +337,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $entityManager = $this->getDoctrine()->getManager();
         $repo = $entityManager->getRepository(Unsubscriber::class);
 
-        if (null !== $repo->findOneBy(['email' => $mail])) {
+        if ($repo->findOneBy(['email' => $mail])) {
             return $this->render('pages/unsubscribe.html.twig', [
                 'mail' => $mail,
                 'alreadyUnsubscribed' => true,

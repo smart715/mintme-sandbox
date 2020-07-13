@@ -600,3 +600,8 @@ services:
     App\Manager\MarketStatusManager:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    monolog.formatter.unsubscribe:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%message%%\n"
