@@ -74,6 +74,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    OrderMixin,
 } from '../../mixins/';
 
 export default {
@@ -86,6 +87,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        OrderMixin,
     ],
     components: {ConfirmModal},
     props: {
@@ -177,7 +179,7 @@ export default {
             return this.tableData.map((order) => {
                 return {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
+                    type: this.getSideByType(order.side),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(order.market.base),
                         this.rebrandingFunc(order.market.quote)
