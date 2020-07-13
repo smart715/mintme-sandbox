@@ -112,7 +112,7 @@ a
 
   &:hover
     color: $color-link-hover
-      
+
   @media (hover: none)
     &:hover
       color: $color-link
@@ -122,7 +122,7 @@ a
       color: $color-link
       text-decoration: none
 
-    &:active 
+    &:active
       color: $color-link-hover
       transition: color 0s
       text-decoration: underline
@@ -311,6 +311,38 @@ a
 
               .blue-question
                 vertical-align: bottom
+  &.currency-container
+    min-height: 95px
+  .donation
+    background: none
+    position: relative
+    color: $card-text-color
+    border: none
+    border-radius: 0
+
+    .donation-header
+      border: none
+      background: $donation-header-bg
+      color: $dark-white
+      padding: .45rem 1.35rem
+
+      @include font-scale(md)
+
+    .donation-body
+      background: $donation-body-bg
+      p.info
+        line-height: 1 !important
+        margin-bottom: 2rem !important
+      @media (max-width: 550px)
+        p.text-nowrap
+          white-space: unset !important
+
+    &.transparent
+      background-color: transparent
+
+      >.donation-header
+        background-color: $dark-white
+        color: inherit
 
 .btn-primary
   color: $dark-white
@@ -833,6 +865,9 @@ meter
 .word-break
   word-break: break-word
 
+.font-size-90
+  font-size: 90% !important
+
 .overflow-wrap-break-word
   overflow-wrap: break-word
 
@@ -886,10 +921,11 @@ input[type=search]::-webkit-search-cancel-button
   text-overflow: ellipsis
 
 .truncate-address
-  strong
-    white-space: nowrap
+  .token-address-buttons
+    display: flex
+    padding-left: 6px
+
   span
-    width: 100%
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
@@ -949,6 +985,11 @@ input[type=search]::-webkit-search-cancel-button
   .airdrop-container
     span.message
       display: block !important
+
+@media (max-width: 420px)
+  .width-100
+    flex: 0 0 100% !important
+    max-width: 100% !important
 
 .ml-api
   @include media-breakpoint-up(sm)

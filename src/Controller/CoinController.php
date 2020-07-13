@@ -66,9 +66,8 @@ class CoinController extends Controller
             'market' => $this->normalize($market),
             'isOwner' => false,
             'showTrade' => true,
-            'hash' => $user ?
-                $user->getHash() :
-                '',
+            'showDonation' => false,
+            'hash' => $user ? $user->getHash() : '',
             'precision' => $quote->getShowSubunit(),
             'isTokenPage' => false,
             'tab' => 'trade',
