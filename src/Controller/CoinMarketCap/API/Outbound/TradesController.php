@@ -9,6 +9,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
  * @Rest\Route("/cmc/api/v1/trades")
