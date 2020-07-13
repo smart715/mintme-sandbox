@@ -185,6 +185,15 @@ class MarketHandler implements MarketHandlerInterface
         }, $stats);
     }
 
+    /** {@inheritdoc} */
+    public function getMarketStatus(Market $market, int $period = 86400): array
+    {
+        return $this->marketFetcher->getMarketInfo(
+            $this->marketNameConverter->convert($market),
+            $period
+        );
+    }
+
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
@@ -403,5 +412,31 @@ class MarketHandler implements MarketHandlerInterface
         }, $zeroDepth);
 
         return $this->moneyWrapper->format($depthAmount);
+    }
+
+    public function getSellOrdersSummary(Market $market): string
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedOrders);
+
+        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+
+        /** @var Money $sellOrdersSum */
+        $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->multiply(
+                $this->moneyWrapper->format($order->getAmount())
+            )->add($sum);
+        }, $zeroDepth);
+
+        return $this->moneyWrapper->format($sellOrdersSum);
     }
 }
