@@ -367,6 +367,10 @@ export default {
                 .catch((error) => {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
                         this.notifyError(error.response.data.message);
+
+                        if ('Tokens availability changed. Please adjust donation amount.' === error.response.data.message) {
+                            location.reload();
+                        }
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                     } else {
