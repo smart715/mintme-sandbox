@@ -627,6 +627,7 @@ export default {
                 marketCap: this.toMoney(marketCap) + ' ' + currency,
                 marketCapUSD: this.toUSD(marketCap, currency),
                 buyDepth: this.toMoney(buyDepth) + ' ' + currency,
+                buyDepthUSD: this.toUSD(buyDepth, currency),
                 tokenized: tokenized,
                 base: currency,
                 quote: token,
