@@ -19,9 +19,9 @@ security:
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
             provider: api_key_user_provider
-        coinmarketapi:
+        coinmarketcapapi:
             anonymous: true
-            pattern: ^/api/v1
+            pattern: ^/cmc/api
             stateless: true
             security: false
         main:
@@ -88,7 +88,7 @@ security:
         - { path: ^/referral-program,                               role: ROLE_USER }
         - { path: ^/logout$,                                        role: ROLE_USER }
         - { path: ^/api,                                            role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/v1,                                         role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cmc/api,                                        role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/2fa,                                            role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
