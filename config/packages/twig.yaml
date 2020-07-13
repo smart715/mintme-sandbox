@@ -28,5 +28,6 @@ twig:
         landing_web_bonus: '%landing_web_bonus%'
         airdrop_params: '%airdrop_params%'
         global_contact_email: '%contact_email%'
+        donation_params: '%donation%'
         withdraw_expiration_time: '%withdraw_expiration_time%'
         enable_google_analytics: '%enable_google_analytics%'

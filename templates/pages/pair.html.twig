@@ -112,15 +112,16 @@
                                 <template v-slot:title>Recent posts</template>
                             </posts>
                             <token-introduction-statistics
-                                    class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
-                                    :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                    twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
-                                    token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}"
-                                    :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
-                                    :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                                class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                :market="{{ market | json_encode }}"
+                                :editable="{{ isOwner }}"
+                                release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                token-created="{{ token.getCreated().format('d M Y') }}"
+                                :precision="{{ precision }}"
+                                :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                                websocket-url="{{ global_websocket_url }}"
                             />
                         </div>
                         <div class="row">
@@ -148,6 +149,19 @@
                             :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
                             >
                         </trade>
+                    </b-tab>
+                {% endif %}
+                {% if showDonation %}
+                    <b-tab title="Donate" {% if tab == 'donation' %} {{ 'active' }} {% endif %}>
+                        <div class="container-fluid px-0">
+                            <donation
+                                :market="{{ market | json_encode }}"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                                :donation-params="{{ donation_params | json_encode }}"
+                            >
+                            </donation>
+                        </div>
                     </b-tab>
                 {% endif %}
                 {% if isTokenPage %}
@@ -207,6 +221,9 @@
 {% block pagescripts %}
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
+    {% if not app.user %}
+        <script src="https://www.google.com/recaptcha/api.js"></script>
+    {% endif %}
     <script src="{{ asset('build/pair.js') }}"></script>
     <script>
         window.fbAsyncInit = () => {
