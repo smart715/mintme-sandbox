@@ -44,9 +44,13 @@ class WebsiteVerifier implements WebsiteVerifierInterface
 
         try {
             $client = $this->clientFactory->createClient(
-                ['base_uri' => $formatUrl, 'timeout' => $this->timeoutSeconds]
+                [
+                    'base_uri' => $formatUrl,
+                    'timeout' => $this->timeoutSeconds,
+                    'request.options' => ['proxy' => $this->proxy],
+                ]
             );
-            $response = $client->request('GET', self::URI, ['proxy' => $this->proxy]);
+            $response = $client->request('GET', self::URI);
         } catch (\Throwable $exception) {
             $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());
