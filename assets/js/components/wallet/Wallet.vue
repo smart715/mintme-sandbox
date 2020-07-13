@@ -28,7 +28,7 @@
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <a class="pl-2 text-white text-xs align-middle" href="#">Deposit</a>
                             </div>
                         </div>
                         <div
@@ -42,7 +42,7 @@
                         >
                             <div><i class="icon-withdraw"></i></div>
                             <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <a class="pl-2 text-white text-xs align-middle" href="#">Withdraw</a>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
                             <div><i class="icon-deposit"></i></div>
                             <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <a class="pl-2 text-white text-xs align-middle" href="#">Deposit</a>
                             </div>
                         </div>
                         <div
@@ -116,7 +116,7 @@
                         >
                             <div><i class="icon-withdraw"></i></div>
                             <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <a class="pl-2 text-white text-xs align-middle" href="#">Withdraw</a>
                             </div>
                         </div>
                     </div>
