@@ -59,4 +59,5 @@ interface BalanceHandlerInterface
     ): array;
 
     public function update(User $user, Token $token, Money $amount, string $type): void;
+    public function updateUserTokenRelation(User $user, Token $token): void;
 }

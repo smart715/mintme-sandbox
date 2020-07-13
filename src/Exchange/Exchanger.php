@@ -176,7 +176,7 @@ class Exchanger implements ExchangerInterface
             $market->isTokenMarket()
                 ? $this->bag->get('token_precision')
                 : $crypto->getShowSubunit(),
-            RoundingMode::UP
+            RoundingMode::HALF_DOWN
         );
 
         return $amount;

@@ -70,6 +70,18 @@ class WebTestCase extends BaseWebTestCase
 
     protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
     {
+        $this->deposit(
+            $email,
+            $amount,
+            Token::WEB_SYMBOL
+        );
+    }
+
+    protected function deposit(
+        string $email,
+        string $amount = '100000000000000000000',
+        string $currency = Token::WEB_SYMBOL
+    ): void {
         $balanceHandler = self::$container->get('balancer');
 
         /** @var User $user */
@@ -79,8 +91,8 @@ class WebTestCase extends BaseWebTestCase
 
         $balanceHandler->deposit(
             $user,
-            Token::getFromSymbol(Token::WEB_SYMBOL),
-            new Money($amount, new Currency(Token::WEB_SYMBOL))
+            Token::getFromSymbol($currency),
+            new Money($amount, new Currency($currency))
         );
     }
 
