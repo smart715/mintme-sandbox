@@ -16,8 +16,7 @@ class AssetsController extends AbstractFOSRestController
 
     public function __construct(
         CryptoManagerInterface $cryptoManager
-    )
-    {
+    ) {
         $this->cryptoManager = $cryptoManager;
     }
 
