@@ -117,4 +117,24 @@ class MarketsController extends APIController
             'marketcap' => $marketCap,
         ]);
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{base}/{quote}/status", name="market_status", options={"expose"=true})
+     */
+    public function getMarketStatus(
+        string $base,
+        string $quote,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new InvalidArgumentException();
+        }
+
+        return $this->view(
+            $marketHandler->getMarketStatus($market)
+        );
+    }
 }

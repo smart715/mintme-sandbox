@@ -186,6 +186,11 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $exception;
         }
 
+        $this->updateUserTokenRelation($user, $token);
+    }
+
+    public function updateUserTokenRelation(User $user, Token $token): void
+    {
         if ($token->getId()) {
             $tokenExist = array_filter($user->getTokens(), function (Token $userToken) use ($token) {
                 return $userToken->getId() === $token->getId();
