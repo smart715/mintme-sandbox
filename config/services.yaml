@@ -125,6 +125,10 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
+    App\Exchange\Donation\DonationFetcher:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc'
+
     App\SmartContract\ContractHandler:
         $rpc: '@deploy.json_rpc'
 
@@ -569,6 +573,26 @@ services:
     App\Repository\PendingTokenWithdrawRepository:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
+
+    App\Exchange\Config\DonationConfig:
+        arguments:
+            $donationParams: '%donation%'
+
+    App\Logger\DonationProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: donation }
+
+    monolog.formatter.donation:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\DonationLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: donation }
 
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand

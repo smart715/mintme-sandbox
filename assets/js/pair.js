@@ -1,4 +1,5 @@
 import CreatePost from './components/posts/CreatePost';
+import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
@@ -17,7 +18,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'trade', 'posts'],
+      tabs: ['intro', 'trade', 'donation', 'posts'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
@@ -37,6 +38,7 @@ new Vue({
   },
   components: {
     CreatePost,
+    Donation,
     Posts,
     TokenIntroductionDescription,
     TokenAvatar,
@@ -132,7 +134,7 @@ new Vue({
       });
     },
     goToPosts: function() {
-      this.tabIndex = 2;
+      this.tabIndex = 3;
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
