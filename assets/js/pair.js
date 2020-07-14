@@ -16,7 +16,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'trade', 'donation', 'posts'],
+      tabs: ['intro', 'trade', 'donate', 'posts'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
