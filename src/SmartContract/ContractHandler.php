@@ -174,7 +174,7 @@ class ContractHandler implements ContractHandlerInterface
     {
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $depositFee = $this->moneyWrapper->format(
-            $wallet->getFee($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))
+            $wallet->getDepositInfo($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getFee()
         );
         $withdrawFee = $crypto
             ? $this->moneyWrapper->format($crypto->getFee())
