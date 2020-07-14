@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import OrderMixin from '../../js/mixins/order';
+import {WSAPI} from '../../js/utils/constants';
 
 describe('OrderMixin', function() {
     const $url = 'URL';
@@ -72,14 +73,22 @@ describe('OrderMixin', function() {
         expect(wrapper.vm.marketIdentifier).to.deep.equal(wrapper.vm.market.quote.identifier);
     });
 
-    it('should handle market check (BTC or WEB) correctly', () => {
+    it('should handle market check (BTC or WEB or ETH) correctly', () => {
         wrapper.vm.action = 'buy';
-        expect(wrapper.vm.isMarketBTCOrWEB).to.be.true;
+        expect(wrapper.vm.isCryptoMarket).to.be.true;
 
         wrapper.vm.action = 'exchange';
-        expect(wrapper.vm.isMarketBTCOrWEB).to.be.false;
+        expect(wrapper.vm.isCryptoMarket).to.be.false;
 
         wrapper.vm.action = 'sell';
-        expect(wrapper.vm.isMarketBTCOrWEB).to.be.true;
+        expect(wrapper.vm.isCryptoMarket).to.be.true;
+    });
+
+    it('should return correctly order side by type', () => {
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY)).equal('Buy');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL)).equal('Sell');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.DONATION)).equal('Donation');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY, true)).equal('Buy (donation)');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL, true)).equal('Sell (donation)');
     });
 });

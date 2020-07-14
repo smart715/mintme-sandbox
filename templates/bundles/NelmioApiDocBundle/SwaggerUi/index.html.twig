@@ -16,19 +16,33 @@
 {% endblock stylesheets %}
 
 {% block javascripts %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
     {% include 'scripts.html.twig' %}
+    {% endapply %}
 {% endblock javascripts %}
 
 {% block swagger_initialization %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
     <script src="{{ asset('bundles/nelmioapidoc/init-swagger-ui.js') }}"></script>
+    {% endapply %}
 {% endblock swagger_initialization %}
 
 {% block header %}
 {% endblock header %}
 
 {% block swagger_ui %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
     <div class="content-wrapper d-flex flex-column">
         {% include 'topnav.html.twig' %}
         <main class="flex-fill content">
@@ -75,8 +89,14 @@
         </main>
         {% include 'footer.html.twig' %}
     </div>
+    {% endapply %}
 {% endblock %}
 
 {% block meta %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
     {% include 'head.html.twig' %}
+    {% endapply %}
 {% endblock %}
