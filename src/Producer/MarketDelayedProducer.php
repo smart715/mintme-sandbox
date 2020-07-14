@@ -11,6 +11,7 @@ class MarketDelayedProducer extends Producer
 {
     private const MARKET_DELAYED_QUQUE_NAME = 'market';
     private const MARKET_DELAYED_EXCHANGE_NAME = 'market';
+    private const DELAY = 15000;
 
     private const QUEUE_IS_PASSIVE      = false;
     private const QUEUE_IS_DURABLE      = true;
@@ -26,8 +27,7 @@ class MarketDelayedProducer extends Producer
         }
 
         $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
-        $delay = 15000;
-        $headersTable = new AMQPTable(['x-delay' => $delay]);
+        $headersTable = new AMQPTable(['x-delay' => self::DELAY]);
         $msg->set('application_headers', $headersTable);
 
         $this->getChannel()->queue_declare(
