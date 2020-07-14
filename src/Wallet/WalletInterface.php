@@ -10,6 +10,7 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
 use Money\Money;
 
@@ -41,5 +42,5 @@ interface WalletInterface
 
     public function getDepositCredential(User $user, Crypto $crypto): Address;
 
-    public function getFee(TradebleInterface $tradable): Money;
+    public function getDepositInfo(TradebleInterface $tradable): DepositInfo;
 }
