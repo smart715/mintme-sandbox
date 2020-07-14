@@ -151,9 +151,9 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Get("/deposit/{crypto}/fee", name="deposit_fee", options={"expose"=true})
+     * @Rest\Get("/deposit/{crypto}/info", name="deposit_info", options={"expose"=true})
      */
-    public function getDepositFee(
+    public function getDepositInfo(
         string $crypto,
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
@@ -166,7 +166,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        return $this->view($depositCommunicator->getFee($crypto));
+        return $this->view($depositCommunicator->getDepositInfo($crypto));
     }
 
     /**
