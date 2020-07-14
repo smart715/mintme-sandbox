@@ -46,30 +46,37 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
-     * @Rest\QueryParam(name="deployed")
+     * @Rest\QueryParam(name="deployed", default=0)
+     * @Rest\QueryParam(name="sort", default="monthVolume")
+     * @Rest\QueryParam(name="order", default="DESC")
      */
     public function getMarketsInfo(
         int $page,
         ParamFetcherInterface $request,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $deployed = !!$request->get('deployed');
-
         /** @var User $user */
         $user = $this->getUser();
+        $user = $user instanceof User && $request->get('user')
+            ? $user->getId()
+            : null;
 
-        $markets = $request->get('user') || $deployed
-            ? $marketStatusManager->getUserMarketStatus(
-                $user,
-                ($page - 1) * self::OFFSET,
-                self::OFFSET,
-                $deployed
-            )
-            : $marketStatusManager->getMarketsInfo(($page - 1) * self::OFFSET, self::OFFSET);
+        $deployed = (int)$request->get('deployed');
+
+        $markets = $marketStatusManager->getMarketsInfo(
+            $page,
+            self::OFFSET,
+            $request->get('sort'),
+            $request->get('order'),
+            $deployed,
+            $user
+        );
 
         return $this->view([
             'markets' => $markets['markets'] ?? $markets,
-            'rows' => $markets['count'] ?? $marketStatusManager->getMarketsCount(),
+            'rows' => $user
+                ? $marketStatusManager->getUserRelatedMarketsCount($user)
+                : $marketStatusManager->getMarketsCount($deployed),
             'limit' => self::OFFSET,
         ]);
     }
@@ -109,5 +116,25 @@ class MarketsController extends APIController
         return $this->view([
             'marketcap' => $marketCap,
         ]);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{base}/{quote}/status", name="market_status", options={"expose"=true})
+     */
+    public function getMarketStatus(
+        string $base,
+        string $quote,
+        MarketHandlerInterface $marketHandler
+    ): View {
+        $market = $this->getMarket($base, $quote);
+
+        if (!$market) {
+            throw new InvalidArgumentException();
+        }
+
+        return $this->view(
+            $marketHandler->getMarketStatus($market)
+        );
     }
 }

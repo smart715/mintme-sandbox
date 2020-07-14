@@ -163,6 +163,19 @@ class User extends BaseUser implements
      */
     protected $clients;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
+     * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
+     * @var Bonus|null
+     */
+    protected $bonus;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -484,6 +497,18 @@ class User extends BaseUser implements
         if ($rewardDeploy->getUserId() !== $this) {
             $rewardDeploy->setUserId($this);
         }
+
+        return $this;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
 
         return $this;
     }

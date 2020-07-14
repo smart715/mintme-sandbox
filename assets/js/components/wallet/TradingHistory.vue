@@ -16,14 +16,29 @@
                         <div v-if="row.value.full.length > 17"
                             v-b-tooltip="{title: row.value.full, boundary: 'viewport'}"
                         >
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.truncate }}
-                            </a>
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
+
                         </div>
                         <div v-else>
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.full }}
-                            </a>
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
                         </div>
                     </template>
                 </b-table>
@@ -55,6 +70,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    OrderMixin,
 } from '../../mixins/';
 
 export default {
@@ -66,6 +82,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        OrderMixin,
     ],
     data() {
         return {
@@ -136,18 +153,21 @@ export default {
         },
         history: function() {
             return this.tableData.map((history) => {
+                let isDonationOrder = 0 === history.id || 0 === history.dealOrderId;
+
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
-                    side: history.side === WSAPI.order.type.SELL ? 'Sell' : 'Buy',
+                    side: this.getSideByType(history.side, isDonationOrder),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(history.market.base),
                         this.rebrandingFunc(history.market.quote)
                     ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
-                    total: toMoney(this.calculateTotalCost(history), history.market.base.subunit),
+                    total: toMoney(this.calculateTotalCost(history), GENERAL.precision),
                     fee: this.createTicker(toMoney(history.fee, this.producePrecision(history)), history),
                     pairUrl: this.generatePairUrl(history.market),
+                    blocked: history.market.quote.hasOwnProperty('blocked') ? history.market.quote.blocked : false,
                 };
             });
         },

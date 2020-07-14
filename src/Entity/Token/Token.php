@@ -230,6 +230,12 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $rewardDeploy;
 
+    /*
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -575,6 +581,19 @@ class Token implements TradebleInterface, ImagineInterface
     public function setAirdropsAmount(Money $airdropsAmount): self
     {
         $this->airdropsAmount = $airdropsAmount->getAmount();
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
 
         return $this;
     }

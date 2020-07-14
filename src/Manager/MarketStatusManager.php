@@ -18,6 +18,23 @@ use InvalidArgumentException;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
+    private const SORTS = [
+        'lastPrice' => 'to_number(ms.lastPrice)',
+        'monthVolume' => 'to_number(ms.monthVolume)',
+        'dayVolume' => 'to_number(ms.dayVolume)',
+        'change' => 'change',
+        'pair' => 'qt.name',
+        'buyDepth' => 'to_number(ms.buyDepth)',
+        'marketCap' => 'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)',
+    ];
+
+    private const SORT_BY_CHANGE = 'change';
+
+    private const SORT_BY_MARKETCAP = ['marketCap', 'marketCapUSD'];
+
+    private const DEPLOYED_FIRST = 1;
+    private const DEPLOYED_ONLY = 2;
+
     /** @var MarketStatusRepository */
     protected $repository;
 
@@ -36,6 +53,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var int */
+    public $minVolumeForMarketcap;
+
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
@@ -53,29 +73,86 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
-    public function getMarketsCount(): int
+    public function getMarketsCount(int $deployed = 0): int
     {
-        return $this->repository->count([]);
+        $qb = $this->em->createQueryBuilder();
+        $qb->select('COUNT(ms)')
+            ->from(MarketStatus::class, 'ms');
+
+        if (self::DEPLOYED_ONLY === $deployed) {
+            $qb->join('ms.quoteToken', 'qt')
+                ->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        }
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function getUserRelatedMarketsCount(int $userId): int
+    {
+        return (int)$this->em->createQueryBuilder()
+            ->select('COUNT(ms)')
+            ->from(MarketStatus::class, 'ms')
+            ->join('ms.quoteToken', 'qt')
+            ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            ->setParameter('id', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /** {@inheritDoc} */
-    public function getMarketsInfo(int $offset, int $limit): array
-    {
+    public function getMarketsInfo(
+        int $page,
+        int $offset,
+        string $sort = "monthVolume",
+        string $order = "DESC",
+        int $deployed = 0,
+        ?int $userId = null
+    ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
+        $firstResult = ($offset - count($predefinedMarketStatus)) * ($page - 1);
+
+        $queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->join('ms.quoteToken', 'qt')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
+            ->setFirstResult($firstResult)
+            ->setMaxResults($offset - count($predefinedMarketStatus));
+
+        if (null !== $userId) {
+            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+                ->setParameter('id', $userId);
+        }
+
+        if (self::DEPLOYED_FIRST === $deployed) {
+            $queryBuilder->addSelect(
+                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
+            )
+            ->orderBy('deployed', 'DESC');
+        } elseif (self::DEPLOYED_ONLY === $deployed) {
+            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        }
+
+        if (self::SORT_BY_CHANGE === $sort) {
+            $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
+        }
+
+        if (in_array($sort, self::SORT_BY_MARKETCAP)) {
+            $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
+        }
+
+        $sort = self::SORTS[$sort] ?? self::SORTS['monthVolume'];
+        $order = 'ASC' === $order
+            ? 'ASC'
+            : 'DESC';
+
+        $queryBuilder->addOrderBy($sort, $order)
+            ->addOrderBy('ms.id', $order);
+        
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
-                $this->repository->createQueryBuilder('ms')
-                    ->addSelect("CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed")
-                    ->join('ms.quoteToken', 'qt')
-                    ->where('qt IS NOT NULL')
-                    ->orderBy('deployed', 'DESC')
-                    ->addOrderBy('ms.lastPrice', 'DESC')
-                    ->setFirstResult($offset)
-                    ->setMaxResults($limit - count($predefinedMarketStatus))
-                    ->getQuery()
-                    ->getResult()
+                $queryBuilder->getQuery()->getResult()
             )
         );
     }
@@ -141,8 +218,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $markets = $this->marketFactory->createUserRelated($user, $deployed);
 
         foreach ($markets as $market) {
-            if ($market->getQuote() instanceof Token) {
-                array_push($userTokenIds, $market->getQuote()->getId());
+            /** @var Token $token */
+            $token = $market->getQuote();
+
+            if ($token instanceof Token && !$token->isBlocked()) {
+                array_push($userTokenIds, $token->getId());
             }
         }
 
