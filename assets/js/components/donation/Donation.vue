@@ -75,7 +75,7 @@
                                                 <div class="input-group-append">
                                                     <button
                                                         @click="all"
-                                                        class="btn btn-primary"
+                                                        class="btn btn-primary all-button"
                                                         type="button"
                                                     >All</button>
                                                 </div>
@@ -308,7 +308,7 @@ export default {
                 });
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit);
+            return this.checkInput(this.currencySubunit, this.currencySubunit);
         },
         onKeyup: function() {
             this.debouncedCheck();
