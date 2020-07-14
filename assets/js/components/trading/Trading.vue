@@ -1,6 +1,6 @@
 <template>
     <div class="trading">
-        <div class="card-header">
+        <div class="card-header d-flex align-items-center">
             <span>Trading</span>
             <div class="trading-page-options">
                 <b-dropdown
