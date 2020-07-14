@@ -583,6 +583,7 @@ a
       flex: initial
       overflow: visible
 
+      /* stylelint-disable no-descending-specificity */
       .nav-link
         color: inherit
         position: relative
@@ -601,6 +602,8 @@ a
           height: .125rem
           background-color: unset
           width: calc(100% - 3rem)
+
+      /* stylelint-enable no-descending-specificity */
 
     @media (max-width: 480px)
       .swagger-ui .model
