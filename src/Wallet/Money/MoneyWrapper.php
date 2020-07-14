@@ -68,14 +68,14 @@ final class MoneyWrapper implements MoneyWrapperInterface
             $scale = $this->getRepository()->subunitFor(new Currency($symbol));
 
             $power = $matches['right'] < 0
-            ? BigDecimal::one()->dividedBy(
-                BigDecimal::of(10)->power(-(int)$matches['right']),
-                $scale,
-                RoundingMode::HALF_DOWN
+            ? BigDecimal::one()->exactlyDividedBy(
+                BigDecimal::of(10)->power(-(int)$matches['right'])
             )
             : BigDecimal::of(10)->power((int)$matches['right']);
 
-            return (string) BigDecimal::of($matches['left'])->multipliedBy($power);
+            return (string) BigDecimal::of($matches['left'])
+                ->multipliedBy($power)
+                ->toScale($scale, RoundingMode::DOWN);
         }
 
         return $notation;
