@@ -21,6 +21,7 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
@@ -130,7 +131,7 @@ class Wallet implements WalletInterface
                 throw new IncorrectAddressException();
             }
         }
-        
+
         $available = $this->tokenManager->getRealBalance(
             $token,
             $this->balanceHandler->balance($user, $token)
@@ -235,9 +236,9 @@ class Wallet implements WalletInterface
         return $this->getDepositCredentials($user, [$crypto])[$crypto->getSymbol()];
     }
 
-    public function getFee(TradebleInterface $tradable): Money
+    public function getDepositInfo(TradebleInterface $tradable): DepositInfo
     {
-        return $this->depositCommunicator->getFee($tradable->getSymbol());
+        return $this->depositCommunicator->getDepositInfo($tradable->getSymbol());
     }
 
     private function validateTokenFee(User $user, ?Crypto $crypto = null): bool
@@ -277,12 +278,12 @@ class Wallet implements WalletInterface
 
         return true;
     }
-    
+
     private function validateEtheriumAddress(string $address): bool
     {
         return $this->startsWith($address, '0x') && 42 === strlen($address);
     }
-    
+
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;

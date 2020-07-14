@@ -116,7 +116,7 @@
                             [url]link.com[/url]<br>
                             [url=link.com]Link[/url]
                         </td>
-                        <td v-html-sanitize="parse('[url]link.com[/url][br][url=link.com]Link[/url]')"></td>
+                        <td v-html-sanitize="parse('[url=#]link.com[/url][p][url=#]Link[/url][/p]')"></td>
                     </tr>
                     <tr>
                         <th colspan="3">Images</th>
