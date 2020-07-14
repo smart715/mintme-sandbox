@@ -6,7 +6,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title">DEPOSIT ({{ currency|rebranding }})</h3>
+                <h3 class="modal-title overflow-wrap-break-word">DEPOSIT ({{ currency|rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <code class="wallet-code text-blue" id="walletaddress">
                         <span>
