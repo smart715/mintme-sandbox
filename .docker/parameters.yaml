@@ -27,6 +27,11 @@ parameters:
     verify_timeout_seconds: 10
     token_quantity: 10000000
     referral_fee: 0.5
+    donation:
+        fee: 5
+        minBtcAmount: 1.0E-6
+        minMintmeAmount: 0.0001
+        minTokensAmount: 0.0001
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
     token_precision: 4
@@ -57,6 +62,7 @@ parameters:
     front_end_logs_cut_headers: true
     minimum_volume_for_marketcap: 100000
     top_holders: 10
+    images_path: /uploads/images
     airdrop_params:
         min_tokens_amount: 0.01
         min_participants_amount: 100

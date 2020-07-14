@@ -10,6 +10,9 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe balance">
                 <b>MINTME:</b> {{ mintmeBalance }}
             </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Etherium balance">
+                <b>ETH:</b> {{ ethBalance }}
+            </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
                 <b>BTC:</b> {{ btcBalance }}
             </span>
@@ -110,6 +113,9 @@ export default {
     computed: {
         mintmeBalance: function() {
             return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
+        },
+        ethBalance: function() {
+            return this.balance.ETH ? new Decimal(this.balance.ETH.available).toFixed(8) : '-';
         },
         btcBalance: function() {
             return this.balance.BTC ? new Decimal(this.balance.BTC.available).toFixed(this.balance.BTC.subunit) : '-';

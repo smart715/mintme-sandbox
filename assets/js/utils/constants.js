@@ -35,6 +35,7 @@ export const GENERAL = {
 
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
+export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
 export const webBtcSymbol = 'WEBBTC';
 
@@ -51,6 +52,10 @@ export const addressLength = {
     },
     BTC: {
         min: 25,
+        max: 42,
+    },
+    ETH: {
+        min: 42,
         max: 42,
     },
 };
@@ -88,6 +93,11 @@ export const TOK = {
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
+};
+
+export const ETH = {
+    symbol: 'ETH',
+    subunit: 18,
 };
 
 export const MINTME = {

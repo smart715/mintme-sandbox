@@ -51,7 +51,7 @@
                                             {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
                                                 <guide>
                                                     <template slot="header">
-                                                        Your {{ tokenSymbol }}
+                                                        Your {{ market.base | rebranding }}
                                                     </template>
                                                     <template slot="body">
                                                         Your {{ market.base.symbol | rebranding }} balance.
@@ -180,7 +180,6 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'TradeBuyOrder',
@@ -301,9 +300,6 @@ export default {
         ]),
     },
     computed: {
-        tokenSymbol: function() {
-            return this.rebrandingFunc(this.market.base.symbol) === MINTME.symbol ? MINTME.symbol : BTC.symbol;
-        },
         shouldTruncate: function() {
             return this.market.quote.symbol.length > 17;
         },

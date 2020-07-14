@@ -55,9 +55,9 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         $this->balanceHandler->withdraw(
             $user,
             Token::getFromSymbol(Token::WEB_SYMBOL),
-            $this->wallet->getFee(
+            $this->wallet->getDepositInfo(
                 Token::getFromSymbol(Token::WEB_SYMBOL)
-            )
+            )->getFee()
         );
     }
 }
