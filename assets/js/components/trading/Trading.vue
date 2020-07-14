@@ -57,55 +57,56 @@
         </div>
         <div class="card card-fixed-large mx-auto">
             <div class="card-body p-0">
-                <div class="card-header">
+                <div class="card-header d-flex align-items-center">
                     <span>Tokens</span>
-                    <b-dropdown
+                    <div class="trading-page-options">
+                        <b-dropdown
                             id="currency"
                             variant="primary"
                             class="float-right"
                             :lazy="true"
-                    >
-                        <template slot="button-content">
-                            Currency:
-                            <span v-if="showUsd">
-                                USD
-                            </span>
-                            <span v-else>
-                                Crypto
-                            </span>
-                        </template>
-                        <template>
-                            <b-dropdown-item @click="toggleUsd(false)">
-                                Crypto
-                            </b-dropdown-item>
-                            <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                                USD
-                            </b-dropdown-item>
-                        </template>
-                    </b-dropdown>
-                </div>
-                <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                    <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
-                    <b-dropdown
-                            v-if="userId" class="float-right pr-3"
+                        >
+                            <template slot="button-content">
+                                <span v-if="showUsd">
+                                    USD
+                                </span>
+                                <span v-else>
+                                    Crypto
+                                </span>
+                            </template>
+                            <template>
+                                <b-dropdown-item @click="toggleUsd(false)">
+                                    Crypto
+                                </b-dropdown-item>
+                                <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
+                                    USD
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                        <b-dropdown
+                            v-if="userId" class="market-filter float-right pr-3"
                             id="customFilter"
                             variant="primary"
                             v-model="marketFilters.selectedFilter"
-                    >
-                        <template slot="button-content">
-                            <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
-                        </template>
-                        <template>
-                            <b-dropdown-item
+                        >
+                            <template slot="button-content">
+                                <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
+                            </template>
+                            <template>
+                                <b-dropdown-item
                                     v-for="filter in marketFilters.options"
                                     :key="filter.key"
                                     :value="filter.label"
                                     @click="toggleFilter(filter.key)"
-                            >
-                                {{ filter.label }}
-                            </b-dropdown-item>
-                        </template>
-                    </b-dropdown>
+                                >
+                                    {{ filter.label }}
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                    </div>
+                </div>
+                <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+                    <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
                 </div>
                 <template v-if="loaded">
                     <div class="trading-table table-responsive text-nowrap">
@@ -323,7 +324,7 @@ export default {
             activeMarketCap: 'marketCap',
             marketFilters: {
                 userSelected: false,
-                selectedFilter: 'deployed',
+                selectedFilter: 'all',
                 options: {
                     deployed: {
                         key: 'deployed',
