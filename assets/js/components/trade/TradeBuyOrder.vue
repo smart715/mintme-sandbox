@@ -45,29 +45,31 @@
                                 @paste="checkPriceInput"
                                 tabindex="3"
                             >
-                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
-                                <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
-                                    <span class="text-white">
-                                        <span class="text-nowrap">
-                                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                                <guide>
-                                                    <template slot="header">
-                                                        Your {{ market.base | rebranding }}
-                                                    </template>
-                                                    <template slot="body">
-                                                        Your {{ market.base.symbol | rebranding }} balance.
-                                                    </template>
-                                                </guide>
-                                        </span>
-                                        <span class="text-nowrap">
-                                            <a
-                                                v-if="showDepositMoreLink"
-                                                :href="depositMoreLink"
-                                                tabindex="1"
-                                            >Deposit more</a>
+                                <span>
+                                    <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
+                                        <span class="text-white">
+                                            <span class="text-nowrap">
+                                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                            </span>
                                         </span>
                                     </span>
+                                    <guide>
+                                        <template slot="header">
+                                            Your {{ tokenSymbol }}
+                                        </template>
+                                        <template slot="body">
+                                            Your {{ market.base.symbol | rebranding }} balance.
+                                        </template>
+                                    </guide>
+                                </span>
+                                <span class="text-nowrap">
+                                    <a
+                                        v-if="showDepositMoreLink"
+                                        :href="depositMoreLink"
+                                        tabindex="1"
+                                    >Deposit more</a>
                                 </span>
                             </div>
                         </div>
