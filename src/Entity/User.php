@@ -176,23 +176,16 @@ class User extends BaseUser implements
      */
     protected $isBlocked = false;
 
+    /**
+     * @ORM\OneToOne(targetEntity=RewardDeployToken::class, mappedBy="user_id", cascade={"persist", "remove"})
+     */
+    protected $rewardDeploy;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
-     * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
-     * @var Bonus|null
-     */
-    private $bonus;
-
-    /**
-     * @ORM\OneToOne(targetEntity=RewardDeployToken::class, mappedBy="user_id", cascade={"persist", "remove"})
-     */
-    private $rewardDeploy;
 
     /** @codeCoverageIgnore
      * @return array
