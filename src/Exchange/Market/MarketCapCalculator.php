@@ -10,7 +10,6 @@ use App\Repository\MarketStatusRepository;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Converter;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
@@ -36,7 +35,7 @@ class MarketCapCalculator
     /** @var FixedExchange */
     private $exchange;
 
-    /** @var cryptoRatesFetcherInterface */
+    /** @var CryptoRatesFetcherInterface */
     private $cryptoRatesFetcher;
 
     /** @var int */

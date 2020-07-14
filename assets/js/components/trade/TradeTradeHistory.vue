@@ -103,12 +103,24 @@ import moment from 'moment';
 import Guide from '../Guide';
 import {formatMoney, toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {GENERAL, WSAPI} from '../../utils/constants';
-import {WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin} from '../../mixins/';
+import {GENERAL} from '../../utils/constants';
+import {
+    WebSocketMixin,
+    FiltersMixin,
+    LazyScrollTableMixin,
+    RebrandingFilterMixin,
+    OrderMixin,
+} from '../../mixins/';
 
 export default {
     name: 'TradeTradeHistory',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin, RebrandingFilterMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        OrderMixin,
+    ],
     props: {
         market: Object,
     },
@@ -165,7 +177,7 @@ export default {
                     orderTrader: order.taker.profile.nickname,
                     makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
                     takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
-                    type: (order.side === WSAPI.order.type.BUY) ? 'Buy' : 'Sell',
+                    type: this.getSideByType(order.side),
                     pricePerQuote: toMoney(order.price, this.market.base.subunit),
                     quoteAmount: toMoney(order.amount, this.market.quote.subunit),
                     baseAmount: toMoney(

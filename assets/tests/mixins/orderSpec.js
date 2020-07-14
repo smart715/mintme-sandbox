@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import OrderMixin from '../../js/mixins/order';
+import {WSAPI} from '../../js/utils/constants';
 
 describe('OrderMixin', function() {
     const $url = 'URL';
@@ -81,5 +82,13 @@ describe('OrderMixin', function() {
 
         wrapper.vm.action = 'sell';
         expect(wrapper.vm.isMarketBTCOrWEB).to.be.true;
+    });
+
+    it('should return correctly order side by type', () => {
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY)).equal('Buy');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL)).equal('Sell');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.DONATION)).equal('Donation');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY, true)).equal('Buy (donation)');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL, true)).equal('Sell (donation)');
     });
 });
