@@ -35,8 +35,23 @@ describe('Trading', () => {
         },
     });
 
-    let market = {pair: 'tok1', change: '0', lastPrice: '0', volume: '0'};
-    let marketOnTop = [{pair: 'BTC/MINTME', change: '0', lastPrice: '0', volume: '0'}];
+    let market = {
+        position: undefined,
+        pair: 'MobCoin',
+        change: '0%',
+        lastPrice: '0.5 WEB',
+        volume: '0 WEB',
+        monthVolume: '0 WEB',
+        tokenUrl: '/token/MobCoin',
+        lastPriceUSD: '0.0002 USD',
+        volumeUSD: '0 USD',
+        monthVolumeUSD: '0 USD',
+        marketCap: '0 WEB',
+        marketCapUSD: '0 USD',
+        tokenized: false,
+        base: 'WEB',
+        quote: 'MobCoin',
+    };
 
     it('Show USD in dropdown option if enableUSD is true', () => {
         expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
@@ -44,18 +59,16 @@ describe('Trading', () => {
     it('show message if there are not deployed tokens yet', () => {
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.vm.marketFilters.userSelected = true;
+        wrapper.vm.sanitizedMarkets = {};
         expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(true);
         wrapper.vm.sanitizedMarkets = market;
-        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
         expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(false);
     });
     it('show message if user has no any token yet', () => {
-        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.marketFilters.selectedFilter = 'user';
         expect(wrapper.html().includes('No any token yet')).to.deep.equal(true);
         wrapper.vm.sanitizedMarkets = market;
-        wrapper.vm.sanitizedMarketsOnTop = marketOnTop;
         expect(wrapper.html().includes('No any token yet')).to.deep.equal(false);
     });
     it('show rest of token link', () => {

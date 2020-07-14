@@ -14,6 +14,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -398,7 +399,10 @@ class ContractHandlerTest extends TestCase
     private function mockWallet(): WalletInterface
     {
         $wallet = $this->createMock(WalletInterface::class);
-        $wallet->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $depositInfo = $this->createMock(DepositInfo::class);
+
+        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $wallet->method('getDepositInfo')->willReturn($depositInfo);
 
         return $wallet;
     }

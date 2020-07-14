@@ -66,8 +66,9 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $amount = self::BTC_SYMBOL === $crypto->getSymbol() ?
-            '0.001' : '100';
+        $amount = self::BTC_SYMBOL === $crypto->getSymbol()
+            ? '0.001'
+            : (Token::ETH_SYMBOL === $crypto->getSymbol() ? '0.05' : '100');
 
         /** @var User $user*/
         $user = $this->getUser();
