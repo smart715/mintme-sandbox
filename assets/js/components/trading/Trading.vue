@@ -12,12 +12,12 @@
                              class="col-12 col-lg-6 my-2 pl-3"
                              v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
                         >
-                            <div class="d-inline-block px-md-3 py-2 float-left">
+                            <div class="d-inline-block px-md-3 py-2">
                                 <a :href="market.tokenUrl" class="text-white">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </a>
                             </div>
-                            <div class="crypto-pair d-inline-block align-middle float-left">
+                            <div class="crypto-pair d-inline-block align-middle">
                                 <a :href="rebrandingFunc(market.tokenUrl)" class="text-white">
                                     {{ market.pair|rebranding }}
                                 </a>
