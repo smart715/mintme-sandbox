@@ -20,6 +20,28 @@ cryptos:
 
     confirmations: 6
 
+  etherium:
+    # etherium rpc server url
+    daemon_host: 'http://openethereum:8545'
+
+    # etherium-cli rpc server url
+    vault_cli_host: 'http://openethereum:8545'
+
+    # etherium rpc server timeout
+    vault_cli_timeout: 3000
+
+    # Address which will receive investment funds:
+    target_address: '0xc26dcee6092beb24b42ebd789f82bb6f8d63387c'
+
+    # Gas limit to pay for transactions
+    gas_limit_wei: 21000
+
+    fee: auto
+
+    min_deposit_val: 0.01
+
+    confirmations: 6
+
   bitcoin:
     electrum_daemon_rpc: 'http://electrum:7777'
 
@@ -45,3 +67,4 @@ app_server_hostname: '0.0.0.0'
 enabled_cryptos:
   - 'web'
   - 'btc'
+  - 'eth'

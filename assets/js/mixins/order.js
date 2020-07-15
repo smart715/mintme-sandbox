@@ -1,4 +1,4 @@
-import {webSymbol, btcSymbol, WSAPI} from '../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, WSAPI} from '../utils/constants';
 
 export default {
     props: {
@@ -12,13 +12,13 @@ export default {
     },
     computed: {
         showDepositMoreLink: function() {
-            return this.loggedIn && this.isMarketBTCOrWEB;
+            return this.loggedIn && this.isCryptoMarket;
         },
         orderInputClass: function() {
             return this.loggedIn ? 'w-50' : 'w-100';
         },
         depositMoreLink: function() {
-            if (this.isMarketBTCOrWEB) {
+            if (this.isCryptoMarket) {
                 return this.$routing.generate('wallet', {
                     depositMore: this.rebrandingFunc(this.marketIdentifier),
                 });
@@ -35,8 +35,8 @@ export default {
 
             return '';
         },
-        isMarketBTCOrWEB: function() {
-            return [webSymbol, btcSymbol].includes(this.marketIdentifier);
+        isCryptoMarket: function() {
+            return [webSymbol, btcSymbol, ethSymbol].includes(this.marketIdentifier);
         },
     },
     methods: {
