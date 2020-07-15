@@ -87,7 +87,7 @@
                 <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
                     <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
                     <b-dropdown
-                            v-if="userId" class="float-right pr-3"
+                            v-if="userId" class="float-right deployed-token"
                             id="customFilter"
                             variant="primary"
                             v-model="marketFilters.selectedFilter"
