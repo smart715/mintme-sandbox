@@ -44,6 +44,14 @@ class DonationConfig
         );
     }
 
+    public function getMinEthAmount(): Money
+    {
+        return $this->moneyWrapper->parse(
+            (string)($this->donationParams['minEthAmount'] ?? 0),
+            Token::ETH_SYMBOL
+        );
+    }
+
     public function getMinTokensAmount(): Money
     {
         return $this->moneyWrapper->parse(

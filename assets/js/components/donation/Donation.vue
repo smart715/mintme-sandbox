@@ -163,7 +163,7 @@ import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {webSymbol, btcSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
 
 export default {
     name: 'Donation',
@@ -189,6 +189,7 @@ export default {
             options: {
                 webSymbol,
                 btcSymbol,
+                ethSymbol
             },
             selectedCurrency: null,
             loginFormLoaded: false,

@@ -346,10 +346,16 @@ class DonationHandler implements DonationHandlerInterface
             if ($amount->lessThan($minBtcAmount) || $amount->greaterThan($balance)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
-        } else {
+        } else if (Token::WEB_SYMBOL === $currency) {
             $minMintmeAmount = $this->donationConfig->getMinMintmeAmount();
 
             if ($amount->lessThan($minMintmeAmount) || $amount->greaterThan($balance)) {
+                throw new ApiBadRequestException('Invalid donation amount.');
+            }
+        } else {
+            $minEthAmount = $this->donationConfig->getMinEthAmount();
+
+            if ($amount->lessThan($minEthAmount) || $amount->greaterThan($balance)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }

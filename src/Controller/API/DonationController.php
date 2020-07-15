@@ -46,7 +46,7 @@ class DonationController extends AbstractFOSRestController
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC)",
+     *     requirements="(WEB|BTC|ETH)",
      *     description="Selected currency to donate."
      * )
      */
