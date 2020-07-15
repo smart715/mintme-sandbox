@@ -189,7 +189,7 @@ export default {
             options: {
                 webSymbol,
                 btcSymbol,
-                ethSymbol
+                ethSymbol,
             },
             selectedCurrency: null,
             loginFormLoaded: false,
@@ -229,7 +229,9 @@ export default {
         currencyMinAmount: function() {
             return btcSymbol === this.selectedCurrency
                 ? this.donationParams.minBtcAmount
-                : this.donationParams.minMintmeAmount;
+                : (ethSymbol === this.selectedCurrency
+                    ? this.donationParams.minEthAmount
+                    : this.donationParams.minMintmeAmount);
         },
         minTotalPrice: function() {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
