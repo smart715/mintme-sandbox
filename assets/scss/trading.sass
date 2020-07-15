@@ -19,13 +19,50 @@
 .dropdown-item:hover
   background-color: darkgray
 
+.market-down
+  color: #ff5b5b
+
+.market-up
+  color: #8fd88f
+
+.market-border
+  border-right: 1px solid $ghost-light
+  @include media-breakpoint-down(md)
+    border: none
+
+.coin-markets
+  .col-12
+    @media (max-width: 350px)
+      padding-left: 5px !important
+      padding-right: 0 !important
+      .crypto-pair
+        font-size: smaller
+
+.market-data
+  font-size: smaller
+  width: 35%
+  @include media-breakpoint-down(md)
+    width: 40%
+
+.market-change
+  width: 25%
+  @include media-breakpoint-down(md)
+    width: 17%
+    font-size: smaller
+
+.coin-markets
+  margin-right: 0
+  margin-left: 0
+  @include media-breakpoint-down(xs)
+    font-size: 13px
+
 .truncate-pair
-	white-space: nowrap
-	overflow: hidden
-	text-overflow: ellipsis
-	display: inline-block
-	max-width: 90%
-	vertical-align: middle
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  display: inline-block
+  max-width: 90%
+  vertical-align: middle
 
 @media (min-width: 576px)
   .trading-table

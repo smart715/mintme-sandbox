@@ -184,7 +184,7 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol} from '../../utils/constants';
+import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
 
 export default {
     name: 'Wallet',
@@ -360,27 +360,29 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
-            this.$axios.retry.get(this.$routing.generate('deposit_fee', {
+            this.$axios.retry.get(this.$routing.generate('deposit_info', {
                     crypto: isToken ? webSymbol : currency,
                 }))
-                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
-                    toMoney(res.data, subunit) :
-                    undefined
-                )
+                .then((res) => {
+                    this.deposit.fee = res.data.fee && 0.0 !== parseFloat(res.data.fee)
+                        ? toMoney(res.data.fee, subunit)
+                        : undefined;
+                    this.deposit.min = res.data.minDeposit ? toMoney(res.data.minDeposit, subunit) : undefined;
+                })
                 .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
-            this.deposit.min = webSymbol === currency ? toMoney(1, subunit) : undefined;
             this.showDepositModal = true;
         },
         closeDeposit: function() {
+            this.deposit.min = undefined;
             this.showDepositModal = false;
         },
         openDepositMore: function() {
             if (
-                [webSymbol, btcSymbol].includes(this.depositMore) &&
+                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore) &&

@@ -1,207 +1,266 @@
 <template>
     <div class="trading">
-        <div class="card-header pr-4">
-            <span>Trading</span>
-                <b-dropdown
-                    id="currency"
-                    variant="primary"
-                    class="float-right"
-                    :lazy="true"
-                >
-                <template slot="button-content">
-                    Currency:
-                <span v-if="showUsd">
-                    USD
-                </span>
-                <span v-else>
-                    Crypto
-                </span>
+        <div class="card card-fixed-large mx-auto mb-3">
+            <div class="card-body p-0">
+                <div class="card-header">
+                    <span>MINTME Markets</span>
+                </div>
+                <template v-if="marketsOnTopIsLoaded">
+                    <div class="row coin-markets">
+                        <div v-for="(market, index) in this.sanitizedMarketsOnTop"
+                             :key="market.pair"
+                             class="col-12 col-lg-6 my-2 pl-3"
+                             v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
+                        >
+                            <div class="d-inline-block px-md-3 py-2">
+                                <a :href="market.tokenUrl" class="text-white">
+                                    <img :src="require('../../../img/' + market.base + '.png')"/>
+                                </a>
+                            </div>
+                            <div class="crypto-pair d-inline-block align-middle">
+                                <a :href="rebrandingFunc(market.tokenUrl)" class="text-white">
+                                    {{ market.pair|rebranding }}
+                                </a>
+                                <br>
+                                <span>{{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}</span>
+                            </div>
+                            <div class="d-inline-block text-center mx-md-1 market-change">
+                                    <span v-if="parseFloat(market.change) > 0" class="market-up">
+                                        &#9650;+{{ market.change }}
+                                    </span>
+                                <span v-else-if="parseFloat(market.change) < 0" class="market-down">
+                                        &#9660;{{ market.change }}
+                                    </span>
+                                <span v-else>
+                                        {{ market.change }}
+                                    </span>
+                            </div>
+                            <div class="d-inline-block align-middle market-data">
+                                <span>30d Volume</span>
+                                <span class="float-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
+                                <br/>
+                                <span>24h Volume</span>
+                                <span class="float-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
+                                <br/>
+                                <span>Market Cap</span>
+                                <span class="float-right">{{ ( showUsd ? market.marketCapUSD : market.marketCap ) | formatMoney}}</span>
+                            </div>
+                        </div>
+                    </div>
                 </template>
-                <template>
-                    <b-dropdown-item @click="toggleUsd(false)">
-                        Crypto
-                    </b-dropdown-item>
-                    <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                        USD
-                    </b-dropdown-item>
+                <template v-else>
+                    <div class="p-4 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
                 </template>
-            </b-dropdown>
+            </div>
         </div>
-        <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-            <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
-            <b-dropdown
-                v-if="userId" class="float-right pr-4"
-                id="customFilter"
-                variant="primary"
-                v-model="marketFilters.selectedFilter"
-            >
-                <template slot="button-content">
-                    <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
-                </template>
-                <template>
-                    <b-dropdown-item
-                        v-for="filter in marketFilters.options"
-                        :key="filter.key"
-                        :value="filter.label"
-                        @click="toggleFilter(filter.key)"
-                    >
-                        {{ filter.label }}
-                    </b-dropdown-item>
-                </template>
-            </b-dropdown>
-        </div>
-        <template v-if="loaded">
-            <div class="trading-table table-responsive text-nowrap">
-                <b-table
-                    thead-class="trading-head"
-                    :items="tokens"
-                    :fields="fieldsArray"
-                    :sort-compare="sortCompare"
-                    sort-direction="desc"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    sort-icon-left
-                    :busy="tableLoading"
-                    @sort-changed="sortChanged"
-                >
-                    <template v-slot:[`head(${fields.position.key})`]="data">
-                        #
-                        <guide>
-                            <template slot="header">
-                                Position
-                            </template>
-                            <template slot=body>
-                                The overall rank position of token.
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-slot:[`head(${fields.volume.key})`]="data">
-                        <b-dropdown
-                            id="volume"
+        <div class="card card-fixed-large mx-auto">
+            <div class="card-body p-0">
+                <div class="card-header">
+                    <span>Tokens</span>
+                    <b-dropdown
+                            id="currency"
                             variant="primary"
+                            class="float-right"
                             :lazy="true"
+                    >
+                        <template slot="button-content">
+                            Currency:
+                            <span v-if="showUsd">
+                                USD
+                            </span>
+                            <span v-else>
+                                Crypto
+                            </span>
+                        </template>
+                        <template>
+                            <b-dropdown-item @click="toggleUsd(false)">
+                                Crypto
+                            </b-dropdown-item>
+                            <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
+                                USD
+                            </b-dropdown-item>
+                        </template>
+                    </b-dropdown>
+                </div>
+                <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+                    <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
+                    <b-dropdown
+                            v-if="userId" class="float-right pr-3"
+                            id="customFilter"
+                            variant="primary"
+                            v-model="marketFilters.selectedFilter"
+                    >
+                        <template slot="button-content">
+                            <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
+                        </template>
+                        <template>
+                            <b-dropdown-item
+                                    v-for="filter in marketFilters.options"
+                                    :key="filter.key"
+                                    :value="filter.label"
+                                    @click="toggleFilter(filter.key)"
+                            >
+                                {{ filter.label }}
+                            </b-dropdown-item>
+                        </template>
+                    </b-dropdown>
+                </div>
+                <template v-if="loaded">
+                    <div class="trading-table table-responsive text-nowrap">
+                        <b-table
+                                thead-class="trading-head"
+                                :items="tokens"
+                                :fields="fieldsArray"
+                                :sort-compare="sortCompare"
+                                sort-direction="desc"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                sort-icon-left
+                                :busy="tableLoading"
+                                @sort-changed="sortChanged"
                         >
-                            <template slot="button-content">
-                                {{ data.label|rebranding }}
+                            <template v-slot:[`head(${fields.position.key})`]="data">
+                                #
+                                <guide>
+                                    <template slot="header">
+                                        Position
+                                    </template>
+                                    <template slot=body>
+                                        The overall rank position of token.
+                                    </template>
+                                </guide>
                             </template>
-                            <template>
-                                <b-dropdown-item
-                                    v-for="(volume, key) in volumes"
-                                    :key="key"
-                                    @click="toggleActiveVolume(key)"
+                            <template v-slot:[`head(${fields.volume.key})`]="data">
+                                <b-dropdown
+                                        id="volume"
+                                        variant="primary"
+                                        :lazy="true"
                                 >
-                                    {{ volume.label|rebranding }}
-                                </b-dropdown-item>
+                                    <template slot="button-content">
+                                        {{ data.label|rebranding }}
+                                    </template>
+                                    <template>
+                                        <b-dropdown-item
+                                                v-for="(volume, key) in volumes"
+                                                :key="key"
+                                                @click="toggleActiveVolume(key)"
+                                        >
+                                            {{ volume.label|rebranding }}
+                                        </b-dropdown-item>
+                                    </template>
+                                </b-dropdown>
+                                <guide class="ml-1 mr-2">
+                                    <template slot="header">
+                                        {{ data.label|rebranding }}
+                                    </template>
+                                    <template slot="body">
+                                        {{ data.field.help|rebranding}}
+                                    </template>
+                                </guide>
                             </template>
-                        </b-dropdown>
-                        <guide class="ml-1 mr-2">
-                            <template slot="header">
-                                {{ data.label|rebranding }}
-                            </template>
-                            <template slot="body">
-                                {{ data.field.help|rebranding}}
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-slot:[`head(${fields.marketCap.key})`]="data">
-                        <b-dropdown
-                                id="marketCap"
-                                variant="primary"
-                                :lazy="true"
-                        >
-                            <template slot="button-content">
-                                {{ data.label|rebranding }}
-                            </template>
-                            <template>
-                                <b-dropdown-item
-                                        v-for="(option, key) in marketCapOptions"
-                                        :key="key"
-                                        @click="setActiveMarketCap(key)"
+                            <template v-slot:[`head(${fields.marketCap.key})`]="data">
+                                <b-dropdown
+                                        id="marketCap"
+                                        variant="primary"
+                                        :lazy="true"
                                 >
-                                    {{ option.label|rebranding }}
-                                </b-dropdown-item>
+                                    <template slot="button-content">
+                                        {{ data.label|rebranding }}
+                                    </template>
+                                    <template>
+                                        <b-dropdown-item
+                                                v-for="(option, key) in marketCapOptions"
+                                                :key="key"
+                                                @click="setActiveMarketCap(key)"
+                                        >
+                                            {{ option.label|rebranding }}
+                                        </b-dropdown-item>
+                                    </template>
+                                </b-dropdown>
+                                <guide class="ml-1 mr-2">
+                                    <template slot="header">
+                                        {{ data.label|rebranding }}
+                                    </template>
+                                    <template slot="body">
+                                        {{ data.field.help|rebranding}}
+                                    </template>
+                                </guide>
                             </template>
-                        </b-dropdown>
-                        <guide class="ml-1 mr-2">
-                            <template slot="header">
-                                {{ data.label|rebranding }}
-                            </template>
-                            <template slot="body">
-                                {{ data.field.help|rebranding}}
-                            </template>
-                        </guide>
-                    </template>
-                    <template v-slot:cell(pair)="row">
-                        <div>
-                            <a :href="row.item.tokenUrl" class="text-white"
-                               :disabled.sync="row.value.length <= 20"
-                               v-b-tooltip.hover :title="row.value">
+                            <template v-slot:cell(pair)="row">
+                                <div>
+                                    <a :href="row.item.tokenUrl" class="text-white"
+                                       :disabled.sync="row.value.length <= 20"
+                                       v-b-tooltip.hover :title="row.value">
                                 <span v-if="showFullPair(row.value)">
                                     <avatar
-                                        :image="row.item.baseImage"
-                                        type="token"
-                                        size="small" :symbol="row.item.base"
-                                        class="d-inline"
-                                        :key="row.item.baseImage"
+                                            :image="row.item.baseImage"
+                                            type="token"
+                                            size="small" :symbol="row.item.base"
+                                            class="d-inline"
+                                            :key="row.item.baseImage"
                                     />
                                     {{ row.item.base }}/
                                 </span>
-                                <avatar
-                                    :image="row.item.quoteImage"
-                                    type="token"
-                                    size="small"
-                                    class="d-inline"
-                                    :key="row.item.quoteImage"
-                                />
-                                {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
-                            </a>
-                            <guide
-                                placement="top"
-                                max-width="150px"
-                                v-if="row.item.tokenized">
-                                <template slot="icon">
-                                    <img src="../../../img/mintmecoin_W.png" alt="deployed">
-                                </template>
-                                <template slot="body">
-                                    This token exists on the blockchain.
-                                </template>
-                            </guide>
-                        </div>
-                    </template>
-                </b-table>
-            </div>
-            <template v-if="!tableLoading">
-                <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
-                    <div class="row justify-content-center">
-                        <p class="text-center p-5">No one deployed his token yet</p>
+                                        <avatar
+                                            :image="row.item.quoteImage"
+                                            type="token"
+                                            size="small"
+                                            class="d-inline"
+                                            :key="row.item.quoteImage"
+                                        />
+                                        {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                    </a>
+                                    <guide
+                                            placement="top"
+                                            max-width="150px"
+                                            v-if="row.item.tokenized">
+                                        <template slot="icon">
+                                            <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                        </template>
+                                        <template slot="body">
+                                            This token exists on the blockchain.
+                                        </template>
+                                    </guide>
+                                </div>
+                            </template>
+                        </b-table>
                     </div>
-                </template>
-                <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
-                    <div class="row justify-content-center">
-                        <p class="text-center p-5">No any token yet</p>
-                    </div>
-                </template>
-                <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
+                    <template v-if="!tableLoading">
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
+                            <div class="row justify-content-center">
+                                <p class="text-center p-5">No one deployed his token yet</p>
+                            </div>
+                        </template>
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
+                            <div class="row justify-content-center">
+                                <p class="text-center p-5">No any token yet</p>
+                            </div>
+                        </template>
+                        <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
                         || marketFilters.selectedFilter === marketFilters.options.user.key)">
+                            <div class="row justify-content-center">
+                                <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                            </div>
+                        </template>
+                    </template>
                     <div class="row justify-content-center">
-                        <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                        <b-pagination
+                                @change="updateMarkets($event, deployedFirst)"
+                                :total-rows="totalRows"
+                                :per-page="perPage"
+                                v-model="currentPage"
+                                class="my-0" />
                     </div>
                 </template>
-            </template>
-            <div class="row justify-content-center">
-                <b-pagination
-                    @change="updateMarkets($event, deployedFirst)"
-                    :total-rows="totalRows"
-                    :per-page="perPage"
-                    v-model="currentPage"
-                    class="my-0" />
+                <template v-else>
+                    <div class="p-5 text-center text-white">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width/>
+                    </div>
+                </template>
             </div>
-        </template>
-        <template v-else>
-            <div class="p-5 text-center text-white">
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-            </div>
-        </template>
+        </div>
     </div>
 </template>
 
@@ -211,7 +270,7 @@ import Guide from '../Guide';
 import Avatar from '../Avatar';
 import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD, WEB, BTC, MINTME} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
@@ -248,6 +307,7 @@ export default {
             sanitizedMarketsOnTop: [],
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
+                {currency: ETH.symbol, token: WEB.symbol},
             ],
             showUsd: false,
             enableUsd: true,
@@ -308,11 +368,7 @@ export default {
     },
     computed: {
         marketsHiddenNames: function() {
-            if (undefined === typeof this.markets) {
-                return {};
-            }
-
-            return Object.keys(this.markets);
+            return undefined === typeof this.markets ? {} : Object.keys(this.markets);
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
@@ -324,7 +380,7 @@ export default {
                     return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
                 });
             }
-            tokens = this.sanitizedMarketsOnTop.concat(tokens);
+
             tokens = _.map(tokens, (token) => {
                 return _.mapValues(token, (item, key) => {
                     return cryptoSymbols.includes(token.base) && cryptoSymbols.includes(token.quote)
@@ -337,6 +393,9 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
+        },
+        marketsOnTopIsLoaded: function() {
+            return this.sanitizedMarketsOnTop.length;
         },
         fields: function() {
             return {
@@ -380,10 +439,9 @@ export default {
             return Object.values(this.fields);
         },
         globalMarketCap: function() {
-            if (this.showUsd) {
-                return this.globalMarketCaps[USD.symbol] + USD.symbol;
-            }
-            return this.globalMarketCaps[BTC.symbol] + BTC.symbol;
+            return this.showUsd
+                ? this.globalMarketCaps[USD.symbol] + USD.symbol
+                : this.globalMarketCaps[BTC.symbol] + BTC.symbol;
         },
     },
     mounted() {
@@ -482,7 +540,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length === 1
+                            Object.keys(res.data.markets).length < 1
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
@@ -543,7 +601,6 @@ export default {
 
             const marketLastPrice = parseFloat(marketInfo.last);
             const changePercentage = this.getPercentage(marketLastPrice, parseFloat(marketInfo.open));
-
 
             const marketCurrency = market.base.symbol;
             const marketToken = market.quote.symbol;
@@ -612,7 +669,7 @@ export default {
 
             return {
                 position: position,
-                pair: BTC.symbol === currency ? `${currency}/${token}` : `${token}`,
+                pair: BTC.symbol === currency || ETH.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
@@ -762,10 +819,7 @@ export default {
             let id = parseInt(Math.random().toString().replace('0.', ''));
             this.sendMessage(JSON.stringify({
                 method: 'state.query',
-                params: [
-                    market,
-                    30 * 24 * 60 * 60,
-                ],
+                params: [market, 30 * 24 * 60 * 60],
                 id,
             }));
 
@@ -774,20 +828,20 @@ export default {
         fetchConversionRates: function() {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('exchange_rates'))
-                .then((res) => {
-                    if (!(res.data && Object.keys(res.data).length)) {
-                        return Promise.reject();
-                    }
+                    .then((res) => {
+                        if (!(res.data && Object.keys(res.data).length)) {
+                            return Promise.reject();
+                        }
 
-                    this.conversionRates = res.data;
-                    resolve();
-                })
-                .catch((err) => {
-                    this.$emit('disable-usd');
-                    this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
-                    this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
-                    reject();
-                });
+                        this.conversionRates = res.data;
+                        resolve();
+                    })
+                    .catch((err) => {
+                        this.$emit('disable-usd');
+                        this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                        this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
+                        reject();
+                    });
             });
         },
         toUSD: function(amount, currency, subunit = false) {
@@ -877,9 +931,9 @@ export default {
         setTokenPositions: function(tokens) {
             let positionIndex = 1;
             return _.map(tokens, (token) => {
-                 if (BTC.symbol !== token.base) {
-                     token.position = positionIndex++;
-                 }
+                if (BTC.symbol !== token.base) {
+                    token.position = positionIndex++;
+                }
                 return token;
             });
         },
