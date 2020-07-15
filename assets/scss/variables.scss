@@ -92,13 +92,13 @@ $modal-alert-border-color: $primary;
 $index-description-bg: linear-gradient(180deg, #102238, #102238, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: #193554;
+$input-bg: #1D3D61; //#193554
 $input-btn-padding-y: .25rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
 $input-btn-focus-color: $input-bg;
-$input-focus: #1D3D61;
-$search-input: #193554;
+$input-focus: #193554; //#1D3D61
+$search-input: #1D3D61; // #193554
 
 // Card
 $card-border-width: 0.6rem;
