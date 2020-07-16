@@ -510,6 +510,18 @@ a
       pointer-events: none !important
 
 .tabs
+  @media (max-width: 768px)
+    &.tabs-theme
+      &.transparent
+        & > div:not(.tab-content)
+          margin-left: 120px
+    .nav-tabs
+      flex-wrap: nowrap
+      overflow-x: auto
+      -webkit-overflow-scrolling: touch
+      -ms-overflow-style: -ms-autohiding-scrollbar
+      &::-webkit-scrollbar
+        display: none
   .nav-tabs
     display: flex
     text-align: center
@@ -551,7 +563,6 @@ a
       background: $secondary
       text-align: left
       border: 2px solid $secondary
-      overflow: hidden
       white-space: nowrap
 
     .nav-item-token
