@@ -39,13 +39,13 @@
                                         v-b-tooltip="popoverConfig"
                                         v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                     >
-                                        <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
-                                            {{ row.value }}
-                                        </span>
                                         <img
                                             :src="row.item.traderAvatar"
                                             class="rounded-circle d-block flex-grow-0 pointer-events-none"
                                             alt="avatar">
+                                        <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
+                                            {{ row.value }}
+                                        </span>
                                     </a>
                                     <a
                                         v-if="row.item.owner"

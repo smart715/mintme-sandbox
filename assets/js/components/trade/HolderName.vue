@@ -6,6 +6,10 @@
             :disabled.sync="disableTooltip"
             boundary="viewport"
         />
+        <img
+            :src="img"
+            class="d-block rounded-circle"
+            alt="avatar">
         <a
             ref="a"
             :href="url"
@@ -15,10 +19,6 @@
                 {{ value }}
             </v-clamp>
         </a>
-        <img
-            :src="img"
-            class="d-block rounded-circle"
-            alt="avatar">
     </div>
 </template>
 

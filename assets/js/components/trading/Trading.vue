@@ -105,7 +105,7 @@
                         </b-dropdown>
                     </div>
                 </div>
-                <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+                <div slot="title" class="card-title font-weight-bold pl-3 pb-1">
                     <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
                 </div>
                 <template v-if="loaded">
