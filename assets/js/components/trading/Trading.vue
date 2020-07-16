@@ -87,7 +87,7 @@
                 <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
                     <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
                     <b-dropdown
-                            v-if="userId" class="float-right pr-3"
+                            class="float-right pr-3"
                             id="customFilter"
                             variant="primary"
                             v-model="marketFilters.selectedFilter"
@@ -327,7 +327,11 @@ export default {
                 options: {
                     deployed: {
                         key: 'deployed',
-                        label: 'Deployed tokens',
+                        label: 'Deployed only',
+                    },
+                    deployedFirst: {
+                        key: 'deployedFirst',
+                        label: 'Deployed first',
                     },
                     all: {
                         key: 'all',
