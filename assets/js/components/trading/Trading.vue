@@ -13,7 +13,7 @@
                              v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
                         >
                             <div class="d-inline-block px-md-3 py-2">
-                                <a :href="market.tokenUrl" class="text-white">
+                                <a :href="rebrandingFunc(market.tokenUrl)" class="text-white">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </a>
                             </div>

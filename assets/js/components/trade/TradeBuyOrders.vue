@@ -15,7 +15,7 @@
                     </guide>
                 </span>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 table-orders">
                 <template v-if="ordersLoaded">
                     <div class="table-responsive fixed-head-table mb-0">
                         <b-table v-if="hasOrders"
