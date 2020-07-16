@@ -20,7 +20,7 @@ class NicknameType extends AbstractType
             'attr' => [
                 'minlength' => 2,
                 'maxlength' => 30,
-                'pattern' => '[A-Za-z]+',
+                'pattern' => '[A-Za-z\d]+',
             ],
             'constraints' => [
                 new IsNotBlacklisted([
@@ -35,7 +35,7 @@ class NicknameType extends AbstractType
                     'max' => 30,
                 ]),
                 new Regex([
-                   'pattern' => '/^[\p{L}]+$/u',
+                   'pattern' => '/^[\p{L}\d]+$/u',
                 ]),
             ],
         ]);
