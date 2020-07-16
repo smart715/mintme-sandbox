@@ -23,7 +23,7 @@
 
 {% block content %}
     <div id="profile" class="container">
-        <div class="row pt-5 justify-content-center">
+        <div class="row pt-4 justify-content-center">
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
@@ -93,11 +93,11 @@
                                     <div class="pb-1">
                                         {% include 'form/nickname_field.html.twig' %}
                                     </div>
-                                    <div v-cloak="$v.firstName" v-if="!$v.nickname.minLength" class="text-danger text-center">
-                                        Nickname must have at least 2 letters
+                                    <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center">
+                                        Minimum length must be 2
                                     </div>
-                                    <div v-cloak="$v.firstName" v-if="!$v.nickname.helpers" class="text-danger text-center">
-                                        Nickname can contain only latin letters
+                                    <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center">
+                                        Nickname can contain only latin letters and numbers
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.firstName, {'attr':
