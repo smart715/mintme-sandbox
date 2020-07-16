@@ -112,7 +112,7 @@ class TokenController extends Controller
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
-
+        
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
