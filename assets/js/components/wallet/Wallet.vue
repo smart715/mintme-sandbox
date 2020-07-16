@@ -26,7 +26,12 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'deposit']"
+                                />
+                            </div>
                             <div>
                                 <a class="pl-2 text-white text-xs align-middle" href="#">Deposit</a>
                             </div>
@@ -40,7 +45,12 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'withdraw']"
+                                />
+                            </div>
                             <div>
                                 <a class="pl-2 text-white text-xs align-middle" href="#">Withdraw</a>
                             </div>
@@ -98,7 +108,12 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'deposit']"
+                                />
+                            </div>
                             <div>
                                 <a class="pl-2 text-white text-xs align-middle" href="#">Deposit</a>
                             </div>
@@ -114,7 +129,12 @@
                                         true,
                                         data.item.blocked)"
                         >
-                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'withdraw']"
+                                />
+                            </div>
                             <div>
                                 <a class="pl-2 text-white text-xs align-middle" href="#">Withdraw</a>
                             </div>
@@ -186,6 +206,11 @@ import {
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+
+library.add(depositIcon);
+library.add(withdrawIcon);
 
 export default {
     name: 'Wallet',
