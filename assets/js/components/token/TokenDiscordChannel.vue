@@ -40,8 +40,9 @@
         >
             <a
                 id="discord-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click.prevent="toggleEdit"
+                href="#"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon

@@ -23,7 +23,7 @@
             @click="showModal"
         >
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
+                class="icon-default c-pointer align-middle"
                 icon="trash"
                 transform="shrink-4 up-1.5"
             />
@@ -33,7 +33,7 @@
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
+                class="icon-default c-pointer align-middle"
                 icon="edit"
                 transform="shrink-4 up-1.5"
             />

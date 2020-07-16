@@ -3,8 +3,9 @@
         <div class="col text-truncate">
             <a
                 id="address-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click="addPage"
+                href="#"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
