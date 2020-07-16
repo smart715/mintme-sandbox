@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-wrap-break-word">
+    <div class="overflow-hidden token-name">
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
@@ -40,9 +40,12 @@
                 @click="editToken"
             />
         </template>
-        <span class="current-token-name">
-            {{ currentName }}
-        </span>
+        <h2
+            class="current-token-name"
+            v-b-tooltip="{title: currentName, boundary:'viewport'}"
+        >
+        {{ currentName }}
+        </h2>
     </div>
 </template>
 

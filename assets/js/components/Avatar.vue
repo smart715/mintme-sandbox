@@ -1,13 +1,13 @@
 <template>
-    <div class="avatar" :class="classObject" @click="upload">
+    <div class="avatar d-flex flex-center" :class="classObject" @click="upload">
         <img :src="imageUrl"
              class="rounded-circle img-fluid"
         >
         <ImageUploader
-                ref="uploader"
-                v-if="editable"
-                :type="type"
-                @upload="setImage"
+            ref="uploader"
+            v-if="editable"
+            :type="type"
+            @upload="setImage"
         />
     </div>
 </template>

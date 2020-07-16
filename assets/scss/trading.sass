@@ -84,19 +84,29 @@
 
   .token-avatar
     z-index: 9
+    min-width: 0
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
     .avatar
       position: absolute
-      transform: translateY(30px)
+      transform: translateY(25px)
       border-radius: 50%
       width: 120px
       height: 120px
       left: 20px
-    .token-name
-      span.current-token-name
-        font-size: 18px !important
 
+    .token-name
+      min-width: 80px
+
+      .current-token-name
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+  .token-profile-avatar
+    width: 26px
+    height: 26px
+    
 .trading-page-options
   display: inline
   width: 100%
