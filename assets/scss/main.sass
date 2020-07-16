@@ -490,8 +490,13 @@ a
     img
       height: 22px
 
-.table-orders td
-    padding-left: 0.75rem
+  .table-orders
+    td
+      &:first-child
+        padding-left: 1.5rem
+      &:last-child
+        padding-right: 1.5rem
+      padding-left: 0.75rem
 
 .fix-layout
   table-layout: fixed

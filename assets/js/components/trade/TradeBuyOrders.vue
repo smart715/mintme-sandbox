@@ -15,7 +15,7 @@
                     </guide>
                 </span>
             </div>
-            <div class="card-body p-0 table-orders">
+            <div class="card-body p-0">
                 <template v-if="ordersLoaded">
                     <div class="table-responsive fixed-head-table mb-0">
                         <b-table v-if="hasOrders"
@@ -24,6 +24,7 @@
                             :items="tableData"
                             :fields="fields"
                             :tbody-tr-class="rowClass"
+                            :tbody-class="'table-orders'"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
