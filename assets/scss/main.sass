@@ -775,22 +775,12 @@ nav.top-navbar
   background-size: auto 100%
   background-repeat: no-repeat
 
-.icon-edit
-  @include font-scale(md)
-
 .icon-with-badge
   margin-top: -4px
 
 .icon-default
-  font-size: 18px
-  color: white
-
-  &:hover
-    color: $gold
-
-.hover-icon:hover
-  path
-    color: $gold
+  @include font-scale(md)
+  color: $white
 
 .img-barcode
   width: 120px
@@ -995,6 +985,9 @@ input[type=search]::-webkit-search-cancel-button
     svg
       color: $blue !important
 
+.hover-icon:hover svg, svg.hover-icon:hover, .icon-default:hover
+  color: $gold
+  transition: color .15s
 
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large

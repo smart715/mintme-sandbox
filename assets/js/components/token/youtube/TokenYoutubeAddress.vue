@@ -1,11 +1,10 @@
 <template>
     <div class="row">
         <div class="col text-truncate">
-            <a
+            <span
                 id="channel-link"
                 class="c-pointer text-white hover-icon"
                 @click="addChannel"
-                href="#"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
@@ -13,8 +12,10 @@
                         size="lg"
                     />
                 </span>
-                {{ computedChannel }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedChannel }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentChannelId"
                 target="channel-link"

@@ -38,11 +38,10 @@
             v-else
             class="col text-truncate"
         >
-            <a
+            <span
                 id="telegram-link"
                 class="c-pointer text-white hover-icon"
                 @click.prevent="toggleEdit"
-                href="#"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
                     <font-awesome-icon
@@ -50,8 +49,10 @@
                         size="lg"
                     />
                 </span>
-                {{ computedTelegramUrl }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedTelegramUrl }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentTelegram"
                 target="telegram-link"
