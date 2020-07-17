@@ -57,55 +57,60 @@
         </div>
         <div class="card card-fixed-large mx-auto">
             <div class="card-body p-0">
-                <div class="card-header">
-                    <span>Tokens</span>
-                    <b-dropdown
-                            id="currency"
-                            variant="primary"
-                            class="float-right"
-                            :lazy="true"
-                    >
-                        <template slot="button-content">
-                            Currency:
-                            <span v-if="showUsd">
-                                USD
-                            </span>
-                            <span v-else>
-                                Crypto
-                            </span>
-                        </template>
-                        <template>
-                            <b-dropdown-item @click="toggleUsd(false)">
-                                Crypto
-                            </b-dropdown-item>
-                            <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                                USD
-                            </b-dropdown-item>
-                        </template>
-                    </b-dropdown>
+                <div class="card-header d-flex flex-wrap align-items-center px-0 pb-0 pt-2">
+                    <span class="px-3 pb-2 mr-auto">Tokens</span>
+                    <div>
+                        <b-dropdown
+                                id="currency"
+                                variant="primary"
+                                class="ml-auto pl-3 pb-2"
+                                :lazy="true"
+                        >
+                            <template slot="button-content">
+                                Currency:
+                                <span v-if="showUsd">
+                                    USD
+                                </span>
+                                <span v-else>
+                                    Crypto
+                                </span>
+                            </template>
+                            <template>
+                                <b-dropdown-item @click="toggleUsd(false)">
+                                    Crypto
+                                </b-dropdown-item>
+                                <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
+                                    USD
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                        <b-dropdown
+                                id="customFilter"
+                                variant="primary"
+                                class="px-3 pb-2"
+                                :lazy="true"
+                                v-model="marketFilters.selectedFilter"
+                        >
+                            <template slot="button-content">
+                                Show:
+                                <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
+                            </template>
+                            <template>
+                                <b-dropdown-item
+                                        v-for="filter in marketFilters.options"
+                                        v-if="'user' !== filter.key || 'user' === filter.key && userId"
+                                        :key="filter.key"
+                                        :value="filter.label"
+                                        @click="toggleFilter(filter.key)"
+                                >
+                                    {{ filter.label }}
+                                </b-dropdown-item>
+                            </template>
+                        </b-dropdown>
+                    </div>
                 </div>
                 <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
                     <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
-                    <b-dropdown
-                            class="float-right pr-3"
-                            id="customFilter"
-                            variant="primary"
-                            v-model="marketFilters.selectedFilter"
-                    >
-                        <template slot="button-content">
-                            <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
-                        </template>
-                        <template>
-                            <b-dropdown-item
-                                    v-for="filter in marketFilters.options"
-                                    :key="filter.key"
-                                    :value="filter.label"
-                                    @click="toggleFilter(filter.key)"
-                            >
-                                {{ filter.label }}
-                            </b-dropdown-item>
-                        </template>
-                    </b-dropdown>
                 </div>
                 <template v-if="loaded">
                     <div class="trading-table table-responsive text-nowrap">
@@ -230,7 +235,7 @@
                     <template v-if="!tableLoading">
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
                             <div class="row justify-content-center">
-                                <p class="text-center p-5">No one deployed his token yet</p>
+                                <p class="text-center p-5">No one deployed tokens yet</p>
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
@@ -241,7 +246,7 @@
                         <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
                         || marketFilters.selectedFilter === marketFilters.options.user.key)">
                             <div class="row justify-content-center">
-                                <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                                <b-link @click="toggleFilter('all')">Show all tokens</b-link>
                             </div>
                         </template>
                     </template>
@@ -325,17 +330,13 @@ export default {
                 userSelected: false,
                 selectedFilter: 'deployed',
                 options: {
-                    deployed: {
-                        key: 'deployed',
-                        label: 'Deployed only',
-                    },
-                    deployedFirst: {
-                        key: 'deployedFirst',
-                        label: 'Deployed first',
-                    },
                     all: {
                         key: 'all',
                         label: 'All tokens',
+                    },
+                    deployed: {
+                        key: 'deployed',
+                        label: 'Deployed tokens',
                     },
                     user: {
                         key: 'user',
