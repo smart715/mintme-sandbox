@@ -13,7 +13,7 @@
         <a
             ref="a"
             :href="url"
-            class="holder-name mr-1"
+            class="holder-name mr-1 text-white"
         >
             <v-clamp autoresize @clampchange="updateTooltip" :max-lines="1">
                 {{ value }}

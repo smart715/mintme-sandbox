@@ -29,7 +29,7 @@
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <a
                                         :href="row.item.traderUrl"
-                                        class="d-flex flex-row flex-nowrap justify-content-between w-100"
+                                        class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white"
                                         v-b-tooltip="popoverConfig"
                                         v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                     >

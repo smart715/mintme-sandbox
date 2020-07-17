@@ -9,7 +9,7 @@
         <span>
             {{ date }}
         </span>
-        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})">
+        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
             <img
                 :src="post.author.image.avatar_small"
                 class="rounded-circle d-inline-block"

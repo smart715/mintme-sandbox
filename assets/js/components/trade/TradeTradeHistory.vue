@@ -44,7 +44,7 @@
 
                             <template v-slot:cell(orderMaker)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0"
@@ -60,7 +60,7 @@
                             </template>
                             <template v-slot:cell(orderTrader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.takerAvatar"
                                             class="rounded-circle d-block flex-grow-0"
