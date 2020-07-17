@@ -23,7 +23,7 @@
                 <template v-slot:cell(action)="data">
                     <div class="row">
                         <div
-                            class="d-flex flex-row c-pointer pl-2"
+                            class="d-flex flex-row c-pointer pl-2 hover-icon"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div>
@@ -37,7 +37,7 @@
                             </div>
                         </div>
                         <div
-                            class="d-flex flex-row c-pointer pl-2"
+                            class="d-flex flex-row c-pointer pl-2 hover-icon"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openWithdraw(
                                         data.item.name,
@@ -105,7 +105,7 @@
                         v-if="data.item.deployed"
                         class="row">
                         <div
-                            class="d-flex flex-row c-pointer pl-2"
+                            class="d-flex flex-row c-pointer pl-2 hover-icon"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
                             <div>
@@ -119,7 +119,7 @@
                             </div>
                         </div>
                         <div
-                            class="d-flex flex-row c-pointer pl-2"
+                            class="d-flex flex-row c-pointer pl-2 hover-icon"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openWithdraw(
                                         data.item.name,
