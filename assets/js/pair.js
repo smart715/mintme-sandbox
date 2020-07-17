@@ -46,6 +46,13 @@ new Vue({
     TopHolders,
     Trade,
   },
+  mounted: function() {
+    let divEl = document.createElement('div');
+    let tabsEl = document.querySelectorAll('.nav.nav-tabs');
+
+    divEl.className = 'tabs-left-margin-container';
+    document.getElementsByClassName('tabs-wrapper')[0].insertBefore(divEl, tabsEl[0]);
+  },
   methods: {
     fetchAddress: function() {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))

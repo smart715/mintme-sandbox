@@ -511,10 +511,15 @@ a
 
 .tabs
   @media (max-width: 768px)
-    &.tabs-theme
-      &.transparent
-        & > div:not(.tab-content)
-          margin-left: 120px
+    .nav
+      &.nav-tabs
+        width: 100%
+    .tabs-wrapper
+      display: flex
+      .tabs-left-margin-container
+        min-width: 120px !important
+        height: 43.5px
+        background: $secondary
     .nav-tabs
       flex-wrap: nowrap
       overflow-x: auto
@@ -836,7 +841,7 @@ nav.top-navbar
   pointer-events: auto
 
 .airdrop-container
-  background: #152d47 !important
+  background: $secondary !important
   font-size: 18px
   button
     &.btn-primary

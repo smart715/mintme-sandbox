@@ -74,7 +74,14 @@
     <div class="row mt-1 justify-content-center">
         <div class="col-md-10" v-cloak>
             {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-            <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
+            <b-tabs
+                no-key-nav
+                @input="tabUpdated"
+                :lazy="true"
+                nav-wrapper-class="tabs-wrapper"
+                class="tabs-theme transparent"
+                v-model="tabIndex"
+            >
                 <token-ongoing-airdrop-campaign
                     v-if="{{ showAirdropCampaign }}"
                     :logged-in="{{ app.user ? 'true' : 'false' }}"
