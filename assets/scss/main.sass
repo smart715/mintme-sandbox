@@ -250,6 +250,14 @@ a
     &:valid
       background-color: $input-focus !important
 
+  input:not([type=button]):not([type=submit]):not([type=reset]):-webkit-autofill
+    -webkit-box-shadow: 0 0 0 30px $card-input-color inset !important
+    -webkit-text-fill-color: $white !important
+
+    &:hover, &:focus, &:active, &:valid
+      -webkit-box-shadow: 0 0 0 30px $input-focus inset !important
+      -webkit-text-fill-color: $white !important
+
   textarea
     height: auto
     border: none
