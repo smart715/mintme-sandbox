@@ -6,7 +6,7 @@
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
-            <font-awesome-icon icon="globe" size="lg" />
+            <font-awesome-icon icon="globe" size="lg" class="icon-default" />
         </a>
         <a
             v-if="youtubeChannelId"
@@ -14,7 +14,7 @@
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
-            <font-awesome-icon :icon="['fab', 'youtube']" size="lg" />
+            <font-awesome-icon :icon="['fab', 'youtube']" size="lg" class="icon-default" />
         </a>
         <a
             v-if="facebookUrl"
@@ -22,7 +22,7 @@
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
-            <font-awesome-icon :icon="['fab', 'facebook']" size="lg" />
+            <font-awesome-icon :icon="['fab', 'facebook']" size="lg" class="icon-default" />
         </a>
         <a
             v-if="discordUrl"
@@ -30,7 +30,7 @@
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
-            <font-awesome-icon :icon="['fab', 'discord']" size="lg" />
+            <font-awesome-icon :icon="['fab', 'discord']" size="lg" class="icon-default" />
         </a>
         <a
             v-if="telegramUrl"
@@ -38,7 +38,7 @@
             class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
             target="_blank"
         >
-            <font-awesome-icon :icon="['fab', 'telegram']" size="lg" />
+            <font-awesome-icon :icon="['fab', 'telegram']" size="lg" class="icon-default" />
         </a>
         <b-dropdown
             id="share"
@@ -56,7 +56,10 @@
                         class="d-block c-pointer"
                         network="email"
                     >
-                        <font-awesome-icon icon="envelope" /> Email
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon icon="envelope" />
+                            Email
+                        </a>
                     </network>
                 </div>
             </social-sharing>
@@ -69,19 +72,34 @@
             >
                 <div class="px-2">
                     <network class="d-block c-pointer" network="facebook">
-                        <font-awesome-icon :icon="['fab', 'facebook']" /> Facebook
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon :icon="['fab', 'facebook']"/>
+                            Facebook
+                        </a>
                     </network>
                     <network class="d-block c-pointer" network="linkedin">
-                        <font-awesome-icon :icon="['fab', 'linkedin']" /> LinkedIn
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                            LinkedIn
+                        </a>
                     </network>
                     <network class="d-block c-pointer" network="reddit">
-                        <font-awesome-icon :icon="['fab', 'reddit']" /> Reddit
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon :icon="['fab', 'reddit']"/>
+                            Reddit
+                        </a>
                     </network>
                     <network class="d-block c-pointer" network="telegram">
-                        <font-awesome-icon :icon="['fab', 'telegram']" /> Telegram
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon :icon="['fab', 'telegram']"/>
+                            Telegram
+                        </a>
                     </network>
                     <network class="d-block c-pointer" network="twitter">
-                        <font-awesome-icon :icon="['fab', 'twitter']" /> Twitter
+                        <a href="#" class="text-white hover-icon">
+                            <font-awesome-icon :icon="['fab', 'twitter']"/>
+                            Twitter
+                        </a>
                     </network>
                 </div>
             </social-sharing>
