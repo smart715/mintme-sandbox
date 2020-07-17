@@ -4,6 +4,7 @@ namespace App\Controller\Dev\API\User;
 
 use App\Controller\Dev\API\DevApiController;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -255,7 +256,7 @@ class OrdersController extends DevApiController
      *
      * @Rest\View()
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
-     * @SWG\Response(response="204", description="Order successfully removed",)
+     * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
      * @SWG\Response(response="404", description="Market not found")
      * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
@@ -284,9 +285,16 @@ class OrdersController extends DevApiController
 
         $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
 
-        $this->trader->cancelOrder($order);
-        $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+        $tradeResult = $this->trader->cancelOrder($order);
+        
+        if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
+            throw new ApiBadRequestException('Invalid request');
+        } else {
+            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
 
-        return $this->view(Response::HTTP_OK);
+            return $this->view([
+                'message' => 'Order successfully removed',
+            ], Response::HTTP_ACCEPTED);
+        }
     }
 }
