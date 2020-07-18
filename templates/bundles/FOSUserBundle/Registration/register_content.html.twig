@@ -9,11 +9,11 @@
     {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
     {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
     {% include 'form/nickname_field.html.twig' %}
-    <div v-cloak="$v.firstName" v-if="!$v.nickname.minLength" class="text-danger text-center small">
-        Nickname must have at least 2 letters
+    <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
+        Minimum length must be 2
     </div>
-    <div v-cloak="$v.firstName" v-if="!$v.nickname.helpers" class="text-danger text-center small">
-        Nickname can contain only latin letters
+    <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
+        Nickname can contain only latin letters and numbers
     </div>
     <div>
             <passwordmeter :password="password" @toggle-error="toggleError">
