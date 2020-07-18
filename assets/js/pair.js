@@ -50,7 +50,7 @@ new Vue({
   },
   mounted() {
       let aux = this.$refs['tokenAvatar'].$attrs['showsuccess'];
-      if (aux) {
+      if (true == aux) {
           this.notifySuccess('Token has been created successfully');
       }
   },
