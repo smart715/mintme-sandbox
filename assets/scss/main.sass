@@ -518,7 +518,6 @@ a
       display: flex
       .tabs-left-margin-container
         min-width: 120px !important
-        height: 43.5px
         background: $secondary
     .nav-tabs
       flex-wrap: nowrap
@@ -545,6 +544,12 @@ a
         background-color: $color-tabs
         color: $dark-white
         padding: .45rem 1.35rem
+        @media (max-width: 768px)
+          padding: .45rem 1rem
+        @media (max-width: 550px)
+          padding: .45rem 0.5rem
+        @media (max-width: 520px)
+          padding: .45rem 0.3rem
 
         @include font-scale(md)
 
