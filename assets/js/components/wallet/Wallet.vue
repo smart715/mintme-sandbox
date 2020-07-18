@@ -228,14 +228,14 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             withdraw: {
                 fee: '0',
