@@ -155,7 +155,7 @@ class TokenController extends Controller
         $user = $this->getUser();
 
         return $this->render('pages/pair.html.twig', [
-            'showSuccessAlert' => ($request->isMethod('POST')) ? true : false,
+            'showSuccessAlert' => ($request->isMethod('POST') ? true : false,
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,

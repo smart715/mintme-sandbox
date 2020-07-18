@@ -78,8 +78,6 @@ new Vue({
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
                 .then((res) => {
                     if (res.status === HTTP_ACCEPTED) {
-                        let formData = new FormData();
-                        let alert = true;
                         frm.action = this.$routing.generate('token_show', {
                             name: this.tokenName,
                         });
