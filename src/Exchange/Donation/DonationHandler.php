@@ -165,7 +165,7 @@ class DonationHandler implements DonationHandlerInterface
                     $currency
                 );
             }
-        } elseif ((Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL ===$currency) && $twoWayDonation) {
+        } elseif ((Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency) && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $sellOrdersSummaryWithFee = $this->calculateAmountWithFee($sellOrdersSummary);
             $sellOrdersSummaryInCrypto = $this->getMintmeWorthInCrypto($sellOrdersSummaryWithFee, $currency);
