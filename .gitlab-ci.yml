@@ -93,8 +93,8 @@ clean_mintme_unused_sites:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
-    # this job only will be executed for branches named
-    # master
+    # this job only will be executed for these branches:
+    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
     - master
   allow_failure: true
 
