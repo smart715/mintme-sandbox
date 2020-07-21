@@ -530,7 +530,7 @@ export default {
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
                 } else if (
-                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
                     params.deployed = DEPLOYED_ONLY;
                 } else if (deployedFirst) {
