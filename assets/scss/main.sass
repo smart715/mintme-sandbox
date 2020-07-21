@@ -511,21 +511,28 @@ a
 
 .tabs
   @media (max-width: 768px)
-    .nav
-      &.nav-tabs
-        width: 100%
     .tabs-wrapper
-      display: flex
-      .tabs-left-margin-container
-        min-width: 120px !important
-        background: $secondary
-    .nav-tabs
-      flex-wrap: nowrap
-      overflow-x: auto
-      -webkit-overflow-scrolling: touch
-      -ms-overflow-style: -ms-autohiding-scrollbar
-      &::-webkit-scrollbar
-        display: none
+      .nav
+        &.nav-tabs
+          width: 100%
+      .tabs-wrapper
+        display: flex
+        .tabs-left-margin-container
+          min-width: 120px !important
+          background: $secondary
+      .nav-tabs
+        flex-wrap: nowrap
+        overflow-x: auto
+        -webkit-overflow-scrolling: touch
+        -ms-overflow-style: -ms-autohiding-scrollbar
+        &::-webkit-scrollbar
+          display: none
+          .nav-link
+            padding: .45rem 1rem
+            @media (max-width: 550px)
+              padding: .45rem 0.5rem
+            @media (max-width: 520px)
+              padding: .45rem 0.3rem
   .nav-tabs
     display: flex
     text-align: center
@@ -544,12 +551,6 @@ a
         background-color: $color-tabs
         color: $dark-white
         padding: .45rem 1.35rem
-        @media (max-width: 768px)
-          padding: .45rem 1rem
-        @media (max-width: 550px)
-          padding: .45rem 0.5rem
-        @media (max-width: 520px)
-          padding: .45rem 0.3rem
 
         @include font-scale(md)
 
