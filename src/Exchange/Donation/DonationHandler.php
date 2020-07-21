@@ -160,7 +160,7 @@ class DonationHandler implements DonationHandlerInterface
                     $tokenCreator,
                     $expectedAmount,
                     $tokenCreator,
-                    $this->getCryptoWorthInMintme($expectedAmount, $currency),
+                    $this->getMintmeWorthInCrypto($expectedAmount, $currency),
                     Token::WEB_SYMBOL,
                     $currency
                 );
