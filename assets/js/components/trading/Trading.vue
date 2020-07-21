@@ -323,7 +323,7 @@ export default {
             activeMarketCap: 'marketCap',
             marketFilters: {
                 userSelected: false,
-                selectedFilter: 'deployed',
+                selectedFilter: 'all',
                 options: {
                     all: {
                         key: 'all',
