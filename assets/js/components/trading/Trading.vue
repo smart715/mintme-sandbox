@@ -12,38 +12,33 @@
                              class="col-12 col-lg-6 my-2 pl-3"
                              v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
                         >
-                            <div class="d-inline-block px-md-3 py-2">
-                                <a :href="rebrandingFunc(market.tokenUrl)" class="text-white">
+                            <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
+                                <div class="d-inline-block px-md-3 py-2">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
-                                </a>
-                            </div>
-                            <div class="crypto-pair d-inline-block align-middle">
-                                <a :href="rebrandingFunc(market.tokenUrl)" class="text-white">
-                                    {{ market.pair|rebranding }}
-                                </a>
-                                <br>
-                                <span>{{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}</span>
-                            </div>
-                            <div class="d-inline-block text-center mx-md-1 market-change">
+                                </div>
+                                <div class="crypto-pair d-inline-block align-middle">
+                                    <span>{{ market.pair|rebranding }}</span>
+                                    <br>
+                                    <span>{{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}</span>
+                                </div>
+                                <div class="d-inline-block text-center mx-md-1 market-change">
                                     <span v-if="parseFloat(market.change) > 0" class="market-up">
                                         &#9650;+{{ market.change }}
                                     </span>
-                                <span v-else-if="parseFloat(market.change) < 0" class="market-down">
+                                    <span v-else-if="parseFloat(market.change) < 0" class="market-down">
                                         &#9660;{{ market.change }}
                                     </span>
-                                <span v-else>
+                                    <span v-else>
                                         {{ market.change }}
                                     </span>
-                            </div>
+                                </div>
+                            </a>
                             <div class="d-inline-block align-middle market-data">
                                 <span>30d Volume</span>
                                 <span class="float-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
                                 <span>24h Volume</span>
                                 <span class="float-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
-                                <br/>
-                                <span>Market Cap</span>
-                                <span class="float-right">{{ ( showUsd ? market.marketCapUSD : market.marketCap ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>
