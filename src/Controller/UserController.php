@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
+use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
 use App\Logger\UserActionLogger;
@@ -79,7 +80,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     /**
      * @Route("/referral-program", name="referral-program")
      */
-    public function referralProgram(): Response
+    public function referralProgram(DeployCostConfig $deployCostConfig): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -87,7 +88,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
-            'deploymentCost' => $this->getParameter('deployment_cost') * 100,
+            'deployCostReward' => $deployCostConfig->getDeployCostReward(),
             'referralsCount' => count($user->getReferrals()),
         ]);
     }

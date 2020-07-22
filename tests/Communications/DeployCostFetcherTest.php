@@ -6,6 +6,7 @@ use App\Communications\DeployCostFetcher;
 use App\Communications\Exception\FetchException;
 use App\Communications\RestRpcInterface;
 use App\Entity\Token\Token;
+use App\Exchange\Config\DeployCostConfig;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
@@ -27,7 +28,7 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            49,
+            new DeployCostConfig(49, 0.1),
             $this->mockMoneyWrapper($this->once())
         ))->getDeployWebCost();
     }
@@ -41,7 +42,7 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            49,
+            new DeployCostConfig(49, 0.1),
             $this->mockMoneyWrapper($this->never())
         ))->getDeployWebCost();
     }

@@ -68,6 +68,7 @@ parameters:
 
     # the cost of deploying token to blockchain in USD
     deploy_cost: 99
+    deploy_cost_referral_reward: 0.1
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
 

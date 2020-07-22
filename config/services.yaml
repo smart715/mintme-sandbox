@@ -97,7 +97,6 @@ services:
     App\Communications\DeployCostFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
-            $usdCost: '%deploy_cost%'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -600,3 +599,8 @@ services:
     App\Manager\MarketStatusManager:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    App\Exchange\Config\DeployCostConfig:
+        arguments:
+            $deployCost: '%deploy_cost%'
+            $deployCostReward: '%deploy_cost_referral_reward%'
