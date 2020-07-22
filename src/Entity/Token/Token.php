@@ -225,7 +225,7 @@ class Token implements TradebleInterface, ImagineInterface
      */
     protected $posts;
 
-    /*
+    /**
      * @ORM\Column(type="boolean", nullable=false)
      * @var bool
      */
