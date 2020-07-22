@@ -88,6 +88,29 @@ services:
       - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
       - webchaind_root:/root/.webchain/morden
 
+  openethereum:
+    image: openethereum/openethereum:latest
+    volumes:
+      - .docker/default/ETH/:/root/eth/
+    ports:
+      - 8545:8545
+      - 8080:8080
+    command:
+      --light
+      --chain=ropsten
+      --jsonrpc-interface=all
+      --jsonrpc-cors=all
+      --jsonrpc-apis=web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,parity_accounts,personal
+      --unlock=0xc26dcee6092beb24b42ebd789f82bb6f8d63387c
+      --password /root/eth/pass
+      --base-path /root/eth
+    working_dir: /home/openethereum
+    user: root
+    mem_limit: 2gb
+    cpuset: '0,3'
+    networks:
+      - middleend
+
   nginx:
     image: nginx:latest
     ports:

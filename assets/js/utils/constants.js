@@ -12,7 +12,7 @@ export const tokenValidLastChars = helpers.regex('lastChars', /[-\s]+$/u);
 export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
 export const tokenNameValidChars = helpers.regex('validChars', /^[-\sA-Za-z0-9]+$/u);
 
-export const nickname = helpers.regex('nickname', /^[A-Za-z]+$/u);
+export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
 export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
 
@@ -35,6 +35,7 @@ export const GENERAL = {
 
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
+export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
 export const webBtcSymbol = 'WEBBTC';
 
@@ -51,6 +52,10 @@ export const addressLength = {
     },
     BTC: {
         min: 25,
+        max: 42,
+    },
+    ETH: {
+        min: 42,
         max: 42,
     },
 };
@@ -88,6 +93,11 @@ export const TOK = {
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
+};
+
+export const ETH = {
+    symbol: 'ETH',
+    subunit: 18,
 };
 
 export const MINTME = {
