@@ -176,11 +176,6 @@ class User extends BaseUser implements
      */
     protected $isBlocked = false;
 
-    /**
-     * @ORM\OneToOne(targetEntity=RewardDeployToken::class, mappedBy="user_id", cascade={"persist", "remove"})
-     */
-    protected $rewardDeploy;
-
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -475,23 +470,6 @@ class User extends BaseUser implements
     public function setBonus(?Bonus $bonus): void
     {
         $this->bonus= $bonus;
-    }
-
-    public function getRewardDeploy(): ?RewardDeployToken
-    {
-        return $this->rewardDeploy;
-    }
-
-    public function setRewardDeploy(RewardDeployToken $rewardDeploy): self
-    {
-        $this->rewardDeploy = $rewardDeploy;
-
-        // set the owning side of the relation if necessary
-        if ($rewardDeploy->getUserId() !== $this) {
-            $rewardDeploy->setUserId($this);
-        }
-
-        return $this;
     }
 
     public function isBlocked(): bool
