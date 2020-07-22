@@ -3,6 +3,8 @@
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Exchange\Market\MarketFetcherInterface;
+use App\Exchange\Market\MarketHandlerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
@@ -11,13 +13,23 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class SummaryController extends AbstractFOSRestController
 {
+    /** @var MarketStatusManagerInterface */
+    private $marketStatusManager;
+
     /** @var MarketFetcherInterface */
     private $marketFetcher;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
     public function __construct(
-        MarketFetcherInterface $marketFetcher
+        MarketStatusManagerInterface $marketStatusManager,
+        MarketFetcherInterface $marketFetcher,
+        MarketHandlerInterface $marketHandler
     ) {
+        $this->marketStatusManager = $marketStatusManager;
         $this->marketFetcher = $marketFetcher;
+        $this->marketHandler = $marketHandler;
     }
 
     /**
@@ -28,6 +40,14 @@ class SummaryController extends AbstractFOSRestController
      */
     public function getSummary(): array
     {
-        return $this->marketFetcher->getMarketList();
+        $markets = $this->marketStatusManager->getAllMarketsInfo('public');
+//        return array_map(
+//            function ($market) {
+//
+//            }, $markets
+//        );
+        return $markets;
+        //return $this->marketFetcher->getMarketList();
+        //return $this->marketHandler->getOrdersDepth('WEBTC');
     }
 }
