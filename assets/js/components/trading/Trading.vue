@@ -87,7 +87,6 @@
                                 v-model="marketFilters.selectedFilter"
                         >
                             <template slot="button-content">
-                                Show:
                                 <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
                             </template>
                             <template>
@@ -323,7 +322,7 @@ export default {
             activeMarketCap: 'marketCap',
             marketFilters: {
                 userSelected: false,
-                selectedFilter: 'all',
+                selectedFilter: 'deployed',
                 options: {
                     all: {
                         key: 'all',
