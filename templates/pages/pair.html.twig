@@ -24,6 +24,7 @@
     <div class="row mt-5 justify-content-center">
         <div class="col-md-10 d-flex justify-content-between">
             <token-avatar
+                ref="tokenAvatar"
                 class="ml-2"
                 :is-owner="{{ isOwner }}"
                 :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
@@ -37,6 +38,7 @@
                 release-address="{{ token.mintDestination }}"
                 facebook-app-id="{{ global_facebook_app_id }}"
                 youtube-client-id="{{ global_youtube_client_id }}"
+                showSuccess="{{ showSuccessAlert }}"
                 :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
                 :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
                 :airdrop-params="{{ airdrop_params | json_encode }}"
