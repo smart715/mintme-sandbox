@@ -41,7 +41,7 @@ class MarketDelayedProducer extends Producer
 
         $this->getChannel()->exchange_declare(
             self::MARKET_DELAYED_EXCHANGE_NAME,
-            'x-delayed-mesage',
+            'x-delayed-message',
             false,
             true,
             false,
