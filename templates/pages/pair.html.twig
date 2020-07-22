@@ -185,7 +185,19 @@
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
-                    {% if not isTokenPage %}
+                    {% if isTokenPage %}
+                        <li class="nav-item ml-auto">
+                            <a
+                                class="nav-link"
+                                href="{{ url('profile-view', {'nickname': profile.nickname}) }}">
+                                <avatar
+                                    class="token-profile-avatar"
+                                    size="middle"
+                                    image="{{ profile.image.url | imagine_filter('avatar_middle') }}"
+                                ></avatar>
+                            </a>
+                        </li>
+                    {% else %}
                         <li class="nav-item-token">
                             <div class="nav-link-token">
                                 <div class="truncate-token">
