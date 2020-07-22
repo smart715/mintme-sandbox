@@ -97,7 +97,7 @@ class TokenController extends Controller
      * @Route("/{name}/{tab}",
      *     name="token_show",
      *     defaults={"tab" = "intro"},
-     *     methods={"GET"},
+     *     methods={"GET", "POST"},
      *     requirements={"tab" = "trade|intro|donation|posts"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
@@ -112,7 +112,7 @@ class TokenController extends Controller
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
-        
+
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
@@ -155,6 +155,7 @@ class TokenController extends Controller
         $user = $this->getUser();
 
         return $this->render('pages/pair.html.twig', [
+            'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
