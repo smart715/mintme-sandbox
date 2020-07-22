@@ -1,10 +1,15 @@
 <template>
     <div class="post">
-        <p v-if="post.content">
-            <bbcode-view :value="post.content" class="post-content"/>
-        </p>
+        <template v-if="loggedIn">
+            <p v-if="post.content">
+                <bbcode-view :value="post.content" class="post-content"/>
+            </p>
+            <p v-else>
+                To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
+            </p>
+        </template>
         <p v-else>
-            To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
+            To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('registergi')">sign up</a>.
         </p>
         <span>
             {{ date }}
@@ -83,6 +88,7 @@ export default {
             type: Boolean,
             default: false,
         },
+        loggedIn: Boolean,
     },
     data() {
         return {
