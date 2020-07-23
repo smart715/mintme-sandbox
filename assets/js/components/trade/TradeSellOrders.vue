@@ -30,6 +30,7 @@
                             :items="tableData"
                             :fields="fields"
                             :tbody-tr-class="rowClass"
+                            :tbody-class="'table-orders'"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">

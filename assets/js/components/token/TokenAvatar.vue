@@ -9,6 +9,7 @@
                     :editable="isOwner"
                 />
                 <token-name
+                    ref="tokenAvatar"
                     class="d-flex align-items-center"
                     :editable="isOwner"
                     :has-release-period-prop="hasReleasePeriodProp"
