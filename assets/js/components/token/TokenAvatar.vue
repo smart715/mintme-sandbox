@@ -1,12 +1,13 @@
 <template>
     <div class="token-avatar">
         <div class="d-flex align-items-center token-name">
-            <avatar
-                type="token"
-                size="large"
-                :image="image"
-                :editable="isOwner"
-            />
+            <div class="align-items-center">
+                <a :href="profileUrl">
+                    <img :src="image"
+                         class="rounded-circle img-fluid token-avatar-link"
+                    >
+                </a>
+            </div>
             <token-name
                 class="d-flex align-items-center"
                 :editable="isOwner"

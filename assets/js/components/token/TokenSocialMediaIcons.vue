@@ -40,70 +40,11 @@
         >
             <font-awesome-icon :icon="['fab', 'telegram']" size="lg" class="icon-default" />
         </a>
-        <b-dropdown
-            id="share"
-            text="Share"
-            variant="primary"
+        <a
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
         >
-            <social-sharing
-                url=""
-                title="MintMe"
-                :description="description"
-                inline-template
-            >
-                <div class="px-2">
-                    <network
-                        class="d-block c-pointer text-white hover-icon"
-                        network="email"
-                    >
-                        <font-awesome-icon icon="envelope" />
-                        <a href="#" class="text-reset">
-                            Email
-                        </a>
-                    </network>
-                </div>
-            </social-sharing>
-            <social-sharing
-                :title="twitterDescription"
-                :description="description"
-                :quote="description"
-                hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
-                inline-template
-            >
-                <div class="px-2">
-                    <network class="d-block c-pointer text-white hover-icon" network="facebook">
-                        <font-awesome-icon :icon="['fab', 'facebook']"/>
-                        <a href="#" class="text-reset">
-                            Facebook
-                        </a>
-                    </network>
-                    <network class="d-block c-pointer text-white hover-icon" network="linkedin">
-                        <font-awesome-icon :icon="['fab', 'linkedin']"/>
-                        <a href="#" class="text-reset">
-                            LinkedIn
-                        </a>
-                    </network>
-                    <network class="d-block c-pointer text-white hover-icon" network="reddit">
-                        <font-awesome-icon :icon="['fab', 'reddit']"/>
-                        <a href="#" class="text-reset">
-                            Reddit
-                        </a>
-                    </network>
-                    <network class="d-block c-pointer text-white hover-icon" network="telegram">
-                        <font-awesome-icon :icon="['fab', 'telegram']"/>
-                        <a href="#" class="text-reset">
-                            Telegram
-                        </a>
-                    </network>
-                    <network class="d-block c-pointer text-white hover-icon" network="twitter">
-                        <font-awesome-icon :icon="['fab', 'twitter']"/>
-                        <a href="#" class="text-reset">
-                            Twitter
-                        </a>
-                    </network>
-                </div>
-            </social-sharing>
-        </b-dropdown>
+            <font-awesome-icon :icon="['fas', 'share']" size="lg" class="icon-default" />
+        </a>
     </div>
 </template>
 
