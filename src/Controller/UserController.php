@@ -88,7 +88,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
-            'deployCostReward' => $deployCostConfig->getDeployCostReward(),
+            'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
         ]);
     }

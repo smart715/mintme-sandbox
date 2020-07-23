@@ -54,4 +54,16 @@ class DeployCostFetcher implements DeployCostFetcherInterface
             ])
         );
     }
+
+    public function getDeployCostReferralReward(): Money
+    {
+        $deployCostReward = $this->deployCostConfig->getDeployCostReward();
+        $deployWebCost = $this->getDeployWebCost();
+
+        if ($deployCostReward > 0 && $deployWebCost->isPositive()) {
+            return $deployWebCost->multiply($deployCostReward);
+        }
+
+        return new Money(0, new Currency(Token::WEB_SYMBOL));
+    }
 }

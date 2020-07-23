@@ -24,11 +24,11 @@ class DeployCostConfig
 
     public function getDeployCostReward(): float
     {
-        return $this->deployCostReward * 100;
+        return $this->deployCostReward;
     }
 
-    public function calculateReward(): float
+    public function getDeployCostRewardPercent(): float
     {
-        return $this->deployCost * $this->deployCostReward;
+        return $this->deployCostReward * 100;
     }
 }

@@ -47,6 +47,27 @@ class DeployCostFetcherTest extends TestCase
         ))->getDeployWebCost();
     }
 
+    public function testGetDeployCostReferralReward(): void
+    {
+        $data = [
+            'webchain' => [
+                'usd' => .002,
+            ],
+        ];
+
+        $rpc = $this->createMock(RestRpcInterface::class);
+        $rpc->method('send')->willReturn(json_encode($data));
+
+        $deployCostReferralReward = (new DeployCostFetcher(
+            $rpc,
+            new DeployCostConfig(100, 0.15),
+            $this->mockMoneyWrapper($this->once())
+        ))->getDeployCostReferralReward();
+
+        $this->assertEquals('150000000000000000', $deployCostReferralReward->getAmount());
+        $this->assertEquals(Token::WEB_SYMBOL, $deployCostReferralReward->getCurrency());
+    }
+
     private function mockMoneyWrapper(Invocation $invocation): MoneyWrapperInterface
     {
         $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);

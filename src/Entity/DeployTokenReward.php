@@ -35,10 +35,10 @@ class DeployTokenReward
      */
     private $user;
 
-    public function __construct(Money $reward, User $user)
+    public function __construct(User $user, Money $reward)
     {
-        $this->reward = $reward->getAmount();
         $this->user = $user;
+        $this->reward = $reward->getAmount();
     }
 
     public function getId(): int
