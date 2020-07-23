@@ -2,6 +2,7 @@
 
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketFetcherInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -22,14 +23,19 @@ class SummaryController extends AbstractFOSRestController
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var MarketFactoryInterface */
+    private $marketFactory;
+
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
         MarketFetcherInterface $marketFetcher,
-        MarketHandlerInterface $marketHandler
+        MarketHandlerInterface $marketHandler,
+        MarketFactoryInterface $marketFactory
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFetcher = $marketFetcher;
         $this->marketHandler = $marketHandler;
+        $this->marketFactory = $marketFactory;
     }
 
     /**
@@ -40,8 +46,25 @@ class SummaryController extends AbstractFOSRestController
      */
     public function getSummary(): array
     {
-        $markets = $this->marketStatusManager->getAllMarketsInfo();
-
-        return $markets;
+        $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
+        return array_map(
+            function($marketStatus) {
+                $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
+                return [
+                    'trading_pairs' => $market->getBase()->getSymbol().'-'.$market->getQuote()->getSymbol(),
+                    'last_price' => $marketStatus->getLastPrice(),
+                    'base_currency' => $market->getBase()->getSymbol(),
+                    'quote_currency' => $market->getQuote()->getSymbol(),
+                    'lowest_ask' => '',
+                    'highest_bid' => '',
+                    'base_volume' => '',
+                    'quote_volume' => $marketStatus->getDayVolume(),
+                    'price_change_percent_24h' => '',
+                    'highest_price_24h' => '',
+                    'lowest_price_24h' => '',
+                ];
+            },
+            array_values($marketStatuses)
+        );
     }
 }
