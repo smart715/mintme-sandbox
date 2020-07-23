@@ -7,6 +7,7 @@ import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/Tok
 import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
 import TokenAvatar from './components/token/TokenAvatar';
 import TopHolders from './components/trade/TopHolders';
+import {NotificationMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
@@ -14,6 +15,7 @@ import Avatar from './components/Avatar';
 
 new Vue({
   el: '#token',
+  mixins: [NotificationMixin],
   data() {
     return {
       tabIndex: 0,
@@ -47,6 +49,12 @@ new Vue({
     TopHolders,
     Trade,
     Avatar,
+  },
+  mounted() {
+      let aux = this.$refs['tokenAvatar'].$attrs['showsuccess'];
+      if (true == aux) {
+          this.notifySuccess('Token has been created successfully');
+      }
   },
   methods: {
     fetchAddress: function() {

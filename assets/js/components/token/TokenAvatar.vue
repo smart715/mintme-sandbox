@@ -1,57 +1,64 @@
 <template>
     <div class="token-avatar">
-        <div class="d-flex align-items-center token-name">
-            <div class="align-items-center">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center token-name">
+                <avatar
+                    type="token"
+                    size="large"
+                    :image="image"
+                    :editable="isOwner"
+                />
+                <token-name
+                    ref="tokenAvatar"
+                    class="d-flex align-items-center"
+                    :editable="isOwner"
+                    :has-release-period-prop="hasReleasePeriodProp"
+                    :is-token-created="isTokenCreated"
+                    :identifier="identifier"
+                    :name="name"
+                    :precision="precision"
+                    :status-prop="statusProp"
+                    :twofa="twofa"
+                    :websocket-url="websocketUrl"
+                    :release-address="releaseAddress"
+                    :facebook-app-id="facebookAppId"
+                    :youtube-client-id="youtubeClientId"
+                    :website-url="tokenWebsite"
+                    :facebook-url="tokenFacebook"
+                    :youtube-channel-id="tokenYoutube"
+                    :telegram-url="telegramUrl"
+                    :discord-url="discordUrl"
+                    :airdrop-params="airdropParams"
+                    @token-deploy-pending="$emit('token-deploy-pending')"
+                    @updated-website="$emit('updated-website')"
+                    @updated-facebook="$emit('updated-facebook')"
+                    @updated-youtube="$emit('updated-youtube')"
+                    @updated-discord="$emit('updated-discord')"
+                    @updated-telegram="$emit('updated-telegram')"
+                />
+                <token-deploy-icon
+                    class="ml-2"
+                    :is-owner="isOwner"
+                    :status-prop="statusProp"
+                />
+                <token-points-progress
+                    class="ml-2"
+                    :profile-name="profileName"
+                    :profile-lastname="profileLastname"
+                    :profile-description="profileDescription"
+                    :profile-anonymously="profileAnonymously"
+                    :token-description="tokenDescription"
+                    :token-facebook="tokenFacebook"
+                    :token-youtube="tokenYoutube"
+                    :token-website="tokenWebsite"
+                    :token-status="statusProp"
+                />
+            </div>
+            <div>
                 <a :href="profileUrl">
-                    <img :src="image"
-                         class="rounded-circle img-fluid token-avatar-link"
-                    >
+                    Visit token's creator profile
                 </a>
             </div>
-            <token-name
-                class="d-flex align-items-center"
-                :editable="isOwner"
-                :has-release-period-prop="hasReleasePeriodProp"
-                :is-token-created="isTokenCreated"
-                :identifier="identifier"
-                :name="name"
-                :precision="precision"
-                :status-prop="statusProp"
-                :twofa="twofa"
-                :websocket-url="websocketUrl"
-                :release-address="releaseAddress"
-                :facebook-app-id="facebookAppId"
-                :youtube-client-id="youtubeClientId"
-                :website-url="tokenWebsite"
-                :facebook-url="tokenFacebook"
-                :youtube-channel-id="tokenYoutube"
-                :telegram-url="telegramUrl"
-                :discord-url="discordUrl"
-                :airdrop-params="airdropParams"
-                @token-deploy-pending="$emit('token-deploy-pending')"
-                @updated-website="$emit('updated-website')"
-                @updated-facebook="$emit('updated-facebook')"
-                @updated-youtube="$emit('updated-youtube')"
-                @updated-discord="$emit('updated-discord')"
-                @updated-telegram="$emit('updated-telegram')"
-            />
-            <token-deploy-icon
-                class="ml-2"
-                :is-owner="isOwner"
-                :status-prop="statusProp"
-            />
-            <token-points-progress
-                class="ml-2"
-                :profile-name="profileName"
-                :profile-lastname="profileLastname"
-                :profile-description="profileDescription"
-                :profile-anonymously="profileAnonymously"
-                :token-description="tokenDescription"
-                :token-facebook="tokenFacebook"
-                :token-youtube="tokenYoutube"
-                :token-website="tokenWebsite"
-                :token-status="statusProp"
-            />
         </div>
     </div>
 </template>
