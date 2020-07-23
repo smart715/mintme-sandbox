@@ -17,12 +17,12 @@
                         <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
                             {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                         </a>
-                    </div>    
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
                     <span class="text-break">
                         {{ data.value | toMoney(data.item.subunit) | formatMoney }}
-                    </span>       
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
@@ -77,8 +77,8 @@
                             </a>
                         </span>
                     </div>
-                    <div 
-                        v-else 
+                    <div
+                        v-else
                         class="first-field"
                     >
                         <span v-if="data.item.blocked">
