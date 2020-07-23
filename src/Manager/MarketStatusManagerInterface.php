@@ -22,11 +22,8 @@ interface MarketStatusManagerInterface
         ?int $userId = null
     ): array;
 
-    /**
-     * @param string $parse
-     * @return array<MarketStatus>
-     */
-    public function getAllMarketsInfo(string $parse): array;
+    /** @return array<MarketStatus> */
+    public function getAllMarketsInfo(): array;
 
     /** @var Market[] */
     public function createMarketStatus(array $market): void;

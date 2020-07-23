@@ -40,14 +40,8 @@ class SummaryController extends AbstractFOSRestController
      */
     public function getSummary(): array
     {
-        $markets = $this->marketStatusManager->getAllMarketsInfo('public');
-//        return array_map(
-//            function ($market) {
-//
-//            }, $markets
-//        );
+        $markets = $this->marketStatusManager->getAllMarketsInfo();
+
         return $markets;
-        //return $this->marketFetcher->getMarketList();
-        //return $this->marketHandler->getOrdersDepth('WEBTC');
     }
 }

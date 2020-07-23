@@ -29,7 +29,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     ];
 
     private const SORT_BY_CHANGE = 'change';
-    private const PUBLIC_API = 'public';
 
     private const SORT_BY_MARKETCAP = ['marketCap', 'marketCapUSD'];
 
@@ -154,11 +153,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getAllMarketsInfo($parse): array
+    public function getAllMarketsInfo(): array
     {
         return $this->parseMarketStatuses(
-            $this->repository->findBy([], ['lastPrice' => Criteria::DESC]),
-            $parse
+            $this->repository->findBy([], ['lastPrice' => Criteria::DESC])
         );
     }
 
@@ -251,62 +249,29 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /**
      * @param array<MarketStatus> $marketStatuses
-     * @param string $parse
      * @return array<MarketStatus>
      */
-    private function parseMarketStatuses(array $marketStatuses, string $parse = ''): array
+    private function parseMarketStatuses(array $marketStatuses): array
     {
-        $parsed = [];
+        $info = [];
 
-        if (self::PUBLIC_API === $parse) {
-            foreach ($marketStatuses as $key => $marketStatus) {
-                $quote = $marketStatus->getQuote();
+        foreach ($marketStatuses as $marketStatus) {
+            $quote = $marketStatus->getQuote();
 
-                if (!$quote) {
-                    continue;
-                }
-
-                $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
-
-                if (!$market) {
-                    continue;
-                }
-
-                $parsed [$key] =
-                    [
-                        'trading_pairs' => $this->marketNameConverter->convert($market),
-                        'last_price' => $marketStatus->getLastPrice(),
-                        'base_currency' => $market->getBase()->getSymbol(),
-                        'quote_currency' => $market->getQuote()->getSymbol(),
-                        'lowest_ask' => '',
-                        'highest_bid' => '',
-                        'base_volume' => '',
-                        'quote_volume' => $marketStatus->getDayVolume(),
-                        'price_change_percent_24h' => '',
-                        'highest_price_24h' => '',
-                        'lowest_price_24h' => '',
-                    ];
-                //= $marketStatus;
+            if (!$quote) {
+                continue;
             }
-        } else {
-            foreach ($marketStatuses as $marketStatus) {
-                $quote = $marketStatus->getQuote();
 
-                if (!$quote) {
-                    continue;
-                }
+            $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
 
-                $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
-
-                if (!$market) {
-                    continue;
-                }
-
-                $parsed[$this->marketNameConverter->convert($market)] = $marketStatus;
+            if (!$market) {
+                continue;
             }
+
+            $info[$this->marketNameConverter->convert($market)] = $marketStatus;
         }
 
-        return $parsed;
+        return $info;
     }
 
     /**
