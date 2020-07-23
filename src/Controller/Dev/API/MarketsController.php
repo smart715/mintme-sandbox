@@ -88,7 +88,10 @@ class MarketsController extends DevApiController
         }, array_values(
             $this->marketManager->getMarketsInfo(
                 (int)$request->get('offset'),
-                (int)$request->get('limit')
+                (int)$request->get('limit'),
+                'monthVolume',
+                'DESC',
+                1
             )
         ));
     }

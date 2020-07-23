@@ -101,23 +101,21 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /** {@inheritDoc} */
     public function getMarketsInfo(
-        int $page,
         int $offset,
+        int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        int $deployed = 0,
+        int $deployed = 1,
         ?int $userId = null
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
-
-        $firstResult = ($offset - count($predefinedMarketStatus)) * ($page - 1);
 
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
-            ->setFirstResult($firstResult)
-            ->setMaxResults($offset - count($predefinedMarketStatus));
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
 
         if (null !== $userId) {
             $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
@@ -125,12 +123,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         }
 
         if (self::DEPLOYED_FIRST === $deployed) {
-            $queryBuilder->addSelect(
-                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
-            )
-            ->orderBy('deployed', 'DESC');
+            $queryBuilder->addOrderBy('qt.deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $deployed) {
-            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+            $queryBuilder->andWhere('qt.deployed IS NOT NULL');
         }
 
         if (self::SORT_BY_CHANGE === $sort) {
@@ -148,7 +143,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $queryBuilder->addOrderBy($sort, $order)
             ->addOrderBy('ms.id', $order);
-        
+
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
