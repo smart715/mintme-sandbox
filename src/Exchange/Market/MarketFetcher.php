@@ -10,12 +10,9 @@ class MarketFetcher implements MarketFetcherInterface
 {
     private const BOOK_ORDERS_METHOD = 'order.book';
     private const PENDING_ORDERS_METHOD = 'order.pending';
-    private const ORDERS_DEPTH_METHOD = 'order.depth';
     private const EXECUTED_ORDERS_METHOD = 'market.deals';
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
     private const MARKET_STATUS = 'market.status';
-    private const MARKET_LIST = 'market.list';
-    private const MARKET_SUMMARY = 'market.summary';
     private const KLINE = 'market.kline';
     private const PENDING_ORDER_DETAIL_METHOD = 'order.pending_detail';
 
@@ -152,43 +149,6 @@ class MarketFetcher implements MarketFetcherInterface
             $end,
             $interval,
         ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
-
-        return $response->getResult();
-    }
-
-    public function getOrdersDepth(string $market, int $limit = 100, string $interval = '0'): array
-    {
-        $response = $this->jsonRpc->send(self::ORDERS_DEPTH_METHOD, [
-            $market,
-            $limit,
-            $interval,
-        ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
-
-        return $response->getResult();
-    }
-
-    public function getMarketList(): array
-    {
-        $response = $this->jsonRpc->send(self::MARKET_LIST, []);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
-
-        return $response->getResult();
-    }
-
-    public function getMarketSummary(): array
-    {
-        $response = $this->jsonRpc->send(self::MARKET_SUMMARY, []);
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
