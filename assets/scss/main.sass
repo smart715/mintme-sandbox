@@ -441,6 +441,16 @@ a
     height: 30px
     background-color: $primary-light
 
+.table-orders
+  tr
+    cursor: pointer
+  td
+    &:first-child
+      padding-left: 1.5rem
+    &:last-child
+      padding-right: 1.5rem
+      padding-left: 0.75rem
+
 .table, .table-responsive
   color: inherit
 
@@ -489,16 +499,6 @@ a
 
     img
       height: 22px
-
-  .table-orders
-    tr
-      cursor: pointer
-    td
-      &:first-child
-        padding-left: 1.5rem
-      &:last-child
-        padding-right: 1.5rem
-        padding-left: 0.75rem
 
 .fix-layout
   table-layout: fixed
