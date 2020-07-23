@@ -13,12 +13,16 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
-                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
-                    </a>
+                    <div class="first-field">
+                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                            {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
+                        </a>
+                    </div>    
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>       
                 </template>
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
@@ -61,7 +65,7 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}" class="first-field">
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
                                 {{ data.item.name | truncate(17) }}
@@ -73,7 +77,10 @@
                             </a>
                         </span>
                     </div>
-                    <div v-else>
+                    <div 
+                        v-else 
+                        class="first-field"
+                    >
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
                                 {{ data.item.name | truncate(17) }}
@@ -87,7 +94,9 @@
                     </div>
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
                     <div
