@@ -166,6 +166,21 @@ class Trader implements TraderInterface
         }, $records);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getOrderDepth(Market $market, array $filterOptions = []): array
+    {
+        $options = new OrderFilterConfig();
+        $options->merge($filterOptions);
+
+        return $this->fetcher->getOrderDepth(
+            $this->marketNameConverter->convert($market),
+            $options['limit'],
+            $options['interval'],
+        );
+    }
+
     private function updateUserTokenReferencer(User $user, Token $token): void
     {
         $referencer = $user->getReferencer();
