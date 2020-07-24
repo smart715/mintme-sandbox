@@ -3,7 +3,7 @@
         <a
             v-if="websiteUrl"
             :href="websiteUrl"
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon icon="globe" size="lg" class="icon-default" />
@@ -11,7 +11,7 @@
         <a
             v-if="youtubeChannelId"
             :href="youtubeUrl"
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'youtube']" size="lg" class="icon-default" />
@@ -19,7 +19,7 @@
         <a
             v-if="facebookUrl"
             :href="facebookUrl"
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'facebook']" size="lg" class="icon-default" />
@@ -27,7 +27,7 @@
         <a
             v-if="discordUrl"
             :href="discordUrl"
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'discord']" size="lg" class="icon-default" />
@@ -35,16 +35,84 @@
         <a
             v-if="telegramUrl"
             :href="telegramUrl"
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
         >
             <font-awesome-icon :icon="['fab', 'telegram']" size="lg" class="icon-default" />
         </a>
-        <a
-            class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
-        >
-            <font-awesome-icon :icon="['fas', 'share']" size="lg" class="icon-default" />
-        </a>
+        <div class="dropdown" :class="{ 'show': showSocialMediaMenu }">
+            <a
+                class="c-pointer col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
+                aria-haspopup="true"
+                :aria-expanded="showSocialMediaMenu"
+                @click="toggleSocialMediaMenu"
+            >
+                <font-awesome-icon :icon="['fas', 'share']" size="lg" class="icon-default" />
+            </a>
+           <div
+               class="dropdown-menu dropdown-menu-right dropdown-menu-social-media align-self-end align-self-lg-center profile-menu"
+               :class="{ 'show': showSocialMediaMenu }"
+           >
+               <social-sharing
+                   url=""
+                   title="MintMe"
+                   :description="description"
+                   inline-template
+               >
+                   <div class="px-2">
+                       <network
+                           class="d-block c-pointer"
+                           network="email"
+                       >
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon icon="envelope" />
+                               Email
+                           </a>
+                       </network>
+                   </div>
+               </social-sharing>
+               <social-sharing
+                   :title="twitterDescription"
+                   :description="description"
+                   :quote="description"
+                   hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                   inline-template
+               >
+                   <div class="px-2">
+                       <network class="d-block c-pointer" network="facebook">
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon :icon="['fab', 'facebook']"/>
+                               Facebook
+                           </a>
+                       </network>
+                       <network class="d-block c-pointer" network="linkedin">
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                               LinkedIn
+                           </a>
+                       </network>
+                       <network class="d-block c-pointer" network="reddit">
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon :icon="['fab', 'reddit']"/>
+                               Reddit
+                           </a>
+                       </network>
+                       <network class="d-block c-pointer" network="telegram">
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon :icon="['fab', 'telegram']"/>
+                               Telegram
+                           </a>
+                       </network>
+                       <network class="d-block c-pointer" network="twitter">
+                           <a href="#" class="text-white hover-icon">
+                               <font-awesome-icon :icon="['fab', 'twitter']"/>
+                               Twitter
+                           </a>
+                       </network>
+                   </div>
+               </social-sharing>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -82,12 +150,21 @@ export default {
     },
     data() {
         return {
+            showSocialMediaMenu: false,
             tokenUrl: this.$routing.generate('token_show', {
                 name: this.tokenName,
                 tab: 'intro',
             }),
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
+    },
+    methods: {
+        toggleSocialMediaMenu: function() {
+            this.showSocialMediaMenu = !this.showSocialMediaMenu;
+        },
+        hideSocialMediaMenu: function() {
+            this.showSocialMediaMenu = false;
+        },
     },
     computed: {
         description() {
