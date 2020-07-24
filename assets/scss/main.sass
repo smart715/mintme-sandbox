@@ -444,10 +444,6 @@ a
 .table, .table-responsive
   color: inherit
 
-  .table-orders
-    tr
-      cursor: pointer
-      
   thead
     th
       border: none
@@ -468,6 +464,16 @@ a
   &, tbody
     @extend .custom-scrollbar
 
+  .table-orders
+    tr
+      cursor: pointer
+    td
+      &:first-child
+        padding-left: 1.5rem
+      &:last-child
+        padding-right: 1.5rem
+        padding-left: 0.75rem
+        
   td
     border: none
     padding-top: 0.35rem
@@ -495,12 +501,14 @@ a
       height: 22px
 
   .table-orders
+    tr
+      cursor: pointer
     td
       &:first-child
         padding-left: 1.5rem
       &:last-child
         padding-right: 1.5rem
-      padding-left: 0.75rem
+        padding-left: 0.75rem
 
 .fix-layout
   table-layout: fixed
