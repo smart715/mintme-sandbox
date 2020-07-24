@@ -146,23 +146,26 @@ class DeployConsumer implements ConsumerInterface
 
         if ($referencer) {
             $reward = $this->deployCostFetcher->getDeployCostReferralReward();
-            $userDeployTokenReward = new DeployTokenReward($user, $reward);
-            $referencerDeployTokenReward = new DeployTokenReward($referencer, $reward);
 
-            $this->balanceHandler->deposit(
-                $user,
-                Token::getFromSymbol(Token::WEB_SYMBOL),
-                $reward
-            );
+            if ($reward->isPositive()) {
+                $userDeployTokenReward = new DeployTokenReward($user, $reward);
+                $referencerDeployTokenReward = new DeployTokenReward($referencer, $reward);
 
-            $this->balanceHandler->deposit(
-                $referencer,
-                Token::getFromSymbol(Token::WEB_SYMBOL),
-                $reward
-            );
+                $this->balanceHandler->deposit(
+                    $user,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $reward
+                );
 
-            $this->em->persist($userDeployTokenReward);
-            $this->em->persist($referencerDeployTokenReward);
+                $this->balanceHandler->deposit(
+                    $referencer,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $reward
+                );
+
+                $this->em->persist($userDeployTokenReward);
+                $this->em->persist($referencerDeployTokenReward);
+            }
         }
     }
 }
