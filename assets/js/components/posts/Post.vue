@@ -9,7 +9,7 @@
             </p>
         </template>
         <p v-else>
-            To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('registergi')">sign up</a>.
+            To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
         </p>
         <span>
             {{ date }}
