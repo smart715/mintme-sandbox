@@ -104,3 +104,13 @@ export const MINTME = {
     symbol: 'MINTME',
     subunit: 4,
 };
+
+export const sanitizeOptions = {
+    allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p'],
+    allowedAttributes: {
+        'ul': ['class'],
+        'img': ['style', 'src'],
+        'a': ['href', 'rel', 'target'],
+        'span': ['style', 'class'],
+    },
+};
