@@ -85,7 +85,7 @@ class Trader implements TraderInterface
 
         if (TradeResult::SUCCESS === $result->getResult()) {
             if ($quote instanceof Token) {
-                $this->updateUserTokenReferrencer($order->getMaker(), $quote);
+                $this->updateUserTokenReferencer($order->getMaker(), $quote);
             } elseif ($quote instanceof Crypto) {
                 $this->updateUserCrypto($order->getMaker(), $quote);
             }
@@ -166,7 +166,7 @@ class Trader implements TraderInterface
         }, $records);
     }
 
-    private function updateUserTokenReferrencer(User $user, Token $token): void
+    private function updateUserTokenReferencer(User $user, Token $token): void
     {
         $referencer = $user->getReferencer();
 
