@@ -1,10 +1,10 @@
 <template>
     <div class="token-avatar">
         <div class="d-flex align-items-center token-name">
-            <div class="align-items-center">
+            <div class="align-items-center token-avatar-link">
                 <a :href="profileUrl">
                     <img :src="image"
-                         class="rounded-circle img-fluid token-avatar-link"
+                         class="rounded-circle img-fluid"
                     >
                 </a>
             </div>
