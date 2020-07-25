@@ -1036,3 +1036,22 @@ input[type=search]::-webkit-search-cancel-button
 
   @include media-breakpoint-up(lg)
     margin-left: 25%
+
+[data-useragent*="WebKit/"]
+  .bbcode-content
+    li
+      .bbcode-span-list-item
+        position: relative
+        left: -0.5em
+    ol
+      .bbcode-span-list-item
+       left: 0 !important
+
+[data-useragent*="Gecko/"]
+  .bbcode-content
+    li
+      position: relative
+      left: 1em
+    ol
+      .bbcode-span-list-item
+        left: 0 !important
