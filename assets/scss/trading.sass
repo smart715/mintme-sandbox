@@ -87,6 +87,15 @@
     min-width: 0
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
+    @include media-breakpoint-down(md)
+      margin-left: calc(103px + 20px) !important
+
+    @include media-breakpoint-down(sm)
+      margin-left: calc(88px + 20px) !important
+
+    @include media-breakpoint-down(xs)
+      margin-left: calc(94px + 20px) !important
+
     .token-avatar-link
       position: absolute
       top: 0%
@@ -94,17 +103,20 @@
       width: 131px
       height: auto
 
-      @media (max-width: 991px)
+      @include media-breakpoint-down(md)
+        width: 108px
         top: 3%
         left: 3%
 
-      @media (max-width: 767px)
+      @include media-breakpoint-down(sm)
+        width: 88px
         top: 3%
         left: 5%
-        width: 108px
 
-      @media (max-width: 766px)
-        left: 6%
+      @include media-breakpoint-down(xs)
+        width: 66px
+        left: 9%
+        top: 8px
 
     .token-name
       min-width: 80px
