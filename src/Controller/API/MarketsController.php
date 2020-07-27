@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class MarketsController extends APIController
 {
-    private const OFFSET = 50;
+    private const TOKENS_ON_PAGE = 50;
 
     /**
      * @Rest\View()
@@ -64,8 +64,8 @@ class MarketsController extends APIController
         $deployed = (int)$request->get('deployed');
 
         $markets = $marketStatusManager->getMarketsInfo(
-            $page,
-            self::OFFSET,
+            self::TOKENS_ON_PAGE * ($page - 1),
+            self::TOKENS_ON_PAGE,
             $request->get('sort'),
             $request->get('order'),
             $deployed,
@@ -77,7 +77,7 @@ class MarketsController extends APIController
             'rows' => $user
                 ? $marketStatusManager->getUserRelatedMarketsCount($user)
                 : $marketStatusManager->getMarketsCount($deployed),
-            'limit' => self::OFFSET,
+            'limit' => self::TOKENS_ON_PAGE,
         ]);
     }
 
