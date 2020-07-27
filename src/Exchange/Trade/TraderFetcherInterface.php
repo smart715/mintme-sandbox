@@ -37,4 +37,8 @@ interface TraderFetcherInterface
         int $limit,
         int $side
     ): array;
+
+    /** @return mixed[] */
+    public function getOrderDepth(string $marketName, int $limit, string $interval): array;
+
 }

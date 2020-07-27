@@ -140,7 +140,7 @@ class TraderFetcher implements TraderFetcherInterface
             throw new FetchException($response->getError()['message'] ?? '');
         }
 
-        return $response->getResult()['result'];
+        return $response->getResult();
     }
 
     private function getCancelOrderErrorResult(int $errorCode): TradeResult
