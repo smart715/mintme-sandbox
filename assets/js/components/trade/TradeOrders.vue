@@ -105,10 +105,10 @@ export default {
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.buyOrders ? this.ordersList(this.groupByPrice(this.buyOrders)) : [];
+            return this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
         },
         filteredSellOrders: function() {
-            return this.sellOrders ? this.ordersList(this.groupByPrice(this.sellOrders)) : [];
+            return this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
         },
     },
     methods: {
@@ -204,6 +204,13 @@ export default {
         },
         clone: function(orders) {
             return JSON.parse(JSON.stringify(orders));
+        },
+        sortOrders: function(orders, isSell) {
+            return orders.sort((a, b) => {
+                return isSell ?
+                    parseFloat(a.price) - parseFloat(b.price) :
+                    parseFloat(b.price) - parseFloat(a.price);
+            });
         },
     },
 };
