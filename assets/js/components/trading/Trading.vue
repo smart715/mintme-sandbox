@@ -227,12 +227,12 @@
                         </b-table>
                     </div>
                     <template v-if="!tableLoading">
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && tokens.length < 2">
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && !tokens.length">
                             <div class="row justify-content-center">
                                 <p class="text-center p-5">No one deployed tokens yet</p>
                             </div>
                         </template>
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && tokens.length < 2">
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && !tokens.length">
                             <div class="row justify-content-center">
                                 <p class="text-center p-5">No any token yet</p>
                             </div>
