@@ -324,13 +324,13 @@ export default {
                 userSelected: false,
                 selectedFilter: 'deployed',
                 options: {
-                    all: {
-                        key: 'all',
-                        label: 'All tokens',
-                    },
                     deployed: {
                         key: 'deployed',
                         label: 'Deployed tokens',
+                    },
+                    all: {
+                        key: 'all',
+                        label: 'All tokens',
                     },
                     user: {
                         key: 'user',
