@@ -181,8 +181,8 @@ export default {
                     this.$axios.retry.get(this.$routing.generate('pending_orders', {
                         base: this.market.base.symbol, quote: this.market.quote.symbol,
                     })).then((result) => {
-                        this.buyOrders = this.sortOrders(result.data.buy, false);
-                        this.sellOrders = this.sortOrders(result.data.sell, true);
+                        this.buyOrders = result.data.buy;
+                        this.sellOrders = result.data.sell;
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -274,7 +274,6 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        orders = this.sortOrders(orders, isSell);
                         this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
                     })
@@ -317,13 +316,6 @@ export default {
             } else {
                 this.buyOrders = orders;
             }
-        },
-        sortOrders: function(orders, isSell) {
-            return orders.sort((a, b) => {
-                return isSell ?
-                    parseFloat(a.price) - parseFloat(b.price) :
-                    parseFloat(b.price) - parseFloat(a.price);
-            });
         },
     },
 };
