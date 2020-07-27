@@ -61,11 +61,11 @@
                >
                    <div class="px-2">
                        <network
-                           class="d-block c-pointer"
+                           class="d-block c-pointer social-link"
                            network="email"
                        >
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon icon="envelope" />
+                           <font-awesome-icon icon="envelope" />
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                Email
                            </a>
                        </network>
@@ -79,33 +79,33 @@
                    inline-template
                >
                    <div class="px-2">
-                       <network class="d-block c-pointer" network="facebook">
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon :icon="['fab', 'facebook']"/>
+                       <network class="d-block c-pointer social-link" network="facebook">
+                           <font-awesome-icon :icon="['fab', 'facebook']"/>
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                Facebook
                            </a>
                        </network>
-                       <network class="d-block c-pointer" network="linkedin">
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                       <network class="d-block c-pointer social-link" network="linkedin">
+                           <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                LinkedIn
                            </a>
                        </network>
-                       <network class="d-block c-pointer" network="reddit">
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon :icon="['fab', 'reddit']"/>
+                       <network class="d-block c-pointer social-link" network="reddit">
+                           <font-awesome-icon :icon="['fab', 'reddit']"/>
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                Reddit
                            </a>
                        </network>
-                       <network class="d-block c-pointer" network="telegram">
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon :icon="['fab', 'telegram']"/>
+                       <network class="d-block c-pointer social-link" network="telegram">
+                           <font-awesome-icon :icon="['fab', 'telegram']"/>
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                Telegram
                            </a>
                        </network>
-                       <network class="d-block c-pointer" network="twitter">
-                           <a href="#" class="text-white hover-icon">
-                               <font-awesome-icon :icon="['fab', 'twitter']"/>
+                       <network class="d-block c-pointer social-link" network="twitter">
+                           <font-awesome-icon :icon="['fab', 'twitter']"/>
+                           <a href="#" class="text-white hover-icon text-decoration-none">
                                Twitter
                            </a>
                        </network>
