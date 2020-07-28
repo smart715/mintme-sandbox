@@ -47,7 +47,7 @@ tests_assets:
   script:
     - npm ci
     - make syntax_check_assets
-    - make karma
+    - make jest
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
