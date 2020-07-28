@@ -33,7 +33,7 @@
                 type="text"
                 v-model="newName"
                 ref="tokenNameInput"
-                class="token-name-input w-100 px-2"
+                class="token-name-input form-control w-100 px-2"
                 :class="{ 'is-invalid': this.$v.$invalid }"
             >
             <div class="col-12 pt-2 px-0 clearfix">
@@ -52,7 +52,7 @@
                     Token name should have at least 4 symbols
                 </div>
                 <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
-                    Token name can't be longer than 255 characters
+                    Token name can't be longer than 60 characters
                 </div>
                 <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
                     Token name can't contain "token" or "coin" words
