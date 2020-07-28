@@ -428,8 +428,8 @@ export default {
         },
         globalMarketCap: function() {
             return this.showUsd
-                ? this.globalMarketCaps[USD.symbol] + USD.symbol
-                : this.globalMarketCaps[BTC.symbol] + BTC.symbol;
+                ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
+                : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
         },
     },
     mounted() {
