@@ -32,8 +32,8 @@ tests_php:
   script:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
-    - make phpunit
-    - make syntax_check
+    - THREADS_COUNT=4 make phpunit
+    - THREADS_COUNT=4 make syntax_check
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -45,12 +45,13 @@ tests_php:
 tests_assets:
   stage: tests
   script:
-    - npm ci
+    - npm ci --cache .npm --prefer-offline
     - make syntax_check_assets
     - make jest
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
+      - .npm/
       - node_modules/
       - vendor/
   tags:
