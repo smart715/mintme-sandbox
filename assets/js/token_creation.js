@@ -101,7 +101,7 @@ new Vue({
             ),
             validChars: tokenNameValidChars,
             minLength: minLength(4),
-            maxLength: maxLength(255),
+            maxLength: maxLength(60),
         },
     },
 });
