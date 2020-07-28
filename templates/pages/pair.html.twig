@@ -15,6 +15,7 @@
 
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
+{% set loggedIn = app.user ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
@@ -86,7 +87,7 @@
             >
                 <token-ongoing-airdrop-campaign
                     v-if="{{ showAirdropCampaign }}"
-                    :logged-in="{{ app.user ? 'true' : 'false' }}"
+                    :logged-in="{{ loggedIn }}"
                     :is-owner="{{ isOwner }}"
                     :token-name="'{{ token.name | default }}'"
                     :user-already-claimed="{{ userAlreadyClaimed }}"
@@ -150,7 +151,7 @@
                             login-url="{{ path('fos_user_security_login') }}"
                             signup-url="{{ path('fos_user_registration_register') }}"
                             :market="{{ market | json_encode }}"
-                            :logged-in="{{ app.user ? 'true' : 'false' }}"
+                            :logged-in="{{ loggedIn }}"
                             :is-owner="{{ isOwner }}"
                             :precision="{{ precision }}"
                             :user-id="{{ app.user ? app.user.id : 0 }}"
@@ -165,7 +166,7 @@
                         <div class="container-fluid px-0">
                             <donation
                                 :market="{{ market | json_encode }}"
-                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                :logged-in="{{ loggedIn }}"
                                 :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
                                 :donation-params="{{ donation_params | json_encode }}"
                             >
