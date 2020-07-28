@@ -52,7 +52,7 @@
                     Token name should have at least 4 symbols
                 </div>
                 <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
-                    Token name can't be longer than 255 characters
+                    Token name can't be longer than 60 characters
                 </div>
                 <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
                     Token name can't contain "token" or "coin" words
