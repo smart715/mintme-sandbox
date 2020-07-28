@@ -16,8 +16,9 @@ describe('Trading', () => {
     afterEach(() => {
         moxios.uninstall();
     });
-    const $routing = {generate: () => 'URL'};
-    const BASE_URL = window.location.hostname;
+    const $routing = {
+        generate: (url, params) => url + '?' + params ? Object.keys(params) + '=' + Object.values(params) : '',
+    };
     const localVue = createLocalVue();
     localVue.use(Axios);
     const wrapper = shallowMount(Trading, {
@@ -89,10 +90,8 @@ describe('Trading', () => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'user';
         wrapper.setProps({userId: 1});
-        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
-        let url = BASE_URL + '/api/markets/info';
         let params = {user: 1};
-        moxios.stubRequest($routing.generate(url, params), {
+        moxios.stubRequest($routing.generate('markets_info', params), {
             status: 200,
             response: {
                 markets: {
@@ -115,9 +114,8 @@ describe('Trading', () => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.setProps({userId: 1});
-        let url = BASE_URL + '/api/markets/info';
+        let url = 'market_info';
         let params = {deployed: 1};
-        const $routing = {generate: (url, params) => url + '?' + Object.keys(params) + '=' + Object.values(params)};
         moxios.stubRequest($routing.generate(url, params), {
             status: 200,
             response: {
@@ -143,8 +141,7 @@ describe('Trading', () => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'all';
         wrapper.setProps({userId: 1});
-        let url = BASE_URL + '/api/markets/info';
-        const $routing = {generate: (url) => url};
+        let url = 'markets_info';
         moxios.stubRequest($routing.generate(url), {
             status: 200,
             response: {
