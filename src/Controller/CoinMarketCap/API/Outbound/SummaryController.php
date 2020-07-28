@@ -3,9 +3,7 @@
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Market\MarketFetcherInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Trade\TraderFetcherInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\MarketStatusManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -19,9 +17,6 @@ class SummaryController extends AbstractFOSRestController
     /** @var MarketStatusManagerInterface */
     private $marketStatusManager;
 
-    /** @var MarketFetcherInterface */
-    private $marketFetcher;
-
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
@@ -31,23 +26,16 @@ class SummaryController extends AbstractFOSRestController
     /** @var TraderInterface */
     private $trader;
 
-    /** @var TraderFetcherInterface */
-    private $traderFetcher;
-
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
-        MarketFetcherInterface $marketFetcher,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        TraderInterface $trader,
-        TraderFetcherInterface $traderFetcher
+        TraderInterface $trader
     ) {
         $this->marketStatusManager = $marketStatusManager;
-        $this->marketFetcher = $marketFetcher;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
         $this->trader = $trader;
-        $this->traderFetcher = $traderFetcher;
     }
 
     /**
@@ -63,18 +51,23 @@ class SummaryController extends AbstractFOSRestController
             function($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
                 $orderDepth = $this->trader->getOrderDepth($market);
+                $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+
                 return [
                     'trading_pairs' => $market->getQuote()->getSymbol().'_'.$market->getBase()->getSymbol(),
-                    'last_price' => $marketStatus->getLastPrice(),
+                    'last_price' => $marketStatusToday['last'],
                     'base_currency' => $market->getBase()->getSymbol(),
                     'quote_currency' => $market->getQuote()->getSymbol(),
                     'lowest_ask' => $orderDepth['asks'] ? min($orderDepth['asks'])[0] : '',
                     'highest_bid' => $orderDepth['bids'] ? max($orderDepth['bids'])[0] : '',
-                    'base_volume' => '',
-                    'quote_volume' => $marketStatus->getDayVolume(),
-                    'price_change_percent_24h' => '',
-                    'highest_price_24h' => '',
-                    'lowest_price_24h' => '',
+                    'base_volume' => $marketStatusToday['deal'],
+                    'quote_volume' => $marketStatusToday['volume'],
+                    'price_change_percent_24h' => $marketStatusToday['open'] ?
+                        ($marketStatusToday['last'] - $marketStatusToday['open']) * 100 / $marketStatusToday['open']
+                        :
+                        0,
+                    'highest_price_24h' => $marketStatusToday['high'],
+                    'lowest_price_24h' => $marketStatusToday['low'],
                 ];
             },
             array_values($marketStatuses)
