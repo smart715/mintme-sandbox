@@ -40,12 +40,12 @@
                 @click="editToken"
             />
         </template>
-        <h2
+        <span
             class="current-token-name"
             v-b-tooltip="{title: currentName, boundary:'viewport'}"
         >
         {{ currentName }}
-        </h2>
+        </span>
     </div>
 </template>
 

@@ -78,6 +78,10 @@
     margin-left: $token-avatar-margin-left
     background: transparent
     z-index: 99
+    @include media-breakpoint-down(md)
+      margin-left: 90px !important
+    @include media-breakpoint-down(sm)
+      margin-left: 0px !important
 
     a
       background: transparent
@@ -88,13 +92,15 @@
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
     @include media-breakpoint-down(md)
-      margin-left: calc(103px + 20px) !important
+      margin-left: calc(103px + 12px) !important
+      margin-top: 17px
 
     @include media-breakpoint-down(sm)
-      margin-left: calc(88px + 20px) !important
+      margin-left: calc(88px + 2px) !important
 
     @include media-breakpoint-down(xs)
-      margin-left: calc(94px + 20px) !important
+      margin-left: calc(94px + 8px) !important
+      margin-top: 25px
 
     .token-avatar-link
       position: absolute
@@ -122,6 +128,15 @@
       min-width: 80px
 
       .current-token-name
+        margin-bottom: 7px
+        font-size: 25px
+        @include media-breakpoint-down(md)
+          font-size: 19px
+          margin-bottom: 6px !important
+        @include media-breakpoint-down(sm)
+          font-size: 16px
+          margin-bottom: 4px !important
+
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis

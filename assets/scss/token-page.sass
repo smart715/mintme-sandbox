@@ -8,6 +8,11 @@
 #token
   .deployed-icon, .not-deployed-icon
     height: 42px
+    @include media-breakpoint-down('md')
+      height: 34px
+    @include media-breakpoint-down('sm')
+      height: 27px
+
   min-height: 800px
 
   .not-deployed-icon
