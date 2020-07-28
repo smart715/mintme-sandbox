@@ -130,7 +130,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             if ($this->checkTokenNameBlacklist($request->get('name'))) {
-                throw new ApiBadRequestException('Invalid token name');
+                throw new ApiBadRequestException('Forbidden token name, please try another');
             }
         }
 
