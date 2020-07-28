@@ -33,7 +33,7 @@
                 type="text"
                 v-model="newName"
                 ref="tokenNameInput"
-                class="token-name-input w-100 px-2"
+                class="token-name-input form-control w-100 px-2"
                 :class="{ 'is-invalid': this.$v.$invalid }"
             >
             <div class="col-12 pt-2 px-0 clearfix">
