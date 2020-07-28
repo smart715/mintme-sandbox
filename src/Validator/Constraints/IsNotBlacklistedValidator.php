@@ -24,6 +24,10 @@ class IsNotBlacklistedValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
+        if (null === $value) {
+            return;
+        }
+
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
