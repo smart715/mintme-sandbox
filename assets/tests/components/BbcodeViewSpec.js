@@ -12,7 +12,7 @@ describe('BbcodeView', () => {
              propsData: {value: '[h1]Lorem ipsum.[/h1]'},
         });
 
-        expect(wrapper.vm.parsedValue).to.equal('<h1>Lorem ipsum.</h1>');
+        expect(wrapper.vm.parsedValue).toBe('<h1>Lorem ipsum.</h1>');
     });
 
     it('parse bbcode image', () => {
@@ -20,7 +20,7 @@ describe('BbcodeView', () => {
              propsData: {value: '[img]foo[/img]'},
         });
 
-        expect(wrapper.vm.parsedValue).to.equal('<img style="max-width:100%" src="foo" />');
+        expect(wrapper.vm.parsedValue).toBe('<img style="max-width:100%" src="foo" />');
     });
 
     it('parse bbcode link', () => {
@@ -28,7 +28,7 @@ describe('BbcodeView', () => {
              propsData: {value: '[url=foo]bar[/url]'},
         });
 
-        expect(wrapper.vm.parsedValue).to.equal('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
+        expect(wrapper.vm.parsedValue).toBe('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
     });
 
     it('parse bbcode li', () => {
@@ -36,7 +36,7 @@ describe('BbcodeView', () => {
             propsData: {value: '[li]foo[/li]'},
         });
 
-        expect(wrapper.vm.parsedValue).to.equal('<li><span class="bbcode-span-list-item">foo</span></li>');
+        expect(wrapper.vm.parsedValue).toBe('<li><span class="bbcode-span-list-item">foo</span></li>');
     });
 
     it('parse bbcode not allowed tags', () => {
@@ -44,6 +44,6 @@ describe('BbcodeView', () => {
             propsData: {value: '<div>bar</div>'},
         });
 
-        expect(wrapper.vm.parsedValue).to.equal('bar');
+        expect(wrapper.vm.parsedValue).toBe('bar');
     });
 });
