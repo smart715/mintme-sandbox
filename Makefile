@@ -7,8 +7,8 @@ phpfunctional:
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
-karma:
-	npm run unit
+jest:
+	npm run unit --silent
 
 syntax_check:
 	php bin/console cache:warmup
