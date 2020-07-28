@@ -3,6 +3,7 @@
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
@@ -14,10 +15,15 @@ class AssetsController extends AbstractFOSRestController
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var TokenManagerInterface */
+    private $tokenManager;
+
     public function __construct(
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ) {
         $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -28,8 +34,9 @@ class AssetsController extends AbstractFOSRestController
      */
     public function getAssets(): array
     {
-        $data = [];
+        $assets = [];
         $cryptos = $this->cryptoManager->findAllIndexed('symbol', true);
+        $tokens = $this->tokenManager->findAll();
         $makerFee = $this->getParameter('maker_fee_rate');
         $takerFee = $this->getParameter('taker_fee_rate');
 
@@ -37,18 +44,32 @@ class AssetsController extends AbstractFOSRestController
             $subUnit = $crypto['showSubunit'];
             $minWithdraw = '1e-' . $subUnit;
 
-            $data[$crypto['symbol']] = [
+            $assets[$crypto['symbol']] = [
                 'name' => strtolower($crypto['name']),
-                'unified_cryptoasset_id' => 1,
                 'can_withdraw' => true,
                 'can_deposit' => true,
                 'min_withdraw' => number_format((float)$minWithdraw, $subUnit),
-//                 'max_withdraw' => 0,
+                'max_withdraw' => false,
                 'maker_fee' => $makerFee,
                 'taker_fee' => $takerFee,
             ];
         }
 
-        return $data;
+        foreach ($tokens as $token) {
+            $deployed = $token->isDeployed();
+
+            $assets[$token->getSymbol()] = [
+                'name' => strtolower($token->getName()),
+                'can_withdraw' => $deployed,
+                'can_deposit' => $deployed,
+                'min_withdraw' => false,
+                'max_withdraw' => $this->getParameter('token_quantity'),
+                'maker_fee' => $makerFee,
+                'taker_fee' => $takerFee,
+            ];
+        }
+
+        return $assets;
+
     }
 }
