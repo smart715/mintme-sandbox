@@ -24,10 +24,14 @@
                     <li role="presentation"
                         class="nav-item {% if isTokenPage %} token-avatar-left {% endif %}">
                         <a
-                            role="tab" aria-selected="true"
+                            role="tab"
+                            aria-selected="true"
                             aria-setsize="2"
-                            aria-posinset="1" target="_self" href="#"
-                            class="nav-link active">
+                            aria-posinset="1"
+                            target="_self"
+                            href="#"
+                            class="nav-link {% if tab|default and tab == 'intro' %}active{% endif %}"
+                        >
                             Introduction
                         </a>
                     </li>
@@ -39,7 +43,8 @@
                             aria-setsize="2"
                             aria-posinset="2"
                             target="_self" href="#"
-                            class="nav-link">
+                            class="nav-link {% if tab and tab == 'trade' %}active{% endif %}"
+                        >
                             Trade
                         </a>
                     </li>
@@ -47,8 +52,22 @@
                         <a role="tab"
                            aria-selected="false"
                            aria-setsize="2"
-                           aria-posinset="2" target="_self" href="#"
-                           class="nav-link"
+                           aria-posinset="2"
+                           target="_self"
+                           href="#"
+                           class="nav-link {% if tab and tab == 'donation' %}active{% endif %}"
+                        >
+                            Donate
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a role="tab"
+                           aria-selected="false"
+                           aria-setsize="2"
+                           aria-posinset="2"
+                           target="_self"
+                           href="#"
+                           class="nav-link {% if tab and tab == 'posts' %}active{% endif %}"
                         >
                             Posts
                         </a>
@@ -64,7 +83,7 @@
                 </ul>
             </div>
             <div class="tab-content">
-                <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'intro' %}active{% endif %}">
                     <div class="row">
                         <div class="col-12 pb-3">
                             <div class="card h-100">
@@ -130,6 +149,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'trade' %}active{% endif %}">
+                    {{ include('spinners/trade_tab.html.twig') }}
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'donation' %}active{% endif %}">
+                    {{ include('spinners/donation_tab.html.twig') }}
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'posts' %}active{% endif %}">
+                    {{ include('spinners/posts_tab.html.twig') }}
                 </div>
             </div>
         </div>
