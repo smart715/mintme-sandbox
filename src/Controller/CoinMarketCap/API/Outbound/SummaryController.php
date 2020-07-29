@@ -57,15 +57,20 @@ class SummaryController extends AbstractFOSRestController
         return array_map(
             function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
+
                 $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
                 /**
                  * @todo when #6477 is done this should be changed accordingly
                  */
-                $market->isTokenMarket() ?
-                    ($base = $market->getQuote()) && ($quote = $market->getBase()) :
-                    ($base = $market->getBase()) && ($quote = $market->getQuote());
+                if ($market->isTokenMarket()) {
+                    $base = $market->getQuote();
+                    $quote = $market->getBase();
+                } else {
+                    $base = $market->getBase();
+                    $quote = $market->getQuote();
+                }
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($base->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
