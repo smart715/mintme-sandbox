@@ -2,6 +2,7 @@
 
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
+use App\Controller\Traits\BaseQuoteOrder;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
@@ -15,6 +16,8 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class SummaryController extends AbstractFOSRestController
 {
+    use BaseQuoteOrder;
+
     /** @var MarketStatusManagerInterface */
     private $marketStatusManager;
 
@@ -61,19 +64,10 @@ class SummaryController extends AbstractFOSRestController
                 $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
-                /**
-                 * @todo when #6477 is done this should be changed accordingly
-                 */
-                if ($market->isTokenMarket()) {
-                    $base = $market->getQuote();
-                    $quote = $market->getBase();
-                } else {
-                    $base = $market->getBase();
-                    $quote = $market->getQuote();
-                }
+                $this->fixBaseQuoteOrder($market);
 
-                $rebrandedBaseSymbol = $this->rebrandingConverter->convert($base->getSymbol());
-                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
+                $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
+                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());
 
                 return [
                     'trading_pairs' => $rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol,
