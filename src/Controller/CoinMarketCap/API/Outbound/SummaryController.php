@@ -55,10 +55,11 @@ class SummaryController extends AbstractFOSRestController
         $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
 
         return array_map(
-            function($marketStatus) {
+            function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
                 $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+
                 /**
                  * @todo when #6477 is done this should be changed accordingly
                  */
@@ -67,7 +68,7 @@ class SummaryController extends AbstractFOSRestController
                     ($base = $market->getBase()) && ($quote = $market->getQuote());
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($base->getSymbol());
-                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert(($quote->getSymbol()));
+                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
 
                 return [
                     'trading_pairs' => $rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol,
@@ -78,17 +79,15 @@ class SummaryController extends AbstractFOSRestController
                     'highest_bid' => $orderDepth['bids'] ? max($orderDepth['bids'])[0] : '',
                     'base_volume' => $marketStatusToday['deal'],
                     'quote_volume' => $marketStatusToday['volume'],
-                    'price_change_percent_24h' => $marketStatusToday['open'] ?
-                        ($marketStatusToday['last'] - $marketStatusToday['open']) * 100 / $marketStatusToday['open']
-                        :
-                        0,
+                    'price_change_percent_24h' =>
+                        $marketStatusToday['open'] ?
+                            ($marketStatusToday['last'] - $marketStatusToday['open']) * 100 / $marketStatusToday['open'] :
+                            0,
                     'highest_price_24h' => $marketStatusToday['high'],
                     'lowest_price_24h' => $marketStatusToday['low'],
                 ];
-
             },
             array_values($marketStatuses)
         );
-
     }
 }

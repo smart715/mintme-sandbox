@@ -70,6 +70,5 @@ class AssetsController extends AbstractFOSRestController
         }
 
         return $assets;
-
     }
 }
