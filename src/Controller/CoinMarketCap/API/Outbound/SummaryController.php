@@ -6,6 +6,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
@@ -26,16 +27,21 @@ class SummaryController extends AbstractFOSRestController
     /** @var TraderInterface */
     private $trader;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        TraderInterface $trader
+        TraderInterface $trader,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
         $this->trader = $trader;
+        $this->rebrandingConverter = $rebrandingConverter;
     }
 
     /**
@@ -47,14 +53,21 @@ class SummaryController extends AbstractFOSRestController
     public function getSummary(): array
     {
         $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
+
         return array_map(
             function($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
                 $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+                /**
+                 * @todo when #6477 is done this should be changed accordingly
+                 */
+                $market->isTokenMarket() ?
+                    ($base = $market->getQuote()) && ($quote = $market->getBase()) :
+                    ($base = $market->getBase()) && ($quote = $market->getQuote());
 
                 return [
-                    'trading_pairs' => $market->getQuote()->getSymbol().'_'.$market->getBase()->getSymbol(),
+                    'trading_pairs' => $base->getSymbol() . '_' . $quote->getSymbol(),
                     'last_price' => $marketStatusToday['last'],
                     'base_currency' => $market->getBase()->getSymbol(),
                     'quote_currency' => $market->getQuote()->getSymbol(),
@@ -69,8 +82,10 @@ class SummaryController extends AbstractFOSRestController
                     'highest_price_24h' => $marketStatusToday['high'],
                     'lowest_price_24h' => $marketStatusToday['low'],
                 ];
+
             },
             array_values($marketStatuses)
         );
+
     }
 }
