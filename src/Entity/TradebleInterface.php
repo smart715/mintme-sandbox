@@ -26,4 +26,6 @@ interface TradebleInterface
      * @return mixed
      */
     public function setSymbol(string $symbol);
+
+    public function isBlocked(): bool;
 }

@@ -144,6 +144,11 @@ class Crypto implements TradebleInterface, ImagineInterface
         return $this->exchangeble;
     }
 
+    public function isBlocked(): bool
+    {
+        return $this->isTradable() && $this->isExchangeble();
+    }
+
     public function getFee(): Money
     {
         return new Money($this->fee, new Currency($this->getSymbol()));
