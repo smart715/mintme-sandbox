@@ -4,6 +4,7 @@ namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
@@ -18,12 +19,17 @@ class AssetsController extends AbstractFOSRestController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
     public function __construct(
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->rebrandingConverter = $rebrandingConverter;
     }
 
     /**
@@ -44,8 +50,8 @@ class AssetsController extends AbstractFOSRestController
             $subUnit = $crypto['showSubunit'];
             $minWithdraw = '1e-' . $subUnit;
 
-            $assets[$crypto['symbol']] = [
-                'name' => strtolower($crypto['name']),
+            $assets[$this->rebrandingConverter->convert($crypto['symbol'])] = [
+                'name' => strtolower($this->rebrandingConverter->convert($crypto['name'])),
                 'can_withdraw' => true,
                 'can_deposit' => true,
                 'min_withdraw' => number_format((float)$minWithdraw, $subUnit),
@@ -58,8 +64,8 @@ class AssetsController extends AbstractFOSRestController
         foreach ($tokens as $token) {
             $deployed = $token->isDeployed();
 
-            $assets[$token->getSymbol()] = [
-                'name' => strtolower($token->getName()),
+            $assets[$this->rebrandingConverter->convert($token->getSymbol())] = [
+                'name' => strtolower($this->rebrandingConverter->convert($token->getName())),
                 'can_withdraw' => $deployed,
                 'can_deposit' => $deployed,
                 'min_withdraw' => false,
