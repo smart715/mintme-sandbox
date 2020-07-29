@@ -118,6 +118,7 @@
                                 :show-edit="{{ isOwner }}"
                                 @go-to-posts="goToPosts"
                                 @delete-post="deletePost"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
                             >
                                 <template v-slot:title>Recent posts</template>
                             </posts>
@@ -189,6 +190,7 @@
                                     :posts="posts || (posts = {{posts | json_encode}})"
                                     :show-edit="{{ isOwner }}"
                                     @delete-post="deletePost"
+                                    :logged-in="{{ app.user ? 'true' : 'false' }}"
                                 />
                             </div>
                         </div>

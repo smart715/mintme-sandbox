@@ -107,6 +107,9 @@ class RegistrationController extends FOSRegistrationController
         ]);
     }
 
+    /**
+     * @Route("/register", name="register", options = {"expose": true})
+     */
     public function registerAction(Request $request): Response
     {
         $form = $this->formFactory->createForm();
