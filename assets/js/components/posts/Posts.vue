@@ -11,6 +11,7 @@
                     :index="i"
                     @delete-post="$emit('delete-post', $event)"
                     :show-edit="showEdit"
+                    :logged-in="loggedIn"
                 />
             </template>
             <div v-else>
@@ -51,6 +52,7 @@ export default {
             type: Boolean,
             default: false,
         },
+        loggedIn: Boolean,
     },
     data() {
         return {
