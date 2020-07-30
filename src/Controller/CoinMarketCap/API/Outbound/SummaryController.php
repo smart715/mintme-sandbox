@@ -16,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class SummaryController extends AbstractFOSRestController
 {
+
     use BaseQuoteOrder;
 
     /** @var MarketStatusManagerInterface */
