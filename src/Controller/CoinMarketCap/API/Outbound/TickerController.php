@@ -16,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class TickerController extends AbstractFOSRestController
 {
+
     use BaseQuoteOrder;
 
     /** @var MarketStatusManagerInterface */
@@ -55,16 +56,13 @@ class TickerController extends AbstractFOSRestController
      */
     public function getTicker(): array
     {
-        $assets = [];
         $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
 
         return array_map(
             function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
-                $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
-
                 $this->fixBaseQuoteOrder($market);
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
