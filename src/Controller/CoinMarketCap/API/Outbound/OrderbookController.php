@@ -10,6 +10,7 @@ use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route("/cmc/api/v1/orderbook")
@@ -40,15 +41,14 @@ class OrderbookController extends AbstractFOSRestController
      * @Rest\Get("/{market_pair}")
      * @Rest\QueryParam(
      *     name="limit",
-     *     default="500",
-     *     requirements=@Assert\Range(min="1", max="500"),
+     *     default="100",
+     *     requirements=@Assert\Range(min="1", max="101"),
      *     nullable=false,
      *     allowBlank=false,
      *     strict=true
      * )
      * @Rest\QueryParam(
      *     name="interval",
-     *     requirements="(0|1)",
      *     default="0",
      *     nullable=false,
      *     allowBlank=false,
@@ -56,25 +56,25 @@ class OrderbookController extends AbstractFOSRestController
      * )
      * @Rest\View()
      */
-    public function getOrderBook(ParamFetcherInterface $request, string $marketPair): array
+    public function getOrderBook(ParamFetcherInterface $request, string $market_pair): array
     {
-        $marketNames = explode('_', $marketPair);
+        $marketNames = explode('_', $market_pair);
         $base = $marketNames[0] ?? '';
         $quote = $marketNames[1] ?? '';
-        $base = $this->cryptoManager->findBySymbol($base);
+        $base = $this->tokenManager->findByName($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $market = new Market($base, $quote);
+        $market = new Market($quote, $base);
 
         return $this->trader->getOrderDepth(
             $market,
             [
                 'limit' => (int)$request->get('limit'),
-                'interval' => (int)$request->get('interval'),
+                'interval' => (string)$request->get('interval'),
             ]
         );
     }
