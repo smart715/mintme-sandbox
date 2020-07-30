@@ -4,11 +4,8 @@ namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Controller\Traits\BaseQuoteOrder;
 use App\Exception\ApiNotFoundException;
-use App\Exchange\Market;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Trade\TraderInterface;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -24,12 +21,6 @@ class OrderbookController extends AbstractFOSRestController
 
     use BaseQuoteOrder;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
     /** @var TraderInterface */
     private $trader;
 
@@ -40,14 +31,10 @@ class OrderbookController extends AbstractFOSRestController
     private $rebrandingConverter;
 
     public function __construct(
-        TokenManagerInterface $tokenManager,
-        CryptoManagerInterface $cryptoManager,
         TraderInterface $trader,
         MarketFinderInterface $marketFinder,
         RebrandingConverterInterface $rebrandingConverter
     ) {
-        $this->tokenManager = $tokenManager;
-        $this->cryptoManager = $cryptoManager;
         $this->trader = $trader;
         $this->marketFinder = $marketFinder;
         $this->rebrandingConverter = $rebrandingConverter;
