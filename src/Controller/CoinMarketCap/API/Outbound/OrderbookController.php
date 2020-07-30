@@ -2,7 +2,7 @@
 
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
-use App\Controller\Traits\BaseQuoteOrder;
+use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Trade\TraderInterface;
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class OrderbookController extends AbstractFOSRestController
 {
 
-    use BaseQuoteOrder;
+    use BaseQuoteOrderTrait;
 
     /** @var TraderInterface */
     private $trader;
@@ -60,7 +60,7 @@ class OrderbookController extends AbstractFOSRestController
      * )
      * @Rest\View()
      */
-    public function getOrderBook(ParamFetcherInterface $request, string $market_pair)
+    public function getOrderbook(ParamFetcherInterface $request, string $market_pair): array
     {
         $marketPair = explode('_', $market_pair);
         $base = $marketPair[0] ?? '';
@@ -71,7 +71,7 @@ class OrderbookController extends AbstractFOSRestController
 
         $market = $this->marketFinder->find($base, $quote);
 
-        if (!$market) {
+        if (is_null($market)) {
             throw new ApiNotFoundException('Market pair not found');
         }
 
