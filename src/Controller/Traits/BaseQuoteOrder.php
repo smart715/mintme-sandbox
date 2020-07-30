@@ -8,7 +8,6 @@ trait BaseQuoteOrder
 {
     public function fixBaseQuoteOrder(Market $market): Market
     {
-        // TODO: when #6477 is done this should be changed accordingly
         if ($market->isTokenMarket()) {
             $base = $market->getQuote();
             $quote = $market->getBase();
