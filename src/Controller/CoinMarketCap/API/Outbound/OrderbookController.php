@@ -2,14 +2,17 @@
 
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
+use App\Controller\Traits\BaseQuoteOrder;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Safe\DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -17,23 +20,31 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrderbookController extends AbstractFOSRestController
 {
+
+    use BaseQuoteOrder;
+
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    /** TraderInterface */
+    /** @var TraderInterface */
     private $trader;
+
+    /** @var MarketFinderInterface */
+    private $marketFinder;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
-        TraderInterface $trader
+        TraderInterface $trader,
+        MarketFinderInterface $marketFinder
     ) {
         $this->tokenManager = $tokenManager;
         $this->cryptoManager = $cryptoManager;
         $this->trader = $trader;
+        $this->marketFinder = $marketFinder;
     }
     /**
      * Get complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair.
@@ -56,26 +67,32 @@ class OrderbookController extends AbstractFOSRestController
      * )
      * @Rest\View()
      */
-    public function getOrderBook(ParamFetcherInterface $request, string $market_pair): array
+    public function getOrderBook(ParamFetcherInterface $request, string $market_pair)
     {
-        $marketNames = explode('_', $market_pair);
-        $base = $marketNames[0] ?? '';
-        $quote = $marketNames[1] ?? '';
-        $base = $this->tokenManager->findByName($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+        $marketPair = explode('_', $market_pair);
+        $base = $marketPair[0] ?? '';
+        $quote = $marketPair[1] ?? '';
 
-        if (is_null($base) || is_null($quote)) {
+        $market = $this->marketFinder->find($base, $quote);
+
+        if (!$market) {
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $market = new Market($quote, $base);
+        $this->fixBaseQuoteOrder($market);
 
-        return $this->trader->getOrderDepth(
+        $orderDepth = $this->trader->getOrderDepth(
             $market,
             [
                 'limit' => (int)$request->get('limit'),
                 'interval' => (string)$request->get('interval'),
             ]
         );
+
+        $date = new DateTimeImmutable();
+        $timestamp = array('timestamp' => $date->getTimestamp());
+        $orderDepth[] = $timestamp + $orderDepth;
+
+        return $orderDepth;
     }
 }
