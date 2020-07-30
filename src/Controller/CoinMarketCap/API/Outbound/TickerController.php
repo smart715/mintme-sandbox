@@ -56,10 +56,11 @@ class TickerController extends AbstractFOSRestController
      */
     public function getTicker(): array
     {
+        $assets = [];
         $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
 
         return array_map(
-            function ($marketStatus) {
+            function ($marketStatus) use ($assets) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
