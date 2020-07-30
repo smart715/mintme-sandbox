@@ -2,42 +2,69 @@
 
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
+use App\Communications\CryptoRatesFetcherInterface;
+use App\Controller\Traits\BaseQuoteOrderTrait;
+use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcherInterface;
+use App\Exchange\Market\MarketFinderInterface;
+use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
+use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use Money\Currency;
+use Money\Exchange\FixedExchange;
+use Money\Money;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Safe\DateTimeImmutable;
 
 /**
  * @Rest\Route("/cmc/api/v1/trades")
  */
 class TradesController extends AbstractFOSRestController
 {
-    /** @var MarketFetcherInterface */
-    private $marketFetcher;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    use BaseQuoteOrderTrait;
 
-    /** @var MarketNameConverterInterface */
-    private $marketNameConverter;
+    /** @var TraderInterface */
+    private $trader;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var MarketFinderInterface */
+    private $marketFinder;
+
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    /** @var MoneyWrapperInterface */
+    private $moneyWrapper;
+
+    /** @var CryptoRatesFetcherInterface */
+    private $cryptoRatesFetcher;
 
     public function __construct(
-        MarketFetcherInterface $marketFetcher,
-        CryptoManagerInterface $cryptoManager,
-        MarketNameConverterInterface $marketNameConverter,
-        TokenManagerInterface $tokenManager
+        TraderInterface $trader,
+        MarketFinderInterface $marketFinder,
+        RebrandingConverterInterface $rebrandingConverter,
+        MarketHandlerInterface $marketHandler,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ) {
-        $this->marketFetcher = $marketFetcher;
-        $this->cryptoManager = $cryptoManager;
-        $this->marketNameConverter = $marketNameConverter;
-        $this->tokenManager = $tokenManager;
+        $this->trader = $trader;
+        $this->marketFinder = $marketFinder;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->marketHandler = $marketHandler;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     /**
@@ -46,21 +73,45 @@ class TradesController extends AbstractFOSRestController
      * @Rest\Get("/{market_pair}")
      * @Rest\View()
      */
-    public function getTrades(
-        string $market_pair
-    ): array {
-        $marketNames = explode('_', $market_pair);
-        $base = $marketNames[0] ?? '';
-        $quote = $marketNames[1] ?? '';
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+    public function getTrades(string $market_pair)
+    {
+        $marketPair = explode('_', $market_pair);
 
-        if (is_null($base) || is_null($quote)) {
-            throw new ApiNotFoundException('Market not found');
+        $base = $marketPair[0] ?? '';
+        $quote = $marketPair[1] ?? '';
+
+        $base = $this->rebrandingConverter->reverseConvert($base);
+        $quote = $this->rebrandingConverter->reverseConvert($quote);
+
+        $market = $this->marketFinder->find($base, $quote);
+
+        $this->fixBaseQuoteOrder($market);
+
+        if (is_null($market)) {
+            throw new ApiNotFoundException('Market pair not found');
         }
 
-        $market = new Market($base, $quote);
+        $exchange = new FixedExchange($this->cryptoRatesFetcher->fetch());
 
-        return $this->marketFetcher->getExecutedOrders($this->marketNameConverter->convert($market));
+        return array_map(function ($order) use($market, $exchange) {
+            $order = $this->rebrandingConverter->convertOrder($order);
+            return $order;
+            return [
+                'trade_id' => $order->getId(),
+                'price' => $order->getPrice(),
+                'base_volume' => $order->getAmount(),
+                'quote_volume' => $this->moneyWrapper->convert(
+                    $market->getBase()->getSymbol(),
+                    $order->getMarket()->getQuote(),
+                    $exchange
+                ),
+                'timestamp' => $order->getTimestamp(),
+                'type' => array_search($order->getSide(), Order::SIDE_MAP),
+            ];
+        }, $this->marketHandler->getExecutedOrders(
+            $market,
+            0,
+            100
+        ));
     }
 }
