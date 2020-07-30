@@ -106,16 +106,16 @@
                 <template v-if="loaded">
                     <div class="trading-table table-responsive text-nowrap">
                         <b-table
-                                thead-class="trading-head"
-                                :items="tokens"
-                                :fields="fieldsArray"
-                                :sort-compare="sortCompare"
-                                sort-direction="desc"
-                                :sort-by.sync="sortBy"
-                                :sort-desc.sync="sortDesc"
-                                sort-icon-left
-                                :busy="tableLoading"
-                                @sort-changed="sortChanged"
+                            thead-class="trading-head"
+                            :items="tokens"
+                            :fields="fieldsArray"
+                            :sort-compare="sortCompare"
+                            sort-direction="desc"
+                            :sort-by.sync="sortBy"
+                            :sort-desc.sync="sortDesc"
+                            sort-icon-left
+                            :busy="tableLoading"
+                            @sort-changed="sortChanged"
                         >
                             <template v-slot:[`head(${fields.position.key})`]="data">
                                 #
@@ -130,18 +130,18 @@
                             </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
-                                        id="volume"
-                                        variant="primary"
-                                        :lazy="true"
+                                    id="volume"
+                                    variant="primary"
+                                    :lazy="true"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
                                     </template>
                                     <template>
                                         <b-dropdown-item
-                                                v-for="(volume, key) in volumes"
-                                                :key="key"
-                                                @click="toggleActiveVolume(key)"
+                                            v-for="(volume, key) in volumes"
+                                            :key="key"
+                                            @click="toggleActiveVolume(key)"
                                         >
                                             {{ volume.label|rebranding }}
                                         </b-dropdown-item>
@@ -186,19 +186,21 @@
                             </template>
                             <template v-slot:cell(pair)="row">
                                 <div>
-                                    <a :href="row.item.tokenUrl" class="text-white"
+                                    <a :href="row.item.tokenUrl" class="text-white text-decoration-none token-link"
                                        :disabled.sync="row.value.length <= 20"
                                        v-b-tooltip.hover :title="row.value">
-                                <span v-if="showFullPair(row.value)">
-                                    <avatar
-                                            :image="row.item.baseImage"
-                                            type="token"
-                                            size="small" :symbol="row.item.base"
-                                            class="d-inline"
-                                            :key="row.item.baseImage"
-                                    />
-                                    {{ row.item.base }}/
-                                </span>
+                                        <span v-if="showFullPair(row.value)">
+                                            <avatar
+                                                :image="row.item.baseImage"
+                                                type="token"
+                                                size="small" :symbol="row.item.base"
+                                                class="d-inline"
+                                                :key="row.item.baseImage"
+                                            />
+                                            <span class="token-link">
+                                                {{row.item.base}}/
+                                            </span>
+                                        </span>
                                         <avatar
                                             :image="row.item.quoteImage"
                                             type="token"
@@ -206,12 +208,14 @@
                                             class="d-inline"
                                             :key="row.item.quoteImage"
                                         />
-                                        {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        <span class="token-link">
+                                            {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        </span>
                                     </a>
                                     <guide
-                                            placement="top"
-                                            max-width="150px"
-                                            v-if="row.item.tokenized">
+                                        placement="top"
+                                        max-width="150px"
+                                        v-if="row.item.tokenized">
                                         <template slot="icon">
                                             <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                         </template>
@@ -243,11 +247,11 @@
                     </template>
                     <div class="row justify-content-center">
                         <b-pagination
-                                @change="updateMarkets($event, deployedFirst)"
-                                :total-rows="totalRows"
-                                :per-page="perPage"
-                                v-model="currentPage"
-                                class="my-0" />
+                            @change="updateMarkets($event, deployedFirst)"
+                            :total-rows="totalRows"
+                            :per-page="perPage"
+                            v-model="currentPage"
+                            class="my-0" />
                     </div>
                 </template>
                 <template v-else>
