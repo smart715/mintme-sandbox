@@ -1,5 +1,5 @@
 <template>
-    <div class="avatar d-flex flex-center" :class="classObject" @click="upload">
+    <div class="avatar" :class="classObject" @click="upload">
         <img :src="imageUrl"
              class="rounded-circle img-fluid"
         >

@@ -196,7 +196,7 @@
                                 class="nav-link"
                                 href="{{ url('profile-view', {'nickname': profile.nickname}) }}">
                                 <avatar
-                                    class="token-profile-avatar"
+                                    class="token-profile-avatar d-flex"
                                     size="middle"
                                     image="{{ profile.image.url | imagine_filter('avatar_middle') }}"
                                 ></avatar>

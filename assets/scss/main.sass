@@ -701,7 +701,8 @@ a
     @include font-scale(md)
 
 nav.top-navbar
-  padding: 0rem 1rem !important
+  @include media-breakpoint-down(md)
+    padding: 0.3rem 1rem !important
 
   .navbar-toggler-icon
     outline: none
