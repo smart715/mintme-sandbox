@@ -25,7 +25,7 @@
             <font-awesome-icon :icon="['fab', 'facebook']" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="discordUrl"
+
             :href="discordUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
@@ -61,12 +61,12 @@
                >
                    <div class="px-2">
                        <network
-                           class="d-block c-pointer social-link"
+                           class="d-block c-pointer"
                            network="email"
                        >
-                           <font-awesome-icon icon="envelope" />
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               Email
+                               <font-awesome-icon icon="envelope" />
+                               <span class="social-link">Email</span>
                            </a>
                        </network>
                    </div>
@@ -79,34 +79,34 @@
                    inline-template
                >
                    <div class="px-2">
-                       <network class="d-block c-pointer social-link" network="facebook">
-                           <font-awesome-icon :icon="['fab', 'facebook']"/>
+                       <network class="d-block c-pointer" network="facebook">
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               Facebook
+                               <font-awesome-icon :icon="['fab', 'facebook']"/>
+                               <span class="social-link">Facebook</span>
                            </a>
                        </network>
-                       <network class="d-block c-pointer social-link" network="linkedin">
-                           <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                       <network class="d-block c-pointer" network="linkedin">
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               LinkedIn
+                               <font-awesome-icon :icon="['fab', 'linkedin']"/>
+                               <span class="social-link">LinkedIn</span>
                            </a>
                        </network>
-                       <network class="d-block c-pointer social-link" network="reddit">
-                           <font-awesome-icon :icon="['fab', 'reddit']"/>
+                       <network class="d-block c-pointer" network="reddit">
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               Reddit
+                               <font-awesome-icon :icon="['fab', 'reddit']"/>
+                               <span class="social-link">Reddit</span>
                            </a>
                        </network>
-                       <network class="d-block c-pointer social-link" network="telegram">
-                           <font-awesome-icon :icon="['fab', 'telegram']"/>
+                       <network class="d-block c-pointer" network="telegram">
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               Telegram
+                               <font-awesome-icon :icon="['fab', 'telegram']"/>
+                               <span class="social-link">Telegram</span>
                            </a>
                        </network>
-                       <network class="d-block c-pointer social-link" network="twitter">
-                           <font-awesome-icon :icon="['fab', 'twitter']"/>
+                       <network class="d-block c-pointer" network="twitter">
                            <a href="#" class="text-white hover-icon text-decoration-none">
-                               Twitter
+                               <font-awesome-icon :icon="['fab', 'twitter']"/>
+                               <span class="social-link">Twitter</span>
                            </a>
                        </network>
                    </div>

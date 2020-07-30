@@ -1019,9 +1019,13 @@ input[type=search]::-webkit-search-cancel-button
     svg
       color: $blue !important
 
-.hover-icon:hover svg, svg.hover-icon:hover, .icon-default:hover, .social-link:hover
-  color: $gold
-  transition: color .15s
+.hover-icon:hover svg, .icon-default:hover
+    color: $gold
+    transition: color .15s
+
+a.hover-icon:hover
+  span.social-link
+    text-decoration: underline !important
 
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large
