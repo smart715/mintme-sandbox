@@ -28,9 +28,6 @@ class TickerController extends AbstractFOSRestController
     /** @var MarketFactoryInterface */
     private $marketFactory;
 
-    /** @var TraderInterface */
-    private $trader;
-
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
@@ -38,13 +35,11 @@ class TickerController extends AbstractFOSRestController
         MarketStatusManagerInterface $marketStatusManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
-        $this->trader = $trader;
         $this->rebrandingConverter = $rebrandingConverter;
     }
 
