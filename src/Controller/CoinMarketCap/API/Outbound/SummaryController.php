@@ -3,6 +3,7 @@
 namespace App\Controller\CoinMarketCap\API\Outbound;
 
 use App\Controller\Traits\BaseQuoteOrder;
+use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
@@ -17,7 +18,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 class SummaryController extends AbstractFOSRestController
 {
 
-    use BaseQuoteOrder;
+    use BaseQuoteOrderTrait;
 
     /** @var MarketStatusManagerInterface */
     private $marketStatusManager;

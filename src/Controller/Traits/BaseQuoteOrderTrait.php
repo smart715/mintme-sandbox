@@ -6,19 +6,13 @@ use App\Exchange\Market;
 
 trait BaseQuoteOrderTrait
 {
-    public function fixBaseQuoteOrder(Market $market): Market
+    public function fixBaseQuoteOrder(Market $market)
     {
         if ($market->isTokenMarket()) {
-            $base = $market->getQuote();
-            $quote = $market->getBase();
-        } else {
             $base = $market->getBase();
             $quote = $market->getQuote();
+            $market->setBase($quote);
+            $market->setQuote($base);
         }
-
-        $market->setBase($base);
-        $market->setQuote($quote);
-
-        return $market;
     }
 }
