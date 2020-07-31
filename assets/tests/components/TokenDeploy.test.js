@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenDeploy from '../../js/components/token/deploy/TokenDeploy';
 import moxios from 'moxios';
 import Vuex from 'vuex';
@@ -35,10 +35,19 @@ function mockVue() {
 function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed') {
     const localVue = mockVue();
     localVue.use(Axios);
+    localVue.component('font-awesome-icon', {});
     const store = new Vuex.Store({
-        modules: {makeOrder},
+        modules: {
+            makeOrder,
+            websocket: {
+                namespaced: true,
+                actions: {
+                    addMessageHandler: () => {},
+                },
+            },
+        },
     });
-    const wrapper = mount(TokenDeploy, {
+    const wrapper = shallowMount(TokenDeploy, {
         store,
         localVue,
         propsData: {
@@ -47,6 +56,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
             isOwner: isOwner,
             precision: 4,
             statusProp: status,
+            websocketUrl: '',
         },
     });
 
@@ -69,8 +79,12 @@ describe('TokenDeploy', () => {
 
     it('show loading icon if balances not fetched yet', () => {
         const wrapper = mockTokenDeploy(false);
-        wrapper.vm.hasReleasePeriod = true;
+        wrapper.setProps({hasReleasePeriod: true});
         expect(wrapper.find('.loading-spinner').exists()).toBe(true);
+        wrapper.setData({
+            webCost: 999,
+            balance: 999,
+        });
         wrapper.vm.balance = 999;
         wrapper.vm.webCost = 999;
         expect(wrapper.find('.loading-spinner').exists()).toBe(false);

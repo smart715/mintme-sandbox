@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import bbob from '@bbob/core';
 import {render} from '@bbob/html';
 import presetHTML5 from '@bbob/preset-html5';

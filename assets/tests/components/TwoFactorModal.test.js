@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import {mount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
 Vue.use(Vuelidate);
@@ -7,13 +7,14 @@ Vue.use(Toasted);
 import TwoFactorModal from '../../js/components/modal/TwoFactorModal';
 
 describe('TwoFactorModal', () => {
-    const wrapper = mount(TwoFactorModal, {
-         propsData: {visible: true},
-         data: {code: ''},
+    const wrapper = shallowMount(TwoFactorModal, {
+        propsData: {visible: true},
         mocks: {
             $toasted: {show: () => {}},
         },
     });
+
+    wrapper.setData({code: ''});
 
     const textInput = wrapper.find('input');
 
@@ -44,14 +45,14 @@ describe('TwoFactorModal', () => {
     });
 
     it('2fa label when 2fa activated', () => {
-        const wrapper = mount(TwoFactorModal, {
+        const wrapper = shallowMount(TwoFactorModal, {
              propsData: {twofa: true},
         });
         expect(wrapper.find('label').text()).toBe('Two Factor Authentication Code:');
     });
 
     it('email label when 2fa not activated', () => {
-        const wrapper = mount(TwoFactorModal, {
+        const wrapper = shallowMount(TwoFactorModal, {
              propsData: {twofa: false},
         });
         expect(wrapper.find('label').text()).toBe('Email Verification Code:');

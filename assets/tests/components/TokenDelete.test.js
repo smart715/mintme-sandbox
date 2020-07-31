@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
 import TokenDelete from '../../js/components/token/TokenDelete';
@@ -32,27 +32,30 @@ describe('TokenDelete', () => {
     });
 
     it('renders correctly with assigned props', () => {
-        const wrapper = mount(TokenDelete);
+        const wrapper = shallowMount(TokenDelete, {
+            localVue: mockVue(),
+        });
 
-        wrapper.vm.isTokenExchanged = true;
-        wrapper.vm.isTokenNotDeployed = false;
+        wrapper.setProps({isTokenExchanged: true});
+        wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.vm.isTokenExchanged = true;
-        wrapper.vm.isTokenNotDeployed = true;
+        wrapper.setProps({isTokenExchanged: true});
+        wrapper.setProps({isTokenNotDeployed: true});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.vm.isTokenExchanged = false;
-        wrapper.vm.isTokenNotDeployed = false;
+        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.vm.isTokenExchanged = false;
-        wrapper.vm.isTokenNotDeployed = true;
+        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenNotDeployed: true});
         expect(wrapper.find('span').classes('text-muted')).toBe(false);
     });
 
     it('open TwoFactorModal for token deletion', () => {
-        const wrapper = mount(TokenDelete, {
+        const wrapper = shallowMount(TokenDelete, {
+            localVue: mockVue(),
             propsData: {
                 isTokenExchanged: false,
                 isTokenNotDeployed: true,
@@ -63,23 +66,24 @@ describe('TokenDelete', () => {
     });
 
     it('do not need to send auth code when 2fa enabled', () => {
-        const wrapper = mount(TokenDelete, {
+        const wrapper = shallowMount(TokenDelete, {
+            localVue: mockVue(),
             propsData: {twofa: true},
         });
         expect(wrapper.vm.needToSendCode).toBe(false);
     });
 
     it('need to send auth code whe 2fa disabled', () => {
-        const wrapper = mount(TokenDelete, {
+        const wrapper = shallowMount(TokenDelete, {
+            localVue: mockVue(),
             propsData: {twofa: false},
         });
         expect(wrapper.vm.needToSendCode).toBe(true);
     });
 
     it('do not need send auth code when it already sent', (done) => {
-        const localVue = mockVue();
-        const wrapper = mount(TokenDelete, {
-            localVue,
+        const wrapper = shallowMount(TokenDelete, {
+            localVue: mockVue(),
             propsData: {twofa: false},
         });
 

@@ -1,9 +1,19 @@
-import {mount, shallowMount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Avatar from '../../js/components/Avatar';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {template: ''});
+    return localVue;
+}
 
 describe('Avatar', () => {
     it('should render default fallback image if empty', () => {
         const wrapper = shallowMount(Avatar, {
+            localVue: mockVue(),
             propsData: {
                 image: '',
                 fallback: '/media/default_profile.png',
@@ -13,11 +23,12 @@ describe('Avatar', () => {
             },
         });
 
-        expect(wrapper.find('img').attributes('src')).to.have.string('default_profile.png');
+        expect(wrapper.find('img').attributes('src')).toContain('default_profile.png');
     });
 
     it('should add proper classes', () => {
         const wrapper = shallowMount(Avatar, {
+            localVue: mockVue(),
             propsData: {
                 image: '',
                 type: 'token',
@@ -25,17 +36,18 @@ describe('Avatar', () => {
         });
 
         wrapper.setProps({size: 'small'});
-        expect(wrapper.find('div.avatar').classes('avatar__small')).to.be.true;
+        expect(wrapper.find('div.avatar').classes('avatar__small')).toBe(true);
 
         wrapper.setProps({size: 'medium'});
-        expect(wrapper.find('div.avatar').classes('avatar__medium')).to.be.true;
+        expect(wrapper.find('div.avatar').classes('avatar__medium')).toBe(true);
 
         wrapper.setProps({size: 'large'});
-        expect(wrapper.find('div.avatar').classes('avatar__large')).to.be.true;
+        expect(wrapper.find('div.avatar').classes('avatar__large')).toBe(true);
     });
 
     it('should not allow editing avatar if disabled', () => {
-        const wrapper = mount(Avatar, {
+        const wrapper = shallowMount(Avatar, {
+            localVue: mockVue(),
             propsData: {
                 image: '',
                 editable: false,
@@ -43,11 +55,12 @@ describe('Avatar', () => {
             },
         });
 
-        expect(wrapper.contains('input')).to.be.false;
+        expect(wrapper.contains('imageuploader-stub')).toBe(false);
     });
 
     it('should allow editing avatar if enabled', () => {
-        const wrapper = mount(Avatar, {
+        const wrapper = shallowMount(Avatar, {
+            localVue: mockVue(),
             propsData: {
                 image: '',
                 editable: true,
@@ -55,6 +68,6 @@ describe('Avatar', () => {
             },
         });
 
-        expect(wrapper.contains('input')).to.be.true;
+        expect(wrapper.contains('imageuploader-stub')).toBe(true);
     });
 });

@@ -39,7 +39,7 @@ describe('TradeChart', () => {
                     Vue.nextTick(() => {
                         Vue.nextTick(() => {
                             expect(vm.chartData.datasets[0].data)
-                                .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 0, 321]);
+                                .toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 321]);
                             done();
                         });
                         done();
@@ -68,7 +68,7 @@ describe('TradeChart', () => {
                     Vue.nextTick(() => {
                         Vue.nextTick(() => {
                             expect(vm.chartData.datasets[0].data)
-                                .to.deep.equal([0, 0, 0, 0, 0, 0, 0, 0, 321, 3210]);
+                                .toEqual([0, 0, 0, 0, 0, 0, 0, 0, 321, 3210]);
                             done();
                         });
                         done();
