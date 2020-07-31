@@ -23,15 +23,13 @@ const $routing = {
     },
 };
 
-const $store = new Vuex.Store({
-    modules: {status},
-});
-
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {});
+    localVue.component('b-table', {});
     localVue.use(Vuex);
     localVue.use({
         install(Vue) {
@@ -40,7 +38,9 @@ function mockVue() {
                 single: axios,
             };
             Vue.prototype.$routing = $routing;
-            Vue.prototype.$store = $store;
+            Vue.prototype.$store = new Vuex.Store({
+                modules: {status},
+            });
             Vue.prototype.$toasted = {show: (val) => val};
         },
     });
@@ -53,6 +53,7 @@ let propsForTestCorrectlyRenders = {
     tradingUrl: 'tradingUrl',
     depositMore: 'depositMore',
     twofa: 'twofa',
+    websocketUrl: '',
 };
 
 const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};
@@ -78,9 +79,9 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tokens = null;
-        expect(wrapper.vm.hasTokens).to.be.false;
-        wrapper.vm.tokens = {foo: 'foo'};
-        expect(wrapper.vm.hasTokens).to.be.true;
+        expect(wrapper.vm.hasTokens).toBe(false);
+        wrapper.vm.tokens = [{foo: {name: 'foo'}}];
+        expect(wrapper.vm.hasTokens).toBe(true);
     });
 
     it('should compute allTokens correctly', () => {
@@ -91,10 +92,10 @@ describe('Wallet', () => {
         });
         wrapper.vm.tokens = null;
         wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.allTokens).to.deep.equal({});
-        wrapper.vm.tokens = {foo: 'foo'};
-        wrapper.vm.predefinedTokens = {bar: 'bar'};
-        expect(wrapper.vm.allTokens).to.deep.equal({foo: 'foo', bar: 'bar'});
+        expect(wrapper.vm.allTokens).toMatchObject({});
+        wrapper.vm.tokens = {foo: {name: 'foo'}};
+        wrapper.vm.predefinedTokens = {bar: {name: 'bar'}};
+        expect(wrapper.vm.allTokens).toMatchObject({bar: {name: 'bar'}, foo: {name: 'foo'}});
     });
 
     it('should compute allTokensName correctly', () => {
@@ -104,7 +105,7 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tokens = {foo: {identifier: 'foo'}, bar: {identifier: 'bar'}};
-        expect(wrapper.vm.allTokensName).to.deep.equal(['foo', 'bar']);
+        expect(wrapper.vm.allTokensName).toEqual(['foo', 'bar']);
     });
 
     it('should compute predefinedItems correctly', () => {
@@ -114,9 +115,9 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.predefinedItems).to.deep.equal([]);
+        expect(wrapper.vm.predefinedItems).toEqual([]);
         wrapper.vm.predefinedTokens = assertData;
-        expect(wrapper.vm.predefinedItems).to.deep.equal(expectData);
+        expect(wrapper.vm.predefinedItems).toMatchObject(expectData);
     });
 
     it('should compute items correctly', () => {
@@ -126,9 +127,9 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tokens = null;
-        expect(wrapper.vm.items).to.deep.equal([]);
+        expect(wrapper.vm.items).toEqual([]);
         wrapper.vm.tokens = assertData;
-        expect(wrapper.vm.items).to.deep.equal(expectData);
+        expect(wrapper.vm.items).toMatchObject(expectData);
     });
 
     it('should compute showLoadingIconP correctly', () => {
@@ -138,9 +139,9 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.predefinedTokens = null;
-        expect(wrapper.vm.showLoadingIconP).to.be.true;
-        wrapper.vm.predefinedTokens = 'foo';
-        expect(wrapper.vm.showLoadingIconP).to.be.false;
+        expect(wrapper.vm.showLoadingIconP).toBe(true);
+        wrapper.vm.predefinedTokens = [{name: 'foo'}];
+        expect(wrapper.vm.showLoadingIconP).toBe(false);
     });
 
     it('should compute showLoadingIcon correctly', () => {
@@ -150,9 +151,9 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tokens = null;
-        expect(wrapper.vm.showLoadingIcon).to.be.true;
-        wrapper.vm.tokens = 'foo';
-        expect(wrapper.vm.showLoadingIcon).to.be.false;
+        expect(wrapper.vm.showLoadingIcon).toBe(true);
+        wrapper.vm.tokens = [{name: 'foo'}];
+        expect(wrapper.vm.showLoadingIcon).toBe(false);
     });
 
     it('should set data correctly when the function openWithdraw() is called', () => {
@@ -162,21 +163,21 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.showModal = false;
-        wrapper.vm.twofa = '';
+        wrapper.setProps({twofa: ''});
         wrapper.vm.openWithdraw('currency', 'fee', 'amount', 'subunit');
-        expect(wrapper.vm.showModal).to.be.false;
-        wrapper.vm.twofa = 'foo';
+        expect(wrapper.vm.showModal).toBe(false);
+        wrapper.setProps({twofa: 'foo'});
         wrapper.vm.predefinedTokens = {};
-        wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: true};
+        wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
         wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8);
-        expect(wrapper.vm.showModal).to.be.true;
-        expect(wrapper.vm.selectedCurrency).to.equal(webSymbol);
-        expect(wrapper.vm.isTokenModal).to.be.false;
-        expect(wrapper.vm.withdraw.fee).to.equal('0.5');
-        expect(wrapper.vm.withdraw.webFee).to.equal('0.5');
-        expect(wrapper.vm.withdraw.availableWeb).to.be.true;
-        expect(wrapper.vm.withdraw.amount).to.equal('0.8');
-        expect(wrapper.vm.withdraw.subunit).to.equal(8);
+        expect(wrapper.vm.showModal).toBe(true);
+        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+        expect(wrapper.vm.isTokenModal).toBe(false);
+        expect(wrapper.vm.withdraw.fee).toBe('0.5');
+        expect(wrapper.vm.withdraw.webFee).toBe('0.5');
+        expect(wrapper.vm.withdraw.availableWeb).toBe('.01');
+        expect(wrapper.vm.withdraw.amount).toBe('0.8');
+        expect(wrapper.vm.withdraw.subunit).toBe(8);
     });
 
     it('should set showModal correctly when the function closeWithdraw() is called', () => {
@@ -187,7 +188,7 @@ describe('Wallet', () => {
         });
         wrapper.vm.showModal = true;
         wrapper.vm.closeWithdraw();
-        expect(wrapper.vm.showModal).to.be.false;
+        expect(wrapper.vm.showModal).toBe(false);
     });
 
     describe('openDeposit', () => {
@@ -198,13 +199,13 @@ describe('Wallet', () => {
                 propsData: propsForTestCorrectlyRenders,
             });
             wrapper.vm.openDeposit(webSymbol, 8);
-            expect(wrapper.vm.depositAddress).to.equal('Loading..');
-            expect(wrapper.vm.depositDescription).to.equal('Send WEB to the address above.');
-            expect(wrapper.vm.selectedCurrency).to.equal(webSymbol);
-            expect(wrapper.vm.deposit.fee).to.be.undefined;
-            expect(wrapper.vm.isTokenModal).to.be.false;
-            expect(wrapper.vm.deposit.min).to.equal('1');
-            expect(wrapper.vm.showDepositModal).to.be.true;
+            expect(wrapper.vm.depositAddress).toBe('Loading..');
+            expect(wrapper.vm.depositDescription).toBe('Send WEB to the address above.');
+            expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+            expect(wrapper.vm.deposit.fee).toBeUndefined();
+            expect(wrapper.vm.isTokenModal).toBe(false);
+            expect(wrapper.vm.deposit.min).toBe(undefined);
+            expect(wrapper.vm.showDepositModal).toBe(true);
         });
 
         it('should do $axios request and set properties correctly when result of $axios request is empty', (done) => {
@@ -221,7 +222,7 @@ describe('Wallet', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).to.be.undefined;
+                expect(wrapper.vm.deposit.fee).toBeUndefined();
                 done();
             });
         });
@@ -241,7 +242,7 @@ describe('Wallet', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).to.be.undefined;
+                expect(wrapper.vm.deposit.fee).toBeUndefined();
                 done();
             });
         });
@@ -252,16 +253,16 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.vm.deposit.fee = 'foo';
+            wrapper.vm.deposit.fee = '.01';
             wrapper.vm.openDeposit(webSymbol, 8);
 
-            moxios.stubRequest('deposit_fee', {
+            moxios.stubRequest(/deposit_info.*/, {
                 status: 200,
-                response: 0.5,
+                response: {fee: 0.5},
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).to.equal('0.5');
+                expect(wrapper.vm.deposit.fee).toBe('0.5');
                 done();
             });
         });
@@ -274,20 +275,20 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.vm.depositMore = webSymbol;
+            wrapper.setProps({depositMore: webSymbol});
             wrapper.vm.predefinedTokens = {};
             wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
             wrapper.vm.depositAddresses = {};
             wrapper.vm.depositAddresses[wrapper.vm.depositMore] = 'foo';
             wrapper.vm.openDepositMore();
 
-            moxios.stubRequest('deposit_fee', {
+            moxios.stubRequest(/deposit_info.*/, {
                 status: 200,
-                response: 0.5,
+                response: {fee: 0.5},
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.deposit.fee).to.equal('0.5');
+                expect(wrapper.vm.deposit.fee).toBe('0.5');
                 done();
             });
         });
@@ -305,8 +306,8 @@ describe('Wallet', () => {
             wrapper.vm.tokens = {};
             wrapper.vm.tokens['token'] = {identifier: 'oTokenName'};
             wrapper.vm.updateBalances(assertTokens);
-            expect(wrapper.vm.predefinedTokens['token'].available).to.equal('0.5000');
-            expect(wrapper.vm.tokens['token'].available).to.equal('0.5000');
+            expect(wrapper.vm.predefinedTokens['token'].available).toBe('0.5000');
+            expect(wrapper.vm.tokens['token'].available).toBe('0.5000');
         });
 
         it('should do $axios request and set properties correctly when result of $axios request is not empty', (done) => {
@@ -327,7 +328,7 @@ describe('Wallet', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tokens['token'].available).to.deep.equal(new Decimal(assertTokens['oTokenName'].available).sub('0.05'));
+                expect(wrapper.vm.tokens['token'].available).toMatchObject(new Decimal(assertTokens['oTokenName'].available).sub('0.05'));
                 done();
             });
         });
@@ -349,7 +350,7 @@ describe('Wallet', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tokens['token'].available).to.equal('0.5000');
+                expect(wrapper.vm.tokens['token'].available).toBe('0.5000');
                 done();
             });
         });
@@ -363,7 +364,7 @@ describe('Wallet', () => {
         });
         wrapper.vm.showDepositModal = true;
         wrapper.vm.closeDeposit();
-        expect(wrapper.vm.showDepositModal).to.be.false;
+        expect(wrapper.vm.showDepositModal).toBe(false);
     });
 
     it('should return correctly value when the function tokensToArray() is called', () => {
@@ -372,7 +373,7 @@ describe('Wallet', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.tokensToArray(assertData)).to.deep.equal(expectData);
+        expect(wrapper.vm.tokensToArray(assertData)).toMatchObject(expectData);
     });
 
     it('should return correctly url when the function generatePairUrl() is called', () => {
@@ -381,7 +382,7 @@ describe('Wallet', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.generatePairUrl({name: 'foo'})).to.equal('token_show-foo');
+        expect(wrapper.vm.generatePairUrl({name: 'foo'})).toBe('token_show-foo');
     });
 
     it('should return correctly url when the function generateCoinUrl() is called', () => {
@@ -391,8 +392,8 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.predefinedTokens = {BTC: {name: 'BTC'}, WEB: {name: 'WEB'}};
-        expect(wrapper.vm.generateCoinUrl({exchangeble: false})).to.equal('coin-WEB');
-        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: false, name: 'foo'})).to.equal('coin-BTC-WEB');
-        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: true, name: 'foo'})).to.equal('coin-BTC-foo');
+        expect(wrapper.vm.generateCoinUrl({exchangeble: false})).toBe('coin-WEB');
+        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: false, name: 'foo'})).toBe('coin-BTC-WEB');
+        expect(wrapper.vm.generateCoinUrl({exchangeble: true, tradable: true, name: 'foo'})).toBe('coin-BTC-foo');
     });
 });

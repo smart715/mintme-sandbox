@@ -21,21 +21,23 @@ describe('TradeSellOrders', () => {
                     identifier: 'TOK',
                 },
             },
-            fields: {
-                price: {
-                    label: 'Price',
-                    key: 'price',
+            fields: [
+                {
+                    price: {
+                        label: 'Price',
+                        key: 'price',
+                    },
+                    amount: {
+                        label: 'Amount',
+                    },
+                    sum: {
+                        label: 'Sum WEB',
+                    },
+                    trader: {
+                        label: 'Trader',
+                    },
                 },
-                amount: {
-                    label: 'Amount',
-                },
-                sum: {
-                    label: 'Sum WEB',
-                },
-                trader: {
-                    label: 'Trader',
-                },
-            },
+            ],
             sortBy: 'name',
             sortDesc: true,
             basePrecision: 8,
@@ -53,17 +55,17 @@ describe('TradeSellOrders', () => {
     };
 
     it('hide the table and show message if no orders yet', () => {
-        expect(wrapper.find('b-table').exists()).to.deep.equal(false);
-        expect(wrapper.html().includes('No order was added yet')).to.deep.equal(true);
-        wrapper.vm.ordersList = Array(2).fill(order);
-        expect(wrapper.find('b-table').exists()).to.deep.equal(true);
-        expect(wrapper.html().includes('No order was added yet')).to.deep.equal(false);
+        expect(wrapper.find('b-table').exists()).toBe(false);
+        expect(wrapper.html().includes('No order was added yet')).toBe(true);
+        wrapper.setProps({ordersList: Array(2).fill(order)});
+        expect(wrapper.find('b-table').exists()).toBe(true);
+        expect(wrapper.html().includes('No order was added yet')).toBe(false);
     });
 
     it('show total amount correctly', () => {
-        wrapper.vm.ordersList = Array(2).fill(order);
-        expect(wrapper.vm.total).to.deep.equal(toMoney(4));
+        wrapper.setProps({ordersList: Array(2).fill(order)});
+        expect(wrapper.vm.total).toBe(toMoney(4));
         wrapper.vm.ordersList.push(order);
-        expect(wrapper.vm.total).to.deep.equal(toMoney(6));
+        expect(wrapper.vm.total).toBe(toMoney(6));
     });
 });

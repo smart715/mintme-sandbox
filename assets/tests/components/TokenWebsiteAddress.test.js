@@ -1,4 +1,4 @@
-import {mount, createLocalVue} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenWebsiteAddress from '../../js/components/token/website/TokenWebsiteAddress';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -8,7 +8,8 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
+    localVue.component('b-modal', {});
+    localVue.component('b-tooltip', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -29,11 +30,13 @@ describe('TokenWebsiteAddress', () => {
 
     it('open confirm dialog', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenWebsiteAddress, {
+        const wrapper = shallowMount(TokenWebsiteAddress, {
             localVue,
-            data: {
-                showWebsiteError: false,
-                showConfirmWebsiteModal: false,
+            data() {
+                return {
+                    showWebsiteError: false,
+                    showConfirmWebsiteModal: false,
+                };
             },
             propsData: {editingWebsite: true},
         });
@@ -46,10 +49,12 @@ describe('TokenWebsiteAddress', () => {
 
     it('do not save incorrect link', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenWebsiteAddress, {
+        const wrapper = shallowMount(TokenWebsiteAddress, {
             localVue,
-            data: {
-                showWebsiteError: false,
+            data() {
+                return {
+                    showWebsiteError: false,
+                };
             },
             propsData: {
                 editingWebsite: true,
@@ -64,7 +69,7 @@ describe('TokenWebsiteAddress', () => {
 
     it('show invitation text when link is not specified', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenWebsiteAddress, {
+        const wrapper = shallowMount(TokenWebsiteAddress, {
             localVue,
             propsData: {
                 editingWebsite: false,
@@ -75,7 +80,7 @@ describe('TokenWebsiteAddress', () => {
 
     it('show link when specified', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenWebsiteAddress, {
+        const wrapper = shallowMount(TokenWebsiteAddress, {
             localVue,
             propsData: {
                 currentWebsite: 'https://example.com',

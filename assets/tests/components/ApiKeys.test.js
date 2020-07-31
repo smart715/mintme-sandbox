@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ApiKeys from '../../js/components/ApiKeys';
 import moxios from 'moxios';
 import axiosPlugin from '../../js/axios';
@@ -9,6 +9,9 @@ import axiosPlugin from '../../js/axios';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(axiosPlugin);
+    localVue.component('font-awesome-icon', {
+        template: '',
+    });
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
@@ -17,7 +20,7 @@ function mockVue() {
     return localVue;
 }
 
-describe('ApiKeys', () => {
+describe('ApiKey', () => {
     beforeEach(() => {
         moxios.install();
     });
@@ -31,7 +34,7 @@ describe('ApiKeys', () => {
             publicKey: 'foo',
             plainPrivateKey: 'bar',
         };
-        const wrapper = mount(ApiKeys, {
+        const wrapper = shallowMount(ApiKeys, {
             localVue: mockVue(),
             propsData: {
                 apiKeys,
@@ -65,7 +68,7 @@ describe('ApiKeys', () => {
             publicKey: 'foo',
             plainPrivateKey: 'bar',
         };
-        const wrapper = mount(ApiKeys, {
+        const wrapper = shallowMount(ApiKeys, {
             localVue: mockVue(),
             propsData: {
                 apiKeys,
