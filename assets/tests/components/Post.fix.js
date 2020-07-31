@@ -7,7 +7,6 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -45,7 +44,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('bbcode-view-stub').html()).to.contain('foo');
+        expect(wrapper.find('bbcode-view-stub').html()).toContain('foo');
     });
 
     it('doesnt show content if post.content is null', () => {
@@ -61,7 +60,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('p').html()).to.contain('To see this post you need to have 0 tok in your balance. Visit trade page and create buy order to get required tokens.');
+        expect(wrapper.find('p').html()).toContain('To see this post you need to have 0 tok in your balance. Visit trade page and create buy order to get required tokens.');
     });
 
     it('shows edit and delete icons if showEdit is true', () => {
@@ -74,8 +73,8 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.post-edit-icon').exists()).to.be.true;
-        expect(wrapper.find('.delete-icon').exists()).to.be.true;
+        expect(wrapper.find('.post-edit-icon').exists()).toBe(true);
+        expect(wrapper.find('.delete-icon').exists()).toBe(true);
     });
 
     it('doesnt show edit and delete icons if showEdit is false', () => {
@@ -88,7 +87,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.post-edit-icon').exists()).to.be.false;
-        expect(wrapper.find('.delete-icon').exists()).to.be.false;
+        expect(wrapper.find('.post-edit-icon').exists()).toBe(false);
+        expect(wrapper.find('.delete-icon').exists()).toBe(false);
     });
 });

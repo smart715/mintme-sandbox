@@ -3,13 +3,22 @@ import TokenAirdropCampaign from '../../js/components/token/airdrop_campaign/Tok
 import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
-import tokenStats from '../../js/storage/modules/token_statistics';
+import tokenStatistics from '../../js/storage/modules/token_statistics';
+
+delete window.location;
+window.location = {
+    reload: jest.fn(),
+    href: '',
+};
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.directive('b-toggle', {});
+    localVue.component('font-awesome-icon', {});
+    localVue.component('b-collapse', {});
     localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
@@ -27,7 +36,7 @@ function mockVue() {
  */
 function getStore() {
     return new Vuex.Store({
-        modules: {tokenStats},
+        modules: {tokenStatistics},
     });
 }
 
@@ -95,7 +104,6 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.btnDisabled).toBe(true);
         wrapper.vm.participantsAmount = 101;
         expect(wrapper.vm.btnDisabled).toBe(false);
-        wrapper.vm.minTokensAmount = '0.01';
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.tokenBalance = 0;
         expect(wrapper.vm.btnDisabled).toBe(true);

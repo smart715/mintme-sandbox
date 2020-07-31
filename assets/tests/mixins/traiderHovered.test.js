@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
-import TraiderHoveredMixin from '../../js/mixins/trader_hovered';
+import TraderHoveredMixin from '../../js/mixins/trader_hovered';
 
-describe('TraiderHoveredMixin', function() {
+describe('TraderHoveredMixin', () => {
     const $url = 'URL';
     const $routing = {generate: () => $url};
     const Component = Vue.component('foo', {
-        mixins: [TraiderHoveredMixin],
+        template: '<div></div>',
+        mixins: [TraderHoveredMixin],
     });
     const basePrecision = 4;
     const wrapper = shallowMount(Component, {

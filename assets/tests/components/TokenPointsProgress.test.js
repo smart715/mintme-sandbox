@@ -2,14 +2,14 @@ import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenPointsProgress from '../../js/components/token/TokenPointsProgress';
 import {tokenDeploymentStatus} from '../../js/utils/constants';
 import Vuex from 'vuex';
-import tokenStats from '../../js/storage/modules/token_statistics';
+import tokenStatistics from '../../js/storage/modules/token_statistics';
 
 describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly with any item', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -37,7 +37,7 @@ describe('TokenPointsProgress', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -67,7 +67,7 @@ describe('TokenPointsProgress', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -90,14 +90,14 @@ describe('TokenPointsProgress', () => {
             },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.vm.tokenDescription = null;
+        wrapper.setProps({tokenDescription: null});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
     it('should calculate token points gained correctly "user profile with out trade anonymously"', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -120,14 +120,14 @@ describe('TokenPointsProgress', () => {
             },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.vm.profileAnonymously = '1';
+        wrapper.setProps({profileAnonymously: '1'});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
     it('should calculate token points gained correctly with all items', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -155,7 +155,7 @@ describe('TokenPointsProgress', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -181,11 +181,15 @@ describe('TokenPointsProgress', () => {
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
         it('should calculate token points gained correctly on token status "token pending"', () => {
-            wrapper.vm.tokenStatus = tokenDeploymentStatus.pending;
+            wrapper.setProps({
+                tokenStatus: tokenDeploymentStatus.pending,
+            });
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
          it('should calculate token points gained correctly "token deployed"', () => {
-            wrapper.vm.tokenStatus = tokenDeploymentStatus.deployed;
+            wrapper.setProps({
+                tokenStatus: tokenDeploymentStatus.deployed,
+            });
             expect(wrapper.vm.tokenPointsGained).toBe(4);
         });
     });
@@ -193,7 +197,7 @@ describe('TokenPointsProgress', () => {
         const localVue = createLocalVue();
         localVue.use(Vuex);
         const store = new Vuex.Store({
-            modules: {tokenStats},
+            modules: {tokenStatistics},
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -219,27 +223,27 @@ describe('TokenPointsProgress', () => {
             expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
         it('should calculate token points gained correctly all social media', () => {
-            wrapper.vm.tokenFacebook = 'facebook';
-            wrapper.vm.tokenYoutube = 'youtube';
-            wrapper.vm.tokenWebsite = 'website';
+            wrapper.setProps({tokenFacebook: 'facebook'});
+            wrapper.setProps({tokenYoutube: 'youtube'});
+            wrapper.setProps({tokenWebsite: 'website'});
             expect(wrapper.vm.tokenPointsGained).toBe(2);
         });
         it('should calculate token points gained correctly when facebok dont exist', () =>{
-            wrapper.vm.tokenFacebook = null;
-            wrapper.vm.tokenYoutube = 'youtube';
-            wrapper.vm.tokenWebsite = 'website';
+            wrapper.setProps({tokenFacebook: null});
+            wrapper.setProps({tokenYoutube: 'youtube'});
+            wrapper.setProps({tokenWebsite: 'website'});
             expect(wrapper.vm.tokenPointsGained).toBe(2);
         });
         it('should calculate token points gained correctly when youtube dont exist', () =>{
-            wrapper.vm.tokenFacebook = 'facebook';
-            wrapper.vm.tokenWebsite = 'website';
-            wrapper.vm.tokenYoutube = null;
+            wrapper.setProps({tokenFacebook: 'facebook'});
+            wrapper.setProps({tokenWebsite: 'website'});
+            wrapper.setProps({tokenYoutube: null});
             expect(wrapper.vm.tokenPointsGained).toBe(2);
         });
         it('should calculate token points gained correctly when website dont exist', () =>{
-            wrapper.vm.tokenFacebook = 'facebook';
-            wrapper.vm.tokenYoutube = 'youtube';
-            wrapper.vm.tokenWebsite = null;
+            wrapper.setProps({tokenFacebook: 'facebook'});
+            wrapper.setProps({tokenYoutube: 'youtube'});
+            wrapper.setProps({tokenWebsite: null});
             expect(wrapper.vm.tokenPointsGained).toBe(2);
         });
     });

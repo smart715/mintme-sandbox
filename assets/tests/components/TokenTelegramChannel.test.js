@@ -1,4 +1,4 @@
-import {mount, createLocalVue} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenTelegramChannel from '../../js/components/token/TokenTelegramChannel';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -8,6 +8,7 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.component('b-tooltip', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -29,10 +30,12 @@ describe('TokenTelegramChannel', () => {
 
     it('save correct link', (done) => {
         const localVue = mockVue();
-        const wrapper = mount(TokenTelegramChannel, {
+        const wrapper = shallowMount(TokenTelegramChannel, {
             localVue,
-            data: {
-                showTelegramError: false,
+            data() {
+                return {
+                    showTelegramError: false,
+                };
             },
             propsData: {
                 editingTelegram: true,
@@ -56,10 +59,12 @@ describe('TokenTelegramChannel', () => {
 
     it('do not save incorrect link', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenTelegramChannel, {
+        const wrapper = shallowMount(TokenTelegramChannel, {
             localVue,
-            data: {
-                showTelegramError: false,
+            data() {
+                return {
+                    showTelegramError: false,
+                };
             },
             propsData: {
                 editingTelegram: true,
@@ -74,7 +79,7 @@ describe('TokenTelegramChannel', () => {
 
     it('show invitation text when link is not specified', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenTelegramChannel, {
+        const wrapper = shallowMount(TokenTelegramChannel, {
             localVue,
             propsData: {
                 editingTelegram: false,
@@ -85,7 +90,7 @@ describe('TokenTelegramChannel', () => {
 
     it('show link when specified', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenTelegramChannel, {
+        const wrapper = shallowMount(TokenTelegramChannel, {
             localVue,
             propsData: {
                 currentTelegram: 'https://t.me/joinchat/newtelegram',

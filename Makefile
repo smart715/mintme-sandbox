@@ -14,7 +14,7 @@ phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
 jest:
-	npm run unit --silent
+	npm run unit
 
 syntax_check:
 	php bin/console cache:warmup

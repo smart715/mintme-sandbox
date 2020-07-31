@@ -1,4 +1,4 @@
-import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Donation from '../../js/components/donation/Donation';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -9,11 +9,14 @@ import {webSymbol, btcSymbol, tokSymbol, MINTME} from '../../js/utils/constants'
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
+    localVue.component('font-awesome-icon', {});
+    localVue.component('b-dropdown', {});
+    localVue.component('b-dropdown-item', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$toasted = {show: () => {}};
         },
     });
 
@@ -30,84 +33,88 @@ describe('Donation', () => {
     });
 
     it('should renders correctly for logged in user', () => {
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
             },
+            localVue: mockVue(),
         });
 
-        expect(wrapper.vm.dropdownText).to.equal('Select currency');
-        expect(wrapper.vm.isCurrencySelected).to.be.false;
-        expect(wrapper.vm.loginFormLoaded).to.be.true;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
-        expect(wrapper.vm.isAmountValid).to.be.false;
-        expect(wrapper.find('.donation-header span').text()).to.equal('Donations');
-        expect(wrapper.find('b-dropdown').exists()).to.deep.equal(true);
+        expect(wrapper.vm.dropdownText).toBe('Select currency');
+        expect(wrapper.vm.isCurrencySelected).toBe(false);
+        expect(wrapper.vm.loginFormLoaded).toBe(true);
+        expect(wrapper.vm.buttonDisabled).toBe(true);
+        expect(wrapper.vm.isAmountValid).toBe(false);
+        expect(wrapper.find('.donation-header span').text()).toBe('Donations');
+        expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
     });
 
     it('should renders correctly for not logged in user', () => {
-        const localVue = mockVue();
-        const wrapper = mount(Donation, {
-            localVue,
+        const wrapper = shallowMount(Donation, {
+            localVue: mockVue(),
             propsData: {
                 loggedIn: false,
             },
         });
 
-        expect(wrapper.vm.loginFormLoaded).to.be.false;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
-        expect(wrapper.vm.isAmountValid).to.be.false;
-        expect(wrapper.vm.dropdownText).to.equal('Select currency');
-        expect(wrapper.find('.donation-header span').text()).to.equal('To make a donation you have to be logged in');
-        expect(wrapper.find('b-dropdown').exists()).to.deep.equal(false);
+        expect(wrapper.vm.loginFormLoaded).toBe(false);
+        expect(wrapper.vm.buttonDisabled).toBe(true);
+        expect(wrapper.vm.isAmountValid).toBe(false);
+        expect(wrapper.vm.dropdownText).toBe('Select currency');
+        expect(wrapper.find('.donation-header span').text()).toBe('To make a donation you have to be logged in');
+        expect(wrapper.find('b-dropdown-stub').exists()).toBe(false);
     });
 
     it('should renders correctly for logged in user and load balance for selected currency', () => {
-        const wrapper = mount(Donation, {
+        const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
+            localVue: mockVue(),
         });
 
-        expect(wrapper.vm.dropdownText).to.equal('Select currency');
-        expect(wrapper.vm.isCurrencySelected).to.be.false;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
-        expect(wrapper.vm.isAmountValid).to.be.false;
-        expect(wrapper.find('.donation-header span').text()).to.equal('Donations');
-        expect(wrapper.find('b-dropdown').exists()).to.deep.equal(true);
+        expect(wrapper.vm.dropdownText).toBe('Select currency');
+        expect(wrapper.vm.isCurrencySelected).toBe(false);
+        expect(wrapper.vm.buttonDisabled).toBe(true);
+        expect(wrapper.vm.isAmountValid).toBe(false);
+        expect(wrapper.find('.donation-header span').text()).toBe('Donations');
+        expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
-        wrapper.find('b-dropdown').trigger('click');
-        expect(wrapper.find('b-dropdown-item').exists()).to.deep.equal(true);
         // Select WEB
-        wrapper.find('b-dropdown-item:first-child').trigger('click');
-        expect(wrapper.vm.isCurrencySelected).to.be.true;
-        expect(wrapper.vm.balanceLoaded).to.be.false;
-        expect(wrapper.vm.isAmountValid).to.be.false;
-        expect(wrapper.vm.selectedCurrency).to.be.equal(webSymbol);
+        wrapper.vm.onSelect(webSymbol);
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
+        expect(wrapper.vm.balanceLoaded).toBe(false);
+        expect(wrapper.vm.isAmountValid).toBe(false);
+        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
 
         // Select BTC
-        wrapper.find('b-dropdown-item:last-child').trigger('click');
-        expect(wrapper.vm.isCurrencySelected).to.be.true;
-        expect(wrapper.vm.balanceLoaded).to.be.false;
-        expect(wrapper.vm.isAmountValid).to.be.false;
-        expect(wrapper.vm.selectedCurrency).to.be.equal(btcSymbol);
+        wrapper.vm.onSelect(btcSymbol);
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
+        expect(wrapper.vm.balanceLoaded).toBe(false);
+        expect(wrapper.vm.isAmountValid).toBe(false);
+        expect(wrapper.vm.selectedCurrency).toBe(btcSymbol);
     });
 
     it('should rebrand selected currency WEB -> MINTME', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.donationCurrency).to.be.equal(MINTME.symbol);
+        expect(wrapper.vm.donationCurrency).toBe(MINTME.symbol);
 
         wrapper.vm.selectedCurrency = btcSymbol;
-        expect(wrapper.vm.donationCurrency).to.be.equal(btcSymbol);
+        expect(wrapper.vm.donationCurrency).toBe(btcSymbol);
 
         wrapper.vm.selectedCurrency = tokSymbol;
-        expect(wrapper.vm.donationCurrency).to.be.equal(tokSymbol);
+        expect(wrapper.vm.donationCurrency).toBe(tokSymbol);
     });
 
     it('should generate link to wallet for selected currency', () => {
@@ -116,59 +123,67 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.getDepositLink).to.be.equal('wallet');
+        expect(wrapper.vm.getDepositLink).toBe('wallet');
 
         wrapper.vm.selectedCurrency = btcSymbol;
-        expect(wrapper.vm.getDepositLink).to.be.equal('wallet');
+        expect(wrapper.vm.getDepositLink).toBe('wallet');
     });
 
     it('should properly check if currency selected', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.selectedCurrency = '';
-        expect(wrapper.vm.isCurrencySelected).to.be.false;
+        expect(wrapper.vm.isCurrencySelected).toBe(false);
 
         wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.isCurrencySelected).to.be.true;
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
 
         wrapper.vm.selectedCurrency = tokSymbol;
-        expect(wrapper.vm.isCurrencySelected).to.be.false;
+        expect(wrapper.vm.isCurrencySelected).toBe(false);
 
         wrapper.vm.selectedCurrency = btcSymbol;
-        expect(wrapper.vm.isCurrencySelected).to.be.true;
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
     });
 
     it('should properly check insufficient funds', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
                 market: {
+                    quote: 'tok1',
                     base: {
                         subunit: 4,
                     },
                 },
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.balanceLoaded = false;
-        expect(wrapper.vm.insufficientFunds).to.be.false;
+        expect(wrapper.vm.insufficientFunds).toBe(false);
 
         wrapper.vm.balanceLoaded = true;
-        expect(wrapper.vm.insufficientFunds).to.be.true;
+        expect(wrapper.vm.insufficientFunds).toBe(true);
 
         wrapper.vm.balance = '0.5';
-        expect(wrapper.vm.insufficientFunds).to.be.false;
+        expect(wrapper.vm.insufficientFunds).toBe(false);
 
         wrapper.vm.amountToDonate = '0.55';
-        expect(wrapper.vm.insufficientFunds).to.be.true;
+        expect(wrapper.vm.insufficientFunds).toBe(true);
     });
 
     it('should properly check amount to donate', () => {
@@ -180,35 +195,37 @@ describe('Donation', () => {
                     minBtcAmount: 0.000001,
                     minMintmeAmount: 0.0001,
                 },
+                market: {quote: 'tok1'},
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.amountToDonate = '';
-        expect(wrapper.vm.isAmountValid).to.be.false;
+        expect(wrapper.vm.isAmountValid).toBe(false);
 
         wrapper.vm.amountToDonate = '0.0';
-        expect(wrapper.vm.isAmountValid).to.be.false;
+        expect(wrapper.vm.isAmountValid).toBe(false);
 
         wrapper.vm.amountToDonate = '0.001';
-        expect(wrapper.vm.isAmountValid).to.be.true;
+        expect(wrapper.vm.isAmountValid).toBe(true);
 
         wrapper.vm.amountToDonate = '0.0000';
-        expect(wrapper.vm.isAmountValid).to.be.false;
+        expect(wrapper.vm.isAmountValid).toBe(false);
 
         wrapper.vm.amountToDonate = '0.0001';
-        expect(wrapper.vm.isAmountValid).to.be.true;
+        expect(wrapper.vm.isAmountValid).toBe(true);
 
         wrapper.vm.selectedCurrency = btcSymbol;
         wrapper.vm.amountToDonate = 0.0000001;
-        expect(wrapper.vm.isAmountValid).to.be.false;
+        expect(wrapper.vm.isAmountValid).toBe(false);
         wrapper.vm.amountToDonate = 0.000001;
-        expect(wrapper.vm.isAmountValid).to.be.true;
+        expect(wrapper.vm.isAmountValid).toBe(true);
 
         wrapper.vm.selectedCurrency = webSymbol;
         wrapper.vm.amountToDonate = 0.00001;
-        expect(wrapper.vm.isAmountValid).to.be.false;
+        expect(wrapper.vm.isAmountValid).toBe(false);
         wrapper.vm.amountToDonate = 0.0001;
-        expect(wrapper.vm.isAmountValid).to.be.true;
+        expect(wrapper.vm.isAmountValid).toBe(true);
     });
 
     it('should properly disable button', () => {
@@ -218,55 +235,60 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: false,
                 market: {
+                    quote: 'tok1',
                     base: {
                         subunit: 4,
                     },
                 },
                 donationParams: {
+                    fee: .01,
                     minMintmeAmount: 0.0001,
                 },
             },
         });
 
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).toBe(true);
 
-        wrapper.vm.loggedIn = true;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        wrapper.setProps({loggedIn: true});
+        expect(wrapper.vm.buttonDisabled).toBe(true);
 
         wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).toBe(true);
 
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.balance = '20';
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).toBe(true);
 
         wrapper.vm.amountToDonate = '5';
-        expect(wrapper.vm.buttonDisabled).to.be.false;
+        expect(wrapper.vm.buttonDisabled).toBe(false);
 
         wrapper.vm.donationChecking = true;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).toBe(true);
 
         wrapper.vm.donationChecking = false;
         wrapper.vm.donationInProgress = true;
-        expect(wrapper.vm.buttonDisabled).to.be.true;
+        expect(wrapper.vm.buttonDisabled).toBe(true);
     });
 
     it('can select currency', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.onSelect(webSymbol);
-        expect(wrapper.vm.selectedCurrency).to.be.equal(webSymbol);
-        expect(wrapper.vm.balanceLoaded).to.be.false;
+        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+        expect(wrapper.vm.balanceLoaded).toBe(false);
 
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.onSelect(btcSymbol);
-        expect(wrapper.vm.selectedCurrency).to.be.equal(btcSymbol);
-        expect(wrapper.vm.balanceLoaded).to.be.false;
+        expect(wrapper.vm.selectedCurrency).toBe(btcSymbol);
+        expect(wrapper.vm.balanceLoaded).toBe(false);
     });
 
     it('can load login form', (done) => {
@@ -275,6 +297,8 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: false,
+                donationParams: {fee: .01},
+                market: {quote: 'tok1'},
             },
         });
 
@@ -286,8 +310,8 @@ describe('Donation', () => {
         wrapper.vm.loadLoginForm();
 
         moxios.wait(() => {
-            expect(wrapper.vm.loginFormLoaded).to.be.true;
-            expect(wrapper.html()).to.contain('<form>');
+            expect(wrapper.vm.loginFormLoaded).toBe(true);
+            expect(wrapper.html()).toContain('<form>');
             done();
         });
     });
@@ -298,6 +322,13 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: true,
+                donationParams: {
+                    minMintmeAmount: .0001,
+                    fee: .01,
+                },
+                market: {
+                    quote: 'tok1',
+                },
             },
         });
 
@@ -310,8 +341,8 @@ describe('Donation', () => {
                 status: 200,
                 response: 111,
             }).then(() => {
-                expect(wrapper.vm.balance).to.be.equal(111);
-                expect(wrapper.vm.balanceLoaded).to.be.true;
+                expect(wrapper.vm.balance).toBe(111);
+                expect(wrapper.vm.balanceLoaded).toBe(true);
                 done();
             });
         });
@@ -345,14 +376,13 @@ describe('Donation', () => {
             },
         });
 
-        wrapper.vm.selectedCurrency = webSymbol;
         wrapper.vm.amountToDonate = 50;
         wrapper.vm.checkDonation();
-        expect(wrapper.vm.donationChecking).to.be.true;
+        expect(wrapper.vm.donationChecking).toBe(true);
 
         moxios.wait(() => {
-            expect(wrapper.vm.amountToReceive).to.be.equal('2.5674');
-            expect(wrapper.vm.donationChecking).to.be.false;
+            expect(wrapper.vm.amountToReceive).toBe('2.5674');
+            expect(wrapper.vm.donationChecking).toBe(false);
             done();
         });
     });
@@ -363,6 +393,9 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: true,
+                donationParams: {
+                    fee: .01,
+                },
                 market: {
                     base: {
                         symbol: webSymbol,
@@ -372,13 +405,13 @@ describe('Donation', () => {
                     },
                 },
             },
-            data: {
-                selectedCurrency: webSymbol,
-                amountToDonate: 20,
-                amountToReceive: 2,
-                balanceLoaded: true,
-                balance: 220,
-            },
+        });
+
+        wrapper.setData({
+            selectedCurrency: webSymbol,
+            amountToDonate: 20,
+            amountToReceive: 2,
+            balance: 220,
         });
 
         moxios.stubRequest('make_donation', {
@@ -386,14 +419,14 @@ describe('Donation', () => {
         });
 
         wrapper.vm.makeDonation();
-        expect(wrapper.vm.donationInProgress).to.be.true;
+        expect(wrapper.vm.donationInProgress).toBe(true);
 
         moxios.wait(() => {
-            expect(wrapper.vm.amountToDonate).to.be.equal(0);
-            expect(wrapper.vm.amountToReceive).to.be.equal(0);
-            expect(wrapper.vm.balanceLoaded).to.be.false;
-            Vue.nextTick(() => {
-                expect(wrapper.vm.donationInProgress).to.be.false;
+            expect(wrapper.vm.amountToDonate).toBe(0);
+            expect(wrapper.vm.amountToReceive).toBe(0);
+            expect(wrapper.vm.balanceLoaded).toBe(false);
+            wrapper.vm.$nextTick(() => {
+                expect(wrapper.vm.donationInProgress).toBe(false);
                 done();
             });
         });
@@ -425,28 +458,32 @@ describe('Donation', () => {
         wrapper.vm.amountToDonate = 20;
         wrapper.vm.all();
 
-        expect(wrapper.vm.amountToDonate).to.be.equal('100');
+        expect(wrapper.vm.amountToDonate).toBe('100');
 
         // Insufficient funds
         wrapper.vm.balance = 100;
         wrapper.vm.amountToDonate = 120;
         wrapper.vm.all();
 
-        expect(wrapper.vm.amountToDonate).to.be.equal('100');
+        expect(wrapper.vm.amountToDonate).toBe('100');
     });
 
     it('should reset amount to donate and amount to receive on calling resetAmount()', () => {
         const wrapper = shallowMount(Donation, {
             propsData: {
                 loggedIn: true,
+                market: {
+                    quote: 'tok1',
+                },
             },
+            localVue: mockVue(),
         });
 
         wrapper.vm.amountToDonate = 50;
         wrapper.vm.amountToReceive = 7;
         wrapper.vm.resetAmount();
 
-        expect(wrapper.vm.amountToDonate).to.be.equal(0);
-        expect(wrapper.vm.amountToReceive).to.be.equal(0);
+        expect(wrapper.vm.amountToDonate).toBe(0);
+        expect(wrapper.vm.amountToReceive).toBe(0);
     });
 });
