@@ -1,4 +1,4 @@
-import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenOngoingAirdropCampaign from '../../js/components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -9,6 +9,7 @@ import moment from 'moment';
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -163,7 +164,7 @@ describe('TokenOngoingAirdropCampaign', () => {
 
     it('should load airdrop campaign data', (done) => {
         const localVue = mockVue();
-        const wrapper = mount(TokenOngoingAirdropCampaign, {
+        const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
             propsData: {
                 tokenName: 'test1',

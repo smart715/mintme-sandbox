@@ -55,36 +55,36 @@ describe('Trading', () => {
     };
 
     it('Show USD in dropdown option if enableUSD is true', () => {
-        expect(wrapper.find('.usdOption').exists()).to.deep.equal(true);
+        expect(wrapper.find('.usdOption').exists()).toBe(true);
     });
     it('show message if there are not deployed tokens yet', () => {
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.sanitizedMarkets = {};
-        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(true);
+        expect(wrapper.html().includes('No one deployed his token yet')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No one deployed his token yet')).to.deep.equal(false);
+        expect(wrapper.html().includes('No one deployed his token yet')).toBe(false);
     });
     it('show message if user has no any token yet', () => {
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.marketFilters.selectedFilter = 'user';
-        expect(wrapper.html().includes('No any token yet')).to.deep.equal(true);
+        expect(wrapper.html().includes('No any token yet')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No any token yet')).to.deep.equal(false);
+        expect(wrapper.html().includes('No any token yet')).toBe(false);
     });
     it('show rest of token link', () => {
         wrapper.vm.marketFilters.selectedFilter = 'all';
-        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(false);
+        expect(wrapper.html().includes('Show rest of tokens')).toBe(false);
         wrapper.setProps({userId: 1});
         wrapper.vm.marketFilters.selectedFilter = 'user';
-        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+        expect(wrapper.html().includes('Show rest of tokens')).toBe(true);
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
-        expect(wrapper.html().includes('Show rest of tokens')).to.deep.equal(true);
+        expect(wrapper.html().includes('Show rest of tokens')).toBe(true);
     });
     it('show only deployed tokens if user selected the option', () => {
         wrapper.vm.marketFilters.userSelected = true;
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
-        expect(wrapper.vm.sanitizedMarkets).to.not.be.empty;
+        expect(wrapper.vm.sanitizedMarkets).not.toMatchObject({});
     });
     it('make sure that expected "user=1" will be sent', (done) => {
         wrapper.vm.marketFilters.userSelected = true;
@@ -106,7 +106,7 @@ describe('Trading', () => {
         });
         wrapper.vm.sanitizedMarkets = markets;
         moxios.wait(() => {
-            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            expect(wrapper.vm.sanitizedMarkets).toMatchObject(markets);
             done();
         });
     });
@@ -133,7 +133,7 @@ describe('Trading', () => {
         });
         wrapper.vm.sanitizedMarkets = markets;
         moxios.wait(() => {
-            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            expect(wrapper.vm.sanitizedMarkets).toMatchObject(markets);
             done();
         });
     });
@@ -163,7 +163,7 @@ describe('Trading', () => {
         });
         wrapper.vm.sanitizedMarkets = markets;
         moxios.wait(() => {
-            expect(wrapper.vm.sanitizedMarkets).to.be.equal(markets);
+            expect(wrapper.vm.sanitizedMarkets).toMatchObject(markets);
             done();
         });
     });
@@ -255,7 +255,7 @@ describe('Trading', () => {
 
                     Vue.nextTick(() => {
                         Vue.nextTick(() => {
-                            expect(vm.tokens).to.deep.equal([
+                            expect(vm.tokens).toMatchObject([
                                 {pair: 'WEB/tok1', change: '-73.03', lastPrice: '123.00', volume: '321.00'},
                             ]);
                             done();
@@ -285,7 +285,7 @@ describe('Trading', () => {
 
                     Vue.nextTick(() => {
                         Vue.nextTick(() => {
-                            expect(vm.tokens).to.deep.equal([
+                            expect(vm.tokens).toMatchObject([
                                 {pair: 'WEB/BTC', change: '-73.33', lastPrice: '12.00', volume: '32.00'},
                                 {pair: 'WEB/tok1', change: '-73.03', lastPrice: '123.00', volume: '321.00'},
                             ]);
@@ -316,7 +316,7 @@ describe('Trading', () => {
 
                     Vue.nextTick(() => {
                         Vue.nextTick(() => {
-                            expect(vm.tokens).to.deep.equal([
+                            expect(vm.tokens).toMatchObject([
                                 {pair: 'WEB/BTC', change: '-73.33', lastPrice: '12.00', volume: '32.00'},
                                 {pair: 'WEB/tok2', change: '-73.03', lastPrice: '1230.00', volume: '3210.00'},
                                 {pair: 'WEB/tok1', change: '-73.03', lastPrice: '123.00', volume: '321.00'},
@@ -340,7 +340,7 @@ describe('Trading', () => {
                         {pair: 'WEB/tok1', change: '-73.03', lastPrice: '100.00', volume: '321.00'},
                     ];
                     vm.sanitizedMarketsOnTop = sanitizedMarketsAfterSort;
-                    expect(vm.sanitizedMarketsOnTop).to.deep.equal(sanitizedMarketsAfterSort);
+                    expect(vm.sanitizedMarketsOnTop).toMatchObject(sanitizedMarketsAfterSort);
                     done();
                 });
             });

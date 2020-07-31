@@ -1,9 +1,22 @@
-import '../../js/main';
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TradingHistory from '../../js/components/wallet/TradingHistory';
+import axios from 'axios';
 
 describe('TradingHistory', () => {
-    const el = mount(TradingHistory);
+    const localVue = createLocalVue();
+    localVue.component('b-table', {});
+    localVue.component('font-awesome-icon', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$sortCompare = () => {};
+        },
+    });
+
+    const el = shallowMount(TradingHistory, {
+        localVue,
+    });
 
     const tableData = [
         {
@@ -13,7 +26,10 @@ describe('TradingHistory', () => {
             'price': '1.000000000000000000',
             'fee': '0.500000000000000000',
             'market': {
-                'token': {
+                'base': {
+                    'subunit': 4,
+                },
+                'quote': {
                     'name': 'user110token',
                 },
                 'currencySymbol': 'WEB',
@@ -27,7 +43,10 @@ describe('TradingHistory', () => {
             'price': '1.000000000000000000',
             'fee': '0.050000000000000000',
             'market': {
-                'token': {
+                'base': {
+                    'subunit': 4,
+                },
+                'quote': {
                     'name': 'user110token',
                 },
                 'currencySymbol': 'WEB',
@@ -41,7 +60,10 @@ describe('TradingHistory', () => {
             'price': '1.000000000000000000',
             'fee': '0.500000000000000000',
             'market': {
-                'token': {
+                'base': {
+                    'subunit': 4,
+                },
+                'quote': {
                     'name': 'user110token',
                 },
                 'currencySymbol': 'WEB',
@@ -55,7 +77,10 @@ describe('TradingHistory', () => {
             'price': '1.000000000000000000',
             'fee': '0.050000000000000000',
             'market': {
-                'token': {
+                'base': {
+                    'subunit': 4,
+                },
+                'quote': {
                     'name': 'user110token',
                 },
                 'currencySymbol': 'WEB',
@@ -65,6 +90,6 @@ describe('TradingHistory', () => {
 
     it('must determine history', () => {
         el.setData({tableData});
-        expect(el.vm.hasHistory).to.be.true;
+        expect(el.vm.hasHistory).toBe(true);
     });
 });
