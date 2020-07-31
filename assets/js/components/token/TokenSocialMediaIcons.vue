@@ -46,11 +46,12 @@
                 aria-haspopup="true"
                 :aria-expanded="showSocialMediaMenu"
                 @click="toggleSocialMediaMenu"
+                v-on-clickaway="hideSocialMediaMenu"
             >
                 <font-awesome-icon :icon="['fas', 'share']" size="lg" class="icon-default" />
             </a>
            <div
-               class="dropdown-menu dropdown-menu-right dropdown-menu-social-media align-self-end align-self-lg-center profile-menu"
+               class="dropdown-menu dropdown-menu-right dropdown-menu-social-media align-self-end align-self-lg-center"
                :class="{ 'show': showSocialMediaMenu }"
            >
                <social-sharing
@@ -123,6 +124,7 @@ import TokenTelegramChannel from './TokenTelegramChannel';
 import TokenWebsiteAddressView from './website/TokenWebsiteAddressView';
 import TokenYoutubeAddressView from './youtube/TokenYoutubeAddressView';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {directive as onClickaway} from 'vue-clickaway';
 import Guide from '../Guide';
 
 let SocialSharing = require('vue-social-sharing');
@@ -131,6 +133,9 @@ Vue.use(SocialSharing);
 
 export default {
     name: 'TokenSocialMediaIcons',
+    directives: {
+        onClickaway,
+    },
     props: {
         discordUrl: String,
         facebookUrl: String,
