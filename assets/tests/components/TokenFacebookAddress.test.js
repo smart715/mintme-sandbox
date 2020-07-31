@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenFacebookAddress from '../../js/components/token/facebook/TokenFacebookAddress';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -8,6 +8,7 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.component('b-tooltip', {});
     localVue.use({
         install(Vue) {
             Vue.prototype.$axios = {single: axios};
@@ -15,7 +16,7 @@ function mockVue() {
         },
     });
     return localVue;
-};
+}
 
 describe('TokenFacebookAddress', () => {
     beforeEach(() => {
@@ -26,13 +27,9 @@ describe('TokenFacebookAddress', () => {
         moxios.uninstall();
     });
 
-    const $routing = {generate: (val) => val};
-
     it('should be equal "Add Facebook address" when address props is blank', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+            localVue: mockVue(),
             propsData: {
                 address: '',
                 appId: 'foo id',
@@ -44,9 +41,7 @@ describe('TokenFacebookAddress', () => {
 
     it('should equal to address props when address props is not empty', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+            localVue: mockVue(),
             propsData: {
                 address: 'foo address',
                 appId: 'foo id',
@@ -58,9 +53,7 @@ describe('TokenFacebookAddress', () => {
 
     it('should be blank when pages array is empty', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+            localVue: mockVue(),
             propsData: {
                 address: '',
                 appId: 'foo id',
@@ -71,14 +64,15 @@ describe('TokenFacebookAddress', () => {
     });
 
     it('should select index zero of pages if pages props not empty', () => {
-        const wrapper = mount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+        const wrapper = shallowMount(TokenFacebookAddress, {
+            localVue: mockVue(),
             data() {
                 return {
                     pages: [{link: 'foo.com', name: 'foo name'}],
                 };
+            },
+            stubs: {
+                Modal: {template: '<div><slot name="body"></slot></div>'},
             },
             propsData: {
                 address: '',
@@ -122,9 +116,7 @@ describe('TokenFacebookAddress', () => {
 
     it('call saveFacebookAddress() when savePage() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+            localVue: mockVue(),
             methods: {
                 saveFacebookAddress: function() {
                     wrapper.vm.$emit('savePageTest');
@@ -143,9 +135,7 @@ describe('TokenFacebookAddress', () => {
 
     it('call saveFacebookAddress() when deleteAddress() is called', () => {
         const wrapper = shallowMount(TokenFacebookAddress, {
-            mocks: {
-                $routing,
-            },
+            localVue: mockVue(),
             methods: {
                 saveFacebookAddress: function() {
                     wrapper.vm.$emit('deleteAddressTest');

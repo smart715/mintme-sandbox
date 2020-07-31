@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
-import OrderHighlights from '../../js/mixins/order_highlights';
+import OrderHighlightsMixin from '../../js/mixins/order_highlights';
 
-describe('orderHighlights', function() {
+describe('OrderHighlightsMixin', function() {
     const Component = Vue.component('foo', {
-        mixins: [OrderHighlights],
+        template: '<div></div>',
+        mixins: [OrderHighlightsMixin],
     });
     const wrapper = shallowMount(Component);
 

@@ -1,9 +1,19 @@
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenWebsiteAddressView from '../../js/components/token/website/TokenWebsiteAddressView';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.directive('b-tooltip', {});
+    return localVue;
+}
 
 describe('TokenWebsiteAddressView', () => {
     it('show website link', () => {
-        const wrapper = mount(TokenWebsiteAddressView, {
+        const wrapper = shallowMount(TokenWebsiteAddressView, {
+            localVue: mockVue(),
             propsData: {currentWebsite: 'current_website'},
         });
 
