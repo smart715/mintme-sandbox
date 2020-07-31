@@ -1,22 +1,20 @@
-import Vue from 'vue';
 import Vuelidate from 'vuelidate';
-import Toasted from 'vue-toasted';
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import WithdrawModal from '../../js/components/modal/WithdrawModal';
 import moxios from 'moxios';
 import axios from 'axios';
-Vue.use(Vuelidate);
-Vue.use(Toasted);
 
 /**
  * @return {Wrapper<Vue>}
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
+    localVue.use(Vuelidate);
     localVue.use({
         install(Vue) {
-            Vue.prototype.$axios = {single: axios};
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$toasted = {show: () => {}};
         },
     });
     return localVue;
@@ -72,50 +70,59 @@ describe('WithdrawModal', () => {
     it('should be visible when visible props is true', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
-        expect(wrapper.vm.visible).to.be.true;
+        expect(wrapper.vm.visible).toBe(true);
     });
 
     it('should provide closing on ESC and closing on backdrop click when noClose props is false', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
-        expect(wrapper.vm.noClose).to.be.false;
+        expect(wrapper.vm.noClose).toBe(false);
     });
 
     it('emit "close" when the function closeModal() is called', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.closeModal();
-        expect(wrapper.emitted('close').length).to.be.equal(1);
+        expect(wrapper.emitted('close').length).toBe(1);
     });
 
     it('emit "cancel" and "close" when clicking on span "Cancel"', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.find('span.btn-cancel.pl-3.c-pointer').trigger('click');
-        expect(wrapper.emitted('cancel').length).to.be.equal(1);
-        expect(wrapper.emitted('close').length).to.be.equal(1);
+        expect(wrapper.emitted('cancel').length).toBe(1);
+        expect(wrapper.emitted('close').length).toBe(1);
     });
 
     it('should be equal "0.001" when subunit props is equal 0.001', () => {
         propsForTestCorrectlyRenders.subunit = 3;
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         propsForTestCorrectlyRenders.subunit = 0;
-        expect(wrapper.vm.minAmount).to.be.deep.equal('0.001');
+        expect(wrapper.vm.minAmount).toBe('0.001');
     });
 
     it('should be contain "123456789" in the "Withdrawal fee" field  when isToken props is true', () => {
         propsForTestCorrectlyRenders.webFee = '123456789';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
+            stubs: {
+                Modal: {template: '<div><slot name="body"></slot></div>'},
+            },
         });
         propsForTestCorrectlyRenders.webFee = '0';
-        expect(wrapper.html()).to.contain('123456789');
+        expect(wrapper.html().includes('123456789')).toBe(true);
     });
 
     it('should be contain "987654321" in the "Withdrawal fee" field  when isToken props is false', () => {
@@ -123,17 +130,22 @@ describe('WithdrawModal', () => {
         propsForTestCorrectlyRenders.fee = '987654321';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
+            stubs: {
+                Modal: {template: '<div><slot name="body"></slot></div>'},
+            },
         });
         propsForTestCorrectlyRenders.isToken = true;
         propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.html()).to.contain('987654321');
+        expect(wrapper.html().includes('987654321')).toBe(true);
     });
 
     it('should be equal "WEB" when isToken props is true', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
-        expect(wrapper.vm.feeCurrency).to.be.equal('WEB');
+        expect(wrapper.vm.feeCurrency).toBe('WEB');
     });
 
     it('should be equal "webTest" when isToken props is false', () => {
@@ -141,10 +153,11 @@ describe('WithdrawModal', () => {
         propsForTestCorrectlyRenders.currency = 'webTest';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         propsForTestCorrectlyRenders.isToken = true;
         propsForTestCorrectlyRenders.currency = '';
-        expect(wrapper.vm.feeCurrency).to.be.equal('webTest');
+        expect(wrapper.vm.feeCurrency).toBe('webTest');
     });
 
     it('should be contain "mintimeTest" in the form', () => {
@@ -157,10 +170,14 @@ describe('WithdrawModal', () => {
                 },
             },
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
+            stubs: {
+                Modal: {template: '<div><slot name="body"></slot></div>'},
+            },
         });
         propsForTestCorrectlyRenders.isToken = true;
         propsForTestCorrectlyRenders.currency = '';
-        expect(wrapper.html()).to.contain('mintimeTest');
+        expect(wrapper.html().includes('mintimeTest')).toBe(true);
     });
 
     it('should be equal "15912.12" in the "Total to be withdrawn" field', () => {
@@ -168,137 +185,144 @@ describe('WithdrawModal', () => {
         propsForTestCorrectlyRenders.fee = '3567';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.amount = 12345.1234;
         propsForTestCorrectlyRenders.subunit = 0;
         propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.vm.fullAmount).to.be.equal('15912.12');
+        expect(wrapper.vm.fullAmount).toBe('15912.12');
     });
 
     it('should be equal "12345" in the "Total to be withdrawn" field when fee props is greater than amount data', () => {
         propsForTestCorrectlyRenders.fee = '35678';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.amount = 12345;
         propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.vm.fullAmount).to.be.equal('12345');
+        expect(wrapper.vm.fullAmount).toBe('12345');
     });
 
     it('should\'t be equal "12345f" in the "Total to be withdrawn" field', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.amount = '12345f';
-        expect(wrapper.vm.fullAmount).to.be.equal('0');
+        expect(wrapper.vm.fullAmount).toBe('0');
     });
 
     it('should be false when address data is incorrect', () => {
         propsForTestCorrectlyRenders.currency = 'BTC';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.address = '';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).to.be.false;
+        expect(!wrapper.vm.$v.address.$error).toBe(false);
 
         wrapper.vm.address = 'ab-cd';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).to.be.false;
+        expect(!wrapper.vm.$v.address.$error).toBe(false);
 
         wrapper.vm.address = 'abcd';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.address.$error).to.be.false;
+        expect(!wrapper.vm.$v.address.$error).toBe(false);
 
         wrapper.vm.address = 'abcd1234567890123456789012345678901234567890';
         wrapper.vm.$v.$touch();
         propsForTestCorrectlyRenders.currency = '';
-        expect(!wrapper.vm.$v.address.$error).to.be.false;
+        expect(!wrapper.vm.$v.address.$error).toBe(false);
     });
 
     it('should be true when address data is correct', () => {
         propsForTestCorrectlyRenders.currency = 'BTC';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.address = addressOk;
         wrapper.vm.$v.$touch();
         propsForTestCorrectlyRenders.currency = '';
-        expect(!wrapper.vm.$v.address.$error).to.be.true;
+        expect(!wrapper.vm.$v.address.$error).toBe(true);
     });
 
     it('should be false when amount data is incorrect', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.amount = '';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).to.be.false;
+        expect(!wrapper.vm.$v.amount.$error).toBe(false);
 
         wrapper.vm.amount = 'abcd';
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).to.be.false;
+        expect(!wrapper.vm.$v.amount.$error).toBe(false);
 
         wrapper.vm.amount = 0.1;
-        wrapper.vm.subunit = 0;
+        wrapper.setProps({subunit: 0});
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).to.be.false;
+        expect(!wrapper.vm.$v.amount.$error).toBe(false);
 
         wrapper.vm.amount = 1000;
-        wrapper.vm.maxAmount = '100';
+        wrapper.setProps({maxAmount: '100'});
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).to.be.false;
+        expect(!wrapper.vm.$v.amount.$error).toBe(false);
     });
 
     it('should be true when amount data is correct', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.amount = amountOk;
-        wrapper.vm.subunit = subunitOk;
-        wrapper.vm.maxAmount = maxAmountOk;
+        wrapper.setProps({subunit: subunitOk});
+        wrapper.setProps({maxAmount: maxAmountOk});
         wrapper.vm.$v.$touch();
-        expect(!wrapper.vm.$v.amount.$error).to.be.true;
+        expect(!wrapper.vm.$v.amount.$error).toBe(true);
     });
 
     it('calculate the amount correctly when the function setMaxAmount() is called', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
-        wrapper.vm.maxAmount = '1000';
-        wrapper.vm.subunit = 2;
-        wrapper.vm.fee = '123.1234';
+        wrapper.setProps({maxAmount: '1000'});
+        wrapper.setProps({subunit: 2});
+        wrapper.setProps({fee: '123.1234'});
         wrapper.vm.setMaxAmount();
-        expect(wrapper.vm.amount).to.be.equal('876.87');
+        expect(wrapper.vm.amount).toBe('876.87');
 
-        wrapper.vm.maxAmount = '100';
-        wrapper.vm.subunit = 2;
-        wrapper.vm.fee = '123.1234';
+        wrapper.setProps({maxAmount: '100'});
+        wrapper.setProps({subunit: 2});
+        wrapper.setProps({fee: '123.1234'});
         wrapper.vm.setMaxAmount();
-        expect(wrapper.vm.amount).to.be.equal('0');
+        expect(wrapper.vm.amount).toBe('0');
     });
 
     it('do $axios request and emit "withdraw" when the function onWithdraw() is called and when data is correct', (done) => {
-        const localVue = mockVue();
         propsForTestCorrectlyRenders.currency = 'BTC';
         const wrapper = shallowMount(WithdrawModal, {
-            localVue,
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.address = addressOk;
         wrapper.vm.amount = amountOk;
-        wrapper.vm.subunit = subunitOk;
-        wrapper.vm.maxAmount = maxAmountOk;
+        wrapper.setProps({subunit: subunitOk});
+        wrapper.setProps({maxAmount: maxAmountOk});
         wrapper.vm.$v.$touch();
         wrapper.vm.onWithdraw();
-        expect(wrapper.emitted('withdraw').length).to.be.equal(1);
+        expect(wrapper.emitted('withdraw').length).toBe(1);
 
         moxios.stubRequest('withdraw_url', {
             status: 202,
         });
 
         moxios.wait(() => {
-            expect(wrapper.vm.withdrawing).to.be.false;
+            expect(wrapper.vm.withdrawing).toBe(false);
             done();
         });
     });
@@ -307,9 +331,10 @@ describe('WithdrawModal', () => {
         propsForTestCorrectlyRenders.currency = 'WEB';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
         wrapper.vm.address = addressNotOk;
         wrapper.vm.$v.$touch();
-        expect(wrapper.vm.$v.address.$error).to.be.true;
+        expect(wrapper.vm.$v.address.$error).toBe(true);
     });
 });

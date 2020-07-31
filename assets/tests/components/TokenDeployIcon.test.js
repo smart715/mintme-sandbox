@@ -1,9 +1,19 @@
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenDeployIcon from '../../js/components/token/deploy/TokenDeployIcon';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {});
+    return localVue;
+}
 
 describe('TokenDeployIcon', () => {
     it('do not show if owner & not deployed', () => {
-        const wrapper = mount(TokenDeployIcon, {
+        const wrapper = shallowMount(TokenDeployIcon, {
+            localVue: mockVue(),
             propsData: {
                 isOwner: true,
                 statusProp: 'not-deployed',
@@ -15,7 +25,8 @@ describe('TokenDeployIcon', () => {
     });
 
     it('do not show if not owner & not deployed', () => {
-        const wrapper = mount(TokenDeployIcon, {
+        const wrapper = shallowMount(TokenDeployIcon, {
+            localVue: mockVue(),
             propsData: {
                 isOwner: false,
                 statusProp: 'not-deployed',
@@ -27,7 +38,8 @@ describe('TokenDeployIcon', () => {
     });
 
     it('show pending icon if owner & pending', () => {
-        const wrapper = mount(TokenDeployIcon, {
+        const wrapper = shallowMount(TokenDeployIcon, {
+            localVue: mockVue(),
             propsData: {
                 isOwner: true,
                 statusProp: 'pending',
@@ -39,7 +51,8 @@ describe('TokenDeployIcon', () => {
     });
 
     it('do not show pending icon if not owner & pending', () => {
-        const wrapper = mount(TokenDeployIcon, {
+        const wrapper = shallowMount(TokenDeployIcon, {
+            localVue: mockVue(),
             propsData: {
                 isOwner: false,
                 statusProp: 'pending',
@@ -51,7 +64,8 @@ describe('TokenDeployIcon', () => {
     });
 
     it('show deployed icon if deployed', () => {
-        const wrapper = mount(TokenDeployIcon, {
+        const wrapper = shallowMount(TokenDeployIcon, {
+            localVue: mockVue(),
             propsData: {
                 statusProp: 'deployed',
             },
