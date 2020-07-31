@@ -1,14 +1,24 @@
-import {shallowMount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import BbcodeHelp from '../../js/components/bbcode/BbcodeHelp';
 
 let propsForTestCorrectlyRenders = {
-    placement: {type: 'foo', default: 'bottom'},
+    placement: 'bottom',
 };
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.directive('html-sanitize', {});
+    return localVue;
+}
 
 describe('BbcodeHelp', () => {
     it('should parse and transform BBCode to HTML/CSS when the function parse() is called', () => {
         const wrapper = shallowMount(BbcodeHelp, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
 
         expect(wrapper.vm.parse('[b][/b]')).toEqual(
@@ -37,6 +47,7 @@ describe('BbcodeHelp', () => {
     it('should replace "<a href=" with the required HTML/CSS string when the function parse() is called', () => {
         const wrapper = shallowMount(BbcodeHelp, {
             propsData: propsForTestCorrectlyRenders,
+            localVue: mockVue(),
         });
 
         expect(wrapper.vm.parse('[url][/url]')).toEqual(

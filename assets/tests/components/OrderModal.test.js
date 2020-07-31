@@ -93,7 +93,11 @@ describe('OrderModal', () => {
                 title: 'webTest',
                 visible: true,
             },
+            stubs: {
+                Modal: {template: '<div><slot name="body"></slot></div>'},
+            },
         });
+
         expect(wrapper.html()).toEqual(
             expect.stringContaining('mintimeTest')
         );

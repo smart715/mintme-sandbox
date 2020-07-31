@@ -1,9 +1,13 @@
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenFacebookAddressView from '../../js/components/token/facebook/TokenFacebookAddressView';
 
 describe('TokenFacebookAddressView', () => {
     it('show facebook link and button', () => {
-        const wrapper = mount(TokenFacebookAddressView, {
+        const localVue = createLocalVue();
+        localVue.directive('b-tooltip', {});
+
+        const wrapper = shallowMount(TokenFacebookAddressView, {
+            localVue,
             propsData: {address: 'facebook_url'},
         });
 

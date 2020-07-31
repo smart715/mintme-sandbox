@@ -1,14 +1,9 @@
-import Vue from 'vue';
-import {mount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import BbcodeView from '../../js/components/bbcode/BbcodeView';
-import VueSanitize from 'vue-sanitize';
-import {sanitizeOptions} from '../../js/utils/constants.js';
-
-Vue.use(VueSanitize, sanitizeOptions);
 
 describe('BbcodeView', () => {
     it('parse bbcode', () => {
-        const wrapper = mount(BbcodeView, {
+        const wrapper = shallowMount(BbcodeView, {
              propsData: {value: '[h1]Lorem ipsum.[/h1]'},
         });
 
@@ -16,7 +11,7 @@ describe('BbcodeView', () => {
     });
 
     it('parse bbcode image', () => {
-        const wrapper = mount(BbcodeView, {
+        const wrapper = shallowMount(BbcodeView, {
              propsData: {value: '[img]foo[/img]'},
         });
 
@@ -24,7 +19,7 @@ describe('BbcodeView', () => {
     });
 
     it('parse bbcode link', () => {
-        const wrapper = mount(BbcodeView, {
+        const wrapper = shallowMount(BbcodeView, {
              propsData: {value: '[url=foo]bar[/url]'},
         });
 
@@ -32,7 +27,7 @@ describe('BbcodeView', () => {
     });
 
     it('parse bbcode li', () => {
-        const wrapper = mount(BbcodeView, {
+        const wrapper = shallowMount(BbcodeView, {
             propsData: {value: '[li]foo[/li]'},
         });
 
@@ -40,7 +35,7 @@ describe('BbcodeView', () => {
     });
 
     it('parse bbcode not allowed tags', () => {
-        const wrapper = mount(BbcodeView, {
+        const wrapper = shallowMount(BbcodeView, {
             propsData: {value: '<div>bar</div>'},
         });
 
