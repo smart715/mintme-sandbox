@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import LoggerMixin from '../../js/mixins/logger';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -9,7 +9,6 @@ import Vue from 'vue';
  */
 function mockVue() {
     const localVue = createLocalVue();
-
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -20,7 +19,7 @@ function mockVue() {
     return localVue;
 }
 
-describe('logger', () => {
+describe('LoggerMixin', () => {
     beforeEach(() => {
         moxios.install();
     });
@@ -29,8 +28,11 @@ describe('logger', () => {
         moxios.uninstall();
     });
 
-    const Component = Vue.component('foo', {mixins: [LoggerMixin]});
-    const wrapper = mount(Component, {
+    const Component = Vue.component('foo', {
+        template: '<div></div>',
+        mixins: [LoggerMixin],
+    });
+    const wrapper = shallowMount(Component, {
         localVue: mockVue(),
     });
 

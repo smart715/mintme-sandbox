@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenChangeName from '../../js/components/token/TokenChangeName';
 import Axios from '../../js/axios';
 import axios from 'axios';
@@ -17,7 +17,7 @@ describe('TokenChangeName', () => {
         moxios.uninstall(axios);
     });
     it('renders correctly with assigned props', () => {
-        const wrapper = mount(TokenChangeName, {
+        const wrapper = shallowMount(TokenChangeName, {
             propsData: {
                 currentName: 'foobar',
                 twofa: false,
@@ -29,26 +29,26 @@ describe('TokenChangeName', () => {
         expect(wrapper.vm.newName).toBe('foobar');
         expect(wrapper.find('input').element.value).toBe('foobar');
 
-        wrapper.vm.isTokenExchanged = true;
-        wrapper.vm.isTokenNotDeployed = false;
+        wrapper.setProps({isTokenExchanged: true});
+        wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
         expect(wrapper.contains('#error-message')).toBe(true);
         expect(wrapper.find('#error-message').text()).toBe(deployedErrorMessage);
 
-        wrapper.vm.isTokenExchanged = true;
-        wrapper.vm.isTokenNotDeployed = true;
+        wrapper.setProps({isTokenExchanged: true});
+        wrapper.setProps({isTokenNotDeployed: true});
         expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
         expect(wrapper.contains('#error-message')).toBe(true);
         expect(wrapper.find('#error-message').text()).toBe(exchangedErrorMessage);
 
-        wrapper.vm.isTokenExchanged = false;
-        wrapper.vm.isTokenNotDeployed = false;
+        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('button').attributes('disabled')).toBe('disabled');
         expect(wrapper.contains('#error-message')).toBe(true);
         expect(wrapper.find('#error-message').text()).toBe(deployedErrorMessage);
 
-        wrapper.vm.isTokenExchanged = false;
-        wrapper.vm.isTokenNotDeployed = true;
+        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenNotDeployed: true});
         wrapper.vm.$v.hasNotBlockedWords = false;
         wrapper.vm.newName = 'different';
         wrapper.vm.tokenNameExists = false;
@@ -65,7 +65,7 @@ describe('TokenChangeName', () => {
         });
     });
     it('open TwoFactorModal for saving name when 2fa is enabled', () => {
-        const wrapper = mount(TokenChangeName, {
+        const wrapper = shallowMount(TokenChangeName, {
             propsData: {
                 currentName: 'foobar',
                 twofa: true,
@@ -88,7 +88,7 @@ describe('TokenChangeName', () => {
                 Vue.prototype.$routing = {generate: (val) => val};
             },
         });
-        const wrapper = mount(TokenChangeName, {
+        const wrapper = shallowMount(TokenChangeName, {
             localVue,
             propsData: {
                 currentName: 'foobar',
@@ -105,7 +105,7 @@ describe('TokenChangeName', () => {
 
     describe('throw error', () => {
         it('when token name has spaces in the beginning', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('  newName');
@@ -115,7 +115,7 @@ describe('TokenChangeName', () => {
         });
 
         it('when token name has dashes in the beginning', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('----newName');
@@ -125,7 +125,7 @@ describe('TokenChangeName', () => {
         });
 
         it('when token name has spaces in the end', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName  ');
@@ -135,7 +135,7 @@ describe('TokenChangeName', () => {
         });
 
         it('when token name has dashes in the end', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('newName----');
@@ -145,7 +145,7 @@ describe('TokenChangeName', () => {
         });
 
         it('when token name has spaces between dashes', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new--- ---Name');
@@ -155,7 +155,7 @@ describe('TokenChangeName', () => {
         });
 
         it('when token name has chars outside of alphabet, numbers, - and spaces', () => {
-            const wrapper = mount(TokenChangeName, {
+            const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
             });
             wrapper.find('input').setValue('new$Name!');

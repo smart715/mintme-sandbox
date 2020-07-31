@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TopHolders from '../../js/components/trade/TopHolders';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -12,9 +12,10 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$toasted = {show: () => false};
         },
     });
-
+    localVue.component('font-awesome-icon', {template: ''});
     return localVue;
 }
 
@@ -22,7 +23,7 @@ function mockVue() {
  * @return {Wrapper<Vue>}
  */
 function mockTopHolders() {
-    return mount(TopHolders, {
+    return shallowMount(TopHolders, {
         localVue: mockVue(),
         propsData: {
             name: 'TOK1',
@@ -42,10 +43,10 @@ describe('TopHolders', () => {
     it('should show loading before getting the traders', (done) => {
         const wrapper = mockTopHolders();
 
-        expect(wrapper.vm.loaded).to.be.false;
-        expect(wrapper.find('font-awesome-icon').exists()).to.be.true;
-        expect(wrapper.find('b-table').exists()).to.be.false;
-        expect(wrapper.vm.traders).to.deep.equal(null);
+        expect(wrapper.vm.loaded).toBe(false);
+        expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(true);
+        expect(wrapper.find('b-table').exists()).toBe(false);
+        expect(wrapper.vm.traders).toBe(null);
 
         moxios.stubRequest('top_holders', {status: 200, response: [
             {
@@ -58,12 +59,12 @@ describe('TopHolders', () => {
                 timestamp: 1563550710,
                 balance: '99',
             },
-            ]});
+        ]});
 
         moxios.wait(() => {
-            expect(wrapper.vm.loaded).to.be.true;
-            expect(wrapper.find('font-awesome-icon').exists()).to.be.false;
-            expect(wrapper.find('b-table').exists()).to.be.true;
+            expect(wrapper.vm.loaded).toBe(true);
+            expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(false);
+            expect(wrapper.find('b-table').exists()).toBe(true);
             done();
         });
     });
@@ -71,7 +72,7 @@ describe('TopHolders', () => {
     it('should hide the table if there are not traders', () => {
         const wrapper = mockTopHolders();
         wrapper.vm.traders = [];
-        expect(wrapper.vm.hasTraders).to.be.false;
-        expect(wrapper.find('b-table').exists()).to.be.false;
+        expect(wrapper.vm.hasTraders).toBe(false);
+        expect(wrapper.find('b-table').exists()).toBe(false);
     });
 });
