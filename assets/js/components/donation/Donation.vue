@@ -358,13 +358,6 @@ export default {
                 .then(() => this.donationChecking = false);
         },
         makeDonation: function() {
-            if (this.tokensAvailabilityChanged) {
-                this.notifyError('Tokens availability changed. Please adjust donation amount.');
-                this.tokensAvailabilityChanged = false;
-                location.reload();
-                return;
-            }
-
             this.donationInProgress = true;
             this.showModal = false;
 
@@ -413,6 +406,13 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
+            if (this.tokensAvailabilityChanged) {
+                this.notifyError('Tokens availability changed. Please adjust donation amount.');
+                this.tokensAvailabilityChanged = false;
+                location.reload();
+                return;
+            }
+
             if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersSummary)) {
                 this.showModal = true;
             } else {
