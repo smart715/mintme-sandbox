@@ -39,6 +39,9 @@ class TradesController extends AbstractFOSRestController
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var MarketFetcherInterface */
+    private $marketFetcher;
+
     /** @var MarketFinderInterface */
     private $marketFinder;
 
@@ -57,7 +60,8 @@ class TradesController extends AbstractFOSRestController
         RebrandingConverterInterface $rebrandingConverter,
         MarketHandlerInterface $marketHandler,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        MarketFetcherInterface $marketFetcher
     ) {
         $this->trader = $trader;
         $this->marketFinder = $marketFinder;
@@ -65,6 +69,7 @@ class TradesController extends AbstractFOSRestController
         $this->marketHandler = $marketHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+        $this->marketFetcher = $marketFetcher;
     }
 
     /**
@@ -95,16 +100,12 @@ class TradesController extends AbstractFOSRestController
 
         return array_map(function ($order) use($market, $exchange) {
             $order = $this->rebrandingConverter->convertOrder($order);
-            return $order;
+
             return [
                 'trade_id' => $order->getId(),
                 'price' => $order->getPrice(),
                 'base_volume' => $order->getAmount(),
-                'quote_volume' => $this->moneyWrapper->convert(
-                    $market->getBase()->getSymbol(),
-                    $order->getMarket()->getQuote(),
-                    $exchange
-                ),
+                'quote_volume' => $order->getAmount()->multiply($this->moneyWrapper->format($order->getPrice())),
                 'timestamp' => $order->getTimestamp(),
                 'type' => array_search($order->getSide(), Order::SIDE_MAP),
             ];
