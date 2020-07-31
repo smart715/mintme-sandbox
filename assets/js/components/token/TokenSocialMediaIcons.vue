@@ -25,7 +25,7 @@
             <font-awesome-icon :icon="['fab', 'facebook']" size="lg" class="icon-default" />
         </a>
         <a
-
+            v-if="discordUrl"
             :href="discordUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
