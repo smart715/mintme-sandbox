@@ -39,7 +39,7 @@
                 release-address="{{ token.mintDestination }}"
                 facebook-app-id="{{ global_facebook_app_id }}"
                 youtube-client-id="{{ global_youtube_client_id }}"
-                showSuccess="{{ showSuccessAlert }}"
+                :showSuccess="{{ showSuccessAlert ? 'true' : 'false' }}"
                 :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
                 :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
                 :airdrop-params="{{ airdrop_params | json_encode }}"
