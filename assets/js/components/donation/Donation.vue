@@ -275,7 +275,7 @@ export default {
             }));
 
             this.addMessageHandler((response) => {
-                if ('order.update' === response.method) {
+                if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }
             });
