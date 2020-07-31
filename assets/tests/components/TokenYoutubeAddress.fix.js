@@ -43,7 +43,7 @@ describe('TokenYoutubeAddress', () => {
             },
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.find('b-tooltip').html()).to.contain('testChannelId');
+        expect(wrapper.find('b-tooltip').html()).toContain('testChannelId');
     });
 
     it('should compute computedChannel correctly', () => {
@@ -53,10 +53,10 @@ describe('TokenYoutubeAddress', () => {
             },
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.computedChannel).to.be.equal('https://www.youtube.com/channel/testChannelId');
+        expect(wrapper.vm.computedChannel).toBe('https://www.youtube.com/channel/testChannelId');
 
         wrapper.vm.currentChannelId = false;
-        expect(wrapper.vm.computedChannel).to.be.equal('Add Youtube channel');
+        expect(wrapper.vm.computedChannel).toBe('Add Youtube channel');
     });
 
     it('should set youtube url correctly when the function buildYoutubeUrl() is called', () => {
@@ -66,7 +66,7 @@ describe('TokenYoutubeAddress', () => {
             },
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.buildYoutubeUrl('foo')).to.be.equal('https://www.youtube.com/channel/foo');
+        expect(wrapper.vm.buildYoutubeUrl('foo')).toBe('https://www.youtube.com/channel/foo');
     });
 
     it('do $axios request, set currentChannelId and submitting correctly and emit "saveYoutube" when submitting data is false and the function saveYoutubeChannel() is called', (done) => {
@@ -87,9 +87,9 @@ describe('TokenYoutubeAddress', () => {
         });
 
         moxios.wait(() => {
-            expect(wrapper.vm.currentChannelId).to.be.equal('foo');
-            expect(wrapper.vm.submitting).to.be.false;
-            expect(wrapper.emitted('saveYoutube').length).to.be.equal(1);
+            expect(wrapper.vm.currentChannelId).toBe('foo');
+            expect(wrapper.vm.submitting).toBe(false);
+            expect(wrapper.emitted('saveYoutube').length).toBe(1);
             done();
         });
     });
@@ -103,7 +103,7 @@ describe('TokenYoutubeAddress', () => {
         });
         wrapper.vm.submitting = true;
         wrapper.vm.saveYoutubeChannel('foo');
-        expect(wrapper.vm.currentChannelId).to.be.equal('testChannelId');
+        expect(wrapper.vm.currentChannelId).toBe('testChannelId');
     });
 
     it('call saveYoutubeChannel(\'\') when deleteChannel() is called', () => {
@@ -121,6 +121,6 @@ describe('TokenYoutubeAddress', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.deleteChannel();
-        expect(wrapper.emitted('deleteChannelTest').length).to.be.equal(1);
+        expect(wrapper.emitted('deleteChannelTest').length).toBe(1);
     });
 });

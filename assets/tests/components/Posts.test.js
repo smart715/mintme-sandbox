@@ -40,8 +40,8 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.findAll('post-stub').length).to.equals(0);
-        expect(wrapper.find('.posts').html()).to.contain('The token creator has not added any posts yet.');
+        expect(wrapper.findAll('post-stub').length).toBe(0);
+        expect(wrapper.find('.posts').html()).toContain('The token creator has not added any posts yet.');
     });
 
     it('shows posts if posts is not empty', () => {
@@ -54,7 +54,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('post-stub').exists()).to.be.true;
+        expect(wrapper.find('post-stub').exists()).toBe(true);
     });
 
     it('shows all posts if max is null', () => {
@@ -67,7 +67,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.findAll('post-stub').length).to.equals(4);
+        expect(wrapper.findAll('post-stub').length).toBe(4);
     });
 
     it('computes postsCount correctly', () => {
@@ -81,11 +81,11 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.vm.postsCount).to.equals(4);
+        expect(wrapper.vm.postsCount).toBe(4);
 
         wrapper.setProps({max: 2});
 
-        expect(wrapper.vm.postsCount).to.equals(2);
+        expect(wrapper.vm.postsCount).toBe(2);
     });
 
     it('computes showReadMore correctly', () => {
@@ -98,13 +98,13 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.vm.showReadMore).to.be.false;
+        expect(wrapper.vm.showReadMore).toBe(false);
 
         wrapper.setProps({max: 2});
-        expect(wrapper.vm.showReadMore).to.be.true;
+        expect(wrapper.vm.showReadMore).toBe(true);
 
         wrapper.setProps({max: 8});
-        expect(wrapper.vm.showReadMore).to.be.false;
+        expect(wrapper.vm.showReadMore).toBe(false);
     });
 
     it('shows read more if posts length is more than max', () => {
@@ -118,7 +118,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('a[href=\'token_show\']').exists()).to.be.true;
+        expect(wrapper.find('a[href=\'token_show\']').exists()).toBe(true);
     });
 
     it('doesnt show read more if posts length is less than max or max is null', () => {
@@ -131,10 +131,10 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('a[href=\'token_show\']').exists()).to.be.false;
+        expect(wrapper.find('a[href=\'token_show\']').exists()).toBe(false);
 
         wrapper.setProps({max: 8});
 
-        expect(wrapper.find('a[href=\'token_show\']').exists()).to.be.false;
+        expect(wrapper.find('a[href=\'token_show\']').exists()).toBe(false);
     });
 });
