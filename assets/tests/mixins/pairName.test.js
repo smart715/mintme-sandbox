@@ -2,8 +2,11 @@ import {shallowMount} from '@vue/test-utils';
 import pairNameMixin from '../../js/mixins/pair_name';
 import Vue from 'vue';
 
-describe('pair_name', () => {
-    const component = Vue.component('foo', {mixins: [pairNameMixin]});
+describe('pairNameMixin', () => {
+    const component = Vue.component('foo', {
+        template: '<div></div>',
+        mixins: [pairNameMixin],
+    });
     const wrapper = shallowMount(component);
 
     it('show full pair name if base quote is not MINTME', () => {

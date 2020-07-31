@@ -18,7 +18,15 @@ describe('TradeBuyOrder', () => {
     localVue.use(Axios);
     localVue.use(Vuex);
     const store = new Vuex.Store({
-        modules: {makeOrder},
+        modules: {
+            makeOrder,
+            websocket: {
+                namespaced: true,
+                actions: {
+                    addMessageHandler: () => {},
+                },
+            },
+        },
     });
 
     const wrapper = shallowMount(TradeBuyOrder, {
@@ -26,6 +34,7 @@ describe('TradeBuyOrder', () => {
         localVue,
         mocks: {
             $routing,
+            $toasted: {show: () => {}},
         },
         propsData: {
             loginUrl: 'loginUrl',
@@ -48,13 +57,14 @@ describe('TradeBuyOrder', () => {
             },
             marketPrice: 2,
             isOwner: false,
+            websocketUrl: '',
         },
     });
     it('hide buy order  contents and show loading instead', () => {
-        wrapper.vm.balanceLoaded = false;
+        wrapper.setProps({balanceLoaded: false});
         expect(wrapper.find('font-awesome-icon').exists()).toBe(true);
         expect(wrapper.find('div.card-body > div.row').exists()).toBe(false);
-        wrapper.vm.balanceLoaded = true;
+        wrapper.setProps({balanceLoaded: true});
         expect(wrapper.find('font-awesome-icon').exists()).toBe(false);
         expect(wrapper.find('div.card-body > div.row').exists()).toBe(true);
     });
@@ -63,7 +73,7 @@ describe('TradeBuyOrder', () => {
     it('show login & logout buttons if not logged in', () => {
         expect(wrapper.find('a[href="loginUrl"]').exists()).toBe(true);
         expect(wrapper.find('a[href="signupUrl"]').exists()).toBe(true);
-        wrapper.vm.loggedIn = true;
+        wrapper.setProps({loggedIn: true});
         expect(wrapper.find('a[href="loginUrl"]').exists()).toBe(false);
         expect(wrapper.find('a[href="signupUrl"]').exists()).toBe(false);
     });
@@ -82,16 +92,16 @@ describe('TradeBuyOrder', () => {
 
     describe('useMarketPrice', function() {
         it('should be disabled if marketPrice not greater than zero', () => {
-            wrapper.vm.marketPrice = 0;
+            wrapper.setProps({marketPrice: 0});
             expect(wrapper.vm.disabledMarketPrice).toBe(true);
-            wrapper.vm.marketPrice = 2;
+            wrapper.setProps({marketPrice: 2});
             expect(wrapper.vm.disabledMarketPrice).toBe(false);
         });
 
         it('should be unchecked if it is disabled', () => {
-            wrapper.vm.marketPrice = 2;
+            wrapper.setProps({marketPrice: 2});
             wrapper.vm.useMarketPrice = true;
-            wrapper.vm.marketPrice = 0;
+            wrapper.setProps({marketPrice: 0});
             expect(wrapper.vm.useMarketPrice).toBe(false);
         });
     });
@@ -118,13 +128,13 @@ describe('TradeBuyOrder', () => {
         wrapper.vm.updateMarketPrice();
         expect(wrapper.vm.buyPrice).toBe(0);
 
-        wrapper.vm.marketPrice = 5;
+        wrapper.setProps({marketPrice: 5});
         wrapper.vm.useMarketPrice = true;
         wrapper.vm.updateMarketPrice();
         expect(wrapper.vm.buyPrice).toBe('5');
 
-        wrapper.vm.marketPrice = 0;
-        wrapper.vm.disabledMarketPrice = true;
+        wrapper.setProps({marketPrice: 0});
+        wrapper.setProps({disabledMarketPrice: true});
         wrapper.vm.updateMarketPrice();
         expect(wrapper.vm.buyPrice).toBe(0);
         expect(wrapper.vm.useMarketPrice).toBe(false);
@@ -139,7 +149,7 @@ describe('TradeBuyOrder', () => {
 
         it('should add the correct amount to match the full balance', () => {
             wrapper.vm.immutableBalance = 10;
-            wrapper.vm.marketPrice = 5;
+            wrapper.setProps({marketPrice: 5});
             wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.buyAmount).toBe('2');
@@ -148,7 +158,7 @@ describe('TradeBuyOrder', () => {
 
         it('shouldn\'t add price if the price edited manually', () => {
             wrapper.vm.immutableBalance = 10;
-            wrapper.vm.marketPrice = 5;
+            wrapper.setProps({marketPrice: 5});
             wrapper.vm.buyPrice = 2;
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
@@ -159,7 +169,7 @@ describe('TradeBuyOrder', () => {
 
         it('should add price if the price edited manually but has 0 value', () => {
             wrapper.vm.immutableBalance = 10;
-            wrapper.vm.marketPrice = 5;
+            wrapper.setProps({marketPrice: 5});
             wrapper.vm.buyPrice = '00';
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
@@ -170,7 +180,7 @@ describe('TradeBuyOrder', () => {
 
         it('should add price if the price edited manually but has null value', () => {
             wrapper.vm.immutableBalance = 10;
-            wrapper.vm.marketPrice = 5;
+            wrapper.setProps({marketPrice: 5});
             wrapper.vm.buyPrice = null;
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
@@ -181,7 +191,7 @@ describe('TradeBuyOrder', () => {
 
         it('Deposit more link click - should not add the balance to the amount input, price/amount not changing', () => {
             wrapper.vm.immutableBalance = 100;
-            wrapper.vm.marketPrice = 7;
+            wrapper.setProps({marketPrice: 7});
             wrapper.vm.buyAmount = '0';
             wrapper.vm.buyPrice = '0';
             event.target.tagName = 'a';
