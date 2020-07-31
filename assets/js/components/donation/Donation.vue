@@ -362,6 +362,7 @@ export default {
                 this.notifyError('Tokens availability changed. Please adjust donation amount.');
                 this.tokensAvailabilityChanged = false;
                 location.reload();
+                return;
             }
 
             this.donationInProgress = true;
