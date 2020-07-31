@@ -30,27 +30,27 @@ let objectForTestCorrectlyMounting = {
 describe('TokenSocialMediaIcons', () => {
     it('renders correctly with props', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, objectForTestCorrectlyMounting);
-        expect(wrapper.find('a[href=\'testDiscordUrl\']')).to.exist;
-        expect(wrapper.find('a[href=\'testFacebookUrl\']')).to.exist;
-        expect(wrapper.find('a[href=\'testTelegramUrl\']')).to.exist;
-        expect(wrapper.find('a[href=\'testTokenName\']')).to.exist;
-        expect(wrapper.find('a[href=\'testWebsiteUrl\']')).to.exist;
-        expect(wrapper.find('a[href=\'https://www.youtube.com/channel/testYoutubeChannelId\']')).to.exist;
+        expect(wrapper.find('a[href=\'testDiscordUrl\']').exists()).toBe(true);
+        expect(wrapper.find('a[href=\'testFacebookUrl\']').exists()).toBe(true);
+        expect(wrapper.find('a[href=\'testTelegramUrl\']').exists()).toBe(true);
+        expect(wrapper.find('a[href=\'testTokenName\']').exists()).toBe(true);
+        expect(wrapper.find('a[href=\'testWebsiteUrl\']').exists()).toBe(true);
+        expect(wrapper.find('a[href=\'https://www.youtube.com/channel/testYoutubeChannelId\']').exists()).toBe(true);
     });
 
     it('should compute description correctly', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, objectForTestCorrectlyMounting);
         wrapper.vm.twitterDescription = 'foo';
-        expect(wrapper.vm.description).to.be.equal('footoken_show');
+        expect(wrapper.vm.description).toBe('footoken_show');
     });
 
     it('should compute youtubeUrl correctly', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, objectForTestCorrectlyMounting);
-        expect(wrapper.vm.youtubeUrl).to.be.equal('https://www.youtube.com/channel/testYoutubeChannelId');
+        expect(wrapper.vm.youtubeUrl).toBe('https://www.youtube.com/channel/testYoutubeChannelId');
     });
 
     it('doesnt show unsetted urls', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, emptyUrls);
-        expect(wrapper.findAll('a').length).to.be.equal(0);
+        expect(wrapper.findAll('a').length).toBe(0);
     });
 });
