@@ -21,6 +21,7 @@ const $routing = {
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuex);
+    localVue.component('b-table', {});
     localVue.component('FontAwesomeIcon', {
         template: '<i></i>',
     });
@@ -110,7 +111,7 @@ describe('DepositWithdrawHistory', () => {
         });
         wrapper.vm.tableData = [];
         expect(wrapper.vm.noHistory).toBe(true);
-        wrapper.vm.tableData = ['foo'];
+        wrapper.vm.tableData = tableData;
         expect(wrapper.vm.noHistory).toBe(false);
     });
 
@@ -119,7 +120,7 @@ describe('DepositWithdrawHistory', () => {
         const wrapper = shallowMount(DepositWithdrawHistory, {
             localVue,
         });
-        wrapper.vm.tableData = false;
+        wrapper.vm.tableData = [];
         expect(wrapper.vm.loaded).toBe(true);
         wrapper.vm.tableData = null;
         expect(wrapper.vm.loaded).toBe(false);
@@ -171,11 +172,11 @@ describe('DepositWithdrawHistory', () => {
 
             moxios.stubRequest('payment_history', {
                 status: 200,
-                response: ['foo'],
+                response: tableData,
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).toEqual(['foo', 'foo']);
+                expect(wrapper.vm.tableData).toEqual([...tableData, ...tableData]);
                 expect(wrapper.vm.currentPage).toBe(3);
                 done();
             });
@@ -187,7 +188,9 @@ describe('DepositWithdrawHistory', () => {
         const wrapper = shallowMount(DepositWithdrawHistory, {
             localVue,
         });
-        expect(wrapper.vm.sanitizeHistory(tableData)).toEqual(expectTableData);
+        wrapper.setData({tableData: tableData});
+
+        expect(wrapper.vm.sanitizedHistory).toEqual(expectTableData);
     });
 
     it('should return correctly value when the function generatePairUrl() is called', () => {

@@ -1,7 +1,22 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import ImageUploader from '../../js/components/ImageUploader';
+import axios from 'axios';
 import moxios from 'moxios';
-import axiosPlugin from '../../js/axios';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$routing = {generate: (val) => val};
+        },
+    });
+    return localVue;
+}
 
 describe('ImageUploader', () => {
     beforeEach(() => {
@@ -11,20 +26,6 @@ describe('ImageUploader', () => {
     afterEach(() => {
         moxios.uninstall();
     });
-
-    /**
-     * @return {Wrapper<Vue>}
-     */
-    function mockVue() {
-        const localVue = createLocalVue();
-        localVue.use(axiosPlugin);
-        localVue.use({
-            install(Vue, options) {
-                Vue.prototype.$routing = {generate: (val) => val};
-            },
-        });
-        return localVue;
-    }
 
     it('should upload a file', () => {
         const wrapper = shallowMount(ImageUploader, {
@@ -44,7 +45,7 @@ describe('ImageUploader', () => {
         wrapper.vm.upload('dummy.jpg');
 
         moxios.wait(() => {
-            expect(wrapper.emitted().upload).to.be.true;
+            expect(wrapper.emitted().upload).toBe(true);
             done();
         });
     });
@@ -74,7 +75,7 @@ describe('ImageUploader', () => {
         wrapper.vm.upload('dummy.jpg');
 
         moxios.wait(() => {
-            expect(wrapper.emitted().errormessage).to.be.true;
+            expect(wrapper.emitted().errormessage).toBe(true);
             done();
         });
     });

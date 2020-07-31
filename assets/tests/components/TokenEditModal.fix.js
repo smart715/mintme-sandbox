@@ -58,7 +58,7 @@ describe('TokenEditModal', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.isTokenNotDeployed).to.be.true;
+        expect(wrapper.vm.isTokenNotDeployed).toBe(true);
     });
 
     it('should be true when statusProp props is equal "deployed"', () => {
@@ -66,7 +66,7 @@ describe('TokenEditModal', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.isTokenDeployed).to.be.true;
+        expect(wrapper.vm.isTokenDeployed).toBe(true);
     });
 
     it('should be true when the function releasePeriodUpdated() is called', () => {
@@ -74,7 +74,7 @@ describe('TokenEditModal', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.releasePeriodUpdated();
-        expect(wrapper.vm.hasReleasePeriod).to.be.true;
+        expect(wrapper.vm.hasReleasePeriod).toBe(true);
     });
 
     it('should refresh sliders for "released-slider" and "release-period-slider" refs', () => {
@@ -85,7 +85,7 @@ describe('TokenEditModal', () => {
         });
 
         wrapper.vm.refreshSliders();
-        expect(wrapper.find(vueSliderTest).vm.refreshd).to.be.true;
-        expect(wrapper.find(vueSliderPeriodTest).vm.refreshd).to.be.true;
+        expect(wrapper.find(vueSliderTest).vm.refreshd).toBe(true);
+        expect(wrapper.find(vueSliderPeriodTest).vm.refreshd).toBe(true);
     });
 });

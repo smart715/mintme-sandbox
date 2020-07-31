@@ -1,5 +1,6 @@
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import DepositModal from '../../js/components/modal/DepositModal';
+import Modal from '../../js/components/modal/Modal';
 
 let rebrandingTest = (val) => {
     if (!val) {
@@ -20,9 +21,24 @@ let rebrandingTest = (val) => {
     return val;
 };
 
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.component('b-modal', {render: () => ''});
+    localVue.component('b-col', {});
+    localVue.component('b-row', {});
+    localVue.component('font-awesome-icon', {});
+    localVue.directive('clipboard', {});
+    localVue.directive('tippy', {});
+    return localVue;
+}
+
 describe('DepositModal', () => {
     it('should be visible when visible props is true', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -38,7 +54,8 @@ describe('DepositModal', () => {
     });
 
     it('should provide closing on ESC and closing on backdrop click when noClose props is false', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -54,7 +71,8 @@ describe('DepositModal', () => {
     });
 
     it('emit "close" when the function closeModal() is called', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -71,7 +89,8 @@ describe('DepositModal', () => {
     });
 
     it('emit "success" when clicking on button "OK"', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -88,7 +107,8 @@ describe('DepositModal', () => {
     });
 
     it('emit "success" when the function onSuccess() is called', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -105,7 +125,8 @@ describe('DepositModal', () => {
     });
 
     it('should be equal "WEB" when isToken props is true', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -121,7 +142,8 @@ describe('DepositModal', () => {
     });
 
     it('should be equal "webTest" when isToken props is false', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -137,12 +159,17 @@ describe('DepositModal', () => {
     });
 
     it('should be contain "addressTest" in the address field', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
             filters: {
                 rebranding: function(val) {
                     return rebrandingTest(val);
                 },
             },
+            stubs: {
+                Modal: Modal,
+            },
+            localVue: mockVue(),
+            children: [Modal],
             propsData: {
                 visible: true,
                 address: 'addressTest',
@@ -154,16 +181,21 @@ describe('DepositModal', () => {
                 noClose: true,
             },
         });
+
         expect(wrapper.html().includes('addressTest')).toBe(true);
     });
 
     it('should be contain "MintMe Coin Test" in the description field', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
             filters: {
                 rebranding: function(val) {
                     return rebrandingTest(val);
                 },
             },
+            stubs: {
+                Modal: Modal,
+            },
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -175,16 +207,21 @@ describe('DepositModal', () => {
                 noClose: true,
             },
         });
+
         expect(wrapper.html().includes('MintMe Coin Test')).toBe(true);
     });
 
     it('should be contain "mintimeTest" in the min field', () => {
-        const wrapper = mount(DepositModal, {
+        const wrapper = shallowMount(DepositModal, {
             filters: {
                 rebranding: function(val) {
                     return rebrandingTest(val);
                 },
             },
+            stubs: {
+                Modal: Modal,
+            },
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -196,19 +233,19 @@ describe('DepositModal', () => {
                 noClose: true,
             },
         });
+
         expect(wrapper.html().includes('mintimeTest')).toBe(true);
     });
 
     it('should be contain "mintimeTest" in the fee field', () => {
-        const wrapper = mount(DepositModal, {
-            scopedSlots: {
-                'modal': '<modal slot-scope="body">{{ currency|rebranding }}</modal>',
+        const wrapper = shallowMount(DepositModal, {
+            stubs: {
+                Modal: Modal,
             },
             filters: {
-                rebranding: function(val) {
-                    return rebrandingTest(val);
-                },
+                rebranding: (val) => rebrandingTest(val),
             },
+            localVue: mockVue(),
             propsData: {
                 visible: true,
                 address: '',
@@ -220,6 +257,7 @@ describe('DepositModal', () => {
                 noClose: true,
             },
         });
+
         expect(wrapper.html().includes('mintimeTest')).toBe(true);
     });
 });
