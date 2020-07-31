@@ -158,6 +158,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     RebrandingFilterMixin,
+    WebSocketMixin,
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
@@ -173,6 +174,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         RebrandingFilterMixin,
+        WebSocketMixin,
     ],
     components: {
         Guide,
@@ -201,6 +203,7 @@ export default {
             balance: 0,
             donationInProgress: false,
             showModal: false,
+            tokensAvailabilityChanged: false,
         };
     },
     computed: {
@@ -264,6 +267,18 @@ export default {
             this.loadLoginForm();
         } else {
             this.loginFormLoaded = true;
+
+            this.sendMessage(JSON.stringify({
+                method: 'order.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
+
+            this.addMessageHandler((response) => {
+                if ('order.update' === response.method) {
+                    this.tokensAvailabilityChanged = true;
+                }
+            });
         }
 
         this.debouncedCheck = debounce(this.checkDonation, 500);
@@ -343,6 +358,12 @@ export default {
                 .then(() => this.donationChecking = false);
         },
         makeDonation: function() {
+            if (this.tokensAvailabilityChanged) {
+                this.notifyError('Tokens availability changed. Please adjust donation amount.');
+                this.tokensAvailabilityChanged = false;
+                location.reload();
+            }
+
             this.donationInProgress = true;
             this.showModal = false;
 
