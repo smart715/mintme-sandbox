@@ -1,16 +1,32 @@
 import Vue from 'vue';
 import Vuelidate from 'vuelidate';
 import Toasted from 'vue-toasted';
-import {mount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenReleaseAddress from '../../js/components/token/TokenReleaseAddress';
+import axios from 'axios';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
 
 const newAddress = '0x1111111111111111111111111111111111111111';
 
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$routing = {generate: (val) => val};
+        },
+    });
+    return localVue;
+}
+
 describe('TokenReleaseAddress', () => {
     it('renders correctly with assigned props', () => {
-        const wrapper = mount(TokenReleaseAddress, {
+        const wrapper = shallowMount(TokenReleaseAddress, {
+            localVue: mockVue(),
             propsData: {
                 releaseAddress: 'foobar',
                 isTokenDeployed: true,
@@ -21,7 +37,8 @@ describe('TokenReleaseAddress', () => {
     });
 
     it('can be edited if deployed only', () => {
-        const wrapper = mount(TokenReleaseAddress, {
+        const wrapper = shallowMount(TokenReleaseAddress, {
+            localVue: mockVue(),
             propsData: {
                 releaseAddress: 'foobar',
                 isTokenDeployed: false,
@@ -29,13 +46,14 @@ describe('TokenReleaseAddress', () => {
             },
         });
         expect(wrapper.find('input').exists()).toBe(false);
-        wrapper.vm.isTokenDeployed = true;
+        wrapper.setProps({isTokenDeployed: true});
         expect(wrapper.find('input').exists()).toBe(true);
     });
 
     describe('2fa modal', () => {
         it('is displayed after submit if 2fa is enabled', () => {
-            const wrapper = mount(TokenReleaseAddress, {
+            const wrapper = shallowMount(TokenReleaseAddress, {
+                localVue: mockVue(),
                 propsData: {
                     releaseAddress: 'foobar',
                     isTokenDeployed: true,
@@ -49,7 +67,8 @@ describe('TokenReleaseAddress', () => {
         });
 
         it('is not displayed after submit if 2fa is disabled', () => {
-            const wrapper = mount(TokenReleaseAddress, {
+            const wrapper = shallowMount(TokenReleaseAddress, {
+                localVue: mockVue(),
                 propsData: {
                     releaseAddress: 'foobar',
                     isTokenDeployed: true,

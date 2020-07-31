@@ -109,7 +109,7 @@ describe('TradeTradeHistory', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            expect(wrapper.vm.shouldTruncate).to.be.false;
+            expect(wrapper.vm.shouldTruncate).toBe(false);
         });
         it('when truncate is necessary', () => {
             const localVue = mockVue();
@@ -118,7 +118,7 @@ describe('TradeTradeHistory', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            expect(wrapper.vm.shouldTruncate).to.be.true;
+            expect(wrapper.vm.shouldTruncate).toBe(true);
         });
         propsForTestCorrectlyRenders.market.quote.symbol = 'WEB';
     });
@@ -130,9 +130,9 @@ describe('TradeTradeHistory', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tableData = false;
-        expect(wrapper.vm.hasOrders).to.be.false;
+        expect(wrapper.vm.hasOrders).toBe(false);
         wrapper.vm.tableData = tableData;
-        expect(wrapper.vm.hasOrders).to.be.true;
+        expect(wrapper.vm.hasOrders).toBe(true);
     });
 
     it('should compute loaded correctly', () => {
@@ -142,7 +142,7 @@ describe('TradeTradeHistory', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tableData = tableData;
-        expect(wrapper.vm.hasOrders).to.be.true;
+        expect(wrapper.vm.hasOrders).toBe(true);
     });
 
     it('should compute lastId correctly', () => {
@@ -152,9 +152,9 @@ describe('TradeTradeHistory', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tableData = tableData;
-        expect(wrapper.vm.lastId).to.deep.equal(0);
+        expect(wrapper.vm.lastId).toBe(0);
         wrapper.vm.tableData = [{id: 'foo'}];
-        expect(wrapper.vm.lastId).to.be.equal('foo');
+        expect(wrapper.vm.lastId).toBe('foo');
     });
 
     describe('updateTableData', () => {
@@ -172,7 +172,7 @@ describe('TradeTradeHistory', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).to.deep.equal(['foo']);
+                expect(wrapper.vm.tableData).toEqual(['foo']);
                 done();
             });
         });
@@ -191,7 +191,7 @@ describe('TradeTradeHistory', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).to.deep.equal(['foo', 'foo']);
+                expect(wrapper.vm.tableData).toEqual(['foo', 'foo']);
                 done();
             });
         });
@@ -210,7 +210,7 @@ describe('TradeTradeHistory', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).to.equal('foo');
+                expect(wrapper.vm.tableData).toBe('foo');
                 done();
             });
         });
@@ -228,6 +228,6 @@ describe('TradeTradeHistory', () => {
             },
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.html()).to.contain('mintimeTest');
+        expect(wrapper.html()).toContain('mintimeTest');
     });
 });

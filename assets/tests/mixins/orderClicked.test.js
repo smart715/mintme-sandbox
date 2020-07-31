@@ -4,10 +4,13 @@ import Vuex from 'vuex';
 import makeOrder from '../../js/storage/modules/make_order';
 import orderClickedMixin from '../../js/mixins/order_clicked';
 
-describe('OrderClicked', function() {
+describe('orderClickedMixin', function() {
     const localVue = createLocalVue();
     localVue.use(Vuex);
-    const Component = Vue.component('foo', {mixins: [orderClickedMixin]});
+    const Component = Vue.component('foo', {
+        template: '<div></div>',
+        mixins: [orderClickedMixin],
+    });
 
     makeOrder.state.baseBalance = 50;
     makeOrder.state.quoteBalance = 12;

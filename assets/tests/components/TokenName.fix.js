@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenName from '../../js/components/token/TokenName';
 import moxios from 'moxios';
 import axiosPlugin from '../../js/axios';
@@ -51,28 +51,28 @@ describe('TokenName', () => {
     //     });
     //
     //     moxios.wait(() => {
-    //         expect(wrapper.find('input').exists()).to.deep.equal(false);
-    //         expect(wrapper.vm.editingName).to.deep.equal(false);
+    //         expect(wrapper.find('input').exists()).toBe(false);
+    //         expect(wrapper.vm.editingName).toBe(false);
     //
     //         wrapper.vm.editName();
     //
     //         let input = wrapper.find('input');
     //
-    //         expect(input.exists()).to.deep.equal(true);
-    //         expect(wrapper.vm.editingName).to.deep.equal(true);
+    //         expect(input.exists()).toBe(true);
+    //         expect(wrapper.vm.editingName).toBe(true);
     //
     //         input.setValue('bar');
     //         wrapper.vm.editName();
     //
-    //         expect(wrapper.vm.currentName).to.deep.equal('bar');
-    //         expect(wrapper.vm.newName).to.deep.equal('bar');
+    //         expect(wrapper.vm.currentName).toBe('bar');
+    //         expect(wrapper.vm.newName).toBe('bar');
     //         done();
     //     });
     // });
 
     it('can not be edited if not editable', () => {
         const localVue = mockVue();
-        const wrapper = mount(TokenName, {
+        const wrapper = shallowMount(TokenName, {
             localVue,
             propsData: {
                 name: 'foo',
@@ -80,6 +80,6 @@ describe('TokenName', () => {
                 editable: false,
             },
         });
-        expect(wrapper.find('svg').exists()).to.equal(false);
+        expect(wrapper.find('svg').exists()).toBe(false);
     });
 });
