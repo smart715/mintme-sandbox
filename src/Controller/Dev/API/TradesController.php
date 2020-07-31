@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\CoinMarketCap\API\Outbound;
+namespace App\Controller\Dev\API;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
@@ -13,7 +13,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
- * @Rest\Route("/cmc/api/v1/trades")
+ * @Rest\Route("/dev/api/v2/public/trades")
  */
 class TradesController extends AbstractFOSRestController
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\CoinMarketCap\API\Outbound;
+namespace App\Controller\Dev\API;
 
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -9,7 +9,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
- * @Rest\Route("/cmc/api/v1/assets")
+ * @Rest\Route("/dev/api/v2/public/assets")
  */
 class AssetsController extends AbstractFOSRestController
 {

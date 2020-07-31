@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\CoinMarketCap\API\Outbound;
+namespace App\Controller\Dev\API;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -12,9 +12,9 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
- * @Rest\Route("/cmc/api/v1/ticker")
+ * @Rest\Route("/dev/api/v2/public/summary")
  */
-class TickerController extends AbstractFOSRestController
+class SummaryController extends AbstractFOSRestController
 {
 
     use BaseQuoteOrderTrait;
@@ -28,6 +28,9 @@ class TickerController extends AbstractFOSRestController
     /** @var MarketFactoryInterface */
     private $marketFactory;
 
+    /** @var TraderInterface */
+    private $trader;
+
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
@@ -35,45 +38,54 @@ class TickerController extends AbstractFOSRestController
         MarketStatusManagerInterface $marketStatusManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
+        TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
+        $this->trader = $trader;
         $this->rebrandingConverter = $rebrandingConverter;
     }
 
     /**
-     * Get 24-hour pricing and volume summary for each market pair available on the exchange.
+     * Get data for all tickers and all markets.
      *
      * @Rest\Get("/")
      * @Rest\View()
      */
-    public function getTicker(): array
+    public function getSummary(): array
     {
-        $assets = [];
         $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
 
         return array_map(
-            function ($marketStatus) use ($assets) {
+            function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
+                $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+
                 $this->fixBaseQuoteOrder($market);
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());
 
-                $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
-                    'base_id' => $market->getBase()->getId(),
-                    'quote_id' => $market->getQuote()->getId(),
+                return [
+                    'trading_pairs' => $rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol,
                     'last_price' => $marketStatusToday['last'],
-                    'quote_volume' => $marketStatusToday['volume'],
+                    'base_currency' => $rebrandedBaseSymbol,
+                    'quote_currency' => $rebrandedQuoteSymbol,
+                    'lowest_ask' => $orderDepth['asks'] ? min($orderDepth['asks'])[0] : '',
+                    'highest_bid' => $orderDepth['bids'] ? max($orderDepth['bids'])[0] : '',
                     'base_volume' => $marketStatusToday['deal'],
-                    'isFrozen' => $market->getBase()->isBlocked(),
+                    'quote_volume' => $marketStatusToday['volume'],
+                    'price_change_percent_24h' =>
+                        $marketStatusToday['open'] ?
+                            ($marketStatusToday['last'] - $marketStatusToday['open']) * 100 / $marketStatusToday['open'] :
+                            0,
+                    'highest_price_24h' => $marketStatusToday['high'],
+                    'lowest_price_24h' => $marketStatusToday['low'],
                 ];
-
-                return $assets;
             },
             array_values($marketStatuses)
         );
