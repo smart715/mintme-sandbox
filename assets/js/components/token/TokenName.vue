@@ -44,7 +44,7 @@
             class="current-token-name"
             v-b-tooltip="{title: currentName, boundary:'viewport'}"
         >
-        {{ currentName }}
+            {{ currentName }}
         </span>
     </div>
 </template>
