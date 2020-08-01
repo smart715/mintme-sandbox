@@ -9,7 +9,7 @@
             <font-awesome-icon icon="globe" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="youtubeUrl"
+            v-if="youtubeChannelId"
             :href="youtubeUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
