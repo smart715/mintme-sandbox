@@ -41,7 +41,7 @@
                 :status-prop="statusProp"
             />
             <token-points-progress
-                class="ml-2"
+                class="ml-2 token-point-progress"
                 :profile-name="profileName"
                 :profile-lastname="profileLastname"
                 :profile-description="profileDescription"

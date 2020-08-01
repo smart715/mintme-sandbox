@@ -3,7 +3,7 @@
         <vue-circle
             ref="circleElement"
             :progress="percent"
-            :size="55"
+            :size="40"
             :reverse="false"
             line-cap="square"
             :fill="color"

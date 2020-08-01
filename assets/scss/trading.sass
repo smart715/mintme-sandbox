@@ -75,13 +75,17 @@
 
 #token
   ul.nav .token-avatar-left
-    margin-left: $token-avatar-margin-left
+    margin-left: 127px
     background: transparent
     z-index: 99
-    @include media-breakpoint-down(md)
-      margin-left: 90px !important
-    @include media-breakpoint-down(sm)
-      margin-left: 0px !important
+    @media(max-width: 1199px)
+      margin-left: 123px
+
+    @media(max-width: 991px)
+      margin-left: 106px
+
+    @media(max-width: 767px)
+      margin-left: 0px
 
     a
       background: transparent
@@ -91,16 +95,14 @@
     min-width: 0
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
-    @include media-breakpoint-down(md)
-      margin-left: calc(113px + 5px) !important
-      margin-top: 17px
+    @media(max-width: 1199px)
+      margin-left: calc(111px + 20px) !important
 
-    @include media-breakpoint-down(sm)
-      margin-left: calc(82px + 2px) !important
+    @media(max-width: 991px)
+      margin-left: calc(94px + 20px) !important
 
-    @include media-breakpoint-down(xs)
-      margin-left: calc(79px + 0px) !important
-      margin-top: 22px
+    @media(max-width: 767px)
+      margin-left: calc(54px + 20px) !important
 
     .token-avatar-link
       position: absolute
@@ -111,7 +113,7 @@
 
       @include media-breakpoint-down(md)
         width: 108px
-        top: 4%
+        top: 29%
         left: 23px
 
       @include media-breakpoint-down(sm)
@@ -126,6 +128,13 @@
 
     .token-name
       min-width: 80px
+      margin-left: 5px
+      margin-top: 15px
+
+      @include media-breakpoint-down(md)
+        margin-top: 19px
+      @include media-breakpoint-down(sm)
+        margin-top: 13px
 
       .current-token-name
         margin-bottom: 7px

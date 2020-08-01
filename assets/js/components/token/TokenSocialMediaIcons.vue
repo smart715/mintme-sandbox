@@ -1,7 +1,7 @@
 <template>
     <div class="d-flex align-items-center">
         <a
-            v-if="websiteUrl"
+
             :href="websiteUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
@@ -9,7 +9,7 @@
             <font-awesome-icon icon="globe" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="youtubeChannelId"
+
             :href="youtubeUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
@@ -17,7 +17,7 @@
             <font-awesome-icon :icon="['fab', 'youtube']" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="facebookUrl"
+
             :href="facebookUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
@@ -25,7 +25,7 @@
             <font-awesome-icon :icon="['fab', 'facebook']" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="discordUrl"
+
             :href="discordUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
@@ -33,7 +33,7 @@
             <font-awesome-icon :icon="['fab', 'discord']" size="lg" class="icon-default" />
         </a>
         <a
-            v-if="telegramUrl"
+
             :href="telegramUrl"
             class="col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
             target="_blank"
