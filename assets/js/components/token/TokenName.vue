@@ -34,7 +34,7 @@
                 @updated-telegram="$emit('updated-telegram', $event)"
             />
             <font-awesome-icon
-                class="icon-default c-pointer align-middle"
+                class="icon-default c-pointer align-middle token-edit-icon"
                 icon="edit"
                 transform="shrink-4 up-1.5"
                 @click="editToken"

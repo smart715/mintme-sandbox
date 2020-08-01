@@ -36,7 +36,7 @@
                 @updated-telegram="$emit('updated-telegram')"
             />
             <token-deploy-icon
-                class="ml-2"
+                class="ml-2 token-deploy-icon"
                 :is-owner="isOwner"
                 :status-prop="statusProp"
             />

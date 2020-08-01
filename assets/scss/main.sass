@@ -432,10 +432,26 @@ a
     font-size: 9px !important
 
 .token-point-progress
-  margin-top: 6px
+  margin-top: 15px
+  margin-bottom: -9px
+
+  @include media-breakpoint-down(md)
+    margin-top: 18px
   @include media-breakpoint-down(sm)
     margin-top: 4px
-  @include media-breakpoint-down(xs)
+
+.token-deploy-icon
+  margin-top: 19px
+
+  @include media-breakpoint-down(md)
+    margin-top: 23px
+  @include media-breakpoint-down(sm)
+    margin-top: 9px
+
+.token-edit-icon
+  margin-top: 12px
+
+  @include media-breakpoint-down(sm)
     margin-top: 4px
 
 .nav-item-circle-progress
