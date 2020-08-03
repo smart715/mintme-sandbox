@@ -7,6 +7,7 @@ use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -18,9 +19,12 @@ class RegistrationType extends AbstractType
         $builder
             ->remove('username')
             ->remove('plainPassword')
-            ->add('nickname', NicknameType::class, [
+            ->add('nickname', searchType::class, [
                 'attr' => [
-                    'autocomplete' => "new-password"        
+                    'autocomplete' => "off",
+                    'minlength' => "2",
+                    'maxlength' => "30",
+                    'pattern' => "[A-Za-z\d]+",
                 ],
             ])
             ->add('recaptcha', EWZRecaptchaType::class, [
