@@ -120,7 +120,7 @@ class DeployConsumer implements ConsumerInterface
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
 
-                $this->setDeployCostReward($user);
+                $this->setDeployCostReward($user, $token->getName());
             }
 
             $this->em->persist($lockIn);
@@ -140,7 +140,7 @@ class DeployConsumer implements ConsumerInterface
         return true;
     }
 
-    private function setDeployCostReward(User $user): void
+    private function setDeployCostReward(User $user, string $tokenName): void
     {
         $referencer = $user->getReferencer();
 
@@ -165,6 +165,17 @@ class DeployConsumer implements ConsumerInterface
 
                 $this->em->persist($userDeployTokenReward);
                 $this->em->persist($referencerDeployTokenReward);
+
+                $this->logger->info(
+                    '[deploy-consumer] token deploy referral reward'
+                    . json_encode([
+                        'referredUserId' => $user->getId(),
+                        'referrerUserId' => $referencer->getId(),
+                        'tokenName' => $tokenName(),
+                        'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
+                        'rewardAmountInMintme' => $reward->getAmount(),
+                    ])
+                );
             }
         }
     }
