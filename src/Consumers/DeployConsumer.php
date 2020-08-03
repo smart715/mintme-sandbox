@@ -171,7 +171,7 @@ class DeployConsumer implements ConsumerInterface
                     . json_encode([
                         'referredUserId' => $user->getId(),
                         'referrerUserId' => $referencer->getId(),
-                        'tokenName' => $tokenName(),
+                        'tokenName' => $tokenName,
                         'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
                         'rewardAmountInMintme' => $reward->getAmount(),
                     ])
