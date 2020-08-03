@@ -64,13 +64,13 @@
                                         </template>
                                     </guide>
                                 </span>
-                                <span class="text-nowrap">
+                                <p class="text-nowrap">
                                     <a
                                         v-if="showDepositMoreLink"
                                         :href="depositMoreLink"
                                         tabindex="1"
                                     >Deposit more</a>
-                                </span>
+                                </p>
                             </div>
                         </div>
                     </div>
