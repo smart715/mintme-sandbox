@@ -1,4 +1,4 @@
-import {mount, createLocalVue} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenReleasePeriod from '../../js/components/token/TokenReleasePeriod';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -8,6 +8,10 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.component('b-col', {});
+    localVue.component('b-row', {});
+    localVue.component('b-button', {});
+    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -30,7 +34,7 @@ describe('TokenReleasePeriod', () => {
     describe('releasedDisabled', () => {
         it('returns true if token is exchanged and has lockin even if not deployed', (done) => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,
@@ -49,7 +53,7 @@ describe('TokenReleasePeriod', () => {
 
         it('returns true if token deployed even if not exchanged', (done) => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: false,
@@ -68,7 +72,7 @@ describe('TokenReleasePeriod', () => {
 
         it('returns false if token not exchanged and not deployed', () => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: false,
@@ -82,7 +86,7 @@ describe('TokenReleasePeriod', () => {
 
         it('returns false if token doesn\'t have lockin and is not deployed, even if it is exchanged', () => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,
@@ -98,7 +102,7 @@ describe('TokenReleasePeriod', () => {
     describe('releasePeriodDisabled', () => {
         it('returns true if token deployed or pending', (done) => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,
@@ -116,7 +120,7 @@ describe('TokenReleasePeriod', () => {
 
         it('returns false if not deployed', () => {
             const localVue = mockVue();
-            const wrapper = mount(TokenReleasePeriod, {
+            const wrapper = shallowMount(TokenReleasePeriod, {
                 localVue,
                 propsData: {
                     isTokenExchanged: true,

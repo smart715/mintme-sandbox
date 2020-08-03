@@ -78,29 +78,29 @@ describe('Trade', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.find('trade-chart-stub').attributes('websocketurl')).to.be.equal('testWebsocketUrl');
-        expect(wrapper.find('trade-chart-stub').attributes('market')).to.be.equal('[object Object]');
-        expect(wrapper.find('trade-chart-stub').attributes('mintmesupplyurl')).to.be.equal('testMintmeSupplyUrl');
-        expect(wrapper.find('trade-chart-stub').attributes('minimumvolumeformarketcap')).to.be.equal('11');
-        expect(wrapper.find('trade-buy-order-stub').attributes('websocketurl')).to.be.equal('testWebsocketUrl');
-        expect(wrapper.find('trade-buy-order-stub').attributes('hash')).to.be.equal('testHash');
-        expect(wrapper.find('trade-buy-order-stub').attributes('loggedin')).to.be.equal('true');
-        expect(wrapper.find('trade-buy-order-stub').attributes('market')).to.be.equal('[object Object]');
-        expect(wrapper.find('trade-buy-order-stub').attributes('loginurl')).to.be.equal('testLoginUrl');
-        expect(wrapper.find('trade-buy-order-stub').attributes('signupurl')).to.be.equal('testSignupUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('websocketurl')).to.be.equal('testWebsocketUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('hash')).to.be.equal('testHash');
-        expect(wrapper.find('trade-sell-order-stub').attributes('loggedin')).to.be.equal('true');
-        expect(wrapper.find('trade-sell-order-stub').attributes('market')).to.be.equal('[object Object]');
-        expect(wrapper.find('trade-sell-order-stub').attributes('loginurl')).to.be.equal('testLoginUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('signupurl')).to.be.equal('testSignupUrl');
-        expect(wrapper.find('trade-sell-order-stub').attributes('isowner')).to.be.equal('true');
-        expect(wrapper.find('trade-orders-stub').attributes('market')).to.be.equal('[object Object]');
-        expect(wrapper.find('trade-orders-stub').attributes('userid')).to.be.equal('2');
-        expect(wrapper.find('trade-orders-stub').attributes('loggedin')).to.be.equal('true');
-        expect(wrapper.find('trade-trade-history-stub').attributes('websocketurl')).to.be.equal('testWebsocketUrl');
-        expect(wrapper.find('trade-trade-history-stub').attributes('hash')).to.be.equal('testHash');
-        expect(wrapper.find('trade-trade-history-stub').attributes('market')).to.be.equal('[object Object]');
+        expect(wrapper.find('trade-chart-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.find('trade-chart-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.find('trade-chart-stub').attributes('mintmesupplyurl')).toBe('testMintmeSupplyUrl');
+        expect(wrapper.find('trade-chart-stub').attributes('minimumvolumeformarketcap')).toBe('11');
+        expect(wrapper.find('trade-buy-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.find('trade-buy-order-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.find('trade-buy-order-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.find('trade-buy-order-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.find('trade-buy-order-stub').attributes('loginurl')).toBe('testLoginUrl');
+        expect(wrapper.find('trade-buy-order-stub').attributes('signupurl')).toBe('testSignupUrl');
+        expect(wrapper.find('trade-sell-order-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.find('trade-sell-order-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.find('trade-sell-order-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.find('trade-sell-order-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.find('trade-sell-order-stub').attributes('loginurl')).toBe('testLoginUrl');
+        expect(wrapper.find('trade-sell-order-stub').attributes('signupurl')).toBe('testSignupUrl');
+        expect(wrapper.find('trade-sell-order-stub').attributes('isowner')).toBe('true');
+        expect(wrapper.find('trade-orders-stub').attributes('market')).toBe('[object Object]');
+        expect(wrapper.find('trade-orders-stub').attributes('userid')).toBe('2');
+        expect(wrapper.find('trade-orders-stub').attributes('loggedin')).toBe('true');
+        expect(wrapper.find('trade-trade-history-stub').attributes('websocketurl')).toBe('testWebsocketUrl');
+        expect(wrapper.find('trade-trade-history-stub').attributes('hash')).toBe('testHash');
+        expect(wrapper.find('trade-trade-history-stub').attributes('market')).toBe('[object Object]');
     });
 
     it('should compute baseBalance correctly', () => {
@@ -110,11 +110,11 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.balances = false;
-        expect(wrapper.vm.baseBalance).to.be.false;
+        expect(wrapper.vm.baseBalance).toBe(false);
         wrapper.vm.balances = [];
-        expect(wrapper.vm.baseBalance).to.be.false;
+        expect(wrapper.vm.baseBalance).toBe(false);
         wrapper.vm.balances = {'BTC': {available: 10}};
-        expect(wrapper.vm.baseBalance).to.be.equal(10);
+        expect(wrapper.vm.baseBalance).toBe(10);
     });
 
     it('should compute quoteBalance correctly', () => {
@@ -124,11 +124,11 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.balances = false;
-        expect(wrapper.vm.quoteBalance).to.be.false;
+        expect(wrapper.vm.quoteBalance).toBe(false);
         wrapper.vm.balances = [];
-        expect(wrapper.vm.quoteBalance).to.be.false;
+        expect(wrapper.vm.quoteBalance).toBe(false);
         wrapper.vm.balances = {'WEB': {available: 11}};
-        expect(wrapper.vm.quoteBalance).to.be.equal(11);
+        expect(wrapper.vm.quoteBalance).toBe(11);
     });
 
     it('should compute balanceLoaded correctly', () => {
@@ -138,7 +138,7 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.balances = null;
-        expect(wrapper.vm.balanceLoaded).to.be.false;
+        expect(wrapper.vm.balanceLoaded).toBe(false);
     });
 
     it('should compute ordersLoaded correctly', () => {
@@ -149,13 +149,13 @@ describe('Trade', () => {
         });
         wrapper.vm.buyOrders = false;
         wrapper.vm.sellOrders = null;
-        expect(wrapper.vm.ordersLoaded).to.be.false;
+        expect(wrapper.vm.ordersLoaded).toBe(false);
         wrapper.vm.buyOrders = null;
         wrapper.vm.sellOrders = false;
-        expect(wrapper.vm.ordersLoaded).to.be.false;
+        expect(wrapper.vm.ordersLoaded).toBe(false);
         wrapper.vm.buyOrders = false;
         wrapper.vm.sellOrders = false;
-        expect(wrapper.vm.ordersLoaded).to.be.true;
+        expect(wrapper.vm.ordersLoaded).toBe(true);
     });
 
     it('should compute marketPriceSell correctly', () => {
@@ -165,11 +165,11 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.buyOrders = false;
-        expect(wrapper.vm.marketPriceSell).to.be.equal(0);
+        expect(wrapper.vm.marketPriceSell).toBe(0);
         wrapper.vm.buyOrders = [];
-        expect(wrapper.vm.marketPriceSell).to.be.equal(0);
+        expect(wrapper.vm.marketPriceSell).toBe(0);
         wrapper.vm.buyOrders = [{price: 10}];
-        expect(wrapper.vm.marketPriceSell).to.be.equal(10);
+        expect(wrapper.vm.marketPriceSell).toBe(10);
     });
 
     it('should compute marketPriceBuy correctly', () => {
@@ -179,11 +179,11 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.sellOrders = false;
-        expect(wrapper.vm.marketPriceBuy).to.be.equal(0);
+        expect(wrapper.vm.marketPriceBuy).toBe(0);
         wrapper.vm.sellOrders = [];
-        expect(wrapper.vm.marketPriceBuy).to.be.equal(0);
+        expect(wrapper.vm.marketPriceBuy).toBe(0);
         wrapper.vm.sellOrders = [{price: 11}];
-        expect(wrapper.vm.marketPriceBuy).to.be.equal(11);
+        expect(wrapper.vm.marketPriceBuy).toBe(11);
     });
 
     it('should set buyOrders and sellOrders correctly when the function saveOrders() is called', () => {
@@ -194,10 +194,10 @@ describe('Trade', () => {
         });
         wrapper.vm.sellOrders = null;
         wrapper.vm.saveOrders('foo', true);
-        expect(wrapper.vm.sellOrders).to.be.equal('foo');
+        expect(wrapper.vm.sellOrders).toBe('foo');
         wrapper.vm.buyOrders = null;
         wrapper.vm.saveOrders('foo', false);
-        expect(wrapper.vm.buyOrders).to.be.equal('foo');
+        expect(wrapper.vm.buyOrders).toBe('foo');
     });
 
     it('should sort price correctly when the function sortOrders() is called', () => {
@@ -206,8 +206,8 @@ describe('Trade', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.vm.sortOrders(orders, true)).to.deep.equal([{price: '1'}, {price: '2'}]);
-        expect(wrapper.vm.sortOrders(orders, false)).to.deep.equal([{price: '2'}, {price: '1'}]);
+        expect(wrapper.vm.sortOrders(orders, true)).toMatchObject([{price: '1'}, {price: '2'}]);
+        expect(wrapper.vm.sortOrders(orders, false)).toMatchObject([{price: '2'}, {price: '1'}]);
     });
 
     describe('updateOrders', () => {
@@ -225,8 +225,8 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).to.deep.equal([{price: '2'}, {price: '1'}]);
-                expect(wrapper.vm.sellOrders).to.deep.equal([{price: '3'}, {price: '4'}]);
+                expect(wrapper.vm.buyOrders).toMatchObject([{price: '2'}, {price: '1'}]);
+                expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
                 done();
             });
         });
@@ -246,8 +246,8 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).to.deep.equal([]);
-                expect(wrapper.vm.sellOrders).to.deep.equal([]);
+                expect(wrapper.vm.buyOrders).toEqual([]);
+                expect(wrapper.vm.sellOrders).toEqual([]);
                 done();
             });
         });
@@ -268,8 +268,8 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.sellOrders).to.deep.equal([{price: '3'}, {price: '4'}, {price: '3'}, {price: '4'}]);
-                expect(wrapper.vm.sellPage).to.be.equal(3);
+                expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}, {price: '3'}, {price: '4'}]);
+                expect(wrapper.vm.sellPage).toBe(3);
                 done();
             });
         });
@@ -290,8 +290,8 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).to.deep.equal([{price: '2'}, {price: '1'}, {price: '2'}, {price: '1'}]);
-                expect(wrapper.vm.buyPage).to.be.equal(3);
+                expect(wrapper.vm.buyOrders).toMatchObject([{price: '2'}, {price: '1'}, {price: '2'}, {price: '1'}]);
+                expect(wrapper.vm.buyPage).toBe(3);
                 done();
             });
         });
@@ -307,7 +307,7 @@ describe('Trade', () => {
             wrapper.vm.balances = 'foo';
             wrapper.vm.loggedIn = false;
             wrapper.vm.updateAssets();
-            expect(wrapper.vm.balances).to.be.false;
+            expect(wrapper.vm.balances).toBe(false);
         });
 
         it('should do $axios request and set balances correctly when market quote symbol is undefined', (done) => {
@@ -325,7 +325,7 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.balances['WEB']).to.deep.equal({available: '0'});
+                expect(wrapper.vm.balances['WEB']).toMatchObject({available: '0'});
                 done();
             });
         });
@@ -345,7 +345,7 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.balances).to.deep.equal({'0': 'bar', 'WEB': 'foo'});
+                expect(wrapper.vm.balances).toMatchObject({'0': 'bar', 'WEB': 'foo'});
                 done();
             });
         });
@@ -360,10 +360,10 @@ describe('Trade', () => {
             });
             const oldSellOrders = wrapper.vm.sellOrders = [{id: 'bar'}];
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, 'foo');
-            expect(wrapper.vm.sellOrders).to.deep.equal(oldSellOrders);
+            expect(wrapper.vm.sellOrders).toMatchObject(oldSellOrders);
             const oldBuyOrders = wrapper.vm.buyOrders = [{id: 'qwe'}];
             wrapper.vm.processOrders({side: 'bar', id: 'foobar'}, 'foo');
-            expect(wrapper.vm.buyOrders).to.deep.equal(oldBuyOrders);
+            expect(wrapper.vm.buyOrders).toMatchObject(oldBuyOrders);
         });
 
         it('should do $axios request and set sellOrders and buyOrders correctly when when \'type\' type matches PUT', (done) => {
@@ -383,8 +383,8 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.sellOrders).to.deep.equal([{id: 'foo', price: 1}, {id: 'bar', price: 2}]);
-                expect(wrapper.vm.buyOrders).to.deep.equal([{id: 'qwe', price: 3}, {id: 'foo', price: 1}]);
+                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'foo', price: 1}, {id: 'bar', price: 2}]);
+                expect(wrapper.vm.buyOrders).toMatchObject([{id: 'qwe', price: 3}, {id: 'foo', price: 1}]);
                 done();
             });
         });
@@ -398,8 +398,8 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.UPDATE);
-            expect(wrapper.vm.sellOrders).to.deep.equal([{id: 'bar', price: 2}]);
-            expect(wrapper.vm.buyOrders).to.be.null;
+            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
+            expect(wrapper.vm.buyOrders).toBe(null);
         });
 
         it('set sellOrders and buyOrders correctly when when \'type\' type matches UPDATE and order is defined', () => {
@@ -411,8 +411,8 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}, Constants.WSAPI.order.status.UPDATE);
-            expect(wrapper.vm.sellOrders).to.deep.equal([{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime', createdTimestamp: 'nestCtime', amount: 'testLeft', timestamp: 'testMtime'}]);
-            expect(wrapper.vm.buyOrders).to.be.null;
+            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime', createdTimestamp: 'nestCtime', amount: 'testLeft', timestamp: 'testMtime'}]);
+            expect(wrapper.vm.buyOrders).toBe(null);
         });
 
         it('set sellOrders and buyOrders correctly when when \'type\' type matches FINISH and order is undefined', () => {
@@ -424,8 +424,8 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.FINISH);
-            expect(wrapper.vm.sellOrders).to.deep.equal([{id: 'bar', price: 2}]);
-            expect(wrapper.vm.buyOrders).to.be.null;
+            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
+            expect(wrapper.vm.buyOrders).toBe(null);
         });
 
         it('set sellOrders and buyOrders correctly when when \'type\' type matches FINISH and order is defined', () => {
@@ -437,8 +437,8 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar'}, Constants.WSAPI.order.status.FINISH);
-            expect(wrapper.vm.sellOrders).to.deep.equal([]);
-            expect(wrapper.vm.buyOrders).to.be.null;
+            expect(wrapper.vm.sellOrders).toEqual([]);
+            expect(wrapper.vm.buyOrders).toBe(null);
         });
     });
 });

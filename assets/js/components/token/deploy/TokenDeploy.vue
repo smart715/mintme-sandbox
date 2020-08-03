@@ -123,7 +123,7 @@ export default {
             return null !== this.webCost || null !== this.balance;
         },
         costExceed: function() {
-            return new Decimal(this.webCost).greaterThan(this.balance);
+            return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
         },
     },
     methods: {
@@ -185,7 +185,7 @@ export default {
     },
     filters: {
         toMoney: function(val, precision) {
-            return toMoney(val, precision);
+            return toMoney(val || 0, precision);
         },
         formatMoney: function(val) {
             return formatMoney(val);

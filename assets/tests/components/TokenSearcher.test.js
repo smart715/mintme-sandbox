@@ -3,6 +3,22 @@ import TokenSearcher from '../../js/components/token/TokenSearcher';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 
+delete window.location;
+window.location = {
+    reload: jest.fn(),
+    href: '',
+};
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.component('font-awesome-icon', {});
+    localVue.use(Axios);
+    return localVue;
+}
+
 describe('TokenSearcher', () => {
     beforeEach(() => {
        moxios.install();
@@ -13,10 +29,8 @@ describe('TokenSearcher', () => {
     });
 
     it('triggers searchUpdate()', (done) => {
-        const localVue = createLocalVue();
-        localVue.use(Axios);
         const wrapper = shallowMount(TokenSearcher, {
-            localVue,
+            localVue: mockVue(),
             propsData: {
                 searchUrl: 'searchUrl',
             },
@@ -38,6 +52,7 @@ describe('TokenSearcher', () => {
     describe('input value', () => {
         const $routing = {generate: () => 'TokenUrl'};
         const wrapper = shallowMount(TokenSearcher, {
+            localVue: mockVue(),
             mocks: {
                 $routing,
             },
