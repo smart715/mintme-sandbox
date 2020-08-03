@@ -238,7 +238,7 @@
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        || marketFilters.selectedFilter === marketFilters.options.user.key">
+                        && tokens.length">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">Show all tokens</b-link>
                             </div>
