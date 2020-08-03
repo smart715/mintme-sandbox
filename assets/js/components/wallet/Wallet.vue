@@ -68,12 +68,12 @@
                     <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}" class="first-field">
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(15) }}
                             </span>
                         </span>
                         <span v-else>
                             <a :href="generatePairUrl(data.item)" class="text-white">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(15) }}
                             </a>
                         </span>
                     </div>
@@ -83,7 +83,7 @@
                     >
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(15) }}
                             </span>
                         </span>
                         <span v-else>
