@@ -16,7 +16,7 @@ use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\Route("/api/donation")
+ * @Rest\Route("/api/donate")
  */
 class DonationController extends AbstractFOSRestController
 {

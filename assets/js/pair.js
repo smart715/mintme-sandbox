@@ -18,7 +18,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'trade', 'donation', 'posts'],
+      tabs: ['intro', 'trade', 'donate', 'posts'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
@@ -48,11 +48,17 @@ new Vue({
     TopHolders,
     Trade,
   },
-  mounted() {
-      let aux = this.$refs['tokenAvatar'];
-      if (aux && aux.$attrs['showsuccess']) {
-          this.notifySuccess('Token has been created successfully');
-      }
+  mounted: function() {
+    let divEl = document.createElement('div');
+    let tabsEl = document.querySelectorAll('.nav.nav-tabs');
+
+    divEl.className = 'tabs-left-margin-container';
+    document.getElementsByClassName('tabs-wrapper')[0].insertBefore(divEl, tabsEl[0]);
+
+    let aux = this.$refs['tokenAvatar'];
+    if (aux && aux.$attrs['showsuccess']) {
+        this.notifySuccess('Token has been created successfully');
+    }
   },
   methods: {
     fetchAddress: function() {
