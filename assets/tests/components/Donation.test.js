@@ -2,6 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Donation from '../../js/components/donation/Donation';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
 import {webSymbol, btcSymbol, tokSymbol, MINTME} from '../../js/utils/constants';
 
 /**
@@ -32,12 +33,32 @@ describe('Donation', () => {
         moxios.uninstall();
     });
 
+    const localVue = mockVue();
+    localVue.use(Vuex);
+
+    const store = new Vuex.Store({
+        modules: {
+            websocket: {
+                namespaced: true,
+                actions: {
+                    addOnOpenHandler: () => {},
+                    addMessageHandler: () => {},
+                },
+            },
+        },
+    });
+
     it('should renders correctly for logged in user', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
+                market: {
+                    identifier: 'bar',
+                },
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         expect(wrapper.vm.dropdownText).toBe('Select currency');
@@ -51,9 +72,11 @@ describe('Donation', () => {
 
     it('should renders correctly for not logged in user', () => {
         const wrapper = shallowMount(Donation, {
-            localVue: mockVue(),
+            store,
+            localVue,
             propsData: {
                 loggedIn: false,
+                websocketUrl: '',
             },
         });
 
@@ -67,12 +90,14 @@ describe('Donation', () => {
 
     it('should renders correctly for logged in user and load balance for selected currency', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         expect(wrapper.vm.dropdownText).toBe('Select currency');
@@ -99,12 +124,14 @@ describe('Donation', () => {
 
     it('should rebrand selected currency WEB -> MINTME', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
@@ -118,13 +145,14 @@ describe('Donation', () => {
     });
 
     it('should generate link to wallet for selected currency', () => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
         });
 
@@ -137,12 +165,14 @@ describe('Donation', () => {
 
     it('should properly check if currency selected', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.selectedCurrency = '';
@@ -160,6 +190,8 @@ describe('Donation', () => {
 
     it('should properly check insufficient funds', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
@@ -169,8 +201,8 @@ describe('Donation', () => {
                         subunit: 4,
                     },
                 },
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.balanceLoaded = false;
@@ -188,6 +220,8 @@ describe('Donation', () => {
 
     it('should properly check amount to donate', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {
@@ -196,8 +230,8 @@ describe('Donation', () => {
                     minMintmeAmount: 0.0001,
                 },
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.amountToDonate = '';
@@ -229,8 +263,8 @@ describe('Donation', () => {
     });
 
     it('should properly disable button', () => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: false,
@@ -244,6 +278,7 @@ describe('Donation', () => {
                     fee: .01,
                     minMintmeAmount: 0.0001,
                 },
+                websocketUrl: '',
             },
         });
 
@@ -272,12 +307,14 @@ describe('Donation', () => {
 
     it('can select currency', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.balanceLoaded = true;
@@ -292,13 +329,14 @@ describe('Donation', () => {
     });
 
     it('can load login form', (done) => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: false,
                 donationParams: {fee: .01},
                 market: {quote: 'tok1'},
+                websocketUrl: '',
             },
         });
 
@@ -317,8 +355,8 @@ describe('Donation', () => {
     });
 
     it('can load token balance', (done) => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: true,
@@ -329,6 +367,7 @@ describe('Donation', () => {
                 market: {
                     quote: 'tok1',
                 },
+                websocketUrl: '',
             },
         });
 
@@ -349,8 +388,8 @@ describe('Donation', () => {
     });
 
     it('can check donation if logged in and currency selected and amount to donate not null', (done) => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: true,
@@ -366,6 +405,7 @@ describe('Donation', () => {
                     minBtcAmount: '0.000001',
                     minMintmeAmount: '0.0001',
                 },
+                websocketUrl: '',
             },
         });
 
@@ -388,8 +428,8 @@ describe('Donation', () => {
     });
 
     it('can make donation if logged in and currency selected and amount to donate/receive not null', (done) => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: true,
@@ -404,6 +444,7 @@ describe('Donation', () => {
                         symbol: 'TOK00011122233',
                     },
                 },
+                websocketUrl: '',
             },
         });
 
@@ -433,8 +474,8 @@ describe('Donation', () => {
     });
 
     it('can use all funds to donate', () => {
-        const localVue = mockVue();
         const wrapper = shallowMount(Donation, {
+            store,
             localVue,
             propsData: {
                 loggedIn: true,
@@ -450,6 +491,7 @@ describe('Donation', () => {
                     minBtcAmount: '0.000001',
                     minMintmeAmount: '0.0001',
                 },
+                websocketUrl: '',
             },
         });
 
@@ -470,13 +512,15 @@ describe('Donation', () => {
 
     it('should reset amount to donate and amount to receive on calling resetAmount()', () => {
         const wrapper = shallowMount(Donation, {
+            store,
+            localVue,
             propsData: {
                 loggedIn: true,
                 market: {
                     quote: 'tok1',
                 },
+                websocketUrl: '',
             },
-            localVue: mockVue(),
         });
 
         wrapper.vm.amountToDonate = 50;
