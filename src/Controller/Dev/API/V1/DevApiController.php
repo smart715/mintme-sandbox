@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API;
+namespace App\Controller\Dev\API\V1;
 
 use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;

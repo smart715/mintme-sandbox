@@ -1,21 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API\User;
+namespace App\Controller\Dev\API\V2\User;
 
-use App\Controller\Dev\API\DevApiController;
-use App\Entity\User;
-use App\Exception\ApiBadRequestException;
-use App\Exception\ApiNotFoundException;
-use App\Exchange\ExchangerInterface;
-use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Market;
-use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Order;
-use App\Exchange\Trade\TraderInterface;
-use App\Logger\UserActionLogger;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Utils\Converter\RebrandingConverterInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -25,49 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Rest\Route(path="/dev/api/v1/user/orders")
+ * @Rest\Route(path="/dev/api/v2/auth/user/orders")
  */
-class OrdersController extends DevApiController
+class OrdersController extends AbstractFOSRestController
 {
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var TraderInterface */
-    private $trader;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    public function __construct(
-        MarketFactoryInterface $marketFactory,
-        MarketHandlerInterface $marketHandler,
-        UserActionLogger $userActionLogger,
-        TraderInterface $trader,
-        RebrandingConverterInterface $rebrandingConverter,
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
-    ) {
-        $this->marketFactory = $marketFactory;
-        $this->marketHandler = $marketHandler;
-        $this->userActionLogger = $userActionLogger;
-        $this->trader = $trader;
-        $this->rebrandingConverter = $rebrandingConverter;
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-    }
-
     /**
      * List users active orders
      *
@@ -101,24 +49,16 @@ class OrdersController extends DevApiController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getActiveOrders(ParamFetcherInterface $request): array
+    public function getActiveOrders(ParamFetcherInterface $request): Response
     {
-        /** @var User $user*/
-        $user = $this->getUser();
-        $markets = $this->marketFactory->createUserRelated($user);
-
-        if (!$markets) {
-            return [];
-        }
-
-        return array_map(function ($order) {
-            return $this->rebrandingConverter->convertOrder($order);
-        }, $this->marketHandler->getPendingOrdersByUser(
-            $user,
-            $markets,
-            (int)$request->get('offset'),
-            (int)$request->get('limit')
-        ));
+        return $this->forward(
+            'App\Controller\Dev\API\V1\User\OrdersController::getActiveOrders',
+            ['request' => $request,],
+            [
+                'offset' => (int)$request->get('offset'),
+                'limit' => (int)$request->get('limit'),
+            ]
+        );
     }
 
     /**
@@ -154,25 +94,16 @@ class OrdersController extends DevApiController
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
-    public function getFinishedOrders(ParamFetcherInterface $request): array
+    public function getFinishedOrders(ParamFetcherInterface $request): Response
     {
-        /** @var User $user*/
-        $user = $this->getUser();
-
-        $markets = $this->marketFactory->createUserRelated($user);
-
-        if (!$markets) {
-            return [];
-        }
-
-        return array_map(function ($order) {
-            return $this->rebrandingConverter->convertOrder($order);
-        }, $this->marketHandler->getUserExecutedHistory(
-            $user,
-            $markets,
-            (int)$request->get('offset'),
-            (int)$request->get('limit')
-        ));
+        return $this->forward(
+            'App\Controller\Dev\API\V1\User\OrdersController::getFinishedOrders',
+            ['request' => $request,],
+            [
+                'offset' => (int)$request->get('offset'),
+                'limit' => (int)$request->get('limit'),
+            ]
+        );
     }
 
     /**
@@ -219,36 +150,10 @@ class OrdersController extends DevApiController
      */
     public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): View
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
-
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
-
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-
-        if (is_null($base) || is_null($quote)) {
-            throw new ApiNotFoundException('Market not found');
-        }
-
-        $market = new Market($base, $quote);
-
-        /** @var User $user*/
-        $user = $this->getUser();
-
-        $tradeResult = $exchanger->placeOrder(
-            $user,
-            $market,
-            (string)$request->get('amountInput'),
-            (string)$request->get('priceInput'),
-            filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
-            Order::SIDE_MAP[$request->get('action')]
-        );
-
-        return $this->view([
-            'result' => $tradeResult->getResult(),
-            'message' => $tradeResult->getMessage(),
-        ], Response::HTTP_ACCEPTED);
+        return $this->forward('App\Controller\Dev\API\V1\User\OrdersController::placeOrder', [
+            'request' => $request,
+            'exchanger' => $exchanger,
+        ]);
     }
 
     /**
@@ -268,33 +173,9 @@ class OrdersController extends DevApiController
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): View
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
-
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
-
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-
-        if (is_null($base) || is_null($quote)) {
-            throw new ApiNotFoundException('Market not found');
-        }
-
-        /** @var User $user*/
-        $user = $this->getUser();
-
-        $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
-
-        $tradeResult = $this->trader->cancelOrder($order);
-        
-        if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
-            throw new ApiBadRequestException('Invalid request');
-        } else {
-            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
-
-            return $this->view([
-                'message' => 'Order successfully removed',
-            ], Response::HTTP_ACCEPTED);
-        }
+        return $this->forward('App\Controller\Dev\API\V1\User\OrdersController::cancelOrder', [
+            'request' => $request,
+            'id' => $id,
+        ]);
     }
 }

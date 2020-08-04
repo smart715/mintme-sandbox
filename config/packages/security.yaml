@@ -12,17 +12,16 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api:
+        dev_api_auth:
             anonymous: ~
-            pattern: ^/dev/api
+            pattern: ^/dev/api/(v1|v2/auth)
             stateless: true
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
             provider: api_key_user_provider
-        coinmarketcapapi:
-            anonymous: true
-            pattern: ^/cmc/api
-            stateless: true
+            security: false
+        dev_api_public:
+            pattern: ^/dev/api/v2/public
             security: false
         main:
             pattern: ^/
@@ -72,7 +71,8 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
-        - { path: ^/dev/api,                                        role: ROLE_API }
+        - { path: ^/dev/api/(v1|v2/auth),                           role: ROLE_API }
+        - { path: ^/dev/api/v2/public,                              role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/media/upload,                               role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$,             role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$,                role: ROLE_USER }
@@ -88,7 +88,7 @@ security:
         - { path: ^/referral-program,                               role: ROLE_USER }
         - { path: ^/logout$,                                        role: ROLE_USER }
         - { path: ^/api,                                            role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/cmc/api,                                        role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/dev/api/v2/public,                              role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/2fa,                                            role: IS_AUTHENTICATED_2FA_IN_PROGRESS }

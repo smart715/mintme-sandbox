@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API;
+namespace App\Controller\Dev\API\V2;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exchange\Factory\MarketFactoryInterface;
