@@ -531,7 +531,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length > 0
+                            Object.keys(res.data.markets).length === 2 // there are only WEBBTC and WEBETH markets
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
