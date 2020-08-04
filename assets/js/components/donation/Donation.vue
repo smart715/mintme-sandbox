@@ -75,7 +75,7 @@
                                                 <div class="input-group-append">
                                                     <button
                                                         @click="all"
-                                                        class="btn btn-primary"
+                                                        class="btn btn-primary all-button"
                                                         type="button"
                                                     >All</button>
                                                 </div>
@@ -158,6 +158,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     RebrandingFilterMixin,
+    WebSocketMixin,
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
@@ -173,6 +174,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         RebrandingFilterMixin,
+        WebSocketMixin,
     ],
     components: {
         Guide,
@@ -202,6 +204,7 @@ export default {
             balance: 0,
             donationInProgress: false,
             showModal: false,
+            tokensAvailabilityChanged: false,
         };
     },
     computed: {
@@ -267,6 +270,18 @@ export default {
             this.loadLoginForm();
         } else {
             this.loginFormLoaded = true;
+
+            this.sendMessage(JSON.stringify({
+                method: 'order.subscribe',
+                params: [this.market.identifier],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
+
+            this.addMessageHandler((response) => {
+                if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
+                    this.tokensAvailabilityChanged = true;
+                }
+            });
         }
 
         this.debouncedCheck = debounce(this.checkDonation, 500);
@@ -311,7 +326,7 @@ export default {
                 });
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit);
+            return this.checkInput(this.currencySubunit, this.currencySubunit);
         },
         onKeyup: function() {
             this.debouncedCheck();
@@ -370,6 +385,10 @@ export default {
                 .catch((error) => {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
                         this.notifyError(error.response.data.message);
+
+                        if ('Tokens availability changed. Please adjust donation amount.' === error.response.data.message) {
+                            location.reload();
+                        }
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                     } else {
@@ -390,6 +409,13 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
+            if (this.tokensAvailabilityChanged) {
+                this.notifyError('Tokens availability changed. Please adjust donation amount.');
+                this.tokensAvailabilityChanged = false;
+                location.reload();
+                return;
+            }
+
             if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersSummary)) {
                 this.showModal = true;
             } else {

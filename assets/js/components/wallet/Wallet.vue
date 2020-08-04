@@ -13,17 +13,20 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
-                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
-                    </a>
+                    <div class="first-field">
+                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                            {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
+                        </a>
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div class="row">
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                    <div class="row pl-2">
+                        <div class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div><i class="icon-deposit"></i></div>
@@ -62,22 +65,25 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
+                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}" class="first-field">
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(14) }}
                             </span>
                         </span>
                         <span v-else>
                             <a :href="generatePairUrl(data.item)" class="text-white">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(14) }}
                             </a>
                         </span>
                     </div>
-                    <div v-else>
+                    <div
+                        v-else
+                        class="first-field"
+                    >
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
-                                {{ data.item.name | truncate(17) }}
+                                {{ data.item.name | truncate(14) }}
                             </span>
                         </span>
                         <span v-else>
@@ -88,12 +94,14 @@
                     </div>
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
                     <div
                         v-if="data.item.deployed"
-                        class="row">
+                        class="row pl-2">
                         <div
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
@@ -229,14 +237,14 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             withdraw: {
                 fee: '0',
