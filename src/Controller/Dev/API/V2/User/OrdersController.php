@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
+use App\Exchange\ExchangerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -148,12 +149,23 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="User Orders")
      */
-    public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): View
+    public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): Response
     {
-        return $this->forward('App\Controller\Dev\API\V1\User\OrdersController::placeOrder', [
-            'request' => $request,
-            'exchanger' => $exchanger,
-        ]);
+        return $this->forward(
+            'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
+            [
+                'request' => $request,
+                'exchanger' => $exchanger,
+            ],
+            [
+                'base' => (int)$request->get('base'),
+                'quote' => (int)$request->get('quote'),
+                'priceInput' => (int)$request->get('priceInput'),
+                'amountInput' => (int)$request->get('amountInput'),
+                'marketPrice' => (int)$request->get('marketPrice'),
+                'action' => (int)$request->get('action'),
+            ]
+        );
     }
 
     /**
@@ -171,11 +183,18 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer", required=true)
      * @SWG\Tag(name="User Orders")
      */
-    public function cancelOrder(ParamFetcherInterface $request, int $id): View
+    public function cancelOrder(ParamFetcherInterface $request, int $id): Response
     {
-        return $this->forward('App\Controller\Dev\API\V1\User\OrdersController::cancelOrder', [
-            'request' => $request,
-            'id' => $id,
-        ]);
+        return $this->forward(
+            'App\Controller\Dev\API\V1\User\OrdersController::cancelOrder',
+            [
+                'request' => $request,
+                'id' => $id,
+            ],
+            [
+                'base' => (int)$request->get('base'),
+                'quote' => (int)$request->get('quote'),
+            ]
+        );
     }
 }
