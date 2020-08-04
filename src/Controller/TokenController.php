@@ -23,6 +23,7 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Utils\Facebook\FacebookPixelCommunicatorInterface;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -69,7 +70,9 @@ class TokenController extends Controller
     /** @var UserActionLogger  */
     private $userActionLogger;
 
-
+    /** @var FacebookPixelCommunicatorInterface */
+    private $facebookPixelCommunicator;
+    
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -79,7 +82,8 @@ class TokenController extends Controller
         TraderInterface $trader,
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
-        BlacklistManager $blacklistManager
+        BlacklistManager $blacklistManager,
+        FacebookPixelCommunicatorInterface $facebookPixelCommunicator
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -89,6 +93,7 @@ class TokenController extends Controller
         $this->trader = $trader;
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
+        $this->facebookPixelCommunicator = $facebookPixelCommunicator;
 
         parent::__construct($normalizer);
     }
@@ -246,6 +251,8 @@ class TokenController extends Controller
 
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
+                
+                $this->sendFacebookPixelEvent($user, ['token_name' => $token->getName(), 'token_id' => $token->getId()]);
 
                 return $this->json("success", Response::HTTP_ACCEPTED);
             } catch (Throwable $exception) {
@@ -324,5 +331,22 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();
+    }
+    
+    private function sendFacebookPixelEvent(User $user, array $tokenParams): void
+    {
+        $request = Request::createFromGlobals();
+        
+        $this->facebookPixelCommunicator->sendUserEvent(
+            'Token create',
+            $user->getEmail(),
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
+            [
+                'token_name' => $tokenParams['token_name'],
+                'token_id' => $tokenParams['token_id'],
+            ],
+            $this->profileManager->getProfile($user)
+        );
     }
 }
