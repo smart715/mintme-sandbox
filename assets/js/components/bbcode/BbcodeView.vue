@@ -5,14 +5,15 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import bbob from '@bbob/core';
 import {render} from '@bbob/html';
 import presetHTML5 from '@bbob/preset-html5';
 import VueSanitize from 'vue-sanitize';
 import {sanitizeOptions} from '../../utils/constants.js';
 
-Vue.use(VueSanitize, sanitizeOptions);
+if (typeof Vue !== 'undefined') {
+  Vue.use(VueSanitize, sanitizeOptions);
+}
 
 export default {
     name: 'BbcodeView',

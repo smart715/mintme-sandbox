@@ -283,6 +283,7 @@ a
     &[role=tab]
         background: $secondary-dark
 
+
     @include font-scale(md)
 
     .card-header-description
@@ -341,6 +342,9 @@ a
       p.info
         line-height: 1 !important
         margin-bottom: 2rem !important
+      .input-group-append
+        button.all-button
+          z-index: 4
       @media (max-width: 550px)
         p.text-nowrap
           white-space: unset !important
@@ -517,8 +521,6 @@ a
     padding-top: 0.35rem
     padding-bottom: 0.35rem
     vertical-align: middle
-    padding-left: calc(0.75rem + 0.25em)
-
 
     &:first-child
       padding-left: 1.5rem
@@ -568,6 +570,28 @@ a
       pointer-events: none !important
 
 .tabs
+  @media (max-width: 768px)
+    .tabs-wrapper
+      display: flex
+      .nav
+        &.nav-tabs
+          width: 100%
+          flex-wrap: nowrap
+          overflow-x: auto
+          overflow-y: hidden
+          -webkit-overflow-scrolling: touch
+          -ms-overflow-style: -ms-autohiding-scrollbar
+          &::-webkit-scrollbar
+            display: none
+          .nav-link
+            padding: .45rem 1rem
+            @media (max-width: 550px)
+              padding: .45rem 0.5rem
+            @media (max-width: 520px)
+              padding: .45rem 0.3rem
+      .tabs-left-margin-container
+        min-width: 120px !important
+        background: $secondary
   .nav-tabs
     display: flex
     text-align: center
@@ -613,7 +637,6 @@ a
       background: $secondary
       text-align: left
       border: 2px solid $secondary
-      overflow: hidden
       white-space: nowrap
 
     .nav-item-token
@@ -894,7 +917,7 @@ nav.top-navbar
   pointer-events: auto
 
 .airdrop-container
-  background: #152d47 !important
+  background: $secondary !important
   font-size: 18px
   button
     &.btn-primary
