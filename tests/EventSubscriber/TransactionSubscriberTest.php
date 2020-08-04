@@ -12,7 +12,11 @@ use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
+use App\Manager\ProfileManager;
+use App\Manager\ProfileManagerInterface;
 use App\Tests\MockMoneyWrapper;
+use App\Utils\Facebook\FacebookPixelCommunicator;
+use App\Utils\Facebook\FacebookPixelCommunicatorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -31,7 +35,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Crypto::class);
@@ -50,7 +56,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -78,7 +86,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -118,7 +128,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -157,7 +169,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -199,7 +213,9 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockProfileManager(),
+            $this->mockFacebookPixelCommunicator()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -252,5 +268,18 @@ class TransactionSubscriberTest extends TestCase
     private function mockEntityManager(): EntityManagerInterface
     {
         return $this->createMock(EntityManagerInterface::class);
+    }
+    
+    private function mockFacebookPixelCommunicator(): FacebookPixelCommunicatorInterface
+    {
+        $facebookPixelCommunicator = $this->createMock(FacebookPixelCommunicatorInterface::class);
+        $facebookPixelCommunicator->method('sendEvent')->willReturn(null);
+        
+        return $facebookPixelCommunicator;
+    }
+    
+    private function mockProfileManager(): ProfileManagerInterface
+    {
+        return $this->createMock(ProfileManagerInterface::class);
     }
 }
