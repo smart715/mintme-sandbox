@@ -236,6 +236,7 @@ a
     margin-bottom: .5rem
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+    border: none !important
     background-color: $card-input-color !important
     color: $white !important
     border-radius: 0
@@ -243,9 +244,17 @@ a
     transition: all .3s ease
 
   input:not([type=button]):not([type=submit]):not([type=reset])
-    &:focus
+    &:focus, &:valid
       background-color: $input-focus !important
       box-shadow: none !important
+
+  input:not([type=button]):not([type=submit]):not([type=reset]):-webkit-autofill
+    -webkit-box-shadow: 0 0 0 30px $card-input-color inset !important
+    -webkit-text-fill-color: $white !important
+
+    &:hover, &:focus, &:active, &:valid
+      -webkit-box-shadow: 0 0 0 30px $input-focus inset !important
+      -webkit-text-fill-color: $white !important
 
   textarea
     height: auto
@@ -270,7 +279,7 @@ a
     border: none
     background: $card-header-bg
     color: $dark-white
-    padding: 0.75rem 1.25rem
+    padding: .2rem 1.25rem
     &[role=tab]
         background: $secondary-dark
 
@@ -324,7 +333,7 @@ a
       border: none
       background: $donation-header-bg
       color: $dark-white
-      padding: .45rem 1.35rem
+      padding: .2rem 1.25rem
 
       @include font-scale(md)
 
@@ -406,9 +415,47 @@ a
     height: auto
     width: auto
 
+    canvas
+      @include media-breakpoint-down(md)
+        width: 33px
+      @include media-breakpoint-down(sm)
+        width: 23px
+      @include media-breakpoint-down(xs)
+        width: 23px
+
 .percent-text
-  font-size: 8px !important
-  margin-bottom: 4px
+  font-size: 15px !important
+  margin-bottom: 5px
+
+  @include media-breakpoint-down(md)
+    font-size: 13px !important
+  @include media-breakpoint-down(sm)
+    font-size: 10px !important
+  @include media-breakpoint-down(xs)
+    font-size: 9px !important
+
+.token-point-progress
+  margin-top: 15px
+  margin-bottom: -9px
+
+  @include media-breakpoint-down(md)
+    margin-top: 18px
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
+
+.token-deploy-icon
+  margin-top: 19px
+
+  @include media-breakpoint-down(md)
+    margin-top: 23px
+  @include media-breakpoint-down(sm)
+    margin-top: 9px
+
+.token-edit-icon
+  margin-top: 12px
+
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
 
 .nav-item-circle-progress
   @include media-breakpoint-up(md)
@@ -446,11 +493,13 @@ a
 
 .table, .table-responsive
   color: inherit
+  margin-bottom: 0.7rem
 
   thead
     th
       border: none
       font-weight: normal
+      padding-top: 0.2rem
 
       &:first-child
         padding-left: 1.5rem
@@ -560,7 +609,10 @@ a
         border: none
         background-color: $color-tabs
         color: $dark-white
-        padding: .45rem 1.35rem
+        padding: .2rem 1.25rem
+
+        &:hover
+          color: $gold
 
         @include font-scale(md)
 
@@ -569,6 +621,7 @@ a
 
       .active
         color: $gold
+
 
   .tab-content
     flex: 1 1 auto
@@ -613,6 +666,7 @@ a
       flex: initial
       overflow: visible
 
+      /* stylelint-disable no-descending-specificity */
       .nav-link
         color: inherit
         position: relative
@@ -631,6 +685,8 @@ a
           height: .125rem
           background-color: unset
           width: calc(100% - 3rem)
+
+      /* stylelint-enable no-descending-specificity */
 
     @media (max-width: 480px)
       .swagger-ui .model
@@ -690,6 +746,9 @@ a
     @include font-scale(md)
 
 nav.top-navbar
+  @include media-breakpoint-down(md)
+    padding: 0.3rem 1rem !important
+
   .navbar-toggler-icon
     outline: none
     background-image: $navbar-toogler
@@ -791,11 +850,12 @@ nav.top-navbar
   background-size: auto 100%
   background-repeat: no-repeat
 
-.icon-edit
-  @include font-scale(md)
-
 .icon-with-badge
   margin-top: -4px
+
+.icon-default
+  @include font-scale(md)
+  color: $white
 
 .img-barcode
   width: 120px
@@ -1004,6 +1064,13 @@ input[type=search]::-webkit-search-cancel-button
     svg
       color: $blue !important
 
+.hover-icon:hover svg, .icon-default:hover
+    color: $gold
+    transition: color .15s
+
+a.hover-icon:hover
+  span.social-link
+    text-decoration: underline !important
 
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large
@@ -1059,6 +1126,47 @@ input[type=search]::-webkit-search-cancel-button
       .bbcode-span-list-item
         left: 0 !important
 
+.socialMediaIcon
+  margin-top: 58px
+
+.dropdown-menu-social-media
+  min-width: 7rem
+
+.pair-container
+  margin-top: 1.5rem !important
+
+  @include media-breakpoint-down(md)
+    margin-top: 0.3rem !important
+
+.trade-tabs
+  ul
+    height: 35px
+    li.nav-item
+      margin: -2px
+    li.nav-item-token
+      margin: -6px
+
+.token-trading-title
+  height: 38px
+  @media(max-width: 480px)
+    height: 74px
+  @media(max-width: 393px )
+    height: 116px
+
+.small-profile-link
+  margin-top: 3px
+
+  span.icon-profile
+    margin-right: 17px
+    background-image: url('../img/profile-sprite.png')
+    @extend .icon
+
+    &:hover
+      background-position: -18px 0
+
 #client-copy-btn, #secret-copy-btn
   textarea
     top: 0 !important
+
+.social-media-menu
+  margin-right: 13px

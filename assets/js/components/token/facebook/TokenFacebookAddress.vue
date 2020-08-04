@@ -1,9 +1,9 @@
 <template>
     <div class="row">
         <div class="col text-truncate">
-            <a
+            <span
                 id="address-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click="addPage"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -12,8 +12,10 @@
                         size="lg"
                     />
                 </span>
-                {{ computedAddress }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedAddress }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="address"
                 target="address-link"

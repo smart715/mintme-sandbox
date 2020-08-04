@@ -11,6 +11,7 @@ import {NotificationMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
+import Avatar from './components/Avatar';
 
 new Vue({
   el: '#token',
@@ -47,6 +48,7 @@ new Vue({
     TokenSocialMediaIcons,
     TopHolders,
     Trade,
+    Avatar,
   },
   mounted: function() {
     let divEl = document.createElement('div');
