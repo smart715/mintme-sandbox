@@ -236,6 +236,7 @@ a
     margin-bottom: .5rem
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+    border: none !important
     background-color: $card-input-color !important
     color: $white !important
     border-radius: 0
@@ -243,11 +244,9 @@ a
     transition: all .3s ease
 
   input:not([type=button]):not([type=submit]):not([type=reset])
-    &:focus
+    &:focus, &:valid
       background-color: $input-focus !important
       box-shadow: none !important
-    &:valid
-      background-color: $input-focus !important
 
   input:not([type=button]):not([type=submit]):not([type=reset]):-webkit-autofill
     -webkit-box-shadow: 0 0 0 30px $card-input-color inset !important
@@ -1130,3 +1129,13 @@ a.hover-icon:hover
     height: 74px
   @media(max-width: 393px )
     height: 116px
+
+.small-profile-link
+  margin-top: 3px
+
+  span.icon-profile
+    background-image: url('../img/profile-sprite.png')
+    @extend .icon
+
+    &:hover
+      background-position: -18px 0

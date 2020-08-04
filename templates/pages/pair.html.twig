@@ -191,16 +191,15 @@
                 {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
-                        <li class="nav-item ml-auto">
-                            <a
-                                class="nav-link"
-                                href="{{ url('profile-view', {'nickname': profile.nickname}) }}">
-                                <avatar
-                                    class="token-profile-avatar d-flex"
-                                    size="middle"
-                                    image="{{ profile.image.url | imagine_filter('avatar_middle') }}"
-                                ></avatar>
-                            </a>
+                        <li class="nav-item ml-auto small-profile-link">
+                            <div>
+                                <a
+                                    class="testgedn"
+                                    href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                >
+                                    <span class="icon-profile float-left mt-1 mr-2 d-lg-inline"></span>
+                                </a>
+                            </div>
                         </li>
                     {% else %}
                         <li class="nav-item-token">
