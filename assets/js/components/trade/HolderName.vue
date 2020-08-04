@@ -6,19 +6,19 @@
             :disabled.sync="disableTooltip"
             boundary="viewport"
         />
+        <img
+            :src="img"
+            class="d-block rounded-circle"
+            alt="avatar">
         <a
             ref="a"
             :href="url"
-            class="holder-name mr-1"
+            class="holder-name mr-1 text-white"
         >
             <v-clamp autoresize @clampchange="updateTooltip" :max-lines="1">
                 {{ value }}
             </v-clamp>
         </a>
-        <img
-            :src="img"
-            class="d-block rounded-circle"
-            alt="avatar">
     </div>
 </template>
 

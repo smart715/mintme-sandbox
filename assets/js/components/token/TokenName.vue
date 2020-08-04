@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-wrap-break-word">
+    <div class="overflow-hidden token-name">
         <template v-if="editable">
             <token-edit-modal
                 v-if="editable"
@@ -34,13 +34,16 @@
                 @updated-telegram="$emit('updated-telegram', $event)"
             />
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
+                class="icon-default c-pointer align-middle token-edit-icon"
                 icon="edit"
                 transform="shrink-4 up-1.5"
                 @click="editToken"
             />
         </template>
-        <span class="current-token-name">
+        <span
+            class="current-token-name"
+            v-b-tooltip="{title: currentName, boundary:'viewport'}"
+        >
             {{ currentName }}
         </span>
     </div>

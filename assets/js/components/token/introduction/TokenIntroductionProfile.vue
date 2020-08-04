@@ -16,7 +16,7 @@
                     <div>
                         <font-awesome-icon
                             v-if="editable"
-                            class="icon-edit float-right c-pointer"
+                            class="icon-default float-right c-pointer"
                             :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = !editingUrls"
