@@ -1,10 +1,22 @@
-import {shallowMount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import BbcodeView from '../../js/components/bbcode/BbcodeView';
+import VueSanitize from 'vue-sanitize';
+import {sanitizeOptions} from '../../js/utils/constants.js';
+
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use(VueSanitize, sanitizeOptions);
+    return localVue;
+}
 
 describe('BbcodeView', () => {
     it('parse bbcode', () => {
         const wrapper = shallowMount(BbcodeView, {
-             propsData: {value: '[h1]Lorem ipsum.[/h1]'},
+            localVue: mockVue(),
+            propsData: {value: '[h1]Lorem ipsum.[/h1]'},
         });
 
         expect(wrapper.vm.parsedValue).toBe('<h1>Lorem ipsum.</h1>');
@@ -12,7 +24,8 @@ describe('BbcodeView', () => {
 
     it('parse bbcode image', () => {
         const wrapper = shallowMount(BbcodeView, {
-             propsData: {value: '[img]foo[/img]'},
+            localVue: mockVue(),
+            propsData: {value: '[img]foo[/img]'},
         });
 
         expect(wrapper.vm.parsedValue).toBe('<img style="max-width:100%" src="foo" />');
@@ -20,7 +33,8 @@ describe('BbcodeView', () => {
 
     it('parse bbcode link', () => {
         const wrapper = shallowMount(BbcodeView, {
-             propsData: {value: '[url=foo]bar[/url]'},
+            localVue: mockVue(),
+            propsData: {value: '[url=foo]bar[/url]'},
         });
 
         expect(wrapper.vm.parsedValue).toBe('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
@@ -28,6 +42,7 @@ describe('BbcodeView', () => {
 
     it('parse bbcode li', () => {
         const wrapper = shallowMount(BbcodeView, {
+            localVue: mockVue(),
             propsData: {value: '[li]foo[/li]'},
         });
 
@@ -36,6 +51,7 @@ describe('BbcodeView', () => {
 
     it('parse bbcode not allowed tags', () => {
         const wrapper = shallowMount(BbcodeView, {
+            localVue: mockVue(),
             propsData: {value: '<div>bar</div>'},
         });
 

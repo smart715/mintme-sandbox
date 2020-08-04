@@ -126,7 +126,7 @@ class DonationHandler implements DonationHandlerInterface
         );
 
         // Check expected tokens amount.
-        if ($currentExpectedAmount->lessThan($expectedAmount)) {
+        if (!$currentExpectedAmount->equals($expectedAmount)) {
             throw new ApiBadRequestException('Tokens availability changed. Please adjust donation amount.');
         }
 

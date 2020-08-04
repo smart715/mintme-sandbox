@@ -56,20 +56,16 @@
         tr
           td:first-child
             display: table-cell !important
-
-.top-holders
-  td:not(:first-child)
-    white-space: nowrap
-
-  .holder-name
-    width: calc(100% - 2em)
-    min-width: 70px
+        td
+          padding-left: calc(0.75rem + 0.65em)
 
 #token
   ul.nav .token-avatar-left
     margin-left: $token-avatar-margin-left
     background: transparent
-
+    z-index: 99
+    @media (max-width: 768px)
+      margin-left: 0 !important
     a
       background: transparent
 
@@ -87,3 +83,7 @@
     .token-name
       span.current-token-name
         font-size: 18px !important
+
+.deployed-token
+  padding: 0.75rem 1.25rem
+  
