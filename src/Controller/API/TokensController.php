@@ -25,11 +25,15 @@ use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
+use App\Manager\ProfileManager;
+use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Utils\Facebook\FacebookPixelCommunicator;
+use App\Utils\Facebook\FacebookPixelCommunicatorInterface;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -41,6 +45,7 @@ use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Validator\Constraints\Url;
@@ -75,13 +80,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /** @var BlacklistManagerInterface */
     protected $blacklistManager;
+    
+    /** @var FacebookPixelCommunicatorInterface */
+    private $facebookPixelCommunicator;
 
+    /** @var ProfileManagerInterface */
+    private $profileManager;
+    
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
+        FacebookPixelCommunicatorInterface $facebookPixelCommunicator,
+        ProfileManager $profileManager,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -92,6 +105,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
+        $this->facebookPixelCommunicator = $facebookPixelCommunicator;
+        $this->profileManager = $profileManager;
     }
 
     /**
@@ -646,7 +661,17 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
-
+        
+        /** @var User */
+        $user = $this->getUser();
+        
+        $this->sendFacebookPixelEvent($user, [
+            'token_id' => $token->getId(),
+            'token_name' => $token->getName(),
+            'token_symbol' => $token->getSymbol(),
+            'token_deploy_cost' => $token->getDeployCost(),
+        ]);
+        
         return $this->view();
     }
 
@@ -749,5 +774,19 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;
+    }
+    
+    private function sendFacebookPixelEvent(User $user, array $params): void
+    {
+        $request = Request::createFromGlobals();
+        
+        $this->facebookPixelCommunicator->sendUserEvent(
+            'Token deploy',
+            $user->getEmail(),
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
+            $params,
+            $this->profileManager->getProfile($user)
+        );
     }
 }
