@@ -600,3 +600,12 @@ services:
     App\Manager\MarketStatusManager:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    App\Utils\Facebook\FacebookPixelCommunicator:
+        arguments:
+          $appSecret: '%app_secret%'
+          $appID: '%app_id%'
+          $pixelID: '%pixel_id%'
+          $accessToken: '%access_token%'
+          $testCode: '%test_code%'
+          $useTestCode: '%use_test_code%'

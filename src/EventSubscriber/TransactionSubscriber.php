@@ -8,6 +8,10 @@ use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
+use App\Manager\ProfileManager;
+use App\Manager\ProfileManagerInterface;
+use App\Utils\Facebook\FacebookPixelCommunicator;
+use App\Utils\Facebook\FacebookPixelCommunicatorInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,17 +33,27 @@ class TransactionSubscriber implements EventSubscriberInterface
 
     /** @var EntityManagerInterface */
     private $em;
+    
+    /** @var ProfileManagerInterface */
+    private $profileManager;
+    
+    /** @var FacebookPixelCommunicatorInterface */
+    private $facebookPixelCommunicator;
 
     public function __construct(
         MailerInterface $mailer,
         MoneyWrapperInterface $moneyWrapper,
         LoggerInterface $logger,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ProfileManagerInterface $profileManager,
+        FacebookPixelCommunicatorInterface $facebookPixelCommunicator
     ) {
         $this->mailer = $mailer;
         $this->moneyWrapper = $moneyWrapper;
         $this->logger = $logger;
         $this->em = $em;
+        $this->profileManager = $profileManager;
+        $this->facebookPixelCommunicator = $facebookPixelCommunicator;
     }
 
     public static function getSubscribedEvents(): array
@@ -48,10 +62,12 @@ class TransactionSubscriber implements EventSubscriberInterface
            DepositCompletedEvent::NAME => [
                ['sendTransactionCompletedMail'],
                ['updateTokenWithdraw'],
+               ['sendFacebookEvent'],
            ],
            WithdrawCompletedEvent::NAME => [
                ['sendTransactionCompletedMail'],
                ['updateTokenWithdraw'],
+               ['sendFacebookEvent'],
            ],
         ];
     }
@@ -129,5 +145,40 @@ class TransactionSubscriber implements EventSubscriberInterface
         } catch (\Throwable $exception) {
             $this->logger->error("[transaction-subscriber] Failed to update token withdrawn. Reason: {$exception->getMessage()}");
         }
+    }
+    
+    public function sendFacebookEvent(TransactionCompletedEvent $event): void
+    {
+        if (DepositCompletedEvent::TYPE == $event::TYPE) {
+            $this->sendFacebookDepositEvent($event);
+        } elseif (WithdrawCompletedEvent::TYPE == $event::TYPE) {
+            $this->sendFacebookWithdrawEvent($event);
+        }
+    }
+    
+    private function sendFacebookDepositEvent(TransactionCompletedEvent $event): void
+    {
+        $this->facebookPixelCommunicator->sendEvent(
+            'Deposit',
+            $event->getUser()->getEmail(),
+            [
+                'amount' => $event->getAmount(),
+                'currency' => $event->getTradable()->getSymbol(),
+            ],
+            $this->profileManager->getProfile($event->getUser())
+        );
+    }
+    
+    private function sendFacebookWithdrawEvent(TransactionCompletedEvent $event): void
+    {
+        $this->facebookPixelCommunicator->sendEvent(
+            'Withdraw',
+            $event->getUser()->getEmail(),
+            [
+                'amount' => $event->getAmount(),
+                'currency' => $event->getTradable()->getSymbol(),
+            ],
+            $this->profileManager->getProfile($event->getUser())
+        );
     }
 }
