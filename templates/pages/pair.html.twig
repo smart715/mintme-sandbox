@@ -9,8 +9,20 @@
     {% endif %}
 {% endblock %}
 
+{% if post.image is not null %}
+    {% set metaImage %}{% path token.image.url | imagine_filter('avatar_large'), 'reference' %}{% endset %}
+{% endif %}
+
+{% if token|default %}
+    {% set pageTitle = Information about {{ token.name }} token | mintMe %}
+{% else %}
+    {% set pageTitle = {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} | mintMe %}
+{% endif %} | mintMe
+{% set metaTitle = {{ pageTitle }} %}
+{% set metaImageAlt = {{ pageTitle }} %}
+
 {% block title %}
-    {% if token|default %} Information about {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+    {{ pageTitle }}
 {% endblock %}
 
 {% block content %}

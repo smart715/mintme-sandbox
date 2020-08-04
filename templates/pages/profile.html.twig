@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
+{% if post.image is not null %}
+    {% set metaImage %}{% path profile.image.url | imagine_filter('avatar_large'), 'reference' %}{% endset %}
+{% endif %}
+{% set metaTitle = {{ profile.nickname }}'s profile | mintMe %}
+{% set metaImageAlt = {{ profile.nickname }}'s profile | mintMe %}
+
 {% block title %}
     {% if profile.anonymous %}
         {{ profile.nickname }}'s profile | mintMe
