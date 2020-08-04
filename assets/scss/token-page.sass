@@ -7,7 +7,12 @@
 
 #token
   .deployed-icon, .not-deployed-icon
-    height: 25px
+    height: 42px
+    @include media-breakpoint-down('md')
+      height: 34px
+    @include media-breakpoint-down('sm')
+      height: 27px
+
   min-height: 800px
 
   .not-deployed-icon
@@ -111,3 +116,7 @@
   font-size: 14px !important
   padding: 0 10px !important
   margin-bottom: 5px
+
+.token-social-media-edit
+  a:hover
+    text-decoration: underline

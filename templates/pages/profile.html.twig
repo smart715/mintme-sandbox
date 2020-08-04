@@ -23,7 +23,7 @@
 
 {% block content %}
     <div id="profile" class="container">
-        <div class="row pt-5 justify-content-center">
+        <div class="row pt-4 justify-content-center">
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
@@ -32,7 +32,7 @@
                     <div class="card-body position-relative">
                         {%- if (canEdit == true) -%}
                             <a @click="showEditForm = true" class="edit-icon">
-                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-edit" v-if="!showEditForm"></font-awesome-icon>
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-default" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {%- endif -%}
                         {%- if (profile.anonymous == true) -%}
