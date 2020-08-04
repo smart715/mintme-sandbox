@@ -44,14 +44,14 @@
 
                             <template v-slot:cell(orderMaker)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
-                                        </span>
+                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0"
                                             alt="avatar">
+                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                            {{ row.value }}
+                                        </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
                                         <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
@@ -60,14 +60,14 @@
                             </template>
                             <template v-slot:cell(orderTrader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
-                                        </span>
+                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.takerAvatar"
                                             class="rounded-circle d-block flex-grow-0"
                                             alt="avatar">
+                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                            {{ row.value }}
+                                        </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
                                         <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />

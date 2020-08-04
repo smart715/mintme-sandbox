@@ -1,3 +1,11 @@
+.trading-table
+  .table
+    tbody
+      tr:first-child
+        border-bottom: 1px solid
+        border-top: 1px solid
+        border-color: #7791A3
+
 .dropdown-item:hover
   background-color: darkgray
 
@@ -56,34 +64,110 @@
         tr
           td:first-child
             display: table-cell !important
-        td
-          padding-left: calc(0.75rem + 0.65em)
+
+.top-holders
+  td:not(:first-child)
+    white-space: nowrap
+
+  .holder-name
+    width: calc(100% - 2em)
+    min-width: 70px
 
 #token
   ul.nav .token-avatar-left
-    margin-left: $token-avatar-margin-left
+    margin-left: 127px
     background: transparent
     z-index: 99
-    @media (max-width: 768px)
-      margin-left: 0 !important
+    @media(max-width: 1199px)
+      margin-left: 123px
+
+    @media(max-width: 991px)
+      margin-left: 106px
+
+    @media(max-width: 767px)
+      margin-left: 0px
+
     a
       background: transparent
 
   .token-avatar
-    z-index: 1
+    z-index: 9
+    min-width: 0
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
-    .avatar
-      position: absolute
-      transform: translateY(30px)
-      border-radius: 50%
-      width: 120px
-      height: 120px
-      left: 20px
-    .token-name
-      span.current-token-name
-        font-size: 18px !important
+    @media(max-width: 1199px)
+      margin-left: calc(111px + 20px) !important
 
-.deployed-token
-  padding: 0.75rem 1.25rem
-  
+    @media(max-width: 991px)
+      margin-left: calc(94px + 20px) !important
+
+    @media(max-width: 767px)
+      margin-left: calc(54px + 20px) !important
+
+    .token-avatar-link
+      position: absolute
+      top: 0%
+      left: 2%
+      width: 131px
+      height: auto
+
+      @include media-breakpoint-down(md)
+        width: 108px
+        top: 29%
+        left: 23px
+
+      @include media-breakpoint-down(sm)
+        width: 68px
+        top: 4%
+        left: 23px
+
+      @include media-breakpoint-down(xs)
+        width: 69px
+        left: 22px
+        top: 3px
+
+    .token-name
+      min-width: 80px
+      margin-left: 5px
+      margin-top: 15px
+
+      @include media-breakpoint-down(md)
+        margin-top: 19px
+      @include media-breakpoint-down(sm)
+        margin-top: 11px
+
+      .current-token-name
+        margin-bottom: -3px
+        font-size: 25px
+
+        @include media-breakpoint-down(md)
+          font-size: 19px
+          margin-bottom: -4px !important
+        @include media-breakpoint-down(sm)
+          font-size: 16px
+          margin-bottom: 0px !important
+
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+  .token-profile-avatar
+    width: 26px
+    height: 26px
+
+.trading-page-options
+  display: inline
+  width: 100%
+  @media (max-width: 387px)
+    display: inline-grid
+    margin-left: 8px
+
+    .market-filter
+      margin-top: 8px
+      padding-right: 0px !important
+.card-title
+  padding-top: 1rem
+
+a.token-link:hover
+  span.token-link
+    text-decoration: underline !important

@@ -14,7 +14,7 @@
         <span>
             {{ date }}
         </span>
-        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})">
+        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
             <img
                 :src="post.author.image.avatar_small"
                 class="rounded-circle d-inline-block"
@@ -28,7 +28,7 @@
             @click="showModal"
         >
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
+                class="icon-default c-pointer align-middle"
                 icon="trash"
                 transform="shrink-4 up-1.5"
             />
@@ -38,7 +38,7 @@
             :href="$routing.generate('edit_post_page', {id: post.id})"
         >
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
+                class="icon-default c-pointer align-middle"
                 icon="edit"
                 transform="shrink-4 up-1.5"
             />

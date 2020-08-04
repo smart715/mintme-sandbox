@@ -18,11 +18,11 @@
                 The token creator has not added any posts yet.
             </div>
             <a v-if="showReadMore"
-                class="align-self-start"
+                class="align-self-center"
                 :href="readMoreUrl"
                 @click.prevent="goToPosts"
             >
-                More Posts
+                All Posts
             </a>
         </div>
     </div>

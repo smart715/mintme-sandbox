@@ -198,6 +198,17 @@
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
+                    {% if isTokenPage %}
+                        <li class="nav-item ml-auto small-profile-link">
+                            <div>
+                                <a
+                                    href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                >
+                                    <span class="icon-profile float-left mt-1 d-lg-inline"></span>
+                                </a>
+                            </div>
+                        </li>
+                    {% endif %}
                     {% if not isTokenPage %}
                         <li class="nav-item-token">
                             <div class="nav-link-token">

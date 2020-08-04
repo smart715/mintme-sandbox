@@ -52,7 +52,7 @@
         </div>
         <div class="card card-fixed-large mx-auto">
             <div class="card-body p-0">
-                <div class="card-header d-flex flex-wrap align-items-center px-0 pb-0 pt-2">
+                <div class="token-trading-title card-header d-flex flex-wrap align-items-center px-0 pb-0">
                     <span class="px-3 pb-2 mr-auto">Tokens</span>
                     <div>
                         <b-dropdown
