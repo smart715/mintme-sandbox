@@ -40,7 +40,7 @@ class SecurityControllerTest extends WebTestCase
         $this->client->request('GET', '/logout');
         $this->client->followRedirect();
 
-        $this->client->request('GET', '/token/' . $tokName . '/donation');
+        $this->client->request('GET', '/token/' . $tokName . '/donate');
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $this->client->request('GET', '/login?formContentOnly=true');
