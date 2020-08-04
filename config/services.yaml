@@ -604,3 +604,12 @@ services:
         arguments:
             $deployCost: '%deploy_cost%'
             $deployCostReward: '%deploy_cost_referral_reward%'
+
+    App\Utils\Facebook\FacebookPixelCommunicator:
+        arguments:
+            $appSecret: '%app_secret%'
+            $appID: '%app_id%'
+            $pixelID: '%pixel_id%'
+            $accessToken: '%access_token%'
+            $testCode: '%test_code%'
+            $useTestCode: '%use_test_code%'
