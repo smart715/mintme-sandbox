@@ -52,16 +52,17 @@
         </div>
         <div class="card card-fixed-large mx-auto">
             <div class="card-body p-0">
-                <div class="card-header d-flex align-items-center">
-                    <span>Tokens</span>
-                    <div class="trading-page-options">
+                <div class="card-header d-flex flex-wrap align-items-center px-0 pb-0 pt-2">
+                    <span class="px-3 pb-2 mr-auto">Tokens</span>
+                    <div>
                         <b-dropdown
-                            id="currency"
-                            variant="primary"
-                            class="float-right"
-                            :lazy="true"
+                                id="currency"
+                                variant="primary"
+                                class="ml-auto pl-3 pb-2"
+                                :lazy="true"
                         >
                             <template slot="button-content">
+                                Currency:
                                 <span v-if="showUsd">
                                     USD
                                 </span>
@@ -79,20 +80,22 @@
                             </template>
                         </b-dropdown>
                         <b-dropdown
-                            v-if="userId" class="market-filter float-right pr-3"
-                            id="customFilter"
-                            variant="primary"
-                            v-model="marketFilters.selectedFilter"
+                                id="customFilter"
+                                variant="primary"
+                                class="px-3 pb-2"
+                                :lazy="true"
+                                v-model="marketFilters.selectedFilter"
                         >
                             <template slot="button-content">
                                 <span>{{ marketFilters.options[marketFilters.selectedFilter].label }}</span>
                             </template>
                             <template>
                                 <b-dropdown-item
-                                    v-for="filter in marketFilters.options"
-                                    :key="filter.key"
-                                    :value="filter.label"
-                                    @click="toggleFilter(filter.key)"
+                                        v-for="filter in marketFilters.options"
+                                        v-if="'user' !== filter.key || 'user' === filter.key && userId"
+                                        :key="filter.key"
+                                        :value="filter.label"
+                                        @click="toggleFilter(filter.key)"
                                 >
                                     {{ filter.label }}
                                 </b-dropdown-item>
@@ -100,22 +103,22 @@
                         </b-dropdown>
                     </div>
                 </div>
-                <div slot="title" class="card-title font-weight-bold pl-3 pb-1">
-                    <span class="float-left">Top {{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
+                <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
+                    <span class="float-left">{{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
                 </div>
                 <template v-if="loaded">
                     <div class="trading-table table-responsive text-nowrap">
                         <b-table
-                            thead-class="trading-head"
-                            :items="tokens"
-                            :fields="fieldsArray"
-                            :sort-compare="sortCompare"
-                            sort-direction="desc"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            sort-icon-left
-                            :busy="tableLoading"
-                            @sort-changed="sortChanged"
+                                thead-class="trading-head"
+                                :items="tokens"
+                                :fields="fieldsArray"
+                                :sort-compare="sortCompare"
+                                sort-direction="desc"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                sort-icon-left
+                                :busy="tableLoading"
+                                @sort-changed="sortChanged"
                         >
                             <template v-slot:[`head(${fields.position.key})`]="data">
                                 #
@@ -130,18 +133,18 @@
                             </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
-                                    id="volume"
-                                    variant="primary"
-                                    :lazy="true"
+                                        id="volume"
+                                        variant="primary"
+                                        :lazy="true"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
                                     </template>
                                     <template>
                                         <b-dropdown-item
-                                            v-for="(volume, key) in volumes"
-                                            :key="key"
-                                            @click="toggleActiveVolume(key)"
+                                                v-for="(volume, key) in volumes"
+                                                :key="key"
+                                                @click="toggleActiveVolume(key)"
                                         >
                                             {{ volume.label|rebranding }}
                                         </b-dropdown-item>
@@ -186,21 +189,19 @@
                             </template>
                             <template v-slot:cell(pair)="row">
                                 <div>
-                                    <a :href="row.item.tokenUrl" class="text-white text-decoration-none token-link"
+                                    <a :href="row.item.tokenUrl" class="text-white"
                                        :disabled.sync="row.value.length <= 20"
                                        v-b-tooltip.hover :title="row.value">
-                                        <span v-if="showFullPair(row.value)">
-                                            <avatar
-                                                :image="row.item.baseImage"
-                                                type="token"
-                                                size="small" :symbol="row.item.base"
-                                                class="d-inline"
-                                                :key="row.item.baseImage"
-                                            />
-                                            <span class="token-link">
-                                                {{row.item.base}}/
-                                            </span>
-                                        </span>
+                                <span v-if="showFullPair(row.value)">
+                                    <avatar
+                                            :image="row.item.baseImage"
+                                            type="token"
+                                            size="small" :symbol="row.item.base"
+                                            class="d-inline"
+                                            :key="row.item.baseImage"
+                                    />
+                                    {{ row.item.base }}/
+                                </span>
                                         <avatar
                                             :image="row.item.quoteImage"
                                             type="token"
@@ -208,14 +209,12 @@
                                             class="d-inline"
                                             :key="row.item.quoteImage"
                                         />
-                                        <span class="token-link">
-                                            {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
-                                        </span>
+                                        {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
                                     </a>
                                     <guide
-                                        placement="top"
-                                        max-width="150px"
-                                        v-if="row.item.tokenized">
+                                            placement="top"
+                                            max-width="150px"
+                                            v-if="row.item.tokenized">
                                         <template slot="icon">
                                             <img src="../../../img/mintmecoin_W.png" alt="deployed">
                                         </template>
@@ -230,7 +229,7 @@
                     <template v-if="!tableLoading">
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && !tokens.length">
                             <div class="row justify-content-center">
-                                <p class="text-center p-5">No one deployed his token yet</p>
+                                <p class="text-center p-5">No one deployed tokens yet</p>
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && !tokens.length">
@@ -238,20 +237,20 @@
                                 <p class="text-center p-5">No any token yet</p>
                             </div>
                         </template>
-                        <template v-if="userId && (marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        || marketFilters.selectedFilter === marketFilters.options.user.key)">
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
+                        || marketFilters.selectedFilter === marketFilters.options.user.key">
                             <div class="row justify-content-center">
-                                <b-link @click="toggleFilter('all')">Show rest of tokens</b-link>
+                                <b-link @click="toggleFilter('all')">Show all tokens</b-link>
                             </div>
                         </template>
                     </template>
                     <div class="row justify-content-center">
                         <b-pagination
-                            @change="updateMarkets($event, deployedFirst)"
-                            :total-rows="totalRows"
-                            :per-page="perPage"
-                            v-model="currentPage"
-                            class="my-0" />
+                                @change="updateMarkets($event, deployedFirst)"
+                                :total-rows="totalRows"
+                                :per-page="perPage"
+                                v-model="currentPage"
+                                class="my-0" />
                     </div>
                 </template>
                 <template v-else>
@@ -323,7 +322,7 @@ export default {
             activeMarketCap: 'marketCap',
             marketFilters: {
                 userSelected: false,
-                selectedFilter: 'all',
+                selectedFilter: 'deployed',
                 options: {
                     deployed: {
                         key: 'deployed',
@@ -522,7 +521,7 @@ export default {
                 if (this.marketFilters.selectedFilter === this.marketFilters.options.user.key) {
                     params.user = 1;
                 } else if (
-                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key && this.userId
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
                     params.deployed = DEPLOYED_ONLY;
                 } else if (deployedFirst) {
