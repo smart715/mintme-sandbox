@@ -4,10 +4,10 @@
              class="rounded-circle img-fluid"
         >
         <ImageUploader
-                ref="uploader"
-                v-if="editable"
-                :type="type"
-                @upload="setImage"
+            ref="uploader"
+            v-if="editable"
+            :type="type"
+            @upload="setImage"
         />
     </div>
 </template>

@@ -29,7 +29,7 @@
                                         class="c-pointer"
                                         :content-to-copy="tokenContractAddress"
                                     >
-                                        <font-awesome-icon :icon="['far', 'copy']" />
+                                        <font-awesome-icon :icon="['far', 'copy']" class="icon-default"/>
                                     </copy-link>
                                     <guide>
                                         <template slot="header">
