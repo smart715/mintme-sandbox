@@ -40,7 +40,7 @@
         >
             <font-awesome-icon :icon="['fab', 'telegram']" size="lg" class="icon-default" />
         </a>
-        <div class="dropdown" :class="{ 'show': showSocialMediaMenu }">
+        <div class="dropdown social-media-menu" :class="{ 'show': showSocialMediaMenu }">
             <a
                 class="c-pointer col-auto d-flex text-white rounded-circle justify-content-center socialMediaIcon p-0 mx-1"
                 aria-haspopup="true"
