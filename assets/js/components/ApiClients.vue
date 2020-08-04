@@ -13,7 +13,7 @@
                             ID:<br />
                             <span class="text-danger word-break">{{ row.item.id }}</span>
                             <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
-                                <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                <font-awesome-icon :icon="['far', 'copy']" class="hover-icon"></font-awesome-icon>
                             </copy-link>
                             <a @click="setInvalidateModal(true, row.item.id)">
                                 <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
@@ -23,7 +23,7 @@
                                 <template>
                                     <span class="text-danger word-break">{{ row.item.secret }}</span>
                                     <copy-link class="code-copy c-pointer ml-2" id="secret-copy-btn" :content-to-copy="row.item.secret">
-                                        <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
+                                        <font-awesome-icon :icon="['far', 'copy']" class="hover-icon"></font-awesome-icon>
                                     </copy-link>
                                 </template>
                             </div>
