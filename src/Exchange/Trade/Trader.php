@@ -85,7 +85,7 @@ class Trader implements TraderInterface
 
         if (TradeResult::SUCCESS === $result->getResult()) {
             if ($quote instanceof Token) {
-                $this->updateUserTokenReferrencer($order->getMaker(), $quote);
+                $this->updateUserTokenReferencer($order->getMaker(), $quote);
             } elseif ($quote instanceof Crypto) {
                 $this->updateUserCrypto($order->getMaker(), $quote);
             }
@@ -166,9 +166,9 @@ class Trader implements TraderInterface
         }, $records);
     }
 
-    private function updateUserTokenReferrencer(User $user, Token $token): void
+    private function updateUserTokenReferencer(User $user, Token $token): void
     {
-        $referrencer = $user->getReferrencer();
+        $referencer = $user->getReferencer();
 
         if (!in_array($user, $token->getUsers(), true)) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
@@ -178,11 +178,11 @@ class Trader implements TraderInterface
             $this->entityManager->flush();
         }
 
-        if ($referrencer && !in_array($referrencer, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($referrencer);
+        if ($referencer && !in_array($referencer, $token->getUsers(), true)) {
+            $userToken = (new UserToken())->setToken($token)->setUser($referencer);
             $this->entityManager->persist($userToken);
-            $referrencer->addToken($userToken);
-            $this->entityManager->persist($referrencer);
+            $referencer->addToken($userToken);
+            $this->entityManager->persist($referencer);
             $this->entityManager->flush();
         }
     }
