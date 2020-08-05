@@ -137,7 +137,7 @@ class Exchanger implements ExchangerInterface
             $fee,
             null,
             null,
-            $user->getReferrencer() ? (int)$user->getReferrencer()->getId() : 0
+            $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
         );
 
         $tradeResult = $this->trader->placeOrder($order);
