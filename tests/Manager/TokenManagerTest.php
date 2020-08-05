@@ -3,6 +3,7 @@
 namespace App\Tests\Manager;
 
 use App\Entity\Crypto;
+use App\Entity\DeployTokenReward;
 use App\Entity\Profile;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
@@ -11,6 +12,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManager;
+use App\Repository\DeployTokenRewardRepository;
 use App\Repository\TokenRepository;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -242,7 +244,38 @@ class TokenManagerTest extends TestCase
         $this->assertNotContains($blahTok, $toks);
     }
 
+    public function testGetUserDeployTokensReward(): void
+    {
+        /** @var User|MockObject $user */
+        $user = $this->createMock(User::class);
+        $repo = $this->createMock(DeployTokenRewardRepository::class);
+        $repo->expects($this->once())
+            ->method('findBy')
+            ->with(['user' => $user])
+            ->willReturn([
+                new DeployTokenReward($user, new Money(5, new Currency(Token::WEB_SYMBOL))),
+                new DeployTokenReward($user, new Money(5, new Currency(Token::WEB_SYMBOL))),
+            ]);
 
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getRepository')->willReturn($repo);
+
+        $tokenManager = new TokenManager(
+            $em,
+            $this->createMock(ProfileFetcherInterface::class),
+            $this->createMock(TokenStorageInterface::class),
+            $this->mockCryptoManager([
+                $this->mockCrypto('foo'),
+                $this->mockCrypto('bar'),
+            ]),
+            $this->mockConfig(0)
+        );
+
+        $referralReward = $tokenManager->getUserDeployTokensReward($user);
+
+        $this->assertEquals('10', $referralReward->getAmount());
+        $this->assertEquals(Token::WEB_SYMBOL, $referralReward->getCurrency());
+    }
 
     private function mockToken(string $name, ?LockIn $lockIn = null, ?User $user = null, bool $deployed = false): Token
     {

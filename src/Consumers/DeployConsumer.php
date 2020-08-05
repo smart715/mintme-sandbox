@@ -2,9 +2,12 @@
 
 namespace App\Consumers;
 
+use App\Communications\DeployCostFetcherInterface;
 use App\Consumers\Helpers\DBConnection;
+use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,16 +31,21 @@ class DeployConsumer implements ConsumerInterface
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
+    /** @var DeployCostFetcherInterface */
+    private $deployCostFetcher;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        DeployCostFetcherInterface $deployCostFetcher
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
+        $this->deployCostFetcher = $deployCostFetcher;
     }
 
     /** {@inheritdoc} */
@@ -80,13 +88,15 @@ class DeployConsumer implements ConsumerInterface
 
             /** @var LockIn */
             $lockIn = $token->getLockIn();
+            /** @var User */
+            $user = $token->getProfile()->getUser();
 
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
                     $amount = new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
 
                     $this->balanceHandler->deposit(
-                        $token->getProfile()->getUser(),
+                        $user,
                         Token::getFromSymbol(Token::WEB_SYMBOL),
                         $amount
                     );
@@ -98,7 +108,7 @@ class DeployConsumer implements ConsumerInterface
                     $this->logger->info(
                         '[deploy-consumer] the money is payed back returned back'
                         . json_encode([
-                            'userId' => $token->getProfile()->getUser()->getId(),
+                            'userId' => $user->getId(),
                             'tokenName' => $token->getName(),
                             'amount' => $amount,
                         ])
@@ -109,6 +119,8 @@ class DeployConsumer implements ConsumerInterface
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
+
+                $this->setDeployCostReward($user, $token->getName());
             }
 
             $this->em->persist($lockIn);
@@ -126,5 +138,45 @@ class DeployConsumer implements ConsumerInterface
         }
 
         return true;
+    }
+
+    private function setDeployCostReward(User $user, string $tokenName): void
+    {
+        $referencer = $user->getReferencer();
+
+        if ($referencer) {
+            $reward = $this->deployCostFetcher->getDeployCostReferralReward();
+
+            if ($reward->isPositive()) {
+                $userDeployTokenReward = new DeployTokenReward($user, $reward);
+                $referencerDeployTokenReward = new DeployTokenReward($referencer, $reward);
+
+                $this->balanceHandler->deposit(
+                    $user,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $reward
+                );
+
+                $this->balanceHandler->deposit(
+                    $referencer,
+                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $reward
+                );
+
+                $this->em->persist($userDeployTokenReward);
+                $this->em->persist($referencerDeployTokenReward);
+
+                $this->logger->info(
+                    '[deploy-consumer] token deploy referral reward'
+                    . json_encode([
+                        'referredUserId' => $user->getId(),
+                        'referrerUserId' => $referencer->getId(),
+                        'tokenName' => $tokenName,
+                        'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
+                        'rewardAmountInMintme' => $reward->getAmount(),
+                    ])
+                );
+            }
+        }
     }
 }

@@ -326,13 +326,13 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function getReferrencer(): ?self
+    public function getReferencer(): ?self
     {
         return $this->referencer;
     }
 
     /** @codeCoverageIgnore */
-    public function setReferrencer(User $user): self
+    public function setReferencer(User $user): self
     {
         $this->referencer = $user;
 
