@@ -68,6 +68,7 @@ parameters:
 
     # the cost of deploying token to blockchain in USD
     deploy_cost: 99
+    deploy_cost_referral_reward: 0.1
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
 
@@ -150,3 +151,11 @@ parameters:
     # enable sending web site visit stats to google, should only be enabled for prod,
     # default value is disabled (false)
     enable_google_analytics: false
+
+    # properties for facebook pixel
+    app_secret: '6cf3736b6b69ddbe971abc2437b036c2'
+    app_id: '226171185039984'
+    access_token: 'EAADNs5UkinABAB7MsUzPqNqGkGOSZCrUaKOC9t1iHUwoIpUumfRASnvHOY8wjXYXbkUGk9IOhOCyYHvzpPaq90FB3Y0LvKcnV1hmUuW4u1WRN7XWEcRiBMjdpM1ZAcZB4UcyIGTH8SP0hOZBTZCFNqlZBvfn5uvv24yBkG97I94tzeiC5ZAL8Wz68eEvxZAOYm0ZD'
+    pixel_id: '270823927350138'
+    test_code: ''
+    use_test_code: false

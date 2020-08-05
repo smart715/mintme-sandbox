@@ -18,10 +18,10 @@
         </div>
         <div class="input-group-append position-relative ml-2">
             <div v-if="input" class="clear-search-icon">
-                <font-awesome-icon size="xs" @click="clearSearch" class="c-pointer" icon="times"></font-awesome-icon>
+                <font-awesome-icon size="xs" @click="clearSearch" class="c-pointer hover-icon" icon="times"></font-awesome-icon>
             </div>
             <span class="input-group-text text-white">
-                <font-awesome-icon class="c-pointer" @click="redirectToToken" icon="search"></font-awesome-icon>
+                <font-awesome-icon class="c-pointer hover-icon" @click="redirectToToken" icon="search"></font-awesome-icon>
             </span>
         </div>
     </div>

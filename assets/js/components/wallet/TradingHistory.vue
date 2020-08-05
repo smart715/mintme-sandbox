@@ -1,7 +1,7 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table" v-if="hasHistory">
+            <div class="table-responsive table-restricted trading-history" ref="table" v-if="hasHistory">
                 <b-table
                     thead-class="trading-head"
                     :items="history"
