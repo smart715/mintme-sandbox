@@ -49,7 +49,7 @@
                 @updated-youtube="youtubeUpdated"
                 @updated-discord="discordUpdated"
                 @updated-telegram="telegramUpdated"
-                image="{{ asset('build/images/default_token_avatar.svg') }}"
+                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url}}"
                 profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
                 profile-name="{{ profile.firstName }}"
                 profile-lastname="{{ profile.lastname }}"
@@ -198,13 +198,17 @@
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
-                    {% if isTokenPage %}
+                    {% if isTokenPage and app.user %}
                         <li class="nav-item ml-auto small-profile-link">
                             <div>
                                 <a
                                     href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                 >
-                                    <span class="icon-profile float-left mt-1 d-lg-inline"></span>
+                                    <avatar
+                                        size="small"
+                                        type="profile"
+                                        image="{{ app.user.profile.image.url | imagine_filter('avatar_small') }}"
+                                    ></avatar>
                                 </a>
                             </div>
                         </li>
