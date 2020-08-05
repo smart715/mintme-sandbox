@@ -11,6 +11,7 @@ use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
@@ -56,6 +57,7 @@ class TradesController extends AbstractFOSRestController
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Public")
+     * @Security(name="")
      */
     public function getTrades(string $market_pair): array
     {

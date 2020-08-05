@@ -7,6 +7,7 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
@@ -44,6 +45,7 @@ class AssetsController extends AbstractFOSRestController
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Public")
+     * @Security(name="")
      */
     public function getAssets(): array
     {

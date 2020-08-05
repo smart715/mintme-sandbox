@@ -10,6 +10,7 @@ use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Safe\DateTimeImmutable;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -46,7 +47,6 @@ class OrderbookController extends AbstractFOSRestController
      * @Rest\Get("/{market_pair}")
      * @Rest\QueryParam(
      *     name="limit",
-     *     default="100",
      *     requirements=@Assert\Range(min="1", max="101"),
      *     nullable=false,
      *     allowBlank=false,
@@ -54,7 +54,6 @@ class OrderbookController extends AbstractFOSRestController
      * )
      * @Rest\QueryParam(
      *     name="interval",
-     *     default="0",
      *     nullable=false,
      *     allowBlank=false,
      *     strict=true
@@ -66,6 +65,7 @@ class OrderbookController extends AbstractFOSRestController
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Public")
+     * @Security(name="")
      */
     public function getOrderbook(ParamFetcherInterface $request, string $market_pair): array
     {

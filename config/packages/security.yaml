@@ -19,6 +19,9 @@ security:
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
             provider: api_key_user_provider
+        api_public:
+            pattern: ^/dev/api/v2/public
+            security: false
         main:
             pattern: ^/
             logout:
