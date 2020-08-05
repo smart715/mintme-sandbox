@@ -11,6 +11,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Safe\DateTimeImmutable;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -40,7 +41,7 @@ class OrderbookController extends AbstractFOSRestController
         $this->rebrandingConverter = $rebrandingConverter;
     }
     /**
-     * Get complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair.
+     * Get order book
      *
      * @Rest\Get("/{market_pair}")
      * @Rest\QueryParam(
@@ -58,7 +59,13 @@ class OrderbookController extends AbstractFOSRestController
      *     allowBlank=false,
      *     strict=true
      * )
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"dev"})
+     * @SWG\Response(
+     *     response="200",
+     *     description="Returns complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair."
+     * )
+     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Tag(name="Public")
      */
     public function getOrderbook(ParamFetcherInterface $request, string $market_pair): array
     {

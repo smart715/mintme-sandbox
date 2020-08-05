@@ -10,6 +10,7 @@ use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Swagger\Annotations as SWG;
 
 /**
  * @Rest\Route("/dev/api/v2/public/ticker")
@@ -44,10 +45,16 @@ class TickerController extends AbstractFOSRestController
     }
 
     /**
-     * Get 24-hour pricing and volume summary for each market pair available on the exchange.
+     * List tickers
      *
      * @Rest\Get("/")
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"dev"})
+     * @SWG\Response(
+     *     response="200",
+     *     description="Returns 24-hour pricing and volume summary for each market pair available on the exchange."
+     * )
+     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Tag(name="Public")
      */
     public function getTicker(): array
     {

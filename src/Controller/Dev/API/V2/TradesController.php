@@ -11,6 +11,7 @@ use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Swagger\Annotations as SWG;
 
 /**
  * @Rest\Route("/dev/api/v2/public/trades")
@@ -45,10 +46,16 @@ class TradesController extends AbstractFOSRestController
     }
 
     /**
-     * Get data on all recently completed trades for a given market pair.
+     * Get completed trades
      *
      * @Rest\Get("/{market_pair}")
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"dev"})
+     * @SWG\Response(
+     *     response="200",
+     *     description="Returns all recently completed trades for a given market pair."
+     * )
+     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Tag(name="Public")
      */
     public function getTrades(string $market_pair): array
     {
