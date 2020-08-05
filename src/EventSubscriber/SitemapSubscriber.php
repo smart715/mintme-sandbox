@@ -73,7 +73,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     {
         $lastUrls = [
             $this->urlGenerator->generate(
-                'sonata_news_archive',
+                'sonata_news_home',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
