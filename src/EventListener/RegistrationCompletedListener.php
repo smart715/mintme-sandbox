@@ -48,13 +48,13 @@ class RegistrationCompletedListener
     {
         /** @var User $user */
         $user = $this->event->getUser();
-        $referrencer = $this->userManager->findByReferralCode($this->extractReferralCode());
+        $referencer = $this->userManager->findByReferralCode($this->extractReferralCode());
 
-        if (!$referrencer) {
+        if (!$referencer) {
             return;
         }
 
-        $user->setReferrencer($referrencer);
+        $user->setReferencer($referencer);
         $this->userManager->updateUser($user);
     }
 

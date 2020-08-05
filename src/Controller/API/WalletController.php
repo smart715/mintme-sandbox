@@ -183,11 +183,18 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw new InvalidArgumentException();
         }
 
-        /** @var User $user*/
+        /** @var User|null $user */
         $user = $this->getUser();
 
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $referralBalance = $balanceHandler->balance($user, $webToken)->getReferral();
+        $referralReward = $tokenManager->getUserDeployTokensReward($user);
+
         return $this->view([
-            'balance' => $balanceHandler->balance($user, $webToken)->getReferral(),
+            'balance' => $referralBalance->add($referralReward),
             'token' => $webToken,
         ]);
     }
