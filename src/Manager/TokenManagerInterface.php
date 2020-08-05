@@ -5,6 +5,7 @@ namespace App\Manager;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
+use Money\Money;
 
 interface TokenManagerInterface
 {
@@ -33,4 +34,6 @@ interface TokenManagerInterface
 
     /** @return Token[] */
     public function getDeployedTokens(): array;
+
+    public function getUserDeployTokensReward(User $user): Money;
 }
