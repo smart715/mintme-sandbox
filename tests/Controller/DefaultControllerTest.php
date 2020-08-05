@@ -34,7 +34,7 @@ class DefaultControllerTest extends WebTestCase
         return [
             ['/'],
             ['/trading'],
-            ['/news/archive'],
+            ['/news'],
             ['/kb'],
             ['/register/'],
             ['/login'],
