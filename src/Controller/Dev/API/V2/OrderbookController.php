@@ -93,7 +93,7 @@ class OrderbookController extends AbstractFOSRestController
         );
 
         $date = new DateTimeImmutable();
-        $timestamp = array('timestamp' => $date->getTimestamp());
+        $timestamp = ['timestamp' => $date->getTimestamp()];
         $orderDepth[] = $timestamp + $orderDepth;
 
         return $orderDepth;
