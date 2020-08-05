@@ -189,7 +189,7 @@
                             </template>
                             <template v-slot:cell(pair)="row">
                                 <div>
-                                    <a :href="row.item.tokenUrl" class="text-white"
+                                    <a :href="row.item.tokenUrl" class="text-white text-decoration-none token-link"
                                        :disabled.sync="row.value.length <= 20"
                                        v-b-tooltip.hover :title="row.value">
                                 <span v-if="showFullPair(row.value)">
@@ -200,7 +200,9 @@
                                             class="d-inline"
                                             :key="row.item.baseImage"
                                     />
-                                    {{ row.item.base }}/
+                                    <span class="token-link">
+                                        {{ row.item.base }}/
+                                    </span>
                                 </span>
                                         <avatar
                                             :image="row.item.quoteImage"
@@ -209,7 +211,9 @@
                                             class="d-inline"
                                             :key="row.item.quoteImage"
                                         />
-                                        {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        <span class="token-link">
+                                            {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        </span>
                                     </a>
                                     <guide
                                             placement="top"
