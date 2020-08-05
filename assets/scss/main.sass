@@ -570,28 +570,6 @@ a
       pointer-events: none !important
 
 .tabs
-  @media (max-width: 768px)
-    .tabs-wrapper
-      display: flex
-      .nav
-        &.nav-tabs
-          width: 100%
-          flex-wrap: nowrap
-          overflow-x: auto
-          overflow-y: hidden
-          -webkit-overflow-scrolling: touch
-          -ms-overflow-style: -ms-autohiding-scrollbar
-          &::-webkit-scrollbar
-            display: none
-          .nav-link
-            padding: .45rem 1rem
-            @media (max-width: 550px)
-              padding: .45rem 0.5rem
-            @media (max-width: 520px)
-              padding: .45rem 0.3rem
-      .tabs-left-margin-container
-        min-width: 120px !important
-        background: $secondary
   .nav-tabs
     display: flex
     text-align: center
@@ -1131,6 +1109,7 @@ a.hover-icon:hover
 
 .dropdown-menu-social-media
   min-width: 7rem
+  left: -68px
 
 .pair-container
   margin-top: 1.5rem !important
