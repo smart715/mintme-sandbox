@@ -247,30 +247,7 @@ export default {
             this.stats = res.data;
             this.chartSettings.start = this.getStartTradingPeriod();
 
-            this.addMessageHandler((result) => {
-                if (result.method === 'state.update') {
-                    this.updateMarketData(result);
-                }
-                if (result.method === 'kline.update') {
-                    let lastCandle = this.stats[this.stats.length - 1];
-
-                    if (lastCandle && this.getDate(result.params[0][0]) === this.getDate(lastCandle.time)) {
-                        this.stats.pop();
-                    }
-
-                    this.stats.push({
-                        time: result.params[0][0],
-                        open: result.params[0][1],
-                        close: result.params[0][2],
-                        highest: result.params[0][3],
-                        lowest: result.params[0][4],
-                        volume: result.params[0][5],
-                    });
-                }
-                if (result.id === this.monthInfoRequestId) {
-                    this.updateMonthMarketData(result.result);
-                }
-            }, 'trade-chart-state');
+            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state');
 
             this.sendMessage(JSON.stringify({
                 method: 'state.subscribe',
@@ -380,6 +357,30 @@ export default {
                         reject(err);
                     });
             });
+        },
+        messageHandler: function(result) {
+            if (result.method === 'state.update') {
+                this.updateMarketData(result);
+            }
+            if (result.method === 'kline.update') {
+                let lastCandle = this.stats[this.stats.length - 1];
+
+                if (lastCandle && this.getDate(result.params[0][0]) === this.getDate(lastCandle.time)) {
+                    this.stats.pop();
+                }
+
+                this.stats.push({
+                    time: result.params[0][0],
+                    open: result.params[0][1],
+                    close: result.params[0][2],
+                    highest: result.params[0][3],
+                    lowest: result.params[0][4],
+                    volume: result.params[0][5],
+                });
+            }
+            if (result.id === this.monthInfoRequestId) {
+                this.updateMonthMarketData(result.result);
+            }
         },
     },
     components: {

@@ -8,13 +8,8 @@ import {Constants} from '../../js/utils';
 
 const $routing = {generate: (val, params) => val};
 
-const $store = new Vuex.Store({
-    modules: {status},
-});
-
 let ordersBuy = [{price: '1'}, {price: '2'}];
 let ordersSell = [{price: '3'}, {price: '4'}];
-let orders = [{price: '1'}, {price: '2'}];
 
 /**
  * @return {Wrapper<Vue>}
@@ -29,7 +24,23 @@ function mockVue() {
                 single: axios,
             };
             Vue.prototype.$routing = $routing;
-            Vue.prototype.$store = $store;
+            Vue.prototype.$store = new Vuex.Store({
+                modules: {
+                    status,
+                    websocket: {
+                        namespaced: true,
+                        actions: {
+                            addOnOpenHandler: jest.fn(),
+                            addMessageHandler: jest.fn(),
+                            init: jest.fn(),
+                        },
+                        getters: {
+                            getClient: jest.fn(),
+                        },
+                    },
+                },
+            });
+            Vue.prototype.$toasted = {show: () => false};
         },
     });
     return localVue;
@@ -113,8 +124,8 @@ describe('Trade', () => {
         expect(wrapper.vm.baseBalance).toBe(false);
         wrapper.vm.balances = [];
         expect(wrapper.vm.baseBalance).toBe(false);
-        wrapper.vm.balances = {'BTC': {available: 10}};
-        expect(wrapper.vm.baseBalance).toBe(10);
+        wrapper.vm.balances = {'BTC': {available: '10'}};
+        expect(wrapper.vm.baseBalance).toBe('10');
     });
 
     it('should compute quoteBalance correctly', () => {
@@ -127,8 +138,8 @@ describe('Trade', () => {
         expect(wrapper.vm.quoteBalance).toBe(false);
         wrapper.vm.balances = [];
         expect(wrapper.vm.quoteBalance).toBe(false);
-        wrapper.vm.balances = {'WEB': {available: 11}};
-        expect(wrapper.vm.quoteBalance).toBe(11);
+        wrapper.vm.balances = {'WEB': {available: '11'}};
+        expect(wrapper.vm.quoteBalance).toBe('11');
     });
 
     it('should compute balanceLoaded correctly', () => {
@@ -147,14 +158,14 @@ describe('Trade', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        wrapper.vm.buyOrders = false;
+        wrapper.vm.buyOrders = [];
         wrapper.vm.sellOrders = null;
         expect(wrapper.vm.ordersLoaded).toBe(false);
         wrapper.vm.buyOrders = null;
-        wrapper.vm.sellOrders = false;
+        wrapper.vm.sellOrders = [];
         expect(wrapper.vm.ordersLoaded).toBe(false);
-        wrapper.vm.buyOrders = false;
-        wrapper.vm.sellOrders = false;
+        wrapper.vm.buyOrders = [];
+        wrapper.vm.sellOrders = [];
         expect(wrapper.vm.ordersLoaded).toBe(true);
     });
 
@@ -164,7 +175,7 @@ describe('Trade', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        wrapper.vm.buyOrders = false;
+        wrapper.vm.buyOrders = null;
         expect(wrapper.vm.marketPriceSell).toBe(0);
         wrapper.vm.buyOrders = [];
         expect(wrapper.vm.marketPriceSell).toBe(0);
@@ -178,7 +189,7 @@ describe('Trade', () => {
             localVue,
             propsData: propsForTestCorrectlyRenders,
         });
-        wrapper.vm.sellOrders = false;
+        wrapper.vm.sellOrders = null;
         expect(wrapper.vm.marketPriceBuy).toBe(0);
         wrapper.vm.sellOrders = [];
         expect(wrapper.vm.marketPriceBuy).toBe(0);
@@ -193,21 +204,11 @@ describe('Trade', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.sellOrders = null;
-        wrapper.vm.saveOrders('foo', true);
-        expect(wrapper.vm.sellOrders).toBe('foo');
+        wrapper.vm.saveOrders([], true);
+        expect(wrapper.vm.sellOrders).toEqual([]);
         wrapper.vm.buyOrders = null;
-        wrapper.vm.saveOrders('foo', false);
-        expect(wrapper.vm.buyOrders).toBe('foo');
-    });
-
-    it('should sort price correctly when the function sortOrders() is called', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(Trade, {
-            localVue,
-            propsData: propsForTestCorrectlyRenders,
-        });
-        expect(wrapper.vm.sortOrders(orders, true)).toMatchObject([{price: '1'}, {price: '2'}]);
-        expect(wrapper.vm.sortOrders(orders, false)).toMatchObject([{price: '2'}, {price: '1'}]);
+        wrapper.vm.saveOrders([], false);
+        expect(wrapper.vm.buyOrders).toEqual([]);
     });
 
     describe('updateOrders', () => {
@@ -217,15 +218,20 @@ describe('Trade', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.vm.updateOrders(false);
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
-                response: {buy: ordersBuy, sell: ordersSell},
+                response: {
+                    buy: ordersBuy,
+                    sell: ordersSell,
+                    buyDepth: 0,
+                },
             });
 
+            wrapper.vm.updateOrders(false);
+
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).toMatchObject([{price: '2'}, {price: '1'}]);
+                expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
                 done();
             });
@@ -242,7 +248,11 @@ describe('Trade', () => {
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
-                response: {buy: [], sell: []},
+                response: {
+                    buy: [],
+                    sell: [],
+                    buyDepth: 0,
+                },
             });
 
             moxios.wait(() => {
@@ -264,7 +274,11 @@ describe('Trade', () => {
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
-                response: {buy: ordersBuy, sell: ordersSell},
+                response: {
+                    buy: ordersBuy,
+                    sell: ordersSell,
+                    buyDepth: 0,
+                },
             });
 
             moxios.wait(() => {
@@ -286,11 +300,15 @@ describe('Trade', () => {
 
             moxios.stubRequest('pending_orders', {
                 status: 200,
-                response: {buy: ordersBuy, sell: ordersSell},
+                response: {
+                    buy: ordersBuy,
+                    sell: ordersSell,
+                    buyDepth: 0,
+                },
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.buyOrders).toMatchObject([{price: '2'}, {price: '1'}, {price: '2'}, {price: '1'}]);
+                expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}, {price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.buyPage).toBe(3);
                 done();
             });
@@ -305,7 +323,7 @@ describe('Trade', () => {
                 propsData: propsForTestCorrectlyRenders,
             });
             wrapper.vm.balances = 'foo';
-            wrapper.vm.loggedIn = false;
+            wrapper.setProps({loggedIn: false});
             wrapper.vm.updateAssets();
             expect(wrapper.vm.balances).toBe(false);
         });
@@ -383,7 +401,7 @@ describe('Trade', () => {
             });
 
             moxios.wait(() => {
-                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'foo', price: 1}, {id: 'bar', price: 2}]);
+                expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}, {id: 'foo', price: 1}]);
                 expect(wrapper.vm.buyOrders).toMatchObject([{id: 'qwe', price: 3}, {id: 'foo', price: 1}]);
                 done();
             });

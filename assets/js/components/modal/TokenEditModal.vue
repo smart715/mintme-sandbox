@@ -213,8 +213,7 @@ export default {
             this.hasReleasePeriod = true;
         },
         refreshSliders: function() {
-            this.$refs['token-release-period-component'].$refs['released-slider'].refresh();
-            this.$refs['token-release-period-component'].$refs['release-period-slider'].refresh();
+            this.$refs['token-release-period-component'].refreshSliders();
         },
     },
 };
