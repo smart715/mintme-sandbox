@@ -205,9 +205,10 @@
                                     href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                 >
                                     {% if app.user.profile.image.url == "/media/default_profile.png" %}
-                                        <i class="small-icon-user-avatar d-lg-block"></i>
+                                        <i class="small-icon-user-avatar d-block"></i>
                                     {% else %}
                                         <avatar
+                                            class="avatar-token-page"
                                             size="small"
                                             type="profile"
                                             image="{{ app.user.profile.image.url | imagine_filter('avatar_small') }}"
