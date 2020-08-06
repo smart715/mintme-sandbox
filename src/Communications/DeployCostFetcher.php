@@ -4,6 +4,7 @@ namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\Token\Token;
+use App\Exchange\Config\DeployCostConfig;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
@@ -16,16 +17,19 @@ class DeployCostFetcher implements DeployCostFetcherInterface
     /** @var RestRpcInterface */
     private $rpc;
 
-    /** @var int */
-    private $usdCost;
+    /** @var DeployCostConfig */
+    private $deployCostConfig;
 
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    public function __construct(RestRpcInterface $rpc, int $usdCost, MoneyWrapperInterface $moneyWrapper)
-    {
+    public function __construct(
+        RestRpcInterface $rpc,
+        DeployCostConfig $deployCostConfig,
+        MoneyWrapperInterface $moneyWrapper
+    ) {
         $this->rpc = $rpc;
-        $this->usdCost = $usdCost;
+        $this->deployCostConfig = $deployCostConfig;
         $this->moneyWrapper = $moneyWrapper;
     }
 
@@ -43,11 +47,23 @@ class DeployCostFetcher implements DeployCostFetcherInterface
         }
 
         return $this->moneyWrapper->convert(
-            Money::USD($this->usdCost),
+            Money::USD($this->deployCostConfig->getDeployCost()),
             new Currency(Token::WEB_SYMBOL),
             new FixedExchange([
                 MoneyWrapper::USD_SYMBOL => [ Token::WEB_SYMBOL => 1 / $response['webchain']['usd'] ],
             ])
         );
+    }
+
+    public function getDeployCostReferralReward(): Money
+    {
+        $deployCostReward = $this->deployCostConfig->getDeployCostReward();
+        $deployWebCost = $this->getDeployWebCost();
+
+        if ($deployCostReward > 0 && $deployWebCost->isPositive()) {
+            return $deployWebCost->multiply($deployCostReward);
+        }
+
+        return new Money(0, new Currency(Token::WEB_SYMBOL));
     }
 }

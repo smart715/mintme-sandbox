@@ -2,12 +2,9 @@
 <div class="row mt-5 justify-content-center" v-if="false">
     <div class="col-md-10 d-flex justify-content-between">
         <div class="token-avatar ml-2">
-            <div class="d-flex flex-column">
-                <div class="d-flex align-items-center token-name">
-                    <div class="avatar avatar__large"></div>
-                </div>
-                <div>
-                    Visit token's creator profile
+            <div class="d-flex align-items-center token-name">
+                <div class="overflow-wrap-break-word d-flex align-items-center">
+                    <h2 class="current-token-name">{{  token.name }}</h2>
                 </div>
             </div>
         </div>
@@ -19,7 +16,8 @@
     {% if isTokenPage %}
     <div class="col-md-10">
         <div class="tabs tabs-theme transparent">
-            <div>
+            <div class="tabs-wrapper">
+                <div class="tabs-left-margin-container"></div>
                 <ul role="tablist" class="nav nav-tabs">
                     <li role="presentation"
                         class="nav-item {% if isTokenPage %} token-avatar-left {% endif %}">
@@ -55,7 +53,7 @@
                            aria-posinset="2"
                            target="_self"
                            href="#"
-                           class="nav-link {% if tab and tab == 'donation' %}active{% endif %}"
+                           class="nav-link {% if tab and tab == 'donate' %}active{% endif %}"
                         >
                             Donate
                         </a>
@@ -153,7 +151,7 @@
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'trade' %}active{% endif %}">
                     {{ include('spinners/trade_tab.html.twig') }}
                 </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'donation' %}active{% endif %}">
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'donate' %}active{% endif %}">
                     {{ include('spinners/donation_tab.html.twig') }}
                 </div>
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'posts' %}active{% endif %}">

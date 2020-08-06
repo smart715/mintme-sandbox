@@ -2,11 +2,28 @@
   min-height: 435px
 
 .wallet
+  .active-orders
+    table
+      tbody
+        td
+          padding-left: calc(0.75rem + 0.65em)
+
+  .trading-history
+    table
+      tbody
+        td
+          padding-left: calc(0.75rem + 0.65em)
+
   .deposit-withdraw-table
     .text-truncate
       max-width: 200px
       text-overflow: ellipsis
       overflow: hidden
+
+    table
+      tbody
+        td
+          padding-left: calc(0.75rem + 0.65em)
 
   .table-restricted
     max-height: 500px
@@ -15,18 +32,6 @@
     th
       &:last-child
         text-align: center
-
-  .icon-deposit
-    background-image: url('../img/deposit-sprite.png')
-    @extend .icon
-    &:hover
-      background-position: -18px 0
-
-  .icon-withdraw
-    background-image: url('../img/withdraw-sprite.png')
-    @extend .icon
-    &:hover
-      background-position: -18px 0
 
   .icon-cancel
     background-image: url('../img/cancel-sprite.png')
@@ -37,3 +42,13 @@
 
   .cancel-forbidden
     background-position: -17px 0
+
+.field-table
+  width: 25%
+
+.first-field
+  width: 50%
+  
+  @media (max-width: 550px)
+    width: 140px
+

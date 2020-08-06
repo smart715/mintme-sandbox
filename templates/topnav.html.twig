@@ -26,7 +26,7 @@
             >
         </a>
         <button
-            class="navbar-toggler mt-2"
+            class="navbar-toggler"
             :class="{ 'collapsed': !showNavbarMenu }"
             type="button"
             :aria-expanded="showNavbarMenu"
@@ -85,7 +85,7 @@
                     </li>
                 {% endif %}
                 <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
-                    <a href="{{ path('sonata_news_archive') }}" class="nav-link">News</a>
+                    <a href="{{ path('sonata_news_home') }}" class="nav-link">News</a>
                 </li>
                 {% if show_links %}
                     <li class="nav-item align-self-center {{ route == 'referral-program' ? 'active' : '' }}">
@@ -133,11 +133,15 @@
                                     @click="toggleProfileMenu"
                                     v-on-clickaway="hideProfileMenu"
                                 >
-                                    <avatar
-                                        size="middle"
-                                        type="profile"
-                                        image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
-                                    ></avatar>
+                                    {% if app.user.profile.image.url == "/media/default_profile.png" %}
+                                        <i class="icon-user-avatar d-none d-lg-block"></i>
+                                    {% else %}
+                                        <avatar
+                                            size="middle"
+                                            type="profile"
+                                            image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
+                                        ></avatar>
+                                    {% endif %}
                                 </a>
                                 <div
                                     class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
