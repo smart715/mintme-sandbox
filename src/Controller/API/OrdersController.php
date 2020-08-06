@@ -12,10 +12,6 @@ use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
-use App\Manager\ProfileManager;
-use App\Manager\ProfileManagerInterface;
-use App\Utils\Facebook\FacebookPixelCommunicator;
-use App\Utils\Facebook\FacebookPixelCommunicatorInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -24,7 +20,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -49,26 +44,16 @@ class OrdersController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
-    /** @var FacebookPixelCommunicatorInterface */
-    private $facebookPixelCommunicator;
-    
-    /** @var ProfileManagerInterface */
-    private $profileManager;
-    
     public function __construct(
         TraderInterface $trader,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
-        UserActionLogger $userActionLogger,
-        FacebookPixelCommunicatorInterface $facebookPixelCommunicator,
-        ProfileManagerInterface $profileManager
+        UserActionLogger $userActionLogger
     ) {
         $this->trader = $trader;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
-        $this->facebookPixelCommunicator = $facebookPixelCommunicator;
-        $this->profileManager = $profileManager;
     }
 
     /**
@@ -142,18 +127,7 @@ class OrdersController extends AbstractFOSRestController
             (bool)$request->get('marketPrice'),
             Order::SIDE_MAP[$request->get('action')]
         );
-        
-        if (TradeResult::SUCCESS == $tradeResult->getResult()) {
-            $this->sendFacebookPixelEvent($currentUser, [
-                'token_id' => $market->getBase()->getId(),
-                'token_name' => $market->getBase()->getName(),
-                'order_action' => $request->get('action'),
-                'amount' => $request->get('amountInput'),
-                'price' => $request->get('priceInput'),
-                'market_price' => $request->get('marketPrice'),
-            ]);
-        }
-        
+
         return $this->view([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
@@ -263,20 +237,6 @@ class OrdersController extends AbstractFOSRestController
             $this->marketManager->createUserRelated($user),
             ($page - 1) * self::WALLET_OFFSET,
             self::WALLET_OFFSET
-        );
-    }
-    
-    private function sendFacebookPixelEvent(User $user, array $params): void
-    {
-        $request = Request::createFromGlobals();
-        
-        $this->facebookPixelCommunicator->sendUserEvent(
-            'Place Success Order',
-            $user->getEmail(),
-            $request->getClientIp(),
-            $request->headers->get('User-Agent'),
-            $params,
-            $this->profileManager->getProfile($user)
         );
     }
 }
