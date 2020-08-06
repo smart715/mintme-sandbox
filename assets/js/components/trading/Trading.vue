@@ -220,7 +220,7 @@
                                             max-width="150px"
                                             v-if="row.item.tokenized">
                                         <template slot="icon">
-                                            <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                            <img :src="row.item.baseImage" alt="deployed">
                                         </template>
                                         <template slot="body">
                                             This token exists on the blockchain.
