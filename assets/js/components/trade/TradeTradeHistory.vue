@@ -253,7 +253,7 @@ export default {
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
 
                     if (this.$refs.table) {
-                        this.$refs.table.refresh();
+                        this.$refs.table.hasOwnProperty('refresh') ? this.$refs.table.refresh() : null;
                     }
 
                     resolve(result.data);

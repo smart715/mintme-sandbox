@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import * as zxcvbn from 'zxcvbn';
+import zxcvbn from 'zxcvbn';
 export default {
     name: 'passwordmeter',
     props: {

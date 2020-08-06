@@ -15,7 +15,8 @@ function mockVue() {
             Vue.prototype.$toasted = {show: () => false};
         },
     });
-    localVue.component('font-awesome-icon', {template: ''});
+    localVue.component('font-awesome-icon', {});
+    localVue.component('b-table', {});
     return localVue;
 }
 
@@ -50,12 +51,22 @@ describe('TopHolders', () => {
 
         moxios.stubRequest('top_holders', {status: 200, response: [
             {
-                user: {profile: {nickname: 'foo'}},
+                user: {
+                    profile: {
+                        nickname: 'foo',
+                        image: {avatar_small: ''},
+                    },
+                },
                 timestamp: 1563550710,
                 balance: '999',
             },
             {
-                user: {profile: {nickname: 'foo'}},
+                user: {
+                    profile: {
+                        nickname: 'foo',
+                        image: {avatar_small: ''},
+                    },
+                },
                 timestamp: 1563550710,
                 balance: '99',
             },
@@ -64,7 +75,7 @@ describe('TopHolders', () => {
         moxios.wait(() => {
             expect(wrapper.vm.loaded).toBe(true);
             expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(false);
-            expect(wrapper.find('b-table').exists()).toBe(true);
+            expect(wrapper.find('b-table-stub').exists()).toBe(true);
             done();
         });
     });
