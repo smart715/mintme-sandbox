@@ -28,7 +28,6 @@
             <errorLevel type="info">
                 <file name="src/Wallet/Wallet.php"/>
                 <file name="src/Exchange/Market/MarketHandler.php"/>
-                <file name="src/Utils/Facebook/FacebookPixelCommunicator.php"/>
             </errorLevel>
         </InvalidScalarArgument>
         <NullableReturnStatement>
@@ -49,10 +48,5 @@
                 <file name="src/Security/ApiKeyUserProvider.php"/>
             </errorLevel>
         </InvalidNullableReturnType>
-        <InvalidArgument>
-            <errorLevel type="info">
-                <file name="src/Utils/Facebook/FacebookPixelCommunicator.php"/>
-            </errorLevel>
-        </InvalidArgument>
     </issueHandlers>
 </psalm>
