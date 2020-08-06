@@ -177,6 +177,10 @@ export default {
             'setStats',
             'setTokenExchangeAmount',
         ]),
+        refreshSliders: function() {
+            this.$refs['released-slider'].refresh();
+            this.$refs['release-period-slider'].refresh();
+        },
     },
 };
 </script>
