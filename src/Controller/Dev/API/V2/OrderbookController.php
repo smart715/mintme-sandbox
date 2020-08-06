@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrderbookController extends AbstractFOSRestController
 {
+    public const ONLY_BEST = 1;
+    public const ARRANGED_BY_BEST = 2;
+    public const NO_AGGREGATION = 3;
 
     use BaseQuoteOrderTrait;
 
@@ -46,15 +49,20 @@ class OrderbookController extends AbstractFOSRestController
      *
      * @Rest\Get("/{market_pair}")
      * @Rest\QueryParam(
-     *     name="limit",
+     *     name="depth",
      *     requirements=@Assert\Range(min="1", max="101"),
      *     nullable=false,
+     *     description="Order depth",
      *     allowBlank=false,
      *     strict=true
      * )
      * @Rest\QueryParam(
-     *     name="interval",
+     *     name="level",
+     *     requirements=@Assert\Range(min="1", max="3"),
      *     nullable=false,
+     *     description="Level 1 – Only the best bid and ask.
+Level 2 – Arranged by best bids and asks.
+Level 3 – Complete order book, no aggregation.",
      *     allowBlank=false,
      *     strict=true
      * )
@@ -87,14 +95,24 @@ class OrderbookController extends AbstractFOSRestController
         $orderDepth = $this->trader->getOrderDepth(
             $market,
             [
-                'limit' => (int)$request->get('limit'),
-                'interval' => (string)$request->get('interval'),
+                'limit' => (int)$request->get('depth'),
+                'interval' => '0',
             ]
         );
 
+        $level = $request->get('level');
+
+        if(self::ONLY_BEST === $level) {
+            $orderDepth['asks'] = max($orderDepth['asks']);
+            $orderDepth['bids'] = min($orderDepth['bids']);
+
+        } elseif (self::ARRANGED_BY_BEST == $level) {
+            rsort($orderDepth['asks']);
+            sort($orderDepth['bids']);
+        }
+
         $date = new DateTimeImmutable();
-        $timestamp = ['timestamp' => $date->getTimestamp()];
-        $orderDepth[] = $timestamp + $orderDepth;
+        $orderDepth['timestamp'] = $date->getTimestamp();
 
         return $orderDepth;
     }
