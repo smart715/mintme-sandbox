@@ -628,9 +628,9 @@ export default {
             );
 
             if (marketOnTopIndex > -1) {
-                Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
+                this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
             } else {
-                Vue.set(this.sanitizedMarkets, marketName, sanitizedMarket);
+                this.$set(this.sanitizedMarkets, marketName, sanitizedMarket);
             }
 
             this.markets[marketName] = {
@@ -738,9 +738,9 @@ export default {
                         this.markets[market].quote.image.avatar_small
                     );
                     if (marketOnTopIndex > -1) {
-                        Vue.set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
+                        this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
                     } else {
-                        Vue.set(this.sanitizedMarkets, market, sanitizedMarket);
+                        this.$set(this.sanitizedMarkets, market, sanitizedMarket);
                     }
                 }
             }
@@ -885,7 +885,7 @@ export default {
                 market.base.image.avatar_small,
                 market.quote.image.avatar_small
             );
-            Vue.set(this.sanitizedMarketsOnTop, 0, market);
+            this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
         fetchGlobalMarketCap: function() {
             this.$axios.retry.get(this.$routing.generate('marketcap'))
