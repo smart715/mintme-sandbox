@@ -47,7 +47,7 @@ class TradesController extends AbstractFOSRestController
     }
 
     /**
-     * List completed trades
+     * Get completed trades
      *
      * @Rest\Get("/{market_pair}")
      * @Rest\View(serializerGroups={"dev"})
