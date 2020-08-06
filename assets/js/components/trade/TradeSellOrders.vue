@@ -47,7 +47,7 @@
                                                 alt="avatar">
                                             <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                                 {{ row.value }}
-                                            </span> 
+                                            </span>
                                         </a>
                                     </div>
                                     <div class="col-1 pull-right pl-0 ml-0">
