@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex align-items-center">
+    <div id="token-social-media-icons" class="d-flex align-items-center">
         <a
             v-if="websiteUrl"
             :href="websiteUrl"
@@ -129,7 +129,9 @@ import Guide from '../Guide';
 
 let SocialSharing = require('vue-social-sharing');
 
-Vue.use(SocialSharing);
+if (typeof Vue !== 'undefined') {
+    Vue.use(SocialSharing);
+}
 
 export default {
     name: 'TokenSocialMediaIcons',

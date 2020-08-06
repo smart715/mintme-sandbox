@@ -4,6 +4,7 @@ import TokenSocialMediaIcons from '../../js/components/token/TokenSocialMediaIco
 const $routing = {generate: (val, params) => val};
 
 let objectForTestCorrectlyMounting = {
+    stubs: ['social-sharing', 'network', 'font-awesome-icon', 'b-dropdown'],
     mocks: {$routing},
     propsData: {
         discordUrl: 'testDiscordUrl',
@@ -16,6 +17,7 @@ let objectForTestCorrectlyMounting = {
  };
 
  let emptyUrls = {
+    stubs: ['social-sharing', 'network', 'font-awesome-icon', 'b-dropdown'],
     mocks: {$routing},
     propsData: {
         discordUrl: '',
@@ -33,7 +35,6 @@ describe('TokenSocialMediaIcons', () => {
         expect(wrapper.find('a[href=\'testDiscordUrl\']').exists()).toBe(true);
         expect(wrapper.find('a[href=\'testFacebookUrl\']').exists()).toBe(true);
         expect(wrapper.find('a[href=\'testTelegramUrl\']').exists()).toBe(true);
-        expect(wrapper.find('a[href=\'testTokenName\']').exists()).toBe(true);
         expect(wrapper.find('a[href=\'testWebsiteUrl\']').exists()).toBe(true);
         expect(wrapper.find('a[href=\'https://www.youtube.com/channel/testYoutubeChannelId\']').exists()).toBe(true);
     });
@@ -51,6 +52,6 @@ describe('TokenSocialMediaIcons', () => {
 
     it('doesnt show unsetted urls', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, emptyUrls);
-        expect(wrapper.findAll('a').length).toBe(0);
+        expect(wrapper.findAll('#token-social-media-icons > a').length).toBe(0);
     });
 });
