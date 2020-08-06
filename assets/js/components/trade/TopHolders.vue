@@ -7,13 +7,14 @@
             <div class="table-responsive">
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
-                     ref="table"
-                    :items="traders"
-                    :fields="fields">
-                    <template v-slot:cell(trader)="row">
-                        <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
-                    </template>
-                </b-table>
+                        ref="table"
+                        :items="traders"
+                        :fields="fields"
+                    >
+                        <template v-slot:cell(trader)="row">
+                            <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                        </template>
+                    </b-table>
                     <div v-else>
                         <p class="text-center p-5">No Holders yet</p>
                     </div>
