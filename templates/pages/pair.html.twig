@@ -180,7 +180,10 @@
                     </b-tab>
                 {% endif %}
                 {% if isTokenPage %}
-                    <b-tab title="Posts" {% if tab == 'posts' %} {{ 'active' }} {% endif %}>
+                    <b-tab title="Posts"
+                        {% if isTokenPage %} title-item-class="trade-post" {% endif %}
+                        {% if tab == 'posts' %} {{ 'active' }} {% endif %}
+                    >
                         <div class="container-fluid">
                             {% if is_granted('edit', token) %}
                                 <div class="row justify-content-center">
@@ -203,7 +206,7 @@
                 <template slot="tabs-end">
                     {% if isTokenPage and app.user %}
                         <li class="nav-item ml-auto small-profile-link">
-                            <div>
+                            <div class="div-container-avatar">
                                 <a
                                     href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                 >
