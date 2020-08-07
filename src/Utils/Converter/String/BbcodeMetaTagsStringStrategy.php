@@ -16,7 +16,7 @@ class BbcodeMetaTagsStringStrategy implements StringConverterInterface
     public function convert(?string $description): string
     {
         return (string)preg_replace(
-            ['/(\[url\].*\[\/url\])+/','/(\[img\].*\[\/img\])+/'],
+            ['/(\[url\].*?\[\/url\])+/','/(\[img\].*?\[\/img\])+/'],
             [],
             $description
         );
