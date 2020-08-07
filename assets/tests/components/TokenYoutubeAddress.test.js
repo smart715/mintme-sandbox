@@ -10,7 +10,6 @@ const $routing = {generate: (val, params) => val};
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(axios);
     localVue.use({
         install(Vue) {
             Vue.prototype.$axios = {single: axios};
@@ -38,16 +37,18 @@ describe('TokenYoutubeAddress', () => {
 
     it('renders correctly with assigned props', () => {
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             mocks: {
                 $routing,
             },
             propsData: propsForTestCorrectlyRenders,
         });
-        expect(wrapper.find('b-tooltip').html()).toContain('testChannelId');
+        expect(wrapper.find('b-tooltip-stub').html()).toContain('testChannelId');
     });
 
     it('should compute computedChannel correctly', () => {
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             mocks: {
                 $routing,
             },
@@ -61,6 +62,7 @@ describe('TokenYoutubeAddress', () => {
 
     it('should set youtube url correctly when the function buildYoutubeUrl() is called', () => {
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             mocks: {
                 $routing,
             },
@@ -72,6 +74,7 @@ describe('TokenYoutubeAddress', () => {
     it('do $axios request, set currentChannelId and submitting correctly and emit "saveYoutube" when submitting data is false and the function saveYoutubeChannel() is called', (done) => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             localVue,
             methods: {
                 notifySuccess: function(message) {
@@ -96,6 +99,7 @@ describe('TokenYoutubeAddress', () => {
 
     it('do not $axios request when submitting data is true and the function saveYoutubeChannel() is called', () => {
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             mocks: {
                 $routing,
             },
@@ -108,6 +112,7 @@ describe('TokenYoutubeAddress', () => {
 
     it('call saveYoutubeChannel(\'\') when deleteChannel() is called', () => {
         const wrapper = shallowMount(TokenYoutubeAddress, {
+            stubs: ['b-tooltip'],
             mocks: {
                 $routing,
             },

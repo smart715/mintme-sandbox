@@ -1,7 +1,11 @@
-import {shallowMount} from '@vue/test-utils';
+import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenYoutubeAddressView from '../../js/components/token/youtube/TokenYoutubeAddressView';
 
+const localVue = createLocalVue();
+localVue.directive('b-tooltip', () => {});
+
 let objectForTestCorrectlyMouning = {
+    localVue,
     methods: {
         renderYtSubscribeButton: function(channelId) {
             return channelId;
