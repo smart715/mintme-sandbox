@@ -43,7 +43,7 @@
                                         >
                                             <img
                                                 :src="row.item.traderAvatar"
-                                                class="rounded-circle d-block flex-grow-0 pointer-events-none"
+                                                class="rounded-circle d-block flex-grow-0 pointer-events-none mr-1"
                                                 alt="avatar">
                                             <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
                                                 {{ row.value }}
