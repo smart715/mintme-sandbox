@@ -9,6 +9,8 @@
         left: 50%
         position: absolute
         transform: translate(-50%, -50%)
+        visibility: hidden
+        opacity: 0
 
     &:after
         content: ""
@@ -23,6 +25,11 @@
 
     &:hover:after
         background: rgba(0, 0, 0, 0.3)
+        
+    &:hover .avatar-overlay
+        visibility: visible
+        opacity: 1
+        transition: opacity 1s ease
 
 .avatar__small
     max-width: 22px
