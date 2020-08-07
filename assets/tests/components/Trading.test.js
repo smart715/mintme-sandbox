@@ -96,15 +96,12 @@ describe('Trading', () => {
     });
     it('show rest of token link', () => {
         const wrapper = mockTrading();
+        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
-        wrapper.vm.marketFilters.selectedFilter = 'all';
-
         expect(wrapper.html().includes('Show all tokens')).toBe(false);
-        wrapper.setProps({userId: 1});
-        wrapper.vm.marketFilters.selectedFilter = 'user';
-        expect(wrapper.html().includes('Show all tokens')).toBe(true);
-        wrapper.vm.marketFilters.selectedFilter = 'deployed';
+        wrapper.vm.sanitizedMarkets = market;
         expect(wrapper.html().includes('Show all tokens')).toBe(true);
     });
     it('make sure that expected "user=1" will be sent', (done) => {
@@ -252,7 +249,7 @@ describe('Trading', () => {
                                 low: '0',
                                 volume: '0',
                                 deal: '32',
-                            },
+                        },
                         ],
                         id: null,
                     });
@@ -281,7 +278,7 @@ describe('Trading', () => {
                                 low: '0',
                                 volume: '0',
                                 deal: '3210',
-                            },
+                        },
                         ],
                         id: null,
                     });
