@@ -3,7 +3,7 @@
 {% if post.image is not null %}
     {% set metaImage %}{% path post.image, 'reference' %}{% endset %}
 {% endif %}
-{% set metaTitle = post.title %}
+{% set metaTitle = post.title ~ ' | mintMe' %}
 {% set metaImageAlt = post.title %}
 
 {% block title %}
