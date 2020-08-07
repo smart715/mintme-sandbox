@@ -82,7 +82,7 @@
                 @input="tabUpdated"
                 :lazy="true"
                 nav-wrapper-class="tabs-wrapper"
-                class="tabs-theme transparent"
+                class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
                 v-model="tabIndex"
             >
                 <token-ongoing-airdrop-campaign
@@ -144,7 +144,10 @@
                     </b-tab>
                 {% endif %}
                 {% if showTrade %}
-                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                    <b-tab title="Trade"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
+                    >
                         <trade
                             :is-token="{{ isTokenPage ? 'true' : 'false' }}"
                             websocket-url="{{ global_websocket_url }}"

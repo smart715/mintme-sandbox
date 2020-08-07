@@ -570,6 +570,19 @@ a
       pointer-events: none !important
 
 .tabs
+  @media (max-width: 768px)
+    .tabs-wrapper
+      display: flex
+      .nav
+        &.nav-tabs
+          width: 100%
+          flex-wrap: nowrap
+          overflow-x: auto
+          overflow-y: hidden
+          -webkit-overflow-scrolling: touch
+          -ms-overflow-style: -ms-autohiding-scrollbar
+          &::-webkit-scrollbar
+            display: none
   .nav-tabs
     display: flex
     text-align: center
@@ -703,6 +716,10 @@ a
       flex: initial
       padding: 1rem 0
       background: none
+
+.parent-trade-tab
+  ul
+    margin-top: 1.4rem
 
 .modal-content
   background: $secondary
@@ -1117,14 +1134,6 @@ a.hover-icon:hover
 
   @include media-breakpoint-down(md)
     margin-top: 0.3rem !important
-
-.trade-tabs
-  ul
-    height: 35px
-    li.nav-item
-      margin: -2px
-    li.nav-item-token
-      margin: -6px
 
 .token-trading-title
   height: 38px
