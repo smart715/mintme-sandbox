@@ -6,6 +6,12 @@
 #}
 {% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
 
+{% if '/v1' in app.request.uri %}
+    {% set version = 'v1' %}
+{% else %}
+    {% set version = 'v2' %}
+{% endif %}
+
 {% block title %}
     API Documentation | mintMe
 {% endblock %}
@@ -102,8 +108,16 @@
                 <div class="row pt-4 justify-content-center">
                     <div class="col-12 px-3">
                         <div class="card card-fixed-large mx-auto">
-                            <div class="card-header">
-                                <h2>API Documentation</h2>
+                            <div class="card-header p-3">
+                                <div class="row justify-content-md-center align-items-center">
+                                    <div class="col"><h2 class="m-0">API Documentation</h2></div>
+                                    <div class="col-auto mr-auto">
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <a class="btn btn-secondary {% if 'v1' == version %}active{% endif %}" {% if 'v2' == version %}href="v1"{% endif %}>v1</a>
+                                            <a class="btn btn-secondary {% if 'v2' == version %}active{% endif %}" {% if 'v1' == version %}href="v2"{% endif %}>v2</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body py-2 px-0">
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
