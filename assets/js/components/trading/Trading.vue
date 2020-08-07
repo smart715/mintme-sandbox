@@ -240,7 +240,7 @@
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        || marketFilters.selectedFilter === marketFilters.options.user.key">
+                        && tokens.length">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">Show all tokens</b-link>
                             </div>
@@ -533,7 +533,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length < 1
+                            Object.keys(res.data.markets).length === 2 // there are only WEBBTC and WEBETH markets
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
