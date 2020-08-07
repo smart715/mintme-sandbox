@@ -358,12 +358,16 @@ a
 
 .btn-primary
   color: $dark-white
-  background-color: transparent
+  background-color: transparent !important
   border-color: $dark-white
-  &:hover
-    color: $secondary
-    background-color: $dark-white
-    border-color: $dark-white
+  @media (hover: hover)
+    &:hover
+      color: $secondary !important
+      background-color: $dark-white !important
+      border-color: $dark-white !important
+  @media (hover: none)
+    background-color: $primary
+    border-color: $dark-white !important
   &:disabled
     &:hover
       color: inherit
