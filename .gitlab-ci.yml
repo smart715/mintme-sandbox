@@ -74,11 +74,6 @@ build_mintme_sites:
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - node_modules/
-      - vendor/
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
