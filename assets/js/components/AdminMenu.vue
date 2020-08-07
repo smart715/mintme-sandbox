@@ -126,5 +126,7 @@ export default {
         content: ">" !important
 
     .vsm-collapsed
-        width: 30px !important
+        width: 10px !important
+        .collapse-btn
+            width: 30px !important
 </style>
