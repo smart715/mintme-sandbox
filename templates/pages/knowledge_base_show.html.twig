@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% set metaTitle = article.title ~ ' | mintMe' %}
+
 {% block title %}{{ article.title }} | mintMe{% endblock %}
 
 {% block tokenDescription %}
     <meta property="og:description" content="{{ metaDescription }}">
     <meta name="description" content="{{ metaDescription }}">
 {% endblock %}
-
-{% set metaTitle = article.title %}
 
 {% block content %}
     <div id="kb_show" class="container mt-5">
