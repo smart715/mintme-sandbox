@@ -5,7 +5,7 @@ namespace App\Utils\Converter\String;
 /***
  * Class BbcodeMetaTagsStringStrategy
  *
- * - tags img and url (only url without a name, [url]link[/url] yes, [url=link]name[/url] no) 
+ * - tags img and url (only url without a name, [url]link[/url] yes, [url=link]name[/url] no)
  * should be trimmed along with content between tags from meta tag description
  *
  * @package App\Utils\Converter
