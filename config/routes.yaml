@@ -1,6 +1,6 @@
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
-    prefix:   /dev/documentation
+    prefix:   /dev/documentation/{area}
     options:
         2fa_progress: false
 

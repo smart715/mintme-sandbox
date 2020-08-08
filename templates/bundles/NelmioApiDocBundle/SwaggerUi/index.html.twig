@@ -50,9 +50,10 @@
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
     %}
+    {% include 'scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    {% include 'scripts.html.twig' %}
+    <script src="{{ asset('build/api.js') }}"></script>
     {% endapply %}
 {% endblock javascripts %}
 
@@ -108,14 +109,14 @@
                 <div class="row pt-4 justify-content-center">
                     <div class="col-12 px-3">
                         <div class="card card-fixed-large mx-auto">
-                            <div class="card-header p-3">
+                            <div class="card-header py-3 px-4">
                                 <div class="row justify-content-md-center align-items-center">
                                     <div class="col"><h2 class="m-0">API Documentation</h2></div>
-                                    <div class="col-auto mr-auto">
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <a class="btn btn-secondary {% if 'v1' == version %}active{% endif %}" {% if 'v2' == version %}href="v1"{% endif %}>v1</a>
-                                            <a class="btn btn-secondary {% if 'v2' == version %}active{% endif %}" {% if 'v1' == version %}href="v2"{% endif %}>v2</a>
-                                        </div>
+                                    <div id="api-version" class="col-auto mr-auto">
+                                        <api-version
+                                            url-version={{ version }}
+                                        >
+                                        </api-version>
                                     </div>
                                 </div>
                             </div>
