@@ -1,5 +1,17 @@
 {% extends 'base.html.twig' %}
 
+{% if token.image is not null %}
+    {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
+{% endif %}
+
+{% if token|default %}
+    {% set metaTitle = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+    {% set metaImageAlt = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+{% else %}
+    {% set metaTitle = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+    {% set metaImageAlt = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+{% endif %}
+
 {% block tokenDescription %}
     {% if isTokenPage and tokenDescription is defined %}
         <meta property="og:description" content="{{ tokenDescription }}">

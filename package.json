@@ -108,12 +108,18 @@
   "jest": {
     "moduleFileExtensions": [
       "js",
-      "vue"
+      "vue",
+      "coffee"
     ],
     "testRegex": "assets/tests/.+\\.test\\.js",
     "transform": {
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
-      ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest"
+      ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest",
+      ".*\\.(coffee)$": "<rootDir>/coffee.processor.js"
+    },
+    "transformIgnorePatterns": ["^node_modules(.(?!.*\\.coffee))*$"],
+    "moduleNameMapper": {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assets/tests/__mocks__/fileMock.js"
     }
   }
 }

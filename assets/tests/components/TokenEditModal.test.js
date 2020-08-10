@@ -15,43 +15,14 @@ let propsForTestCorrectlyRenders = {
     websocketUrl: '',
 };
 
-const vueSliderTest = Vue.component('vue-slider-test', {
-    template: '<div></div>',
-        data() {
-            return {
-                refreshd: false,
-            };
-        },
-        methods: {
-            refresh: function() {
-                this.refreshd = true;
-            },
-    },
-});
+const refreshSlidersMock = jest.fn();
 
-const vueSliderPeriodTest = Vue.component('vue-slider-period-test', {
+const tokenReleasePeriodStub = {
     template: '<div></div>',
-        data() {
-            return {
-                refreshd: false,
-            };
-    },
     methods: {
-        refresh: function() {
-            this.refreshd = true;
-        },
+        refreshSliders: refreshSlidersMock,
     },
-});
-
-
-const tokenReleasePeriodTest = Vue.component('token-release-period', {
-    template: '<div><vue-slider-test ref="released-slider"></vue-slider-test><vue-slider-period-test ref="release-period-slider"></vue-slider-period-test></div>',
-    components: {
-         vueSliderTest,
-         vueSliderPeriodTest,
-    },
-
-});
+};
 
 describe('TokenEditModal', () => {
     it('should be true when statusProp props is equal "not-deployed"', () => {
@@ -79,13 +50,13 @@ describe('TokenEditModal', () => {
 
     it('should refresh sliders for "released-slider" and "release-period-slider" refs', () => {
         const wrapper = shallowMount(TokenEditModal, {
+            propsData: propsForTestCorrectlyRenders,
             stubs: {
-                'token-release-period': tokenReleasePeriodTest,
+                'token-release-period': tokenReleasePeriodStub,
             },
         });
 
         wrapper.vm.refreshSliders();
-        expect(wrapper.find(vueSliderTest).vm.refreshd).toBe(true);
-        expect(wrapper.find(vueSliderPeriodTest).vm.refreshd).toBe(true);
+        expect(refreshSlidersMock).toHaveBeenCalled();
     });
 });
