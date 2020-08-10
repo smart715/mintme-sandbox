@@ -61,7 +61,7 @@
                 @updated-youtube="youtubeUpdated"
                 @updated-discord="discordUpdated"
                 @updated-telegram="telegramUpdated"
-                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url}}"
+                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
                 profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
                 profile-name="{{ profile.firstName }}"
                 profile-lastname="{{ profile.lastname }}"
