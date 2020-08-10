@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\V2;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
+use App\Entity\Crypto;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -72,13 +73,18 @@ class TickerController extends AbstractFOSRestController
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());
 
+                $base = $market->getBase();
+                $quote = $market->getQuote();
+
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
                     'base_id' => $market->getBase()->getId(),
                     'quote_id' => $market->getQuote()->getId(),
                     'last_price' => $marketStatusToday['last'],
                     'quote_volume' => $marketStatusToday['volume'],
                     'base_volume' => $marketStatusToday['deal'],
-                    'isFrozen' => $market->getBase()->isBlocked(),
+                    'isFrozen' =>
+                        ($base instanceof Crypto ? !$base->isTradable() : $base->isBlocked()) ||
+                        ($quote instanceof Crypto ? !$quote->isExchangeble() : $quote->isBlocked()),
                 ];
 
                 return $assets;
