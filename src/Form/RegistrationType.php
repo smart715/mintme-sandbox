@@ -19,11 +19,7 @@ class RegistrationType extends AbstractType
         $builder
             ->remove('username')
             ->remove('plainPassword')
-            ->add('nickname', NicknameType::class, [
-                'attr' => [
-                    'autocomplete' => "off",
-                ],
-            ])
+            ->add('nickname', NicknameType::class)
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [
