@@ -5,6 +5,7 @@ namespace App\Form\Type;
 use App\Validator\Constraints\IsNotBlacklisted;
 use App\Validator\Constraints\UniqueNickname;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
@@ -44,7 +45,7 @@ class NicknameType extends AbstractType
 
     public function getParent(): string
     {
-        return TextType::class;
+        return SearchType::class;
     }
 
 
