@@ -19,8 +19,8 @@ security:
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
             provider: api_key_user_provider
-        api_public:
-            pattern: ^/dev/api/v2/public
+        api_open:
+            pattern: ^/dev/api/v2/open
             security: false
         main:
             pattern: ^/
@@ -86,7 +86,7 @@ security:
         - { path: ^/referral-program,                               role: ROLE_USER }
         - { path: ^/logout$,                                        role: ROLE_USER }
         - { path: ^/api,                                            role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/dev/api/v2/public,                              role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/dev/api/v2/open,                                role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/2fa,                                            role: IS_AUTHENTICATED_2FA_IN_PROGRESS }

@@ -15,7 +15,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
- * @Rest\Route("/dev/api/v2/public/trades")
+ * @Rest\Route("/dev/api/v2/open/trades")
  */
 class TradesController extends AbstractFOSRestController
 {
@@ -56,7 +56,7 @@ class TradesController extends AbstractFOSRestController
      *     description="Returns all recently completed trades for a given market pair."
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="Public")
+     * @SWG\Tag(name="Open")
      * @Security(name="")
      */
     public function getTrades(string $market_pair): array

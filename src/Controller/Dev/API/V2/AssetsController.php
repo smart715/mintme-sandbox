@@ -11,7 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
- * @Rest\Route("/dev/api/v2/public/assets")
+ * @Rest\Route("/dev/api/v2/open/assets")
  */
 class AssetsController extends AbstractFOSRestController
 {
@@ -44,7 +44,7 @@ class AssetsController extends AbstractFOSRestController
      *     description="Returns detailed summary for each currency available on the exchange."
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="Public")
+     * @SWG\Tag(name="Open")
      * @Security(name="")
      */
     public function getAssets(): array

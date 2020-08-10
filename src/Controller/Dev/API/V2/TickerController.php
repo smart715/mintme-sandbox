@@ -14,7 +14,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
- * @Rest\Route("/dev/api/v2/public/ticker")
+ * @Rest\Route("/dev/api/v2/open/ticker")
  */
 class TickerController extends AbstractFOSRestController
 {
@@ -55,7 +55,7 @@ class TickerController extends AbstractFOSRestController
      *     description="Returns 24-hour pricing and volume summary for each market pair available on the exchange."
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="Public")
+     * @SWG\Tag(name="Open")
      * @Security(name="")
      */
     public function getTicker(): array

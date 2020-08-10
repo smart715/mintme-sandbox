@@ -14,7 +14,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 /**
- * @Rest\Route("/dev/api/v2/public/summary")
+ * @Rest\Route("/dev/api/v2/open/summary")
  */
 class SummaryController extends AbstractFOSRestController
 {
@@ -60,7 +60,7 @@ class SummaryController extends AbstractFOSRestController
      *     description="Returns data for all tickers and all markets."
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="Public")
+     * @SWG\Tag(name="Open")
      * @Security(name="")
      */
     public function getSummary(): array

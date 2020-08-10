@@ -16,7 +16,7 @@ use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Rest\Route("/dev/api/v2/public/orderbook")
+ * @Rest\Route("/dev/api/v2/open/orderbook")
  */
 class OrderbookController extends AbstractFOSRestController
 {
@@ -72,7 +72,7 @@ Level 3 – Complete order book, no aggregation.",
      *     description="Returns complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair."
      * )
      * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="Public")
+     * @SWG\Tag(name="Open")
      * @Security(name="")
      */
     public function getOrderbook(ParamFetcherInterface $request, string $market_pair): array
