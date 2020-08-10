@@ -4,6 +4,7 @@ namespace App\Controller\Dev\API\V2;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -76,15 +77,24 @@ class TickerController extends AbstractFOSRestController
                 $base = $market->getBase();
                 $quote = $market->getQuote();
 
+                $isFrozen = true;
+
+                if (
+                    $base instanceof Crypto && !$base->isTradable() ||
+                    $quote instanceof Crypto && !$quote->isExchangeble() ||
+                    $base instanceof Token && $base->isBlocked() ||
+                    $quote instanceof Token && $quote->isBlocked()
+                ) {
+                    $isFrozen = false;
+                }
+
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
                     'base_id' => $market->getBase()->getId(),
                     'quote_id' => $market->getQuote()->getId(),
                     'last_price' => $marketStatusToday['last'],
                     'quote_volume' => $marketStatusToday['volume'],
                     'base_volume' => $marketStatusToday['deal'],
-                    'isFrozen' =>
-                        ($base instanceof Crypto ? !$base->isTradable() : $base->isBlocked()) ||
-                        ($quote instanceof Crypto ? !$quote->isExchangeble() : $quote->isBlocked()),
+                    'isFrozen' => $isFrozen,
                 ];
 
                 return $assets;
