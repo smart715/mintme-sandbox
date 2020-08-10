@@ -121,7 +121,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('----newName');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!wrapper.vm.$v.newName.validFirstChars).toBe(true);
+            expect(wrapper.vm.$v.newName.validFirstChars).toBe(true);
         });
 
         it('when token name has spaces in the end', () => {
@@ -141,7 +141,7 @@ describe('TokenChangeName', () => {
             wrapper.find('input').setValue('newName----');
             wrapper.vm.editName();
             wrapper.vm.$v.$touch();
-            expect(!wrapper.vm.$v.newName.validLastChars).toBe(true);
+            expect(wrapper.vm.$v.newName.validLastChars).toBe(true);
         });
 
         it('when token name has spaces between dashes', () => {
