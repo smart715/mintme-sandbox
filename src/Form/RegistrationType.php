@@ -19,7 +19,7 @@ class RegistrationType extends AbstractType
         $builder
             ->remove('username')
             ->remove('plainPassword')
-            ->add('nickname', searchType::class, [
+            ->add('nickname', SearchType::class, [
                 'attr' => [
                     'autocomplete' => "off",
                     'minlength' => "2",
