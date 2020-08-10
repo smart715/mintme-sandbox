@@ -1,14 +1,14 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Controller\Dev\API;
+namespace App\Tests\Controller\Dev\API\V1;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
 use App\Tests\Controller\WebTestCase;
 
-class MarketsControllerTest extends WebTestCase
+class CurrenciesControllerTest extends WebTestCase
 {
-    public function testGetMarkets(): void
+    public function testGetCurrencies(): void
     {
         $email = $this->register($this->client);
         /** @var User $user */
@@ -19,7 +19,7 @@ class MarketsControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/markets', [
+        $this->client->request('GET', '/dev/api/v1/currencies', [
             'offset' => 0,
             'limit' => 100,
         ], [], [
@@ -34,7 +34,7 @@ class MarketsControllerTest extends WebTestCase
         );
     }
 
-    public function testGetMarket(): void
+    public function testGetCurrency(): void
     {
         $email = $this->register($this->client);
         /** @var User $user */
@@ -45,22 +45,15 @@ class MarketsControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/markets/BTC/MINTME', [], [], [
+        $this->client->request('GET', '/dev/api/v1/currencies/WEB', [], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertEquals(
-            [
-                'BTC',
-                'MINTME',
-            ],
-            [
-                $res['base'],
-                $res['quote'],
-            ]
+            'WEB',
+            json_decode((string)$this->client->getResponse()->getContent(), true)['symbol']
         );
     }
 
@@ -75,28 +68,26 @@ class MarketsControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/markets', [
+        $this->client->request('GET', '/dev/api/v1/currencies', [
             'offset' => 0,
-            'limit' => 3,
+            'limit' => 1,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
         $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->client->request('GET', '/dev/api/v1/markets', [
+        $this->client->request('GET', '/dev/api/v1/currencies', [
             'offset' => 1,
-            'limit' => 3,
+            'limit' => 1,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
         $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(3, $res1);
-        $this->assertCount(3, $res2);
-        $this->assertEquals($res1[0], $res2[0]);
-        $this->assertNotEquals($res1[1], $res2[1]);
-        $this->assertEquals($res1[2], $res2[1]);
+        $this->assertCount(1, $res1);
+        $this->assertCount(1, $res2);
+        $this->assertNotEquals($res1, $res2);
     }
 }
