@@ -5,7 +5,6 @@ namespace App\Controller\Dev\API\V2;
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Trade\TraderInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
