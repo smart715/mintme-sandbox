@@ -1,3 +1,9 @@
+nelmio_api_doc:
+    resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
+    prefix:   /dev/documentation/v1
+    options:
+        2fa_progress: false
+
 nelmio_security:
     path:     /csp-report
     defaults: { _controller: nelmio_security.csp_reporter_controller:indexAction }
