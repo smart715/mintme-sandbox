@@ -7,10 +7,10 @@ export const addressFirstSymbol = {
     'BTC': () => true,
 };
 export const zipCodeContain = helpers.regex('zipCode', /^[a-zA-Z0-9-\s]+$/u);
-export const tokenValidFirstChars = helpers.regex('firstChars', /^[-\s]+/u);
-export const tokenValidLastChars = helpers.regex('lastChars', /[-\s]+$/u);
+export const tokenValidFirstChars = helpers.regex('firstChars', /^[\s]+/u);
+export const tokenValidLastChars = helpers.regex('lastChars', /[\s]+$/u);
 export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
-export const tokenNameValidChars = helpers.regex('validChars', /^[-\sA-Za-z0-9]+$/u);
+export const tokenNameValidChars = helpers.regex('validChars', /^[\sA-Za-z0-9]+$/u);
 
 export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
