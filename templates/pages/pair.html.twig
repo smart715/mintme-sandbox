@@ -216,22 +216,18 @@
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
-                    {% if isTokenPage and app.user %}
+                    {% if isTokenPage %}
                         <li class="nav-item ml-auto small-profile-link">
                             <div class="div-container-avatar">
                                 <a
-                                    href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                    href="{{ path('profile') }}/{{ profile.nickname }}"
                                 >
-                                    {% if app.user.profile.image.url == "/media/default_profile.png" %}
-                                        <i class="small-icon-user-avatar d-block"></i>
-                                    {% else %}
-                                        <avatar
-                                            class="avatar-token-page"
-                                            size="small"
-                                            type="profile"
-                                            image="{{ app.user.profile.image.url | imagine_filter('avatar_small') }}"
-                                        ></avatar>
-                                    {% endif %}
+                                    <avatar
+                                        class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
+                                        size="small"
+                                        type="profile"
+                                        image="{{ profile.image.url | imagine_filter('avatar_small') }}"
+                                    ></avatar>
                                 </a>
                             </div>
                         </li>
