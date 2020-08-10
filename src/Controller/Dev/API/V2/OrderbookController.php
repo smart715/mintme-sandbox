@@ -47,7 +47,7 @@ class OrderbookController extends AbstractFOSRestController
     /**
      * Get order book
      *
-     * @Rest\Get("/{market_pair}")
+     * @Rest\Get("/{base_quote}")
      * @Rest\QueryParam(
      *     name="depth",
      *     requirements=@Assert\Range(min="1", max="101"),
@@ -75,9 +75,9 @@ Level 3 – Complete order book, no aggregation.",
      * @SWG\Tag(name="Open")
      * @Security(name="")
      */
-    public function getOrderbook(ParamFetcherInterface $request, string $market_pair): array
+    public function getOrderbook(ParamFetcherInterface $request, string $base_quote): array
     {
-        $marketPair = explode('_', $market_pair);
+        $marketPair = explode('_', $base_quote);
         $base = $marketPair[0] ?? '';
         $quote = $marketPair[1] ?? '';
 
