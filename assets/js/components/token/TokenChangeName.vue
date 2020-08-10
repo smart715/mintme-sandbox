@@ -38,7 +38,7 @@
             >
             <div class="col-12 pt-2 px-0 clearfix">
                 <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
-                    Token name can contain only alphabets, numbers, spaces and dashes
+                    Token name can contain only alphabets, numbers and spaces
                 </div>
                 <div
                     v-if="this.newName.length > 0
@@ -46,7 +46,7 @@
                     || !this.$v.newName.validLastChars
                     || !this.$v.newName.noSpaceBetweenDashes)"
                     class="text-danger text-center small">
-                    Token name can't start or end with a dash or space, or have spaces between dashes
+                    Token name can't start or end with a space
                 </div>
                 <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
                     Token name should have at least 4 symbols
@@ -137,7 +137,7 @@ export default {
     watch: {
         newName: function() {
             clearTimeout(this.tokenNameTimeout);
-            if (this.newName.replace(/-|\s/g, '').length === 0) {
+            if (this.newName.replace(/\s/g, '').length === 0) {
                 this.newName = '';
             }
             this.tokenNameExists = false;
