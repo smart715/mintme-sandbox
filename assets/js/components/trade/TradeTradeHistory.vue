@@ -47,7 +47,7 @@
                                     <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.makerAvatar"
-                                            class="rounded-circle d-block flex-grow-0"
+                                            class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
                                         <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                             {{ row.value }}
@@ -63,7 +63,7 @@
                                     <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
                                         <img
                                             :src="row.item.takerAvatar"
-                                            class="rounded-circle d-block flex-grow-0"
+                                            class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
                                         <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                             {{ row.value }}

@@ -9,6 +9,7 @@
         <font-awesome-icon
             v-if="!uploading"
             icon="camera"
+            color="#656565"
             size="2x"
             class="avatar-overlay icon-camera"></font-awesome-icon
         >
