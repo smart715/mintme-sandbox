@@ -9,6 +9,28 @@
         left: 50%
         position: absolute
         transform: translate(-50%, -50%)
+        visibility: hidden
+        opacity: 0
+
+    &:after
+        content: ""
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        border-radius: 50%
+        background: rgba(0, 0, 0, 0)
+        transition: background 1s ease
+
+    &.avatar__large
+        &.avatar_owner:hover:after
+            background: rgba(0, 0, 0, 0.3)
+
+    &:hover .avatar-overlay
+        visibility: visible
+        opacity: 1
+        transition: opacity 1s ease
 
 .avatar__small
     max-width: 22px
@@ -27,8 +49,8 @@
 .avatar__large
     max-width: 152px
     max-height: 152px
-    min-height: 80px
-    min-width: 80px
+    min-height: auto
+    min-width: auto
     border-width: 2px
 
 .card-header .avatar

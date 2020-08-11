@@ -133,15 +133,12 @@
                                     @click="toggleProfileMenu"
                                     v-on-clickaway="hideProfileMenu"
                                 >
-                                    {% if app.user.profile.image.url == "/media/default_profile.png" %}
-                                        <i class="icon-user-avatar d-none d-lg-block"></i>
-                                    {% else %}
-                                        <avatar
-                                            size="middle"
-                                            type="profile"
-                                            image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
-                                        ></avatar>
-                                    {% endif %}
+                                    <avatar
+                                        class="{% if app.user.profile.image.url == "/media/default_profile.png" %}default-user-avatar-topnav{% endif %}"
+                                        size="middle"
+                                        type="profile"
+                                        image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
+                                    ></avatar>
                                 </a>
                                 <div
                                     class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
