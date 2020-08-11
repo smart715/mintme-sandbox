@@ -32,7 +32,7 @@ class TokenCreateType extends AbstractType
                 'attr' => [
                     'minlength' => Token::NAME_MIN_LENGTH,
                     'max' => Token::NAME_MAX_LENGTH,
-                    'pattern' => "[a-zA-Z0-9\-\s]*",
+                    'pattern' => "[a-zA-Z0-9\s]*",
                     'title' => 'Invalid token name.',
                 ],
             ]);

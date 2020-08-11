@@ -1,5 +1,17 @@
 {% extends 'base.html.twig' %}
 
+{% if token.image is not null %}
+    {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
+{% endif %}
+
+{% if token|default %}
+    {% set metaTitle = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+    {% set metaImageAlt = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+{% else %}
+    {% set metaTitle = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+    {% set metaImageAlt = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+{% endif %}
+
 {% block tokenDescription %}
     {% if isTokenPage and tokenDescription is defined %}
         <meta property="og:description" content="{{ tokenDescription }}">
@@ -22,7 +34,7 @@
     {{ include('spinners/pair.html.twig') }}
 
     {% if isTokenPage %}
-    <div class="row mt-5 justify-content-center">
+    <div class="row justify-content-center pair-container">
         <div class="col-md-10 d-flex justify-content-between">
             <token-avatar
                 ref="tokenAvatar"
@@ -49,7 +61,7 @@
                 @updated-youtube="youtubeUpdated"
                 @updated-discord="discordUpdated"
                 @updated-telegram="telegramUpdated"
-                image="{{ token.image.url | imagine_filter('avatar_large') }}"
+                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
                 profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
                 profile-name="{{ profile.firstName }}"
                 profile-lastname="{{ profile.lastname }}"
@@ -82,7 +94,7 @@
                 @input="tabUpdated"
                 :lazy="true"
                 nav-wrapper-class="tabs-wrapper"
-                class="tabs-theme transparent"
+                class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
                 v-model="tabIndex"
             >
                 <token-ongoing-airdrop-campaign
@@ -144,7 +156,10 @@
                     </b-tab>
                 {% endif %}
                 {% if showTrade %}
-                    <b-tab title="Trade" {% if tab == 'trade' %} {{ 'active' }} {% endif %}>
+                    <b-tab title="Trade"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
+                    >
                         <trade
                             :is-token="{{ isTokenPage ? 'true' : 'false' }}"
                             websocket-url="{{ global_websocket_url }}"
@@ -177,7 +192,10 @@
                     </b-tab>
                 {% endif %}
                 {% if isTokenPage %}
-                    <b-tab title="Posts" {% if tab == 'posts' %} {{ 'active' }} {% endif %}>
+                    <b-tab title="Posts"
+                        {% if isTokenPage %} title-item-class="trade-post" {% endif %}
+                        {% if tab == 'posts' %} {{ 'active' }} {% endif %}
+                    >
                         <div class="container-fluid">
                             {% if is_granted('edit', token) %}
                                 <div class="row justify-content-center">
@@ -200,11 +218,16 @@
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto small-profile-link">
-                            <div>
+                            <div class="div-container-avatar">
                                 <a
-                                    href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                    href="{{ path('profile') }}/{{ profile.nickname }}"
                                 >
-                                    <span class="icon-profile float-left mt-1 d-lg-inline"></span>
+                                    <avatar
+                                        class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
+                                        size="small"
+                                        type="profile"
+                                        image="{{ profile.image.url | imagine_filter('avatar_small') }}"
+                                    ></avatar>
                                 </a>
                             </div>
                         </li>

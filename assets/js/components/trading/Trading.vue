@@ -191,7 +191,7 @@
                             </template>
                             <template v-slot:cell(pair)="row">
                                 <div>
-                                    <a :href="row.item.tokenUrl" class="text-white"
+                                    <a :href="row.item.tokenUrl" class="text-white text-decoration-none token-link"
                                        :disabled.sync="row.value.length <= 20"
                                        v-b-tooltip.hover :title="row.value">
                                 <span v-if="showFullPair(row.value)">
@@ -202,7 +202,9 @@
                                             class="d-inline"
                                             :key="row.item.baseImage"
                                     />
-                                    {{ row.item.base }}/
+                                    <span class="token-link">
+                                        {{ row.item.base }}/
+                                    </span>
                                 </span>
                                         <avatar
                                             :image="row.item.quoteImage"
@@ -211,14 +213,16 @@
                                             class="d-inline"
                                             :key="row.item.quoteImage"
                                         />
-                                        {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        <span class="token-link">
+                                            {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
+                                        </span>
                                     </a>
                                     <guide
                                             placement="top"
                                             max-width="150px"
                                             v-if="row.item.tokenized">
                                         <template slot="icon">
-                                            <img src="../../../img/mintmecoin_W.png" alt="deployed">
+                                            <img :src="row.item.baseImage" alt="deployed">
                                         </template>
                                         <template slot="body">
                                             This token exists on the blockchain.
@@ -240,7 +244,7 @@
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        || marketFilters.selectedFilter === marketFilters.options.user.key">
+                        && tokens.length">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">Show all tokens</b-link>
                             </div>
@@ -533,7 +537,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length < 1
+                            Object.keys(res.data.markets).length === 2 // there are only WEBBTC and WEBETH markets
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {

@@ -50,7 +50,7 @@
             classObject: function() {
                 return {
                     [`avatar__${this.size}`]: true,
-                    'c-pointer': this.editable,
+                    'c-pointer avatar_owner': this.editable,
                 };
             },
             imageUrl: function() {
