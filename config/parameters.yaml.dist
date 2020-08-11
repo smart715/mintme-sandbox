@@ -45,6 +45,7 @@ parameters:
         fee: 5
         minBtcAmount: 0.000001
         minMintmeAmount: 0.0001
+        minEthAmount: 0.01
         minTokensAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-22'
