@@ -583,15 +583,6 @@ a
           -ms-overflow-style: -ms-autohiding-scrollbar
           &::-webkit-scrollbar
             display: none
-          .nav-link
-            padding: .45rem 1rem
-            @media (max-width: 550px)
-              padding: .45rem 0.5rem
-            @media (max-width: 520px)
-              padding: .45rem 0.3rem
-      .tabs-left-margin-container
-        min-width: 120px !important
-        background: $secondary
   .nav-tabs
     display: flex
     text-align: center
@@ -633,7 +624,6 @@ a
 
   &.transparent
     .nav-tabs
-      position: relative
       background: $secondary
       text-align: left
       border: 2px solid $secondary
@@ -725,6 +715,10 @@ a
       flex: initial
       padding: 1rem 0
       background: none
+
+.parent-trade-tab
+  ul
+    margin-top: 1.4rem
 
 .modal-content
   background: $secondary
@@ -1012,6 +1006,7 @@ input[type=search]::-webkit-search-cancel-button
   width: 100%
   white-space: nowrap
   text-overflow: ellipsis
+  margin-block: -5px
 
 .truncate-address
   .token-address-buttons
@@ -1131,20 +1126,13 @@ a.hover-icon:hover
 
 .dropdown-menu-social-media
   min-width: 7rem
+  left: -68px
 
 .pair-container
   margin-top: 1.5rem !important
 
   @include media-breakpoint-down(md)
     margin-top: 0.3rem !important
-
-.trade-tabs
-  ul
-    height: 35px
-    li.nav-item
-      margin: -2px
-    li.nav-item-token
-      margin: -6px
 
 .token-trading-title
   height: 38px
@@ -1155,14 +1143,13 @@ a.hover-icon:hover
 
 .small-profile-link
   margin-top: 3px
+  position: absolute
+  right: 15px
 
-  span.icon-profile
-    margin-right: 17px
-    background-image: url('../img/profile-sprite.png')
-    @extend .icon
-
-    &:hover
-      background-position: -18px 0
+  .div-container-avatar
+    background: #152D47
+    padding-left: 5px
+    padding-right: 17px
 
 #client-copy-btn, #secret-copy-btn
   textarea
@@ -1170,3 +1157,22 @@ a.hover-icon:hover
 
 .social-media-menu
   margin-right: 13px
+
+#login-form-captcha-container
+  min-height: 60.5px
+
+#register-form-captcha-container
+  min-height: 75.5px
+
+#register-form-password-container
+  min-height: 88px
+
+ul.spinner-tabs
+  height: 36px
+
+li.trade-post
+  a.nav-link
+    margin-right: 32px
+
+.default-user-avatar-topnav:hover, .default-user-avatar-navbar:hover
+  filter: invert(26%) sepia(52%) saturate(255%) hue-rotate(4deg) brightness(87%) contrast(64%)

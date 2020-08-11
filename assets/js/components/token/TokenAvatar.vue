@@ -2,11 +2,12 @@
     <div class="token-avatar">
         <div class="d-flex align-items-center token-name">
             <div class="align-items-center token-avatar-link">
-                <a :href="profileUrl">
-                    <img :src="image"
-                         class="rounded-circle img-fluid"
-                    >
-                </a>
+                <avatar
+                    type="token"
+                    size="large"
+                    :image="image"
+                    :editable="isOwner"
+                />
             </div>
             <token-name
                 class="d-flex align-items-center"
