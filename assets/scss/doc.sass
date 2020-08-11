@@ -118,8 +118,11 @@ header::before
 
   .btn
     color: $dark-white
-    background-color: transparent !important
+    background-color: $secondary !important
     border-color: $dark-white
+    &:focus
+      box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
+      -webkit-box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
     @media (hover: hover)
       &:hover
         color: $secondary !important
@@ -128,22 +131,17 @@ header::before
     @media (hover: none)
       background-color: $primary
       border-color: $dark-white !important
+    &:hover
+      background-color: $secondary-dark !important
+      color: $dark-white !important
+      border: none !important
     &:disabled
       &:hover
         color: inherit
         background-color: $primary
         border-color: $primary
-    &:focus
-      box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
-      -webkit-box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
     border: none !important
     border-radius: inherit
-    background-color: $secondary !important
-
-    &:hover
-      background-color: $secondary-dark !important
-      color: $dark-white !important
-      border: none !important
 
   select
     @include media-breakpoint-down('sm')
