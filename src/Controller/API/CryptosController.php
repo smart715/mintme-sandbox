@@ -35,7 +35,7 @@ class CryptosController extends APIController
      * @Rest\Get(
      *     "/{symbol}/balance",
      *     name="crypto_balance",
-     *     requirements={"symbol"="(WEB|BTC)"},
+     *     requirements={"symbol"="(WEB|BTC|ETH)"},
      *     options={"expose"=true}
      * )
      */
