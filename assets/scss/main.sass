@@ -357,11 +357,11 @@ a
         color: inherit
 
 .btn-primary
-  color: $dark-white
+  color: $dark-white !important
   background-color: transparent !important
   border-color: $dark-white
   @media (hover: hover)
-    &:hover
+    &:hover:not(:disabled)
       color: $secondary !important
       background-color: $dark-white !important
       border-color: $dark-white !important
@@ -389,11 +389,15 @@ a
 .btn-ghost
   border-color: $dark-white
   background: transparent
-  color: $dark-white
+  color: $dark-white !important
   transition: all .3s ease
-  &:hover
-    background: $dark-white
-    color: $secondary
+  @media (hover: hover)
+    &:hover
+      background: $dark-white
+      color: $secondary
+  @media (hover: none)
+    background-color: $secondary-dark !important
+    border-color: $dark-white !important
   &.ghost-alt
     &:hover
       color: $primary-light
