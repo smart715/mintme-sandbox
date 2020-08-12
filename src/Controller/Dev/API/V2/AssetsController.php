@@ -64,7 +64,6 @@ class AssetsController extends AbstractFOSRestController
                 'can_withdraw' => true,
                 'can_deposit' => true,
                 'min_withdraw' => number_format((float)$minWithdraw, $subUnit),
-                'max_withdraw' => false,
                 'maker_fee' => $makerFee,
                 'taker_fee' => $takerFee,
             ];
@@ -77,7 +76,6 @@ class AssetsController extends AbstractFOSRestController
                 'name' => strtolower($this->rebrandingConverter->convert($token->getName())),
                 'can_withdraw' => $deployed,
                 'can_deposit' => $deployed,
-                'min_withdraw' => false,
                 'max_withdraw' => $this->getParameter('token_quantity'),
                 'maker_fee' => $makerFee,
                 'taker_fee' => $takerFee,
