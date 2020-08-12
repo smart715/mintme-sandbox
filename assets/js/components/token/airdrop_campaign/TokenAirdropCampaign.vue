@@ -150,7 +150,7 @@ export default {
             showEndDate: false,
             tokensAmount: null,
             participantsAmount: null,
-            endDate: moment().add(30, 'days').toDate(),
+            endDate: moment().add(1, 'hours').hours(),
             options: {
                 format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
