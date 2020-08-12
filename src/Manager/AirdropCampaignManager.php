@@ -62,9 +62,13 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdrop->setAmount($amount);
         $airdrop->setParticipants($participants);
 
-        if ($endDate instanceof \DateTimeImmutable && $endDate->getTimestamp() > time()) {
+        if ($endDate instanceof \DateTimeImmutable && ($endDate->getTimestamp() - time()) < 86400000){
+            $airdrop->setEndDate(setTime(0, 0, [0, [(time() + 86400000)]]));
+        }
+        elseif ($endDate instanceof \DateTimeImmutable && $endDate->getTimestamp() > time()) {
             $airdrop->setEndDate($endDate);
         }
+
 
         $reward = $this->getAirdropReward($airdrop);
         $lockedAmount = $reward->multiply($participants);
