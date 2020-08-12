@@ -373,13 +373,15 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
             return $this->redirectToRoute('homepage');
         } else {
-            return hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key
-            ? $this->render('pages/unsubscribe.html.twig', [
-                'mail' => $mail,
-                'form' => $form->createView(),
-                'alreadyUnsubscribed' => false,
-            ])
-            : $this->render('pages/404.html.twig');
+            if (hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key) {
+                return $this->render('pages/unsubscribe.html.twig', [
+                    'mail' => $mail,
+                    'form' => $form->createView(),
+                    'alreadyUnsubscribed' => false,
+                ]);
+            }
+
+            return $this->render('pages/404.html.twig');
         }
     }
 }
