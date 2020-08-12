@@ -154,7 +154,7 @@ export default {
             options: {
                 format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
-                minDate: moment().add(24, 'hours').toDate(),
+                minDate: moment().add(1, 'hours').hours(),
             },
             errorMessage: '',
             precision: TOK.subunit,
