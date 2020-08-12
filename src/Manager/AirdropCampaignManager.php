@@ -63,7 +63,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdrop->setAmount($amount);
         $airdrop->setParticipants($participants);
 
-        if ($endDate instanceof \DateTimeImmutable && ($endDate->getTimestamp() - time()) < self::ONE_HOUR_IN_MILLISEC){
+        if ($endDate instanceof \DateTimeImmutable && ($endDate->getTimestamp() - time()) < self::ONE_HOUR_IN_MILLISEC) {
             $newEndDate = $endDate->setTime(0, 0, [0, [(time() + self::ONE_HOUR_IN_MILLISEC)]]);
             $airdrop->setEndDate($newEndDate);
         }
