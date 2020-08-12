@@ -77,13 +77,13 @@ class TickerController extends AbstractFOSRestController
                 $base = $market->getBase();
                 $quote = $market->getQuote();
 
-                $isFrozen = true;
+                $isFrozen = 1;
 
                 if ($base instanceof Crypto && !$base->isTradable() ||
                     $quote instanceof Crypto && !$quote->isExchangeble() ||
                     $base instanceof Token && $base->isBlocked() ||
                     $quote instanceof Token && $quote->isBlocked()) {
-                    $isFrozen = false;
+                    $isFrozen = 0;
                 }
 
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
