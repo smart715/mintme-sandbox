@@ -5,7 +5,7 @@ namespace App\Form\Type;
 use App\Validator\Constraints\IsNotBlacklisted;
 use App\Validator\Constraints\UniqueNickname;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,7 +21,6 @@ class NicknameType extends AbstractType
                 'minlength' => 2,
                 'maxlength' => 30,
                 'pattern' => '[A-Za-z\d]+',
-                'autocomplete' => 'off',
             ],
             'constraints' => [
                 new IsNotBlacklisted([
@@ -45,7 +44,7 @@ class NicknameType extends AbstractType
 
     public function getParent(): string
     {
-        return SearchType::class;
+        return TextType::class;
     }
 
 
