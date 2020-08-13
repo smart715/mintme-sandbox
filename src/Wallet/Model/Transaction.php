@@ -76,39 +76,45 @@ class Transaction
         return $this->to;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getFee(): Money
     {
         return $this->fee;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getDate(): \DateTime
     {
         return $this->date;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getTradable(): ?TradebleInterface
     {
         return $this->tradable;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getStatus(): Status
     {
         return $this->status;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getType(): Type
     {
         return $this->type;
+    }
+
+    /** @Groups({"dev"}) */
+    public function getAddress(): string
+    {
+        return $this->to;
     }
 }
