@@ -12,7 +12,7 @@
     {% set metaImageAlt = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
 {% endif %}
 
-{% block tokenDescription %}
+{% block metaDescription %}
     {% if isTokenPage and tokenDescription is defined %}
         <meta property="og:description" content="{{ tokenDescription }}">
         <meta name="description" content="{{ tokenDescription }}">
