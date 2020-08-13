@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\ApiKey;
+use App\Entity\Unsubscriber;
 use App\Entity\User;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
+use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
@@ -14,8 +16,10 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -317,5 +321,67 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
+    }
+
+    /**
+     * @Route("user/unsubscribe/{key}/{mail}", name="unsubscribe")
+     */
+    public function unsubscribe(
+        Request $request,
+        string $key,
+        string $mail,
+        LoggerInterface $unsubscribeLogger
+    ): Response {
+        if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+            return $this->render('pages/404.html.twig');
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $entityManager->getRepository(Unsubscriber::class);
+
+        if ($repo->findOneBy(['email' => $mail])) {
+            return $this->render('pages/unsubscribe.html.twig', [
+                'mail' => $mail,
+                'alreadyUnsubscribed' => true,
+            ]);
+        }
+
+        $form = $this->createForm(UnsubscribeType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $date = new \DateTimeImmutable();
+                $unsubscriber = new Unsubscriber($mail, $date);
+                $entityManager->persist($unsubscriber);
+                $entityManager->flush();
+            } catch (\Throwable $e) {
+                $form->addError(new FormError("Error when unsubscribing {$mail}"));
+
+                return $this->render('pages/unsubscribe.html.twig', [
+                    'mail' => $mail,
+                    'form' => $form->createView(),
+                    'alreadyUnsubscribed' => false,
+                ]);
+            }
+
+            $unsubscribeLogger->info(
+                sprintf("%s %s\n", $mail, $date->format('Y-m-d H:i:s'))
+            );
+
+            $this->addFlash('success', "{$mail} was successfully unsubscribed");
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        if (hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key) {
+            return $this->render('pages/unsubscribe.html.twig', [
+                'mail' => $mail,
+                'form' => $form->createView(),
+                'alreadyUnsubscribed' => false,
+            ]);
+        }
+
+        return $this->render('pages/404.html.twig');
     }
 }
