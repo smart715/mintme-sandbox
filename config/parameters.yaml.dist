@@ -152,3 +152,14 @@ parameters:
     # enable sending web site visit stats to google, should only be enabled for prod,
     # default value is disabled (false)
     enable_google_analytics: false
+
+    #HMAC SHA1 key
+    hmac_sha_one_key: 'qwerty'
+
+    #Social media links
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'

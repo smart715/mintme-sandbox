@@ -1,11 +1,11 @@
 monolog:
-    channels: ['user_action', 'front_end', 'donation']
+    channels: ['user_action', 'front_end', 'donation', 'unsubscribe']
     handlers:
         main:
             type: fingers_crossed
             action_level: error
             handler: nested
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe']
             excluded_404s:
                 # regex: exclude all 404 errors from the logs
                 - ^/
@@ -70,3 +70,9 @@ monolog:
             level: debug
             channels: ['front_end']
             formatter: monolog.formatter.front_end
+        unsubscribe:
+            type: stream
+            path: "%kernel.logs_dir%/unsubscribers.txt"
+            level: info
+            channels: ['unsubscribe']
+            formatter: monolog.formatter.unsubscribe
