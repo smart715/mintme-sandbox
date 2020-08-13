@@ -604,6 +604,11 @@ services:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
 
+    monolog.formatter.unsubscribe:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%message%%\n"
+
     App\Exchange\Config\DeployCostConfig:
         arguments:
             $deployCost: '%deploy_cost%'

@@ -15,7 +15,7 @@
     <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
         Nickname can contain only latin letters and numbers
     </div>
-    <div>
+    <div id="register-form-password-container">
             <passwordmeter :password="password" @toggle-error="toggleError">
                 <span @click="togglePassword()" class="show-password">
                     <i class="far fa-eye"></i>
@@ -23,7 +23,7 @@
                 {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
             </passwordmeter>
         </div>
-        <div class="py-2">
+        <div id="register-form-captcha-container" class="py-2">
             {{ form_row(form.recaptcha, { 'inline': false }) }}
         </div>
         <div class="text-left">

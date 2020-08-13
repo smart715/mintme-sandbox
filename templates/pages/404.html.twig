@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}404 - Page not found - {{ error_message }} {% endblock %}
+{% block title %}404 - Page not found - {{ error_message | default('')}} {% endblock %}
 
 {% block bodyclass %}errorpage{% endblock %}
 

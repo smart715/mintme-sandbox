@@ -8,6 +8,8 @@ use App\Exception\NotFoundProfileException;
 use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
+use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
+use App\Utils\Converter\String\StringConverter;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,10 +122,12 @@ class ProfileController extends Controller
         /** @var User $user*/
         $user = $this->getUser();
 
+        $profileDescription = $profile->getDescription() ?? '';
+        $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);
         $profileDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
             '\2',
-            $profile->getDescription() ?? ''
+            $profileDescription
         ) ?? '';
 
         return $this->render('pages/profile.html.twig', [
