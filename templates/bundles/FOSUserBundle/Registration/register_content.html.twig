@@ -6,8 +6,8 @@
 {% set featured = true %}
 
 {% block formBody %}
-    {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
-    {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
+    {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register', 'autocomplete': 'off'}}) }}
+    {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required', 'autocomplete': 'off'} }) }}
     {% include 'form/nickname_field.html.twig' %}
     <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
         Minimum length must be 2
@@ -20,7 +20,7 @@
                 <span @click="togglePassword()" class="show-password">
                     <i class="far fa-eye"></i>
                 </span>
-                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password', 'autocomplete': 'off'} }) }}
+                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
             </passwordmeter>
         </div>
         <div class="py-2">
