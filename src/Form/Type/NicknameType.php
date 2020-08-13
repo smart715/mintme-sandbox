@@ -45,7 +45,7 @@ class NicknameType extends AbstractType
 
     public function getParent(): string
     {
-        return SearchType::class;
+        return TextType::class;
     }
 
 
