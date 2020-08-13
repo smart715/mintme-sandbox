@@ -11,6 +11,7 @@ import {NotificationMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
+import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
 
 new Vue({
@@ -63,6 +64,11 @@ new Vue({
     }
   },
   methods: {
+    ...mapMutations('makeOrder', [
+      'setUseBuyMarketPrice',
+      'setBuyAmountInput',
+      'setSubtractQuoteBalanceFromBuyAmount',
+    ]),
     fetchAddress: function() {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
@@ -149,6 +155,22 @@ new Vue({
     },
     coalesce: function(a, b) {
       return null !== a ? a : b;
+    },
+    goToTrade: function(amount) {
+      this.tabIndex= 1;
+      this.setUseBuyMarketPrice(true);
+      this.setBuyAmountInput(amount);
+      this.setSubtractQuoteBalanceFromBuyAmount(true);
+    },
+  },
+  computed: {
+    ...mapGetters('makeOrder', [
+      'getQuoteBalance',
+    ]),
+  },
+  watch: {
+    getQuoteBalance: function() {
+      this.updatePosts();
     },
   },
   store,

@@ -130,6 +130,7 @@
                                 :show-edit="{{ isOwner }}"
                                 @go-to-posts="goToPosts"
                                 @delete-post="deletePost"
+                                @go-to-trade="goToTrade"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
                             >
                                 <template v-slot:title>Recent posts</template>
@@ -173,6 +174,9 @@
                             :user-id="{{ app.user ? app.user.id : 0 }}"
                             mintme-supply-url="{{ mintme_supply }}"
                             :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            {% if isTokenPage %}
+                                :taker-fee="{{ taker_fee }}"
+                            {% endif %}
                             >
                         </trade>
                     </b-tab>
@@ -209,6 +213,7 @@
                                     :posts="posts || (posts = {{posts | json_encode}})"
                                     :show-edit="{{ isOwner }}"
                                     @delete-post="deletePost"
+                                    @go-to-trade="goToTrade"
                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
                                 />
                             </div>
