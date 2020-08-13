@@ -52,7 +52,7 @@ new Vue({
     Trade,
     Avatar,
   },
-  mounted: function() {\
+  mounted: function() {
     let divEl = document.createElement('div');
     let tabsEl = document.querySelectorAll('.nav.nav-tabs');
 
