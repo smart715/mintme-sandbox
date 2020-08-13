@@ -20,6 +20,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -143,10 +144,12 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
+        $tokenDescription = $token->getDescription() ?? '';
+        $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
             '\2',
-            $token->getDescription() ?? ''
+            $tokenDescription
         );
         $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
