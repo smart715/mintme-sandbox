@@ -208,6 +208,7 @@ export default {
         marketPrice: [Number, String],
         balance: [String, Boolean],
         balanceLoaded: [String, Boolean],
+        takerFee: Number,
     },
     data() {
         return {
@@ -301,6 +302,7 @@ export default {
             'setBuyAmountInput',
             'setBaseBalance',
             'setUseBuyMarketPrice',
+            'setTakerFee',
         ]),
     },
     computed: {
@@ -343,7 +345,7 @@ export default {
         },
         buyAmount: {
             get() {
-                return this.getBuyAmountInput;
+                return new Decimal(this.getBuyAmountInput).toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
             },
             set(val) {
                 this.setBuyAmountInput(val);
@@ -359,7 +361,7 @@ export default {
         },
         useMarketPrice: {
             get() {
-                return this.getUseBuyMarketPrice;
+                return this.getUseBuyMarketPrice && this.marketPrice > 0;
             },
             set(val) {
                 this.setUseBuyMarketPrice(val);
@@ -381,6 +383,7 @@ export default {
         },
     },
     mounted: function() {
+        this.setTakerFee(this.takerFee);
         this.addMessageHandler((response) => {
             if (
                 'asset.update' === response.method &&
