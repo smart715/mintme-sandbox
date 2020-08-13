@@ -21,6 +21,9 @@ class MinOrderValidator implements ValidatorInterface
     /** @var string */
     private $amount;
 
+    /** @var string */
+    private $message = 'Amount is low';
+
     public function __construct(
         ?TradebleInterface $baseTradable,
         ?TradebleInterface $quoteTradable,
@@ -62,6 +65,11 @@ class MinOrderValidator implements ValidatorInterface
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
             && BigDecimal::of((float)$this->price)->multipliedBy((float)$this->amount)->toFloat() >= $baseMinimal;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
     }
 
     private function getCrypto(?TradebleInterface $tradeble): ?Crypto
