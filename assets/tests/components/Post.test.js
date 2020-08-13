@@ -78,8 +78,8 @@ describe('Post', () => {
                 loggedIn: true,
             },
         });
-
-        expect(wrapper.find('p').html()).toContain('To see this post you need to have 0 tok in your balance. Visit trade page and create buy order to get required tokens.');
+        console.log(wrapper.find('p').html());
+        expect(wrapper.find('p').html()).toContain('To see this post you need to have <a href="#">0 tok</a> in your balance. Visit trade page and create buy order to get required tokens.');
     });
 
     it('shows edit and delete icons if showEdit is true', () => {

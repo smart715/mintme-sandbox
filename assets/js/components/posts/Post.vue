@@ -5,7 +5,7 @@
                 <bbcode-view :value="post.content"/>
             </p>
             <p v-else>
-                To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
+              To see this post you need to have <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> in your balance. Visit trade page and create buy order to get required tokens.
             </p>
         </template>
         <p v-else>

@@ -11,6 +11,7 @@
                     :index="i"
                     @delete-post="$emit('delete-post', $event)"
                     :show-edit="showEdit"
+                    @go-to-trade="$emit('go-to-trade', $event)"
                     :logged-in="loggedIn"
                 />
             </template>
