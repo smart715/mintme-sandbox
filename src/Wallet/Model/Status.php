@@ -35,7 +35,7 @@ class Status
         );
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getStatusCode(): string
     {
         return $this->status;

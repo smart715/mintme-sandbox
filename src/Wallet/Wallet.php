@@ -86,12 +86,12 @@ class Wallet implements WalletInterface
     /** {@inheritdoc} */
     public function getWithdrawDepositHistory(User $user, int $offset, int $limit): array
     {
-        $limit = intval($limit / 3);
+        // todo: store transations in mintme DB to make pagination more efficient
+        $gatewayLimit = $offset + $limit;
 
-        $depositHistory = $this->depositCommunicator->getTransactions($user, $offset, $limit);
-        $withdrawHistory = $this->withdrawGateway->getHistory($user, $offset, $limit);
-
-        $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, $offset, $limit);
+        $depositHistory = $this->depositCommunicator->getTransactions($user, 0, $gatewayLimit);
+        $withdrawHistory = $this->withdrawGateway->getHistory($user, 0, $gatewayLimit);
+        $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, 0, $gatewayLimit);
 
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
@@ -99,7 +99,7 @@ class Wallet implements WalletInterface
             return $first->getDate()->getTimestamp() < $second->getDate()->getTimestamp();
         });
 
-        return $history;
+        return array_slice($history, $offset, $limit);
     }
 
     /**
