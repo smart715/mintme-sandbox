@@ -152,7 +152,7 @@ describe('TradeBuyOrder', () => {
             wrapper.setProps({marketPrice: 5});
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe('2');
+            expect(wrapper.vm.buyAmount).toBe(2);
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -163,7 +163,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe('5');
+            expect(wrapper.vm.buyAmount).toBe(5);
             expect(wrapper.vm.buyPrice).toBe(2);
         });
 
@@ -174,7 +174,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe('2');
+            expect(wrapper.vm.buyAmount).toBe(2);
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -185,7 +185,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe('2');
+            expect(wrapper.vm.buyAmount).toBe(2);
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -197,7 +197,7 @@ describe('TradeBuyOrder', () => {
             event.target.tagName = 'a';
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe('0');
+            expect(wrapper.vm.buyAmount).toBe(0);
             expect(wrapper.vm.buyPrice).toBe('0');
         });
     });

@@ -23,6 +23,7 @@
                     :market-price="marketPriceBuy"
                     :balance="baseBalance"
                     :balance-loaded="balanceLoaded"
+                    :taker-fee="takerFee"
                     @check-input="checkInput"
                 />
             </div>
@@ -111,6 +112,7 @@ export default {
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
         isToken: Boolean,
+        takerFee: Number,
     },
     data() {
         return {
