@@ -5,4 +5,5 @@ namespace App\Utils\Validator;
 interface ValidatorInterface
 {
     public function validate(): bool;
+    public function getMessage(): string;
 }
