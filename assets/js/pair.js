@@ -52,8 +52,7 @@ new Vue({
     Trade,
     Avatar,
   },
-  mounted: function() {
-    window.addEventListener('scroll', (e) => console.log(e));
+  mounted: function() {\
     let divEl = document.createElement('div');
     let tabsEl = document.querySelectorAll('.nav.nav-tabs');
 
