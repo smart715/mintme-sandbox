@@ -152,7 +152,6 @@ class DonationHandler implements DonationHandlerInterface
         if ($expectedAmount->greaterThan($minTokensAmount) && $sellOrdersSummary->greaterThanOrEqual($donationAmount)) {
             // Donate using donation viabtc API (token creator has available sell orders)
             if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency) {
-                // Конвертирует в минтми
                 $this->sendAmountFromUserToUser(
                     $donorUser,
                     // Sum of donation in any crypto (ETH, BTC)
