@@ -2,6 +2,8 @@
 
 namespace App\Admin\KnowledgeBase;
 
+use App\Admin\Traits\CheckContentLinksTrait;
+use App\Entity\KnowledgeBase\KnowledgeBase;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
@@ -15,8 +17,25 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class KnowledgeBaseAdmin extends AbstractAdmin
 {
+
+    use CheckContentLinksTrait;
+
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
+
+    /** {@inheritdoc} */
+    public function preUpdate($object): void
+    {
+        if ($object instanceof KnowledgeBase && preg_match('/<a (.*)>(.*)<\/a>/i', $object->getDescription())) {
+            $result = $this->addNoreferrerToLinks($object->getDescription());
+
+            if ($result['contentChanged']) {
+                $object->setDescription($result['content']);
+            }
+        }
+
+        parent::preUpdate($object);
+    }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
