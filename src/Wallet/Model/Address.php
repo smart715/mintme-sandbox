@@ -8,7 +8,7 @@ class Address
 {
     /**
      * @var string
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     private $address;
 
@@ -17,7 +17,7 @@ class Address
         if (!preg_match('/^\w+$/', $address)) {
             throw new \InvalidArgumentException('Incorrect address');
         }
-        
+
         $this->address = $address;
     }
 

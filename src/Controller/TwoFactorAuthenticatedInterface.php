@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-interface TwoFactorAuthenticatedController
+interface TwoFactorAuthenticatedInterface
 {
 
 }

@@ -40,6 +40,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const NOT_DEPLOYED = 'not-deployed';
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
+    public const TOKEN_SUBUNIT = 4;
 
     /**
      * @ORM\Id()
