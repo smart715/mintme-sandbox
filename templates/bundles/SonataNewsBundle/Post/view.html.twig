@@ -11,7 +11,11 @@
     {{ post.title }} | mintMe
 {% endspaceless %}
 {% endblock %}
-{% block metaDescription %}{{ post.abstract }}{% endblock %}
+
+{% block metaDescription %}
+    <meta property="og:description" content="{{ post.abstract }}">
+    <meta name="description" content="{{ post.abstract }}">
+{% endblock %}
 
 {% block contentClass %}blog{% endblock %}
 
