@@ -292,14 +292,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $base = $market->getBase();
         $quote = $market->getQuote();
 
-        if ($base instanceof Crypto && $quote instanceof Crypto && !$base->isExchangeble() ||
+        return
+            $base instanceof Crypto && $quote instanceof Crypto && !$base->isExchangeble() ||
             $base instanceof Crypto && $quote instanceof Crypto && !$quote->isTradable() ||
             $base instanceof Token && $base->isBlocked() ||
             $base instanceof Token && $quote instanceof Token ||
-            $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())) {
-            return false;
-        }
-
-        return true;
+            $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol());
     }
 }

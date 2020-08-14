@@ -54,10 +54,9 @@ class OrderbookController extends AbstractFOSRestController
      * @Rest\QueryParam(
      *     name="depth",
      *     requirements=@Assert\Range(min="0", max="101"),
-     *     default=101,
-     *     nullable=false,
+     *     nullable=true,
      *     description="Order depth (how many asks/bids records to show [1-101])",
-     *     allowBlank=false,
+     *     allowBlank=true,
      *     strict=true
      * )
      * @Rest\QueryParam(
@@ -97,11 +96,15 @@ Level 3 – Complete order book, no aggregation.",
             throw new ApiNotFoundException('Market pair not found');
         }
 
+        $depth =
+            !empty($request->get('depth')) ?
+            $request->get('depth') :
+            101;
+
         $orderDepth = $this->trader->getOrderDepth(
             $market,
             [
-                'limit' => (int)$request->get('depth'),
-                'interval' => '0',
+                'limit' => (int)$depth,
             ],
             true
         );
