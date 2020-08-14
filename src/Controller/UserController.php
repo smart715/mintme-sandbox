@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserController extends AbstractController implements TwoFactorAuthenticatedController
+class UserController extends AbstractController implements TwoFactorAuthenticatedInterface
 {
     /** @var UserManagerInterface */
     protected $userManager;
@@ -77,10 +77,10 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             : null;
 
         $passwordForm = $this->getPasswordForm($request, $keys);
-        
+
         return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
     }
-    
+
     /**
      * @Route("/referral-program", name="referral-program")
      */
@@ -242,7 +242,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
         return $this->redirectToRoute('settings');
     }
-    
+
     private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
     {
         /** @var User $user */
