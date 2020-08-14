@@ -14,9 +14,11 @@ class SafeHtmlExtension extends AbstractExtension
 
     public function __construct()
     {
-        $this->purifier = new HTMLPurifier(
-            HTMLPurifier_Config::createDefault()
-        );
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('HTML.TargetBlank', true);
+        $config->set('HTML.TargetNoreferrer', true);
+        $config->set('HTML.TargetNoopener', false);
+        $this->purifier = new HTMLPurifier($config);
     }
 
     public function getFilters(): array
