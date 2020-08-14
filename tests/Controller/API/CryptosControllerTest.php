@@ -14,11 +14,13 @@ class CryptosControllerTest extends WebTestCase
         $this->client->request('GET', '/api/cryptos/rates');
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(2, $res);
+        $this->assertCount(3, $res);
         $this->assertArrayHasKey('BTC', $res);
         $this->assertArrayHasKey('WEB', $res);
         $this->assertArrayHasKey('BTC', $res['BTC']);
         $this->assertArrayHasKey('USD', $res['BTC']);
+        $this->assertArrayHasKey('ETH', $res);
+        $this->assertArrayHasKey('ETH', $res['ETH']);
     }
 
     public function testGetBalance(): void

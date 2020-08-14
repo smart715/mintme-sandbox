@@ -23,9 +23,8 @@
             </div>
             <div class="card-body p-0">
                 <template v-if="ordersLoaded">
-                    <div class="table-responsive fixed-head-table mb-0">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table v-if="hasOrders"
-                            ref="table"
                             @row-clicked="orderClicked"
                             :items="tableData"
                             :fields="fields"

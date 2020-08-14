@@ -596,9 +596,18 @@ services:
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
 
+    App\Controller\Dev\API\User\WalletController:
+        arguments:
+            $withdrawExpirationTime: '%withdraw_expiration_time%'
+
     App\Manager\MarketStatusManager:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    monolog.formatter.unsubscribe:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%message%%\n"
 
     App\Exchange\Config\DeployCostConfig:
         arguments:
