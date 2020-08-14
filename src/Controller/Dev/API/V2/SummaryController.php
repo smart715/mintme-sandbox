@@ -84,13 +84,20 @@ class SummaryController extends AbstractFOSRestController
                     'last_price' => $marketStatusToday['last'],
                     'base_currency' => $rebrandedBaseSymbol,
                     'quote_currency' => $rebrandedQuoteSymbol,
-                    'lowest_ask' => $orderDepth['asks'] ? min($orderDepth['asks'])[0] : '',
-                    'highest_bid' => $orderDepth['bids'] ? max($orderDepth['bids'])[0] : '',
+                    'lowest_ask' => $orderDepth['asks'] ? (float)min($orderDepth['asks'])[0] : 0,
+                    'highest_bid' => $orderDepth['bids'] ? (float)max($orderDepth['bids'])[0] : 0,
                     'base_volume' => $marketStatusToday['deal'],
                     'quote_volume' => $marketStatusToday['volume'],
                     'price_change_percent_24h' =>
-                        $marketStatusToday['open'] ?
-                            ($marketStatusToday['last'] - $marketStatusToday['open']) * 100 / $marketStatusToday['open'] :
+                        '0' !== $marketStatusToday['open'] ?
+                            round(
+                                (
+                                    ($marketStatusToday['last'] - $marketStatusToday['open']) *
+                                    100 /
+                                    $marketStatusToday['open']
+                                ),
+                                2
+                            ) :
                             0,
                     'highest_price_24h' => $marketStatusToday['high'],
                     'lowest_price_24h' => $marketStatusToday['low'],

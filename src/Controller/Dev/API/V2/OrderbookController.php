@@ -2,10 +2,10 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Trade\TraderInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -24,13 +24,14 @@ class OrderbookController extends AbstractFOSRestController
     public const ARRANGED_BY_BEST = 2;
     public const NO_AGGREGATION = 3;
 
-    use BaseQuoteOrderTrait;
-
     /** @var TraderInterface */
     private $trader;
 
     /** @var MarketFinderInterface */
     private $marketFinder;
+
+    /** @var MarketStatusManagerInterface */
+    private $marketStatusManager;
 
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
@@ -38,11 +39,13 @@ class OrderbookController extends AbstractFOSRestController
     public function __construct(
         TraderInterface $trader,
         MarketFinderInterface $marketFinder,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        MarketStatusManagerInterface $marketStatusManager
     ) {
         $this->trader = $trader;
         $this->marketFinder = $marketFinder;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->marketStatusManager = $marketStatusManager;
     }
     /**
      * Get order book
@@ -50,9 +53,10 @@ class OrderbookController extends AbstractFOSRestController
      * @Rest\Get("/{base_quote}")
      * @Rest\QueryParam(
      *     name="depth",
-     *     requirements=@Assert\Range(min="1", max="101"),
+     *     requirements=@Assert\Range(min="0", max="101"),
+     *     default=101,
      *     nullable=false,
-     *     description="Order depth",
+     *     description="Order depth (how many asks/bids records to show [1-101])",
      *     allowBlank=false,
      *     strict=true
      * )
@@ -72,6 +76,9 @@ Level 3 – Complete order book, no aggregation.",
      *     description="Returns complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair."
      * )
      * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Parameter(name="base_quote", in="path", type="string")
+     * @SWG\Parameter(name="depth", in="query", type="integer")
+     * @SWG\Parameter(name="level", in="query", type="integer")
      * @SWG\Tag(name="Open")
      * @Security(name="")
      */
@@ -86,18 +93,17 @@ Level 3 – Complete order book, no aggregation.",
 
         $market = $this->marketFinder->find($base, $quote);
 
-        if (is_null($market)) {
+        if (is_null($market) || !$this->marketStatusManager->isValid($market)) {
             throw new ApiNotFoundException('Market pair not found');
         }
-
-        $this->fixBaseQuoteOrder($market);
 
         $orderDepth = $this->trader->getOrderDepth(
             $market,
             [
                 'limit' => (int)$request->get('depth'),
                 'interval' => '0',
-            ]
+            ],
+            true
         );
 
         $level = $request->get('level');
@@ -106,8 +112,8 @@ Level 3 – Complete order book, no aggregation.",
             $orderDepth['asks'] = max($orderDepth['asks']);
             $orderDepth['bids'] = min($orderDepth['bids']);
         } elseif (self::ARRANGED_BY_BEST == $level) {
-            rsort($orderDepth['asks']);
-            sort($orderDepth['bids']);
+            sort($orderDepth['asks']);
+            rsort($orderDepth['bids']);
         }
 
         $date = new DateTimeImmutable();

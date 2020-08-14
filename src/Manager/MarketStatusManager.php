@@ -2,14 +2,13 @@
 
 namespace App\Manager;
 
+use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\MarketInfo;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\Common\Collections\Criteria;
@@ -286,5 +285,21 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol()
         );
+    }
+
+    public function isValid(Market $market): bool
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        if ($base instanceof Crypto && $quote instanceof Crypto && !$base->isExchangeble() ||
+            $base instanceof Crypto && $quote instanceof Crypto && !$quote->isTradable() ||
+            $base instanceof Token && $base->isBlocked() ||
+            $base instanceof Token && $quote instanceof Token ||
+            $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())) {
+            return false;
+        }
+
+        return true;
     }
 }

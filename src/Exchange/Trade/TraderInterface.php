@@ -18,5 +18,5 @@ interface TraderInterface
     public function getPendingOrders(User $user, Market $market, array $filterOptions = []): array;
 
     /** @return array */
-    public function getOrderDepth(Market $market, array $filterOptions = []): array;
+    public function getOrderDepth(Market $market, array $filterOptions = [], bool $baseFirst = false): array;
 }
