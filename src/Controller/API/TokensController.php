@@ -4,7 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
 use App\Controller\Traits\CheckTokenNameBlacklistTrait;
-use App\Controller\TwoFactorAuthenticatedController;
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -50,7 +50,7 @@ use Throwable;
 /**
  * @Rest\Route("/api/tokens")
  */
-class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
+class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
 
     use CheckTokenNameBlacklistTrait;
