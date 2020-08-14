@@ -2,7 +2,7 @@
 
 namespace App\Controller\API;
 
-use App\Controller\TwoFactorAuthenticatedController;
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @Rest\Route("/api/users")
  */
-class UsersController extends AbstractFOSRestController implements TwoFactorAuthenticatedController
+class UsersController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
     /** @var UserManagerInterface */
     protected $userManager;

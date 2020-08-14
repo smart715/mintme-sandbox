@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Controller\TwoFactorAuthenticatedController;
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 use InvalidArgumentException;
@@ -53,7 +53,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
-        if (!is_array($controller) || !$controller[0] instanceof TwoFactorAuthenticatedController) {
+        if (!is_array($controller) || !$controller[0] instanceof TwoFactorAuthenticatedInterface) {
             return;
         }
 
