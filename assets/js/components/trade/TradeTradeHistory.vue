@@ -49,8 +49,10 @@
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
                                         </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -65,8 +67,11 @@
                                             :src="row.item.takerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}"
+                                            >
+                                                {{ row.value }}
+                                            </span>
                                         </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
