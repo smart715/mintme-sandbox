@@ -38,15 +38,18 @@
                                         <a
                                             :href="row.item.traderUrl"
                                             class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white"
-                                            v-b-tooltip="popoverConfig"
-                                            v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                         >
                                             <img
                                                 :src="row.item.traderAvatar"
                                                 class="rounded-circle d-block flex-grow-0 pointer-events-none mr-1"
                                                 alt="avatar">
-                                            <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
-                                                {{ row.value }}
+                                            <span class="d-inline-block truncate-name flex-grow-1">
+                                                <span
+                                                    v-b-tooltip="popoverConfig"
+                                                    v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                                >
+                                                    {{ row.value }}
+                                                </span>
                                             </span>
                                         </a>
                                     </div>
