@@ -84,15 +84,16 @@ Level 3 – Complete order book, no aggregation.",
     public function getOrderbook(ParamFetcherInterface $request, string $base_quote): array
     {
         $marketPair = explode('_', $base_quote);
+
         $base = $marketPair[0] ?? '';
         $quote = $marketPair[1] ?? '';
 
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($base));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($quote));
+        $base = $this->rebrandingConverter->reverseConvert($base);
+        $quote = $this->rebrandingConverter->reverseConvert($quote);
 
         $market = $this->marketFinder->find($base, $quote);
 
-        if (is_null($market) || !$this->marketStatusManager->isValid($market)) {
+        if (!$market || !$this->marketStatusManager->isValid($market)) {
             throw new ApiNotFoundException('Market pair not found');
         }
 
