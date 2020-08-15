@@ -14,8 +14,8 @@ export default {
             return {
                 title: this.tooltipContent,
                 html: true,
-                boundary: 'viewport',
-                customClass: 'tooltip-traders',
+                boundary: 'window',
+                customClass: 'tooltip-traders tooltip-custom',
                 delay: 0,
             };
         },
