@@ -150,11 +150,11 @@ export default {
             showEndDate: false,
             tokensAmount: null,
             participantsAmount: null,
-            endDate: moment().add(1, 'hours').hours(),
+            endDate: moment().add(1, 'hours').toDate(),
             options: {
                 format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
-                minDate: moment().add(1, 'hours').hours(),
+                minDate: moment().add(1, 'hours').toDate(),
             },
             errorMessage: '',
             precision: TOK.subunit,
@@ -350,7 +350,7 @@ export default {
 
             this.tokensAmount = 100;
             this.participantsAmount = 100;
-            this.endDate = moment().add(30, 'days').toDate();
+            this.endDate = moment().add(1, 'hours').toDate();
         },
         checkInput: function(precision) {
             let selectionStart = event.target.selectionStart;
