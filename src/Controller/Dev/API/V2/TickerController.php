@@ -71,11 +71,11 @@ class TickerController extends AbstractFOSRestController
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
                 $this->fixBaseQuoteOrder($market);
 
-                $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
-                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());
-
                 $base = $market->getBase();
                 $quote = $market->getQuote();
+
+                $rebrandedBaseSymbol = $this->rebrandingConverter->convert($base->getSymbol());
+                $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
 
                 $isFrozen = 1;
 
