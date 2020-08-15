@@ -7,6 +7,7 @@ use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -34,16 +35,21 @@ class TradesController extends AbstractFOSRestController
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    /** @var MarketStatusManagerInterface */
+    private $marketStatusManager;
+
     public function __construct(
         MarketFinderInterface $marketFinder,
         RebrandingConverterInterface $rebrandingConverter,
         MarketHandlerInterface $marketHandler,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        MarketStatusManagerInterface $marketStatusManager
     ) {
         $this->marketFinder = $marketFinder;
         $this->rebrandingConverter = $rebrandingConverter;
         $this->marketHandler = $marketHandler;
         $this->moneyWrapper = $moneyWrapper;
+        $this->marketStatusManager = $marketStatusManager;
     }
 
     /**
@@ -71,7 +77,7 @@ class TradesController extends AbstractFOSRestController
 
         $market = $this->marketFinder->find($base, $quote);
 
-        if (!$market) {
+        if (!$market || !$this->marketStatusManager->isValid($market)) {
             throw new ApiNotFoundException('Market pair not found');
         }
 

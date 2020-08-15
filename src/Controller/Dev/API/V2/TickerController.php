@@ -69,6 +69,7 @@ class TickerController extends AbstractFOSRestController
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+
                 $this->fixBaseQuoteOrder($market);
 
                 $base = $market->getBase();
@@ -77,14 +78,12 @@ class TickerController extends AbstractFOSRestController
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($base->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
 
-                $isFrozen = 1;
-
-                if ($base instanceof Crypto && !$base->isTradable() ||
+                $isFrozen =
+                    $base instanceof Crypto && !$base->isTradable() ||
                     $quote instanceof Crypto && !$quote->isExchangeble() ||
                     $base instanceof Token && $base->isBlocked() ||
-                    $quote instanceof Token && $quote->isBlocked()) {
-                    $isFrozen = 0;
-                }
+                    $quote instanceof Token && $quote->isBlocked() ?
+                    0 : 1;
 
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
                     'base_id' => $market->getBase()->getId(),
