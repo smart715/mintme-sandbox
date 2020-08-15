@@ -2,7 +2,7 @@
 
 namespace App\Tests\EventSubscriber;
 
-use App\Controller\TwoFactorAuthenticatedController;
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
 use App\EventSubscriber\TwoFactorSubscriber;
 use App\Manager\TwoFactorManagerInterface;
@@ -229,7 +229,7 @@ class TwoFactorSubscriberTest extends TestCase
     {
         $event = $this->createMock(FilterControllerEvent::class);
         $event->method('getController')->willReturn(
-            [$this->createMock(TwoFactorAuthenticatedController::class)]
+            [$this->createMock(TwoFactorAuthenticatedInterface::class)]
         );
         $request = $this->createMock(Request::class);
         $request->method('get')->willReturn($code);

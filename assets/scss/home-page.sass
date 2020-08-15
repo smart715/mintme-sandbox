@@ -80,11 +80,15 @@
   .btn-ghost
     border-color: $dark-white
     background: transparent
-    color: $dark-white
+    color: $dark-white !important
     transition: all .3s ease
-    &:hover
-      background: $dark-white
-      color: $secondary
+    @media (hover: hover)
+      &:hover
+        color: $secondary !important
+        background-color: $dark-white !important
+    @media (hover: none)
+      background-color: $secondary-dark !important
+      border-color: $dark-white !important
     &.ghost-alt
       &:hover
         color: $primary-light

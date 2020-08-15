@@ -10,6 +10,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
@@ -107,7 +108,8 @@ class TokenController extends Controller
         string $name,
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter,
-        AirdropCampaignManagerInterface $airdropCampaignManager
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        LimitOrderConfig $orderConfig
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -178,6 +180,7 @@ class TokenController extends Controller
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
+            'taker_fee' => $orderConfig->getTakerFeeRate(),
         ]);
     }
 
