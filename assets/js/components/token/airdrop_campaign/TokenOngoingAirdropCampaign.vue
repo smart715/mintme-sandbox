@@ -15,7 +15,7 @@
                     <span
                         v-if="showEndDate"
                         class="m-0 message">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}.
+                        Airdrop ends on {{ endsDate }} at {{ endsTime }}({{ duration }}).
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
@@ -82,6 +82,9 @@ export default {
     },
     mounted: function() {
         this.getAirdropCampaign();
+        setInterval(() => {
+            this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+        }, 1000);
     },
     computed: {
         actualParticipants: function() {
@@ -105,6 +108,13 @@ export default {
         },
         endsTime: function() {
             return moment(this.airdropCampaign.endDate).format('HH:mm');
+        },
+        endsDateTime: function() {
+            return moment(this.airdropCampaign.endDate.format('D MMMM YYYY HH:mm:ss'));
+        },
+        duration: function() {
+            return moment.duration(moment().diff(this.endsDateTime), 'milliseconds', true);
+            // return moment.duration(moment().diff(this.endsDateTime)).asDays().format('HH:mm:ss');
         },
         confirmButtonText: function() {
             let button = '';
