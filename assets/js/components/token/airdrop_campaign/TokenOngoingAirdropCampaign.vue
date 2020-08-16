@@ -101,7 +101,7 @@ export default {
             return null !== this.airdropCampaign.endDate && '' !== this.airdropCampaign.endDate;
         },
         endsDate: function() {
-            return moment(this.airdropCampaign.endDate).format('D MMMM YYYY');
+            return moment(this.airdropCampaign.endDate).format('Do MMMM YYYY');
         },
         endsTime: function() {
             return moment(this.airdropCampaign.endDate).format('HH:mm');
