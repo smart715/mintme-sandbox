@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% if token.image is not null %}
+{% if isTokenPage and token.image is not null %}
     {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
 {% endif %}
 

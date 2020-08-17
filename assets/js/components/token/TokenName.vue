@@ -40,14 +40,14 @@
                 @click="editToken"
             />
         </template>
-        <span v-if="shouldTruncate"
-              class="current-token-name"
+        <h1 v-if="shouldTruncate"
+              class="h2 current-token-name"
               v-b-tooltip="{title: currentName, boundary:'viewport'}">
             {{ currentName | truncate(maxLengthToTruncate) }}
-        </span>
-        <span v-else class="current-token-name">
+        </h1>
+        <h1 v-else class="h2 current-token-name">
             {{ currentName }}
-        </span>
+        </h1>
     </div>
 </template>
 
