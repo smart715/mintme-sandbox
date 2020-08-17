@@ -114,7 +114,7 @@ export default {
             return moment(this.airdropCampaign.endDate).format('D MMMM YYYY HH:mm:ss');
         },
         duration: function() {
-            let now  = moment();
+            let now = moment();
             return moment.duration(moment(now).diff(this.endsDateTime), 'milliseconds', true);
             // return moment.duration(moment().diff(this.endsDateTime)).asDays().format('HH:mm:ss');
         },
