@@ -58,6 +58,10 @@ new Vue({
 
     this.postFromUrl = (/(?:posts#)(\d+)/g.exec(window.location.href) || [])[1] || null;
     if (this.postFromUrl !== null) {
+        // Prevent browser from restoring previous scroll height (if page was raloaded)
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
         document.getElementById(this.postFromUrl).scrollIntoView();
     }
 
