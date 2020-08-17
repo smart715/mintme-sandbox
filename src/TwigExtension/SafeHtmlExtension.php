@@ -2,6 +2,7 @@
 
 namespace App\TwigExtension;
 
+use App\Admin\Traits\CheckContentLinksTrait;
 use HTMLPurifier;
 use HTMLPurifier_Config;
 use Twig\Extension\AbstractExtension;
@@ -9,16 +10,17 @@ use Twig\TwigFilter;
 
 class SafeHtmlExtension extends AbstractExtension
 {
+
+    use CheckContentLinksTrait;
+
     /** @var HTMLPurifier */
     private $purifier;
 
     public function __construct()
     {
-        $config = HTMLPurifier_Config::createDefault();
-        $config->set('HTML.TargetBlank', true);
-        $config->set('HTML.TargetNoreferrer', true);
-        $config->set('HTML.TargetNoopener', false);
-        $this->purifier = new HTMLPurifier($config);
+        $this->purifier = new HTMLPurifier(
+            HTMLPurifier_Config::createDefault()
+        );
     }
 
     public function getFilters(): array
@@ -30,6 +32,16 @@ class SafeHtmlExtension extends AbstractExtension
 
     public function doSafeHtml(string $value): ?string
     {
-        return $this->purifier->purify($value);
+        $purifiedValue = $this->purifier->purify($value);
+
+        if ($purifiedValue && preg_match('/<a (.*)>(.*)<\/a>/i', $purifiedValue)) {
+            $result = $this->addNoreferrerToLinks($purifiedValue);
+
+            if ($result['contentChanged']) {
+                return $result['content'];
+            }
+        }
+
+        return $purifiedValue;
     }
 }
