@@ -70,8 +70,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
             }
             $airdrop->setEndDate($endDate);
         }
-
-
+        
         $reward = $this->getAirdropReward($airdrop);
         $lockedAmount = $reward->multiply($participants);
         $airdrop->setLockedAmount($lockedAmount);
