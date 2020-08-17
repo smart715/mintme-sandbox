@@ -2,8 +2,6 @@
 
 namespace App\Admin;
 
-use App\Admin\Traits\CheckContentLinksTrait;
-use App\Entity\News\Post;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\NewsBundle\Admin\PostAdmin as PostAdminBase;
@@ -11,9 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class PostAdmin extends PostAdminBase
 {
-
-    use CheckContentLinksTrait;
-
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
 
@@ -29,20 +24,6 @@ class PostAdmin extends PostAdminBase
         // name of the ordered field (default = the model's id field, if any)
         '_sort_by' => 'publicationDateStart',
     ];
-
-    /** {@inheritdoc} */
-    public function preUpdate($object): void
-    {
-        if ($object instanceof Post && preg_match('/<a (.*)>(.*)<\/a>/i', $object->getRawContent())) {
-            $result = $this->addNoreferrerToLinks($object->getRawContent());
-
-            if ($result['contentChanged']) {
-                $object->setRawContent($result['content']);
-            }
-        }
-
-        parent::preUpdate($object);
-    }
 
     protected function configureFormFields(FormMapper $formMapper): void
     {
