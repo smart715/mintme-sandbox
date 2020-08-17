@@ -15,7 +15,8 @@
                     <span
                         v-if="showEndDate"
                         class="m-0 message">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}({{ duration }}).
+                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
+                        ({{ duration.days() }}{{ duration.hours() }}{{ duration.minutes() }}{{ duration.seconds() }}).
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
@@ -113,7 +114,8 @@ export default {
             return moment(this.airdropCampaign.endDate).format('D MMMM YYYY HH:mm:ss');
         },
         duration: function() {
-            return moment.duration(moment(moment()).diff(this.endsDateTime), 'milliseconds', true);
+            let now  = moment();
+            return moment.duration(moment(now).diff(this.endsDateTime), 'milliseconds', true);
             // return moment.duration(moment().diff(this.endsDateTime)).asDays().format('HH:mm:ss');
         },
         confirmButtonText: function() {
