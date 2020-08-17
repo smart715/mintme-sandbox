@@ -106,8 +106,10 @@ export const MINTME = {
 };
 
 export const sanitizeOptions = {
-    allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p'],
+    allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p', 'iframe', 'div'],
     allowedAttributes: {
+        'iframe': ['height', 'width', 'allow', 'frameborder', 'src', 'allowfullscreen', 'class'],
+        'div': ['class'],
         'ul': ['class'],
         'img': ['style', 'src'],
         'a': ['href', 'rel', 'target'],
