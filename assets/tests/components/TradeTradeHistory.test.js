@@ -170,7 +170,7 @@ describe('TradeTradeHistory', () => {
     describe('should compute shouldTruncate correctly', () => {
         it('when truncate isn\'t necessary', () => {
             const localVue = mockVue();
-            propsForTestCorrectlyRenders.market.quote.symbol = '1234';
+            propsForTestCorrectlyRenders.market.quote.symbol = '12345678901234567';
             const wrapper = shallowMount(TradeTradeHistory, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
@@ -179,7 +179,7 @@ describe('TradeTradeHistory', () => {
         });
         it('when truncate is necessary', () => {
             const localVue = mockVue();
-            propsForTestCorrectlyRenders.market.quote.symbol = '12345';
+            propsForTestCorrectlyRenders.market.quote.symbol = '123456789012345678';
             const wrapper = shallowMount(TradeTradeHistory, {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,

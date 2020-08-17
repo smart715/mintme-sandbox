@@ -5,9 +5,8 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-if="shouldTruncate"
-                          v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'window', customClass:'tooltip-custom'}">
-                        {{ market.quote | rebranding | truncate(12) }}
+                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                        {{ market.quote | rebranding | truncate(17) }}
                     </span>
                     <span v-else>
                         {{ market.quote | rebranding }}
@@ -131,7 +130,7 @@ export default {
     },
     computed: {
         shouldTruncate: function() {
-            return this.market.quote.symbol.length > 12;
+            return this.market.quote.symbol.length > 17;
         },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
