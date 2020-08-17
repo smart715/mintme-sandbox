@@ -5,7 +5,19 @@ namespace App\Admin\Traits;
 trait CheckContentLinksTrait
 {
     /** @var array<string> $domainsToSkip */
-    public static $domainsToSkip = ['mintme.com', 'coinimp.com', 'webchain.network', 'cba.pl', 'zzz.com.ua'];
+    public static $domainsToSkip = [
+        'mintme.com', 'www.mintme.com',
+        'coinimp.com', 'www.coinimp.com',
+        'cba.pl', 'www.cba.pl',
+        'zzz.com.ua', 'www.zzz.com.ua',
+        'zz.com.ve', 'www.zz.com.ve',
+        'aba.ae', 'www.aba.ae',
+        'for.ug', 'www.for.ug',
+        'lea.com.mx', 'www.lea.com.mx',
+        'hit.ng', 'www.hit.ng',
+        'server.trading', 'www.server.trading',
+        'webchain.network', 'www.webchain.network',
+    ];
 
     public function addNoreferrerToLinks(string $content): array
     {
