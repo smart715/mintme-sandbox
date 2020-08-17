@@ -129,6 +129,11 @@ describe('TokenIntroductionDescription', () => {
         });
         wrapper.vm.newDescription = 'f';
         wrapper.vm.editDescription();
+
+        moxios.stubRequest('token_update', {
+            status: 202, responseText: {data: {newDescription: 'f'}},
+        });
+
         expect(wrapper.emitted('errormessage').length).toBe(1);
     });
 
@@ -144,11 +149,13 @@ describe('TokenIntroductionDescription', () => {
 
         moxios.stubRequest('token_update', {
             status: 202,
+            response: {newDescription: 'foo'},
         });
 
         moxios.wait(() => {
             expect(wrapper.emitted('updated').length).toBe(1);
             expect(wrapper.vm.editingDescription).toBe(false);
+            expect(wrapper.vm.newDescription).toBe('foo');
             expect(wrapper.vm.icon).toBe('edit');
             done();
         });
