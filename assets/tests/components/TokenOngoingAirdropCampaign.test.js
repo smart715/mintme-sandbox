@@ -82,7 +82,7 @@ describe('TokenOngoingAirdropCampaign', () => {
             },
         });
 
-        expect(wrapper.vm.endsDate).toBe(moment(dateNow).format('D MMMM YYYY'));
+        expect(wrapper.vm.endsDate).toBe(moment(dateNow).format('Do MMMM YYYY'));
         expect(wrapper.vm.endsTime).toBe(moment(dateNow).format('HH:mm'));
     });
 
