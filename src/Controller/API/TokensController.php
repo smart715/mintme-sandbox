@@ -142,7 +142,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $form->submit(array_filter($request->all(), function ($value) {
             return null !== $value;
         }), false);
-
+        
         if (!$form->isValid()) {
             foreach ($form->all() as $childForm) {
                 /** @var FormError[] $fieldErrors */
@@ -155,12 +155,19 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
             throw new ApiBadRequestException('Invalid argument');
         }
-
+        
         $this->em->persist($token);
         $this->em->flush();
 
         $this->userActionLogger->info('Change token info', $request->all());
 
+        if ($request->get('description')) {
+            return $this->view(
+                ['tokenName' => $token->getName(), 'newDescription' => $token->getDescription()],
+                Response::HTTP_ACCEPTED
+            );
+        }
+        
         return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
 
