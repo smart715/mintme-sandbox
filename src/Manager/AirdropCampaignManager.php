@@ -68,8 +68,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
                 $newEndDate = new \DateTimeImmutable('+1 hour');
                 $airdrop->setEndDate($newEndDate);
             }
-
-            $airdrop->setEndDate($endDate);
+            else($airdrop->setEndDate($endDate));
         }
 
         $reward = $this->getAirdropReward($airdrop);
