@@ -160,6 +160,7 @@ export default {
                 needToCheckCode: false,
             })
                 .then((response) => {
+                    this.newDescription = response.data.newDescription;
                     this.$emit('updated', this.newDescription);
                 }, (error) => {
                     this.readyToSave = true;
