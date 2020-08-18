@@ -119,6 +119,12 @@ const markitupSet = {
             before: '[p]',
             after: '[/p]\n',
         },
+        {
+          name: 'YouTube',
+          icon: 'indent',
+          before: '[yt]',
+          after: '[/yt]',
+        },
     ],
 };
 

@@ -52,7 +52,7 @@ describe('BbcodeView', () => {
     it('parse bbcode not allowed tags', () => {
         const wrapper = shallowMount(BbcodeView, {
             localVue: mockVue(),
-            propsData: {value: '<div>bar</div>'},
+            propsData: {value: '<button>bar</button>'},
         });
 
         expect(wrapper.vm.parsedValue).toBe('bar');
