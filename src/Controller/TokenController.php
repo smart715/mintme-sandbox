@@ -146,7 +146,9 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
-        $tokenDescription = $token->getDescription() ?? '';
+        $tokenDescription = $token->getDescription() ?: '';
+        $tokenDescription =  '' != $tokenDescription? $token->getDescription()
+            : 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
         $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',

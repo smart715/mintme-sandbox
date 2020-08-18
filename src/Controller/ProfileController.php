@@ -129,6 +129,7 @@ class ProfileController extends Controller
             '\2',
             $profileDescription
         ) ?? '';
+        $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
         return $this->render('pages/profile.html.twig', [
             'token' => $profile->getToken(),
