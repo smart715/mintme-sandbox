@@ -15,7 +15,7 @@
             </div>
             <div class="card-body">
                 <div class="row fix-height custom-scrollbar">
-                    <div class="col-12">
+                    <div class="col-12 overflow-y-hidden">
                         <span class="card-header-icon">
                             <font-awesome-icon
                                 v-if="showEditIcon"
@@ -203,4 +203,3 @@ export default {
         white-space: pre-line
         word-break: break-word
 </style>
-
