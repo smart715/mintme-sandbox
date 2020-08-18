@@ -7,6 +7,8 @@ parameters:
     router.request_context.base_url: ''
     asset.request_context.base_path: '%router.request_context.base_url%'
     old_sound_rabbit_mq.consumer.class: 'App\RabbitMq\Consumer'
+    container.dumper.inline_factories: true
+    container.dumper.inline_class_loader: true
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
