@@ -16,7 +16,7 @@
                         v-if="showEndDate"
                         class="m-0 message">
                         Airdrop ends on {{ endsDate }} at {{ endsTime }}
-                        ({{ duration.days() }}{{ duration.hours() }}{{ duration.minutes() }}{{ duration.seconds() }}).
+                        ({{ duration.days() }}d {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">

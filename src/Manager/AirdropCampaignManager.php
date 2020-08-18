@@ -20,7 +20,7 @@ use Money\Money;
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
     private const AIRDROP_REWARD_PRECISION = 4;
-    private const ONE_HOUR_IN_MILLISEC = 86400000;
+    private const ONE_HOUR_IN_MILLISEC = 3600000;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -68,7 +68,9 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
                 $newEndDate = new \DateTimeImmutable('+1 hour');
                 $airdrop->setEndDate($newEndDate);
             }
-            else($airdrop->setEndDate($endDate));
+            else{
+                $airdrop->setEndDate($endDate);
+            };
         }
 
         $reward = $this->getAirdropReward($airdrop);
