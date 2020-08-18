@@ -110,7 +110,7 @@ Level 3 – Complete order book, no aggregation.",
             true
         );
 
-        $level = $request->get('level');
+        $level = (int)$request->get('level');
 
         if (self::ONLY_BEST === $level) {
             $orderDepth['asks'] = max($orderDepth['asks']);
