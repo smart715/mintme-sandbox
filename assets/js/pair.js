@@ -63,18 +63,17 @@ new Vue({
         this.notifySuccess('Token has been created successfully');
     }
 
-    let self = this;
     let tokenName = this.tokenName;
     tokenName = tokenName.replace(/\s/g, '-');
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
-        introLink.href = self.$routing.generate('token_show', {name: tokenName, tab: self.tabs[0]});
+        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = self.$routing.generate('token_show', {name: tokenName, tab: self.tabs[1]});
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
         let donateLink = document.querySelectorAll('a.token-donate-tab-link')[0];
-        donateLink.href = self.$routing.generate('token_show', {name: tokenName, tab: self.tabs[2]});
+        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = self.$routing.generate('token_show', {name: tokenName, tab: self.tabs[3]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
     });
   },
   methods: {
