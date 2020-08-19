@@ -32,14 +32,21 @@ trait CheckContentLinksTrait
             if (is_array($urlComponents) && isset($urlComponents['host'])
                 && in_array($urlComponents['host'], self::$domainsToSkip)
             ) {
+                if ($item->hasAttribute('rel') || $item->hasAttribute('target')) {
+                    $initialLinkText = $dom->saveHTML($item);
+                    $item->removeAttribute('rel', 'noreferrer');
+                    $item->removeAttribute('target', '_blank');
+                    $changedLinkText = $dom->saveHTML($item);
+
+                    $content = str_replace((string)$initialLinkText, (string)$changedLinkText, $content);
+                    $contentChanged = true;
+                }
                 continue;
             }
 
             $initialLinkText = $dom->saveHTML($item);
-
             $item->setAttribute('rel', 'noreferrer');
             $item->setAttribute('target', '_blank');
-
             $changedLinkText = $dom->saveHTML($item);
 
             $content = str_replace((string)$initialLinkText, (string)$changedLinkText, $content);
