@@ -126,6 +126,7 @@ export const ourDomains = [
     'aba.ae',
     'for.ug',
     'lea.com.mx',
+    'lea.mx',
     'hit.ng',
     'server.trading',
     'webchain.network',

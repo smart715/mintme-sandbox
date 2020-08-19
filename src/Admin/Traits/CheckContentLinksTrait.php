@@ -14,6 +14,7 @@ trait CheckContentLinksTrait
         'aba.ae', 'www.aba.ae',
         'for.ug', 'www.for.ug',
         'lea.com.mx', 'www.lea.com.mx',
+        'lea.mx', 'www.lea.mx',
         'hit.ng', 'www.hit.ng',
         'server.trading', 'www.server.trading',
         'webchain.network', 'www.webchain.network',
