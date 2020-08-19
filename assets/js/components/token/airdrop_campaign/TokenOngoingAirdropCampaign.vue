@@ -116,7 +116,6 @@ export default {
         duration: function() {
             let now = moment();
             return moment.duration(moment(now).diff(this.endsDateTime), 'milliseconds', true);
-            // return moment.duration(moment().diff(this.endsDateTime)).asDays().format('HH:mm:ss');
         },
         confirmButtonText: function() {
             let button = '';
