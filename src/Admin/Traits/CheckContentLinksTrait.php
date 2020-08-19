@@ -34,13 +34,14 @@ trait CheckContentLinksTrait
             ) {
                 if ($item->hasAttribute('rel') || $item->hasAttribute('target')) {
                     $initialLinkText = $dom->saveHTML($item);
-                    $item->removeAttribute('rel', 'noreferrer');
-                    $item->removeAttribute('target', '_blank');
+                    $item->removeAttribute('rel');
+                    $item->removeAttribute('target');
                     $changedLinkText = $dom->saveHTML($item);
 
                     $content = str_replace((string)$initialLinkText, (string)$changedLinkText, $content);
                     $contentChanged = true;
                 }
+
                 continue;
             }
 
