@@ -78,7 +78,7 @@ describe('Post', () => {
                 loggedIn: true,
             },
         });
-        console.log(wrapper.find('p').html());
+
         expect(wrapper.find('p').html()).toContain('To see this post you need to have <a href="#">0 tok</a> in your balance. Visit trade page and create buy order to get required tokens.');
     });
 
