@@ -128,6 +128,7 @@ export const ourDomains = [
     'lea.com.mx',
     'lea.mx',
     'hit.ng',
+    'hosting7.eu',
     'server.trading',
     'webchain.network',
 ];

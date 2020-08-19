@@ -16,6 +16,7 @@ trait CheckContentLinksTrait
         'lea.com.mx', 'www.lea.com.mx',
         'lea.mx', 'www.lea.mx',
         'hit.ng', 'www.hit.ng',
+        'hosting7.eu', 'www.hosting7.eu',
         'server.trading', 'www.server.trading',
         'webchain.network', 'www.webchain.network',
     ];
