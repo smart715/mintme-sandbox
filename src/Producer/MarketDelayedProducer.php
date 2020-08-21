@@ -47,7 +47,7 @@ class MarketDelayedProducer extends Producer
             false,
             false,
             false,
-            ['x-delayed-type' => 'fanout'],
+            ['x-delayed-type' => ['s', 'fanout']],
         );
 
         $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_DELAYED_EXCHANGE_NAME);

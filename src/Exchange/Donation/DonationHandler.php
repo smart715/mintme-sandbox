@@ -97,22 +97,32 @@ class DonationHandler implements DonationHandlerInterface
         User $donorUser,
         string $sellOrdersSummary
     ): void {
+        // Sum of danation in any crypto (MINTME, BTC, ETH)
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
+
+        // Check if user has enough balance
         $this->checkAmount($donorUser, $amountObj, $currency);
+
         /** @var Token $token */
         $token = $market->getQuote();
         /** @var User tokenCreator */
         $tokenCreator = $token->getProfile()->getUser();
 
+        // Summary in MINTME of all sell orders
         $sellOrdersSummary = $this->moneyWrapper->parse($sellOrdersSummary, Token::WEB_SYMBOL);
+
+        // Amount of tokens which user receive after donation
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
         $minTokensAmount = $this->donationConfig->getMinTokensAmount();
+
         $donationAmount = $amountObj;
 
         if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency) {
+            // Convert sum of donation in any Crypto to MINTME
             $donationAmount = $this->getCryptoWorthInMintme($donationAmount, $currency);
         }
 
+        // Check how many tokens will recieve user and how many MINTME he should spend
         $checkDonationResult = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
             $this->moneyWrapper->format($donationAmount),
@@ -124,6 +134,12 @@ class DonationHandler implements DonationHandlerInterface
             $checkDonationResult->getExpectedTokens(),
             Token::WEB_SYMBOL
         );
+
+        $tokensWorthInMintme = $this->moneyWrapper->parse(
+            $checkDonationResult->getTokensWorth(),
+            Token::WEB_SYMBOL
+        );
+        $tokensWorthInMintmeWithFee = $tokensWorthInMintme->divide(1 + floatval($this->donationConfig->getFee()));
 
         // Check expected tokens amount.
         if (!$currentExpectedAmount->equals($expectedAmount)) {
@@ -138,8 +154,10 @@ class DonationHandler implements DonationHandlerInterface
             if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency) {
                 $this->sendAmountFromUserToUser(
                     $donorUser,
+                    // Sum of donation in any crypto (ETH, BTC)
                     $amountObj,
                     $donorUser,
+                    // Sum of donation in MINTME
                     $donationAmount,
                     $currency,
                     Token::WEB_SYMBOL
@@ -156,14 +174,11 @@ class DonationHandler implements DonationHandlerInterface
             );
 
             if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency) {
-                $donationAmountFee = $this->calculateFee($donationAmount);
-                $approxAmountTokenCreatorShouldReceive = $donationAmount->subtract($donationAmountFee);
-
                 $this->sendAmountFromUserToUser(
                     $tokenCreator,
-                    $approxAmountTokenCreatorShouldReceive,
+                    $tokensWorthInMintmeWithFee,
                     $tokenCreator,
-                    $this->getMintmeWorthInCrypto($approxAmountTokenCreatorShouldReceive, $currency),
+                    $this->getMintmeWorthInCrypto($tokensWorthInMintmeWithFee, $currency),
                     Token::WEB_SYMBOL,
                     $currency
                 );

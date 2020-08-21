@@ -16,7 +16,19 @@
                     no-sort-reset
                 >
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                        <div v-if="row.value.full.length <= 7">
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
+                        </div>
+                        <div v-else v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
                             <span v-if="row.item.blocked && !row.item.isCryptoMarket">
                                 <span class="text-muted">
                                     {{ row.value.truncate }}

@@ -80,7 +80,9 @@
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span v-if="shouldTruncate" v-b-tooltip:title="market.quote.symbol" class="d-inline-block ml-1">
+                            <span v-if="shouldTruncate"
+                                  v-b-tooltip="{title:market.quote.symbol, boundary: 'window', customClass: 'tooltip-custom'}"
+                                  class="d-inline-block ml-1">
                                 {{ market.quote | rebranding | truncate(17) }}
                             </span>
                             <span v-else class="d-inline-block ml-1">
