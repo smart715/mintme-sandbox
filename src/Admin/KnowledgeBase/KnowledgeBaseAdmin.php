@@ -24,7 +24,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     public $supportsPreviewMode = true;
 
     /** {@inheritdoc} */
-    public function preUpdate($object): void
+    public function preValidate($object): void
     {
         if ($object instanceof KnowledgeBase && preg_match('/<a (.*)>(.*)<\/a>/i', $object->getDescription())) {
             $result = $this->addNoreferrerToLinks($object->getDescription());
