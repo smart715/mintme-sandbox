@@ -191,27 +191,47 @@
                             </template>
                             <template v-slot:cell(pair)="row">
                                 <div>
-                                    <a :href="row.item.tokenUrl" class="text-white text-decoration-none token-link"
-                                       :disabled.sync="row.value.length <= 20"
-                                       v-b-tooltip.hover :title="row.value">
-                                <span v-if="showFullPair(row.value)">
-                                    <avatar
-                                            :image="row.item.baseImage"
-                                            type="token"
-                                            size="small" :symbol="row.item.base"
-                                            class="d-inline"
-                                            :key="row.item.baseImage"
-                                    />
-                                    <span class="token-link">
-                                        {{ row.item.base }}/
-                                    </span>
-                                </span>
+                                    <a v-if="row.value.length <= 20"
+                                       :href="row.item.tokenUrl" class="text-white">
+                                        <span v-if="showFullPair(row.value)">
+                                            <avatar
+                                                    :image="row.item.baseImage"
+                                                    type="token"
+                                                    size="small"
+                                                    :symbol="row.item.base"
+                                                    class="d-inline"
+                                                    :key="row.item.baseImage"
+                                            />
+                                            {{ row.item.base }}/
+                                        </span>
                                         <avatar
-                                            :image="row.item.quoteImage"
-                                            type="token"
-                                            size="small"
-                                            class="d-inline"
-                                            :key="row.item.quoteImage"
+                                                :image="row.item.quoteImage"
+                                                type="token"
+                                                size="small"
+                                                class="d-inline"
+                                                :key="row.item.quoteImage"
+                                        />
+                                        {{ row.item.quote }}
+                                    </a>
+                                    <a v-else :href="row.item.tokenUrl" class="text-white"
+                                       v-b-tooltip="{title: row.value, boundary:'window', customClass: 'tooltip-custom'}">
+                                        <span v-if="showFullPair(row.value)">
+                                            <avatar
+                                                    :image="row.item.baseImage"
+                                                    type="token"
+                                                    size="small"
+                                                    :symbol="row.item.base"
+                                                    class="d-inline"
+                                                    :key="row.item.baseImage"
+                                            />
+                                            {{ row.item.base }}/
+                                        </span>
+                                        <avatar
+                                                :image="row.item.quoteImage"
+                                                type="token"
+                                                size="small"
+                                                class="d-inline"
+                                                :key="row.item.quoteImage"
                                         />
                                         <span class="token-link">
                                             {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
