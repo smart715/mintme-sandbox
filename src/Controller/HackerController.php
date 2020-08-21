@@ -214,4 +214,24 @@ class HackerController extends AbstractController
 
         return $response;
     }
+
+    /**
+     * @Route(
+     *     "/hacker-toggle-info-bar", name="hacker-toggle-info-bar",
+     *     options={"expose"=true}
+     *     )
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function toggleInfoBar(Request $request): RedirectResponse
+    {
+        /** @var string $referer */
+        $referer = $request->headers->get('referer');
+
+        $request->getSession()->get('show_info_bar') ?
+            $request->getSession()->set('show_info_bar', false) :
+            $request->getSession()->set('show_info_bar', true);
+
+        return $this->redirect($referer);
+    }
 }

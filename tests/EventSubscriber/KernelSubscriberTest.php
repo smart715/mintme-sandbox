@@ -7,8 +7,10 @@ use App\EventSubscriber\KernelSubscriber;
 use App\Manager\ProfileManagerInterface;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,9 +23,11 @@ class KernelSubscriberTest extends TestCase
     {
         $sub = new KernelSubscriber(
             true,
-            $this->mockProfileManager($this->once()),
+            $this->mockProfileManager(static::once()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockParameterBagInterface(true),
+            $this->mockSessionInterface(true),
         );
 
         $sub->onRequest(
@@ -37,7 +41,9 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockParameterBagInterface(true),
+            $this->mockSessionInterface(true),
         );
 
         $this->expectException(Throwable::class);
@@ -52,7 +58,9 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(false)
+            $this->mockCsrfTokenManager(false),
+            $this->mockParameterBagInterface(true),
+            $this->mockSessionInterface(true),
         );
 
         $this->expectException(Throwable::class);
@@ -108,5 +116,19 @@ class KernelSubscriberTest extends TestCase
         $ctm->method('isTokenValid')->willReturn($isValid);
 
         return $ctm;
+    }
+    private function mockSessionInterface(bool $session): SessionInterface
+    {
+        $si = $this->createMock(SessionInterface::class);
+        $si->method('get')->willReturn($session);
+
+        return $si;
+    }
+    private function mockParameterBagInterface(bool $isHackerAllowed): ParameterBagInterface
+    {
+        $pb = $this->createMock(ParameterBagInterface::class);
+        $pb->method('get')->willReturn($isHackerAllowed);
+
+        return $pb;
     }
 }
