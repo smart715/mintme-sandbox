@@ -21,6 +21,7 @@ class NicknameType extends AbstractType
                 'minlength' => 2,
                 'maxlength' => 30,
                 'pattern' => '[A-Za-z\d]+',
+                'autocomplete' => 'off',
             ],
             'constraints' => [
                 new IsNotBlacklisted([

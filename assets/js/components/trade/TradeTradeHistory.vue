@@ -26,7 +26,7 @@
 
                             <template v-slot:head(pricePerQuote)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    Price per {{ market.quote | rebranding | truncate(17) }}
+                                    Price per {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
                                 </span>
                                 <span v-else>
                                     Price per {{ market.quote | rebranding }}
@@ -35,7 +35,7 @@
 
                             <template v-slot:head(quoteAmount)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    {{ market.quote | rebranding | truncate(17) }} amount
+                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} amount
                                 </span>
                                  <span v-else>
                                     {{ market.quote | rebranding }} amount
@@ -49,8 +49,10 @@
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
                                         </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -65,8 +67,11 @@
                                             :src="row.item.takerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
                                             alt="avatar">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.value, boundary:'viewport'}">
-                                            {{ row.value }}
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}"
+                                            >
+                                                {{ row.value }}
+                                            </span>
                                         </span>
                                     </a>
                                     <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
@@ -129,6 +134,7 @@ export default {
     },
     data() {
         return {
+            maxLengthToTruncate: 4,
             fields: [
                 {
                     key: 'type',
@@ -164,7 +170,7 @@ export default {
     },
     computed: {
         shouldTruncate: function() {
-            return this.market.quote.symbol.length > 17;
+            return this.market.quote.symbol.length > this.maxLengthToTruncate;
         },
         hasOrders: function() {
             return this.ordersList.length > 0;

@@ -3,8 +3,8 @@
     <div class="col-md-10 d-flex justify-content-between">
         <div class="token-avatar ml-2">
             <div class="d-flex align-items-center token-name">
-                <div class="overflow-wrap-break-word d-flex align-items-center">
-                    <h2 class="current-token-name">{{  token.name }}</h2>
+                <div class="overflow-hidden token-name d-flex align-items-center">
+                    <h1 class="h2 current-token-name">{{  token.name }}</h1>
                 </div>
             </div>
         </div>
@@ -98,8 +98,13 @@
                                 <div class="card-body">
                                     <div class="row fix-height custom-scrollbar">
                                         <div class="col-12">
-                                            <span class="card-header-icon"></span>
-                                            <div><p></p></div>
+                                            <div>
+                                                <p>
+                                                    {% if tokenDescription is defined %}
+                                                        {{ tokenDescription }}
+                                                    {% endif %}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

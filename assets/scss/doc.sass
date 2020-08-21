@@ -76,6 +76,9 @@ header::before
   .btn.authorize svg
     fill: $dark-white
 
+  .authorization__btn.locked
+    opacity: .4
+
   .parameters-col_name
     width: auto
 
@@ -120,6 +123,14 @@ header::before
     color: $dark-white
     background-color: $secondary !important
     border-color: $dark-white
+    &.auth-wrapper
+      border: 1px solid $dark-white !important
+      &:hover
+        color: $secondary !important
+        background-color: $dark-white !important
+
+        svg
+          fill: $secondary
     &:focus
       box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
       -webkit-box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
