@@ -5,8 +5,9 @@
                 Sell Orders
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
-                    <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                        {{ market.quote | rebranding | truncate(17) }}
+                    <span v-if="shouldTruncate"
+                          v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'window', customClass:'tooltip-custom'}">
+                        {{ market.quote | rebranding | truncate(12) }}
                     </span>
                     <span v-else>
                         {{ market.quote | rebranding }}
@@ -37,15 +38,18 @@
                                         <a
                                             :href="row.item.traderUrl"
                                             class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white"
-                                            v-b-tooltip="popoverConfig"
-                                            v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
                                         >
                                             <img
                                                 :src="row.item.traderAvatar"
                                                 class="rounded-circle d-block flex-grow-0 pointer-events-none mr-1"
                                                 alt="avatar">
-                                            <span class="d-inline-block truncate-name flex-grow-1 pointer-events-none">
-                                                {{ row.value }}
+                                            <span class="d-inline-block truncate-name flex-grow-1">
+                                                <span
+                                                    v-b-tooltip="popoverConfig"
+                                                    v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                                >
+                                                    {{ row.value }}
+                                                </span>
                                             </span>
                                         </a>
                                     </div>
@@ -127,7 +131,7 @@ export default {
     },
     computed: {
         shouldTruncate: function() {
-            return this.market.quote.symbol.length > 17;
+            return this.market.quote.symbol.length > 12;
         },
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>

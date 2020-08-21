@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% if token.image is not null %}
+{% if isTokenPage and token.image is not null %}
     {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
 {% endif %}
 
@@ -109,6 +109,7 @@
                 {% if isTokenPage %}
                     <b-tab
                         title="Introduction"
+                        title-link-class="token-intro-tab-link"
                         {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
@@ -157,7 +158,9 @@
                     </b-tab>
                 {% endif %}
                 {% if showTrade %}
-                    <b-tab title="Trade"
+                    <b-tab
+                        title="Trade"
+                        title-link-class="token-trade-tab-link"
                         {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
                         {% if tab == 'trade' %} {{ 'active' }} {% endif %}
                     >
@@ -182,7 +185,11 @@
                     </b-tab>
                 {% endif %}
                 {% if showDonation %}
-                    <b-tab title="Donate" {% if tab == 'donate' %} {{ 'active' }} {% endif %}>
+                    <b-tab
+                        title="Donate"
+                        title-link-class="token-donate-tab-link"
+                        {% if tab == 'donate' %} {{ 'active' }} {% endif %}
+                    >
                         <div class="container-fluid px-0">
                             <donation
                                 :market="{{ market | json_encode }}"
@@ -196,7 +203,9 @@
                     </b-tab>
                 {% endif %}
                 {% if isTokenPage %}
-                    <b-tab title="Posts"
+                    <b-tab
+                        title="Posts"
+                        title-link-class="token-posts-tab-link"
                         {% if isTokenPage %} title-item-class="trade-post" {% endif %}
                         {% if tab == 'posts' %} {{ 'active' }} {% endif %}
                     >
