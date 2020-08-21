@@ -101,12 +101,14 @@ export default {
         return {
             deleteDisabled: false,
             isModalVisible: false,
-            link: this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id,
         };
     },
     computed: {
         date() {
             return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
+        },
+        link() {
+            return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
         },
     },
     methods: {
