@@ -40,12 +40,14 @@
                 @click="editToken"
             />
         </template>
-        <span
-            class="current-token-name"
-            v-b-tooltip="{title: currentName, boundary:'viewport'}"
-        >
+        <h1 v-if="shouldTruncate"
+              class="h2 current-token-name"
+              v-b-tooltip="{title: currentName, boundary:'viewport'}">
+            {{ currentName | truncate(maxLengthToTruncate) }}
+        </h1>
+        <h1 v-else class="h2 current-token-name">
             {{ currentName }}
-        </span>
+        </h1>
     </div>
 </template>
 
@@ -93,7 +95,13 @@ export default {
             isTokenExchanged: true,
             isTokenNotDeployed: false,
             showTokenEditModal: false,
+            maxLengthToTruncate: 30,
         };
+    },
+    computed: {
+        shouldTruncate: function() {
+            return this.currentName.length > this.maxLengthToTruncate;
+        },
     },
     mounted: function() {
         if (!this.editable) {

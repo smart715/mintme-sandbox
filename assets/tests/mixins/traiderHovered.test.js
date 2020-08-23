@@ -43,7 +43,7 @@ describe('TraderHoveredMixin', () => {
         wrapper.vm.tooltipData = 'Loading...';
         expect(wrapper.vm.popoverConfig.title).toBe('Loading...');
         expect(wrapper.vm.popoverConfig.html).toBe(true);
-        expect(wrapper.vm.popoverConfig.boundary).toBe('viewport');
+        expect(wrapper.vm.popoverConfig.boundary).toBe('window');
         expect(wrapper.vm.popoverConfig.delay).toBe(0);
     });
 
