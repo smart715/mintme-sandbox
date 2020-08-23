@@ -87,7 +87,7 @@ export default {
     },
     mounted: function() {
         this.getAirdropCampaign();
-        this.getCountdownTimer();
+        this.showCountdown();
     },
     computed: {
         actualParticipants: function() {
@@ -97,6 +97,7 @@ export default {
             if (this.loaded) {
                 let airdropReward = new Decimal(this.airdropCampaign.amount)
                     .dividedBy(new Decimal(this.airdropCampaign.participants));
+
                 return toMoney(airdropReward, TOK.subunit);
             }
 
@@ -157,7 +158,7 @@ export default {
         },
     },
     methods: {
-        getCountdownTimer: function() {
+        showCountdown: function() {
             return setInterval(() => {
                     this.duration = moment.duration(this.duration - 1000, 'milliseconds');
                     if (this.duration.asMilliseconds() <= 0) {
