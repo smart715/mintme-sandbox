@@ -19,6 +19,7 @@
                         <span v-show="showDuration">
                             ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
                         </span>
+                        <span v-show="timeElapsed">(Airdrop has ended!)</span>
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
