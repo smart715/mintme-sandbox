@@ -175,6 +175,7 @@ class HackerController extends AbstractController
 
         $profile = new Profile($user);
         $profile->setNickname($nickname);
+        $profile->setNextReminderDate(new \DateTime('+1 month'));
         $user->setProfile($profile);
 
         $em = $this->getDoctrine()->getManager();
