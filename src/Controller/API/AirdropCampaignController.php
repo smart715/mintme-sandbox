@@ -151,7 +151,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException('Token does not have active airdrop campaign.');
         }
 
-        if ($token->getActiveAirdrop()->getId() !== $airdrop->getId() || $token->getActiveAirdrop()->getEndDate()->getTimeStamp() < time()) {
+        if ($token->getActiveAirdrop()->getId() !== $airdrop->getId() ||
+            $token->getActiveAirdrop()->getEndDate()->getTimeStamp() < time()) {
             throw new ApiBadRequestException('Current airdrop campaign is finished.');
         }
 
