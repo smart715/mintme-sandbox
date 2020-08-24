@@ -116,19 +116,3 @@ export const sanitizeOptions = {
         'span': ['style', 'class'],
     },
 };
-
-export const ourDomains = [
-    'mintme.com',
-    'coinimp.com',
-    'cba.pl',
-    'zzz.com.ua',
-    'zz.com.ve',
-    'aba.ae',
-    'for.ug',
-    'lea.com.mx',
-    'lea.mx',
-    'hit.ng',
-    'hosting7.eu',
-    'server.trading',
-    'webchain.network',
-];

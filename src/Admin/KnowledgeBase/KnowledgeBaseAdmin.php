@@ -27,7 +27,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
     public function preValidate($object): void
     {
         if ($object instanceof KnowledgeBase && preg_match('/<a (.*)>(.*)<\/a>/i', $object->getDescription())) {
-            $result = $this->addNoreferrerToLinks($object->getDescription());
+            $result = $this->addNoopenerToLinks($object->getDescription());
 
             if ($result['contentChanged']) {
                 $object->setDescription($result['content']);

@@ -9,7 +9,7 @@ import bbob from '@bbob/core';
 import {render} from '@bbob/html';
 import presetHTML5 from '@bbob/preset-html5';
 import VueSanitize from 'vue-sanitize';
-import {sanitizeOptions, ourDomains} from '../../utils/constants.js';
+import {sanitizeOptions} from '../../utils/constants.js';
 
 if (typeof Vue !== 'undefined') {
   Vue.use(VueSanitize, sanitizeOptions);
@@ -39,37 +39,9 @@ export default {
                 .html
                 .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
                 .replace(/<li>/g, '<li><span class="bbcode-span-list-item">')
-                .replace(/<\/li>/g, '</span></li>');
-
-            return this.$sanitize(this.checkBbcodeLinks(html));
-        },
-    },
-    methods: {
-        checkBbcodeLinks: function(text) {
-            let ourDomainsRegex = new RegExp(ourDomains.join('|'));
-            let div = document.createElement('div');
-            div.innerHTML = text;
-            let links = div.getElementsByTagName('a');
-
-            for (let link of links) {
-                let linkHref = link.outerHTML;
-
-                if (!ourDomainsRegex.test(linkHref)) {
-                    link.rel = 'noreferrer';
-                    link.target = '_blank';
-                } else {
-                    link.removeAttribute('rel');
-                    link.removeAttribute('target');
-                }
-
-                let linkHrefChanged = link.outerHTML;
-
-                if (linkHref !== linkHrefChanged) {
-                    text = text.replace(linkHref, linkHrefChanged);
-                }
-            }
-
-            return text;
+                .replace(/<\/li>/g, '</span></li>')
+                .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="noopener" target="_blank" href="https://');
+            return this.$sanitize(html);
         },
     },
 };

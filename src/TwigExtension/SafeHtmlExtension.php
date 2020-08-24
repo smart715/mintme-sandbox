@@ -35,7 +35,7 @@ class SafeHtmlExtension extends AbstractExtension
         $purifiedValue = $this->purifier->purify($value);
 
         if ($purifiedValue && preg_match('/<a (.*)>(.*)<\/a>/i', $purifiedValue)) {
-            $result = $this->addNoreferrerToLinks($purifiedValue);
+            $result = $this->addNoopenerToLinks($purifiedValue);
 
             if ($result['contentChanged']) {
                 return $result['content'];
