@@ -232,6 +232,18 @@ class Token implements TradebleInterface, ImagineInterface
      */
     protected $isBlocked = false;
 
+    /**
+     * @ORM\Column(name="number_of_reminder", type="smallint")
+     * @var int
+     */
+    private $numberOfReminder = 0;
+
+    /**
+     * @ORM\Column(name="next_reminder_date", type="datetime", nullable=true)
+     * @var \DateTime
+     */
+    private $nextReminderDate;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -609,5 +621,29 @@ class Token implements TradebleInterface, ImagineInterface
         return $profile
             ? $profile->getUser()
             : null;
+    }
+
+    public function getNumberOfReminder(): ?int
+    {
+        return $this->numberOfReminder;
+    }
+
+    public function setNumberOfReminder(int $numberOfReminder): self
+    {
+        $this->numberOfReminder = $numberOfReminder;
+
+        return $this;
+    }
+
+    public function getNextReminderDate(): ?\DateTime
+    {
+        return $this->nextReminderDate;
+    }
+
+    public function setNextReminderDate(\DateTime $nextReminderDate): self
+    {
+        $this->nextReminderDate = $nextReminderDate;
+
+        return $this;
     }
 }

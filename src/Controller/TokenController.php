@@ -229,6 +229,7 @@ class TokenController extends Controller
 
             /** @var User $user */
             $user = $this->getUser();
+            $token->setNextReminderDate(new \DateTime('+1 month'));
             $token->setProfile(
                 $this->profileManager->getProfile($this->getUser()) ?? new Profile($user)
             );
