@@ -18,4 +18,6 @@ interface MailerInterface
     public function sendTokenDeletedMail(Token $token): void;
     public function sendPasswordResetMail(User $user, bool $resetting): void;
     public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userLoginInfo): void;
+    public function sendProfileFillingReminderMail(User $user): void;
+    public function sendTokenDescriptionReminderMail(User $user): void;
 }
