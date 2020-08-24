@@ -128,6 +128,18 @@ class Profile implements ImagineInterface
      */
     protected $image;
 
+    /**
+     * @ORM\Column(name="number_of_reminder", type="smallint")
+     * @var int
+     */
+    private $numberOfReminder = 0;
+
+    /**
+     * @ORM\Column(name="next_reminder_date", type="date", nullable=true)
+     * @var \DateTime
+     */
+    private $nextReminderDate;
+
     public function __construct(User $user)
     {
         $this->user = $user;
@@ -322,5 +334,29 @@ class Profile implements ImagineInterface
                 ->addViolation();
             }
         }
+    }
+
+    public function getNumberOfReminder(): ?int
+    {
+        return $this->numberOfReminder;
+    }
+
+    public function setNumberOfReminder(int $numberOfReminder): self
+    {
+        $this->numberOfReminder = $numberOfReminder;
+
+        return $this;
+    }
+
+    public function getNextReminderDate(): ?\DateTime
+    {
+        return $this->nextReminderDate;
+    }
+
+    public function setNextReminderDate(\DateTime $nextReminderDate): self
+    {
+        $this->nextReminderDate = $nextReminderDate;
+
+        return $this;
     }
 }
