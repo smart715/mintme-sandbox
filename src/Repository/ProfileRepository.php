@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Profile;
-use App\Entity\Token\Token;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FOS\UserBundle\Model\UserInterface;
 
@@ -19,5 +19,19 @@ class ProfileRepository extends EntityRepository
     public function getProfileByNickname(string $nickname): ?Profile
     {
         return $this->findOneBy(['nickname' => $nickname]);
+    }
+
+    /** @codeCoverageIgnore */
+    public function findAllProfileWithEmptyDescription(int $numberOfReminder = 14): ?array
+    {
+        $query = $this->createQueryBuilder('p')
+            ->innerJoin('p.user', 'u', 'p.user = u.id')
+            ->where('p.description is null')
+            ->andWhere('p.numberOfReminder <> :numberOfReminder')
+            ->andWhere('p.nextReminderDate = :nextReminderDate OR p.nextReminderDate is null')
+            ->setParameter('numberOfReminder', $numberOfReminder)
+            ->setParameter('nextReminderDate', \Date('Y-m-d'));
+
+        return $query->getQuery()->getResult();
     }
 }
