@@ -217,7 +217,8 @@ class HackerController extends AbstractController
 
     /**
      * @Route(
-     *     "/hacker-toggle-info-bar", name="hacker-toggle-info-bar",
+     *     "/hacker-toggle-info-bar",
+     *     name="hacker-toggle-info-bar",
      *     options={"expose"=true}
      *     )
      * @param Request $request

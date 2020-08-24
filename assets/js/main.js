@@ -71,7 +71,7 @@ const imagesContext = require.context(
 );
 imagesContext.keys().forEach(imagesContext);
 
-if ( document.getElementById('info-bar') ) {
+if (document.getElementById('info-bar')) {
     new Vue({
         el: '#info-bar',
         components: {
