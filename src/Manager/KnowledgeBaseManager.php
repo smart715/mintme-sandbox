@@ -56,11 +56,14 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
             if (!$subcategory) {
                 $parsedKb[$category][] = $kb;
-            } elseif (!array_key_exists($subcategory, $parsedKb[$category])) {
-                $parsedKb[$category][$subcategory] = [];
-                array_push($parsedKb[$category][$subcategory], $kb);
             } else {
-                array_push($parsedKb[$category][$subcategory], $kb);
+                if (!isset($parsedKb[$category][$subcategory])) {
+                    $parsedKb[$category][$subcategory] = [];
+                }
+
+                if (is_array($parsedKb[$category][$subcategory])) {
+                    $parsedKb[$category][$subcategory][] = $kb;
+                }
             }
         }
 
