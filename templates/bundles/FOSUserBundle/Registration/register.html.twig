@@ -8,4 +8,9 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/register.js') }}"></script>
+    <script>
+        window.onload = function() {
+            document.getElementById("fos_user_registration_form_email").focus();
+        }
+    </script>
 {% endblock %}
