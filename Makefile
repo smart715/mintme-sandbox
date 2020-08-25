@@ -8,7 +8,7 @@ phpunit:
 	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpfunctional:
-	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller -name "*Test.php" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller/ -name "*Test.php" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
