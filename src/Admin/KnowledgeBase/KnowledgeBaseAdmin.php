@@ -34,7 +34,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             }
         }
 
-        parent::preUpdate($object);
+        parent::preValidate($object);
     }
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
