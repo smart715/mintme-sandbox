@@ -11,6 +11,14 @@
         <p v-else>
             To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
         </p>
+        <a href="#" class="hover-icon text-decoration-none text-white">
+            <font-awesome-icon
+                class="c-pointer align-middle"
+                icon="comment"
+                transform="shrink-4 up-1.5"
+            />
+          <span class="social-link">5 Comments</span>
+        </a>
         <span>
             {{ date }}
         </span>
@@ -59,13 +67,14 @@
 import BbcodeView from '../bbcode/BbcodeView';
 import moment from 'moment';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTrash, faComment} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 
 library.add(faEdit);
 library.add(faTrash);
+library.add(faComment);
 
 export default {
     name: 'Post',
