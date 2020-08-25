@@ -73,14 +73,15 @@
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
             ></token-avatar>
             <token-social-media-icons
-                    youtube-client-id="{{ global_youtube_client_id }}"
-                    facebook-app-id="{{ global_facebook_app_id }}"
-                    token-name="{{ market.quote.name }}"
-                    :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
-                    :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
-                    :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
-                    :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
-                    :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+                youtube-client-id="{{ global_youtube_client_id }}"
+                facebook-app-id="{{ global_facebook_app_id }}"
+                token-name="{{ market.quote.name }}"
+                token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
+                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
             />
         </div>
     </div>

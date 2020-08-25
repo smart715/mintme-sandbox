@@ -11,6 +11,7 @@ let objectForTestCorrectlyMounting = {
         facebookUrl: 'testFacebookUrl',
         telegramUrl: 'testTelegramUrl',
         tokenName: 'testTokenName',
+        tokenUrl: 'localhost://testTokenName',
         websiteUrl: 'testWebsiteUrl',
         youtubeChannelId: 'testYoutubeChannelId',
     },
@@ -24,6 +25,7 @@ let objectForTestCorrectlyMounting = {
         facebookUrl: '',
         telegramUrl: '',
         tokenName: '',
+        tokenUrl: '',
         websiteUrl: '',
         youtubeChannelId: '',
     },
@@ -42,7 +44,7 @@ describe('TokenSocialMediaIcons', () => {
     it('should compute description correctly', () => {
         const wrapper = shallowMount(TokenSocialMediaIcons, objectForTestCorrectlyMounting);
         wrapper.vm.twitterDescription = 'foo';
-        expect(wrapper.vm.description).toBe('footoken_show');
+        expect(wrapper.vm.description).toBe('foolocalhost://testTokenName');
     });
 
     it('should compute youtubeUrl correctly', () => {
