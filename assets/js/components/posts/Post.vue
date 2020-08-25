@@ -11,7 +11,7 @@
         <p v-else>
             To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
         </p>
-        <a href="#" class="hover-icon text-decoration-none text-white">
+        <a :href="$routing.generate('show_post', {id: post.id})" class="hover-icon text-decoration-none text-white">
             <font-awesome-icon
                 class="c-pointer align-middle"
                 icon="comment"
