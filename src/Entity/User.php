@@ -176,6 +176,12 @@ class User extends BaseUser implements
      */
     protected $isBlocked = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author")
+     * @var Comment
+     */
+    protected $comments;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
