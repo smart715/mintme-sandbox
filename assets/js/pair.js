@@ -36,6 +36,7 @@ new Vue({
       retryCountLimit: 15,
       tokenAddress: null,
       posts: null,
+      postFromUrl: null,
     };
   },
   components: {
@@ -54,6 +55,15 @@ new Vue({
   mounted: function() {
     let divEl = document.createElement('div');
     let tabsEl = document.querySelectorAll('.nav.nav-tabs');
+
+    this.postFromUrl = (/(?:posts#)(\d+)/g.exec(window.location.href) || [])[1] || null;
+    if (this.postFromUrl !== null) {
+        // Prevent browser from restoring previous scroll height (if page was raloaded)
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+        document.getElementById(this.postFromUrl).scrollIntoView();
+    }
 
     divEl.className = 'tabs-left-margin-container';
     document.getElementsByClassName('tabs-wrapper')[0].insertBefore(divEl, tabsEl[0]);
