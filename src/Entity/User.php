@@ -178,7 +178,7 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author")
-     * @var Comment
+     * @var ArrayCollection
      */
     protected $comments;
 
@@ -486,6 +486,18 @@ class User extends BaseUser implements
     public function setIsBlocked(bool $isBlocked): self
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments->toArray();
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        $this->comments->add($comment);
 
         return $this;
     }

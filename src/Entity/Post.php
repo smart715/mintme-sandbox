@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use App\Validator\Constraints\PositiveAmount;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -66,7 +67,7 @@ class Post
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post")
-     * @var Comment
+     * @var ArrayCollection
      */
     protected $comments;
 
@@ -162,5 +163,17 @@ class Post
     public function getAuthor(): ?Profile
     {
         return $this->getToken()->getProfile();
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments->toArray();
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        $this->comments->add($comment);
+
+        return $this;
     }
 }

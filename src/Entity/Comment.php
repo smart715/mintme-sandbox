@@ -117,5 +117,15 @@ class Comment
         return $this->post;
     }
 
+    public function setAuthor(User $author): self
+    {
+        $this->author = $author;
 
+        return $this;
+    }
+
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
 }
