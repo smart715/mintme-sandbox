@@ -229,10 +229,8 @@ class HackerController extends AbstractController
     {
         /** @var string $referer */
         $referer = $request->headers->get('referer');
-
-        $request->getSession()->get('show_info_bar') ?
-            $request->getSession()->set('show_info_bar', false) :
-            $request->getSession()->set('show_info_bar', true);
+        $session = $request->getSession();
+        $session->set('show_info_bar', !$session->get('show_info_bar', true));
 
         return $this->redirect($referer);
     }

@@ -4,10 +4,8 @@ namespace App\EventSubscriber;
 
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -30,26 +28,16 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @var bool */
     private $isAuth;
 
-    /** @var ParameterBagInterface */
-    private $bag;
-
-    /** @var SessionInterface */
-    private $session;
-
     public function __construct(
         bool $isAuth,
         ProfileManagerInterface $profileManager,
         TokenStorageInterface $tokenStorage,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        ParameterBagInterface $bag,
-        SessionInterface $session
+        CsrfTokenManagerInterface $csrfTokenManager
     ) {
         $this->isAuth = $isAuth;
         $this->profileManager = $profileManager;
         $this->tokenStorage = $tokenStorage;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->bag = $bag;
-        $this->session = $session;
     }
 
     /** @codeCoverageIgnore */
@@ -70,10 +58,6 @@ class KernelSubscriber implements EventSubscriberInterface
 
     public function onRequest(GetResponseEvent $request): void
     {
-        if ($this->bag->get('is_hacker_allowed') && null === $this->session->get('show_info_bar')) {
-            $this->session->set('show_info_bar', true);
-        }
-
         $csrf = $request->getRequest()->headers->get('X-CSRF-TOKEN', '');
 
         if (!is_string($csrf) ||
