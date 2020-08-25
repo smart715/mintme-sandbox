@@ -41,6 +41,12 @@ class Comment
     protected $createdAt;
 
     /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
+     */
+    protected $updatedAt;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="comments")
      * @ORM\JoinColumn(name="post_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @var Post
@@ -54,6 +60,9 @@ class Comment
      */
     protected $author;
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getId(): int
     {
         return $this->id;
@@ -66,6 +75,9 @@ class Comment
         return $this;
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getContent(): string
     {
         return $this->content;
@@ -99,6 +111,9 @@ class Comment
         return $this;
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
@@ -111,7 +126,6 @@ class Comment
         return $this;
     }
 
-    /** @Groups({"Default", "API"}) */
     public function getPost(): Post
     {
         return $this->post;
@@ -124,6 +138,9 @@ class Comment
         return $this;
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getAuthor(): User
     {
         return $this->author;

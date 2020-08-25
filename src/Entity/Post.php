@@ -165,6 +165,9 @@ class Post
         return $this->getToken()->getProfile();
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getComments(): array
     {
         return $this->comments->toArray();
