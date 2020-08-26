@@ -98,7 +98,7 @@
                     <date-picker
                         v-model="endDate"
                         id="endDate"
-                        :disabled="!showEndDate || hasAirdropCampaign"/>
+                        :disabled="!showEndDate || hasAirdropCampaign"
                         :config="options">
                     </date-picker>
                 </div>
