@@ -45,7 +45,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     protected $id;
 
@@ -234,7 +234,7 @@ class User extends BaseUser implements
 
     /**
      * @codeCoverageIgnore
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     public function getProfile(): Profile
     {
