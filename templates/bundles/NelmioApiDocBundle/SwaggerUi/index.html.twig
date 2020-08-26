@@ -12,6 +12,30 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <style>
+        .top-navbar .mintme-logo {
+          max-height: 42px !important;
+        }
+
+        @media (min-width: 768px) {
+          .top-navbar .mintme-logo {
+            max-height: 48px !important;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .top-navbar .mintme-logo {
+            max-height: 56px !important;
+          }
+        }
+
+        #footer .socialmedia img {
+          width: 45px !important;
+          height: 45px !important;
+          -webkit-transition: all .3s ease;
+          transition: all .3s ease;
+        }
+    </style>
     <link rel="stylesheet" href="{{ asset('build/main.css') }}">
 {% endblock stylesheets %}
 

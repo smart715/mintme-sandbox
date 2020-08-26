@@ -205,4 +205,46 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $this->mailer->send($msg);
     }
+
+    public function sendProfileFillingReminderMail(User $user): void
+    {
+        $body = $this->twigEngine->render('mail/profile_reminder.html.twig', [
+            'username' => $user->getUsername(),
+            'profile_name' => $user->getProfile()->getNickname(),
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/profile_reminder.txt.twig', [
+            'username' => $user->getUsername(),
+            'profile_name' => $user->getProfile()->getNickname(),
+        ]);
+
+        $subjectMsg = 'Mintme Reminder';
+        $msg = (new Swift_Message($subjectMsg))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+        $this->mailer->send($msg);
+    }
+
+    public function sendTokenDescriptionReminderMail(User $user): void
+    {
+        $body = $this->twigEngine->render('mail/token_description_reminder.html.twig', [
+            'username' => $user->getUsername(),
+            'token_name' => $user->getProfile()->getToken()->getName(),
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/token_description_reminder.txt.twig', [
+            'username' => $user->getUsername(),
+            'token_name' => $user->getProfile()->getToken()->getName(),
+        ]);
+
+        $subjectMsg = 'Mintme Reminder';
+        $msg = (new Swift_Message($subjectMsg))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+        $this->mailer->send($msg);
+    }
 }

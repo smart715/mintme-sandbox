@@ -71,6 +71,7 @@ class CreateProfiles extends Command
 
                 $profile->setNickname($userNickname);
                 $user->setProfile($profile);
+
                 $this->em->persist($user);
                 $updatedUsers++;
             }

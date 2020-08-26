@@ -1,7 +1,8 @@
 {% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 {% set route = app.request.get('_route') %}
+{% set show_info_bar = app.session.get('show_info_bar', true) %}
 
-{% if is_hacker_allowed %}
+{% if is_hacker_allowed and show_info_bar %}
     <div id="info-bar">
         <info-bar
             username="{{ app.user.username|default('') }}"
@@ -48,6 +49,8 @@
                         type="text"
                     >
                     <svg
+                        width="19.5"
+                        height="19.5"
                         aria-hidden="true"
                         focusable="false"
                         data-prefix="fas"
