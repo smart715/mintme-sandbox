@@ -98,7 +98,7 @@
                     <date-picker
                         v-model="endDate"
                         id="endDate"
-                        :disabled="!showEndDate || hasAirdropCampaign"
+                        :disabled="!showEndDate || hasAirdropCampaign"/>
                         :config="options">
                     </date-picker>
                 </div>
@@ -150,11 +150,11 @@ export default {
             showEndDate: false,
             tokensAmount: null,
             participantsAmount: null,
-            endDate: moment().add(1, 'hours').toDate(),
+            endDate: moment().add(1, 'hour').toDate(),
             options: {
                 format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
-                minDate: moment().add(1, 'hours').toDate(),
+                minDate: moment().add(1, 'hour').toDate(),
             },
             errorMessage: '',
             precision: TOK.subunit,
@@ -350,7 +350,7 @@ export default {
 
             this.tokensAmount = 100;
             this.participantsAmount = 100;
-            this.endDate = moment().add(1, 'hours').toDate();
+            this.endDate = moment().add(1, 'hour').toDate();
         },
         checkInput: function(precision) {
             let selectionStart = event.target.selectionStart;
