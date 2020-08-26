@@ -2,9 +2,11 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Comment;
 use App\Entity\Post;
 use App\Exception\ApiNotFoundException;
 use App\Form\PostType;
+use App\Form\CommentType;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -125,6 +127,31 @@ class PostsController extends AbstractFOSRestController
         return $this->view(['message' => 'Post deleted.'], Response::HTTP_OK);
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{id<\d+>}/comments/add", name="add_comment", options={"expose"=true})
+     * @Rest\RequestParam(name="content", nullable=false)
+     */
+    public function addComment(int $id, ParamFetcherInterface $request): View
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new ApiNotFoundException('Post not found.');
+        }
+
+        $comment = new Comment();
+        $comment->setPost($post)->setAuthor($user);
+
+        return $this->handleCommentForm($comment, $request, 'Comment created.');
+    }
+
     private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
     {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
@@ -136,6 +163,22 @@ class PostsController extends AbstractFOSRestController
         }
 
         $this->entityManager->persist($post);
+        $this->entityManager->flush();
+
+        return $this->view(["message" => $message], Response::HTTP_OK);
+    }
+
+    private function handleCommentForm(Comment $comment, ParamFetcherInterface $request, string $message): View
+    {
+        $form = $this->createForm(CommentType::class, $comment, ['csrf_protection' => false]);
+
+        $form->submit($request->all());
+
+        if (!$form->isValid()) {
+            return $this->view($form, Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->entityManager->persist($comment);
         $this->entityManager->flush();
 
         return $this->view(["message" => $message], Response::HTTP_OK);

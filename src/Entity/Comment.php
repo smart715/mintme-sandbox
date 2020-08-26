@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -25,7 +24,6 @@ class Comment
     /**
      * @ORM\Column(type="string", length=60000)
      * @Assert\NotNull
-     * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
      *     max = 500,

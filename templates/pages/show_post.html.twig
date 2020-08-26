@@ -18,7 +18,7 @@
                                     @go-to-trade="$emit('go-to-trade', $event)"
                                     :logged-in="{{ loggedIn }}"
                                 ></post>
-                                <comments :comments="{{ post.comments | json_encode }}" ></comments>
+                                <comments :comments="{{ post.comments | json_encode }}" :post-id="{{ post.id }}"></comments>
                             </div>
                         </div>
                     </div>
