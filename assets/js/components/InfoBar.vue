@@ -129,6 +129,7 @@ export default {
                 });
         },
         close: function() {
+            this.$axios.retry.get(this.$routing.generate('hacker-toggle-info-bar'));
             let panel = document.getElementById('info-panel');
             panel.style.display = 'none';
         },

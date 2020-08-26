@@ -22,6 +22,17 @@ export default {
     data() {
         return {
             isClicked: false,
+            testingMenu:
+                {
+                    title: 'Tester Options',
+                    icon: 'fa fa-tasks',
+                    child: [
+                        {
+                            href: this.$routing.generate('hacker-toggle-info-bar'),
+                            title: 'Tester widget show/hide',
+                        },
+                    ],
+                },
             authorizedMenu: [
                 {
                     header: true,
@@ -83,7 +94,12 @@ export default {
             return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
         },
         menu: function() {
-            return this.isUserLogged ? this.authorizedMenu : this.nonAuthorizedMenu;
+            let menu = this.isUserLogged ?
+                this.authorizedMenu :
+                this.nonAuthorizedMenu;
+
+            menu.push(this.testingMenu);
+            return menu;
         },
         menuWidth: function() {
             return this.isClicked ? '350px' : '30px';

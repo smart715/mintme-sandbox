@@ -1,5 +1,21 @@
 <template>
-    <div class="post">
+    <div class="post" :id="post.id">
+        <div>
+            <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
+                <img
+                    :src="post.author.image.avatar_small"
+                    class="rounded-circle d-inline-block"
+                    alt="avatar"
+                >
+                {{ post.author.nickname }}
+            </a>
+            <span class="post-date">
+                {{ date }}
+            </span>
+            <copy-link :content-to-copy="link" class="c-pointer ml-1">
+              <font-awesome-icon :icon="['far', 'copy']"/>
+            </copy-link>
+        </div>
         <template v-if="loggedIn">
             <p v-if="post.content">
                 <bbcode-view :value="post.content"/>
@@ -18,17 +34,6 @@
                 transform="shrink-4 up-1.5"
             />
           <span class="social-link">5 Comments</span>
-        </a>
-        <span>
-            {{ date }}
-        </span>
-        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
-            <img
-                :src="post.author.image.avatar_small"
-                class="rounded-circle d-inline-block"
-                alt="avatar"
-            >
-            {{ post.author.nickname }}
         </a>
         <button v-if="showEdit"
             class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
@@ -71,6 +76,7 @@ import {faEdit, faTrash, faComment} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
+import CopyLink from '../CopyLink';
 
 library.add(faEdit);
 library.add(faTrash);
@@ -86,6 +92,7 @@ export default {
         BbcodeView,
         ConfirmModal,
         FontAwesomeIcon,
+        CopyLink,
     },
     props: {
         post: Object,
@@ -108,6 +115,9 @@ export default {
     computed: {
         date() {
             return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
+        },
+        link() {
+            return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
         },
     },
     methods: {
