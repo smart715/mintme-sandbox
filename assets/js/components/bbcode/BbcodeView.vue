@@ -40,7 +40,7 @@ export default {
                 .replace(/<img src="/g, '<img style="max-width: 100%;" src="')
                 .replace(/<li>/g, '<li><span class="bbcode-span-list-item">')
                 .replace(/<\/li>/g, '</span></li>')
-                .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="nofollow" target="_blank" href="https://');
+                .replace(/<a href="(http(s)?:\/\/)?/g, '<a rel="noopener" target="_blank" href="https://');
             return this.$sanitize(html);
         },
     },
