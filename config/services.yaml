@@ -220,7 +220,7 @@ services:
         arguments:
             - null
             - App\Entity\KnowledgeBase\KnowledgeBase
-            - Sonata\AdminBundle\Controller\CRUDController
+            - PixSortableBehaviorBundle:SortableAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, label: Knowledge Base }
         public: true
@@ -230,7 +230,7 @@ services:
         arguments:
             - null
             - App\Entity\KnowledgeBase\Category
-            - Sonata\AdminBundle\Controller\CRUDController
+            - PixSortableBehaviorBundle:SortableAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, label: KB Categories }
         public: true
@@ -240,7 +240,7 @@ services:
         arguments:
             - null
             - App\Entity\KnowledgeBase\Subcategory
-            - Sonata\AdminBundle\Controller\CRUDController
+            - PixSortableBehaviorBundle:SortableAdmin
         tags:
             - { name: sonata.admin, manager_type: orm, label: KB Subcategories }
         public: true
@@ -615,3 +615,10 @@ services:
         arguments:
             $deployCost: '%deploy_cost%'
             $deployCostReward: '%deploy_cost_referral_reward%'
+
+    gedmo.listener.sortable:
+        class: Gedmo\Sortable\SortableListener
+        calls:
+            - [setAnnotationReader, ['@annotation_reader']]
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
