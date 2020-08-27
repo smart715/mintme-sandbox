@@ -27,7 +27,7 @@ header::before
   .auth-wrapper
     padding-right: 5px
 
-  .response-undocumented i , .parameters-col_name div , .body-param__text ,  .false td , .false td span span span
+  .response-undocumented i, .parameters-col_name div, .body-param__text, .false td, .false td span span span
     @extend .text-monospaced
 
   .scheme-container
@@ -42,8 +42,8 @@ header::before
       background: white
 
     @include media-breakpoint-down('sm')
-      margin: 0!important
-      padding: 0!important
+      margin: 0 !important
+      padding: 0 !important
 
       section
         margin: 0
@@ -108,7 +108,7 @@ header::before
     padding: 0 10px
 
   .opblock-tag:hover
-    background-color: rgba(0,0,0,.1)
+    background-color: rgba(0, 0, 0, .1)
     color: $dark-white
 
   .information-container.wrapper
@@ -123,6 +123,7 @@ header::before
     color: $dark-white
     background-color: $secondary !important
     border-color: $dark-white
+
     &.auth-wrapper
       border: 1px solid $dark-white !important
       &:hover
@@ -131,9 +132,11 @@ header::before
 
         svg
           fill: $secondary
+
     &:focus
-      box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
-      -webkit-box-shadow: 0 0 0 0.2rem rgba(50,88,113,.5)
+      box-shadow: 0 0 0 0.2rem rgba(50, 88, 113, .5)
+      -webkit-box-shadow: 0 0 0 0.2rem rgba(50, 88, 113, .5)
+
     @media (hover: hover)
       &:hover
         color: $secondary !important
@@ -142,10 +145,12 @@ header::before
     @media (hover: none)
       background-color: $primary
       border-color: $dark-white !important
+
     &:hover
       background-color: $secondary-dark !important
       color: $dark-white !important
       border: none !important
+
     &:disabled
       &:hover
         color: inherit
