@@ -47,6 +47,7 @@ body
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
+
   &.modal-open
     padding-right: 0 !important
 
@@ -287,8 +288,9 @@ a
     background: $card-header-bg
     color: $dark-white
     padding: .2rem 1.25rem
+
     &[role=tab]
-        background: $secondary-dark
+      background: $secondary-dark
 
 
     @include font-scale(md)
@@ -306,7 +308,7 @@ a
   &.transparent
     background-color: transparent
 
-    >.card-header
+    > .card-header
       background-color: $dark-white
       color: inherit
 
@@ -321,14 +323,16 @@ a
           .custom-checkbox
             min-height: 1rem !important
 
-            >.custom-control-label
+            > .custom-control-label
               &:before, &:after
                 top: 0 !important
 
               .blue-question
                 vertical-align: bottom
+
   &.currency-container
     min-height: 95px
+
   .donation
     background: none
     position: relative
@@ -346,12 +350,15 @@ a
 
     .donation-body
       background: $donation-body-bg
+
       p.info
         line-height: 1 !important
         margin-bottom: 2rem !important
+
       .input-group-append
         button.all-button
           z-index: 4
+
       @media (max-width: 550px)
         p.text-nowrap
           white-space: unset !important
@@ -359,7 +366,7 @@ a
     &.transparent
       background-color: transparent
 
-      >.donation-header
+      > .donation-header
         background-color: $dark-white
         color: inherit
 
@@ -375,14 +382,17 @@ a
   @media (hover: none)
     background-color: $primary
     border-color: $dark-white !important
+
   &:disabled
     &:hover
       color: inherit
       background-color: $primary
       border-color: $primary
+
   &.dropdown-toggle
     background-color: transparent !important
     border-color: $dark-white !important
+
     &:hover
       color: $secondary !important
       background-color: $dark-white !important
@@ -405,12 +415,14 @@ a
   @media (hover: none)
     background-color: $secondary-dark !important
     border-color: $dark-white !important
+
   &.ghost-alt
     &:hover
       color: $primary-light
 
 .bright-on-hover
   transition: all .3s ease
+
   &:hover
     filter: brightness(1.2)
 
@@ -418,8 +430,10 @@ a
   color: $dark-white
   background-color: $secondary
   border: 1px solid $dark-white
+
   .dropdown-item
     color: $dark-white
+
     &:hover
       color: $gold
       background-color: transparent
@@ -559,6 +573,7 @@ a
     td
       &:first-child
         padding-left: 1.5rem
+
       &:last-child
         padding-right: 1.5rem
         padding-left: 0.75rem
@@ -588,6 +603,7 @@ a
   @media (max-width: 768px)
     .tabs-wrapper
       display: flex
+
       .nav
         &.nav-tabs
           width: 100%
@@ -596,8 +612,10 @@ a
           overflow-y: hidden
           -webkit-overflow-scrolling: touch
           -ms-overflow-style: -ms-autohiding-scrollbar
+
           &::-webkit-scrollbar
             display: none
+
   .nav-tabs
     display: flex
     text-align: center
@@ -672,6 +690,7 @@ a
       overflow: visible
 
       /* stylelint-disable no-descending-specificity */
+
       .nav-link
         color: inherit
         position: relative
@@ -691,7 +710,7 @@ a
           background-color: unset
           width: calc(100% - 3rem)
 
-      /* stylelint-enable no-descending-specificity */
+    /* stylelint-enable no-descending-specificity */
 
     @media (max-width: 480px)
       .swagger-ui .model
@@ -761,6 +780,7 @@ nav.top-navbar
   .navbar-toggler-icon
     outline: none
     background-image: $navbar-toogler
+
     &:focus
       outline: none
 
@@ -818,6 +838,7 @@ nav.top-navbar
   .title
     @include font-scale(md)
     font-weight: 800
+
   .link
     color: $blue
 
@@ -826,6 +847,7 @@ nav.top-navbar
 
 [v-cloak]
   display: none
+
   & > .v-cloak--block
     display: block !important
 
@@ -896,12 +918,15 @@ nav.top-navbar
     &.error
       background: $toast-error-bg !important
       color: $toast-error-text !important
+
     &.info
       background: $toast-info-bg !important
       color: $toast-info-text !important
+
     &.success
       background: $toast-success-bg !important
       color: $toast-success-text !important
+
     &.warning
       background: $toast-warning-bg
       color: $toast-warning-text
@@ -928,6 +953,7 @@ nav.top-navbar
 .airdrop-container
   background: $secondary !important
   font-size: 18px
+
   button
     &.btn-primary
       padding: 0 0.5rem !important
@@ -940,15 +966,16 @@ meter
   /* Applicable only to Firefox
   background: none
   background-color: $grey-light
+
   &::-webkit-meter-bar
     background: none
     background-color: $grey-light
 
 @for $i from 1 to length($meterbg-list)+1
   meter[value="#{$i}"]::-webkit-meter-optimum-value
-    background: nth($meterbg-list,$i)
+    background: nth($meterbg-list, $i)
   meter[value="#{$i}"]::-moz-meter-bar
-    background: nth($meterbg-list,$i)
+    background: nth($meterbg-list, $i)
 
 @media (min-width: 992px)
   .resetlabel
@@ -959,6 +986,7 @@ meter
 #token, #profile
   [v-cloak]
     display: none
+
   .text-danger
     font-size: 80%
 
@@ -982,12 +1010,13 @@ meter
 
 .is-invalid
   border: 1px solid $red !important
+
   &:focus, &:active
     outline: 0 !important
     outline-color: transparent !important
     outline-width: 0 !important
     outline-style: none !important
-    box-shadow: 0 0 0 0 rgba(0,123,255,0) !important
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0) !important
 
 input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
   cursor: url('../img/input-cursor.png'), auto
@@ -1049,7 +1078,7 @@ input[type=search]::-webkit-search-cancel-button
   max-width: 981px
 
 .markitup-dropdown li a:hover
-    background: $primary
+  background: $primary
 
 .form-control-btn.is-invalid
   background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
@@ -1075,8 +1104,8 @@ input[type=search]::-webkit-search-cancel-button
       color: $blue !important
 
 .hover-icon:hover svg, .icon-default:hover
-    color: $gold
-    transition: color .15s
+  color: $gold
+  transition: color .15s
 
 a.hover-icon:hover
   span.social-link
@@ -1093,6 +1122,7 @@ a.hover-icon:hover
   .airdrop-container
     text-align: center !important
     font-size: 17px
+
     button
       margin-top: .5rem !important
 
@@ -1120,18 +1150,21 @@ a.hover-icon:hover
   .bbcode-content
     li
       list-style-position: inside
+
       .bbcode-span-list-item
         position: relative
         left: -0.5em
+
     ol
       .bbcode-span-list-item
-       left: 0 !important
+        left: 0 !important
 
 [data-useragent*="Gecko/"]
   .bbcode-content
     li
       position: relative
       left: 1em
+
     ol
       .bbcode-span-list-item
         left: 0 !important
@@ -1153,7 +1186,7 @@ a.hover-icon:hover
   height: 38px
   @media(max-width: 480px)
     height: 74px
-  @media(max-width: 393px )
+  @media(max-width: 393px)
     height: 116px
 
 .small-profile-link
