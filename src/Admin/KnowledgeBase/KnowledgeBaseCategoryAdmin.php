@@ -6,6 +6,7 @@ use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -13,6 +14,13 @@ final class KnowledgeBaseCategoryAdmin extends AbstractAdmin
 {
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
+
+    /** @var mixed overriding $datagridValues */
+    protected $datagridValues = [
+        '_page' => 1,
+        '_sort_order' => 'ASC',
+        '_sort_by' => 'position',
+    ];
 
     protected function configureDatagridFilters(DatagridMapper $datagridMapper): void
     {
@@ -27,6 +35,21 @@ final class KnowledgeBaseCategoryAdmin extends AbstractAdmin
     protected function configureListFields(ListMapper $listMapper): void
     {
         $listMapper->addIdentifier('id', IntegerType::class)
-            ->add('name', TextType::class);
+            ->add('name', TextType::class)
+            ->add('_action', null, [
+                'label' => false,
+                'actions' => [
+                    'move' => [
+                        'template' => '@PixSortableBehavior/Default/_sort.html.twig',
+                        'enable_top_bottom_buttons' => true,
+                    ],
+                ],
+            ])
+        ;
+    }
+
+    protected function configureRoutes(RouteCollection $collection): void
+    {
+        $collection->add('move', $this->getRouterIdParameter().'/move/{position}');
     }
 }

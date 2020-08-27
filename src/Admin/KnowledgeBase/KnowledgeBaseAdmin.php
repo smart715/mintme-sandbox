@@ -10,6 +10,7 @@ use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Form\Type\ModelListType;
+use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -22,6 +23,13 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
 
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
+
+    /** @var mixed overriding $datagridValues */
+    protected $datagridValues = [
+        '_page' => 1,
+        '_sort_order' => 'ASC',
+        '_sort_by' => 'position',
+    ];
 
     /** {@inheritdoc} */
     public function preValidate($object): void
@@ -68,7 +76,17 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('subcategory', null)
             ->addIdentifier('title', TextType::class)
             ->add('url', TextType::class)
-            ->add('description', TextareaType::class);
+            ->add('description', TextareaType::class)
+            ->add('_action', null, [
+                'label' => false,
+                'actions' => [
+                    'move' => [
+                        'template' => '@PixSortableBehavior/Default/_sort.html.twig',
+                        'enable_top_bottom_buttons' => true,
+                    ],
+                ],
+            ])
+        ;
     }
 
     protected function configureShowFields(ShowMapper $showMapper): void
@@ -80,5 +98,10 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('url')
             ->add('description', null, ['safe' => true])
         ;
+    }
+
+    protected function configureRoutes(RouteCollection $collection): void
+    {
+        $collection->add('move', $this->getRouterIdParameter().'/move/{position}');
     }
 }
