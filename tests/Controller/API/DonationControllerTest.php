@@ -10,7 +10,6 @@ class DonationControllerTest extends WebTestCase
     public function testCheckDonation(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request(
@@ -63,7 +62,6 @@ class DonationControllerTest extends WebTestCase
     public function testMakeDonation(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/donate/' . Token::WEB_SYMBOL . '/' . $tokName . '/make', [

@@ -9,7 +9,6 @@ class OrdersControllerTest extends WebTestCase
     public function testCreatingSellOrder(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -37,7 +36,6 @@ class OrdersControllerTest extends WebTestCase
     public function testCreatingBuyOrder(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -67,7 +65,6 @@ class OrdersControllerTest extends WebTestCase
     public function testCancelOrder(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -94,7 +91,6 @@ class OrdersControllerTest extends WebTestCase
     public function testExecutedOrders(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -120,7 +116,6 @@ class OrdersControllerTest extends WebTestCase
     public function testExecutedUserOrders(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 

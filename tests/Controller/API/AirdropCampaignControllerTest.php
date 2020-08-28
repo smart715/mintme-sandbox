@@ -9,7 +9,6 @@ class AirdropCampaignControllerTest extends WebTestCase
     public function testGetAirdropCampaign(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/airdrop_campaign/' . $tokName);
@@ -23,7 +22,6 @@ class AirdropCampaignControllerTest extends WebTestCase
     public function testCreateAirdropCampaign(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $endDate = new \DateTimeImmutable('+2 days');
@@ -60,7 +58,6 @@ class AirdropCampaignControllerTest extends WebTestCase
     public function testCreateAirdropCampaignWithInvalidParams(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
@@ -112,7 +109,6 @@ class AirdropCampaignControllerTest extends WebTestCase
     public function testDeleteAirdropCampaign(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $endDate = new \DateTimeImmutable('+2 days');
@@ -153,7 +149,6 @@ class AirdropCampaignControllerTest extends WebTestCase
     public function testClaimAirdropCampaign(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
