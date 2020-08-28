@@ -10,8 +10,7 @@ class ResettingControllerTest extends WebTestCase
     {
         $email = $this->register($this->client);
 
-        $this->client->request('GET', '/resetting/request');
-        $this->client->followRedirect();
+        $this->client->request('GET', 'https://localhost/resetting/request');
 
         $this->client->submitForm(
             'Change password',
@@ -41,8 +40,7 @@ class ResettingControllerTest extends WebTestCase
 
     public function testResetActionNotFound(): void
     {
-        $this->client->request('GET', '/resetting/reset/' . $this->generateString());
-        $this->client->followRedirect();
+        $this->client->request('GET', 'https://localhost/resetting/reset/' . $this->generateString());
         $this->assertContains(
             'Page not found',
             $this->client->getResponse()->getContent()
@@ -63,8 +61,7 @@ class ResettingControllerTest extends WebTestCase
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->client->request('GET', '/resetting/reset/' . $user->getConfirmationToken());
-        $this->client->followRedirect();
+        $this->client->request('GET', 'https://localhost/resetting/reset/' . $user->getConfirmationToken());
 
         $this->client->submitForm(
             'Change password',

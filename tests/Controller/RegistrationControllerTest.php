@@ -15,6 +15,7 @@ class RegistrationControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $email,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -41,6 +42,7 @@ class RegistrationControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $str,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -64,6 +66,7 @@ class RegistrationControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $email,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -92,7 +95,6 @@ class RegistrationControllerTest extends WebTestCase
     public function testRefererRedirect(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/logout');
@@ -109,6 +111,7 @@ class RegistrationControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $email,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
