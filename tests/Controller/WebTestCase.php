@@ -26,9 +26,10 @@ class WebTestCase extends BaseWebTestCase
 
         $this->em = self::$container->get('doctrine.orm.entity_manager');
         $this->client = static::createClient();
+        $_SERVER['HTTP_USER_AGENT'] = 'foo/1';
     }
 
-    protected function register(Client $client): string
+    protected function register(Client $client, string $nickname = ''): string
     {
         $email = $this->generateEmail();
 
@@ -37,6 +38,7 @@ class WebTestCase extends BaseWebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $email,
+                'fos_user_registration_form[nickname]' => $nickname ?: $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',

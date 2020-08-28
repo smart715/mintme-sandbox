@@ -34,7 +34,6 @@ class SecurityControllerTest extends WebTestCase
     public function testLoginFromTab(): void
     {
         $fooEmail = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/logout');
@@ -92,7 +91,6 @@ class SecurityControllerTest extends WebTestCase
     public function testRefererRedirect(): void
     {
         $userEmail = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/logout');

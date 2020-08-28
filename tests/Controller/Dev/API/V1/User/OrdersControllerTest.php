@@ -189,7 +189,6 @@ class OrdersControllerTest extends WebTestCase
     public function testGetBuyActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -252,7 +251,6 @@ class OrdersControllerTest extends WebTestCase
     public function testGetFinishedOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -317,7 +315,6 @@ class OrdersControllerTest extends WebTestCase
     public function testPlaceOrder(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var User $user */
@@ -371,7 +368,6 @@ class OrdersControllerTest extends WebTestCase
     public function testCancelOrder(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [

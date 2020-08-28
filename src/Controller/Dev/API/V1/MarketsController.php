@@ -83,17 +83,24 @@ class MarketsController extends DevApiController
      */
     public function getMarkets(ParamFetcherInterface $request): array
     {
-        return array_map(function ($market) {
-            return $this->rebrandingConverter->convertMarketStatus($market);
-        }, array_values(
-            $this->marketManager->getMarketsInfo(
-                (int)$request->get('offset'),
-                (int)$request->get('limit'),
-                'monthVolume',
-                'DESC',
-                1
-            )
-        ));
+        $offset = (int)$request->get('offset');
+        $limit = (int)$request->get('limit');
+
+        return array_slice(
+            array_map(function ($market) {
+                return $this->rebrandingConverter->convertMarketStatus($market);
+            }, array_values(
+                $this->marketManager->getMarketsInfo(
+                    $offset,
+                    $limit,
+                    'monthVolume',
+                    'DESC',
+                    1
+                )
+            )),
+            0,
+            $limit
+        );
     }
 
     /**
