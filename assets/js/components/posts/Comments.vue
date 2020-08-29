@@ -14,12 +14,17 @@
         <button class="btn btn-cancel">
             Cancel
         </button>
-        <div class="mt-3">
-            <comment
-                v-for="(n, i) in commentsCount"
-                :comment="comments[i]"
-                :key="i"
-            ></comment>
+        <div class="my-3">
+            <template v-if="commentsCount > 0">
+                <comment
+                    v-for="(n, i) in commentsCount"
+                    :comment="comments[i]"
+                    :key="i"
+                ></comment>
+            </template>
+            <div v-else class="text-center w-100">
+                No one commented yet.
+            </div>
         </div>
     </div>
 </template>
