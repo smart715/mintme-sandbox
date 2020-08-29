@@ -30,7 +30,6 @@
             </template>
         </div>
         <p v-html="comment.content"
-           @click=""
         ></p>
     </div>
 </template>
