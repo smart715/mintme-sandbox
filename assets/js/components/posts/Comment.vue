@@ -29,9 +29,9 @@
                 </a>
             </template>
         </div>
-        <p>
-            {{ comment.content }}
-        </p>
+        <p v-html="comment.content"
+           @click=""
+        ></p>
     </div>
 </template>
 
@@ -53,8 +53,7 @@ export default {
         comment: Object,
     },
     data() {
-        return {
-        };
+        return {};
     },
     computed: {
         date() {
