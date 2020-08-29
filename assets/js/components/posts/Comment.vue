@@ -24,17 +24,38 @@
                         transform="shrink-4 up-1.5"
                     />
                 </button>
-                <a class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset" href="#">
+                <button
+                    class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
+                    @click="editing = true"
+                >
                     <font-awesome-icon
                         class="icon-default c-pointer align-middle"
                         icon="edit"
                         transform="shrink-4 up-1.5"
                     />
-                </a>
+                </button>
             </template>
         </div>
-        <p v-html="comment.content"
+        <p v-if="!editing"
+            v-html="comment.content"
         ></p>
+        <div v-else>
+            <textarea
+                class="form-control my-3"
+                v-model="newContent"
+            ></textarea>
+            <button
+                class="btn btn-primary"
+                @click="editComment"
+            >
+                Save
+            </button>
+            <button class="btn btn-cancel"
+                @click="cancelEditing"
+            >
+                Cancel
+            </button>
+        </div>
     </div>
 </template>
 
@@ -63,6 +84,8 @@ export default {
     data() {
         return {
             deleteDisabled: false,
+            editing: false,
+            newContent: this.comment.content,
         };
     },
     computed: {
@@ -85,6 +108,19 @@ export default {
                     this.deleteDisabled = false;
                 });
         },
+        editComment() {
+            this.$axios.single.post(this.$routing.generate('edit_comment', {id: this.comment.id}), {
+                content: this.newContent,
+            }).then((res) => {
+                this.comment.content = res.data.comment.content;
+                this.newContent = res.data.comment.content;
+                this.editing = false;
+            });
+        },
+        cancelEditing() {
+            this.newContent = this.comment.content;
+            this.editing = false;
+        }
     },
 };
 </script>

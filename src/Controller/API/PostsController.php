@@ -178,6 +178,30 @@ class PostsController extends AbstractFOSRestController
         return $this->view(['message' => 'Comment deleted.'], Response::HTTP_OK);
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post("/comments/edit/{id<\d+>}", name="edit_comment", options={"expose"=true})
+     * @Rest\RequestParam(name="content", nullable=false)
+     */
+    public function editComment(ParamFetcherInterface $request, int $id): View
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $comment = $this->commentManager->getById($id);
+
+        if (!$comment) {
+            throw new ApiNotFoundException("Comment not found");
+        }
+
+        $this->denyAccessUnlessGranted('edit', $comment);
+
+        return $this->handleCommentForm($comment, $request, 'Comment edited.');
+    }
+
     private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
     {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
