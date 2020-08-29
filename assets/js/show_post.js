@@ -7,4 +7,14 @@ new Vue({
         Comments,
         Post,
     },
+    data() {
+        return {
+            comments: null,
+        };
+    },
+    methods: {
+        deleteComment(index) {
+            this.comments.splice(index, 1);
+        },
+    },
 });

@@ -8,6 +8,7 @@ use App\Exception\ApiNotFoundException;
 use App\Form\PostType;
 use App\Form\CommentType;
 use App\Manager\PostManagerInterface;
+use App\Manager\CommentManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -31,14 +32,19 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
+    /** @var CommentManagerInterface */
+    private $commentManager;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
-        PostManagerInterface $postManager
+        PostManagerInterface $postManager,
+        CommentManagerInterface $commentManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
+        $this->commentManager = $commentManager;
     }
 
     /**
@@ -150,6 +156,26 @@ class PostsController extends AbstractFOSRestController
         $comment->setPost($post)->setAuthor($user);
 
         return $this->handleCommentForm($comment, $request, 'Comment created.');
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/comments/delete/{id<\d+>}", name="delete_comment", options={"expose"=true})
+     */
+    public function deleteComment(int $id): View
+    {
+        $comment = $this->commentManager->getById($id);
+
+        if (!$comment) {
+            throw new ApiNotFoundException("Comment not found");
+        }
+
+        $this->denyAccessUnlessGranted('edit', $comment);
+
+        $this->entityManager->remove($comment);
+        $this->entityManager->flush();
+
+        return $this->view(['message' => 'Comment deleted.'], Response::HTTP_OK);
     }
 
     private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View

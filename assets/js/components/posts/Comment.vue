@@ -13,7 +13,11 @@
                 {{ date }}
             </span>
             <template v-if="comment.editable">
-                <button class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset">
+                <button
+                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                    :disabled="deleteDisabled"
+                    @click="deleteComment"
+                >
                     <font-awesome-icon
                         class="icon-default c-pointer align-middle"
                         icon="trash"
@@ -39,20 +43,27 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import {NotificationMixin} from '../../mixins';
 
 library.add(faEdit);
 library.add(faTrash);
 
 export default {
     name: 'Comment',
+    mixins: [
+        NotificationMixin
+    ],
     components: {
         FontAwesomeIcon,
     },
     props: {
         comment: Object,
+        index: Number,
     },
     data() {
-        return {};
+        return {
+            deleteDisabled: false,
+        };
     },
     computed: {
         date() {
@@ -60,6 +71,20 @@ export default {
         },
     },
     methods: {
+        deleteComment() {
+            this.deleteDisabled = true;
+            this.$axios.single.post(this.$routing.generate('delete_comment', {id: this.comment.id}))
+                .then((res) => {
+                    this.$emit('delete-comment', this.index);
+                    this.notifySuccess(res.data.message);
+                })
+                .catch(() => {
+                    this.notifyError('Error deleting comment.');
+                })
+                .finally(() => {
+                    this.deleteDisabled = false;
+                });
+        },
     },
 };
 </script>

@@ -19,9 +19,10 @@
                                     :logged-in="{{ loggedIn }}"
                                 ></post>
                                 <comments
-                                    :comments="{{ comments | json_encode }}"
+                                    :comments="comments || (comments = {{ comments | json_encode }})"
                                     :post-id="{{ post.id }}"
                                     :logged-in="{{ loggedIn }}"
+                                    @delete-comment="deleteComment"
                                 ></comments>
                             </div>
                         </div>

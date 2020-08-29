@@ -127,10 +127,12 @@ export default {
             .then((res) => {
                this.$emit('delete-post', this.index);
                this.notifySuccess(res.data.message);
-               this.deleteDisabled = false;
             })
             .catch(() => {
                 this.notifyError('Error deleting post.');
+            })
+            .finally(() => {
+                this.deleteDisabled = false;
             });
         },
         showModal() {

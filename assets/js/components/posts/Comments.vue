@@ -20,6 +20,8 @@
                     v-for="(n, i) in commentsCount"
                     :comment="comments[i]"
                     :key="i"
+                    :index="i"
+                    @delete-comment="$emit('delete-comment', $event)"
                 ></comment>
             </template>
             <div v-else class="text-center w-100">
