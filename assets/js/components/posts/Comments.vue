@@ -63,6 +63,8 @@ export default {
 
             this.$axios.single.post(this.$routing.generate('add_comment', {id: this.postId}), {
                 content: this.newComment,
+            }).then((res) => {
+                this.$emit('new-comment', res.data.comment);
             });
         },
         goToLogIn(e) {

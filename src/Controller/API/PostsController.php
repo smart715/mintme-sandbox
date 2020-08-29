@@ -207,6 +207,6 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
 
-        return $this->view(["message" => $message], Response::HTTP_OK);
+        return $this->view(["message" => $message, "comment" => $comment], Response::HTTP_OK);
     }
 }

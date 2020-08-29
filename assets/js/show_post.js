@@ -16,5 +16,8 @@ new Vue({
         deleteComment(index) {
             this.comments.splice(index, 1);
         },
+        newComment(comment) {
+            this.comments.unshift(comment);
+        },
     },
 });
