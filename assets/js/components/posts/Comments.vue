@@ -11,7 +11,10 @@
         >
             Save
         </button>
-        <button class="btn btn-cancel">
+        <button
+            class="btn btn-cancel"
+            @click="cancel"
+        >
             Cancel
         </button>
         <div class="my-3">
@@ -65,6 +68,7 @@ export default {
                 content: this.newComment,
             }).then((res) => {
                 this.$emit('new-comment', res.data.comment);
+                this.newComment = '';
             });
         },
         goToLogIn(e) {
@@ -73,6 +77,13 @@ export default {
                 location.href = this.$routing.generate('login', {}, true);
             }
         },
+        cancel() {
+            if (!this.loggedIn) {
+                location.href = this.$routing.generate('login', {}, true);
+            }
+
+            this.newComment = '';
+        }
     },
 };
 </script>
