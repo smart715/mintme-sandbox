@@ -51,6 +51,7 @@ export default {
         addComment() {
             if (!this.loggedIn) {
                 location.href = this.$routing.generate('login', {}, true);
+                return;
             }
 
             this.$axios.single.post(this.$routing.generate('add_comment', {id: this.postId}), {
