@@ -483,14 +483,6 @@ a
   @include media-breakpoint-down(sm)
     margin-top: 4px
 
-.token-info-container
-  max-height: 370px
-  .token-introduction-statistics
-    height: max-content
-  .card-body.posts
-    max-height: 340px
-    overflow-y: scroll
-
 .nav-item-circle-progress
   @include media-breakpoint-up(md)
     margin-left: 30px
@@ -987,6 +979,25 @@ meter
     position: absolute
     bottom: 1.2rem
     right: 1rem
+
+  .token-info-container
+    max-height: 370px
+    position: relative
+    .token-introduction-statistics
+      height: 100%
+      position: absolute;
+      right: 0;
+      top: 0;
+      .card
+        height: 100% !important
+        .card-body
+          height: 100% !important
+          .loading-spinner
+            top: 50%;
+            position: absolute;
+    .card-body.posts
+      max-height: 335px
+      overflow-y: scroll
 
 #token, #profile
   [v-cloak]

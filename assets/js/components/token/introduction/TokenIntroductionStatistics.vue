@@ -186,7 +186,7 @@
                     </div>
                 </template>
                 <template v-else>
-                    <div class="p-5 text-center">
+                    <div class="text-center h-100">
                         <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                     </div>
                 </template>
