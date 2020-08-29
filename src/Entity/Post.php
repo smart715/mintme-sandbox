@@ -66,7 +66,7 @@ class Post
     protected $amount = '0';
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post")
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $comments;
@@ -168,6 +168,11 @@ class Post
     /**
      * @Groups({"Default", "API"})
      */
+    public function getCommentsCount(): int
+    {
+        return $this->comments->count();
+    }
+
     public function getComments(): array
     {
         return $this->comments->toArray();

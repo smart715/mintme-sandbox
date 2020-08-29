@@ -33,7 +33,7 @@
                 icon="comment"
                 transform="shrink-4 up-1.5"
             />
-          <span class="social-link">5 Comments</span>
+          <span class="social-link">{{ post.commentsCount }} Comments</span>
         </a>
         <button v-if="showEdit"
             class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"

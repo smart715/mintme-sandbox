@@ -38,6 +38,7 @@ class PostController extends Controller
         return $this->render('pages/show_post.html.twig', [
             'post' => $this->normalize($post),
             'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
+            'comments' => $this->normalize($post->getComments()),
         ]);
     }
 
