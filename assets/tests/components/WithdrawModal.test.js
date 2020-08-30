@@ -66,7 +66,7 @@ describe('WithdrawModal', () => {
     const amountOk = 100;
     const subunitOk = 0;
     const maxAmountOk = '1000';
-
+    const code = '123456';
     it('should be visible when visible props is true', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
@@ -311,6 +311,7 @@ describe('WithdrawModal', () => {
         });
         wrapper.vm.address = addressOk;
         wrapper.vm.amount = amountOk;
+        wrapper.vm.code = code;
         wrapper.setProps({subunit: subunitOk});
         wrapper.setProps({maxAmount: maxAmountOk});
         wrapper.vm.$v.$touch();

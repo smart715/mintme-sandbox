@@ -48,7 +48,6 @@ class WalletControllerTest extends WebTestCase
     public function testWithdrawConfirmToken(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
         $backupCodes = $this->turnOn2FA($email);

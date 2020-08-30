@@ -9,12 +9,13 @@ class MediaControllerTest extends WebTestCase
     public function testUpload(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
 
-        $path = self::$container->getParameter('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' .
+        $originalName = 'foo.png';
+        $dir = self::$container->getParameter('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' .
             DIRECTORY_SEPARATOR .
-            'media' . DIRECTORY_SEPARATOR . 'default_profile.png';
-        $originalName = 'default_profile.png';
+            'media' . DIRECTORY_SEPARATOR;
+        $path = $dir . DIRECTORY_SEPARATOR . 'foo.png';
+        copy($dir . DIRECTORY_SEPARATOR . 'default_mintme.png', $path);
         $file = new UploadedFile($path, $originalName, null, UPLOAD_ERR_OK, true);
 
         $this->client->request('POST', '/api/media/upload', [

@@ -8,9 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class CheckTokenNameBlacklistTraitTest extends TestCase
 {
-    /*
-     * @dataProvider checkProvider
-     */
+    /** @dataProvider checkProvider */
     public function testCheckTokenNameBlacklist(string $name, bool $result): void
     {
         $blm = $this->createMock(BlacklistManagerInterface::class);
