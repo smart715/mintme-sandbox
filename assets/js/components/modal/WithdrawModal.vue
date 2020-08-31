@@ -17,7 +17,7 @@
                         @change="setFirstTimeOpen"
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
-                    <div v-if="$v.address.$error class="invalid-feedback">
+                    <div v-if="$v.address.$error" class="invalid-feedback">
                         {{ 'WEB' === currency || true === isToken ? 'Wallet address has to be 42 characters long with leading 0x' : 'Invalid wallet address'}}
                     </div>
                 </div>
@@ -99,7 +99,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -249,7 +249,6 @@ export default {
                 ),
                 addressFirstSymbol:
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
-                addressIsValid: addressFirstSymbol[this.currency] ? this.checkAddress : addressFirstSymbol['WEB'],
             },
             code: {
               required,
