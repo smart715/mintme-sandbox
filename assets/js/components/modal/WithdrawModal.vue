@@ -17,7 +17,7 @@
                         @change="setFirstTimeOpen"
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
-                    <div v-if="$v.address.$error" class="invalid-feedback">
+                    <div v-if="$v.address.$error || !$v.address.addressIsValid" class="invalid-feedback">
                         {{ 'WEB' === currency || true === isToken ? 'Wallet address has to be 42 characters long with leading 0x' : 'Invalid wallet address'}}
                     </div>
                 </div>
@@ -99,7 +99,8 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol} from '../../utils/constants';
+import validate from 'bitcoin-address-validation';
 
 export default {
     name: 'WithdrawModal',
@@ -154,6 +155,9 @@ export default {
         },
     },
     methods: {
+        checkAddress: function() {
+            return validate(this.address) !== false;
+        },
         checkAmount: function(event) {
             let inputPos = event.target.selectionStart;
             let amount = this.$v.amount.$model.toString();
@@ -199,7 +203,10 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
+                if (!!twofa) {
+                    this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
+                    return;
+                }
                 this.closeModal();
             })
             .catch((error) => {
@@ -247,10 +254,7 @@ export default {
                 ),
                 addressFirstSymbol:
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
-            },
-            code: {
-              required,
-              twoFACode,
+                addressIsValid: addressFirstSymbol[this.currency] ? this.checkAddress : addressFirstSymbol['WEB'],
             },
         };
     },
