@@ -151,26 +151,35 @@
                 </template>
             </b-table>
         </div>
-        <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2">Create <a :href="createTokenUrl">your own token</a></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        You have not bought tokens yet. Find favorite content creators or
-                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
-                        Start trading now.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
+                <thead>
+                    <tr>
+                        <th class="first-field">Name</th>
+                        <th class="field-table">Amount</th>
+                        <th >&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="first-field">
+                            <div class="truncate-name">
+                                Create <a :href="createTokenUrl">your own token</a>
+                            </div>
+                        </td>
+                        <td class="field-table">&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            You have not bought tokens yet. Find favorite content creators or
+                            famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
+                            Start trading now.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"
