@@ -27,7 +27,7 @@ class KernelSubscriberTest extends TestCase
         );
 
         $sub->onRequest(
-            $this->mockEvent('foo', '/api/foo', false)
+            $this->mockEvent('foo', '/api/foo', false, false)
         );
     }
 
@@ -42,7 +42,7 @@ class KernelSubscriberTest extends TestCase
 
         $this->expectException(Throwable::class);
         $sub->onRequest(
-            $this->mockEvent(null, '/foo/bar', true)
+            $this->mockEvent(null, '/foo/bar', true, true)
         );
     }
 
@@ -57,7 +57,7 @@ class KernelSubscriberTest extends TestCase
 
         $this->expectException(Throwable::class);
         $sub->onRequest(
-            $this->mockEvent('foo', '/api/bar', true)
+            $this->mockEvent('foo', '/api/bar', true, true)
         );
     }
 
@@ -69,7 +69,7 @@ class KernelSubscriberTest extends TestCase
         return $tok;
     }
 
-    private function mockEvent(?string $csrf, string $path, bool $isXml): GetResponseEvent
+    private function mockEvent(?string $csrf, string $path, bool $isXml, bool $isImgFilter): GetResponseEvent
     {
         $event = $this->createMock(GetResponseEvent::class);
         $req = $this->createMock(Request::class);
@@ -80,6 +80,7 @@ class KernelSubscriberTest extends TestCase
         $req->headers = $hb;
         $req->method('getPathInfo')->willReturn($path);
         $req->method('isXmlHttpRequest')->willReturn($isXml);
+        $req->method('isImgFilterRequest')->willReturn($isImgFilter);
 
         $event->method('getRequest')->willReturn($req);
 
