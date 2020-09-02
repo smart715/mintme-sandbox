@@ -15,7 +15,7 @@
                     :logged-in="loggedIn"
                 />
             </template>
-            <div v-else>
+            <div v-else class="text-centered">
                 The token creator has not added any posts yet.
             </div>
             <a v-if="showReadMore"
