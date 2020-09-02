@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\Comment;
+use App\Entity\Like;
 use App\Entity\Post;
 use App\Exception\ApiNotFoundException;
 use App\Form\PostType;
@@ -200,6 +201,42 @@ class PostsController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('edit', $comment);
 
         return $this->handleCommentForm($comment, $request, 'Comment edited.');
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/comments/like/{id<\d+>}", name="like_comment", options={"expose"=true})
+     */
+    public function likeComment(int $id): View
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $comment = $this->commentManager->getById($id);
+
+        if (!$comment) {
+            throw new ApiNotFoundException("Comment not found");
+        }
+
+        $like = $this->entityManager
+            ->getRepository(Like::class)
+            ->findOneBy(['user' => $user, 'comment' => $comment]);
+
+        if ($like) {
+            $this->entityManager->remove($like);
+            $this->entityManager->flush();
+
+            return $this->view(['message' => 'Like removed.', Response::HTTP_OK]);
+        }
+
+        $like = (new Like())->setComment($comment)->setUser($user);
+        $this->entityManager->persist($like);
+        $this->entityManager->flush();
+
+        return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
     }
 
     private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View

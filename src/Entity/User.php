@@ -177,10 +177,20 @@ class User extends BaseUser implements
     protected $isBlocked = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author")
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author", fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $comments;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @ORM\JoinTable(name="`like`",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")}
+     *      )
+     * @var ArrayCollection
+     */
+    protected $likes;
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey

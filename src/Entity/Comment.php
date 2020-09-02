@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -57,6 +58,16 @@ class Comment
      * @var User
      */
     protected $author;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User")
+     * @ORM\JoinTable(name="`like`",
+     *      joinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      )
+     * @var ArrayCollection
+     */
+    protected $likes;
 
     /**
      * @Groups({"Default", "API"})
@@ -142,5 +153,18 @@ class Comment
     public function getAuthor(): User
     {
         return $this->author;
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getLikeCount(): int
+    {
+        return $this->likes->count();
+    }
+
+    public function getLikedBy(User $user): bool
+    {
+        return $this->likes->contains($user);
     }
 }

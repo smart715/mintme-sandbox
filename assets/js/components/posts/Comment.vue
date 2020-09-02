@@ -56,18 +56,28 @@
                 Cancel
             </button>
         </div>
+        <span>
+            <font-awesome-icon
+                class="icon-default c-pointer align-middle"
+                icon="thumbs-up"
+                transform="shrink-4 up-1.5"
+                @click="likeComment"
+            />
+            {{ comment.likeCount }}
+        </span>
     </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTrash, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
 import {NotificationMixin} from '../../mixins';
 
 library.add(faEdit);
 library.add(faTrash);
+library.add(faThumbsUp);
 
 export default {
     name: 'Comment',
@@ -120,7 +130,13 @@ export default {
         cancelEditing() {
             this.newContent = this.comment.content;
             this.editing = false;
-        }
+        },
+        likeComment() {
+            this.$axios.single.post(this.$routing.generate('like_comment', {id: this.comment.id}))
+                .then((res => {
+                    console.log(res.data.message);
+                }));
+        },
     },
 };
 </script>

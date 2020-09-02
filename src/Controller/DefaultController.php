@@ -13,26 +13,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/test",
-     *     name="test",
-     *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
-     * )
-     */
-    public function test(): Response
-    {
-        $em = $this->getDoctrine()->getManager();
-        $pr = $em->getRepository(\App\Entity\Post::class);
-        $p = $pr->find(2);
-
-        $t = '';
-        foreach($p->getComments() as $comment) {
-            $t .= $comment->getContent().'<br>';
-        }
-
-        return new Response($t);
-    }
-
-    /**
      * @Route("/",
      *     name="homepage",
      *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}

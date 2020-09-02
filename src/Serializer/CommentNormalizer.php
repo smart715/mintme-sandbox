@@ -3,6 +3,8 @@
 namespace App\Serializer;
 
 use App\Entity\Comment;
+use App\Entity\Token\Token;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -15,12 +17,17 @@ class CommentNormalizer implements NormalizerInterface
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
+
     public function __construct(
         ObjectNormalizer $objectNormalizer,
-        AuthorizationCheckerInterface $authorizationChecker
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->normalizer = $objectNormalizer;
         $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /** {@inheritdoc} */
@@ -30,6 +37,11 @@ class CommentNormalizer implements NormalizerInterface
         $comment = $this->normalizer->normalize($object, $format, $context);
 
         $comment['editable'] = $this->authorizationChecker->isGranted('edit', $object);
+
+        $token = $this->tokenStorage->getToken();
+        $user = $token ? $token->getUser() : null;
+
+        $comment['liked'] = $user ? $object->getLikedBy($user) : false;
 
         return $comment;
     }
