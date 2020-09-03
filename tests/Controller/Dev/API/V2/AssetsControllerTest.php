@@ -14,22 +14,8 @@ class AssetsControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertGreaterThan(
-            1,
-            $res
-        );
-
-        $this->assertEquals(
-            [
-                'mintme coin',
-                'bitcoin',
-                'ethereum',
-            ],
-            [
-                $res['MINTME'],
-                $res['BTC'],
-                $res['ETH'],
-            ]
-        );
+        $this->assertArrayHasKey('MINTME', $res);
+        $this->assertArrayHasKey('BTC', $res);
+        $this->assertArrayHasKey('ETH', $res);
     }
 }

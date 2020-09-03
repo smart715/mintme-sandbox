@@ -7,7 +7,7 @@ use App\Tests\Controller\WebTestCase;
 
 class OrderbookControllerTest extends WebTestCase
 {
-    public function testGetOrderbook($baseQuote): void
+    public function testGetOrderbook(): void
     {
         $markets = [
             Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL,
