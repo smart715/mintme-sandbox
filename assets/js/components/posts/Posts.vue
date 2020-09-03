@@ -63,22 +63,13 @@ export default {
     data() {
         return {
             readMoreUrl: this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'}),
-            readMoreFlag: false,
+            readMore: false,
         };
     },
     mounted() {
         this.$nextTick(() => {
-            if (typeof this.$refs.postsContainer !== 'undefined') {
-                let postsContainer = this.$refs.postsContainer;
-
-                console.error('Case before: ', postsContainer.clientHeight, postsContainer.scrollHeight, postsContainer.offsetHeight);
-
-                if (postsContainer.clientHeight > 335) {
-                    postsContainer.style.height = postsContainer.clientHeight - 20 + 'px';
-                    this.readMoreFlag = true;
-
-                    console.error('Case after: ', postsContainer.clientHeight, postsContainer.scrollHeight, postsContainer.offsetHeight);
-                }
+            if (typeof this.$refs.postsContainer !== 'undefined' && this.$refs.postsContainer.clientHeight > 335) {
+                this.readMore = true;
             }
         });
     },
@@ -87,10 +78,10 @@ export default {
             return Math.min(this.posts.length, this.max || Infinity);
         },
         showReadMore() {
-            return !!(this.max && this.posts.length > this.max) || this.readMoreFlag;
+            return !!(this.max && this.posts.length > this.max) || this.readMore;
         },
         classObject: function() {
-            if (this.readMoreFlag) {
+            if (this.readMore && this.max > 0) {
                 return {
                     'show-more-container': true,
                 };
