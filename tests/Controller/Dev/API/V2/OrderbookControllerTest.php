@@ -21,7 +21,7 @@ class OrderbookControllerTest extends WebTestCase
                 'GET',
                 self::URL . '/' . $market,
                 [
-                    'depth' => 20,
+                    'depth' => 5,
                     'level' => 3,
                 ]
             );
