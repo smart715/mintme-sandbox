@@ -82,7 +82,7 @@ library.add(faThumbsUp);
 export default {
     name: 'Comment',
     mixins: [
-        NotificationMixin
+        NotificationMixin,
     ],
     components: {
         FontAwesomeIcon,
@@ -138,7 +138,7 @@ export default {
             }
             this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {id: this.comment.id}))
-                .then(res => {
+                .then((res) => {
                     this.comment.likeCount += this.comment.liked ? -1 : 1;
                     this.comment.liked = !this.comment.liked;
                 })
