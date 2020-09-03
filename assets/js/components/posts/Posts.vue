@@ -21,13 +21,15 @@
             <div v-else class="position-absolute top-50">
                 The token creator has not added any posts yet.
             </div>
-            <a v-if="showReadMore"
-                class="align-self-center"
-                :href="readMoreUrl"
-                @click.prevent="goToPosts"
-            >
-                More posts
-            </a>
+            <div v-if="showReadMore" :class="classObject">
+                <a
+                    class="align-self-center"
+                    :href="readMoreUrl"
+                    @click.prevent="goToPosts"
+                >
+                    More posts
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -61,23 +63,23 @@ export default {
     data() {
         return {
             readMoreUrl: this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'}),
+            readMoreFlag: false,
         };
     },
     mounted() {
-        document.addEventListener('DOMContentLoaded', () => {
-            let container1 = document.querySelectorAll('.posts')[0];
-            console.error('Case 1: ', container1.clientHeight, container1.scrollHeight, container1.offsetHeight);
-
-            let posts1 = this.$refs.postsContainer;
-            console.error('Case 2: ', posts1.clientHeight, posts1.scrollHeight, posts1.offsetHeight);
-        });
-
         this.$nextTick(() => {
-            let container2 = document.querySelectorAll('.posts')[0];
-            console.error('Case 3: ', container2.clientHeight, container2.scrollHeight, container2.offsetHeight);
+            if (typeof this.$refs.postsContainer !== 'undefined') {
+                let postsContainer = this.$refs.postsContainer;
 
-            let posts2 = this.$refs.postsContainer;
-            console.error('Case 4: ', posts2.clientHeight, posts2.scrollHeight, posts2.offsetHeight);
+                console.error('Case before: ', postsContainer.clientHeight, postsContainer.scrollHeight, postsContainer.offsetHeight);
+
+                if (postsContainer.clientHeight > 335) {
+                    postsContainer.style.height = postsContainer.clientHeight - 20 + 'px';
+                    this.readMoreFlag = true;
+
+                    console.error('Case after: ', postsContainer.clientHeight, postsContainer.scrollHeight, postsContainer.offsetHeight);
+                }
+            }
         });
     },
     computed: {
@@ -85,7 +87,14 @@ export default {
             return Math.min(this.posts.length, this.max || Infinity);
         },
         showReadMore() {
-            return !!(this.max && this.posts.length > this.max);
+            return !!(this.max && this.posts.length > this.max) || this.readMoreFlag;
+        },
+        classObject: function() {
+            if (this.readMoreFlag) {
+                return {
+                    'show-more-container': true,
+                };
+            }
         },
     },
     methods: {
