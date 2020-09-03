@@ -18,7 +18,7 @@
                     :logged-in="loggedIn"
                 />
             </template>
-            <div v-else class="position-absolute top-50">
+            <div v-else :class="{ 'position-absolute top-50': tokenPage }">
                 The token creator has not added any posts yet.
             </div>
             <div v-if="showReadMore" :class="classObject">
@@ -68,7 +68,11 @@ export default {
     },
     mounted() {
         this.$nextTick(() => {
-            if (typeof this.$refs.postsContainer !== 'undefined' && this.$refs.postsContainer.clientHeight > 335) {
+            if (
+                typeof this.$refs.postsContainer !== 'undefined'
+                && this.posts.length > 0
+                && this.$refs.postsContainer.scrollHeight > this.$refs.postsContainer.clientHeight
+            ) {
                 this.readMore = true;
             }
         });
@@ -81,7 +85,7 @@ export default {
             return !!(this.max && this.posts.length > this.max) || this.readMore;
         },
         classObject: function() {
-            if (this.readMore && this.max > 0) {
+            if (this.tokenPage && this.readMore && this.max > 0) {
                 return {
                     'show-more-container': true,
                 };
