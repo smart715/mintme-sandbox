@@ -33,7 +33,7 @@ class CommentNormalizer implements NormalizerInterface
     /** {@inheritdoc} */
     public function normalize($object, $format = null, array $context = array())
     {
-        /** @var array $post */
+        /** @var array $comment */
         $comment = $this->normalizer->normalize($object, $format, $context);
 
         $comment['editable'] = $this->authorizationChecker->isGranted('edit', $object);

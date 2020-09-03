@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Entity\Comment;
 use App\Entity\Like;
 use App\Entity\Post;
+use App\Entity\User;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
@@ -141,6 +142,7 @@ class PostsController extends AbstractFOSRestController
      */
     public function addComment(int $id, ParamFetcherInterface $request): View
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         if (!$user) {
@@ -209,6 +211,7 @@ class PostsController extends AbstractFOSRestController
      */
     public function likeComment(int $id): View
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         if (!$user) {
