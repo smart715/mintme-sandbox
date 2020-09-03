@@ -56,9 +56,9 @@
                 Cancel
             </button>
         </div>
-        <span>
+        <span :class="{'text-gold' : comment.liked}">
             <font-awesome-icon
-                class="icon-default c-pointer align-middle"
+                class="hover-icon c-pointer align-middle"
                 icon="thumbs-up"
                 transform="shrink-4 up-1.5"
                 @click="likeComment"
@@ -96,6 +96,7 @@ export default {
             deleteDisabled: false,
             editing: false,
             newContent: this.comment.content,
+            liking: false,
         };
     },
     computed: {
@@ -132,10 +133,16 @@ export default {
             this.editing = false;
         },
         likeComment() {
+            if (this.liking) {
+                return;
+            }
+            this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {id: this.comment.id}))
-                .then((res => {
-                    console.log(res.data.message);
-                }));
+                .then(res => {
+                    this.comment.likeCount += this.comment.liked ? -1 : 1;
+                    this.comment.liked = !this.comment.liked;
+                })
+                .finally(() => this.liking = false);
         },
     },
 };

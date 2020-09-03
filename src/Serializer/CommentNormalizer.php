@@ -3,7 +3,7 @@
 namespace App\Serializer;
 
 use App\Entity\Comment;
-use App\Entity\Token\Token;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -41,7 +41,7 @@ class CommentNormalizer implements NormalizerInterface
         $token = $this->tokenStorage->getToken();
         $user = $token ? $token->getUser() : null;
 
-        $comment['liked'] = $user ? $object->getLikedBy($user) : false;
+        $comment['liked'] = $user instanceof User ? $object->getLikedBy($user) : false;
 
         return $comment;
     }
