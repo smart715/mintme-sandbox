@@ -16,6 +16,6 @@ class SummaryControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey(Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL, $res[0]);
-        $this->assertArrayHasKey(Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBO, $res[1]);
+        $this->assertArrayHasKey(Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL, $res[1]);
     }
 }
