@@ -27,6 +27,7 @@
 
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
+{% set hasTokenDescription = defaultActivated ? 'false' : 'true' %}
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
@@ -115,7 +116,7 @@
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">
-                            {% if isOwner or tokenDescription %}
+                            {% if isOwner or hasTokenDescription %}
                                 <token-introduction-description
                                     class="col-12 pb-3"
                                     name="{{ token.name }}"
