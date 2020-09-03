@@ -4,9 +4,12 @@ namespace App\Tests\Controller\Dev\API\V2;
 
 use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class OrderbookControllerTest extends WebTestCase
 {
+    const URL = '/dev/api/v2/open/orderbook';
+
     public function testGetOrderbook(): void
     {
         $markets = [
@@ -14,11 +17,10 @@ class OrderbookControllerTest extends WebTestCase
             Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL,
         ];
 
-        foreach($markets as $market) {
-
+        foreach ($markets as $market) {
             $this->client->request(
                 'GET',
-                "/dev/api/v2/open/orderbook/$market",
+                URL . $market,
                 [
                     'depth' => 20,
                     'level' => 3,
@@ -38,21 +40,20 @@ class OrderbookControllerTest extends WebTestCase
 
     public function testRebrandingRedirect(): void
     {
-        $this->client->request(
-            'GET',
-            '/dev/api/v2/open/orderbook/' . Token::WEB_SYMBOL . '_' . Token::BTC_SYMBOL
-        );
-        $this->assertTrue($this->client->getResponse()->isRedirect(
-                '/dev/api/v2/open/orderbook/' . Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL
-            )
-        );
-        $this->client->request(
-            'GET',
-            '/dev/api/v2/open/orderbook/' . Token::WEB_SYMBOL . '_' . Token::ETH_SYMBOL
-        );
-        $this->assertTrue($this->client->getResponse()->isRedirect(
-                '/dev/api/v2/open/orderbook/' . Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL
-            )
-        );
+        $redirects = [
+            [
+                'from' => Token::WEB_SYMBOL . '_' . Token::BTC_SYMBOL,
+                'to' => Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL,
+            ],
+            [
+                'from' => Token::WEB_SYMBOL . '_' . Token::ETH_SYMBOL,
+                'to' => Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL,
+            ],
+        ];
+
+        foreach ($redirects as $redirect) {
+            $this->client->request('GET', URL . '/' . $redirect['from']);
+            $this->assertTrue($this->client->getResponse()->isRedirect(URL . '/' . $redirect['to']));
+        }
     }
 }
