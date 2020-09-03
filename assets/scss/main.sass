@@ -974,6 +974,9 @@ meter
   meter[value="#{$i}"]::-moz-meter-bar
     background: nth($meterbg-list, $i)
 
+.top-50
+  top: 50%
+
 @media (min-width: 992px)
   .resetlabel
     position: absolute
@@ -1002,7 +1005,7 @@ meter
             top: 50%
             position: absolute
     .card-body.posts
-      overflow-y: auto
+      overflow-y: hidden
 
 #token, #profile
   [v-cloak]
