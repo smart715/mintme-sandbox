@@ -19,7 +19,7 @@ class OrderbookControllerTest extends WebTestCase
         foreach ($markets as $market) {
             $this->client->request(
                 'GET',
-                URL . $market,
+                self::URL . '/' . $market,
                 [
                     'depth' => 20,
                     'level' => 3,
@@ -51,8 +51,8 @@ class OrderbookControllerTest extends WebTestCase
         ];
 
         foreach ($redirects as $redirect) {
-            $this->client->request('GET', URL . '/' . $redirect['from']);
-            $this->assertTrue($this->client->getResponse()->isRedirect(URL . '/' . $redirect['to']));
+            $this->client->request('GET', self::URL . '/' . $redirect['from']);
+            $this->assertTrue($this->client->getResponse()->isRedirect(self::URL . '/' . $redirect['to']));
         }
     }
 }

@@ -19,21 +19,10 @@ class TradesControllerTest extends WebTestCase
         foreach ($markets as $market) {
             $this->client->request(
                 'GET',
-                URL . $market,
-                [
-                    'depth' => 20,
-                    'level' => 3,
-                ]
+                self::URL . '/' . $market
             );
 
             $this->assertTrue($this->client->getResponse()->isSuccessful());
-
-            $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-
-            $this->assertCount(3, $res);
-            $this->assertArrayHasKey('asks', $res);
-            $this->assertArrayHasKey('bids', $res);
-            $this->assertArrayHasKey('timestamp', $res);
         }
     }
 
@@ -51,8 +40,8 @@ class TradesControllerTest extends WebTestCase
         ];
 
         foreach ($redirects as $redirect) {
-            $this->client->request('GET', URL . '/' . $redirect['from']);
-            $this->assertTrue($this->client->getResponse()->isRedirect(URL . '/' . $redirect['to']));
+            $this->client->request('GET', self::URL . '/' . $redirect['from']);
+            $this->assertTrue($this->client->getResponse()->isRedirect(self::URL . '/' . $redirect['to']));
         }
     }
 }

@@ -95,9 +95,7 @@ class TradesController extends AbstractFOSRestController
                 'type' => array_search($order->getSide(), Order::SIDE_MAP),
             ];
         }, $this->marketHandler->getExecutedOrders(
-            $market,
-            0,
-            100
+            $market
         ));
     }
 }
