@@ -39,9 +39,13 @@ class CommentNormalizer implements NormalizerInterface
         $comment['editable'] = $this->authorizationChecker->isGranted('edit', $object);
 
         $token = $this->tokenStorage->getToken();
-        $user = $token ? $token->getUser() : null;
+        $user = $token
+            ? $token->getUser()
+            : null;
 
-        $comment['liked'] = $user instanceof User ? $object->getLikedBy($user) : false;
+        $comment['liked'] = $user instanceof User
+            ? $object->getLikedBy($user)
+            : false;
 
         return $comment;
     }
