@@ -112,13 +112,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'error' => 'Withdrawal failed',
             ], Response::HTTP_BAD_GATEWAY);
         }
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
-        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
-
-        $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
-            'address' => $pendingWithdraw->getAddress()->getAddress(),
-            'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
-        ]);
+            $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
+                'address' => $pendingWithdraw->getAddress()->getAddress(),
+                'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+            ]);
+        }
 
         return $this->view();
     }
