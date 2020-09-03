@@ -25,6 +25,9 @@ if test ! -f ".env"; then
     cp .env.dist .env
 fi
 
+# Declare delayed message exchange
+rabbitmqadmin declare exchange name='market' type='x-delayed-message' arguments='{"x-delayed-type":"fanout"}'
+
 # Install npm deps
 npm i
 npm run dev
