@@ -384,7 +384,7 @@ export default {
                 },
                 buyDepth: {
                     key: 'buyDepth',
-                    label: 'Buy Depth',
+                    label: 'Buy Depth Test',
                     help: 'Buy depth is amount of buy orders in MINTME on each market. This might better represent ' +
                     'token market size than marketcap.',
                 },
