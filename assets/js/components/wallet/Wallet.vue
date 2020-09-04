@@ -29,15 +29,13 @@
                         <div class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div>
+                            <a href="#" class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
-                            </div>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
+                            </a>
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
@@ -48,15 +46,13 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div>
+                            <a href="#" class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
-                            </div>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                            </a>
                         </div>
                     </div>
                 </template>
@@ -116,15 +112,13 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <div>
+                            <a href="#" class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
-                            </div>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
+                            </a>
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
@@ -138,13 +132,13 @@
                                         data.item.blocked)"
                         >
                             <div>
-                                <font-awesome-icon
-                                    class="icon-default"
-                                    :icon="['fac', 'withdraw']"
-                                />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <a href="#" class="text-white hover-icon text-decoration-none">
+                                    <font-awesome-icon
+                                        class="icon-default"
+                                        :icon="['fac', 'withdraw']"
+                                    />
+                                    <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                </a>
                             </div>
                         </div>
                     </div>
