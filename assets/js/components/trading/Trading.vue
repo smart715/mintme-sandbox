@@ -396,6 +396,14 @@ export default {
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
+            if ('' === this.sortBy) {
+                tokens.sort((first, second) => {
+                    if (first.tokenized !== second.tokenized) {
+                        return first.tokenized ? -1 : 1;
+                    }
+                    return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
+                });
+            }
 
             tokens = _.map(tokens, (token) => {
                 return _.mapValues(token, (item, key) => {

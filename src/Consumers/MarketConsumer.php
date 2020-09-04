@@ -8,6 +8,7 @@ use App\Exchange\Market;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
@@ -77,7 +78,10 @@ class MarketConsumer implements ConsumerInterface
             $this->logger->error(
                 '[market-consumer] Can not update the market. Trying again. Reason: '.$exception->getMessage()
             );
-            $this->marketProducer->send($market);
+
+            if (!$exception instanceof InvalidArgumentException) {
+                $this->marketProducer->send($market);
+            }
         }
 
         return true;
