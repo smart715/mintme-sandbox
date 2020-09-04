@@ -29,6 +29,7 @@ final class Version20200825163628 extends AbstractMigration
                 updated_at DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
                 post_id INT NOT NULL,
                 user_id INT NOT NULL,
+                like_count INT NOT NULL,
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
 

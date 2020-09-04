@@ -9,9 +9,9 @@
                 >
                 {{ post.author.nickname }}
             </a>
-            <span class="post-date">
+            <a  href="singlePageUrl" class="text-decoration-none post-date">
                 {{ date }}
-            </span>
+            </a>
             <copy-link :content-to-copy="link" class="c-pointer ml-1">
               <font-awesome-icon :icon="['far', 'copy']"/>
             </copy-link>
@@ -27,7 +27,7 @@
         <p v-else>
             To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
         </p>
-        <a :href="$routing.generate('show_post', {id: post.id})" class="hover-icon text-decoration-none text-white">
+        <a :href="singlePageUrl" class="hover-icon text-decoration-none text-white">
             <font-awesome-icon
                 class="c-pointer align-middle"
                 icon="comment"
@@ -118,6 +118,9 @@ export default {
         },
         link() {
             return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
+        },
+        singlePageUrl() {
+            return this.$routing.generate('show_post', {id: post.id});
         },
     },
     methods: {

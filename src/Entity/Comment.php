@@ -70,6 +70,12 @@ class Comment
     protected $likes;
 
     /**
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    protected $likeCount = 0;
+
+    /**
      * @Groups({"Default", "API"})
      */
     public function getId(): int
@@ -160,11 +166,25 @@ class Comment
      */
     public function getLikeCount(): int
     {
-        return $this->likes->count();
+        return $this->likeCount;
     }
 
     public function getLikedBy(User $user): bool
     {
         return $this->likes->contains($user);
+    }
+
+    public function removeLike(): self
+    {
+        $this->likeCount--;
+
+        return $this;
+    }
+
+    public function addLike(): self
+    {
+        $this->likeCount++;
+
+        return $this;
     }
 }

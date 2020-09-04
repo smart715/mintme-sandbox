@@ -230,6 +230,10 @@ class PostsController extends AbstractFOSRestController
 
         if ($like) {
             $this->entityManager->remove($like);
+
+            $comment->removeLike();
+            $this->entityManager->persist($comment);
+
             $this->entityManager->flush();
 
             return $this->view(['message' => 'Like removed.', Response::HTTP_OK]);
@@ -237,6 +241,10 @@ class PostsController extends AbstractFOSRestController
 
         $like = (new Like())->setComment($comment)->setUser($user);
         $this->entityManager->persist($like);
+
+        $comment->addLike();
+        $this->entityManager->persist($comment);
+
         $this->entityManager->flush();
 
         return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);

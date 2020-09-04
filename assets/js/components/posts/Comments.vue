@@ -1,10 +1,16 @@
 <template>
     <div class="comments">
-        <textarea
-            class="form-control mb-3"
-            v-model="newComment"
-            @focus="goToLogIn"
-        ></textarea>
+        <div class="form-group">
+            <textarea
+                class="form-control mb-3"
+                :class="{ 'is-invalid' : newCommentInvalid }"
+                v-model="newComment"
+                @focus="goToLogIn"
+            ></textarea>
+            <div class="invalid-feedback">
+                {{ newCommentError }}
+            </div>
+        </div>
         <button
             class="btn btn-primary"
             @click="addComment"
@@ -24,6 +30,7 @@
                     :comment="comments[i]"
                     :key="i"
                     :index="i"
+                    :logged-in="loggedIn"
                     @delete-comment="$emit('delete-comment', $event)"
                 ></comment>
             </template>
@@ -36,6 +43,7 @@
 
 <script>
 import Comment from './Comment';
+import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 
 export default {
     name: 'Comments',
@@ -50,17 +58,39 @@ export default {
     data() {
         return {
             newComment: '',
+            loginUrl: this.$routing.generate('login', {}, true),
+            minContentLength: 1,
+            maxContentLength: 500,
         };
     },
     computed: {
         commentsCount() {
             return this.comments.length;
         },
+        newCommentInvalid() {
+            return this.$v.newComment.$invalid && this.newComment.length > 0;
+        },
+        newCommentError() {
+            if (!this.$v.newComment.required) {
+                return 'Content can\'t be empty';
+            }
+            if (!this.$v.newComment.minLength) {
+                return `Content must be at least ${this.minContentLength} characters long`;
+            }
+            if (!this.$v.newComment.maxLength) {
+                return `Content can't be more than ${this.maxContentLength} characters long`;
+            }
+            return '';
+        },
     },
     methods: {
         addComment() {
             if (!this.loggedIn) {
-                location.href = this.$routing.generate('login', {}, true);
+                location.href = this.loginUrl;
+                return;
+            }
+
+            if (this.$v.newComment.$invalid) {
                 return;
             }
 
@@ -74,16 +104,25 @@ export default {
         goToLogIn(e) {
             if (!this.loggedIn) {
                 e.target.blur();
-                location.href = this.$routing.generate('login', {}, true);
+                location.href = this.loginUrl;
             }
         },
         cancel() {
             if (!this.loggedIn) {
-                location.href = this.$routing.generate('login', {}, true);
+                location.href = this.loginUrl;
             }
 
             this.newComment = '';
         },
+    },
+    validations() {
+        return {
+            newComment: {
+                required,
+                minLength: minLength(this.minContentLength),
+                maxLength: maxLength(this.maxContentLength),
+            };
+        };
     },
 };
 </script>

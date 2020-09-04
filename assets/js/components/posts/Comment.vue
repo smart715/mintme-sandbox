@@ -90,6 +90,7 @@ export default {
     props: {
         comment: Object,
         index: Number,
+        loggedIn: Boolean,
     },
     data() {
         return {
@@ -133,6 +134,10 @@ export default {
             this.editing = false;
         },
         likeComment() {
+            if (!this.loggedIn) {
+                location.href = this.$routing.generate('login', {}, true);
+                return;
+            }
             if (this.liking) {
                 return;
             }

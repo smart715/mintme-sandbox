@@ -67,6 +67,7 @@ class Post
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"likeCount" = "DESC"})
      * @var ArrayCollection
      */
     protected $comments;
