@@ -77,11 +77,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms');
+            ->from(MarketStatus::class, 'ms')
+            ->join('ms.quoteToken', 'qt');
 
         if (self::DEPLOYED_ONLY === $deployed) {
-            $qb->join('ms.quoteToken', 'qt')
-                ->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+            $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         return (int)$qb->getQuery()->getSingleScalarResult();
