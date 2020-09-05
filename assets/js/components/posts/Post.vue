@@ -9,7 +9,7 @@
                 >
                 {{ post.author.nickname }}
             </a>
-            <a  href="singlePageUrl" class="text-decoration-none post-date">
+            <a  :href="singlePageUrl" class="text-decoration-none post-date">
                 {{ date }}
             </a>
             <copy-link :content-to-copy="link" class="c-pointer ml-1">
@@ -120,7 +120,7 @@ export default {
             return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
         },
         singlePageUrl() {
-            return this.$routing.generate('show_post', {id: post.id});
+            return this.$routing.generate('show_post', {id: this.post.id});
         },
     },
     methods: {

@@ -118,10 +118,10 @@ export default {
     validations() {
         return {
             newComment: {
-                required,
+                required: (val) => required(val.trim()),
                 minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
-            };
+            },
         };
     },
 };

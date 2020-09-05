@@ -150,5 +150,10 @@ export default {
                 .finally(() => this.liking = false);
         },
     },
+    watch: {
+        comment() {
+            this.newContent = this.comment.content;
+        },
+    },
 };
 </script>

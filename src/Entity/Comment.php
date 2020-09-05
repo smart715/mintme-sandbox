@@ -75,6 +75,11 @@ class Comment
      */
     protected $likeCount = 0;
 
+    public function __construct()
+    {
+        $this->likes = new ArrayCollection();
+    }
+
     /**
      * @Groups({"Default", "API"})
      */
