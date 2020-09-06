@@ -140,6 +140,17 @@ export default {
                 ? item.highlightClass
                 : '';
         },
+        removeOrder: function() {
+            let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
+                base: this.market.base.symbol,
+                quote: this.market.quote.symbol,
+            });
+            this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
+                .catch((err) => {
+                    this.notifyError('Service unavailable, try again later');
+                    this.sendLogs('error', 'Remove order service unavailable', err);
+                });
+        },
     },
     watch: {
         ordersList: function(newOrders) {
