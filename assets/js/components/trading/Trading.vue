@@ -477,11 +477,12 @@ export default {
             return pair.indexOf('/') !== -1;
         },
         toggleFilter: function(value) {
+            let page = this.marketFilters.selectedFilter === this.marketFilters.options.deployed && value === this.marketFilters.options.all ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
             this.sortDesc = true;
-            this.updateMarkets(1, true);
+            this.updateMarkets(page, true);
         },
         toggleUsd: function(show) {
             this.showUsd = show;
