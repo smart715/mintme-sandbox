@@ -155,7 +155,6 @@ export default {
     },
     methods: {
         checkAmount: function(event) {
-          return true;
             let inputPos = event.target.selectionStart;
             let amount = this.$v.amount.$model.toString();
             let selected = getSelection().toString();
