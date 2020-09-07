@@ -29,7 +29,7 @@
                         <div class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <a href="#" class="text-white hover-icon text-decoration-none">
+                            <a class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
@@ -46,7 +46,7 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <a href="#" class="text-white hover-icon text-decoration-none">
+                            <a class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
@@ -112,7 +112,7 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <a href="#" class="text-white hover-icon text-decoration-none">
+                            <a class="text-white hover-icon text-decoration-none">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
@@ -132,7 +132,7 @@
                                         data.item.blocked)"
                         >
                             <div>
-                                <a href="#" class="text-white hover-icon text-decoration-none">
+                                <a class="text-white hover-icon text-decoration-none">
                                     <font-awesome-icon
                                         class="icon-default"
                                         :icon="['fac', 'withdraw']"
