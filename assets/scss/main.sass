@@ -984,6 +984,9 @@ meter
     right: 1rem
 
   .token-info-container
+    max-height: 370px
+    height: 370px
+    position: relative
     .posts
       .text-centered
         position: absolute
@@ -1006,10 +1009,10 @@ meter
           text-align: center
           padding-top: 2px
 
-.token-info-container
-  max-height: 370px
-  height: 370px
-  position: relative
+@media (max-width: 992px)
+  .token-info-container
+    > div
+      max-height: 370px !important
 
 #token, #profile
   [v-cloak]
