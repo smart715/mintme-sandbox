@@ -163,9 +163,6 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.showModal = false;
-        wrapper.setProps({twofa: ''});
-        wrapper.vm.openWithdraw('currency', 'fee', 'amount', 'subunit');
-        expect(wrapper.vm.showModal).toBe(false);
         wrapper.setProps({twofa: 'foo'});
         wrapper.vm.predefinedTokens = {};
         wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
