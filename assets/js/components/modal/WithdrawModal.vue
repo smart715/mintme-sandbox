@@ -142,7 +142,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                amount.add(this.fee).toString(),
                 this.subunit
             );
         },
@@ -155,6 +155,7 @@ export default {
     },
     methods: {
         checkAmount: function(event) {
+          return true;
             let inputPos = event.target.selectionStart;
             let amount = this.$v.amount.$model.toString();
             let selected = getSelection().toString();
