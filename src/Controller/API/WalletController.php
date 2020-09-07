@@ -65,7 +65,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="required"})
+     * @Rest\Post("/withdraw", name="withdraw")
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(

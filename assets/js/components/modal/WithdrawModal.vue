@@ -199,7 +199,7 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                if (!!this.twofa) {
+                if (!this.twofa) {
                     this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
                     return;
                 }

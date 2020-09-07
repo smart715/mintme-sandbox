@@ -373,10 +373,7 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            if (!this.twofa) {
-                this.notifyInfo('Please enable 2FA before withdrawing');
-                return;
-            }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
