@@ -40,21 +40,14 @@
             v-html="comment.content"
         ></p>
         <div v-else>
-            <textarea
-                class="form-control my-3"
-                v-model="newContent"
-            ></textarea>
-            <button
-                class="btn btn-primary"
-                @click="editComment"
-            >
-                Save
-            </button>
-            <button class="btn btn-cancel"
-                @click="cancelEditing"
-            >
-                Cancel
-            </button>
+            <comment-form
+                :logged-in="loggedIn"
+                :prop-content="comment.content"
+                :api-url="apiUrl"
+                @submitted="editComment"
+                @error="notifyError('Error editing comment.')"
+                @cancel="cancelEditing"
+            ></comment-form>
         </div>
         <span :class="{'text-gold' : comment.liked}">
             <font-awesome-icon
@@ -63,12 +56,13 @@
                 transform="shrink-4 up-1.5"
                 @click="likeComment"
             />
-            {{ comment.likeCount }}
+            {{ comment.likeCount }} Likes
         </span>
     </div>
 </template>
 
 <script>
+import CommentForm from './CommentForm';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTrash, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -86,6 +80,7 @@ export default {
     ],
     components: {
         FontAwesomeIcon,
+        CommentForm,
     },
     props: {
         comment: Object,
@@ -96,13 +91,15 @@ export default {
         return {
             deleteDisabled: false,
             editing: false,
-            newContent: this.comment.content,
             liking: false,
         };
     },
     computed: {
         date() {
             return moment(this.comment.createdAt).format('H:mm, MMM D, YYYY');
+        },
+        apiUrl() {
+            return this.$routing.generate('edit_comment', {id: this.comment.id});
         },
     },
     methods: {
@@ -120,17 +117,11 @@ export default {
                     this.deleteDisabled = false;
                 });
         },
-        editComment() {
-            this.$axios.single.post(this.$routing.generate('edit_comment', {id: this.comment.id}), {
-                content: this.newContent,
-            }).then((res) => {
-                this.comment.content = res.data.comment.content;
-                this.newContent = res.data.comment.content;
-                this.editing = false;
-            });
+        editComment(comment) {
+            this.comment.content = comment.content;
+            this.cancelEditing();
         },
         cancelEditing() {
-            this.newContent = this.comment.content;
             this.editing = false;
         },
         likeComment() {
@@ -147,12 +138,10 @@ export default {
                     this.comment.likeCount += this.comment.liked ? -1 : 1;
                     this.comment.liked = !this.comment.liked;
                 })
+                .catch(() => {
+                    this.notifyError('Error liking comment.');
+                })
                 .finally(() => this.liking = false);
-        },
-    },
-    watch: {
-        comment() {
-            this.newContent = this.comment.content;
         },
     },
 };

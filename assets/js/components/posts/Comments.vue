@@ -1,28 +1,12 @@
 <template>
     <div class="comments">
-        <div class="form-group">
-            <textarea
-                class="form-control mb-3"
-                :class="{ 'is-invalid' : newCommentInvalid }"
-                v-model="newComment"
-                @focus="goToLogIn"
-            ></textarea>
-            <div class="invalid-feedback">
-                {{ newCommentError }}
-            </div>
-        </div>
-        <button
-            class="btn btn-primary"
-            @click="addComment"
-        >
-            Save
-        </button>
-        <button
-            class="btn btn-cancel"
-            @click="cancel"
-        >
-            Cancel
-        </button>
+        <comment-form
+            :logged-in="loggedIn"
+            :api-url="apiUrl"
+            @submitted="$emit('new-comment', $event)"
+            @error="notifyError('Error creating comment.')"
+            reset-after-submit
+        ></comment-form>
         <div class="my-3">
             <template v-if="commentsCount > 0">
                 <comment
@@ -43,12 +27,17 @@
 
 <script>
 import Comment from './Comment';
-import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import CommentForm from './CommentForm';
+import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'Comments',
+    mixins: [
+        NotificationMixin,
+    ],
     components: {
         Comment,
+        CommentForm,
     },
     props: {
         comments: Array,
@@ -57,72 +46,15 @@ export default {
     },
     data() {
         return {
-            newComment: '',
-            loginUrl: this.$routing.generate('login', {}, true),
-            minContentLength: 1,
-            maxContentLength: 500,
         };
     },
     computed: {
         commentsCount() {
             return this.comments.length;
         },
-        newCommentInvalid() {
-            return this.$v.newComment.$invalid && this.newComment.length > 0;
+        apiUrl() {
+            return this.$routing.generate('add_comment', {id: this.postId});
         },
-        newCommentError() {
-            if (!this.$v.newComment.required) {
-                return 'Content can\'t be empty';
-            }
-            if (!this.$v.newComment.minLength) {
-                return `Content must be at least ${this.minContentLength} characters long`;
-            }
-            if (!this.$v.newComment.maxLength) {
-                return `Content can't be more than ${this.maxContentLength} characters long`;
-            }
-            return '';
-        },
-    },
-    methods: {
-        addComment() {
-            if (!this.loggedIn) {
-                location.href = this.loginUrl;
-                return;
-            }
-
-            if (this.$v.newComment.$invalid) {
-                return;
-            }
-
-            this.$axios.single.post(this.$routing.generate('add_comment', {id: this.postId}), {
-                content: this.newComment,
-            }).then((res) => {
-                this.$emit('new-comment', res.data.comment);
-                this.newComment = '';
-            });
-        },
-        goToLogIn(e) {
-            if (!this.loggedIn) {
-                e.target.blur();
-                location.href = this.loginUrl;
-            }
-        },
-        cancel() {
-            if (!this.loggedIn) {
-                location.href = this.loginUrl;
-            }
-
-            this.newComment = '';
-        },
-    },
-    validations() {
-        return {
-            newComment: {
-                required: (val) => required(val.trim()),
-                minLength: minLength(this.minContentLength),
-                maxLength: maxLength(this.maxContentLength),
-            },
-        };
     },
 };
 </script>
