@@ -25,7 +25,7 @@
                     />
                 </button>
                 <button
-                    class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
+                    class="btn btn-link p-0 comment-edit-icon float-right text-decoration-none text-reset"
                     @click="editing = true"
                 >
                     <font-awesome-icon
