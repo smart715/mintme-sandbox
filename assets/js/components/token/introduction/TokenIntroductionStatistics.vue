@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
                 Statistics
                 <guide class="float-right">
@@ -15,7 +15,7 @@
                     </template>
                 </guide>
             </div>
-            <div class="card-body">
+            <div class="card-body h-100">
                 <template v-if="loaded">
                     <div class="d-flex flex-column px-3 pb-3">
                         <div v-if="isTokenDeployed">
@@ -187,7 +187,7 @@
                 </template>
                 <template v-else>
                     <div class="text-center h-100">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner position-absolute" fixed-width />
                     </div>
                 </template>
             </div>

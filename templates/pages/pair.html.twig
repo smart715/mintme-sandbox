@@ -123,7 +123,7 @@
                                     @updated="descriptionUpdated"
                             ></token-introduction-description>
                         </div>
-                        <div class="row token-info-container">
+                        <div class="row token-info-container position-relative">
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
                                 :max="3"
@@ -138,7 +138,7 @@
                                 <template v-slot:title>Recent posts</template>
                             </posts>
                             <token-introduction-statistics
-                                class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1 token-introduction-statistics"
+                                class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1 token-introduction-statistics h-100 position-absolute"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
                                 release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"

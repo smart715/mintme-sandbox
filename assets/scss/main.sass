@@ -983,39 +983,28 @@ meter
     bottom: 1.2rem
     right: 1rem
 
-  .token-info-container
-    max-height: 370px
-    height: 370px
-    position: relative
-    .posts
-      .text-centered
-        position: absolute
-        top: 50%
-    .token-introduction-statistics
-      height: 100%
+.token-info-container
+  max-height: 370px
+  height: 370px
+  .token-introduction-statistics
+    right: 0
+    top: 0
+    .card
+      .card-body
+        padding-bottom: 0 !important
+        .loading-spinner
+          top: 50%
+  .card-body.posts
+    .show-more-container
       position: absolute
-      right: 0
-      top: 0
-      .card
-        height: 100% !important
-        .card-body
-          height: 100% !important
-          padding-bottom: 0 !important
-          .loading-spinner
-            top: 50%
-            position: absolute
-    .card-body.posts
-      overflow-y: hidden
-      .show-more-container
-        position: absolute
-        bottom: 0
-        height: 25px
-        width: 95%
-        align-content: center
-        background: #152d47
-        display: block
-        text-align: center
-        padding-top: 2px
+      bottom: 0
+      height: 25px
+      width: 95%
+      align-content: center
+      background: $secondary
+      display: block
+      text-align: center
+      padding-top: 2px
 
 #token, #profile
   [v-cloak]

@@ -4,7 +4,7 @@
             <slot name="title">Posts</slot>
         </div>
         <div
-            class="card-body posts"
+            class="card-body posts overflow-y-hidden"
             ref="postsContainer"
         >
             <template v-if="posts.length > 0">
