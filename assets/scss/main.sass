@@ -987,8 +987,10 @@ meter
   max-height: 370px
   height: 370px
   .token-introduction-statistics
-    right: 0
-    top: 0
+    @media (min-width: 992px)
+      position: absolute!important
+      right: 0
+      top: 0
   .card-body.posts
     .show-more-container
       position: absolute
