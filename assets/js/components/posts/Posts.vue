@@ -67,15 +67,13 @@ export default {
         };
     },
     mounted() {
-        this.$nextTick(() => {
-            if (
-                typeof this.$refs.postsContainer !== 'undefined'
-                && this.posts.length > 0
-                && this.$refs.postsContainer.scrollHeight > this.$refs.postsContainer.clientHeight
-            ) {
-                this.readMore = true;
-            }
-        });
+        if (
+            typeof this.$refs.postsContainer !== 'undefined'
+            && this.posts.length > 0
+            && this.$refs.postsContainer.scrollHeight > this.$refs.postsContainer.clientHeight
+        ) {
+            this.readMore = true;
+        }
     },
     computed: {
         postsCount() {
