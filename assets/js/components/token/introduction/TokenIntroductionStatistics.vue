@@ -187,7 +187,7 @@
                 </template>
                 <template v-else>
                     <div class="text-center h-100">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner position-absolute top-50" fixed-width />
                     </div>
                 </template>
             </div>
