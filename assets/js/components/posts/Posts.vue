@@ -69,11 +69,22 @@ export default {
     mounted() {
         if (
             typeof this.$refs.postsContainer !== 'undefined'
-            && this.posts.length > 0 && this.loggedIn &&
-            (this.$refs.postsContainer.scrollHeight > this.$refs.postsContainer.clientHeight
-            || this.$refs.postsContainer.clientHeight >= 337)
+            && this.posts.length > 0 && this.loggedIn
         ) {
-            this.readMore = true;
+            let postsContainer = this.$refs.postsContainer;
+            let posts = postsContainer.getElementsByClassName('post');
+            let postsHeight = 0;
+
+            for (let i = 0; i < posts.length; i++) {
+                postsHeight += posts[i].offsetHeight + 10; // `10px` - margin
+            }
+
+            if (
+                postsContainer.scrollHeight > postsContainer.clientHeight
+                || postsHeight > 317
+            ) {
+                this.readMore = true;
+            }
         }
     },
     computed: {
