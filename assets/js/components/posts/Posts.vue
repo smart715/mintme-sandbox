@@ -69,7 +69,7 @@ export default {
     mounted() {
         if (
             typeof this.$refs.postsContainer !== 'undefined'
-            && this.posts.length > 0 &&
+            && this.posts.length > 0 && this.loggedIn &&
             (this.$refs.postsContainer.scrollHeight > this.$refs.postsContainer.clientHeight
             || this.$refs.postsContainer.clientHeight >= 337)
         ) {
