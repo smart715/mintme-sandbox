@@ -62,7 +62,6 @@
                                 :lazy="true"
                         >
                             <template slot="button-content">
-                                Currency:
                                 <span v-if="showUsd">
                                     USD
                                 </span>
