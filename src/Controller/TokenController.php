@@ -169,7 +169,7 @@ class TokenController extends Controller
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
-            'defaultActivated' => $defaultActivated,
+            'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),

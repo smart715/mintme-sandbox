@@ -115,9 +115,8 @@
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">
-                            {% if isOwner or not defaultActivated %}
+                            {% if showDescription %}
                                 <token-introduction-description
-                                    class="col-12 pb-3"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
                                     :editable="{{ isOwner }}"
