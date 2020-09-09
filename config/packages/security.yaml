@@ -24,6 +24,7 @@ security:
             logout:
                 handlers: [logout_listner]
                 target: /logout_success
+                csrf_token_generator: security.csrf.token_manager
             anonymous: true
             form_login:
                 provider: fos_userbundle

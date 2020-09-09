@@ -120,10 +120,18 @@
                             </a>
                         </li>
                         <li class="nav-item align-self-center d-lg-none {{ route == 'fos_user_security_logout' ? 'active' : '' }}">
-                                <a href="{{ path('fos_user_security_logout') }}" class="nav-link">
-                                    <span>Log Out</span>
-                                </a>
-                            </li>
+                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                <button
+                                        class="logout-link"
+                                        type="submit"
+                                        id="_submit"
+                                        name="_submit"
+                                >
+                                    Log Out
+                                </button>
+                            </form>
+                        </li>
                         <li class="nav-item d-none d-lg-block">
                             <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
                                 <a
@@ -155,10 +163,20 @@
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
                                     </a>
-                                    <a class="dropdown-item" href="{{ path('fos_user_security_logout') }}">
-                                        <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        Log Out
-                                    </a>
+                                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                        <span class="dropdown-item">
+                                            <button
+                                                    class="logout"
+                                                    type="submit"
+                                                    id="_submit"
+                                                    name="_submit"
+                                            >
+                                                <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                                Log Out
+                                            </button>
+                                        </span>
+                                    </form>
                                 </div>
                             </div>
                         </li>
