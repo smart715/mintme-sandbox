@@ -108,7 +108,7 @@ export default {
             return this.$routing.generate('edit_comment', {id: this.comment.id});
         },
         profileUrl() {
-            return $routing.generate('profile-view', {nickname: this.comment.author.profile.nickname});
+            return this.$routing.generate('profile-view', {nickname: this.comment.author.profile.nickname});
         },
     },
     methods: {
