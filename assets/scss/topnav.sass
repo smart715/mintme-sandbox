@@ -169,6 +169,19 @@
       margin-top: -9px
       margin-left: -6px
 
+  .logout
+    @extend .dropdown-item
+    display: inline
+    padding: 0 !important
+
+  .logout-link
+    background: transparent
+    border: none
+    outline: none
+    color: white
+    &:hover
+      color: $gold
+
   .icon-token
     background-image: url('../img/token-sprite.png')
     @extend .icon
@@ -181,7 +194,7 @@
     min-width: 7rem
     &:hover
       .icon-token
-         background-position: -18px 0
+        background-position: -18px 0
 
 .badge
   position: absolute
