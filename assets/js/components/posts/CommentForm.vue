@@ -12,6 +12,7 @@
         <button
             class="btn btn-primary"
             @click="submit"
+            :disabled="$v.content.$invalid"
         >
             Save
         </button>
