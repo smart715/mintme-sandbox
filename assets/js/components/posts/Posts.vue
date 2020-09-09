@@ -69,7 +69,7 @@ export default {
     mounted() {
         if (
             typeof this.$refs.postsContainer !== 'undefined'
-            && this.posts.length > 0 && this.loggedIn
+            && this.posts.length > 0 && this.loggedIn && this.max > 0
         ) {
             let postsContainer = this.$refs.postsContainer;
             let posts = postsContainer.getElementsByClassName('post');
