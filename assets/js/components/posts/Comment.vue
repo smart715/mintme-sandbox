@@ -1,7 +1,10 @@
 <template>
     <div class="comment">
         <div>
-            <a :href="$routing.generate('profile-view', {nickname: comment.author.profile.nickname})" class="text-white">
+            <a
+                :href="profileUrl"
+                class="text-white"
+            >
                 <img
                     :src="comment.author.profile.image.avatar_small"
                     class="rounded-circle d-inline-block"
@@ -12,7 +15,9 @@
             <span class="comment-date">
                 {{ date }}
             </span>
-            <template v-if="comment.editable">
+            <template
+                v-if="comment.editable"
+            >
                 <button
                     class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
                     :disabled="deleteDisabled"
@@ -36,7 +41,8 @@
                 </button>
             </template>
         </div>
-        <p v-if="!editing"
+        <p
+            v-if="!editing"
             v-html="comment.content"
         ></p>
         <div v-else>
@@ -47,7 +53,7 @@
                 @submitted="editComment"
                 @error="notifyError('Error editing comment.')"
                 @cancel="cancelEditing"
-            ></comment-form>
+            />
         </div>
         <span :class="{'text-gold' : comment.liked}">
             <font-awesome-icon
@@ -100,6 +106,9 @@ export default {
         },
         apiUrl() {
             return this.$routing.generate('edit_comment', {id: this.comment.id});
+        },
+        profileUrl() {
+            return $routing.generate('profile-view', {nickname: this.comment.author.profile.nickname});
         },
     },
     methods: {

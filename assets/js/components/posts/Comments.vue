@@ -6,7 +6,7 @@
             @submitted="$emit('new-comment', $event)"
             @error="notifyError('Error creating comment.')"
             reset-after-submit
-        ></comment-form>
+        />
         <div class="my-3">
             <template v-if="commentsCount > 0">
                 <comment
@@ -16,7 +16,7 @@
                     :index="i"
                     :logged-in="loggedIn"
                     @delete-comment="$emit('delete-comment', $event)"
-                ></comment>
+                />
             </template>
             <div v-else class="text-center w-100">
                 No one commented yet.
