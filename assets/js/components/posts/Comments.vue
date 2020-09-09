@@ -44,10 +44,6 @@ export default {
         postId: Number,
         loggedIn: Boolean,
     },
-    data() {
-        return {
-        };
-    },
     computed: {
         commentsCount() {
             return this.comments.length;
