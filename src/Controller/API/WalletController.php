@@ -120,6 +120,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'address' => $pendingWithdraw->getAddress()->getAddress(),
                 'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
             ]);
+        } else {
+            try {
+                $wallet->withdrawCommit($pendingWithdraw);
+            } catch (Throwable $exception) {
+                return $this->view([
+                    'error' => 'Something went wrong during withdrawal. Contact us or try again later!',
+                ], Response::HTTP_BAD_GATEWAY);
+            }
         }
 
         return $this->view();

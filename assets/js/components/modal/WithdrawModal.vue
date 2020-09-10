@@ -203,6 +203,7 @@ export default {
                     this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
                     this.closeModal();
                 } else {
+                    this.notifySuccess('Withdrawal request successfully confirmed and added to queue.');
                     this.closeModal();
                 }
             })
