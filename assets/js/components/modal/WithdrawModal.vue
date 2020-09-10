@@ -252,7 +252,6 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
-              required,
               twoFACode,
             },
         };
