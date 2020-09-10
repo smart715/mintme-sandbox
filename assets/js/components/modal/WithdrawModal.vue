@@ -202,9 +202,10 @@ export default {
                 if (!this.twofa) {
                     this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
                     this.closeModal();
-                    return;
                 }
-                this.closeModal();
+                else {
+                    this.closeModal();
+                }
             })
             .catch((error) => {
                 this.notifyError(error.response.data.message);
