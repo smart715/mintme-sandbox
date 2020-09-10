@@ -142,7 +142,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(this.fee).toString(),
+                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
                 this.subunit
             );
         },
@@ -201,6 +201,7 @@ export default {
             .then((response) => {
                 if (!this.twofa) {
                     this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
+                    this.closeModal();
                     return;
                 }
                 this.closeModal();
