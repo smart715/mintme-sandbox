@@ -81,15 +81,19 @@ class MarketsUpdateCommand extends Command
 
         foreach ($markets as $market) {
             $tries = 10;
-            while($tries > 0) {
+
+            while ($tries > 0) {
                 try {
                     $this->marketStatusManager->updateMarketStatus($market);
+
                     break;
                 } catch (\Throwable $e) {
                     $tries--;
+
                     continue;
                 }
             }
+
             $io->progressAdvance();
         }
 
