@@ -23,11 +23,11 @@
             </div>
             <div v-if="showReadMore" :class="classObject">
                 <a
-                    class="align-self-center"
+                    class="align-self-center all-posts-link"
                     :href="readMoreUrl"
                     @click.prevent="goToPosts"
                 >
-                    More posts
+                    See all posts
                 </a>
             </div>
         </div>
@@ -67,25 +67,7 @@ export default {
         };
     },
     mounted() {
-        if (
-            typeof this.$refs.postsContainer !== 'undefined'
-            && this.posts.length > 0 && this.loggedIn && this.max > 0
-        ) {
-            let postsContainer = this.$refs.postsContainer;
-            let posts = postsContainer.getElementsByClassName('post');
-            let postsHeight = 0;
-
-            for (let i = 0; i < posts.length; i++) {
-                postsHeight += posts[i].offsetHeight + 10; // `10px` - margin
-            }
-
-            if (
-                postsContainer.scrollHeight > postsContainer.clientHeight
-                || postsHeight > 317
-            ) {
-                this.readMore = true;
-            }
-        }
+        this.checkPostsHeight();
     },
     computed: {
         postsCount() {
@@ -95,7 +77,7 @@ export default {
             return !!(this.max && this.posts.length > this.max) || this.readMore;
         },
         classObject: function() {
-            if (this.tokenPage && this.readMore && this.max > 0) {
+            if (this.tokenPage && this.readMore) {
                 return {
                     'show-more-container': true,
                 };
@@ -109,6 +91,31 @@ export default {
             } else {
                 location.href = this.readMoreUrl;
             }
+        },
+        checkPostsHeight() {
+            if (
+                typeof this.$refs.postsContainer !== 'undefined'
+                 && this.loggedIn && this.max > 0
+                && this.posts.length > 0 && this.posts.length <= this.max
+            ) {
+                let postsContainer = this.$refs.postsContainer;
+                let posts = postsContainer.getElementsByClassName('post');
+                let postsHeight = 0;
+
+                for (let i = 0; i < posts.length; i++) {
+                    postsHeight += posts[i].offsetHeight + 10; // `10px` - margin
+                }
+
+                if (postsHeight > 317 ) {
+                    this.readMore = true;
+                }
+            }
+        },
+    },
+    watch: {
+        posts: function(value) {
+            this.readMore = false;
+            this.checkPostsHeight();
         },
     },
 };
