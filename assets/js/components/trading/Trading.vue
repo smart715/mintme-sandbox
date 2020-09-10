@@ -120,17 +120,6 @@
                                 :busy="tableLoading"
                                 @sort-changed="sortChanged"
                         >
-                            <template v-slot:[`head(${fields.position.key})`]="data">
-                                #
-                                <guide>
-                                    <template slot="header">
-                                        Position
-                                    </template>
-                                    <template slot=body>
-                                        The overall rank position of token.
-                                    </template>
-                                </guide>
-                            </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
                                         id="volume"
@@ -414,7 +403,7 @@ export default {
                         : item;
                 });
             });
-            return this.setTokenPositions(tokens);
+            return tokens;
         },
         loaded: function() {
             return this.markets !== null && !this.loading;
@@ -424,11 +413,6 @@ export default {
         },
         fields: function() {
             return {
-                position: {
-                    key: 'position',
-                    label: 'Position',
-                    sortable: true,
-                },
                 pair: {
                     key: 'pair',
                     label: 'Market',
@@ -525,7 +509,6 @@ export default {
                 }
             });
             let numeric = key !== this.fields.pair.key;
-            let position = key === this.fields.position.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
@@ -533,7 +516,7 @@ export default {
 
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return position ? -compareResult : (pair ? 0 : compareResult);
+                return pair ? 0 : compareResult;
             }
 
             // If the value is not numeric, currently only pair column
@@ -641,8 +624,6 @@ export default {
 
             const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
-            const position = market.position;
-
             const baseImage = market.base.image.avatar_small;
             const quoteImage = market.quote.image.avatar_small;
 
@@ -657,7 +638,6 @@ export default {
                 marketPrecision,
                 tokenized,
                 buyDepth,
-                position,
                 baseImage,
                 quoteImage
             );
@@ -686,7 +666,6 @@ export default {
             subunit,
             tokenized,
             buyDepth,
-            position,
             baseImage,
             quoteImage
         ) {
@@ -696,7 +675,6 @@ export default {
                 : Decimal.mul(lastPrice, supply);
 
             return {
-                position: position,
                 pair: BTC.symbol === currency || ETH.symbol === currency ? `${currency}/${token}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
@@ -768,7 +746,6 @@ export default {
                         this.markets[market].base.subunit,
                         tokenized,
                         parseFloat(this.markets[market].buyDepth),
-                        this.markets[market].position,
                         this.markets[market].base.image.avatar_small,
                         this.markets[market].quote.image.avatar_small
                     );
@@ -828,7 +805,6 @@ export default {
                 market.base.subunit,
                 tokenized,
                 market.buyDepth,
-                market.position,
                 market.base.image.avatar_small,
                 market.quote.image.avatar_small
                 );
@@ -916,7 +892,6 @@ export default {
                 market.base.subunit,
                 false,
                 market.buyDepth,
-                market.position,
                 market.base.image.avatar_small,
                 market.quote.image.avatar_small
             );
@@ -955,15 +930,6 @@ export default {
         },
         setActiveMarketCap: function(marketCap) {
             this.activeMarketCap = marketCap;
-        },
-        setTokenPositions: function(tokens) {
-            let positionIndex = 1;
-            return _.map(tokens, (token) => {
-                if (BTC.symbol !== token.base) {
-                    token.position = positionIndex++;
-                }
-                return token;
-            });
         },
         updateMarkets: function(page = null, deployedFirst = null) {
             this.tableLoading = true;

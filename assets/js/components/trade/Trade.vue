@@ -139,10 +139,10 @@ export default {
             return this.buyOrders !== null && this.sellOrders !== null;
         },
         marketPriceSell: function() {
-            return this.buyOrders && this.buyOrders[0] ? this.buyOrders[0].price : 0;
+            return this.buyOrders && this.buyOrders[0] ? this.buyOrders.reduce((max, order) => Math.max(parseFloat(order.price), max), 0) : 0;
         },
         marketPriceBuy: function() {
-            return this.sellOrders && this.sellOrders[0] ? this.sellOrders[0].price : 0;
+            return this.sellOrders && this.sellOrders[0] ? this.sellOrders.reduce((min, order) => Math.min(parseFloat(order.price), min), Infinity) : 0;
         },
     },
     mounted() {
