@@ -80,7 +80,16 @@ class MarketsUpdateCommand extends Command
         $io->progressStart(count($markets));
 
         foreach ($markets as $market) {
-            $this->marketStatusManager->updateMarketStatus($market);
+            $tries = 10;
+            while($tries > 0) {
+                try {
+                    $this->marketStatusManager->updateMarketStatus($market);
+                    break;
+                } catch (\Throwable $e) {
+                    $tries--;
+                    continue;
+                }
+            }
             $io->progressAdvance();
         }
 
