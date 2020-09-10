@@ -95,8 +95,7 @@ export default {
         checkPostsHeight() {
             if (
                 typeof this.$refs.postsContainer !== 'undefined'
-                 && this.loggedIn && this.max > 0
-                && this.posts.length > 0 && this.posts.length <= this.max
+                && this.loggedIn && this.max > 0 && this.posts.length > 0
             ) {
                 let postsContainer = this.$refs.postsContainer;
                 let posts = postsContainer.getElementsByClassName('post');
