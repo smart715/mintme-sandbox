@@ -114,7 +114,7 @@ export default {
     watch: {
         posts: function(value) {
             this.readMore = false;
-            this.checkPostsHeight();
+            this.$nextTick(this.checkPostsHeight);
         },
     },
 };
