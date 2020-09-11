@@ -5,7 +5,6 @@ namespace App\Controller\Dev\API\V2;
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Trade\TraderInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -30,9 +29,6 @@ class SummaryController extends AbstractFOSRestController
     /** @var MarketFactoryInterface */
     private $marketFactory;
 
-    /** @var TraderInterface */
-    private $trader;
-
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
@@ -40,13 +36,11 @@ class SummaryController extends AbstractFOSRestController
         MarketStatusManagerInterface $marketStatusManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketHandler = $marketHandler;
         $this->marketFactory = $marketFactory;
-        $this->trader = $trader;
         $this->rebrandingConverter = $rebrandingConverter;
     }
 
@@ -71,8 +65,24 @@ class SummaryController extends AbstractFOSRestController
             function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
-                $orderDepth = $this->trader->getOrderDepth($market);
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
+
+                $bids = array();
+                $asks = array();
+
+                $bids = array_map(
+                    function ($order) {
+                        return [$order->getPrice(), $order->getAmount()];
+                    },
+                    $this->marketHandler->getPendingBuyOrders($market)
+                );
+
+                $asks = array_map(
+                    function ($order) {
+                        return [$order->getPrice(), $order->getAmount()];
+                    },
+                    $this->marketHandler->getPendingSellOrders($market)
+                );
 
                 $this->fixBaseQuoteOrder($market);
 
@@ -84,8 +94,8 @@ class SummaryController extends AbstractFOSRestController
                     'last_price' => $marketStatusToday['last'],
                     'base_currency' => $rebrandedBaseSymbol,
                     'quote_currency' => $rebrandedQuoteSymbol,
-                    'lowest_ask' => $orderDepth['asks'] ? (float)min($orderDepth['asks'])[0] : 0,
-                    'highest_bid' => $orderDepth['bids'] ? (float)max($orderDepth['bids'])[0] : 0,
+                    'lowest_ask' => $asks ? min($asks)[0] : 0,
+                    'highest_bid' => $bids ? max($bids)[0] : 0,
                     'base_volume' => $marketStatusToday['deal'],
                     'quote_volume' => $marketStatusToday['volume'],
                     'price_change_percent_24h' =>
