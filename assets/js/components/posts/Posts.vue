@@ -67,7 +67,9 @@ export default {
         };
     },
     mounted() {
-        this.checkPostsHeight();
+        setTimeout(()=> {
+            this.checkPostsHeight();
+        }, 100);
     },
     computed: {
         postsCount() {
