@@ -6,7 +6,15 @@
             :without-padding="true"
             @close="$emit('close')"
         >
-            <template slot="header"><p class="word-break-all">{{ currentName }}</p></template>
+            <template v-if="shouldTruncate" slot="header">
+                <span v-b-tooltip="{title: currentName, boundary:'viewport'}">
+                    {{ currentName }}
+                </span>
+            </template>
+            <template v-else slot="header">
+                {{ currentName }}
+            </template>
+            <template slot="close"></template>
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
@@ -193,6 +201,7 @@ export default {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
             tokenDeployKey: 0,
+            maxLengthToTruncate: 49,
         };
     },
     beforeUpdate: function() {
@@ -201,6 +210,9 @@ export default {
         };
     },
     computed: {
+        shouldTruncate: function() {
+            return this.currentName.length > this.maxLengthToTruncate;
+        },
         isTokenNotDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.statusProp;
         },
