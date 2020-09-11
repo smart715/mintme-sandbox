@@ -82,7 +82,7 @@ security:
         - { path: ^/wallet,                                         role: ROLE_USER }
         - { path: ^/api/wallet,                                     role: ROLE_USER }
         - { path: ^/referral-program,                               role: ROLE_USER }
-        - { path: ^/logout$,                                        role: ROLE_USER }
+        - { path: ^/logout$,                                        roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS] }
         - { path: ^/api,                                            role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting,                                      role: IS_AUTHENTICATED_ANONYMOUSLY }

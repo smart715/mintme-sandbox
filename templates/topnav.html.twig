@@ -182,7 +182,17 @@
                         </li>
                     {% else %}
                         <li class="align-self-center">
-                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link"><span>Log Out</span></a>
+                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                <button
+                                        class="logout-link"
+                                        type="submit"
+                                        id="_submit"
+                                        name="_submit"
+                                >
+                                    Log Out
+                                </button>
+                            </form>
                         </li>
                     {% endif %}
                 {% endif %}
