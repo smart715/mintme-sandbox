@@ -210,8 +210,8 @@ export default {
             return !this.showEndDate || this.isDateValid;
         },
         isDateValid: function() {
-            let selected = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
-            return this.showEndDate && selected.valueOf() > moment().valueOf();
+            let selectedDate = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
+            return this.showEndDate && selectedDate.valueOf() > moment().valueOf();
         },
         isRewardValid: function() {
             if (this.isAmountValid && this.isParticipantsAmountValid) {
@@ -281,7 +281,8 @@ export default {
             };
 
             if (this.isDateValid) {
-                data.endDate = moment(this.endDate).utc().unix();
+                let selectedDate = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
+                data.endDate = selectedDate.getTime()/1000;
             }
 
             this.loading = true;
