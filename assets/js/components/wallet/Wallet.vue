@@ -29,14 +29,12 @@
                         <div class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
                         </div>
                         <div
@@ -48,14 +46,12 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
                             </div>
                         </div>
                     </div>
@@ -116,14 +112,12 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
                         </div>
                         <div
@@ -138,13 +132,13 @@
                                         data.item.blocked)"
                         >
                             <div>
-                                <font-awesome-icon
-                                    class="icon-default"
-                                    :icon="['fac', 'withdraw']"
-                                />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <div class="text-white hover-icon">
+                                    <font-awesome-icon
+                                        class="icon-default"
+                                        :icon="['fac', 'withdraw']"
+                                    />
+                                    <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                </div>
                             </div>
                         </div>
                     </div>

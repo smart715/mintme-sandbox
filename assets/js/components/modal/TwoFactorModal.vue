@@ -3,7 +3,6 @@
         :visible="visible"
         :no-close="noClose"
         @close="closeModal">
-        <template slot="close"> &nbsp; </template>
         <template slot="body">
             <div class="text-center">
                 <div class="col-12 pb-3">
