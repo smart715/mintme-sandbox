@@ -66,7 +66,7 @@ describe('WithdrawModal', () => {
     const amountOk = 100;
     const subunitOk = 0;
     const maxAmountOk = '1000';
-
+    const code = '123456';
     it('should be visible when visible props is true', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
@@ -193,7 +193,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.vm.fullAmount).toBe('15912.12');
     });
 
-    it('should be equal "12345" in the "Total to be withdrawn" field when fee props is greater than amount data', () => {
+    it('should be equal "48023" in the "Total to be withdrawn" field', () => {
         propsForTestCorrectlyRenders.fee = '35678';
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
@@ -201,7 +201,7 @@ describe('WithdrawModal', () => {
         });
         wrapper.vm.amount = 12345;
         propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.vm.fullAmount).toBe('12345');
+        expect(wrapper.vm.fullAmount).toBe('48023');
     });
 
     it('should\'t be equal "12345f" in the "Total to be withdrawn" field', () => {
@@ -311,6 +311,7 @@ describe('WithdrawModal', () => {
         });
         wrapper.vm.address = addressOk;
         wrapper.vm.amount = amountOk;
+        wrapper.vm.code = code;
         wrapper.setProps({subunit: subunitOk});
         wrapper.setProps({maxAmount: maxAmountOk});
         wrapper.vm.$v.$touch();

@@ -4,19 +4,15 @@ namespace App\Manager;
 
 use App\Entity\KnowledgeBase\Category;
 use App\Entity\KnowledgeBase\KnowledgeBase;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use App\Repository\KnowledgeBase\KnowledgeBaseRepository;
 
 class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 {
-    /** @var EntityRepository  */
+    /** @var KnowledgeBaseRepository  */
     private $kbRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(KnowledgeBaseRepository $repository)
     {
-        /** @var EntityRepository $repository */
-        $repository = $entityManager->getRepository(KnowledgeBase::class);
-
         $this->kbRepository = $repository;
     }
 
@@ -47,7 +43,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
             $category = $categoryObj->getId();
             $subcategoryObj = $kb->getSubcategory();
             $subcategory = is_object($subcategoryObj)
-                ? $subcategoryObj->getId()
+                ? $subcategoryObj->getId() . 'key'
                 : null;
 
             if (!array_key_exists($category, $parsedKb)) {
@@ -55,7 +51,7 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
             }
 
             if (!$subcategory) {
-                array_unshift($parsedKb[$category], $kb);
+                array_push($parsedKb[$category], $kb);
             } elseif (!array_key_exists($subcategory, $parsedKb[$category])) {
                 $parsedKb[$category][$subcategory] = [];
                 array_push($parsedKb[$category][$subcategory], $kb);

@@ -71,7 +71,8 @@ class KernelSubscriber implements EventSubscriberInterface
         /** @psalm-suppress UndefinedDocblockClass */
         if (is_object($this->tokenStorage->getToken()) &&
             is_object($this->tokenStorage->getToken()->getUser()) &&
-            !$request->getRequest()->isXmlHttpRequest()
+            !$request->getRequest()->isXmlHttpRequest() &&
+            !$this->isImgFilterRequest($request->getRequest())
         ) {
             /**
              * @var User $user
@@ -92,5 +93,10 @@ class KernelSubscriber implements EventSubscriberInterface
         return $this->csrfTokenManager->isTokenValid(
             new CsrfToken('authenticate', $token ?? '')
         );
+    }
+
+    private function isImgFilterRequest(Request $request): bool
+    {
+        return 'liip_imagine_filter' === $request->attributes->get('_route');
     }
 }

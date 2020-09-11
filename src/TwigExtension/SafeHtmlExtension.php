@@ -2,6 +2,7 @@
 
 namespace App\TwigExtension;
 
+use App\Admin\Traits\CheckContentLinksTrait;
 use HTMLPurifier;
 use HTMLPurifier_Config;
 use Twig\Extension\AbstractExtension;
@@ -9,6 +10,9 @@ use Twig\TwigFilter;
 
 class SafeHtmlExtension extends AbstractExtension
 {
+
+    use CheckContentLinksTrait;
+
     /** @var HTMLPurifier */
     private $purifier;
 
@@ -28,6 +32,16 @@ class SafeHtmlExtension extends AbstractExtension
 
     public function doSafeHtml(string $value): ?string
     {
-        return $this->purifier->purify($value);
+        $purifiedValue = $this->purifier->purify($value);
+
+        if ($purifiedValue && preg_match('/<a (.*)>(.*)<\/a>/i', $purifiedValue)) {
+            $result = $this->addNoopenerToLinks($purifiedValue);
+
+            if ($result['contentChanged']) {
+                return $result['content'];
+            }
+        }
+
+        return $purifiedValue;
     }
 }
