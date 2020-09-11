@@ -17,7 +17,8 @@
                         class="m-0 message">
                         Airdrop ends on {{ endsDate }} at {{ endsTime }}
                         <span v-show="showDuration">
-                            ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
+                            ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d
+                            {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
                         </span>
                         <span v-show="timeElapsed">(Airdrop has ended!)</span>
                     </span>

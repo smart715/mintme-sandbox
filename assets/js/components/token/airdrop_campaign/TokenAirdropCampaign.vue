@@ -210,7 +210,8 @@ export default {
             return !this.showEndDate || this.isDateValid;
         },
         isDateValid: function() {
-            return this.showEndDate && Date.parse(this.endDate) > Date.now();
+            let selected = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
+            return this.showEndDate && selected.valueOf() > moment().valueOf();
         },
         isRewardValid: function() {
             if (this.isAmountValid && this.isParticipantsAmountValid) {
