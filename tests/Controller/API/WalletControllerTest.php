@@ -115,7 +115,6 @@ class WalletControllerTest extends WebTestCase
                 '_with_csrf' => false,
             ]
         );
-        $this->createProfile($fooClient);
         $tokName = $this->createToken($fooClient);
         $this->sendWeb($fooEmail);
 

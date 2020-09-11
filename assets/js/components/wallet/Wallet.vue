@@ -29,14 +29,12 @@
                         <div class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
                         </div>
                         <div
@@ -48,14 +46,12 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
                             </div>
                         </div>
                     </div>
@@ -116,14 +112,12 @@
                             class="d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
                         </div>
                         <div
@@ -138,39 +132,48 @@
                                         data.item.blocked)"
                         >
                             <div>
-                                <font-awesome-icon
-                                    class="icon-default"
-                                    :icon="['fac', 'withdraw']"
-                                />
-                            </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
+                                <div class="text-white hover-icon">
+                                    <font-awesome-icon
+                                        class="icon-default"
+                                        :icon="['fac', 'withdraw']"
+                                    />
+                                    <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </template>
             </b-table>
         </div>
-        <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2">Create <a :href="createTokenUrl">your own token</a></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        You have not bought tokens yet. Find favorite content creators or
-                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
-                        Start trading now.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
+                <thead>
+                    <tr>
+                        <th class="first-field">Name</th>
+                        <th class="field-table">Amount</th>
+                        <th >&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="first-field">
+                            <div class="truncate-name">
+                                Create <a :href="createTokenUrl">your own token</a>
+                            </div>
+                        </td>
+                        <td class="field-table">&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            You have not bought tokens yet. Find favorite content creators or
+                            famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
+                            Start trading now.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"

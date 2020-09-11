@@ -9,11 +9,11 @@
         :no-close-on-esc="noClose"
     >
         <div slot="modal-header" class="d-flex flex-nowrap justify-content-between">
-            <span class="d-inline-block flex-grow-1 modal-title p-2 pl-4">
+            <span class="text-truncate d-block flex-grow-1 modal-title pl-4">
                 <slot name="header"></slot>
             </span>
             <slot name="close">
-                <a class="modal-close px-2 c-pointer" @click="closeModal()">
+                <a class="modal-close px-2 c-pointer float-right" @click="closeModal()">
                     &times;
                 </a>
             </slot>

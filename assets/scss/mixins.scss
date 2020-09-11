@@ -7,8 +7,7 @@
 @mixin font-scale($scale) {
   @if map-has-key($font-scales, $scale) {
     font-size: map-get($font-scales, $scale);
-  }
-  @else {
+  } @else {
     @warn "Unknown `#{$scale}` in $font-scales.";
   }
 }
@@ -76,9 +75,9 @@
 // =============================================================================
 
 @mixin headers {
-    @for $i from 1 through 6 {
-        h#{7 - $i} {
-            @content
-        }
+  @for $i from 1 through 6 {
+    h#{7 - $i} {
+      @content
     }
+  }
 }
