@@ -12,7 +12,6 @@ class TraderFetcher implements TraderFetcherInterface
     private const CANCEL_ORDER_METHOD = 'order.cancel';
     private const FINISHED_ORDERS_METHOD = 'order.finished';
     private const PENDING_ORDERS_METHOD = 'order.pending';
-    private const DEPTH_ORDERS_METHOD = 'order.depth';
 
     private const INSUFFICIENT_BALANCE_CODE = 10;
     private const ORDER_NOT_FOUND_CODE = 10;
@@ -126,21 +125,6 @@ class TraderFetcher implements TraderFetcherInterface
         }
 
         return $response->getResult()['records'];
-    }
-
-    public function getOrderDepth(string $marketName, int $limit, string $interval): array
-    {
-        $response = $this->jsonRpc->send(self::DEPTH_ORDERS_METHOD, [
-            $marketName,
-            $limit,
-            $interval,
-        ]);
-
-        if ($response->hasError()) {
-            throw new FetchException($response->getError()['message'] ?? '');
-        }
-
-        return $response->getResult();
     }
 
     private function getCancelOrderErrorResult(int $errorCode): TradeResult

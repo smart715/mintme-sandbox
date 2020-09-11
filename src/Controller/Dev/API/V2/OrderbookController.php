@@ -2,9 +2,10 @@
 
 namespace App\Controller\Dev\API\V2;
 
+use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
-use App\Exchange\Trade\TraderInterface;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -20,15 +21,18 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrderbookController extends AbstractFOSRestController
 {
+
+    use BaseQuoteOrderTrait;
+
     public const ONLY_BEST = 1;
     public const ARRANGED_BY_BEST = 2;
     public const NO_AGGREGATION = 3;
 
-    /** @var TraderInterface */
-    private $trader;
-
     /** @var MarketFinderInterface */
     private $marketFinder;
+
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
 
     /** @var MarketStatusManagerInterface */
     private $marketStatusManager;
@@ -37,25 +41,26 @@ class OrderbookController extends AbstractFOSRestController
     private $rebrandingConverter;
 
     public function __construct(
-        TraderInterface $trader,
         MarketFinderInterface $marketFinder,
+        MarketHandlerInterface $marketHandler,
         RebrandingConverterInterface $rebrandingConverter,
         MarketStatusManagerInterface $marketStatusManager
     ) {
-        $this->trader = $trader;
         $this->marketFinder = $marketFinder;
+        $this->marketHandler = $marketHandler;
         $this->rebrandingConverter = $rebrandingConverter;
         $this->marketStatusManager = $marketStatusManager;
     }
     /**
      * Get order book
      *
+     * @Rest\View(serializerGroups={"dev"})
      * @Rest\Get("/{base_quote}")
      * @Rest\QueryParam(
      *     name="depth",
-     *     requirements=@Assert\Range(min="0", max="101"),
+     *     requirements=@Assert\Range(min="0", max="100"),
      *     nullable=true,
-     *     description="Order depth (how many asks/bids records to show [1-101])",
+     *     description="Order depth (how many asks/bids records to show [1-100])",
      *     allowBlank=true,
      *     strict=true
      * )
@@ -69,7 +74,6 @@ Level 3 – Complete order book, no aggregation.",
      *     allowBlank=false,
      *     strict=true
      * )
-     * @Rest\View(serializerGroups={"dev"})
      * @SWG\Response(
      *     response="200",
      *     description="Returns complete level 2 order book (arranged by best asks/bids) with full depth returned for a given market pair."
@@ -80,6 +84,7 @@ Level 3 – Complete order book, no aggregation.",
      * @SWG\Parameter(name="level", in="query", type="integer")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @return mixed[]
      */
     public function getOrderbook(ParamFetcherInterface $request, string $base_quote): array
     {
@@ -99,15 +104,25 @@ Level 3 – Complete order book, no aggregation.",
 
         $depth =
             !empty($request->get('depth')) ?
-            $request->get('depth') :
-            101;
+                (int)$request->get('depth') :
+            100;
 
-        $orderDepth = $this->trader->getOrderDepth(
-            $market,
-            [
-                'limit' => (int)$depth,
-            ],
-            true
+        $this->fixBaseQuoteOrder($market);
+
+        $orderDepth = array();
+
+        $orderDepth['bids'] = array_map(
+            function ($order) {
+                return [$order->getPrice(), $order->getAmount()];
+            },
+            $this->marketHandler->getPendingBuyOrders($market, 0, $depth)
+        );
+
+        $orderDepth['asks'] = array_map(
+            function ($order) {
+                return [$order->getPrice(), $order->getAmount()];
+            },
+            $this->marketHandler->getPendingSellOrders($market, 0, $depth)
         );
 
         $level = (int)$request->get('level');
