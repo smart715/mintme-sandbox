@@ -92,12 +92,12 @@ class Exchanger implements ExchangerInterface
         }
 
         $this->logger->info(
-            sprintf('Cancel %s order', Order::BUY_SIDE === $order->side ? 'buy' : 'sell'),
+            sprintf('Cancel %s order', 'sell'),
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
-                'amount' => $order->amount->getAmount(),
-                'price' => $order->price->getAmount(),
+                'amount' => (new Money('0', new Currency($market->getQuote()->getSymbol())))->getAmount(),
+                'price' => (new Money('0', new Currency($market->getQuote()->getSymbol())))->getAmount(),
             ]
         );
 
