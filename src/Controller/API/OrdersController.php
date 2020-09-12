@@ -62,7 +62,7 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\View()
      */
     public function cancelOrders(
-        Market $market, 
+        Market $market,
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {

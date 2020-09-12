@@ -79,7 +79,7 @@ class Exchanger implements ExchangerInterface
         $this->vf = $validatorFactory;
     }
 
-    public function cancelOrder(Market $market, Order $order): bool 
+    public function cancelOrder(Market $market, Order $order): bool
     {
         $this->trader->cancelOrder($order);
 
