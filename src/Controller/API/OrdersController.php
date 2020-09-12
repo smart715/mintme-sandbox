@@ -32,9 +32,6 @@ class OrdersController extends AbstractFOSRestController
     private const PENDING_OFFSET = 100;
     private const WALLET_OFFSET = 20;
 
-    /** @var TraderInterface */
-    private $trader;
-
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
@@ -45,12 +42,10 @@ class OrdersController extends AbstractFOSRestController
     private $userActionLogger;
 
     public function __construct(
-        TraderInterface $trader,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger
     ) {
-        $this->trader = $trader;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
