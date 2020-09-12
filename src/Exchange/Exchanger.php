@@ -79,6 +79,31 @@ class Exchanger implements ExchangerInterface
         $this->vf = $validatorFactory;
     }
 
+    public function cancelOrder(Market $market, Order $order): bool 
+    {
+        $this->trader->cancelOrder($order);
+
+        try {
+            $this->mp->send($market);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
+            );
+        }
+
+        $this->logger->info(
+            sprintf('Cancel %s order', Order::BUY_SIDE === $order->side ? 'buy' : 'sell'),
+            [
+                'base' => $market->getBase()->getSymbol(),
+                'quote' => $market->getQuote()->getSymbol(),
+                'amount' => $order->amount->getAmount(),
+                'price' => $order->price->getAmount(),
+            ]
+        );
+
+        return true;
+    }
+
     public function placeOrder(
         User $user,
         Market $market,

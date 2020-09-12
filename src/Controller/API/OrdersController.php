@@ -61,8 +61,11 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\RequestParam(name="orderData", allowBlank=false, description="array of orders ids")
      * @Rest\View()
      */
-    public function cancelOrders(Market $market, ParamFetcherInterface $request): View
-    {
+    public function cancelOrders(
+        Market $market, 
+        ParamFetcherInterface $request,
+        ExchangerInterface $exchanger
+    ): View {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
@@ -84,7 +87,7 @@ class OrdersController extends AbstractFOSRestController
                 ""
             );
 
-            $this->trader->cancelOrder($order);
+            $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
         }
 
