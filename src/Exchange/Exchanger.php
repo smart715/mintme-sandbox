@@ -11,7 +11,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;

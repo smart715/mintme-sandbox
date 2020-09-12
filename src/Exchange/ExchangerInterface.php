@@ -3,7 +3,6 @@
 namespace App\Exchange;
 
 use App\Entity\User;
-use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 
 interface ExchangerInterface
