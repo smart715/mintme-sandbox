@@ -117,7 +117,7 @@ export default {
         maxAmount: String,
         availableWeb: String,
         subunit: Number,
-        twofa: String,
+        twofa: Boolean,
         noClose: Boolean,
         expirationTime: Number,
     },
@@ -142,7 +142,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(this.fee).toString(),
+                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
                 this.subunit
             );
         },
