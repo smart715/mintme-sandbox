@@ -435,7 +435,7 @@ class User extends BaseUser implements
         $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
-    private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
+    public function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
     {
         if (null === $this->googleAuthenticatorEntry) {
             $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();

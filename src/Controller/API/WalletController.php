@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -122,7 +123,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'address' => $pendingWithdraw->getAddress()->getAddress(),
                 'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
             ]);
-        } elseif ($twoFactorManager->getGoogleAuthenticatorEntry($user->getId())
+        } elseif ($twoFactorManager->getGoogleAuthEntry($user->getId())
             === $user->getGoogleAuthenticatorEntry()) {
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
