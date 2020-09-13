@@ -177,6 +177,12 @@ class User extends BaseUser implements
     protected $isBlocked = false;
 
     /** @codeCoverageIgnore */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
