@@ -201,7 +201,7 @@ describe('WithdrawModal', () => {
         });
         wrapper.vm.amount = 12345;
         propsForTestCorrectlyRenders.fee = '0';
-        expect(wrapper.vm.fullAmount).toBe('48023');
+        expect(wrapper.vm.fullAmount).toBe('12345');
     });
 
     it('should\'t be equal "12345f" in the "Total to be withdrawn" field', () => {
