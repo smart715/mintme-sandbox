@@ -125,10 +125,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'address' => $pendingWithdraw->getAddress()->getAddress(),
                 'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
             ]);
-        } elseif ($user->isGoogleAuthenticatorEnabled()
-            && !$twoFactorManager->checkCode($user, $code)) {
-            throw new ApiUnauthorizedException('Unauthorized');
-        } else {
+        } elseif (!($user->isGoogleAuthenticatorEnabled()
+            && !$twoFactorManager->checkCode($user, strval($code)))) {
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
             } catch (Throwable $exception) {
@@ -136,6 +134,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                     'error' => 'Something went wrong during withdrawal. Contact us or try again later!',
                 ], Response::HTTP_BAD_GATEWAY);
             }
+        } else {
+            throw new ApiUnauthorizedException('Unauthorized');
         }
 
         return $this->view();
