@@ -10,6 +10,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapper;
@@ -78,6 +79,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     public function withdraw(
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
+        TwoFactorManagerInterface $twoFactorManager,
         TokenManagerInterface $tokenManager,
         MoneyWrapperInterface $moneyWrapper,
         WalletInterface $wallet,
@@ -120,7 +122,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'address' => $pendingWithdraw->getAddress()->getAddress(),
                 'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
             ]);
-        } else {
+        } elseif ($twoFactorManager->getGoogleAuthenticatorEntry($user->getId())
+            === $user->getGoogleAuthenticatorEntry()) {
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
             } catch (Throwable $exception) {
@@ -128,6 +131,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                     'error' => 'Something went wrong during withdrawal. Contact us or try again later!',
                 ], Response::HTTP_BAD_GATEWAY);
             }
+        } else {
+            throw new ApiUnauthorizedException('Unauthorized');
         }
 
         return $this->view();
