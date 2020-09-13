@@ -177,12 +177,6 @@ class User extends BaseUser implements
     protected $isBlocked = false;
 
     /** @codeCoverageIgnore */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
@@ -441,7 +435,7 @@ class User extends BaseUser implements
         $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
-    public function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
+    private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
     {
         if (null === $this->googleAuthenticatorEntry) {
             $this->googleAuthenticatorEntry = new GoogleAuthenticatorEntry();
