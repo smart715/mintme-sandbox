@@ -125,7 +125,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'address' => $pendingWithdraw->getAddress()->getAddress(),
                 'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
             ]);
-        } elseif (!$twoFactorManager->checkCode($user, $code)) {
+        } elseif ($user->isGoogleAuthenticatorEnabled()
+            && !$twoFactorManager->checkCode($user, $code)) {
             throw new ApiUnauthorizedException('Unauthorized');
         } else {
             try {
