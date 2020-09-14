@@ -3,6 +3,7 @@
 namespace App\Tests\Request\ParamConverter;
 
 use App\Entity\Comment;
+use App\Manager\CommentManagerInterface;
 use App\Request\ParamConverter\CommentConverter;
 use PHPUnit\Framework\TestCase;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
