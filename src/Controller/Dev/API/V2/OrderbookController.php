@@ -109,19 +109,15 @@ Level 3 – Complete order book, no aggregation.",
 
         $this->fixBaseQuoteOrder($market);
 
-        $orderDepth = array();
+        $orderDepth = [];
 
         $orderDepth['bids'] = array_map(
-            function ($order) {
-                return [$order->getPrice(), $order->getAmount()];
-            },
+            static fn ($order) => [$order->getPrice(), $order->getAmount()],
             $this->marketHandler->getPendingBuyOrders($market, 0, $depth)
         );
 
         $orderDepth['asks'] = array_map(
-            function ($order) {
-                return [$order->getPrice(), $order->getAmount()];
-            },
+            static fn ($order) => [$order->getPrice(), $order->getAmount()],
             $this->marketHandler->getPendingSellOrders($market, 0, $depth)
         );
 

@@ -67,20 +67,16 @@ class SummaryController extends AbstractFOSRestController
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
-                $bids = array();
-                $asks = array();
+                $bids = [];
+                $asks = [];
 
                 $bids = array_map(
-                    function ($order) {
-                        return [$order->getPrice(), $order->getAmount()];
-                    },
+                    static fn ($order) => [$order->getPrice(), $order->getAmount()],
                     $this->marketHandler->getPendingBuyOrders($market)
                 );
 
                 $asks = array_map(
-                    function ($order) {
-                        return [$order->getPrice(), $order->getAmount()];
-                    },
+                    static fn ($order) => [$order->getPrice(), $order->getAmount()],
                     $this->marketHandler->getPendingSellOrders($market)
                 );
 
