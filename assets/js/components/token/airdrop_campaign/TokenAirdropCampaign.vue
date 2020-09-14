@@ -282,7 +282,7 @@ export default {
 
             if (this.isDateValid) {
                 let selectedDate = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
-                data.endDate = selectedDate.getTime()/1000;
+                data.endDate = Math.round(selectedDate.getTime()/1000);
             }
 
             this.loading = true;

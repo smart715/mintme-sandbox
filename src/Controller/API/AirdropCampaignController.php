@@ -88,7 +88,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
         $participants = (int)$request->get('participants');
-        $endDateTimestamp = $request->get('endDate');
+        $endDateTimestamp = (int)$request->get('endDate');
         $balance = $balanceHandler->exchangeBalance(
             $token->getProfile()->getUser(),
             $token
