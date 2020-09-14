@@ -80,6 +80,9 @@
     ],
     "tokens_num": 100000,
     "brokers": "mq:9092",
+    "balances_topic": "balances",
+    "orders_topic": "orders",
+    "deals_topic": "deals",
     "slice_interval": 3600,
     "slice_keeptime": 259200
 }

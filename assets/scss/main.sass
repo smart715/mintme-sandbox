@@ -665,6 +665,7 @@ a
       flex: initial
       overflow: hidden
       margin-left: auto
+      -webkit-margin-before: -4px
 
       .nav-link-token
         @extend .nav-link
@@ -752,6 +753,7 @@ a
 .parent-trade-tab
   ul
     margin-top: 1.4rem
+    height: 35px
 
 .modal-content
   background: $secondary
@@ -759,18 +761,29 @@ a
   .modal-header
     background-color: $primary
     padding: 0
+    height: 33px
+    align-items: center
 
     div
       width: 100%
 
     .modal-close
+      padding-bottom: 1px
       @include font-scale(lg)
 
       color: $dark-white
       font-weight: lighter
 
   .modal-title
+    padding-top: 11px
     @include font-scale(md)
+
+@-moz-document url-prefix()
+  .modal-title
+    padding-top: 11px !important
+
+  .modal-close
+      padding-bottom: 3px !important
 
 nav.top-navbar
   @include media-breakpoint-down(md)
@@ -1106,8 +1119,8 @@ input[type=search]::-webkit-search-cancel-button
   color: $gold
   transition: color .15s
 
-a.hover-icon:hover
-  span.social-link
+a.hover-icon:hover, div.hover-icon:hover
+  span.social-link, span.wallet-action-txt
     text-decoration: underline !important
 
 @include media-breakpoint-up(lg)
