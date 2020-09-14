@@ -201,7 +201,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($sellOrdersSummaryWithFee),
+                (string)BigDecimal::of($this->moneyWrapper->format($sellOrdersSummaryWithFee))->dividedBy(1, 4, RoundingMode::UP),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
