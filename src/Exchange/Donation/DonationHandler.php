@@ -14,6 +14,8 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -146,7 +148,7 @@ class DonationHandler implements DonationHandlerInterface
             throw new ApiBadRequestException('Tokens availability changed. Please adjust donation amount.');
         }
 
-        $twoWayDonation = $expectedAmount->greaterThan($minTokensAmount)
+        $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationAmount);
 
         if ($expectedAmount->greaterThan($minTokensAmount) && $sellOrdersSummary->greaterThanOrEqual($donationAmount)) {
@@ -233,7 +235,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($sellOrdersSummary),
+                (string)BigDecimal::of($this->moneyWrapper->format($sellOrdersSummary))->dividedBy(1, 4, RoundingMode::UP),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
