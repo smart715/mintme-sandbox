@@ -142,7 +142,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                amount.add(this.fee).toString(),
                 this.subunit
             );
         },
