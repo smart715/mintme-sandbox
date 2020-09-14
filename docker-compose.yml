@@ -89,7 +89,7 @@ services:
       - webchaind_root:/root/.webchain/morden
 
   openethereum:
-    image: openethereum/openethereum:latest
+    image: parity/parity:v2.5.12-stable
     volumes:
       - .docker/default/ETH/:/root/eth/
     ports:
