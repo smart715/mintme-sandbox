@@ -151,9 +151,7 @@ class TokenController extends Controller
         $tokenDescription =  '' !== $tokenDescription
             ? $token->getDescription()
             : $defaultDescription;
-        $defaultActivated = $tokenDescription === $defaultDescription
-            ? true
-            : false;
+        $defaultActivated = $tokenDescription === $defaultDescription;
         $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
