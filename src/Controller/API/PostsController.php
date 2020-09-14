@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
-use App\Manager\CommentManagerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,19 +33,14 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
-    /** @var CommentManagerInterface */
-    private $commentManager;
-
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
-        PostManagerInterface $postManager,
-        CommentManagerInterface $commentManager
+        PostManagerInterface $postManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
-        $this->commentManager = $commentManager;
     }
 
     /**
@@ -165,14 +159,8 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/comments/delete/{id<\d+>}", name="delete_comment", options={"expose"=true})
      */
-    public function deleteComment(int $id): View
+    public function deleteComment(Comment $comment): View
     {
-        $comment = $this->commentManager->getById($id);
-
-        if (!$comment) {
-            throw new ApiNotFoundException("Comment not found");
-        }
-
         $this->denyAccessUnlessGranted('edit', $comment);
 
         $this->entityManager->remove($comment);
@@ -186,18 +174,12 @@ class PostsController extends AbstractFOSRestController
      * @Rest\Post("/comments/edit/{id<\d+>}", name="edit_comment", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      */
-    public function editComment(ParamFetcherInterface $request, int $id): View
+    public function editComment(ParamFetcherInterface $request, Comment $comment): View
     {
         $user = $this->getUser();
 
         if (!$user) {
             throw new AccessDeniedHttpException();
-        }
-
-        $comment = $this->commentManager->getById($id);
-
-        if (!$comment) {
-            throw new ApiNotFoundException("Comment not found");
         }
 
         $this->denyAccessUnlessGranted('edit', $comment);
@@ -209,19 +191,13 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/comments/like/{id<\d+>}", name="like_comment", options={"expose"=true})
      */
-    public function likeComment(int $id): View
+    public function likeComment(Comment $comment): View
     {
         /** @var User|null $user */
         $user = $this->getUser();
 
         if (!$user) {
             throw new AccessDeniedHttpException();
-        }
-
-        $comment = $this->commentManager->getById($id);
-
-        if (!$comment) {
-            throw new ApiNotFoundException("Comment not found");
         }
 
         $like = $this->entityManager

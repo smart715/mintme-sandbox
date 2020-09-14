@@ -25,7 +25,7 @@ class PostController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="show_post", options={"expose"=true})
+     * @Route("/{id<\d+>}", name="show_post", options={"expose"=true})
      */
     public function show(int $id): Response
     {
@@ -43,7 +43,7 @@ class PostController extends Controller
     }
 
     /**
-     * @Route("/edit/{id}", name="edit_post_page", options={"expose"=true})
+     * @Route("/edit/{id<\d+>}", name="edit_post_page", options={"expose"=true})
      */
     public function edit(int $id): Response
     {
