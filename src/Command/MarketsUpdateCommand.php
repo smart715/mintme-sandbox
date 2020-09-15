@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/* Cron job added to DB. */
 class MarketsUpdateCommand extends Command
 {
     /** @var string */
@@ -80,7 +81,18 @@ class MarketsUpdateCommand extends Command
         $io->progressStart(count($markets));
 
         foreach ($markets as $market) {
-            $this->marketStatusManager->updateMarketStatus($market);
+            $tries = 10;
+
+            while ($tries > 0) {
+                try {
+                    $this->marketStatusManager->updateMarketStatus($market);
+
+                    break;
+                } catch (\Throwable $e) {
+                    $tries--;
+                }
+            }
+
             $io->progressAdvance();
         }
 
