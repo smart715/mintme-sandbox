@@ -137,16 +137,15 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 ], Response::HTTP_BAD_GATEWAY);
             }
         } elseif ($user->isGoogledAuthenticatorEnabled()
-            && !$twoFactorManager->checkCode($user, strval($code))) {
-            throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
+            && empty($code)) {
+            throw new ApiUnauthorizedException('Empty two factor authentication code');
         } else {
             throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
         }
 
         return $this->view();
     }
-
-
+    
     /**
      * @Rest\View()
      * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
