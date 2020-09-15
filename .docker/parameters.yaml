@@ -29,10 +29,10 @@ parameters:
     referral_fee: 0.5
     donation:
         fee: 5
-        minBtcAmount: 1.0E-6
-        minMintmeAmount: 0.0001
-        minTokensAmount: 0.0001
-        minEthAmount: 0.01
+        minBtcAmount: 0.000001
+        minMintmeAmount: 0.01
+        minEthAmount: 0.0001
+        minTokensAmount: 0.01
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
     token_precision: 4
@@ -43,6 +43,7 @@ parameters:
     mintme_coin: 'MintMe Coin'
     mintme_coin_link: 'https://www.mintme.com/coin/'
     deploy_cost: 0
+    deploy_cost_referral_reward: 0.1
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
     token_deletion_confirm_code_expiration_time: 60
@@ -75,3 +76,10 @@ parameters:
     market_consumer_enabled: false
     withdraw_expiration_time: 14400
     enable_google_analytics: false
+    hmac_sha_one_key: qwerty
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
