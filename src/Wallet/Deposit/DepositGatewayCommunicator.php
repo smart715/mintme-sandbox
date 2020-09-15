@@ -12,8 +12,6 @@ use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
-use Money\Money;
 
 class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
 {
@@ -97,9 +95,12 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         $result = $response->getResult();
 
         return new DepositInfo(
-            new Money($result['fee'], new Currency($crypto)),
+            $this->moneyWrapper->parse(
+                $result['fee'],
+                $crypto
+            ),
             $result['minDeposit']
-                ? new Money($result['minDeposit'], new Currency($crypto))
+                ?  $this->moneyWrapper->parse($result['minDeposit'], $crypto)
                 : null
         );
     }
@@ -112,11 +113,8 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 $transaction['hash'],
                 $transaction['from'],
                 $transaction['to'],
-                new Money(
-                    $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
-                    new Currency($transaction['crypto'])
-                ),
-                new Money($transaction['fee'] ?? 0, new Currency($transaction['crypto'])),
+                $this->moneyWrapper->parse($transaction['amount'], $transaction['crypto']),
+                $this->moneyWrapper->parse($transaction['fee'] ?? 0, $transaction['crypto']),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])
                 ),
