@@ -136,9 +136,6 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                     'error' => 'Something went wrong during withdrawal. Contact us or try again later!',
                 ], Response::HTTP_BAD_GATEWAY);
             }
-        } elseif ($user->isGoogleAuthenticatorEnabled()
-            && empty($code)) {
-            throw new ApiUnauthorizedException('Unauthorized, Empty two factor authentication code');
         } else {
             throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
         }
