@@ -96,7 +96,7 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
+import {required, requiredIf, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
@@ -117,7 +117,7 @@ export default {
         maxAmount: String,
         availableWeb: String,
         subunit: Number,
-        twofa: Boolean,
+        twofa: String,
         noClose: Boolean,
         expirationTime: Number,
     },
@@ -131,6 +131,9 @@ export default {
         };
     },
     computed: {
+        twoFAEnabled: function() {
+          return this.twofa;
+        },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
         },
@@ -253,7 +256,8 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
-              twoFACode,
+                required: requiredIf('twoFAEnabled'),
+                twoFACode,
             },
         };
     },
