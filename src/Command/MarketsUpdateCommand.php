@@ -90,8 +90,6 @@ class MarketsUpdateCommand extends Command
                     break;
                 } catch (\Throwable $e) {
                     $tries--;
-
-                    continue;
                 }
             }
 

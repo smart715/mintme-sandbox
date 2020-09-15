@@ -19,7 +19,7 @@ final class Version20200910163721 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('INSERT INTO cron_job (name, command, schedule, description, enabled)
-            VALUE ("markets:update", "app:markets:update", "10 0 * * *", "Update markets info from viabtc", 1);');
+            VALUE ("markets:update", "app:markets:update", "1 0 * * *", "Update markets info from viabtc", 1);');
     }
 
     public function down(Schema $schema) : void
