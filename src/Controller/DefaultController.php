@@ -4,14 +4,30 @@ namespace App\Controller;
 
 use App\Manager\MainDocumentsManagerInterfaces;
 use App\Manager\ReciprocalLinksManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\Store\PdoStore;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
+    /**
+     * @Route("/test",
+     *     name="test",
+     *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
+     * )
+     */
+    public function test(EntityManagerInterface $em): Response
+    {
+        $store = new PdoStore($em->getConnection());
+        $store->createTable();
+
+        return new Response('lol');
+    }
+
     /**
      * @Route("/",
      *     name="homepage",

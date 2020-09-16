@@ -15,6 +15,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /* Cron job added to DB. */
 class UpdateDisposableEmailDomains extends Command
 {
+
+    use LockTrait;
+
     /** @var BlacklistManagerInterface */
     private $blacklistManager;
 
@@ -50,6 +53,12 @@ class UpdateDisposableEmailDomains extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->createLock($this->em->getConnection(), 'synchronize-domains');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $io = new SymfonyStyle($input, $output);
 
         $this->logger->info('[blacklist] Update job started..');
@@ -87,6 +96,8 @@ class UpdateDisposableEmailDomains extends Command
 
         $io->success('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
+
+        $lock->release();
 
         return 0;
     }

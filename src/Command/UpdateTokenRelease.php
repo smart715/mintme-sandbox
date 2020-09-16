@@ -13,6 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /* Cron job added to DB. */
 class UpdateTokenRelease extends Command
 {
+
+    use LockTrait;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -41,6 +44,12 @@ class UpdateTokenRelease extends Command
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->createLock($this->em->getConnection(), 'update-token-release');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $this->logger->info('[release] Update job started..');
 
         /** @var LockIn[] $locked */
@@ -59,6 +68,8 @@ class UpdateTokenRelease extends Command
         $this->em->flush();
 
         $this->logger->info('[release] Finished.');
+
+        $lock->release();
 
         return 0;
     }

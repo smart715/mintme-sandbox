@@ -21,6 +21,9 @@ use Throwable;
 /* Cron job added to DB. */
 class UpdatePendingWithdrawals extends Command
 {
+
+    use LockTrait;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -67,6 +70,12 @@ class UpdatePendingWithdrawals extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->createLock($this->em->getConnection(), 'update-pending-withdrawals');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $this->logger->info("[withdrawals] Update job started with expiration time: {$this->expirationTime}S.. ");
 
         $expires = new DateInterval('PT' . $this->expirationTime . 'S');
@@ -160,6 +169,8 @@ class UpdatePendingWithdrawals extends Command
         $this->logger->info("[withdrawals] Pending token withdraval total: $itemsCount, deleted: $pendingCount ..");
 
         $this->logger->info('[withdrawals] Update job finished..');
+
+        $lock->release();
 
         return 0;
     }
