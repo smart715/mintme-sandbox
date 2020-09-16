@@ -7,7 +7,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Utils\LockFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +17,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /* Cron job added to DB. */
 class MarketsUpdateCommand extends Command
 {
-
-    use LockTrait;
-
     /** @var string */
     protected static $defaultName = 'app:markets:update';
 
@@ -38,8 +35,8 @@ class MarketsUpdateCommand extends Command
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
-    /** @var EntityManagerInterface */
-    private $em;
+    /** @var LockFactory */
+    private $lockFactory;
 
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
@@ -47,14 +44,14 @@ class MarketsUpdateCommand extends Command
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         RebrandingConverterInterface $rebrandingConverter,
-        EntityManagerInterface $em
+        LockFactory $lockFactory
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFactory = $marketFactory;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->em = $em;
+        $this->lockFactory = $lockFactory;
         parent::__construct();
     }
 
@@ -69,7 +66,7 @@ class MarketsUpdateCommand extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lock = $this->createLock($this->em->getConnection(), 'markets-update');
+        $lock = $this->lockFactory->createLock('markets-update');
 
         if (!$lock->acquire()) {
             return 0;

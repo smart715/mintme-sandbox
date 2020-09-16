@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Token\LockIn;
 use App\Repository\LockInRepository;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -13,21 +14,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 /* Cron job added to DB. */
 class UpdateTokenRelease extends Command
 {
-
-    use LockTrait;
-
     /** @var LoggerInterface */
     private $logger;
 
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         LoggerInterface $logger,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -44,7 +47,7 @@ class UpdateTokenRelease extends Command
     /** {@inheritdoc} */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lock = $this->createLock($this->em->getConnection(), 'update-token-release');
+        $lock = $this->lockFactory->createLock('update-token-release');
 
         if (!$lock->acquire()) {
             return 0;

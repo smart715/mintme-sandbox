@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -15,9 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /* Cron job added to DB. */
 class UpdateDisposableEmailDomains extends Command
 {
-
-    use LockTrait;
-
     /** @var BlacklistManagerInterface */
     private $blacklistManager;
 
@@ -30,16 +28,21 @@ class UpdateDisposableEmailDomains extends Command
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         LoggerInterface $logger,
         BlacklistManagerInterface $blacklistManager,
         DisposableEmailCommunicatorInterface $domainSynchronizer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->blacklistManager = $blacklistManager;
         $this->domainSynchronizer = $domainSynchronizer;
         $this->em = $em;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -53,7 +56,7 @@ class UpdateDisposableEmailDomains extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $lock = $this->createLock($this->em->getConnection(), 'synchronize-domains');
+        $lock = $this->lockFactory->createLock('synchronize-domains');
 
         if (!$lock->acquire()) {
             return 0;
