@@ -35,40 +35,37 @@ class TokenVoter extends Voter
     /**
      * {@inheritdoc}
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $securityToken): bool
     {
         /** @psalm-suppress UndefinedDocblockClass */
-        $user = $token->getUser();
+        $user = $securityToken->getUser();
 
         if (!$user instanceof User) {
             // the user must be logged in; if not, deny access
             return false;
         }
 
-        if (self::NOT_BLOCKED === $attribute) {
-            $token = $user->getProfile()->getToken();
-
-            if (!$subject || $subject instanceof Crypto) {
-                return !$user->isBlocked();
-            }
-
-            if ($subject instanceof Token && $subject->isBlocked()) {
-                return false;
-            }
-
-            return $token
-                ? !$token->isBlocked()
-                : true;
+        if (!$subject || $subject instanceof Crypto) {
+            return !$user->isBlocked();
         }
 
-        /** @var Token $tokenEntity */
-        $tokenEntity = $subject;
+        /** @var Token $cryptoToken */
+        $cryptoToken = $subject;
 
         switch ($attribute) {
+            case self::NOT_BLOCKED:
+                $cryptoToken = $user->getProfile()->getToken();
+
+                if ($subject instanceof Token && $subject->isBlocked()) {
+                    return false;
+                }
+
+                return $cryptoToken
+                    ? !$cryptoToken->isBlocked()
+                    : true;
             case self::EDIT:
-                return $this->ownToken($tokenEntity) && !$tokenEntity->isBlocked();
             case self::DELETE:
-                return $this->ownToken($tokenEntity) && !$tokenEntity->isBlocked();
+                return $this->ownToken($cryptoToken) && !$cryptoToken->isBlocked();
         }
 
         return false;
