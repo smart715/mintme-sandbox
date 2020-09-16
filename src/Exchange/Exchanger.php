@@ -20,8 +20,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
-use Money\Currency;
-use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
@@ -98,8 +96,8 @@ class Exchanger implements ExchangerInterface
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
-                'amount' => (new Money('0', new Currency($market->getQuote()->getSymbol())))->getAmount(),
-                'price' => (new Money('0', new Currency($market->getQuote()->getSymbol())))->getAmount(),
+                'amount' => $this->mw->parse('0', $market->getQuote()->getSymbol())->getAmount(),
+                'price' => $this->mw->parse('0', $market->getQuote()->getSymbol())->getAmount(),
             ]
         );
 
