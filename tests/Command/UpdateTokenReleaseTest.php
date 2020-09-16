@@ -5,11 +5,13 @@ namespace App\Tests\Command;
 use App\Command\UpdateTokenRelease;
 use App\Entity\Token\LockIn;
 use App\Repository\LockInRepository;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\LockInterface;
 
 class UpdateTokenReleaseTest extends KernelTestCase
 {
@@ -21,7 +23,8 @@ class UpdateTokenReleaseTest extends KernelTestCase
 
         $application->add(new UpdateTokenRelease(
             $this->createMock(LoggerInterface::class),
-            $this->mockEm($lockCount)
+            $this->mockEm($lockCount),
+            $this->mockLockFactory()
         ));
 
         $command = $application->find('app:update-token-release');
@@ -56,5 +59,16 @@ class UpdateTokenReleaseTest extends KernelTestCase
         $lock->expects($this->once())->method('updateFrozenAmount');
 
         return $lock;
+    }
+
+    private function mockLockFactory(): LockFactory
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->method('acquire')->wilLReturn(true);
+
+        $lf = $this->createMock(LockFactory::class);
+        $lf->method('createLock')->willReturn($lock);
+
+        return $lf;
     }
 }

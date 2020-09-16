@@ -3,16 +3,14 @@
 namespace App\Command;
 
 use App\Exchange\Factory\MarketFactoryInterface;
-use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Utils\LockFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -37,18 +35,23 @@ class MarketsUpdateCommand extends Command
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        LockFactory $lockFactory
     ) {
         $this->marketStatusManager = $marketStatusManager;
         $this->marketFactory = $marketFactory;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->lockFactory = $lockFactory;
         parent::__construct();
     }
 
@@ -63,16 +66,24 @@ class MarketsUpdateCommand extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->lockFactory->createLock('markets-update');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $io = new SymfonyStyle($input, $output);
 
         /** @var string $market */
         $market = $input->getArgument('market');
 
-        if ($market) {
-            return $this->updateOne($this->rebrandingConverter->reverseConvert($market), $io);
-        }
+        $result = $market
+            ? $this->updateOne($this->rebrandingConverter->reverseConvert($market), $io)
+            : $this->updateAll($io);
 
-        return $this->updateAll($io);
+        $lock->release();
+
+        return $result;
     }
 
     protected function updateAll(SymfonyStyle $io): int
