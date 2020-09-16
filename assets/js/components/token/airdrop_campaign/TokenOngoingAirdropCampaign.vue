@@ -163,7 +163,7 @@ export default {
         showCountdown: function() {
             return setInterval(() => {
                     this.duration = moment.duration(this.duration - 1000, 'milliseconds');
-                    if (this.duration.asMilliseconds() < 0) {
+                    if (this.duration <= 0) {
                         this.timeElapsed = true;
                         this.showDuration = false;
                     }
