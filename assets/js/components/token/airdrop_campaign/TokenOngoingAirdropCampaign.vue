@@ -88,8 +88,8 @@ export default {
         };
     },
     mounted: function() {
-        this.getAirdropCampaign();
         this.showCountdown();
+        this.getAirdropCampaign();
     },
     computed: {
         actualParticipants: function() {
@@ -120,7 +120,9 @@ export default {
         duration: {
             get: function() {
                 let now = moment();
-                return moment.duration(moment(this.endsDateTime).diff(moment(now)), 'milliseconds', true);
+                return moment.duration(moment(this.endsDateTime).diff(moment(now))).asMilliseconds() <= 0
+                    ? moment.duration(0)
+                    : moment.duration(moment(this.endsDateTime).diff(moment(now)));
             },
             set: function(newDuration) {
                 return newDuration;
@@ -162,12 +164,12 @@ export default {
     methods: {
         showCountdown: function() {
             return setInterval(() => {
-                    this.duration = moment.duration(this.duration - 1000, 'milliseconds');
-                    if (this.duration <= 0) {
-                        this.timeElapsed = true;
-                        this.showDuration = false;
-                    }
-                }, 1000);
+                this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+                if (this.duration.asMilliseconds() <= 0) {
+                    this.timeElapsed = true;
+                    this.showDuration = false;
+                }
+            }, 1000);
         },
         getAirdropCampaign: function() {
             this.$axios.retry.get(this.$routing.generate('get_airdrop_campaign', {
