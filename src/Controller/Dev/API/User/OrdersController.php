@@ -221,6 +221,8 @@ class OrdersController extends DevApiController
     {
         $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
+        $this->denyAccessUnlessGranted('not-blocked', $request->get('quote'));
+
         $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
         $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
 
@@ -270,6 +272,8 @@ class OrdersController extends DevApiController
     {
         $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
+        $this->denyAccessUnlessGranted('not-blocked', $request->get('quote'));
+
         $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
         $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
 
@@ -286,7 +290,7 @@ class OrdersController extends DevApiController
         $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
 
         $tradeResult = $this->trader->cancelOrder($order);
-        
+
         if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
             throw new ApiBadRequestException('Invalid request');
         } else {

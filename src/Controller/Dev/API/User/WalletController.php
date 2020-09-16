@@ -197,6 +197,8 @@ class WalletController extends DevApiController
 
         $this->checkForDisallowedValues($currency);
 
+        $this->denyAccessUnlessGranted('not-blocked', $currency);
+
         $currency = $this->rebrandingConverter->reverseConvert(
             mb_strtolower($currency)
         );
