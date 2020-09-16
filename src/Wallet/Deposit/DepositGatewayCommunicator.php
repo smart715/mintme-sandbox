@@ -114,7 +114,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 $transaction['from'],
                 $transaction['to'],
                 $this->moneyWrapper->parse($transaction['amount'], $transaction['crypto']),
-                $this->moneyWrapper->parse($transaction['fee'] ?? 0, $transaction['crypto']),
+                $this->moneyWrapper->parse($transaction['fee'] ?? '0', $transaction['crypto']),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])
                 ),
