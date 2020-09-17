@@ -101,7 +101,7 @@ class Exchanger implements ExchangerInterface
             ]
         );
 
-        return true;
+        return $tradeResult;
     }
 
     public function placeOrder(
