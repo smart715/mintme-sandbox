@@ -115,13 +115,15 @@
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">
-                            <token-introduction-description
-                                    class="col-12 pb-3"
+                            {% if showDescription %}
+                                <token-introduction-description
+                                    class="col-12 mb-3"
                                     name="{{ token.name }}"
                                     :description="tokenDescription"
                                     :editable="{{ isOwner }}"
                                     @updated="descriptionUpdated"
-                            ></token-introduction-description>
+                                ></token-introduction-description>
+                            {% endif %}
                         </div>
                         <div class="row token-info-container">
                             <posts class="col-12 col-lg-7 pr-lg-1"

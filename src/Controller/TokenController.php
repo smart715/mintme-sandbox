@@ -147,8 +147,9 @@ class TokenController extends Controller
             ? $this->marketManager->create($webCrypto, $token)
             : null;
         $tokenDescription = $token->getDescription() ?: '';
-        $tokenDescription =  '' != $tokenDescription? $token->getDescription()
-            : 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
+        $defaultDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
+        $tokenDescription = $tokenDescription ?: $defaultDescription;
+        $defaultActivated = $tokenDescription === $defaultDescription;
         $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
@@ -164,6 +165,7 @@ class TokenController extends Controller
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
+            'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
