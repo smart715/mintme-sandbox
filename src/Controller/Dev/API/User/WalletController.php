@@ -99,7 +99,11 @@ class WalletController extends DevApiController
             $this->cryptoManager->findAll()
         );
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($user);
+        $isBlockedToken = $user->getProfile()->getToken()
+            ? $user->getProfile()->getToken()->isBlocked()
+            : false;
+
+        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
         $rebrandedAddresses = [];
 
@@ -198,8 +202,6 @@ class WalletController extends DevApiController
         $address = $request->get('address');
 
         $this->checkForDisallowedValues($currency);
-
-        $this->denyAccessUnlessGranted('not-blocked', $currency);
 
         $currency = $this->rebrandingConverter->reverseConvert(
             mb_strtolower($currency)
