@@ -88,7 +88,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
         $participants = (int)$request->get('participants');
-        $endDateTimestamp = $request->get('endDate');
+        $endDateTimestamp = (int)$request->get('endDate');
         $balance = $balanceHandler->exchangeBalance(
             $token->getProfile()->getUser(),
             $token
@@ -153,6 +153,12 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         if ($token->getActiveAirdrop()->getId() !== $airdrop->getId()) {
             throw new ApiBadRequestException('Current airdrop campaign is finished.');
+        }
+
+        if (!is_null($token->getActiveAirDrop()->getEndDate())) {
+            if ($token->getActiveAirdrop()->getEndDate()->getTimeStamp() < time()) {
+                throw new ApiBadRequestException('The time for current airdrop campaign has elapsed.');
+            }
         }
 
         if ($this->airdropCampaignManager->checkIfUserClaimed($user, $token)) {
