@@ -461,11 +461,14 @@ export default {
             return pair.indexOf('/') !== -1;
         },
         toggleFilter: function(value) {
+            let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
+                && (value === this.marketFilters.options.deployed.key || value === this.marketFilters.options.all.key)
+                && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
             this.sortDesc = true;
-            this.updateMarkets(1, true);
+            this.updateMarkets(page, true);
         },
         toggleUsd: function(show) {
             this.showUsd = show;
