@@ -54,12 +54,6 @@ class TokenVoter extends Voter
 
         switch ($attribute) {
             case self::NOT_BLOCKED:
-                $cryptoToken = $user->getProfile()->getToken();
-
-                if ($subject instanceof Token && $subject->isBlocked()) {
-                    return false;
-                }
-
                 return $cryptoToken
                     ? !$cryptoToken->isBlocked()
                     : true;
