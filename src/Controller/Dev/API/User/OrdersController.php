@@ -221,13 +221,13 @@ class OrdersController extends DevApiController
     {
         $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
 
-        $this->denyAccessUnlessGranted('not-blocked', $request->get('quote'));
-
         $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
         $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        $this->denyAccessUnlessGranted('not-blocked', $quote);
 
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
