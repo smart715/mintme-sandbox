@@ -79,9 +79,9 @@ class Exchanger implements ExchangerInterface
         $this->vf = $validatorFactory;
     }
 
-    public function cancelOrder(Market $market, Order $order): bool
+    public function cancelOrder(Market $market, Order $order): TradeResult
     {
-        $this->trader->cancelOrder($order);
+        $tradeResult = $this->trader->cancelOrder($order);
 
         try {
             $this->mp->send($market);

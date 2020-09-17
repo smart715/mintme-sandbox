@@ -16,5 +16,5 @@ interface ExchangerInterface
         int $side
     ): TradeResult;
 
-    public function cancelOrder(Market $market, Order $order): bool;
+    public function cancelOrder(Market $market, Order $order): TradeResult;
 }
