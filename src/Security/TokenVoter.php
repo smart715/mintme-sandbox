@@ -28,8 +28,13 @@ class TokenVoter extends Voter
      */
     protected function supports($attribute, $subject): bool
     {
-        return in_array($attribute, [self::NOT_BLOCKED, self::EDIT, self::DELETE], true)
-            && ($subject instanceof Token || $subject instanceof Crypto || is_null($subject));
+        if (!in_array($attribute, [self::NOT_BLOCKED, self::EDIT, self::DELETE], true)) {
+            return false;
+        }
+
+        if (!($subject instanceof Token || $subject instanceof Crypto || is_null($subject))) {
+            return false;
+        }
     }
 
     /**
