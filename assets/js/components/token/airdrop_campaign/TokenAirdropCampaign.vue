@@ -150,11 +150,11 @@ export default {
             showEndDate: false,
             tokensAmount: null,
             participantsAmount: null,
-            endDate: moment().add(30, 'days').toDate(),
+            endDate: moment().add(1, 'hour').toDate(),
             options: {
                 format: 'MM.DD.YYYY HH:mm',
                 useCurrent: false,
-                minDate: moment().add(24, 'hours').toDate(),
+                minDate: moment().add(1, 'hour').toDate(),
             },
             errorMessage: '',
             precision: TOK.subunit,
@@ -210,7 +210,8 @@ export default {
             return !this.showEndDate || this.isDateValid;
         },
         isDateValid: function() {
-            return this.showEndDate && Date.parse(this.endDate) > Date.now();
+            let selectedDate = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
+            return this.showEndDate && selectedDate.valueOf() > moment().valueOf();
         },
         isRewardValid: function() {
             if (this.isAmountValid && this.isParticipantsAmountValid) {
@@ -280,7 +281,8 @@ export default {
             };
 
             if (this.isDateValid) {
-                data.endDate = moment(this.endDate).utc().unix();
+                let selectedDate = moment(this.endDate, 'MM.DD.YYYY HH:mm' ).toDate();
+                data.endDate = Math.round(selectedDate.getTime()/1000);
             }
 
             this.loading = true;
@@ -350,7 +352,7 @@ export default {
 
             this.tokensAmount = 100;
             this.participantsAmount = 100;
-            this.endDate = moment().add(30, 'days').toDate();
+            this.endDate = moment().add(1, 'hour').toDate();
         },
         checkInput: function(precision) {
             let selectionStart = event.target.selectionStart;
