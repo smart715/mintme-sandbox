@@ -59,9 +59,7 @@ class TokenVoter extends Voter
 
         switch ($attribute) {
             case self::NOT_BLOCKED:
-                return $cryptoToken
-                    ? !$cryptoToken->isBlocked()
-                    : true;
+                return !$cryptoToken->isBlocked();
             case self::EDIT:
             case self::DELETE:
                 return $this->ownToken($cryptoToken) && !$cryptoToken->isBlocked();
