@@ -15,6 +15,27 @@
             <copy-link :content-to-copy="link" class="c-pointer ml-1">
               <font-awesome-icon :icon="['far', 'copy']"/>
             </copy-link>
+            <button v-if="showEdit"
+                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                    :disabled="deleteDisabled"
+                    @click="showModal"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="trash"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
+            <a v-if="showEdit"
+               class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
+               :href="$routing.generate('edit_post_page', {id: post.id})"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                />
+            </a>
         </div>
         <template v-if="loggedIn">
             <p v-if="post.content">
@@ -31,30 +52,9 @@
             <font-awesome-icon
                 class="c-pointer align-middle"
                 icon="comment"
-                transform="shrink-4 up-1.5"
+                transform="grow-1.5"
             />
-          <span class="social-link">{{ post.commentsCount }} Comments</span>
-        </a>
-        <button v-if="showEdit"
-            class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-            :disabled="deleteDisabled"
-            @click="showModal"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="trash"
-                transform="shrink-4 up-1.5"
-            />
-        </button>
-        <a v-if="showEdit"
-            class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-            :href="$routing.generate('edit_post_page', {id: post.id})"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="edit"
-                transform="shrink-4 up-1.5"
-            />
+          <span class="social-link ml-1">{{ post.commentsCount }} Comments</span>
         </a>
         <confirm-modal
             :visible="isModalVisible"

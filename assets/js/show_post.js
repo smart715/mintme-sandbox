@@ -1,4 +1,4 @@
-import Post from './components/posts/Post';
+\import Post from './components/posts/Post';
 import Comments from './components/posts/Comments';
 
 new Vue({

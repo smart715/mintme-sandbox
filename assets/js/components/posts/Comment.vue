@@ -59,10 +59,10 @@
             <font-awesome-icon
                 class="hover-icon c-pointer align-middle"
                 icon="thumbs-up"
-                transform="shrink-4 up-1.5"
+                transform="grow-1.5"
                 @click="likeComment"
             />
-            {{ comment.likeCount }} Likes
+            <span class="ml-1">{{ comment.likeCount }} Likes</span>
         </span>
     </div>
 </template>

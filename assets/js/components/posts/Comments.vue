@@ -1,6 +1,7 @@
 <template>
     <div class="comments">
         <comment-form
+            class="p-2"
             :logged-in="loggedIn"
             :api-url="apiUrl"
             @submitted="$emit('new-comment', $event)"
