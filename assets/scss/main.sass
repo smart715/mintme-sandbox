@@ -112,7 +112,6 @@ body
     background: linear-gradient($secondary-dark 50%, transparent)
 
 a
-  outline: none
   color: $color-link
 
   &.link-light
@@ -153,6 +152,12 @@ a
 .faq-block
   a:hover
     color: white
+
+  a:focus
+    color: white
+    border-style: dotted
+    border-width: 1px
+    border-color: $color-link
 
 .visible-hidden
   visibility: hidden
@@ -402,6 +407,10 @@ a
   @include media-breakpoint-up(xl)
     font-size: 2rem
 
+.btn-transparent
+  border-color: transparent
+  background: transparent
+
 .btn-ghost
   border-color: $dark-white
   background: transparent
@@ -616,17 +625,18 @@ a
             display: none
 
   .nav-tabs
+    background-color: $color-tabs
     display: flex
     text-align: center
-    padding: 0 !important
+    padding: 3px !important
     align-items: stretch
     border: none
 
     .nav-item
       flex: 1 1 auto
-      padding: 0
-      border: none
+      padding: 1px
       color: $dark-white
+      margin-right: 2px
 
       .nav-link
         border: none
@@ -658,6 +668,7 @@ a
     .nav-tabs
       background: $secondary
       text-align: left
+      overflow: hidden
       border: 2px solid $secondary
       white-space: nowrap
 

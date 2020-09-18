@@ -1,5 +1,11 @@
 <template>
-    <div class="avatar" :class="classObject" @click="upload">
+    <div
+        class="avatar"
+        :class="classObject"
+        @click="upload"
+        :tabindex="isTabIndex"
+        @keyup.enter="upload"
+    >
         <img :src="imageUrl"
              class="rounded-circle img-fluid"
         >
@@ -55,6 +61,9 @@
             },
             imageUrl: function() {
                 return this.currentImage ? this.currentImage : this.fallback;
+            },
+            isTabIndex: function() {
+                return this.editable ? 0 : -1;
             },
         },
         methods: {
