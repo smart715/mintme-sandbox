@@ -77,11 +77,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms');
+            ->from(MarketStatus::class, 'ms')
+            ->join('ms.quoteToken', 'qt');
 
         if (self::DEPLOYED_ONLY === $deployed) {
-            $qb->join('ms.quoteToken', 'qt')
-                ->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+            $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         return (int)$qb->getQuery()->getSingleScalarResult();
@@ -123,9 +123,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         }
 
         if (self::DEPLOYED_FIRST === $deployed) {
-            $queryBuilder->addOrderBy('qt.deployed', 'DESC');
+            $queryBuilder->addSelect(
+                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
+            )->orderBy('deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $deployed) {
-            $queryBuilder->andWhere('qt.deployed IS NOT NULL');
+            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         if (self::SORT_BY_CHANGE === $sort) {
@@ -187,7 +189,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     public function updateMarketStatus(Market $market): void
     {
-        $marketInfo = $this->marketHandler->getMarketInfo($market);
         $marketStatus = $this->repository->findByBaseQuoteNames(
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol()
@@ -198,6 +199,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 "Nonexistent market: {$market->getBase()->getSymbol()}/{$market->getQuote()->getSymbol()}"
             );
         }
+
+        $marketInfo = $this->marketHandler->getMarketInfo($market);
 
         $marketStatus->updateStats($marketInfo);
 
