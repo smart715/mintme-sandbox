@@ -41,12 +41,16 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{base}/{quote}/check/{currency}/{amount}", name="check_donation", options={"expose"=true})
+     * @Rest\Get(
+     *     "/{base}/{quote}/check/{currency}/{amount}",
+     *     name="check_donation",
+     *     options={"expose"=true},
+     *     requirements={"currency"="^(WEB|BTC|ETH)$"}
+     * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC|ETH)",
      *     description="Selected currency to donate."
      * )
      */
