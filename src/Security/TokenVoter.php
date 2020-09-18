@@ -32,11 +32,7 @@ class TokenVoter extends Voter
             return false;
         }
 
-        if (!($subject instanceof Token || $subject instanceof Crypto || is_null($subject))) {
-            return false;
-        }
-
-        return true;
+        return $subject instanceof Token || $subject instanceof Crypto || is_null($subject);
     }
 
     /**
