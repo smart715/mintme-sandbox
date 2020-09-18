@@ -14,6 +14,7 @@ use App\Repository\CryptoRepository;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
+use App\Utils\LockFactory;
 use App\Wallet\Model\Amount;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\LockInterface;
 
 class UpdatePendingWithdrawalsTest extends KernelTestCase
 {
@@ -46,7 +48,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockEm($emCount),
             $this->mockDate(new DateTimeImmutable()),
             $handler,
-            $cm
+            $cm,
+            $this->mockLockFactory()
         );
 
         $upw->expirationTime = 1;
@@ -82,7 +85,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $em,
             $this->mockDate(new DateTimeImmutable()),
             $handler,
-            $cm
+            $cm,
+            $this->mockLockFactory()
         );
 
         $upw->expirationTime = 1;
@@ -187,5 +191,16 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
         $lock->method('getName')->willReturn(Token::WEB_SYMBOL);
 
         return $lock;
+    }
+
+    private function mockLockFactory(): LockFactory
+    {
+        $lock = $this->createMock(LockInterface::class);
+        $lock->method('acquire')->wilLReturn(true);
+
+        $lf = $this->createMock(LockFactory::class);
+        $lf->method('createLock')->willReturn($lock);
+
+        return $lf;
     }
 }
