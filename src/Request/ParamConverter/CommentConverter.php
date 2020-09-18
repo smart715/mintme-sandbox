@@ -21,7 +21,7 @@ class CommentConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration): bool
     {
-        $comment = $this->commentManager->getById((int)$request->get('id'));
+        $comment = $this->commentManager->getById((int)$request->get('commentId'));
 
         if (!$comment) {
             throw new NotFoundHttpException('Comment not found');

@@ -157,7 +157,7 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/comments/delete/{id<\d+>}", name="delete_comment", options={"expose"=true})
+     * @Rest\Post("/comments/delete/{commentId<\d+>}", name="delete_comment", options={"expose"=true})
      */
     public function deleteComment(Comment $comment): View
     {
@@ -171,7 +171,7 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/comments/edit/{id<\d+>}", name="edit_comment", options={"expose"=true})
+     * @Rest\Post("/comments/edit/{commentId<\d+>}", name="edit_comment", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      */
     public function editComment(ParamFetcherInterface $request, Comment $comment): View
@@ -189,7 +189,7 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/comments/like/{id<\d+>}", name="like_comment", options={"expose"=true})
+     * @Rest\Post("/comments/like/{commentId<\d+>}", name="like_comment", options={"expose"=true})
      */
     public function likeComment(Comment $comment): View
     {

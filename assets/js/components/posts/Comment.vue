@@ -105,7 +105,7 @@ export default {
             return moment(this.comment.createdAt).format('H:mm, MMM D, YYYY');
         },
         apiUrl() {
-            return this.$routing.generate('edit_comment', {id: this.comment.id});
+            return this.$routing.generate('edit_comment', {commentId: this.comment.id});
         },
         profileUrl() {
             return this.$routing.generate('profile-view', {nickname: this.comment.author.profile.nickname});
@@ -114,7 +114,7 @@ export default {
     methods: {
         deleteComment() {
             this.deleteDisabled = true;
-            this.$axios.single.post(this.$routing.generate('delete_comment', {id: this.comment.id}))
+            this.$axios.single.post(this.$routing.generate('delete_comment', {commentId: this.comment.id}))
                 .then((res) => {
                     this.$emit('delete-comment', this.index);
                     this.notifySuccess(res.data.message);
@@ -142,7 +142,7 @@ export default {
                 return;
             }
             this.liking = true;
-            this.$axios.single.post(this.$routing.generate('like_comment', {id: this.comment.id}))
+            this.$axios.single.post(this.$routing.generate('like_comment', {commentId: this.comment.id}))
                 .then((res) => {
                     this.comment.likeCount += this.comment.liked ? -1 : 1;
                     this.comment.liked = !this.comment.liked;
