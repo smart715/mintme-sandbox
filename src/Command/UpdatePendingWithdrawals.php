@@ -10,6 +10,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
+use App\Utils\LockFactory;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -39,18 +40,23 @@ class UpdatePendingWithdrawals extends Command
     /** @var int */
     public $expirationTime;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         DateTime $dateTime,
         BalanceHandlerInterface $balanceHandler,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
         $this->date = $dateTime;
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -67,6 +73,12 @@ class UpdatePendingWithdrawals extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->lockFactory->createLock('update-pending-withdrawals');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $this->logger->info("[withdrawals] Update job started with expiration time: {$this->expirationTime}S.. ");
 
         $expires = new DateInterval('PT' . $this->expirationTime . 'S');
@@ -160,6 +172,8 @@ class UpdatePendingWithdrawals extends Command
         $this->logger->info("[withdrawals] Pending token withdraval total: $itemsCount, deleted: $pendingCount ..");
 
         $this->logger->info('[withdrawals] Update job finished..');
+
+        $lock->release();
 
         return 0;
     }
