@@ -5,6 +5,7 @@ namespace App\Controller\Dev\API\V2;
 use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -58,6 +59,7 @@ class TickerController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @throws ApiNotFoundException
      */
     public function getTicker(): array
     {
@@ -67,6 +69,10 @@ class TickerController extends AbstractFOSRestController
         return array_map(
             function ($marketStatus) use ($assets) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
+
+                if (!$market) {
+                    throw new ApiNotFoundException('Market pair not found: ' . $marketStatus);
+                }
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
@@ -79,10 +85,10 @@ class TickerController extends AbstractFOSRestController
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
 
                 $isFrozen =
-                    $base instanceof Crypto && !$base->isTradable() ||
-                    $quote instanceof Crypto && !$quote->isExchangeble() ||
-                    $base instanceof Token && $base->isBlocked() ||
-                    $quote instanceof Token && $quote->isBlocked() ?
+                    ($base instanceof Crypto && !$base->isTradable()) ||
+                    ($quote instanceof Crypto && !$quote->isExchangeble()) ||
+                    ($base instanceof Token && $base->isBlocked()) ||
+                    ($quote instanceof Token && $quote->isBlocked()) ?
                     0 : 1;
 
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [

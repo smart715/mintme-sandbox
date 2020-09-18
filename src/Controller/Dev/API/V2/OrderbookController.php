@@ -51,6 +51,7 @@ class OrderbookController extends AbstractFOSRestController
         $this->rebrandingConverter = $rebrandingConverter;
         $this->marketStatusManager = $marketStatusManager;
     }
+
     /**
      * Get order book
      *
@@ -69,8 +70,8 @@ class OrderbookController extends AbstractFOSRestController
      *     requirements=@Assert\Range(min="1", max="3"),
      *     nullable=false,
      *     description="Level 1 – Only the best bid and ask.
-Level 2 – Arranged by best bids and asks.
-Level 3 – Complete order book, no aggregation.",
+    Level 2 – Arranged by best bids and asks.
+    Level 3 – Complete order book, no aggregation.",
      *     allowBlank=false,
      *     strict=true
      * )
@@ -85,6 +86,7 @@ Level 3 – Complete order book, no aggregation.",
      * @SWG\Tag(name="Open")
      * @Security(name="")
      * @return mixed[]
+     * @throws ApiNotFoundException
      */
     public function getOrderbook(ParamFetcherInterface $request, string $base_quote): array
     {
