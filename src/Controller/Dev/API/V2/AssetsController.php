@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dev\API\V2;
 
+use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
@@ -52,6 +53,7 @@ class AssetsController extends AbstractFOSRestController
         $assets = [];
         $cryptos = $this->cryptoManager->findAllIndexed('symbol', true);
         $tokens = $this->tokenManager->findAll();
+        $tokenMinWithdraw = number_format((float)('1e-' . Token::TOKEN_SUBUNIT), Token::TOKEN_SUBUNIT);
         $makerFee = $this->getParameter('maker_fee_rate');
         $takerFee = $this->getParameter('taker_fee_rate');
 
@@ -76,6 +78,7 @@ class AssetsController extends AbstractFOSRestController
                 'name' => strtolower($this->rebrandingConverter->convert($token->getName())),
                 'can_withdraw' => $deployed,
                 'can_deposit' => $deployed,
+                'min_withdraw' => $tokenMinWithdraw,
                 'max_withdraw' => $this->getParameter('token_quantity'),
                 'maker_fee' => $makerFee,
                 'taker_fee' => $takerFee,

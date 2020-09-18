@@ -71,7 +71,12 @@ class TickerController extends AbstractFOSRestController
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
                 if (!$market) {
-                    throw new ApiNotFoundException('Market pair not found: ' . $marketStatus);
+                    throw new ApiNotFoundException(
+                        'Market pair not found: ' .
+                        $marketStatus->getQuote()->getSymbol() .
+                        '/' .
+                        $marketStatus->getCrypto()->getSymbol()
+                    );
                 }
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);

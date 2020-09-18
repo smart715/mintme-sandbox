@@ -71,6 +71,8 @@ class CurrenciesController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Parameter(name="name", in="path", description="Currency name", type="string")
      * @SWG\Tag(name="Currencies")
+     * @param string $name
+     * @return Response
      */
     public function getCurrency(string $name): Response
     {

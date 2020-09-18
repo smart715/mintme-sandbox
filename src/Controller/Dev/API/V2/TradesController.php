@@ -84,15 +84,15 @@ class TradesController extends AbstractFOSRestController
         $this->fixBaseQuoteOrder($market);
 
         return array_map(function ($order) {
-            $order = $this->rebrandingConverter->convertOrder($order);
+            $rebrandedOrder = $this->rebrandingConverter->convertOrder($order);
 
             return [
-                'trade_id' => $order->getId(),
-                'price' => $order->getPrice(),
-                'base_volume' => $order->getAmount(),
-                'quote_volume' => $order->getAmount()->multiply($this->moneyWrapper->format($order->getPrice())),
-                'timestamp' => $order->getTimestamp(),
-                'type' => array_search($order->getSide(), Order::SIDE_MAP),
+                'trade_id' => $rebrandedOrder->getId(),
+                'price' => $rebrandedOrder->getPrice(),
+                'base_volume' => $rebrandedOrder->getAmount(),
+                'quote_volume' => $rebrandedOrder->getAmount()->multiply($this->moneyWrapper->format($rebrandedOrder->getPrice())),
+                'timestamp' => $rebrandedOrder->getTimestamp(),
+                'type' => array_search($rebrandedOrder->getSide(), Order::SIDE_MAP),
             ];
         }, $this->marketHandler->getExecutedOrders(
             $market

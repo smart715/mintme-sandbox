@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\V2;
 
 use App\Controller\Traits\BaseQuoteOrderTrait;
+use App\Exception\ApiNotFoundException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -56,6 +57,7 @@ class SummaryController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @throws ApiNotFoundException
      */
     public function getSummary(): array
     {
@@ -64,6 +66,15 @@ class SummaryController extends AbstractFOSRestController
         return array_map(
             function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
+
+                if (!$market) {
+                    throw new ApiNotFoundException(
+                        'Market pair not found: ' .
+                        $marketStatus->getQuote()->getSymbol() .
+                        '/' .
+                        $marketStatus->getCrypto()->getSymbol()
+                    );
+                }
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
