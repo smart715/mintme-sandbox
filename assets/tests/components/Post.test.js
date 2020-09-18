@@ -106,7 +106,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.post-edit-icon').exists()).toBe(false);
+        expect(wrapper.find('.icon-edit').exists()).toBe(false);
         expect(wrapper.find('.delete-icon').exists()).toBe(false);
     });
 });

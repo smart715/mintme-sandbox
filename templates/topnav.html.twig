@@ -75,7 +75,7 @@
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
                             <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
-                            <span>My Token</span>
+                            My Token
                         </a>
                     </li>
                 {% endif %}
@@ -99,7 +99,7 @@
                     </li>
                     <li class="nav-item align-self-center {{ route == 'fos_user_registration_register' ? 'active' : '' }}">
                         <a href="{{ path('fos_user_registration_register') }}" class="nav-link">
-                            <span>Sign Up</span>
+                            Sign Up
                         </a>
                     </li>
                 {% else %}
@@ -146,6 +146,8 @@
                                     :aria-expanded="showProfileMenu"
                                     @click="toggleProfileMenu"
                                     v-on-clickaway="hideProfileMenu"
+                                    tabindex="0"
+                                    @keyup.enter="toggleProfileMenu"
                                 >
                                     <avatar
                                         class="{% if app.user.profile.image.url == "/media/default_profile.png" %}default-user-avatar-topnav{% endif %}"
@@ -165,6 +167,7 @@
                                     <a
                                         class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
                                         href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                        tabindex="0"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile
@@ -181,6 +184,7 @@
                                                     type="submit"
                                                     id="_submit"
                                                     name="_submit"
+                                                    tabindex="0"
                                             >
                                                 <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                                 Log Out
