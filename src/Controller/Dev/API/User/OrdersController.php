@@ -285,7 +285,7 @@ class OrdersController extends DevApiController
         /** @var User $user*/
         $user = $this->getUser();
 
-        if ($user === $quote->getOwner()) {
+        if ($quote instanceof Token && $user === $quote->getOwner()) {
             $this->denyAccessUnlessGranted('not-blocked', $quote);
         }
 
