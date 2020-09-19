@@ -98,16 +98,16 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
+     * @Rest\Route("/token/{userToken}/invite", name="register-referral", schemes={"https"})
      */
-    public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
+    public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
     {
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
         $response->headers->setCookie(
-            new Cookie('referral-code', $code)
+            new Cookie('referral-code', $userToken)
         );
 
         return $response;
