@@ -278,14 +278,16 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
-        $this->denyAccessUnlessGranted('not-blocked', $quote);
-
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
         }
 
         /** @var User $user*/
         $user = $this->getUser();
+
+        if ($user === $quote->getOwner()) {
+            $this->denyAccessUnlessGranted('not-blocked', $quote);
+        }
 
         $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
 
