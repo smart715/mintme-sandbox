@@ -96,8 +96,6 @@ class Exchanger implements ExchangerInterface
             [
                 'base' => $market->getBase()->getSymbol(),
                 'quote' => $market->getQuote()->getSymbol(),
-                'amount' => $this->mw->parse('0', $market->getQuote()->getSymbol())->getAmount(),
-                'price' => $this->mw->parse('0', $market->getQuote()->getSymbol())->getAmount(),
             ]
         );
 
