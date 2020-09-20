@@ -92,8 +92,8 @@ class TickerController extends AbstractFOSRestController
                 $isFrozen =
                     ($base instanceof Crypto && !$base->isTradable()) ||
                     ($quote instanceof Crypto && !$quote->isExchangeble()) ||
-                    ($base instanceof Token && $base->isBlocked()) ||
-                    ($quote instanceof Token && $quote->isBlocked()) ?
+                    ($base instanceof Token && !$base->isBlocked()) ||
+                    ($quote instanceof Token && !$quote->isBlocked()) ?
                     0 : 1;
 
                 $assets[$rebrandedBaseSymbol . '_' . $rebrandedQuoteSymbol] = [
