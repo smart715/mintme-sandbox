@@ -109,7 +109,7 @@ class OrderbookController extends AbstractFOSRestController
                 (int)$request->get('depth') :
             100;
 
-        $this->fixBaseQuoteOrder($market);
+        $this->reverseBaseQuote($market);
 
         $orderDepth = [];
 

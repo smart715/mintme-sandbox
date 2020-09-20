@@ -91,7 +91,7 @@ class SummaryController extends AbstractFOSRestController
                     $this->marketHandler->getPendingSellOrders($market)
                 );
 
-                $this->fixBaseQuoteOrder($market);
+                $this->reverseBaseQuote($market);
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());

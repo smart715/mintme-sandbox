@@ -81,7 +81,7 @@ class TradesController extends AbstractFOSRestController
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $this->fixBaseQuoteOrder($market);
+        $this->reverseBaseQuote($market);
 
         return array_map(function ($order) {
             $rebrandedOrder = $this->rebrandingConverter->convertOrder($order);

@@ -6,11 +6,11 @@ use App\Exchange\Market;
 
 trait BaseQuoteOrderTrait
 {
-    public function fixBaseQuoteOrder(Market $market): void
+    public function reverseBaseQuote(Market $market): Market
     {
-        $base = $market->getBase();
-        $quote = $market->getQuote();
-        $market->setBase($quote);
-        $market->setQuote($base);
+        $fixedMarket = clone $market;
+        $fixedMarket->setBase($market->getQuote());
+        $fixedMarket->setQuote($market->getBase());
+        return $fixedMarket;
     }
 }
