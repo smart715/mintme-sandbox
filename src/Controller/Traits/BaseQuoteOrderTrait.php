@@ -11,6 +11,7 @@ trait BaseQuoteOrderTrait
         $reversed = clone $market;
         $reversed->setBase($market->getQuote());
         $reversed->setQuote($market->getBase());
+
         return $reversed;
     }
 }
