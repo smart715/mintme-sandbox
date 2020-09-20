@@ -8,9 +8,9 @@ trait BaseQuoteOrderTrait
 {
     public function reverseBaseQuote(Market $market): Market
     {
-        $fixedMarket = clone $market;
-        $fixedMarket->setBase($market->getQuote());
-        $fixedMarket->setQuote($market->getBase());
-        return $fixedMarket;
+        $reversed = clone $market;
+        $reversed->setBase($market->getQuote());
+        $reversed->setQuote($market->getBase());
+        return $reversed;
     }
 }
