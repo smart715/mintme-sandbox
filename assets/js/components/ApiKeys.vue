@@ -33,11 +33,21 @@
                 </span>
             </div>
             <p>Invalidate your API keys:</p>
-            <div class="btn btn-primary c-pointer" @click="toggleInvalidateModal(true)">Invalidate</div>
+            <button
+                class="btn btn-primary c-pointer"
+                @click="toggleInvalidateModal(true)"
+            >
+                Invalidate
+            </button>
         </template>
         <template v-else>
             <p>Generate your API keys:</p>
-            <div class="btn btn-primary c-pointer" @click="generate">Generate</div>
+            <button
+                class="btn btn-primary c-pointer"
+                @click="generate"
+            >
+                Generate
+            </button>
         </template>
         <confirm-modal :visible="invalidateModal" @confirm="invalidate" @close="toggleInvalidateModal(false)">
             <p class="text-white modal-title pt-2">

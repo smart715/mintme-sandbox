@@ -27,27 +27,31 @@
         <p v-else>
             To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
         </p>
-        <button v-if="showEdit"
-            class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-            :disabled="deleteDisabled"
-            @click="showModal"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="trash"
-                transform="shrink-4 up-1.5"
-            />
-        </button>
-        <a v-if="showEdit"
-            class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-            :href="$routing.generate('edit_post_page', {id: post.id})"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="edit"
-                transform="shrink-4 up-1.5"
-            />
-        </a>
+        <div v-if="showEdit" class="float-right">
+            <a
+                class="btn p-0 post-edit-icon text-decoration-none text-reset"
+                :href="$routing.generate('edit_post_page', {id: post.id})"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                />
+            </a>
+            <button
+                class="btn btn-link p-0 delete-icon text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showModal"
+                tabindex="0"
+                @keyup.enter="showModal"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="trash"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
+        </div>
         <confirm-modal
             :visible="isModalVisible"
             @confirm="deletePost"
