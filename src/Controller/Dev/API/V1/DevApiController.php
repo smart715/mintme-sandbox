@@ -5,8 +5,6 @@ namespace App\Controller\Dev\API\V1;
 use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Request\ParamFetcherInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 abstract class DevApiController extends AbstractFOSRestController
 {
