@@ -88,17 +88,19 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
+        $userToken = $user->getProfile()->getToken()->getName();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
+            'tokenName' => $userToken,
         ]);
     }
 
     /**
-     * @Rest\Route("/token/{userToken}/invite", name="register-referral", schemes={"https"})
+     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
      */
     public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
     {
