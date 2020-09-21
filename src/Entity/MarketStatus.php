@@ -85,7 +85,7 @@ class MarketStatus
      * @ORM\Column(type="datetime_immutable")
      * @var \DateTimeImmutable|null
      */
-    private $expires;
+    private $expires = null;
 
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
