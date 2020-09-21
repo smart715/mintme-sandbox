@@ -81,7 +81,7 @@ class TickerController extends AbstractFOSRestController
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
-                $this->reverseBaseQuote($market);
+                $market = $this->reverseBaseQuote($market);
 
                 $base = $market->getBase();
                 $quote = $market->getQuote();
