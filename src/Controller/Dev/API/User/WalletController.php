@@ -92,8 +92,6 @@ class WalletController extends DevApiController
         /** @var  User $user*/
         $user = $this->getUser();
 
-        $this->denyAccessUnlessGranted('not-blocked');
-
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
             $this->cryptoManager->findAll()
