@@ -94,10 +94,10 @@ class WalletController extends DevApiController
 
         $this->denyAccessUnlessGranted('not-blocked');
 
-        $depositAddresses = $depositCommunicator->getDepositCredentials(
+        $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
             $this->cryptoManager->findAll()
-        );
+        ) : [];
 
         $isBlockedToken = $user->getProfile()->getToken()
             ? $user->getProfile()->getToken()->isBlocked()
@@ -107,7 +107,7 @@ class WalletController extends DevApiController
 
         $rebrandedAddresses = [];
 
-        foreach (array_merge($depositAddresses, $tokenDepositAddress) as $symbol => $address) {
+        foreach (array_merge($cryptoDepositAddresses, $tokenDepositAddress) as $symbol => $address) {
             $rebrandedAddresses[$this->rebrandingConverter->convert((string)$symbol)] = $address;
         }
 
