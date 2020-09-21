@@ -62,7 +62,7 @@ class MarketsUpdateCommand extends Command
         $this
             ->setDescription('Update markets with information from viabtc server')
             ->addArgument('market', InputArgument::OPTIONAL, 'The market to update (e.g. BTC/MINTME)')
-            ->addOption('cron', null, InputOption::VALUE_OPTIONAL, 'Run in cron mode', false);
+            ->addOption('cron', null, InputOption::VALUE_NONE, 'Run in cron mode');
     }
 
     /** @inheritDoc */
