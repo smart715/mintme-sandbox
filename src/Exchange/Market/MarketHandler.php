@@ -330,9 +330,9 @@ class MarketHandler implements MarketHandlerInterface
 
         $buyDepth = $this->getBuyDepth($market);
 
-        $expires = $result['expires']
-            ? (new \DateTimeImmutable())->setTimestamp($result['expires'])
-            : null;
+        $expires = $result['expires'] && $monthResult['expires']
+            ? (new \DateTimeImmutable())->setTimestamp(min($result['expires'], $monthResult['expires']))
+            : ($monthResult['expires'] ?? ($result['expires'] ?? null));
 
         return new MarketInfo(
             $market->getBase()->getSymbol(),
