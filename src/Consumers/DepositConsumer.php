@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
@@ -164,12 +165,18 @@ class DepositConsumer implements ConsumerInterface
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
-            $this->logger->error(
-                '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
-            );
-            $this->clock->sleep(10);
+            if ($exception instanceof BalanceException) {
+                $this->logger->error(
+                    '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
+                );
+                $this->clock->sleep(10);
 
-            return false;
+                return false;
+            }
+            
+            $this->logger->error(
+                '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
+            );
         }
 
         return true;
