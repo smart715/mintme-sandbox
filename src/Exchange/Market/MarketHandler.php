@@ -368,7 +368,8 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $buyDepth,
                 $this->getSymbol($market->getBase())
-            )
+            ),
+            new \DateTimeImmutable($result['expires'])
         );
     }
 
