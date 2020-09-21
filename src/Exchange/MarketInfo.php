@@ -75,7 +75,7 @@ class MarketInfo
      */
     private $buyDepth;
 
-    /** @var \DateTimeImmutable */
+    /** @var \DateTimeImmutable|null */
     private $expires;
 
     public function __construct(
@@ -90,7 +90,7 @@ class MarketInfo
         Money $deal,
         Money $monthDeal,
         Money $buyDepth,
-        \DateTimeImmutable $expires
+        ?\DateTimeImmutable $expires
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -190,7 +190,7 @@ class MarketInfo
         return $this->buyDepth;
     }
 
-    public function getExpires(): \DateTimeImmutable
+    public function getExpires(): ?\DateTimeImmutable
     {
         return $this->expires;
     }

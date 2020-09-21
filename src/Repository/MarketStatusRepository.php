@@ -56,7 +56,7 @@ class MarketStatusRepository extends EntityRepository
     public function getExpired(): array
     {
         return $this->createQueryBuilder('ms')
-            ->where('ms.expires < :now')
+            ->where('ms.expires is not null and ms.expires < :now')
             ->setParameter('now', new \DateTimeImmutable())
             ->getQuery()
             ->getResult();

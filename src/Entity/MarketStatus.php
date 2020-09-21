@@ -83,7 +83,7 @@ class MarketStatus
 
     /**
      * @ORM\Column(type="datetime_immutable")
-     * @var \DateTimeImmutable
+     * @var \DateTimeImmutable|null
      */
     private $expires;
 
@@ -183,13 +183,13 @@ class MarketStatus
 
     /**
      * @Groups({"API", "dev"})
-     */g
+     */
     public function getBuyDepth(): Money
     {
         return new Money($this->buyDepth, new Currency($this->crypto->getSymbol()));
     }
 
-    public function getExpires(): \DateTimeImmutable
+    public function getExpires(): ?\DateTimeImmutable
     {
         return $this->expires;
     }
