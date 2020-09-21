@@ -9,7 +9,6 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
-use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
 use App\Wallet\Money\MoneyWrapper;
