@@ -148,7 +148,6 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-
             if ($tradable instanceof Crypto) {
                 $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
                 $this->container->get('security.token_storage')->setToken($token);
@@ -159,7 +158,6 @@ class DepositConsumer implements ConsumerInterface
                     return true;
                 }
             }
-
 
             $strategy = $tradable instanceof Token
                 ? new DepositTokenStrategy(
