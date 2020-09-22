@@ -134,18 +134,6 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-            if ($tradable instanceof Token && $tradable->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit token to user with blocked token. Cancelled.');
-
-                return true;
-            }
-
-            if ($tradable instanceof Crypto && $user->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
-
-                return true;
-            }
-
             $strategy = $tradable instanceof Token
                 ? new DepositTokenStrategy(
                     $this->balanceHandler,

@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\User;
 
 use App\Controller\Dev\API\DevApiController;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
@@ -227,6 +228,8 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
+        $this->denyAccessUnlessGranted('not-blocked', $quote);
+
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
         }
@@ -283,10 +286,14 @@ class OrdersController extends DevApiController
         /** @var User $user*/
         $user = $this->getUser();
 
+        if ($quote instanceof Token && $user === $quote->getOwner()) {
+            $this->denyAccessUnlessGranted('not-blocked', $quote);
+        }
+
         $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
 
         $tradeResult = $this->trader->cancelOrder($order);
-        
+
         if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
             throw new ApiBadRequestException('Invalid request');
         } else {
