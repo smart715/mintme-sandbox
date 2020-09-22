@@ -117,7 +117,7 @@ export default {
         maxAmount: String,
         availableWeb: String,
         subunit: Number,
-        twofa: String,
+        twofa: Boolean,
         noClose: Boolean,
         expirationTime: Number,
     },

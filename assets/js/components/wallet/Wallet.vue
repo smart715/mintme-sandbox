@@ -242,7 +242,7 @@ export default {
         createTokenUrl: String,
         tradingUrl: String,
         depositMore: String,
-        twofa: String,
+        twofa: Boolean,
         expirationTime: Number,
         isUserBlocked: Boolean,
     },
