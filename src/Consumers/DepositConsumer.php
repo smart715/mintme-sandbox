@@ -24,7 +24,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Security;
 
 class DepositConsumer implements ConsumerInterface
 {
@@ -58,8 +61,12 @@ class DepositConsumer implements ConsumerInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var DisabledBlockchainConfig */
-    private $disabledBlockchainConfig;
+    /** @var Security */
+    private $security;
+
+    /** @var ContainerInterface */
+    private $container;
+
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
@@ -72,7 +79,8 @@ class DepositConsumer implements ConsumerInterface
         WalletInterface $depositCommunicator,
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher,
-        DisabledBlockchainConfig $disabledBlockchainConfig
+        ContainerInterface $container,
+        Security $security
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -84,7 +92,8 @@ class DepositConsumer implements ConsumerInterface
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
-        $this->disabledBlockchainConfig = $disabledBlockchainConfig;
+        $this->security = $security;
+        $this->container = $container;
     }
 
     /** {@inheritdoc} */
@@ -153,7 +162,10 @@ class DepositConsumer implements ConsumerInterface
                     return true;
                 }
 
-                if (in_array($tradable->getSymbol(), $this->disabledBlockchainConfig->getDisabledCryptoSymbols())) {
+                $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
+                $this->container->get('security.token_storage')->setToken($token);
+
+                if (!$this->security->isGranted('not-disabled', $tradable)) {
                     $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');
 
                     return true;

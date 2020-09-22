@@ -12,8 +12,8 @@ class DisabledBlockchainConfig
         $this->disabledCrypto = $disabledCrypto;
     }
 
-    public function getDisabledCryptoSymbols(): ?array
+    public function getDisabledCryptoSymbols(): array
     {
-        return $this->disabledCrypto;
+        return $this->disabledCrypto ?? [];
     }
 }
