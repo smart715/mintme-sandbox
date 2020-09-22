@@ -326,10 +326,9 @@ class DepositConsumerTest extends TestCase
     {
         return $this->createMock(ContainerInterface::class);
     }
+
     private function mockSecurity(): Security
     {
         return $this->createMock(Security::class);
     }
 }
-
-
