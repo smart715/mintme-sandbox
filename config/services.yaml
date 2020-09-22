@@ -181,6 +181,10 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
+    App\Security\Config\DisabledBlockchainConfig:
+        arguments:
+            $disabledCrypto: '%blockchain_disabled%'
+
     # SonataAdminBundle Registered Admin Classes
     # =======================================
     admin.user:

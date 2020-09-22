@@ -15,6 +15,7 @@ use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -57,6 +58,9 @@ class DepositConsumer implements ConsumerInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var DisabledBlockchainConfig */
+    private $disabledBlockchainConfig;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -67,7 +71,8 @@ class DepositConsumer implements ConsumerInterface
         ClockInterface $clock,
         WalletInterface $depositCommunicator,
         EntityManagerInterface $em,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        DisabledBlockchainConfig $disabledBlockchainConfig
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -79,6 +84,7 @@ class DepositConsumer implements ConsumerInterface
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
+        $this->disabledBlockchainConfig = $disabledBlockchainConfig;
     }
 
     /** {@inheritdoc} */
@@ -140,10 +146,18 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-            if ($tradable instanceof Crypto && $user->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
+            if ($tradable instanceof Crypto) {
+                if ($user->isBlocked()) {
+                    $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
 
-                return true;
+                    return true;
+                }
+
+                if (in_array($tradable->getSymbol(), $this->disabledBlockchainConfig->getDisabledCryptoSymbols())) {
+                    $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');
+
+                    return true;
+                }
             }
 
             $strategy = $tradable instanceof Token
@@ -173,7 +187,7 @@ class DepositConsumer implements ConsumerInterface
 
                 return false;
             }
-            
+
             $this->logger->error(
                 '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
             );
