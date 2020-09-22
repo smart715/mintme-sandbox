@@ -23,6 +23,8 @@
                                 icon="edit"
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"
+                                tabindex="0"
+                                @keyup.enter="editingDescription = true"
                             />
                         </span>
                         <bbcode-view v-if="!editingDescription" :value="description" />
@@ -69,12 +71,16 @@
                                         class="btn btn-primary"
                                         :disabled="$v.$invalid || !readyToSave"
                                         @click="editDescription"
+                                        @keyup.enter="editDescription"
+                                        tabindex="0"
                                     >
                                         Save
                                     </button>
                                     <span
                                         class="btn-cancel pl-3 c-pointer"
                                         @click="editingDescription = false"
+                                        @keyup.enter="editingDescription = false"
+                                        tabindex="0"
                                     >
                                         Cancel
                                     </span>

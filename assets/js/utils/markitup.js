@@ -7,7 +7,14 @@ const markitupSet = {
     },
     tabs: '    ',
     previewRefreshOn: ['markitup.insertion', 'keyup'],
-    shortcuts: {},
+    shortcuts: {
+        'tab': function() {
+            document.getElementsByTagName('textarea').blur();
+        },
+        'Shift Tab': function() {
+            document.getElementsByTagName('textarea').blur();
+        },
+    },
     toolbar: [
         {
             name: 'Link',

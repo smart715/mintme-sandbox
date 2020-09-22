@@ -15,7 +15,12 @@
                     <span
                         v-if="showEndDate"
                         class="m-0 message">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}.
+                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
+                        <span v-if="showDuration">
+                            ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d
+                            {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
+                        </span>
+                        <span v-if="timeElapsed">(Airdrop has ended!)</span>
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
@@ -27,7 +32,7 @@
                     </button>
                     <confirm-modal
                         :visible="showModal"
-                        :show-cancel-button="!isOwner && !alreadyClaimed"
+                        :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
                         :show-image="false"
                         @confirm="modalOnConfirm"
                         @cancel="modalOnCancel"
@@ -36,7 +41,7 @@
                             {{ confirmModalMessage }}
                         </p>
                         <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
-                        <template v-if="!loggedIn || isOwner || alreadyClaimed" v-slot:confirm>
+                        <template v-if="!loggedIn || isOwner || alreadyClaimed || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
                     </confirm-modal>
@@ -78,9 +83,12 @@ export default {
             loaded: false,
             btnDisabled: false,
             alreadyClaimed: this.userAlreadyClaimed,
+            timeElapsed: false,
+            showDuration: true,
         };
     },
     mounted: function() {
+        this.showCountdown();
         this.getAirdropCampaign();
     },
     computed: {
@@ -101,10 +109,24 @@ export default {
             return null !== this.airdropCampaign.endDate && '' !== this.airdropCampaign.endDate;
         },
         endsDate: function() {
-            return moment(this.airdropCampaign.endDate).format('D MMMM YYYY');
+            return moment(this.airdropCampaign.endDate).format('Do MMMM YYYY');
         },
         endsTime: function() {
             return moment(this.airdropCampaign.endDate).format('HH:mm');
+        },
+        endsDateTime: function() {
+            return moment(this.airdropCampaign.endDate).format('D MMMM YYYY HH:mm:ss');
+        },
+        duration: {
+            get: function() {
+                let now = moment();
+                return moment.duration(moment(this.endsDateTime).diff(moment(now))).asMilliseconds() <= 0
+                    ? moment.duration(0)
+                    : moment.duration(moment(this.endsDateTime).diff(moment(now)));
+            },
+            set: function(newDuration) {
+                return newDuration;
+            },
         },
         confirmButtonText: function() {
             let button = '';
@@ -113,7 +135,7 @@ export default {
                 button = 'Log In';
             }
 
-            if (this.isOwner || this.alreadyClaimed) {
+            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
                 button = 'OK';
             }
 
@@ -132,10 +154,23 @@ export default {
                 return 'You already claimed tokens from this airdrop.';
             }
 
+            if (this.timeElapsed) {
+                return 'Sorry, this airdrop has ended.';
+            }
+
             return `Are you sure you want to claim ${this.airdropReward} ${this.tokenName}?`;
         },
     },
     methods: {
+        showCountdown: function() {
+            return setInterval(() => {
+                this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+                if (this.duration.asMilliseconds() <= 0) {
+                    this.timeElapsed = true;
+                    this.showDuration = false;
+                }
+            }, 1000);
+        },
         getAirdropCampaign: function() {
             this.$axios.retry.get(this.$routing.generate('get_airdrop_campaign', {
                 tokenName: this.tokenName,
@@ -155,7 +190,7 @@ export default {
                 return;
             }
 
-            if (this.isOwner || this.alreadyClaimed) {
+            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
                 return;
             }
 
