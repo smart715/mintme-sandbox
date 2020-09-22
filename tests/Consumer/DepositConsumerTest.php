@@ -10,7 +10,6 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -23,7 +22,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Security;
 
 class DepositConsumerTest extends TestCase
 {
@@ -41,7 +42,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -67,8 +69,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -93,8 +95,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -119,8 +121,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -144,8 +146,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -171,8 +173,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -203,8 +205,8 @@ class DepositConsumerTest extends TestCase
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
-            $this->mockDisabledBlockchainConfig()
-        );
+            $this->mockContainer(),
+            $this->mockSecurity()        );
 
         $this->assertFalse(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -314,8 +316,14 @@ class DepositConsumerTest extends TestCase
         return $this->createMock(EventDispatcherInterface::class);
     }
 
-    private function mockDisabledBlockchainConfig(): DisabledBlockchainConfig
+    private function mockContainer(): ContainerInterface
     {
-        return $this->createMock(DisabledBlockchainConfig::class);
+        return $this->createMock(ContainerInterface::class);
+    }
+    private function mockSecurity(): Security
+    {
+        return $this->createMock(Security::class);
     }
 }
+
+

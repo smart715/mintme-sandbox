@@ -15,7 +15,6 @@ use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
