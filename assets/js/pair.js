@@ -74,8 +74,9 @@ new Vue({
     }
 
     let tokenName = this.tokenName;
-    tokenName = tokenName.replace(/\s/g, '-');
-    document.addEventListener('DOMContentLoaded', () => {
+    if (tokenName) {
+      tokenName = tokenName.replace(/\s/g, '-');
+      document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
         introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
@@ -84,7 +85,8 @@ new Vue({
         donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
         postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
-    });
+      });
+    }
   },
   methods: {
     ...mapMutations('makeOrder', [
