@@ -70,7 +70,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -96,7 +97,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -122,7 +124,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -147,7 +150,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -174,7 +178,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertTrue(
             $dc->execute($this->mockMessage((string)json_encode([
@@ -206,7 +211,8 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity()        );
+            $this->mockSecurity()
+        );
 
         $this->assertFalse(
             $dc->execute($this->mockMessage((string)json_encode([
