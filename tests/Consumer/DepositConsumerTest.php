@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\ClockInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -39,7 +40,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -64,7 +66,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -89,7 +92,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -114,7 +118,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -138,7 +143,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -164,7 +170,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertTrue(
@@ -195,7 +202,8 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockDisabledBlockchainConfig()
         );
 
         $this->assertFalse(
@@ -304,5 +312,10 @@ class DepositConsumerTest extends TestCase
     private function mockEventDispatcher(): EventDispatcherInterface
     {
         return $this->createMock(EventDispatcherInterface::class);
+    }
+
+    private function mockDisabledBlockchainConfig(): DisabledBlockchainConfig
+    {
+        return $this->createMock(DisabledBlockchainConfig::class);
     }
 }
