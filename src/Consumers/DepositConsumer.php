@@ -148,19 +148,8 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-            if ($tradable instanceof Token && $tradable->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit token to user with blocked token. Cancelled.');
-
-                return true;
-            }
 
             if ($tradable instanceof Crypto) {
-                if ($user->isBlocked()) {
-                    $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
-
-                    return true;
-                }
-
                 $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
                 $this->container->get('security.token_storage')->setToken($token);
 
@@ -170,6 +159,7 @@ class DepositConsumer implements ConsumerInterface
                     return true;
                 }
             }
+
 
             $strategy = $tradable instanceof Token
                 ? new DepositTokenStrategy(

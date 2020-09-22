@@ -28,47 +28,39 @@ class TokenVoter extends Voter
      */
     protected function supports($attribute, $subject): bool
     {
-        return in_array($attribute, [self::NOT_BLOCKED, self::EDIT, self::DELETE], true)
-            && ($subject instanceof Token || $subject instanceof Crypto || is_null($subject));
+        if (!in_array($attribute, [self::NOT_BLOCKED, self::EDIT, self::DELETE], true)) {
+            return false;
+        }
+
+        return $subject instanceof Token || $subject instanceof Crypto || is_null($subject);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $securityToken): bool
     {
         /** @psalm-suppress UndefinedDocblockClass */
-        $user = $token->getUser();
+        $user = $securityToken->getUser();
 
         if (!$user instanceof User) {
             // the user must be logged in; if not, deny access
             return false;
         }
 
-        if (self::NOT_BLOCKED === $attribute) {
-            $token = $user->getProfile()->getToken();
-
-            if (!$subject || $subject instanceof Crypto) {
-                return !$user->isBlocked();
-            }
-
-            if ($subject instanceof Token && $subject->isBlocked()) {
-                return false;
-            }
-
-            return $token
-                ? !$token->isBlocked()
-                : true;
+        if (!$subject || $subject instanceof Crypto) {
+            return !$user->isBlocked();
         }
 
-        /** @var Token $tokenEntity */
-        $tokenEntity = $subject;
+        /** @var Token $cryptoToken */
+        $cryptoToken = $subject;
 
         switch ($attribute) {
+            case self::NOT_BLOCKED:
+                return !$cryptoToken->isBlocked();
             case self::EDIT:
-                return $this->ownToken($tokenEntity) && !$tokenEntity->isBlocked();
             case self::DELETE:
-                return $this->ownToken($tokenEntity) && !$tokenEntity->isBlocked();
+                return $this->ownToken($cryptoToken) && !$cryptoToken->isBlocked();
         }
 
         return false;

@@ -141,13 +141,9 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             $cryptoManager->findAll()
         ) : [];
 
-        $isBlockedToken = $user->getProfile()->getToken()
-            ? $user->getProfile()->getToken()->isBlocked()
-            : false;
+        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
 
-        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
-
-        return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
+        return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
     }
 
     /**
