@@ -81,15 +81,12 @@
                         :disabled="$v.$anyError || withdrawing"
                         @click="onWithdraw">
                         Withdraw
-                    </button>&nbsp;
-                    <button
-                        class="btn-cancel pl-3 c-pointer bg-transparent"
-                        @click="onCancel"
-                        @keyup.enter="onCancel"
-                        tabindex="0"
-                    >
-                        <slot name="cancel">Cancel</slot>
                     </button>
+                    <span
+                        class="btn-cancel pl-3 c-pointer"
+                        @click="onCancel">
+                        <slot name="cancel">Cancel</slot>
+                    </span>
                 </div>
             </div>
         </template>
@@ -135,7 +132,7 @@ export default {
     },
     computed: {
         twoFAEnabled: function() {
-          return this.twofa;
+          return this.twofa === true;
         },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
