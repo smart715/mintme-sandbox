@@ -163,3 +163,11 @@ parameters:
     telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
     telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
     facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+
+    # Disable deposit and withdraw for specified crypto (should be null by default)
+    # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
+    # Example for ETH and BTC:
+    # blockchain_disabled:
+    #     - ETH
+    #     - BTC
+    blockchain_disabled: null
