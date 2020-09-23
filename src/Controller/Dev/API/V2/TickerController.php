@@ -84,8 +84,8 @@ class TickerController extends AbstractFOSRestController
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($quote->getSymbol());
 
                 $isFrozen =
-                    ($base instanceof Crypto && !$base->isTradable()) ||
-                    ($quote instanceof Crypto && !$quote->isExchangeble()) ||
+                    ($base instanceof Crypto && !$base->isExchangeble()) ||
+                    ($quote instanceof Crypto && !$quote->isTradable()) ||
                     ($base instanceof Token && $base->isBlocked()) ||
                     ($quote instanceof Token && $quote->isBlocked()) ?
                     1 : 0;
