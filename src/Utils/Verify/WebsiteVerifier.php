@@ -50,7 +50,7 @@ class WebsiteVerifier implements WebsiteVerifierInterface
                     'request.options' => ['proxy' => $this->proxy],
                 ]
             );
-            $response = $client->request('GET', self::URI);
+            $response = $client->request('GET', self::URI, ['proxy' => $this->proxy]);
         } catch (\Throwable $exception) {
             $this->selectError($exception->getCode());
             $this->logger->error($exception->getMessage());

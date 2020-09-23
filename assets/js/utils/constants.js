@@ -44,6 +44,11 @@ export const cryptoSymbols = [
     btcSymbol,
 ];
 
+export const cryptoSymbols = [
+    webSymbol,
+    btcSymbol,
+];
+
 export const tokenDeploymentStatus = {notDeployed: 'not-deployed', pending: 'pending', deployed: 'deployed'};
 export const addressLength = {
     WEB: {
