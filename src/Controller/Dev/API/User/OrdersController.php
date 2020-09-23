@@ -258,6 +258,7 @@ class OrdersController extends DevApiController
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
      * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
+     * @SWG\Response(response="403", description="Access denied")
      * @SWG\Response(response="404", description="Market not found")
      * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
      * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)
