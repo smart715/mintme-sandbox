@@ -16,10 +16,12 @@ use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
+use App\Wallet\Exception\IncorrectAddressException;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
@@ -84,20 +86,20 @@ class Wallet implements WalletInterface
     /** {@inheritdoc} */
     public function getWithdrawDepositHistory(User $user, int $offset, int $limit): array
     {
-        $limit = intval($limit / 3);
+        // todo: store transactions in mintme DB to make pagination more efficient
+        $gatewayLimit = $offset + $limit;
 
-        $depositHistory = $this->depositCommunicator->getTransactions($user, $offset, $limit);
-        $withdrawHistory = $this->withdrawGateway->getHistory($user, $offset, $limit);
-
-        $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, $offset, $limit);
+        $depositHistory = $this->depositCommunicator->getTransactions($user, 0, $gatewayLimit);
+        $withdrawHistory = $this->withdrawGateway->getHistory($user, 0, $gatewayLimit);
+        $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, 0, $gatewayLimit);
 
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
-        usort($history, function (Transaction $first, Transaction $second): bool {
+        usort($history, function (Transaction $first, Transaction $second) {
             return $first->getDate()->getTimestamp() < $second->getDate()->getTimestamp();
         });
 
-        return $history;
+        return array_slice($history, $offset, $limit);
     }
 
     /**
@@ -124,19 +126,25 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
+        if (Token::WEB_SYMBOL === $crypto->getSymbol()) {
+            if (!$this->validateEtheriumAddress($address->getAddress())) {
+                throw new IncorrectAddressException();
+            }
+        }
+
         $available = $this->tokenManager->getRealBalance(
             $token,
             $this->balanceHandler->balance($user, $token)
         )->getAvailable();
 
         $this->logger->info(
-            "Created a new withdraw request for '{$user->getEmail()}' to 
+            "Created a new withdraw request for '{$user->getEmail()}' to
             send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
         );
 
         if ($available->lessThan($amount->getAmount()->add($fee))) {
             $this->logger->warning(
-                "Requested balance for user '{$user->getEmail()}'. 
+                "Requested balance for user '{$user->getEmail()}'.
                 Not enough amount to pay {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}
                 Available amount: {$available->getAmount()} {$tradable->getSymbol()}"
             );
@@ -228,9 +236,9 @@ class Wallet implements WalletInterface
         return $this->getDepositCredentials($user, [$crypto])[$crypto->getSymbol()];
     }
 
-    public function getFee(TradebleInterface $tradable): Money
+    public function getDepositInfo(TradebleInterface $tradable): DepositInfo
     {
-        return $this->depositCommunicator->getFee($tradable->getSymbol());
+        return $this->depositCommunicator->getDepositInfo($tradable->getSymbol());
     }
 
     private function validateTokenFee(User $user, ?Crypto $crypto = null): bool
@@ -269,5 +277,15 @@ class Wallet implements WalletInterface
         }
 
         return true;
+    }
+
+    private function validateEtheriumAddress(string $address): bool
+    {
+        return $this->startsWith($address, '0x') && 42 === strlen($address);
+    }
+
+    private function startsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }

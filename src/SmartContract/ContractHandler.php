@@ -26,6 +26,7 @@ class ContractHandler implements ContractHandlerInterface
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
     private const TRANSACTIONS = 'get_transactions';
+    private const PING = 'ping';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -173,7 +174,7 @@ class ContractHandler implements ContractHandlerInterface
     {
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $depositFee = $this->moneyWrapper->format(
-            $wallet->getFee($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))
+            $wallet->getDepositInfo($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getFee()
         );
         $withdrawFee = $crypto
             ? $this->moneyWrapper->format($crypto->getFee())
@@ -200,5 +201,12 @@ class ContractHandler implements ContractHandlerInterface
                 Type::fromString($transaction['type'])
             );
         }, $transactions);
+    }
+
+    public function ping(): bool
+    {
+        $response = $this->rpc->send(self::PING, []);
+
+        return 'pong' === $response->getResult();
     }
 }

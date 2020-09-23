@@ -7,7 +7,6 @@ class ProfileControllerTest extends WebTestCase
     public function testCreatingProfile(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
 
         $this->assertTrue($this->client->getResponse()->isRedirect());
     }

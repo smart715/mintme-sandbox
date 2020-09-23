@@ -12,7 +12,6 @@ use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -36,9 +35,6 @@ class Trader implements TraderInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var PrelaunchConfig */
-    private $prelaunchConfig;
-
     /** @var MarketNameConverterInterface */
     private $marketNameConverter;
 
@@ -48,24 +44,27 @@ class Trader implements TraderInterface
     /** @var NormalizerInterface */
     private $normalizer;
 
+    /** @var float */
+    private $referralFee;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        PrelaunchConfig $prelaunchConfig,
         MarketNameConverterInterface $marketNameConverter,
         NormalizerInterface $normalizer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        float $referralFee
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
-        $this->prelaunchConfig = $prelaunchConfig;
         $this->marketNameConverter = $marketNameConverter;
         $this->normalizer = $normalizer;
         $this->logger = $logger;
+        $this->referralFee = $referralFee;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -78,15 +77,15 @@ class Trader implements TraderInterface
             $this->moneyWrapper->format($order->getPrice()),
             (string)$this->config->getTakerFeeRate(),
             (string)$this->config->getMakerFeeRate(),
-            $this->isReferralFeeEnabled() ? $order->getReferralId() : 0,
-            $this->isReferralFeeEnabled() ? (string)$this->prelaunchConfig->getReferralFee() : '0'
+            $order->getReferralId() ?: 0,
+            $this->referralFee ? (string)$this->referralFee : '0'
         );
 
         $quote = $order->getMarket()->getQuote();
 
         if (TradeResult::SUCCESS === $result->getResult()) {
             if ($quote instanceof Token) {
-                $this->updateUserTokenReferrencer($order->getMaker(), $quote);
+                $this->updateUserTokenReferencer($order->getMaker(), $quote);
             } elseif ($quote instanceof Crypto) {
                 $this->updateUserCrypto($order->getMaker(), $quote);
             }
@@ -167,14 +166,9 @@ class Trader implements TraderInterface
         }, $records);
     }
 
-    private function isReferralFeeEnabled(): bool
+    private function updateUserTokenReferencer(User $user, Token $token): void
     {
-        return !$this->prelaunchConfig->isEnabled();
-    }
-
-    private function updateUserTokenReferrencer(User $user, Token $token): void
-    {
-        $referrencer = $user->getReferrencer();
+        $referencer = $user->getReferencer();
 
         if (!in_array($user, $token->getUsers(), true)) {
             $userToken = (new UserToken())->setToken($token)->setUser($user);
@@ -184,11 +178,11 @@ class Trader implements TraderInterface
             $this->entityManager->flush();
         }
 
-        if ($referrencer && !in_array($referrencer, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($referrencer);
+        if ($referencer && !in_array($referencer, $token->getUsers(), true)) {
+            $userToken = (new UserToken())->setToken($token)->setUser($referencer);
             $this->entityManager->persist($userToken);
-            $referrencer->addToken($userToken);
-            $this->entityManager->persist($referrencer);
+            $referencer->addToken($userToken);
+            $this->entityManager->persist($referencer);
             $this->entityManager->flush();
         }
     }

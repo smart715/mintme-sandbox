@@ -4,7 +4,7 @@ namespace App\Events;
 
 use App\Entity\TradebleInterface;
 use App\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class TransactionCompletedEvent extends Event implements TransactionCompletedEventInterface
 {

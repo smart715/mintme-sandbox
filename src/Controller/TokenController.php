@@ -2,19 +2,25 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
@@ -23,7 +29,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,10 +40,12 @@ use Throwable;
 
 /**
  * @Route("/token")
- * @Security(expression="is_granted('prelaunch')")
  */
 class TokenController extends Controller
 {
+
+    use CheckTokenNameBlacklistTrait;
+
     /** @var EntityManagerInterface */
     protected $em;
 
@@ -62,7 +69,6 @@ class TokenController extends Controller
 
     /** @var UserActionLogger  */
     private $userActionLogger;
-
 
     public function __construct(
         EntityManagerInterface $em,
@@ -91,8 +97,8 @@ class TokenController extends Controller
      * @Route("/{name}/{tab}",
      *     name="token_show",
      *     defaults={"tab" = "intro"},
-     *     methods={"GET"},
-     *     requirements={"tab" = "trade|intro"},
+     *     methods={"GET", "POST"},
+     *     requirements={"tab" = "trade|intro|donate|posts"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -100,7 +106,8 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        TokenNameConverterInterface $tokenNameConverter
+        TokenNameConverterInterface $tokenNameConverter,
+        AirdropCampaignManagerInterface $airdropCampaignManager
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -119,7 +126,7 @@ class TokenController extends Controller
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
         }
 
@@ -137,32 +144,47 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
+        $tokenDescription = $token->getDescription() ?? '';
+        $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
             '\2',
-            $token->getDescription() ?? ''
+            $tokenDescription
         );
         $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
 
+        /** @var  User|null $user */
+        $user = $this->getUser();
+
         return $this->render('pages/pair.html.twig', [
+            'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
             'tokenDescription' => substr($metaDescription, 0, 200),
             'currency' => Token::WEB_SYMBOL,
-            'hash' => $this->getUser() ? $this->getUser()->getHash() : '',
+            'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
+            'isTokenCreated' => $this->isTokenCreated(),
             'tab' => $tab,
             'showTrade' => true,
+            'showDonation' => true,
             'market' => $this->normalize($market),
             'tokenHiddenName' => $market ?
                 $tokenNameConverter->convert($token) :
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
+            'userAlreadyClaimed' => $airdropCampaignManager
+                ->checkIfUserClaimed($user, $token),
+            'posts' => $this->normalize($token->getPosts()),
         ]);
     }
 
-    /** @Route(name="token_create") */
+    /**
+     * @Route(name="token_create", options={"expose"=true})
+     * @throws ApiBadRequestException
+     */
     public function create(
         Request $request,
         BalanceHandlerInterface $balanceHandler,
@@ -177,41 +199,57 @@ class TokenController extends Controller
         $form = $this->createForm(TokenCreateType::class, $token);
         $form->handleRequest($request);
 
-        if ($this->blacklistManager->isBlacklisted($token->getName(), 'token')) {
-            $this->addFlash('danger', 'This value is not allowed');
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException('Invalid argument');
         }
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isProfileCreated()) {
-            $profile = $this->profileManager->getProfile($this->getUser());
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->checkTokenNameBlacklist($token->getName())) {
+                return $this->json(
+                    ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
 
             $this->em->beginTransaction();
 
-            if (null !== $profile) {
-                $token->setProfile($profile);
-                $this->em->persist($token);
-                $this->em->flush();
-            }
+            /** @var User $user */
+            $user = $this->getUser();
+            $token->setProfile(
+                $this->profileManager->getProfile($this->getUser()) ?? new Profile($user)
+            );
+            $this->em->persist($token);
+            $this->em->flush();
 
             try {
+                /** @var User $user*/
+                $user = $this->getUser();
+
                 $balanceHandler->deposit(
-                    $this->getUser(),
+                    $user,
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
                         MoneyWrapper::TOK_SYMBOL
                     )
                 );
-                $market = $this->marketManager->createUserRelated($this->getUser());
+                $market = $this->marketManager->createUserRelated($user);
 
                 $marketStatusManager->createMarketStatus($market);
 
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->redirectToRoute('token_show', [
-                    'name' => $token->getName(),
-                    'tab' => 'intro',
-                ]);
+                return $this->json("success", Response::HTTP_ACCEPTED);
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');
@@ -235,7 +273,6 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => 'Create your own token',
             'form' => $form->createView(),
-            'profileCreated' => $this->isProfileCreated(),
         ]);
     }
 
@@ -289,10 +326,5 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return null !== $this->tokenManager->getOwnToken();
-    }
-
-    private function isProfileCreated(): bool
-    {
-        return null !== $this->profileManager->getProfile($this->getUser());
     }
 }

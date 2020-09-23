@@ -3,6 +3,9 @@
     background-color: $card-body-bg
 
 #kb_show
+  .row
+    @include media-breakpoint-only(md)
+      display: block !important
   #back-btn
     clear: both
 
@@ -14,7 +17,7 @@
     background-color: $primary
 
   header
-    h2
+    h1
       border-bottom: 2px solid #eee
 
   blockquote

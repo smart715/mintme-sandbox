@@ -2,21 +2,26 @@
 
 namespace App\Controller;
 
-use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Controller\Traits\RefererTrait;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
+use App\Security\PathRoles;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
 {
+
+    use RefererTrait;
+
     /** @var ContainerInterface $container */
     protected $container;
 
@@ -28,6 +33,9 @@ class SecurityController extends FOSSecurityController
     
     /** @var SessionInterface */
     private $session;
+
+    /** @var bool */
+    private $formContentOnly = false;
 
     public function __construct(
         ContainerInterface $container,
@@ -41,7 +49,7 @@ class SecurityController extends FOSSecurityController
         parent::__construct($tokenManager);
     }
 
-    /** @Route("/login", name="login") */
+    /** @Route("/login", name="login", options={"expose"=true}) */
     public function loginAction(Request $request): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
@@ -55,8 +63,9 @@ class SecurityController extends FOSSecurityController
         $this->form->handleRequest($request);
 
         $refers = $request->headers->get('Referer');
+        $this->formContentOnly = $request->get('formContentOnly', false);
 
-        if (!empty($refers) && $refers !== $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL)) {
+        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
             $this->session->set('login_referer', $refers);
         }
 
@@ -70,10 +79,19 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/logout_success", name="logout_success") */
-    public function postLogoutRedirectAction(): Response
+    public function postLogoutRedirectAction(PathRoles $pathRoles): Response
     {
         $hasAuthenticated = $this->session->get('has_authenticated');
+        $referer = $this->session->get('logout_referer');
         $this->session->clear();
+
+        if ($referer) {
+            $roles = $pathRoles->getRoles(Request::create($referer));
+
+            if (null === $roles && $this->noRedirectToMainPage($referer)) {
+                return $this->redirect($referer);
+            }
+        }
 
         return $hasAuthenticated
             ? $this->redirectToRoute("homepage")
@@ -81,7 +99,7 @@ class SecurityController extends FOSSecurityController
     }
 
     /** @Route("/login_success", name="login_success") */
-    public function postLoginRedirectAction(PrelaunchConfig $prelaunchConfig): Response
+    public function postLoginRedirectAction(): Response
     {
         $this->userActionLogger->info('Log in');
 
@@ -94,9 +112,13 @@ class SecurityController extends FOSSecurityController
             return $this->redirectToRoute($refererRoute);
         }
 
-        return $prelaunchConfig->isFinished()
-            ? $this->redirectToRoute("trading")
-            : $this->redirectToRoute("referral-program");
+        if ($referer && $this->isRefererValid($referer)) {
+            $this->session->remove('login_referer');
+
+            return $this->redirect($referer);
+        }
+
+        return $this->redirectToRoute("trading");
     }
 
     /**
@@ -105,7 +127,11 @@ class SecurityController extends FOSSecurityController
      */
     protected function renderLogin(array $data): Response
     {
-        return $this->render('@FOSUser/Security/login.html.twig', array_merge($data, [
+        $template = $this->formContentOnly
+            ? '@FOSUser/Security/login_form_content.html.twig'
+            : '@FOSUser/Security/login.html.twig';
+
+        return $this->render($template, array_merge($data, [
             'form' => $this->form->createView(),
         ]));
     }
@@ -115,5 +141,10 @@ class SecurityController extends FOSSecurityController
         return [
             $this->generateUrl('nelmio_api_doc.swagger_ui', [], UrlGeneratorInterface::ABSOLUTE_URL) => 'settings',
         ];
+    }
+
+    public function pageNotFoundAction(): void
+    {
+        throw new NotFoundHttpException();
     }
 }

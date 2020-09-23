@@ -1,4 +1,11 @@
 {% extends 'base.html.twig' %}
+
+{% if post.image is not null %}
+    {% set metaImage %}{% path post.image, 'reference' %}{% endset %}
+{% endif %}
+{% set metaTitle = post.title ~ ' | mintMe' %}
+{% set metaImageAlt = post.title %}
+
 {% block title %}
 {% spaceless %}
     {{ post.title }} | mintMe

@@ -29,12 +29,25 @@ class DefaultControllerTest extends WebTestCase
         $this->assertFalse($this->client->getResponse()->isRedirect());
     }
 
+    public function testProfileAuth(): void
+    {
+        $this->client->request('GET', '/profile');
+        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login'));
+
+        $nickname = $this->generateString();
+        $this->register($this->client, $nickname);
+
+        $this->client->request('GET', '/profile');
+
+        $this->assertTrue($this->client->getResponse()->isRedirect('/profile/' . $nickname));
+    }
+
     public function unAuthUPages(): array
     {
         return [
             ['/'],
             ['/trading'],
-            ['/news/archive'],
+            ['/news'],
             ['/kb'],
             ['/register/'],
             ['/login'],
@@ -47,7 +60,6 @@ class DefaultControllerTest extends WebTestCase
     public function authPages(): array
     {
         return [
-            ['/profile'],
             ['/token'],
         ];
     }

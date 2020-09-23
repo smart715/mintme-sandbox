@@ -1,5 +1,14 @@
 {% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 {% set route = app.request.get('_route') %}
+
+{% if is_hacker_allowed %}
+    <div id="info-bar">
+        <info-bar
+            username="{{ app.user.username|default('') }}"
+            auth-code="{{ app.user.EmailAuthCode|default('') }}"
+        ></info-bar>
+    </div>
+{% endif %}
 <nav class="navbar top-navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ path('homepage') }}">
@@ -12,12 +21,12 @@
                 {% else %}
                     class="mintme-logo"
                 {% endif %}
-                src="{{ asset('build/images/logo.png') }}"
+                src="{{ asset('build/images/logo.svg') }}"
                 alt="mintMe"
             >
         </a>
         <button
-            class="navbar-toggler mt-2"
+            class="navbar-toggler"
             :class="{ 'collapsed': !showNavbarMenu }"
             type="button"
             :aria-expanded="showNavbarMenu"
@@ -27,65 +36,63 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
+            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-auto">
+                <token-searcher
+                    class="justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
+                    search-url="{{ path('token_search') }}"
+                ></token-searcher>
+                <div class="v-cloak--flex justify-content-center align-items-center ml-1">
+                    <input
+                        class="search-input form-control no-bg-img"
+                        placeholder="Search for the token"
+                        type="text"
+                    >
+                    <svg
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fas"
+                        data-icon="search"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 512 512"
+                        class="search-icon fa-search"
+                    >
+                        <path
+                            d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7
+                            44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0
+                            92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4
+                            33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128
+                            0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
+                        ></path>
+                    </svg>
+                </div>
+            </form>
             <ul class="navbar-nav ml-auto">
-                {% if prelaunch.isFinished() %}
-                    <li class="search nav-item align-self-center py-3 py-lg-0 pr-0 pr-lg-3" v-cloak>
-                        <token-searcher
-                            class="justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
-                            search-url="{{ path('token_search') }}"
-                        ></token-searcher>
-                        <div class="v-cloak--flex justify-content-center align-items-center ml-1">
-                            <input
-                                class="search-input form-control no-bg-img"
-                                placeholder="Search for the token"
-                                type="text"
-                            >
-                            <svg
-                                aria-hidden="true"
-                                focusable="false"
-                                data-prefix="fas"
-                                data-icon="search"
-                                role="img"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 512 512"
-                                class="search-icon fa-search"
-                            >
-                                <path
-                                    d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7
-                                    44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0
-                                    92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4
-                                    33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128
-                                    0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
-                                ></path>
-                            </svg>
-                        </div>
-                    </li>
-                    {% if show_links %}
-                        <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route == 'token' ? 'active' : '' }}">
-                            <a href="{{ path('token_create') }}" class="nav-link">
-                                <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline"></span>
-                                <span>My Token</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item align-self-center {{ route == 'trading' ? 'active' : '' }}">
-                        <a href="{{ path('trading') }}" class="nav-link">Trading</a>
-                    </li>
-                    {% if show_links %}
-                        <li class="nav-item align-self-center {{ route == 'wallet' ? 'active' : '' }}">
-                            <a href="{{ path('wallet') }}" class="nav-link">Wallet</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
-                        <a href="{{ path('sonata_news_archive') }}" class="nav-link">News</a>
+                {% if show_links %}
+                    <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
+                        <a href="{{ path('token_create') }}" class="nav-link">
+                            <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
+                            <span>My Token</span>
+                        </a>
                     </li>
                 {% endif %}
+                <li class="nav-item align-self-center {{ route == 'trading' ? 'active' : '' }}">
+                    <a href="{{ path('trading') }}" class="nav-link">Trading</a>
+                </li>
                 {% if show_links %}
-                    <li class="nav-item align-self-center {{ route == 'referral' ? 'active' : '' }}">
+                    <li class="nav-item align-self-center {{ route == 'wallet' ? 'active' : '' }}">
+                        <a href="{{ path('wallet') }}" class="nav-link">Wallet</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
+                    <a href="{{ path('sonata_news_home') }}" class="nav-link">News</a>
+                </li>
+                {% if show_links %}
+                    <li class="nav-item align-self-center {{ route == 'referral-program' ? 'active' : '' }}">
                         <a href="{{ path('referral-program') }}" class="nav-link">Referrals</a>
                     </li>
                 {% endif %}
-                <li class="nav-item align-self-center {{ route == 'kb' ? 'active' : '' }}">
+                <li class="nav-item align-self-center {{ route starts with 'kb' ? 'active' : '' }}">
                     <a href="{{ path('kb') }}" class="nav-link">Help</a>
                 </li>
                 {% if not app.user %}
@@ -99,28 +106,32 @@
                     </li>
                 {% else %}
                     {% if show_links %}
-                        <div class="d-lg-none align-self-center">
-                            {% if prelaunch.isFinished() %}
-                                <li class="text-center {{ route == 'profile' ? 'active' : '' }}">
-                                    <a
-                                        href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
-                                        class="nav-link"
-                                    >
-                                        <span>Profile</span>
-                                    </a>
-                                </li>
-                            {% endif %}
-                            <li class="text-center {{ route == 'settings' ? 'active' : '' }}">
-                                <a href="{{ path('settings') }}" class="nav-link">
-                                    <span>Settings</span>
-                                </a>
-                            </li>
-                            <li class="text-center {{ route == 'fos_user_security_logout' ? 'active' : '' }}">
-                                <a href="{{ path('fos_user_security_logout') }}" class="nav-link">
-                                    <span>Log Out</span>
-                                </a>
-                            </li>
-                        </div>
+                        <li class="nav-item align-self-center d-lg-none {{ route starts with 'profile' ? 'active' : '' }}">
+                            <a
+                                href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                class="nav-link"
+                            >
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li class="nav-item align-self-center d-lg-none {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}">
+                            <a href="{{ path('settings') }}" class="nav-link">
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item align-self-center d-lg-none {{ route == 'fos_user_security_logout' ? 'active' : '' }}">
+                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                <button
+                                        class="logout-link"
+                                        type="submit"
+                                        id="_submit"
+                                        name="_submit"
+                                >
+                                    Log Out
+                                </button>
+                            </form>
+                        </li>
                         <li class="nav-item d-none d-lg-block">
                             <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
                                 <a
@@ -130,35 +141,58 @@
                                     @click="toggleProfileMenu"
                                     v-on-clickaway="hideProfileMenu"
                                 >
-                                    <i class="icon-user-avatar d-none d-lg-block"></i>
+                                    <avatar
+                                        class="{% if app.user.profile.image.url == "/media/default_profile.png" %}default-user-avatar-topnav{% endif %}"
+                                        size="middle"
+                                        type="profile"
+                                        image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
+                                    ></avatar>
                                 </a>
                                 <div
                                     class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
                                     :class="{ 'show': showProfileMenu }"
                                 >
-                                    {% if prelaunch.isFinished() %}
-                                        <a
-                                            class="dropdown-item"
-                                            href="{{ path('profile') }}/{%- if (app.user.profile.pageurl is defined) -%}{{ app.user.profile.pageurl }}{%- endif -%}"
-                                        >
-                                            <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                            Profile
-                                        </a>
-                                    {% endif %}
-                                    <a class="dropdown-item" href="{{ path('settings') }}">
+                                    <a
+                                        class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
+                                        href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                    >
+                                        <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                        Profile
+                                    </a>
+                                    <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
                                     </a>
-                                    <a class="dropdown-item" href="{{ path('fos_user_security_logout') }}">
-                                        <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        Log Out
-                                    </a>
+                                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                        <span class="dropdown-item">
+                                            <button
+                                                    class="logout"
+                                                    type="submit"
+                                                    id="_submit"
+                                                    name="_submit"
+                                            >
+                                                <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                                Log Out
+                                            </button>
+                                        </span>
+                                    </form>
                                 </div>
                             </div>
                         </li>
                     {% else %}
                         <li class="align-self-center">
-                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link"><span>Log Out</span></a>
+                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                <button
+                                        class="logout-link"
+                                        type="submit"
+                                        id="_submit"
+                                        name="_submit"
+                                >
+                                    Log Out
+                                </button>
+                            </form>
                         </li>
                     {% endif %}
                 {% endif %}

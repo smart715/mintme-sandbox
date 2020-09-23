@@ -4,8 +4,10 @@
             <div class="col-12 col-xl-6 pr-xl-2 mt-3">
                 <trade-buy-orders
                     @update-data="updateBuyOrders"
+                    :full-orders-list="buyOrders"
                     :orders-list="filteredBuyOrders"
                     :orders-loaded="ordersLoaded"
+                    :orders-updated="ordersUpdated"
                     :token-name="market.base.symbol"
                     :fields="fields"
                     :basePrecision="market.base.subunit"
@@ -16,8 +18,10 @@
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
                     @update-data="updateSellOrders"
+                    :full-orders-list="sellOrders"
                     :orders-list="filteredSellOrders"
                     :orders-loaded="ordersLoaded"
+                    :orders-updated="ordersUpdated"
                     :market="market"
                     :fields="fields"
                     :basePrecision="market.base.subunit"
@@ -49,6 +53,7 @@ import TradeSellOrders from './TradeSellOrders';
 import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
+import {WSAPI} from '../../utils/constants';
 import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
@@ -61,6 +66,10 @@ export default {
     },
     props: {
         ordersLoaded: Boolean,
+        ordersUpdated: {
+            type: Boolean,
+            default: false,
+        },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
         market: Object,
@@ -96,10 +105,10 @@ export default {
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.buyOrders ? this.ordersList(this.groupByPrice(this.buyOrders)) : [];
+            return this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
         },
         filteredSellOrders: function() {
-            return this.sellOrders ? this.ordersList(this.groupByPrice(this.sellOrders)) : [];
+            return this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
         },
     },
     methods: {
@@ -118,35 +127,32 @@ export default {
                     price: toMoney(order.price, this.market.base.subunit),
                     amount: toMoney(order.amount, this.market.quote.subunit),
                     sum: toMoney(new Decimal(order.price).mul(order.amount).toString(), this.market.base.subunit),
-                    trader: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? this.traderFullName(order.maker.profile)
-                        : 'Anonymous',
-                    traderFullName: order.maker.profile !== null && !order.maker.profile.anonymous
-                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
-                        : 'Anonymous',
-                    traderUrl: order.maker.profile && !order.maker.profile.anonymous ?
-                        this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url}) :
-                        '#',
+                    trader: order.maker.profile.nickname,
+                    traderUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
                     side: order.side,
                     owner: order.owner,
-                    isAnonymous: !order.maker.profile || order.maker.profile.anonymous,
+                    orderId: order.id,
+                    ownerId: order.maker.id,
+                    highlightClass: '',
+                    traderAvatar: order.maker.profile.image.avatar_small,
                 };
             });
         },
-        traderFullName: function(profile) {
-            return profile.firstName + ' ' + profile.lastName;
-        },
         groupByPrice: function(orders) {
             let filtered = [];
+
             let grouped = this.clone(orders).reduce((a, e) => {
-                if (a[e.price] === undefined) {
-                    a[e.price] = [];
+                let price = parseFloat(e.price);
+
+                if (a[price] === undefined) {
+                    a[price] = [];
                 }
-                a[e.price].push(e);
+                a[price].push(e);
                 return a;
             }, {});
 
             Object.values(grouped).forEach((e) => {
+                e.sort((a, b) => b.createdTimestamp - a.createdTimestamp);
                 let obj = e.reduce((a, e) => {
                     a.owner = a.owner || e.maker.id === this.userId;
                     a.orders.push(e);
@@ -155,10 +161,8 @@ export default {
                     let amount = a.orders.filter((order) => order.maker.id === e.maker.id)
                         .reduce((a, e) => new Decimal(a).add(e.amount), 0);
 
-                    if (parseFloat(a.main.amount) < parseFloat(amount)) {
-                        a.main.amount = amount;
-                        a.main.order = e;
-                    }
+                    a.main.amount = amount;
+                    a.main.order = e;
 
                     return a;
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
@@ -171,7 +175,7 @@ export default {
             return filtered;
         },
         removeOrderModal: function(row) {
-            let isSellSide = row.side === 1;
+            let isSellSide = WSAPI.order.type.SELL === row.side;
             let orders = isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
 
@@ -201,7 +205,13 @@ export default {
         clone: function(orders) {
             return JSON.parse(JSON.stringify(orders));
         },
+        sortOrders: function(orders, isSell) {
+            return orders.sort((a, b) => {
+                return isSell ?
+                    parseFloat(a.price) - parseFloat(b.price) :
+                    parseFloat(b.price) - parseFloat(a.price);
+            });
+        },
     },
 };
-
 </script>

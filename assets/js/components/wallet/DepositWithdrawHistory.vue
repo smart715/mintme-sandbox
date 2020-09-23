@@ -1,20 +1,34 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
+        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table" v-if="!noHistory">
             <b-table
                 thead-class="trading-head"
-                v-if="!noHistory"
                 :items="sanitizedHistory"
-                :fields="fields"
+                :fields="fieldsArray"
+                :sort-compare="$sortCompare(fields)"
+                :sort-by="fields.date.key"
+                :sort-desc="true"
+                sort-direction="desc"
                 :class="{'empty-table': noHistory}"
+                sort-icon-left
             >
                 <template v-slot:cell(symbol)="data">
-                    <a :href="data.item.url" class="text-white">
-                        <span v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
-                            {{ data.item.symbol | truncate(15) }}
-                        </span>
-                    </a>
+                    <span v-if="!data.item.tradable.blocked">
+                        <a :href="data.item.url" class="text-white">
+                            <span
+                                v-if="data.item.symbol.length > 17"
+                                v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                                {{ data.item.symbol | truncate(17) }}
+                            </span>
+                            <span v-else>
+                                {{ data.item.symbol }}
+                            </span>
+                        </a>
+                    </span>
+                    <span v-else class="text-muted">
+                        {{ data.item.symbol }}
+                    </span>
                 </template>
                 <template v-slot:cell(toAddress)="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
@@ -26,12 +40,12 @@
                     </div>
                 </template>
             </b-table>
-            <div v-if="noHistory">
-                <p class="text-center p-5">No transactions were added yet</p>
-            </div>
         </div>
         <div v-if="loading" class="p-1 text-center">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </div>
+        <div v-else-if="noHistory">
+            <p class="text-center p-5">No transactions were added yet</p>
         </div>
         </template>
         <template v-else>
@@ -61,45 +75,52 @@ export default {
     components: {CopyLink},
     data() {
         return {
-            fields: [
-                {
+            fields: {
+                date: {
                     key: 'date',
                     label: 'Date',
                     sortable: true,
+                    type: 'date',
                 },
-                {
+                type: {
                     key: 'type',
                     label: 'Type',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                symbol: {
                     key: 'symbol',
                     label: 'Name',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                toAddress: {
                     key: 'toAddress',
                     label: 'Address',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                amount: {
                     key: 'amount',
                     label: 'Amount',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                status: {
                     key: 'status',
                     label: 'Status',
                     sortable: true,
+                    type: 'string',
                 },
-                {
+                fee: {
                     key: 'fee',
                     label: 'Fee',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            ],
+            },
             tableData: null,
             currentPage: 1,
         };
@@ -113,6 +134,9 @@ export default {
         },
         loaded: function() {
             return this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
@@ -177,11 +201,12 @@ export default {
                 let params = {
                     base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
                     quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
+                    tab: 'trade',
                 };
                 return this.$routing.generate('coin', params);
             }
 
-            return this.$routing.generate('token_show', {name: quote.name});
+            return this.$routing.generate('token_show', {name: quote.name, tab: 'trade'});
         },
     },
 };

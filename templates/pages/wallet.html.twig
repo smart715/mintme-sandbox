@@ -6,9 +6,25 @@
 
 {% block content %}
     <div id="wallet" class="container">
-        <div class="row pt-5 justify-content-center">
+        {% if app.user.profile.token is not empty and app.user.profile.token.isBlocked or app.user.isBlocked %}
+            <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
+                <h1>
+                    {% if app.user.isBlocked %} Account {% else %} Token {% endif %}
+                    was blocked.<br> Withdrawing or depositing
+                    {% if not app.user.isBlocked%} for token {% endif %} is unavailable
+                </h1>
+            </div>
+        {% endif %}
+        <div class="row pt-4 justify-content-center">
             <div class="col-md-12 card-fixed-large px-0 text-white">
-                <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}">
+                {{ include('spinners/wallet.html.twig') }}
+                <b-tabs
+                    @input="tabUpdated"
+                    :lazy="true"
+                    class="tabs-theme"
+                    v-model="tabIndex"
+                    :class="{'no-padding': expandedTab}"
+                >
                     <b-tab title="Wallet" active>
                         <wallet
                             hash="{{ hash }}"
@@ -16,8 +32,13 @@
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
-                            deposit-more="{{ depositMore }}"
+                            :deposit-more="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
+                            :expiration-time="{{ withdraw_expiration_time }}"
+                            disabled-crypto="{{ disabledBlockchain | json_encode }}"
+                            {% if app.user.isBlocked %}
+                            is-user-blocked
+                            {% endif %}
                         >
                         </wallet>
                     </b-tab>
@@ -31,10 +52,15 @@
                         <active-orders
                                 hash="{{ hash }}"
                                 websocket-url="{{ global_websocket_url }}"
-                                :user-id="{{ app.user.id }}">
+                                :user-id="{{ app.user.id }}"
+                                {% if app.user.isBlocked %}
+                                is-user-blocked
+                                {% endif %}
+                        >
                         </active-orders>
                     </b-tab>
                 </b-tabs>
+                <input type="hidden" ref="depositMore" value="{{ depositMore }}"/>
             </div>
         </div>
     </div>

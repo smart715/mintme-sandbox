@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe crowdfunding | create token, create coin, monetize yourself on the blockchain!{% endblock %}
+{% block title %}Mint or create token, create coin, monetize yourself - blockchain crowdfunding MintMe!{% endblock %}
 
 {% block bgclass %}index-bg{% endblock %}
 
 {% block content %}
-    <section id="top-showcase" class="container-fluid text-responsive pt-2 pb-5 py-sm-0">
+    <section id="top-showcase" class="container-fluid text-responsive pt-2 pb-5 py-sm-5 py-md-0">
         <div class="row">
             <div class="col p-0 text-center">
                 <div class="container-fluid w-100 h-100">
@@ -16,16 +16,16 @@
                                     Create your coin<br />Monetize yourself
                                 </h1>
                                 <h2 class="tip pt-2 px-3 d-inline-block text-white">
-                                    MintMe is crowdfunding platform where patrons<br /> also earn on their favorite influencer success.
+                                    MintMe is a crowdfunding platform where patrons<br /> also earn on their favorite influencer success.
                                 </h2>
                                 <div class="py-sm-4">
                                 {% if not app.user %}
-                                    <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('fos_user_registration_register') }}">
+                                    <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('fos_user_registration_register') }}">
                                         Register Now
                                     </a>
                                 {% else %}
-                                    <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('trading') }}">
-                                        TRADE NOW
+                                    <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
+                                        Trade Now
                                     </a>
                                 {% endif %}
                                 </div>
@@ -37,25 +37,6 @@
         </div>
     </section>
     <section id="description">
-        {% if prelaunch.isEnabled() %}
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col">
-                        <h3 class="text-center text-white text-uppercase">We are starting in</h3>
-                    </div>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="col-auto">
-                        <countdown class="text-center text-white" end-date="{{ prelaunch.getFinishDate|date("Y-m-d H:i:s") }}" current-date="{{ 'now'|date("Y-m-d H:i:s") }}" :disabled="false" v-cloak>
-                            <div slot="content">
-                                <h4>--End--</h4>
-                            </div>
-                        </countdown>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-
         <div class="container px-5">
             <div class="row justify-content-center pt-md-3 pb-3">
                 <div class="col">
@@ -66,9 +47,9 @@
             <div class="row justify-content-center">
                 <div class="col">
                     <p class="text-white text-center pb-4">
-                        Anyone can create a token (coin) that represents themselves or a project that they have created for their fanbase and supporters to support them.<br />
+                        Anyone can mint or create a token (coin) that represents themselves or a project that they have created for their fanbase and supporters to support them.<br />
                         It helps content creators to realize their maximum potential through a new innovative way of crowdfunding. It's also a social platform where traders <br />
-                        can interact with token creators and other traders. Tokens are created on top of our custom decentralized blockchain called <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br />
+                        can interact with token creators and other traders. Tokens are created (minted) on top of our custom decentralized blockchain called <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br />
                         When you create coin or create token, you become an owner of your own financial future. Create a token, create a coin for your project or yourself or just trade other people coins.
                     </p>
                 </div>
@@ -77,19 +58,19 @@
 
         <div class="feature-boxes container px-5">
             <div class="row justify-content-center text-white text-center">
-                <div class="col-md col-lg-4 bg-secondary border mx-3 mb-4 text-center">
-                    <img class="mt-5" src="{{ asset('build/images/home-creator-icon.png') }}" alt="Content creator Icon">
-                    <h4 class="mt-5">If you are a content creator</h4>
-                    <p class="mt-4">
+                <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="Content creator Icon">
+                    <h4 class="mb-4">If you are a content creator</h4>
+                    <p>
                         Make your token/coin with just few clicks<br/>
                         Create an order to sell it on the market<br/>
                         Encourage your followers to support you by buying your token
                     </p>
                 </div>
-                <div class="col-md col-lg-4 bg-secondary border mx-3 mb-4 text-center">
-                    <img class="mt-5" src="{{ asset('build/images/home-trader-icon.png') }}" alt="Token trading Icon">
-                    <h4 class="mt-5">If you are a trader</h4>
-                    <p class="mt-4">
+                <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="Token trading Icon">
+                    <h4 class="mb-4">If you are a trader</h4>
+                    <p>
                         Search for a promising content creator with potential for growth<br/>
                         Buy his or her token to support the creator<br/>
                         Trade the token once the Creator's value has increased
@@ -107,61 +88,61 @@
         </div>
 
         <div class="feature-boxes container px-5">
-            <div class="d-flex flex-row flex-wrap justify-content-center text-white">
-                <div class="flex-basis-200 flex-grow-1 bg-module border mx-3 mb-4 text-center">
-                    <img class="d-block mx-auto mt-5" src="{{ asset('build/images/easy_icon_01.png') }}" alt="Create your token/coin">
-                    <p class="mt-5">
-                        Create your token (coin) for free and encourage others to support YOU
+            <div class="row justify-content-center text-white">
+                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="Create your token/coin">
+                    <p>
+                        Mint/create your token (coin) for free and encourage others to support YOU
                     </p>
                 </div>
-                <div class="flex-basis-200 flex-grow-1 bg-module border mx-3 mb-4 text-center">
-                    <img class="d-block mx-auto mt-5" src="{{ asset('build/images/easy_icon_02.png') }}" alt="Supporting favorite creators">
-                    <p class="mt-5">
+                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="Supporting favorite creators">
+                    <p>
                         Earn and help by supporting your favorite creators early
                     </p>
                 </div>
-                <div class="flex-basis-200 flex-grow-1 bg-module border mx-3 mb-4 text-center">
-                    <img class="d-block mx-auto mt-5" src="{{ asset('build/images/easy_icon_03.png') }}" alt="Socializing creators and other traders on Mintme">
-                    <p class="mt-5">
+                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="Socializing creators and other traders on Mintme">
+                    <p>
                         Socialize with creators and other traders directly on the platform
                     </p>
                 </div>
-                <div class="flex-basis-200 flex-grow-1 bg-module border mx-3 mb-4 text-center">
-                    <img class="d-block mx-auto mt-5" src="{{ asset('build/images/easy_icon_04.png') }}" alt="Earning from Mintme referral program">
-                    <p class="mt-5">
+                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="Earning from Mintme referral program">
+                    <p>
                         Earn through our generous referral program that gives you 50% of all transactional fees from each referred user
                     </p>
                 </div>
             </div>
         </div>
-        <div class="container mb-4">
+        <div class="container my-5">
             <div class="text-center text-responsive">
             {% if not app.user %}
-                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-primary border-0 btn-register btn-register-hover-dark text-white">REGISTER NOW</a>
+                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">Register Now</a>
             {% else %}
-                <a class="btn btn-register btn-register-hover-light bg-white" href="{{ path('trading') }}">TRADE NOW</a>
+                <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">Trade Now</a>
             {% endif %}
             </div>
         </div>
         <div class="container mb-3">
-            <div class="row justify-content-center pt-md-3">
+            <div class="row justify-content-center">
                 <div class="col">
-                    <h3 class="text-uppercase text-white text-center mb-0 pt-5">FUELED BY MINTME COIN (MINTME)</h3>
+                    <h3 class="text-uppercase text-white text-center mb-0 mt-4">FUELED BY MINTME COIN (MINTME)</h3>
                 </div>
             </div>
         </div>
 
-        <div class="container  px-5 text-white mb-4">
+        <div class="container px-5 text-white mb-4">
             <div class="border container bg-secondary">
                 <div class="row">
-                    <div class="col-lg-4 p-5 pr-lg-0 align-middle text-center">
-                        <img src="{{ asset('build/images/mintme-coin-graphic.png') }}" class="align-self-center img-fluid" alt="mintme coin graphics">
+                    <div class="col-lg-5 py-4 d-flex centered">
+                        <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="mintme coin graphics">
                     </div>
-                    <div class="col-lg-8 py-5 px-0 text-center">
+                    <div class="col-lg-7 pb-3 pt-lg-5 pb-lg-5 px-0 text-center">
                         <a href="https://mintme.com/coin" target="_blank">
-                            <img src="{{ asset('build/images/mintme-coin-logo.png') }}" class="img-fluid img-reduced mb-4" alt="mintme coin">
+                            <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="mintme coin">
                         </a>
-                        <p class="px-5">
+                        <p class="px-4 px-lg-5">
                             MintMe exchange is based on our custom blockchain solution called MintMe.com Coin - smart contracts platform, created for the World Wide Web. Traders on our exchange will use MINTME to trade people tokens and on top of that all token creators who want to tokenize themselves, will be using MintMe Coin as base for their projects. This will guarantee real non-speculative demand for MintMe Coin.
                         </p>
                     </div>
@@ -177,7 +158,7 @@
         </div>
 
         <div class="container faq  px-5 text-white mb-5 pb-5">
-            <div class="border p-1">
+            <div class="border">
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">

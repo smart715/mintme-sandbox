@@ -22,8 +22,9 @@ update_repository_redmine_training.abchosting.org:
     - training.abchosting.org
 
 before_script:
+  - export PATH=/usr/local/php74:$PATH
   - shopt -s expand_aliases
-  - alias php='/usr/bin/php7.2'
+  - alias php='/usr/bin/php7.4'
   - alias npm='/usr/local/bin/npm'
 
 tests_php:
@@ -31,8 +32,8 @@ tests_php:
   script:
     - export $(grep -v '^#' .env.dist | xargs)
     - composer install
-    - make phpunit
-    - make syntax_check
+    - THREADS_COUNT=4 make phpunit
+    - THREADS_COUNT=4 make syntax_check
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
@@ -44,17 +45,18 @@ tests_php:
 tests_assets:
   stage: tests
   script:
-    - npm ci
+    - npm ci --cache .npm --prefer-offline
     - make syntax_check_assets
-    - make karma
+    - make jest
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     paths:
+      - .npm/
       - node_modules/
       - vendor/
   tags:
     - mintme.abchosting.org
-    
+
 phpfunctional_tests:
   stage: tests
   script:
@@ -65,24 +67,31 @@ phpfunctional_tests:
   only:
     # this job only will be executed for branches
     - update-functional-tests
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/  
+    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
 
 build_mintme_sites:
   stage: build-sites
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - node_modules/
-      - vendor/
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
     # this job only will be executed for branches
     - branches
+    
+staging_release:
+  stage: build-sites
+  script:
+    - sudo /root/update-staging.sh
+  tags:
+    # This job only will be executed by this runner:
+    - staging
+  only:
+    # this job only will be executed for branches
+    - v1.2.0
+  allow_failure: true
 
 clean_mintme_unused_sites:
   stage: clean-unused-sites
@@ -92,8 +101,8 @@ clean_mintme_unused_sites:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
-    # this job only will be executed for branches named
-    # master
+    # this job only will be executed for these branches:
+    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
     - master
   allow_failure: true
 

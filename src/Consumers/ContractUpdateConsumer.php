@@ -94,6 +94,8 @@ class ContractUpdateConsumer implements ConsumerInterface
             sleep(1);
             $this->em->clear();
             $repo = $this->em->getRepository(Token::class);
+
+            /** @var Token|null $token */
             $token = $repo->findOneBy(['address' => $clbResult->getTokenAddress()]);
 
             if (!$token) {

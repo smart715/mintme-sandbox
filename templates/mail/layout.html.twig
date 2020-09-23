@@ -1,44 +1,15 @@
-<style>
-    table {
-        min-width: 500px;
-        padding: 0;
-        width: 100%;
-        background-size: 100% 100%;
-        position: relative;
-        display: table;
-        font-size: 18px;
-        font-weight: normal;
-        margin: 0 auto;
-        font-family: Helvetica, Arial, sans-serif;
-        text-align:center;
-        color:white;
-    }
-    table th {
-        margin: 0 auto;
-        padding-left: 16px;
-        padding-bottom: 16px;
-        width: 100%;
-    }
-    table td {
-        padding-left: 0;
-        padding-right: 0;
-    }
-    a {
-        color: #2199e8;
-    }
-
-</style>
-<table style="min-width: 500px;padding: 0;width: 100%;background-size: 100% 100%;position: relative;display: table;font-size: 18px;font-weight: normal;margin: 0 auto;font-family: Helvetica, Arial, sans-serif;text-align:center;color:white;">
+{% apply inline_css(source('@public' ~ asset('build/mail.css'))) %}
+    <table>
     <tr>
-        <td style="padding-left: 0;padding-right: 0;" align="center" valign="top">
+        <td align="center" valign="top">
             <center>
-                <table style="width: 500px;" background="{{absolute_url(asset('build/images/body.png'))}}">
+                <table class="table-inner" background="{{absolute_url(asset('build/images/body.png'))}}">
                     <tr>
-                        <td style="padding-left: 0;padding-right: 0;">
-                            <table  style="width: 500px;padding: 0;background-size: 100% 100%;position: relative;display: table;font-size: 18px;font-weight: normal;margin: 0 auto;font-family: Helvetica, Arial, sans-serif;text-align:center;color:white;">
+                        <td>
+                            <table>
                                 <tr style="padding: 20px; width: 100%; margin: 0 auto">
                                     <td cellpadding="" align="middle">
-                                        <a style="display: block" href="{{ absolute_url('/') }}" target=_blank><img width="200px" height="80px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
+                                        <a style="display: block" href="{{ absolute_url('/') }}" target=_blank><img width="200px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
                                     </td>
                                 </tr>
                             </table>
@@ -46,7 +17,7 @@
                             <table background="{{absolute_url(asset('build/images/footer.png'))}}" style="margin: 0; padding: 0; width: 100%">
                                 <tr style=" margin-bottom:0">
                                     <td>
-                                        <div style="text-align: center; margin-top: 20px; margin-bottom: 0; color: #fff; background: #131313">
+                                        <div class="text-dark-white bg-black" style="text-align: center; margin-top: 20px; margin-bottom: 0;">
                                             2018 - {{ "now"|date("Y") }} mintMe. All rights reserved
                                         </div>
                                     </td>
@@ -59,4 +30,4 @@
         </td>
     </tr>
 </table>
-
+{% endapply %}

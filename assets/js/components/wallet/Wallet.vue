@@ -13,31 +13,47 @@
             </div>
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
-                    <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
-                        {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
-                    </a>
+                    <div class="first-field">
+                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                            {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
+                        </a>
+                    </div>
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
-                    <div class="row">
+                    <div class="row pl-2">
                         <div class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div><i class="icon-deposit"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'deposit']"
+                                />
+                            </div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Deposit</span>
                             </div>
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'withdraw']"
+                                />
+                            </div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Withdraw</span>
                             </div>
@@ -59,36 +75,74 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div class="truncate-name w-100" v-b-tooltip="{title: data.item.name, boundary:'viewport'}">
-                        <a :href="generatePairUrl(data.item)" class="text-white">
-                            {{ data.item.name }}
-                        </a>
+                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}" class="first-field">
+                        <span v-if="data.item.blocked">
+                            <span class="text-muted">
+                                {{ data.item.name | truncate(14) }}
+                            </span>
+                        </span>
+                        <span v-else>
+                            <a :href="generatePairUrl(data.item)" class="text-white">
+                                {{ data.item.name | truncate(14) }}
+                            </a>
+                        </span>
+                    </div>
+                    <div
+                        v-else
+                        class="first-field"
+                    >
+                        <span v-if="data.item.blocked">
+                            <span class="text-muted">
+                                {{ data.item.name | truncate(14) }}
+                            </span>
+                        </span>
+                        <span v-else>
+                            <a :href="generatePairUrl(data.item)" class="text-white">
+                                {{ data.item.name }}
+                            </a>
+                        </span>
                     </div>
                 </template>
                 <template v-slot:cell(available)="data">
-                    {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    <span class="text-break">
+                        {{ data.value | toMoney(data.item.subunit) | formatMoney }}
+                    </span>
                 </template>
                 <template v-slot:cell(action)="data">
                     <div
                         v-if="data.item.deployed"
-                        class="row">
-                        <div class="d-flex flex-row c-pointer pl-2"
-                            @click="openDeposit(data.item.name, data.item.subunit, true)">
-                            <div><i class="icon-deposit"></i></div>
+                        class="row pl-2">
+                        <div
+                            class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': data.item.blocked}"
+                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'deposit']"
+                                />
+                            </div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Deposit</span>
                             </div>
                         </div>
                         <div
                             class="d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': data.item.blocked}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
                                         data.item.subunit,
-                                        true)"
+                                        true,
+                                        data.item.blocked)"
                         >
-                            <div><i class="icon-withdraw"></i></div>
+                            <div>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'withdraw']"
+                                />
+                            </div>
                             <div>
                                 <span class="pl-2 text-xs align-middle">Withdraw</span>
                             </div>
@@ -129,6 +183,7 @@
             :twofa="twofa"
             :subunit="withdraw.subunit"
             :no-close="true"
+            :expiration-time="expirationTime"
             @close="closeWithdraw"
         />
         <deposit-modal
@@ -158,7 +213,12 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol} from '../../utils/constants';
+import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+
+library.add(depositIcon);
+library.add(withdrawIcon);
 
 export default {
     name: 'Wallet',
@@ -180,6 +240,9 @@ export default {
         tradingUrl: String,
         depositMore: String,
         twofa: String,
+        expirationTime: Number,
+        disabledCrypto: String,
+        isUserBlocked: Boolean,
     },
     data() {
         return {
@@ -200,14 +263,14 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name', class: 'pair-cell'},
-                {key: 'available', label: 'Amount'},
-                {key: 'action', label: 'Actions', sortable: false},
+                {key: 'name', label: 'Name', class: 'first-field'},
+                {key: 'available', label: 'Amount', class: 'field-table'},
+                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
             ],
             withdraw: {
                 fee: '0',
@@ -298,7 +361,18 @@ export default {
         });
     },
     methods: {
-        openWithdraw: function(currency, fee, amount, subunit, isToken = false) {
+        isDisabledCrypto: function(name) {
+          return JSON.parse(this.disabledCrypto).includes(name);
+        },
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Withdrawals for this crypto was disabled. Please try again later');
+
+              return;
+            }
+            if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
+                return;
+            }
             if (!this.twofa) {
                 this.notifyInfo('Please enable 2FA before withdrawing');
                 return;
@@ -318,7 +392,16 @@ export default {
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit, isToken = false) {
+        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Deposit for this crypto was disabled. Please try again later');
+
+              return;
+            }
+
+            if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
+                return;
+            }
             this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
                 || 'Loading..';
             this.depositDescription = `Send ${currency} to the address above.`;
@@ -326,32 +409,40 @@ export default {
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
-            this.$axios.retry.get(this.$routing.generate('deposit_fee', {
+            this.$axios.retry.get(this.$routing.generate('deposit_info', {
                     crypto: isToken ? webSymbol : currency,
                 }))
-                .then((res) => this.deposit.fee = res.data && 0.0 !== parseFloat(res.data) ?
-                    toMoney(res.data, subunit) :
-                    undefined
-                )
+                .then((res) => {
+                    this.deposit.fee = res.data.fee && 0.0 !== parseFloat(res.data.fee)
+                        ? toMoney(res.data.fee, subunit)
+                        : undefined;
+                    this.deposit.min = res.data.minDeposit ? toMoney(res.data.minDeposit, subunit) : undefined;
+                })
                 .catch((err) => {
                     this.notifyError('Can not update deposit fee status. Try again later.');
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
-            // TODO: Get rid of hardcoded WEB
-            this.deposit.min = currency === 'WEB' ? toMoney(1, subunit) : undefined;
             this.showDepositModal = true;
         },
         closeDeposit: function() {
+            this.deposit.min = undefined;
             this.showDepositModal = false;
         },
         openDepositMore: function() {
             if (
-                [webSymbol, btcSymbol].includes(this.depositMore) &&
+                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
-                this.depositAddresses.hasOwnProperty(this.depositMore)
+                this.depositAddresses.hasOwnProperty(this.depositMore) &&
+                !this.isUserBlocked
             ) {
+                if (window.history.replaceState) {
+                    window.history.replaceState(
+                        {}, '', location.href.split('?')[0]
+                    );
+                }
+
                 this.openDeposit(
                     this.depositMore,
                     this.predefinedTokens[this.depositMore].subunit
@@ -378,10 +469,10 @@ export default {
                         this.$axios.retry.get(this.$routing.generate('lock-period', {name: token}))
                             .then((res) =>
                                 this.tokens[token].available = res.data ?
-                                    new Decimal(oToken.available).sub(res.data.frozenAmountWithReceived) : oToken.available
+                                    new Decimal(oToken.available).sub(res.data.frozenAmount) : oToken.available
                             )
                             .catch((err) => {
-                                this.sendLogs('error', 'Can not get lock_period', err);
+                                this.sendLogs('error', 'Can not get lock-period', err);
                             });
                     }
                 });
@@ -395,7 +486,7 @@ export default {
             return Object.values(tokens);
         },
         generatePairUrl: function(market) {
-            return this.$routing.generate('token_show', {name: market.name});
+            return this.$routing.generate('token_show', {name: market.name, tab: 'trade'});
         },
         generateCoinUrl: function(coin) {
             let params = {

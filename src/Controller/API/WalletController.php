@@ -2,7 +2,9 @@
 
 namespace App\Controller\API;
 
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -18,15 +20,13 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
  * @Rest\Route("/api/wallet")
- * @Security(expression="is_granted('prelaunch')")
  */
-class WalletController extends AbstractFOSRestController
+class WalletController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
 
@@ -53,8 +53,11 @@ class WalletController extends AbstractFOSRestController
         int $page,
         WalletInterface $wallet
     ): array {
+        /** @var User $user*/
+        $user = $this->getUser();
+
         return $wallet->getWithdrawDepositHistory(
-            $this->getUser(),
+            $user,
             ($page - 1) * self::DEPOSIT_WITHDRAW_HISTORY_LIMIT,
             self::DEPOSIT_WITHDRAW_HISTORY_LIMIT
         );
@@ -89,9 +92,15 @@ class WalletController extends AbstractFOSRestController
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
+        $this->denyAccessUnlessGranted('not-disabled', $tradable);
+
         try {
             $pendingWithdraw = $wallet->withdrawInit(
-                $this->getUser(),
+                $user,
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
@@ -105,7 +114,7 @@ class WalletController extends AbstractFOSRestController
             ], Response::HTTP_BAD_GATEWAY);
         }
 
-        $mailer->sendWithdrawConfirmationMail($this->getUser(), $pendingWithdraw);
+        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
         $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
@@ -124,21 +133,24 @@ class WalletController extends AbstractFOSRestController
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
-         $depositAddresses = $depositCommunicator->getDepositCredentials(
-             $this->getUser(),
-             $cryptoManager->findAll()
-         );
+        /** @var User $user*/
+        $user = $this->getUser();
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($this->getUser());
+        $depositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
+            $user,
+            $cryptoManager->findAll()
+        ) : [];
 
-        return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
+        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
+
+        return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
     }
 
     /**
      * @Rest\View()
-     * @Rest\Get("/deposit/{crypto}/fee", name="deposit_fee", options={"expose"=true})
+     * @Rest\Get("/deposit/{crypto}/info", name="deposit_info", options={"expose"=true})
      */
-    public function getDepositFee(
+    public function getDepositInfo(
         string $crypto,
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
@@ -151,7 +163,7 @@ class WalletController extends AbstractFOSRestController
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        return $this->view($depositCommunicator->getFee($crypto));
+        return $this->view($depositCommunicator->getDepositInfo($crypto));
     }
 
     /**
@@ -168,8 +180,18 @@ class WalletController extends AbstractFOSRestController
             throw new InvalidArgumentException();
         }
 
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $referralBalance = $balanceHandler->balance($user, $webToken)->getReferral();
+        $referralReward = $tokenManager->getUserDeployTokensReward($user);
+
         return $this->view([
-            'balance' => $balanceHandler->balance($this->getUser(), $webToken)->getReferral(),
+            'balance' => $referralBalance->add($referralReward),
             'token' => $webToken,
         ]);
     }

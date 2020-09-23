@@ -1,7 +1,14 @@
 <template>
     <div>
         <div class="card h-100">
-            <div class="card-header truncate-name">
+            <div class="card-header truncate-token">
+                <div class="d-inline float-left">
+                    <avatar
+                        size="small"
+                        type="profile"
+                        :image="profileImage"
+                    />
+                </div>
                 {{ profileName }}
             </div>
             <div class="card-body">
@@ -9,7 +16,7 @@
                     <div>
                         <font-awesome-icon
                             v-if="editable"
-                            class="icon-edit float-right c-pointer"
+                            class="icon-default float-right c-pointer"
                             :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = !editingUrls"
@@ -21,6 +28,7 @@
                             :currentWebsite="currentWebsite"
                             :editingWebsite="editingWebsite"
                             :tokenName="tokenName"
+                            :key="reRenderTokenWebsite"
                             @saveWebsite="saveWebsite"
                             @toggleEdit="toggleEdit"
                         />
@@ -143,13 +151,14 @@
                                     <a
                                         v-if="currentTelegram"
                                         :href="currentTelegram"
-                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia icon-with-badge p-0 mx-1"
                                         target="_blank"
                                     >
                                         <img
                                             src="../../../../img/icon-telegram-group.png"
                                             class="align-self-center text-center"
                                             width="45"
+                                            height="48.5"
                                             alt="telegram group"
                                         />
                                     </a>
@@ -193,6 +202,7 @@ import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
 import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
+import Avatar from '../../Avatar';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -215,6 +225,7 @@ export default {
         editable: Boolean,
         facebookUrl: String,
         profileName: String,
+        profileImage: String,
         profileUrl: String,
         tokenUrl: String,
         telegramUrl: String,
@@ -225,6 +236,7 @@ export default {
         youtubeChannelId: String,
     },
     components: {
+        Avatar,
         CopyLink,
         FontAwesomeIcon,
         Guide,
@@ -245,6 +257,7 @@ export default {
             currentTelegram: this.telegramUrl,
             currentWebsite: this.websiteUrl,
             currentYoutube: this.youtubeChannelId,
+            reRenderTokenWebsite: 0,
             editingDiscord: false,
             editingTelegram: false,
             editingUrls: false,
@@ -276,18 +289,23 @@ export default {
     methods: {
         saveWebsite: function(newWebsite) {
             this.currentWebsite = newWebsite;
+            this.$emit('updated-website', newWebsite);
+            this.reRenderTokenWebsite++;
+            this.editingWebsite = false;
         },
         saveDiscord: function(newDiscord) {
             this.currentDiscord = newDiscord;
         },
         saveFacebook: function(newFacebook) {
             this.currentFacebook = newFacebook;
+            this.$emit('updated-facebook', newFacebook);
         },
         saveTelegram: function(newTelegram) {
             this.currentTelegram = newTelegram;
         },
         saveYoutube: function(newChannelId) {
             this.currentYoutube = newChannelId;
+            this.$emit('updated-youtube', newChannelId);
         },
         toggleEdit: function(url = null) {
             this.editingDiscord = 'discord' === url;

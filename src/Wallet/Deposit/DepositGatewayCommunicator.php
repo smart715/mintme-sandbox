@@ -7,6 +7,7 @@ use App\Communications\JsonRpcInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Deposit\Model\DepositCredentials;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
@@ -26,7 +27,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     private $moneyWrapper;
 
     private const GET_DEPOSIT_CREDENTIALS_METHOD = "get_deposit_credentials";
-    private const GET_DEPOSIT_FEE_METHOD = "get_fee";
+    private const GET_DEPOSIT_INFO_METHOD = "get_deposit_info";
 
     public const GET_TRANSACTIONS_METHOD = "get_transactions";
 
@@ -82,33 +83,40 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return $this->parseTransactions($response->getResult());
+        return $this->parseTransactions($response->getResult(), $user);
     }
 
-    public function getFee(string $crypto): Money
+    public function getDepositInfo(string $crypto): DepositInfo
     {
-        $response = $this->jsonRpc->send(self::GET_DEPOSIT_FEE_METHOD, ['currency' => $crypto]);
+        $response = $this->jsonRpc->send(self::GET_DEPOSIT_INFO_METHOD, ['currency' => $crypto]);
 
         if ($response->getError()) {
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return new Money($response->getResult(), new Currency($crypto));
+        $result = $response->getResult();
+
+        return new DepositInfo(
+            new Money($result['fee'], new Currency($crypto)),
+            $result['minDeposit']
+                ? new Money($result['minDeposit'], new Currency($crypto))
+                : null
+        );
     }
 
-    private function parseTransactions(array $transactions): array
+    private function parseTransactions(array $transactions, User $user): array
     {
-        return array_map(function (array $transaction) {
+        return array_map(function (array $transaction) use ($user) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 $transaction['hash'],
                 $transaction['from'],
-                $transaction['to'],
+                !$user->isBlocked() ? $transaction['to'] : '',
                 new Money(
                     $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
                     new Currency($transaction['crypto'])
                 ),
-                new Money($transaction['fee'] ?? 0, new Currency($transaction['crypto'])),
+                $this->moneyWrapper->parse($transaction['fee'] ?? '0', $transaction['crypto']),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])
                 ),

@@ -19,7 +19,11 @@ class BlacklistManager implements BlacklistManagerInterface
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
-        $this->repository = $this->em->getRepository(Blacklist::class);
+
+        /** @var BlacklistRepository $repository */
+        $repository = $this->em->getRepository(Blacklist::class);
+
+        $this->repository = $repository;
     }
 
     public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool

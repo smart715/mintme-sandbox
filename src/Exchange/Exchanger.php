@@ -18,6 +18,8 @@ use App\Manager\TokenManagerInterface;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
@@ -134,7 +136,8 @@ class Exchanger implements ExchangerInterface
             Order::PENDING_STATUS,
             $fee,
             null,
-            $user->getReferrencer() ? (int)$user->getReferrencer()->getId() : 0
+            null,
+            $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
         );
 
         $tradeResult = $this->trader->placeOrder($order);
@@ -168,9 +171,13 @@ class Exchanger implements ExchangerInterface
             $market->getQuote();
 
         /** @var string $amount */
-        $amount = bcdiv($amount, '1', $market->isTokenMarket() ?
-            $this->bag->get('token_precision') :
-            $crypto->getShowSubunit());
+        $amount = (string) BigDecimal::of($amount)->dividedBy(
+            '1',
+            $market->isTokenMarket()
+                ? $this->bag->get('token_precision')
+                : $crypto->getShowSubunit(),
+            RoundingMode::HALF_DOWN
+        );
 
         return $amount;
     }

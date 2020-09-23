@@ -4,7 +4,7 @@ namespace App\DataFixtures\Factory;
 
 use App\DataFixtures\FakerHelper;
 use App\Entity\Profile;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /** @codeCoverageIgnore */
 class ProfileFixturesFactory extends AbstractFixturesFactory
@@ -16,7 +16,7 @@ class ProfileFixturesFactory extends AbstractFixturesFactory
     private $userFixturesFactory;
 
     public function __construct(
-        ObjectManager $manager,
+        EntityManagerInterface $manager,
         UserFixturesFactory $userFixturesFactory
     ) {
         $this->userFixturesFactory = $userFixturesFactory;

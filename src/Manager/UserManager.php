@@ -17,9 +17,13 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->getRepository()->find($id);
     }
 
+    /** @psalm-suppress ImplementedReturnTypeMismatch  */
     public function getRepository(): UserRepository
     {
-        return parent::getRepository();
+        /** @var UserRepository $repository */
+        $repository = parent::getRepository();
+
+        return $repository;
     }
 
     public function findByReferralCode(string $code): ?User
@@ -59,7 +63,6 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
                 ->add('where', $qb->expr()->in('ut.user', $userIds))
                 ->andWhere('ut.token = ?1')
                 ->andWhere('ut.user != ?2')
-                ->andWhere('p.anonymous = 0')
                 ->setParameter(1, $token->getId())
                 ->setParameter(2, $token->getProfile()->getUser()->getId())
                 ->getQuery()

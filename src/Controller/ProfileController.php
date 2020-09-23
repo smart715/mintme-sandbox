@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Profile;
+use App\Entity\User;
 use App\Exception\NotFoundProfileException;
 use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
+use App\Utils\Converter\String\StringConverter;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +19,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @Route("/profile")
- * @Security(expression="is_granted('prelaunch')")
  */
 class ProfileController extends Controller
 {
@@ -28,43 +31,41 @@ class ProfileController extends Controller
         $this->userActionLogger = $userActionLogger;
     }
 
-    /** @Route("/{pageUrl}", name="profile-view", options={"expose"=true}) */
+    /** @Route("/{nickname}", name="profile-view", options={"expose"=true}) */
     public function profileView(
         Request $request,
         ProfileManagerInterface $profileManager,
-        string $pageUrl
+        string $nickname
     ): Response {
-        $profile = $profileManager->getProfileByPageUrl($pageUrl);
+        $profile = $profileManager->getProfileByNickname($nickname);
 
         if (null === $profile) {
             throw new NotFoundProfileException();
         }
 
-        $profileClone = clone $profile;
-        $profileDescription = preg_replace(
-            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
-            '\2',
-            $profile->getDescription() ?? ''
-        ) ?? '';
+        $clonedProfile = clone $profile;
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->render('pages/profile.html.twig', [
-                'token' => $profile->getToken(),
-                'profile' => $profileClone,
-                'profileDescription' => substr($profileDescription, 0, 200),
-                'form' =>  $form->createView(),
-                'canEdit' => null !== $this->getUser() && $profile === $this->getUser()->getProfile(),
-                'editFormShowFirst' => !! $form->getErrors(true)->count(),
-            ]);
+            return $this->renderProfileViewForm(
+                $profile,
+                $clonedProfile,
+                $form,
+                (bool)$form->getErrors(true)->count()
+            );
         }
 
-        $profile->setPageUrl($profileManager->generatePageUrl($profile));
-
         $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->merge($profile);
-        $entityManager->flush();
+        $entityManager->persist($profile);
+
+        try {
+            $entityManager->flush();
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', 'an error occurred please try again!');
+
+            return $this->renderProfileViewForm($profile, $clonedProfile, $form, true);
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->get("security.csrf.token_manager")->refreshToken("form_intention");
@@ -72,7 +73,7 @@ class ProfileController extends Controller
 
         $this->userActionLogger->info('Edit profile');
 
-        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
     }
 
     /** @Route(name="profile") */
@@ -83,10 +84,13 @@ class ProfileController extends Controller
         $profile = $profileManager->getProfile($this->getUser());
 
         if (null !== $profile) {
-            return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+            return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
         }
 
-        $profile  = new Profile($this->getUser());
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        $profile  = new Profile($user);
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
 
@@ -100,14 +104,40 @@ class ProfileController extends Controller
             ]);
         }
 
-        $profile->setPageUrl($profileManager->generatePageUrl($profile));
-
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
         $entityManager->flush();
 
         $this->userActionLogger->info('Create profile');
 
-        return $this->redirectToRoute('profile-view', [ 'pageUrl' => $profile->getPageUrl() ]);
+        return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
+    }
+
+    private function renderProfileViewForm(
+        Profile $profile,
+        Profile $clonedProfile,
+        FormInterface $form,
+        bool $showEdit
+    ): Response {
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        $profileDescription = $profile->getDescription() ?? '';
+        $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);
+        $profileDescription = preg_replace(
+            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+            '\2',
+            $profileDescription
+        ) ?? '';
+
+        return $this->render('pages/profile.html.twig', [
+            'token' => $profile->getToken(),
+            'profile' => $profile,
+            'savedNickname' => $clonedProfile->getNickname(),
+            'profileDescription' => substr($profileDescription, 0, 200),
+            'form' =>  $form->createView(),
+            'canEdit' => null !== $user && $profile === $user->getProfile(),
+            'editFormShowFirst' => $showEdit,
+        ]);
     }
 }

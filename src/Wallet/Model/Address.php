@@ -8,7 +8,7 @@ class Address
 {
     /**
      * @var string
-     * @Groups({"API"})
+     * @Groups({"API", "dev"})
      */
     private $address;
 

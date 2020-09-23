@@ -21,14 +21,18 @@ parameters:
         - user
         - pass
         - basic
-    websocket_url: 'ws://localhost:18364'
+    websocket_url: 'wss://localhost/ws'
     taker_fee_rate: 0.002
     maker_fee_rate: 0.001
     verify_timeout_seconds: 10
     token_quantity: 10000000
-    prelaunch_autostart: true
-    prelaunch_finish_datetime: '2019-04-01 10:00:00'
     referral_fee: 0.5
+    donation:
+        fee: 5
+        minBtcAmount: 1.0E-6
+        minMintmeAmount: 0.01
+        minEthAmount: 0.0001
+        minTokensAmount: 0.0001
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
     token_precision: 4
@@ -36,10 +40,12 @@ parameters:
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
     mintme_supply: 'https://mintme.com/coin/supply.txt'
+    mintme_coin: 'MintMe Coin'
+    mintme_coin_link: 'https://www.mintme.com/coin/'
     deploy_cost: 0
+    deploy_cost_referral_reward: 0.1
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
-    mintme_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
     token_deletion_confirm_code_expiration_time: 60
     trusted_device_enabled: true
     trusted_device_cookie_lifetime: 604800
@@ -51,3 +57,30 @@ parameters:
     docs_path: /docs
     password_reset_expiration_time: 3600
     password_reset_retry_time: 3600
+    show_full_data_in_profile: false
+    landing_web_bonus_limit: 50000
+    landing_web_bonus: 5
+    quick_registration_password: blockchaincrowdfunding
+    front_end_logs_cut_headers: true
+    minimum_volume_for_marketcap: 100000
+    top_holders: 10
+    images_path: /uploads/images
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'
+    mintme_url: mintme.com
+    contact_email: support@mintme.com
+    market_consumer_enabled: false
+    withdraw_expiration_time: 14400
+    enable_google_analytics: false
+    hmac_sha_one_key: qwerty
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+    blockchain_disabled: null

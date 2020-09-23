@@ -47,7 +47,7 @@ class ApiKeyUserProvider implements UserProviderInterface
      *
      * @codeCoverageIgnore
      */
-    public function refreshUser(UserInterface $user): void
+    public function refreshUser(UserInterface $user)
     {
         throw new UnsupportedUserException();
     }

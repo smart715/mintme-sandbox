@@ -69,6 +69,16 @@ class TransactionSubscriber implements EventSubscriberInterface
             $this->moneyWrapper->parse($event->getAmount(), $symbol)
         );
 
+        // Remove unneeded zeros and check how much decimals we need
+        $subunit = strlen(
+            rtrim(
+                str_replace('.', '', (string)strstr($amount, '.')),
+                '0'
+            )
+        );
+
+        $amount = number_format((float)$amount, $subunit, '.', ',');
+
         try {
             $this->mailer->checkConnection();
             $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);

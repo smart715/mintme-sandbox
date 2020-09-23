@@ -50,6 +50,10 @@ export default {
                             title: 'Add 100 MINTME',
                         },
                         {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'eth'}),
+                            title: 'Add 0.05 ETH',
+                        },
+                        {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
                             title: 'Add 0.001 BTC',
                         },
@@ -122,5 +126,7 @@ export default {
         content: ">" !important
 
     .vsm-collapsed
-        width: 30px !important
+        width: 10px !important
+        .collapse-btn
+            width: 30px !important
 </style>

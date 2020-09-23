@@ -9,8 +9,10 @@ use Sonata\ClassificationBundle\Admin\CategoryAdmin as Admin;
 class CategoryAdmin extends Admin
 {
 
-    /** @inheritdoc */
-    public function prePersist($object)
+    /**
+     * @param mixed|object $object
+     */
+    public function prePersist($object): void
     {
         if (null == $object->getContext()) {
             $contextId = Context::DEFAULT_CONTEXT;

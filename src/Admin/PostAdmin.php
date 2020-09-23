@@ -11,7 +11,7 @@ class PostAdmin extends PostAdminBase
 {
     /** @var bool overriding $supportsPreviewMode */
     public $supportsPreviewMode = true;
-    
+
     /** @var mixed[] overriding $datagridValues */
     protected $datagridValues = [
 
@@ -28,6 +28,7 @@ class PostAdmin extends PostAdminBase
     protected function configureFormFields(FormMapper $formMapper): void
     {
         parent::configureFormFields($formMapper);
+        /** @var mixed $existingObject */
         $existingObject = $this->getSubject();
         $options = $formMapper->get('content')->get('contentFormatter')->getOptions();
         $options = array_merge($options, [

@@ -5,21 +5,22 @@ namespace App\Controller;
 use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\User;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
+use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
 /**
  * @Route("/wallet")
- * @Security(expression="is_granted('prelaunch')")
  */
 class WalletController extends Controller
 {
@@ -45,13 +46,17 @@ class WalletController extends Controller
      * @Route(name="wallet", options={"expose"=true})
      * @return Response
      */
-    public function wallet(Request $request): Response
+    public function wallet(Request $request, DisabledBlockchainConfig $disabledBlockchainConfig): Response
     {
         $depositMore = $request->get('depositMore') ?? '';
 
+        /** @var  User $user*/
+        $user = $this->getUser();
+
         return $this->render('pages/wallet.html.twig', [
-            'hash' => $this->getUser()->getHash(),
+            'hash' => $user->getHash(),
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
+            'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
         ]);
     }
 
@@ -82,6 +87,31 @@ class WalletController extends Controller
             );
         }
 
+        $isBlocked = $pendingWithdraw instanceof PendingWithdraw
+            ? $pendingWithdraw->getUser()->isBlocked()
+            : ($pendingWithdraw instanceof PendingTokenWithdraw
+                ? $pendingWithdraw->getToken()->isBlocked()
+                : false
+            );
+
+        if ($isBlocked) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Account or token was blocked. Withdrawing is not possible'
+            );
+        }
+
+        if ($pendingWithdraw instanceof PendingWithdraw &&
+            !$this->isGranted('not-disabled', $pendingWithdraw->getCrypto())
+        ) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdraw for this crypto was disabled. Please try again later'
+            );
+        }
+
+        $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
+
         try {
             $wallet->withdrawCommit($pendingWithdraw);
         } catch (Throwable $exception) {
@@ -98,7 +128,7 @@ class WalletController extends Controller
 
         return $this->createWalletRedirection(
             'success',
-            'Your transaction has been successfully sent.'
+            'Your transaction has been successfully confirmed and queued to be sent.'
         );
     }
 

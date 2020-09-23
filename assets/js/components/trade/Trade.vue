@@ -2,9 +2,11 @@
     <div class="container-fluid px-0">
         <div class="row">
             <trade-chart
+                :is-token="isToken"
                 class="col"
                 :websocket-url="websocketUrl"
                 :market="market"
+                :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
             />
@@ -44,6 +46,7 @@
             <trade-orders
                 @update-data="updateOrders"
                 :orders-loaded="ordersLoaded"
+                :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
                 :market="market"
@@ -68,14 +71,24 @@ import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
 import {isRetryableError} from 'axios-retry';
-import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../mixins';
+import {
+    CheckInputMixin,
+    LoggerMixin,
+    NotificationMixin,
+    WebSocketMixin,
+} from '../../mixins';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
 
 export default {
     name: 'Trade',
-    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        CheckInputMixin,
+        LoggerMixin,
+        NotificationMixin,
+        WebSocketMixin,
+    ],
     components: {
         TradeBuyOrder,
         TradeSellOrder,
@@ -97,6 +110,7 @@ export default {
         precision: Number,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        isToken: Boolean,
     },
     data() {
         return {
@@ -105,6 +119,8 @@ export default {
             balances: null,
             sellPage: 2,
             buyPage: 2,
+            buyDepth: null,
+            ordersUpdated: false,
         };
     },
     computed: {
@@ -123,10 +139,10 @@ export default {
             return this.buyOrders !== null && this.sellOrders !== null;
         },
         marketPriceSell: function() {
-            return this.buyOrders && this.buyOrders[0] ? this.buyOrders[0].price : 0;
+            return this.buyOrders && this.buyOrders[0] ? this.buyOrders.reduce((max, order) => Math.max(parseFloat(order.price), max), 0) : 0;
         },
         marketPriceBuy: function() {
-            return this.sellOrders && this.sellOrders[0] ? this.sellOrders[0].price : 0;
+            return this.sellOrders && this.sellOrders[0] ? this.sellOrders.reduce((min, order) => Math.min(parseFloat(order.price), min), Infinity) : 0;
         },
     },
     mounted() {
@@ -155,22 +171,6 @@ export default {
         });
     },
     methods: {
-        checkInput: function(precision) {
-            let selectionStart = event.target.selectionStart;
-            let selectionEnd = event.target.selectionEnd;
-            let amount = event.srcElement.value;
-            let regex = new RegExp(`^[0-9]{0,8}(\\.[0-9]{0,${precision}})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (!regex.test(amount.slice(0, selectionStart) + input + amount.slice(selectionEnd))) {
-                event.preventDefault();
-                return false;
-            }
-
-            return true;
-        },
         /**
          * @param {undefined|{type, isAssigned, resolve}} context
          * @return {Promise}
@@ -181,8 +181,9 @@ export default {
                     this.$axios.retry.get(this.$routing.generate('pending_orders', {
                         base: this.market.base.symbol, quote: this.market.quote.symbol,
                     })).then((result) => {
-                        this.buyOrders = this.sortOrders(result.data.buy, false);
-                        this.sellOrders = this.sortOrders(result.data.sell, true);
+                        this.buyOrders = result.data.buy;
+                        this.sellOrders = result.data.sell;
+                        this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not update orders', err);
@@ -273,8 +274,8 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        orders = this.sortOrders(orders, isSell);
                         this.saveOrders(orders, isSell);
+                        this.ordersUpdated = true;
                     })
                     .catch((err) => {
                         this.notifyError('Something went wrong. Can not update orders.');
@@ -286,17 +287,23 @@ export default {
                         return;
                     }
 
+                    if (!order.hasOwnProperty('createdTimestamp') && data.hasOwnProperty('ctime')) {
+                        order.createdTimestamp = data.ctime;
+                    }
+
                     let index = orders.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+                    this.ordersUpdated = true;
                     break;
                 case WSAPI.order.status.FINISH:
                     if (typeof order === 'undefined') {
                         return;
                     }
 
+                    this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
                     break;
             }
@@ -309,13 +316,6 @@ export default {
             } else {
                 this.buyOrders = orders;
             }
-        },
-        sortOrders: function(orders, isSell) {
-            return orders.sort((a, b) => {
-                return isSell ?
-                    parseFloat(a.price) - parseFloat(b.price) :
-                    parseFloat(b.price) - parseFloat(a.price);
-            });
         },
     },
 };

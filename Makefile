@@ -1,13 +1,19 @@
+THREADS_COUNT ?= 0
+
+ifneq ($(THREADS_COUNT),0)
+	THREADS_ARG ?= --threads=$(THREADS_COUNT)
+endif
+
 phpunit:
-	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/ -name "*Test.php" -and -not -path "*Controller/*" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpfunctional:
-	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller -name "*Test.php" | ./vendor/bin/fastest "./vendor/bin/simple-phpunit -c phpunit.xml.dist {};"
+	./vendor/bin/simple-phpunit --testsuite nothing && find tests/Controller/ -name "*Test.php" | ./vendor/bin/fastest -p$(THREADS_COUNT) "./vendor/bin/simple-phpunit -c phpunit.xml.dist {}"
 
 phpunit-c:
 	./vendor/bin/simple-phpunit --coverage-html ./coverage-php
 
-karma:
+jest:
 	npm run unit
 
 syntax_check:
@@ -15,7 +21,7 @@ syntax_check:
 	./vendor/bin/phplint
 	./vendor/bin/phpcs -n
 	./vendor/bin/phpstan analyse
-	./vendor/bin/psalm
+	./vendor/bin/psalm --no-cache $(THREADS_ARG)
 
 syntax_check_assets:
 	npm run stylelint

@@ -6,11 +6,6 @@ export default {
             _scrollListenerStarted: false,
         };
     },
-    computed: {
-        showDownArrow: function() {
-            return (Array.isArray(this.tableData) && this.tableData.length > 7);
-        },
-    },
     methods: {
         updateTableData: function(attach = false) {},
         startScrollListening: function() {
@@ -42,6 +37,8 @@ export default {
         scrollDown: function() {
             let parentDiv = this.$refs.table.$el.tBodies[0];
             parentDiv.scrollTop = parentDiv.scrollHeight;
+            let parentDivFirefox = this.$refs.table.$el.parentElement;
+            parentDivFirefox.scrollTop = parentDivFirefox.scrollHeight;
         },
         startScrollListeningOnce: function(val) {
             if (!this._scrollListenerStarted && Array.isArray(val) && val.length) {

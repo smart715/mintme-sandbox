@@ -91,13 +91,13 @@ class User extends BaseUser implements
 
     /**
      * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist", "remove"})
-     * @var Profile
+     * @var Profile|null
      */
     protected $profile;
 
     /**
      * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
-     * @var GoogleAuthenticatorEntry
+     * @var GoogleAuthenticatorEntry|null
      */
     protected $googleAuthenticatorEntry;
 
@@ -163,18 +163,24 @@ class User extends BaseUser implements
      */
     protected $clients;
 
-    /** @codeCoverageIgnore */
-    public function getApiKey(): ?ApiKey
-    {
-        return $this->apiKey;
-    }
-
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
      * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
      * @var Bonus|null
      */
-    private $bonus;
+    protected $bonus;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
+    /** @codeCoverageIgnore */
+    public function getApiKey(): ?ApiKey
+    {
+        return $this->apiKey;
+    }
 
     /** @codeCoverageIgnore
      * @return array
@@ -224,9 +230,9 @@ class User extends BaseUser implements
      * @codeCoverageIgnore
      * @Groups({"API"})
      */
-    public function getProfile(): ?Profile
+    public function getProfile(): Profile
     {
-        return $this->profile;
+        return $this->profile ?? new Profile($this);
     }
 
     /** @codeCoverageIgnore */
@@ -320,13 +326,13 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function getReferrencer(): ?self
+    public function getReferencer(): ?self
     {
         return $this->referencer;
     }
 
     /** @codeCoverageIgnore */
-    public function setReferrencer(User $user): self
+    public function setReferencer(User $user): self
     {
         $this->referencer = $user;
 
@@ -346,6 +352,32 @@ class User extends BaseUser implements
     public function getReferralCode(): string
     {
         return $this->referralCode ?? '';
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @var string
+     * @return string
+     */
+    public function getNickname(): string
+    {
+        return $this->getProfile()->getNickname();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @param string $nickname
+     * @return self
+     */
+    public function setNickname(?string $nickname): self
+    {
+        if (!$this->profile) {
+            $this->profile = new Profile($this);
+        }
+
+        $this->profile->setNickname($nickname ?? '');
+
+        return $this;
     }
 
     /** @codeCoverageIgnore */
@@ -438,5 +470,17 @@ class User extends BaseUser implements
     public function setBonus(?Bonus $bonus): void
     {
         $this->bonus= $bonus;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
+
+        return $this;
     }
 }

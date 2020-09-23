@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
-use App\Exchange\Trade\Config\PrelaunchConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderFetcherInterface;
@@ -31,7 +30,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 1)
+            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -43,10 +42,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->once()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -68,7 +67,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(2, 'BARFOO', 1, 100, 50, 2, 1, 2, 1)
+            ->with(2, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -80,10 +79,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->exactly(2)),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -108,7 +107,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 1)
+            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::SUCCESS
@@ -120,10 +119,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->once()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $quote = $this->mockToken('BAR', false);
@@ -144,7 +143,7 @@ class TraderTest extends TestCase
         $trader = $this->mockTraderFetcher();
         $trader->expects($this->once())
             ->method('placeOrder')
-            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 1)
+            ->with(1, 'BARFOO', 1, 100, 50, 2, 1, 2, 0.5)
             ->willReturn(
                 $this->mockTradeResult(
                     TradeResult::FAILED
@@ -156,10 +155,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->never()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -193,10 +192,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->never()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $trader->cancelOrder(
@@ -224,10 +223,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->never()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $trader->cancelOrder(
@@ -259,10 +258,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->never()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $user = $this->mockUser(2);
@@ -312,10 +311,10 @@ class TraderTest extends TestCase
             $this->mockLimitOrderConfig(1, 2),
             $this->mockEm($this->never()),
             $this->mockMoneyWrapper(),
-            $this->mockPrelaunchConfig(1, false),
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            0.5
         );
 
         $user = $this->mockUser(2);
@@ -369,15 +368,6 @@ class TraderTest extends TestCase
         $em->expects($invocation)->method('flush');
 
         return $em;
-    }
-
-    private function mockPrelaunchConfig(int $refFee, bool $enabled): PrelaunchConfig
-    {
-        $config = $this->createMock(PrelaunchConfig::class);
-        $config->method('getReferralFee')->willReturn($refFee);
-        $config->method('isEnabled')->willReturn($enabled);
-
-        return $config;
     }
 
     /** @return TraderFetcherInterface|MockObject */

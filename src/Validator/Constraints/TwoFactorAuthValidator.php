@@ -18,7 +18,10 @@ class TwoFactorAuthValidator extends ConstraintValidator
 
     public function __construct(TokenStorageInterface $token, TwoFactorManager $twoFactorManager)
     {
-        /** @var User $user */
+        /**
+         * @var User $user
+         * @psalm-suppress UndefinedDocblockClass
+         */
         $user = $token->getToken()->getUser();
         $this->user = $user;
         $this->twoFactorManager = $twoFactorManager;

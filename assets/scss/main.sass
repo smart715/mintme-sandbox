@@ -2,12 +2,15 @@
 @import 'mixins'
 @import '~bootstrap/scss/bootstrap'
 @import '~bootstrap-vue/src/index.scss'
+@import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
 @import '~vue-range-slider/dist/vue-range-slider'
+@import '~aos/dist/aos.css'
 @import url('https://fonts.googleapis.com/css?family=Lato')
 @import '../fonts/AlphaCloud/AlphaCloud.css'
 @import 'topnav'
 @import 'header'
 @import 'footer'
+@import 'avatar'
 @import 'home-page'
 @import 'token-page'
 @import 'profile-view-page'
@@ -22,6 +25,8 @@
 @import 'doc'
 @import 'icons'
 @import 'sign-up-landing'
+@import 'spinner'
+@import 'posts'
 
 @include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
@@ -33,6 +38,7 @@ html
   min-height: 100vh
   box-sizing: border-box
   overflow-y: scroll
+  font-display: swap
 
 body
   @include font-scale(sm)
@@ -41,9 +47,8 @@ body
   background: $black url("../img/sky_image.jpg") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
-
-.content-wrapper
-  min-height: 100vh
+  &.modal-open
+    padding-right: 0 !important
 
   @include media-breakpoint-up(xs)
     content: "xs"
@@ -60,8 +65,20 @@ body
   @include media-breakpoint-up(xl)
     content: "xl"
 
+.content-wrapper
+  min-height: 100vh
+
 .form-control
   height: auto
+
+.tooltip-custom
+  max-width: 200px
+  overflow-wrap: break-word
+
+.tooltip-inner
+  white-space: pre-wrap !important
+  width: auto
+  max-width: 100%
 
 .text-white:not(input):not(.bg-danger)
   color: $dark-white !important
@@ -75,21 +92,23 @@ body
   font-weight: 800
 
 .img-reduced
+  max-width: 70%
   @include media-breakpoint-up(md)
-    max-width: 80%
-  @include media-breakpoint-up(xl)
     max-width: 60%
+  @include media-breakpoint-up(lg)
+    max-width: 80%
 
 .index-bg
   min-height: 100vh
-  margin-top: -6.5%
-  padding-top: 6.5%
+  margin-top: -4.5%
+  padding-top: 4.5%
   background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
   background-size: 100% auto
-  @include media-breakpoint-down(xs)
+  @include media-breakpoint-down(sm)
     background: linear-gradient($secondary-dark 50%, transparent)
 
 a
+  outline: none
   color: $color-link
 
   &.link-light
@@ -98,8 +117,23 @@ a
   &:hover
     color: $color-link-hover
 
+  @media (hover: none)
+    &:hover
+      color: $color-link
+      text-decoration: none
+
+    &:focus
+      color: $color-link
+      text-decoration: none
+
+    &:active
+      color: $color-link-hover
+      transition: color 0s
+      text-decoration: underline
+
 .btn-cancel
-  padding: .25rem 0rem
+  display: inline-block
+  padding: .25rem 1rem
   font-size: 1rem
   line-height: 1.5
   vertical-align: middle
@@ -107,6 +141,10 @@ a
   border-style: solid
   border-color: transparent
   color: $color-link
+
+  &:hover
+    color: $color-link-hover
+    text-decoration: underline
 
 .faq-block
   a:hover
@@ -140,6 +178,7 @@ a
   background: $color-tooltip
   padding: .125rem
   font-size: .875em
+  text-align: center
   vertical-align: middle
 
   &.square
@@ -180,6 +219,18 @@ a
 .margin-neg-15
   margin-top: -15px
 
+.success-highlight
+  animation: success-highlight 1000ms ease-out
+  @keyframes success-highlight
+    from
+      background-color: $toast-success-bg
+
+.error-highlight
+  animation: error-highlight 1000ms ease-out
+  @keyframes error-highlight
+    from
+      background-color: $toast-error-bg
+
 .card, .modal, .box
   label
     margin: 0
@@ -189,11 +240,25 @@ a
     margin-bottom: .5rem
 
   input:not([type=button]):not([type=submit]):not([type=reset]), select, textarea
+    border: none !important
     background-color: $card-input-color !important
-    color: $white
+    color: $white !important
     border-radius: 0
-    border: none
     height: calc(2.0rem + 2px)
+    transition: all .3s ease
+
+  input:not([type=button]):not([type=submit]):not([type=reset])
+    &:focus, &:valid
+      background-color: $input-focus !important
+      box-shadow: none !important
+
+  input:not([type=button]):not([type=submit]):not([type=reset]):-webkit-autofill
+    -webkit-box-shadow: 0 0 0 30px $card-input-color inset !important
+    -webkit-text-fill-color: $white !important
+
+    &:hover, &:focus, &:active, &:valid
+      -webkit-box-shadow: 0 0 0 30px $input-focus inset !important
+      -webkit-text-fill-color: $white !important
 
   textarea
     height: auto
@@ -218,7 +283,10 @@ a
     border: none
     background: $card-header-bg
     color: $dark-white
-    padding: .45rem 1.35rem
+    padding: .2rem 1.25rem
+    &[role=tab]
+        background: $secondary-dark
+
 
     @include font-scale(md)
 
@@ -256,23 +324,166 @@ a
 
               .blue-question
                 vertical-align: bottom
+  &.currency-container
+    min-height: 95px
+  .donation
+    background: none
+    position: relative
+    color: $card-text-color
+    border: none
+    border-radius: 0
+
+    .donation-header
+      border: none
+      background: $donation-header-bg
+      color: $dark-white
+      padding: .2rem 1.25rem
+
+      @include font-scale(md)
+
+    .donation-body
+      background: $donation-body-bg
+      p.info
+        line-height: 1 !important
+        margin-bottom: 2rem !important
+      .input-group-append
+        button.all-button
+          z-index: 4
+      @media (max-width: 550px)
+        p.text-nowrap
+          white-space: unset !important
+
+    &.transparent
+      background-color: transparent
+
+      >.donation-header
+        background-color: $dark-white
+        color: inherit
 
 .btn-primary
-  color: $white
-  background-color: #007DC0
-  border-color: #007DC0
+  color: $dark-white !important
+  background-color: transparent !important
+  border-color: $dark-white
+  @media (hover: hover)
+    &:hover:not(:disabled)
+      color: $secondary !important
+      background-color: $dark-white !important
+      border-color: $dark-white !important
+  @media (hover: none)
+    background-color: $primary
+    border-color: $dark-white !important
+  &:disabled
+    &:hover
+      color: inherit
+      background-color: $primary
+      border-color: $primary
+  &.dropdown-toggle
+    background-color: transparent !important
+    border-color: $dark-white !important
+    &:hover
+      color: $secondary !important
+      background-color: $dark-white !important
+
+.btn-big
+  @include media-breakpoint-up(lg)
+    font-size: 1.4rem
+  @include media-breakpoint-up(xl)
+    font-size: 2rem
+
+.btn-ghost
+  border-color: $dark-white
+  background: transparent
+  color: $dark-white !important
+  transition: all .3s ease
+  @media (hover: hover)
+    &:hover
+      background: $dark-white
+      color: $secondary
+  @media (hover: none)
+    background-color: $secondary-dark !important
+    border-color: $dark-white !important
+  &.ghost-alt
+    &:hover
+      color: $primary-light
+
+.bright-on-hover
+  transition: all .3s ease
+  &:hover
+    filter: brightness(1.2)
+
+.dropdown-menu
+  color: $dark-white
+  background-color: $secondary
+  border: 1px solid $dark-white
+  .dropdown-item
+    color: $dark-white
+    &:hover
+      color: $gold
+      background-color: transparent
+
+.circle-progress
+  div.circle
+    background: none
+    height: auto
+    width: auto
+
+    canvas
+      @include media-breakpoint-down(md)
+        width: 33px
+      @include media-breakpoint-down(sm)
+        width: 23px
+      @include media-breakpoint-down(xs)
+        width: 23px
+
+.percent-text
+  font-size: 15px !important
+  margin-bottom: 5px
+
+  @include media-breakpoint-down(md)
+    font-size: 13px !important
+  @include media-breakpoint-down(sm)
+    font-size: 10px !important
+  @include media-breakpoint-down(xs)
+    font-size: 9px !important
+
+.token-point-progress
+  margin-top: 15px
+  margin-bottom: -9px
+
+  @include media-breakpoint-down(md)
+    margin-top: 18px
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
+
+.token-deploy-icon
+  margin-top: 19px
+
+  @include media-breakpoint-down(md)
+    margin-top: 23px
+  @include media-breakpoint-down(sm)
+    margin-top: 9px
+
+.token-edit-icon
+  margin-top: 12px
+
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
+
+.nav-item-circle-progress
+  @include media-breakpoint-up(md)
+    margin-left: 30px
 
 .circle
-    background: #51677F
-    border-radius: 200px
-    height: 200px
-    width: 200px
-    display: table
+  background: #51677F
+  border-radius: 200px
+  height: 200px
+  width: 200px
+  display: table
 
-    img
-      vertical-align: middle
-      display: table-cell
-      width: 120px
+  img
+    vertical-align: middle
+    display: table-cell
+    width: 120px
 
 .custom-scrollbar
   scrollbar-color: auto
@@ -294,11 +505,13 @@ a
 
 .table, .table-responsive
   color: inherit
+  margin-bottom: 0.7rem
 
   thead
     th
       border: none
       font-weight: normal
+      padding-top: 0.2rem
 
       &:first-child
         padding-left: 1.5rem
@@ -339,6 +552,18 @@ a
     img
       height: 22px
 
+  .table-orders
+    td
+      &:first-child
+        padding-left: 1.5rem
+      &:last-child
+        padding-right: 1.5rem
+        padding-left: 0.75rem
+
+  .table-orders:hover
+    tr
+      cursor: pointer
+
 .fix-layout
   table-layout: fixed
 
@@ -347,7 +572,7 @@ a
   .page-item
     .page-link
       background: none
-      color: $color-link
+      color: $blue
       line-height: 13px
 
   .active
@@ -357,6 +582,19 @@ a
       pointer-events: none !important
 
 .tabs
+  @media (max-width: 768px)
+    .tabs-wrapper
+      display: flex
+      .nav
+        &.nav-tabs
+          width: 100%
+          flex-wrap: nowrap
+          overflow-x: auto
+          overflow-y: hidden
+          -webkit-overflow-scrolling: touch
+          -ms-overflow-style: -ms-autohiding-scrollbar
+          &::-webkit-scrollbar
+            display: none
   .nav-tabs
     display: flex
     text-align: center
@@ -374,7 +612,10 @@ a
         border: none
         background-color: $color-tabs
         color: $dark-white
-        padding: .45rem 1.35rem
+        padding: .2rem 1.25rem
+
+        &:hover
+          color: $gold
 
         @include font-scale(md)
 
@@ -382,7 +623,8 @@ a
           cursor: default
 
       .active
-        color: $color-link
+        color: $gold
+
 
   .tab-content
     flex: 1 1 auto
@@ -394,13 +636,10 @@ a
 
   &.transparent
     .nav-tabs
-      position: relative
       background: $secondary
       text-align: left
       border: 2px solid $secondary
-      overflow: hidden
       white-space: nowrap
-      flex-wrap: nowrap
 
     .nav-item-token
       flex: initial
@@ -429,6 +668,7 @@ a
       flex: initial
       overflow: visible
 
+      /* stylelint-disable no-descending-specificity */
       .nav-link
         color: inherit
         position: relative
@@ -437,7 +677,7 @@ a
         @include font-scale(md)
 
         &.active
-          color: $color-link
+          color: $gold
 
         &.active::after
           content: ' '
@@ -448,12 +688,11 @@ a
           background-color: unset
           width: calc(100% - 3rem)
 
-    @media (max-width: 767px)
-      .nav-tabs
-        text-align: center
-        display: block
-        white-space: normal
-        overflow: visible
+      /* stylelint-enable no-descending-specificity */
+
+    @media (max-width: 480px)
+      .swagger-ui .model
+        font-size: 4px
 
       .nav-item
         display: inline-block
@@ -461,22 +700,22 @@ a
         overflow: visible
 
         .nav-link
-            color: inherit
-            position: relative
+          color: inherit
+          position: relative
 
-            @include font-scale(md)
+          @include font-scale(md)
 
-            &.active
-              color: $color-link
+          &.active
+            color: $gold
 
-            &.active::after
-              content: ' '
-              position: absolute
-              bottom: .75rem
-              left: 1.5rem
-              height: .125rem
-              background-color: unset
-              width: calc(100% - 3rem)
+          &.active::after
+            content: ' '
+            position: absolute
+            bottom: .75rem
+            left: 1.5rem
+            height: .125rem
+            background-color: unset
+            width: calc(100% - 3rem)
 
       .edit-token-profile
         position: absolute
@@ -486,8 +725,12 @@ a
 
     .tab-content
       flex: initial
-      padding: 1.25rem 0
+      padding: 1rem 0
       background: none
+
+.parent-trade-tab
+  ul
+    margin-top: 1.4rem
 
 .modal-content
   background: $secondary
@@ -509,11 +752,14 @@ a
     @include font-scale(md)
 
 nav.top-navbar
-    .navbar-toggler-icon
+  @include media-breakpoint-down(md)
+    padding: 0.3rem 1rem !important
+
+  .navbar-toggler-icon
+    outline: none
+    background-image: $navbar-toogler
+    &:focus
       outline: none
-      background-image: $navbar-toogler
-      &:focus
-        outline: none
 
 .input-custom-padding
   padding-right: 75px
@@ -576,6 +822,7 @@ nav.top-navbar
   display: none
 
 [v-cloak]
+  display: none
   & > .v-cloak--block
     display: block !important
 
@@ -609,8 +856,12 @@ nav.top-navbar
   background-size: auto 100%
   background-repeat: no-repeat
 
-.icon-edit
+.icon-with-badge
+  margin-top: -4px
+
+.icon-default
   @include font-scale(md)
+  color: $white
 
 .img-barcode
   width: 120px
@@ -629,7 +880,7 @@ nav.top-navbar
   width: 22px
   height: 20px
 
-.tooltip
+.tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
 
@@ -666,6 +917,18 @@ nav.top-navbar
   right: 0 !important
   -webkit-transform: none !important
   transform: none !important
+  pointer-events: none
+
+.toasted
+  pointer-events: auto
+
+.airdrop-container
+  background: $secondary !important
+  font-size: 18px
+  button
+    &.btn-primary
+      padding: 0 0.5rem !important
+      font-size: 17px
 
 meter
   width: 100%
@@ -702,8 +965,14 @@ meter
 .word-break
   word-break: break-word
 
+.font-size-90
+  font-size: 90% !important
+
 .overflow-wrap-break-word
   overflow-wrap: break-word
+
+.pointer-events-none
+  pointer-events: none !important
 
 .bg-module
   background: $module-background
@@ -719,6 +988,9 @@ meter
 
 input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):not([type=checkbox]):not([type=file]):not([type=image])
   cursor: url('../img/input-cursor.png'), auto
+
+input[type=search]::-webkit-search-cancel-button
+  -webkit-appearance: none
 
 .no-bg-img
   background-image: none !important
@@ -745,14 +1017,15 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
 .truncate-token
   width: 100%
   white-space: nowrap
-  overflow: hidden
   text-overflow: ellipsis
+  margin-block: -5px
 
 .truncate-address
-  strong
-    white-space: nowrap
+  .token-address-buttons
+    display: flex
+    padding-left: 6px
+
   span
-    width: 100%
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
@@ -772,7 +1045,146 @@ input:not([type=button]):not([type=submit]):not([type=reset]):not([type=radio]):
   width: 100%
   max-width: 981px
 
+.markitup-dropdown li a:hover
+    background: $primary
+
+.form-control-btn.is-invalid
+  background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
+
+.form-control:focus
+  border-style: solid
+  border-width: thin
+  border-color: #ced4da
+
+.bootstrap-datetimepicker-widget
+  &, &:hover, &:focus, &:active
+    background-color: $secondary-dark
+
+  table
+    thead tr:first-child th:hover,
+    td.day:hover,
+    td.hour:hover,
+    td.minute:hover,
+    td.second:hover,
+    td span:hover,
+    td i:hover,
+    svg
+      color: $blue !important
+
+.hover-icon:hover svg, .icon-default:hover
+    color: $gold
+    transition: color .15s
+
+a.hover-icon:hover
+  span.social-link
+    text-decoration: underline !important
+
 @include media-breakpoint-up(lg)
   .card-two-divs-fixed-large
     width: 100%
     max-width: calc(981px / 2)
+  .airdrop-container
+    text-align: left !important
+
+@include media-breakpoint-down(md)
+  .airdrop-container
+    text-align: center !important
+    font-size: 17px
+    button
+      margin-top: .5rem !important
+
+@include media-breakpoint-only(xs)
+  .airdrop-container
+    span.message
+      display: block !important
+
+@media (max-width: 420px)
+  .width-100
+    flex: 0 0 100% !important
+    max-width: 100% !important
+
+.ml-api
+  @include media-breakpoint-up(sm)
+    margin-left: 0
+
+  @include media-breakpoint-up(md)
+    margin-left: 15%
+
+  @include media-breakpoint-up(lg)
+    margin-left: 25%
+
+[data-useragent*="WebKit/"]
+  .bbcode-content
+    li
+      list-style-position: inside
+      .bbcode-span-list-item
+        position: relative
+        left: -0.5em
+    ol
+      .bbcode-span-list-item
+       left: 0 !important
+
+[data-useragent*="Gecko/"]
+  .bbcode-content
+    li
+      position: relative
+      left: 1em
+    ol
+      .bbcode-span-list-item
+        left: 0 !important
+
+.socialMediaIcon
+  margin-top: 58px
+
+.dropdown-menu-social-media
+  min-width: 7rem
+  left: -68px
+
+.pair-container
+  margin-top: 1.5rem !important
+
+  @include media-breakpoint-down(md)
+    margin-top: 0.3rem !important
+
+.token-trading-title
+  height: 38px
+  @media(max-width: 480px)
+    height: 74px
+  @media(max-width: 393px )
+    height: 116px
+
+.small-profile-link
+  margin-top: 3px
+  position: absolute
+  right: 15px
+
+  .div-container-avatar
+    background: #152D47
+    padding-left: 5px
+    padding-right: 17px
+
+#client-copy-btn, #secret-copy-btn
+  textarea
+    top: 0 !important
+
+.social-media-menu
+  margin-right: 13px
+
+#login-form-captcha-container
+  min-height: 60.5px
+
+#register-form-captcha-container
+  min-height: 75.5px
+
+#register-form-password-container
+  min-height: 88px
+
+ul.spinner-tabs
+  height: 36px
+
+li.trade-post
+  a.nav-link
+    margin-right: 32px
+
+.default-user-avatar-topnav:hover, .default-user-avatar-navbar:hover
+  filter: invert(26%) sepia(52%) saturate(255%) hue-rotate(4deg) brightness(87%) contrast(64%)

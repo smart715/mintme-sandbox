@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="row  pt-5 justify-content-center">
+    <div class="row  pt-4 justify-content-center">
         <div class="col-lg-6 col-md-8">
             <div class="card">
                 {% if not isTwoFactor %}
@@ -10,8 +10,8 @@
                         <div class='row'>
                             <div class="col-12 pb-2 text-white text-center">
                                 Download the Google Authenticator application from
-                                <a class="text-blue" href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
-                                <a class="text-blue" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
+                                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" target="_blank">App Store</a> or
+                                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play Store</a> and scan this code.
                             </div>
                             <div class="col-12 pb-2 text-center">
                                 <img src="{{ qr_code_data_uri(imgUrl) }}" alt="QR Code" class="img-thumbnail img-fluid img-barcode">
@@ -79,7 +79,7 @@
                                         </div>
                                         <div class="form-group">
                                             <button type="submit" id="_submit" name="submit" class="btn btn-primary">
-                                                Verify Code 
+                                                Verify Code
                                             </button>
                                             {% if isTwoFactor %}
                                                 <a href="{{path('settings')}}" class="btn btn-primary ml-2">Cancel</a>

@@ -6,7 +6,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title">DEPOSIT</h3>
+                <h3 class="modal-title overflow-wrap-break-word">DEPOSIT ({{ currency|rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <code class="wallet-code text-blue" id="walletaddress">
                         <span>
@@ -20,16 +20,14 @@
                     <div class="clearfix"></div>
                     <b-row>
                         <b-col>
-                            <p class="text-center mt-2">
-                                {{ description|rebranding }}
-                            </p>
+                            <p class="text-center mt-2 overflow-wrap-break-word word-break-all">{{ description|rebranding }}</p>
                         </b-col>
                     </b-row>
                     <b-row>
-                        <b-col v-if="min" cols="auto" class="text-left">
+                        <b-col v-if="min" cols="auto" class="text-left overflow-wrap-break-word word-break-all">
                             Minimal value: {{ min }} {{ currency|rebranding }}
                         </b-col>
-                        <b-col v-if="fee" class="text-right">Fee: {{ fee }} {{ feeCurrency|rebranding }}</b-col>
+                        <b-col v-if="fee" class="text-right overflow-wrap-break-word word-break-all">Fee: {{ fee }} {{ feeCurrency|rebranding }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
@@ -47,12 +45,12 @@
 <script>
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
-import {MoneyFilterMixin, RebrandingFilterMixin} from '../../mixins';
+import {RebrandingFilterMixin} from '../../mixins';
 import {webSymbol} from '../../utils/constants';
 
 export default {
     name: 'DepositModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin],
+    mixins: [RebrandingFilterMixin],
     components: {
         Modal,
         CopyLink,

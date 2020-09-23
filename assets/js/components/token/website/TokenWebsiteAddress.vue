@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3"
+            class="form-group col-12"
         >
             <label for="website-err">Website address:</label>
             <input
@@ -19,7 +19,7 @@
             >
                 Please provide a valid URL.
             </div>
-            <div class="col-12 text-left mt-3">
+            <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editWebsite"
@@ -36,11 +36,11 @@
         </div>
         <div
             v-else
-            class="d-block mx-0 my-1 p-0"
+            class="col text-truncate"
         >
-            <a
+            <span
                 id="website-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -49,13 +49,17 @@
                         size="lg"
                     />
                 </span>
-                {{ computedWebsiteUrl | truncate(35) }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedWebsiteUrl }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentWebsite"
                 target="website-link"
                 :title="computedWebsiteUrl"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentWebsite"
                 @click.prevent="deleteWebsite"

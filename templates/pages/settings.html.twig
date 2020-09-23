@@ -4,21 +4,37 @@
 
 {% block content %}
     <div id="settings" class="container">
-        <div class="row pt-5 justify-content-center">
+        <div class="row pt-4 justify-content-center">
             <div class="card-two-divs-fixed-large pl-xl-0 col-md-6">
                 <div class="card">
                     <div class="card-header">Account settings</div>
                     <div class="card-body m-0">
                         <div id="settings">
+                        {% if twoFactorAuth %}
+                            {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'submit2FA'}} ) }}
+                            <two-factor-modal
+                                :visible=twoFaVisible
+                                :twofa=true
+                                @close="twoFaVisible = false"
+                                @verify="doChangePassword"
+                            >
+                            </two-factor-modal>
+                        {% else %}
                             {{ form_start(passwordForm) }}
-                                {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off'}}) }}
-                                <passwordmeter :password="password" @toggle-error="toggleError">
-                                    <span @click="togglePassword()" class="show-password">
-                                        <i class="far fa-eye"></i>
-                                    </span>
-                                    {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
-                                </passwordmeter>
-                                <button type="submit" :disabled="disabled" class="btn btn-primary">Save</button>
+                        {% endif %}
+                            <label for="app_user_change_password_current_password" class="d-block label-featured">Current Password:</label>
+                            <template v-if="showErrorMessage">
+                                <div class="p-2 mb-2 bg-danger text-center text-white">The entered password is invalid.</div>
+                            </template>
+                            {{ form_row(passwordForm.current_password, {'attr': {'autocomplete': 'off', 'v-model': 'currentPassword'}}) }}
+                            <passwordmeter :password="password" @toggle-error="toggleError">
+                                <span @click="togglePassword()" class="show-password">
+                                    <i class="far fa-eye"></i>
+                                </span>
+                                {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
+                                <div class="pwdmeter" v-if="false"><meter max="5" value="0"></meter></div>
+                            </passwordmeter>
+                            <button type="submit" :disabled="disabled" class="btn btn-primary">Save</button>
                             {{ form_end(passwordForm) }}
                         </div>
                     </div>

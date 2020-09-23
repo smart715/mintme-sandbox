@@ -1,0 +1,173 @@
+<template>
+    <div id="info-panel" class="position-relative">
+        <div class="p-2">
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Username login/email">
+                <b>Login:</b>  {{ username || 'guest' }}
+            </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Token name">
+                <b>Token:</b> {{ infoData.tokenName || '-' }}
+            </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe balance">
+                <b>MINTME:</b> {{ mintmeBalance }}
+            </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Etherium balance">
+                <b>ETH:</b> {{ ethBalance }}
+            </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
+                <b>BTC:</b> {{ btcBalance }}
+            </span>
+            <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
+                <b>Code:</b> {{ authCode }}
+            </span>
+            <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">Toggle</b-button>
+            <div class="close-btn p-sm-2" @click="close">
+                <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
+            </div>
+        </div>
+        <b-collapse visible id="collapse-3">
+            <div class="p-2">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of panel">
+                    <b>Pg:</b> {{ infoData.panelBranch }}
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of deposit gateway">
+                    <b>Dg:</b> {{ infoData.depositBranch }}
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of contract gateway">
+                    <b>Cg:</b> {{ infoData.contractBranch }}
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of withdraw gateway">
+                    <b>Wg:</b> {{ infoData.withdrawBranch }}
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of token-contract-gateway">
+                    <b>Tcg:</b>
+                    <span :class="[infoData.isTokenContractActive ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of deposit consumer">
+                    <b>Dcg:</b>
+                    <span :class="[infoData.consumersInfo.deposit ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of withdraw consumer">
+                    <b>Wcg:</b>
+                    <span :class="[infoData.consumersInfo.payment ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of market consumer">
+                    <b>Mcg:</b>
+                    <span :class="[infoData.consumersInfo.market ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of deploy token consumer">
+                    <b>Dtcg:</b>
+                    <span :class="[infoData.consumersInfo.deploy ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of token-contract-update consumer">
+                    <b>Tcuc:</b>
+                    <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
+                </span>
+            </div>
+        </b-collapse>
+    </div>
+</template>
+
+<script>
+import Decimal from 'decimal.js';
+
+export default {
+    name: 'InfoBar',
+    props: {
+        username: String,
+        authCode: String,
+    },
+    data() {
+        return {
+            isHidden: false,
+            infoData: {
+                tokenName: '-',
+                panelBranch: '-',
+                depositBranch: '-',
+                contractBranch: '-',
+                withdrawBranch: '-',
+                consumersInfo: {
+                    'deposit': null,
+                    'payment': null,
+                    'market': null,
+                    'contract-update': null,
+                },
+                isTokenContractActive: false,
+            },
+            balance: {
+                WEB: null,
+                BTC: null,
+            },
+        };
+    },
+    mounted() {
+        this.$axios.retry.get(this.$routing.generate('hacker_info'))
+            .then((res) => {
+                this.infoData = res.data;
+            });
+
+        if (this.username) {
+            this.fetchBalance();
+            setInterval(this.fetchBalance, 10000);
+        }
+    },
+    computed: {
+        mintmeBalance: function() {
+            return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
+        },
+        ethBalance: function() {
+            return this.balance.ETH ? new Decimal(this.balance.ETH.available).toFixed(8) : '-';
+        },
+        btcBalance: function() {
+            return this.balance.BTC ? new Decimal(this.balance.BTC.available).toFixed(this.balance.BTC.subunit) : '-';
+        },
+    },
+    methods: {
+        fetchBalance: function() {
+            this.$axios.retry.get(this.$routing.generate('tokens'))
+                .then((res) => {
+                    this.balance = res.data.predefined;
+                });
+        },
+        close: function() {
+            let panel = document.getElementById('info-panel');
+            panel.style.display = 'none';
+        },
+    },
+};
+</script>
+
+<style lang="sass">
+@import '../../scss/variables'
+
+#info-panel
+    background-color: #01579B
+    line-height: 18px
+
+.circle-info
+    height: 10px
+    width: 10px
+    background-color: $grey-light
+    border-radius: 50%
+    display: inline-block
+
+.circle-info-off
+    @extend .circle-info
+    background-color: red
+
+.circle-info-on
+    @extend .circle-info
+    background-color: green
+
+.resize-btn
+    position: absolute
+    right: 0
+    bottom: 0
+
+.toggle-btn
+    line-height: 13px
+
+.close-btn
+    position: absolute
+    right: 9px
+    top: 2px
+</style>

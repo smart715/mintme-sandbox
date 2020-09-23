@@ -149,7 +149,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL))),
             $this->mockCrypto(Token::WEB_SYMBOL)
         );
@@ -173,7 +173,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL))),
             $this->mockCrypto(Token::WEB_SYMBOL)
         );
@@ -199,7 +199,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
             $this->mockToken()
         );
@@ -227,7 +227,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
             $this->mockToken()
         );
@@ -255,7 +255,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
             $this->mockToken()
         );
@@ -283,7 +283,7 @@ class WalletTest extends TestCase
 
         $wallet->withdrawInit(
             $this->mockUser(),
-            $this->mockAddress('0x123'),
+            $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
             $this->mockToken()
         );

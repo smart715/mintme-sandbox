@@ -16,7 +16,6 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
-use Money\Currency;
 use Money\Money;
 
 class MarketHandler implements MarketHandlerInterface
@@ -186,6 +185,15 @@ class MarketHandler implements MarketHandlerInterface
         }, $stats);
     }
 
+    /** {@inheritdoc} */
+    public function getMarketStatus(Market $market, int $period = 86400): array
+    {
+        return $this->marketFetcher->getMarketInfo(
+            $this->marketNameConverter->convert($market),
+            $period
+        );
+    }
+
     /** @return Order[] */
     private function parsePendingOrders(array $result, Market $market): array
     {
@@ -221,7 +229,8 @@ class MarketHandler implements MarketHandlerInterface
                     (string)$orderData['maker_fee'],
                     $this->getSymbol($market->getQuote())
                 ),
-                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null
+                !empty($orderData['mtime']) ? intval($orderData['mtime']) : null,
+                !empty($orderData['ctime']) ? intval($orderData['ctime']) : null
             );
         });
 
@@ -309,13 +318,28 @@ class MarketHandler implements MarketHandlerInterface
             $this->marketNameConverter->convert($market),
             $period
         );
+
+        if (!$result) {
+            throw new InvalidArgumentException();
+        }
+
         $monthResult = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
             self::MONTH_PERIOD
         );
 
-        if (!$result) {
-            throw new InvalidArgumentException();
+        $buyDepth = $this->getBuyDepth($market);
+
+        $expires = new \DateTimeImmutable();
+
+        if (isset($result['expires'], $monthResult['expires'])) {
+            $expires = $expires->setTimestamp(min($result['expires'], $monthResult['expires']));
+        } elseif (isset($result['expires'])) {
+            $expires = $expires->setTimestamp($result['expires']);
+        } elseif (isset($monthResult['expires'])) {
+            $expires = $expires->setTimestamp($monthResult['expires']);
+        } else {
+            $expires = null;
         }
 
         return new MarketInfo(
@@ -352,7 +376,12 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $monthResult['deal'],
                 $this->getSymbol($market->getBase())
-            )
+            ),
+            $this->moneyWrapper->parse(
+                $buyDepth,
+                $this->getSymbol($market->getBase())
+            ),
+            $expires
         );
     }
 
@@ -361,5 +390,66 @@ class MarketHandler implements MarketHandlerInterface
         return $tradeble instanceof Token
             ? MoneyWrapper::TOK_SYMBOL
             : $tradeble->getSymbol();
+    }
+
+    /**
+     * Get market buy depth
+     *
+     * @param Market $market
+     * @return string
+     */
+    public function getBuyDepth(Market $market): string
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedOrders);
+
+        $zeroDepth = $this->moneyWrapper->parse(
+            '0',
+            $market->isTokenMarket() ? Token::TOK_SYMBOL : $market->getQuote()->getSymbol()
+        );
+
+        /** @var Money $depthAmount */
+        $depthAmount = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->multiply(
+                $this->moneyWrapper->format($order->getAmount())
+            )->add($sum);
+        }, $zeroDepth);
+
+        return $this->moneyWrapper->format($depthAmount);
+    }
+
+    public function getSellOrdersSummary(Market $market): string
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedOrders);
+
+        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+
+        /** @var Money $sellOrdersSum */
+        $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->multiply(
+                $this->moneyWrapper->format($order->getAmount())
+            )->add($sum);
+        }, $zeroDepth);
+
+        return $this->moneyWrapper->format($sellOrdersSum);
     }
 }

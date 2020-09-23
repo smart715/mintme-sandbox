@@ -37,7 +37,7 @@ class MinOrderValidatorTest extends TestCase
             ['.00001', '1', false, 8, 4, true],
             ['.00001', '1', false, 4, 8, false],
             ['.0001', '1', false, 4, 8, true],
-            ['.00000001', true,false, 8, 4, true],
+            ['.00000001', '1',false, 8, 4, true],
             ['.00000001', '1', false, 4, 8, false],
             ['.000000001', '1', false, 8, 4, false],
             ['1', '.0001', false, 8, 4, true],

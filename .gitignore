@@ -30,3 +30,14 @@ public/build
 /coverage-php
 /coverage-js
 .phpunit.result.cache
+
+###< docker databases ###
+.docker/db
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
+
+###< avatar uploader ###
+public/media/cache

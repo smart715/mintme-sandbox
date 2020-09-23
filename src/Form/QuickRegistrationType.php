@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Form\Type\NicknameType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,6 +16,7 @@ class QuickRegistrationType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Email:',
             ])
+            ->add('nickname', NicknameType::class)
             ->add('save', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn-primary',

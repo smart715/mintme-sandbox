@@ -8,13 +8,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BbcodeEditorType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
     }
-
 
     /**
      * {@inheritdoc}
@@ -24,11 +20,7 @@ class BbcodeEditorType extends AbstractType
         return TextareaType::class;
     }
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'bbcodeEditorType';
     }

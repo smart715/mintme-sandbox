@@ -2,6 +2,7 @@
 
 namespace App\Manager;
 
+use App\Entity\KnowledgeBase\Category;
 use App\Entity\KnowledgeBase\KnowledgeBase;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -13,7 +14,10 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->kbRepository = $entityManager->getRepository(KnowledgeBase::class);
+        /** @var EntityRepository $repository */
+        $repository = $entityManager->getRepository(KnowledgeBase::class);
+
+        $this->kbRepository = $repository;
     }
 
     public function getAll(): array
@@ -38,9 +42,12 @@ class KnowledgeBaseManager implements KnowledgeBaseManagerInterface
 
         /** @var KnowledgeBase $kb */
         foreach ($knowledgeBases as $kb) {
-            $category = $kb->getCategory()->getId();
-            $subcategory = $kb->getSubcategory()
-                ? $kb->getSubcategory()->getId()
+            /** @var Category $categoryObj */
+            $categoryObj = $kb->getCategory();
+            $category = $categoryObj->getId();
+            $subcategoryObj = $kb->getSubcategory();
+            $subcategory = is_object($subcategoryObj)
+                ? $subcategoryObj->getId()
                 : null;
 
             if (!array_key_exists($category, $parsedKb)) {

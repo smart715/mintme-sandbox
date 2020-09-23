@@ -13,7 +13,9 @@ class BonusManager implements BonusManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->bonusRepo = $entityManager->getRepository(Bonus::class);
+        /** @var BonusRepository $repo */
+        $repo = $entityManager->getRepository(Bonus::class);
+        $this->bonusRepo = $repo;
     }
 
     public function isLimitReached(int $limit, string $type): bool

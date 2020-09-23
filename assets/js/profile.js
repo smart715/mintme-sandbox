@@ -1,13 +1,18 @@
 import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
+import Avatar from './components/Avatar.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
-import {minLength, helpers} from 'vuelidate/lib/validators';
+import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
-import xRegExp from 'xregexp';
+import Guide from './components/Guide';
+import {names, allNames, nickname} from './utils/constants';
 
-const names = helpers.regex('names', xRegExp('^[\\p{L}]+[\\p{L}\\s\'‘’`´-]*$', 'u'));
+const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
+const nameRequired = function(val, other) {
+    return !val && other;
+};
 
 new Vue({
     el: '#profile',
@@ -16,10 +21,13 @@ new Vue({
         BbcodeHelp,
         BbcodeView,
         LimitedTextarea,
+        Avatar,
+        Guide,
     },
     data() {
         return {
             showEditForm: false,
+            nickname: '',
             firstName: '',
             lastName: '',
             country: '',
@@ -28,9 +36,12 @@ new Vue({
             zipCodeValid: true,
             zipCodeVaidationPattern: false,
             zipCodeProcessing: false,
+            firstNameAux: false,
+            lastNameAux: false,
         };
     },
     mounted: function() {
+        this.nickname = this.$refs.nickname.getAttribute('value');
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
@@ -51,6 +62,25 @@ new Vue({
         toggleZipCodeInputDisabled: function(state) {
             if (this.$refs.zipCode) {
                 this.$refs.zipCode.disabled = state;
+            }
+        },
+
+        validation: function(event) {
+            if (event.target.id ==='profile_firstName') {
+                let hasChinese = this.firstName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                    this.firstNameAux = false;
+                } else {
+                    this.firstNameAux = this.firstName.length < 2;
+                }
+            }
+            if (event.target.id ==='profile_lastName') {
+                let hasChinese = this.lastName.match(REGEX_CHINESE);
+                if (hasChinese) {
+                    this.lastNameAux = false;
+                } else {
+                    this.lastNameAux = this.lastName.length < 2;
+                }
             }
         },
         countryChanged: function() {
@@ -100,28 +130,39 @@ new Vue({
             }
         },
     },
-    validations: {
-        firstName: {
-            helpers: names,
-            minLength: minLength(2),
+    computed: {
+        disableSave: function() {
+            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing || this.firstNameAux || this.lastNameAux;
         },
-        lastName: {
-            helpers: names,
-            minLength: minLength(2),
-        },
-        city: {
-            helpers: names,
-            minLength: minLength(2),
-        },
-        zipCode: {
-            zipCodeContain,
-            zipCodeWrongChars: function(zipCode) {
-                if (!zipCode) {
-                    return true;
-                }
-
-                return zipCode.replace(/\s/g, '').length > 0;
+    },
+    validations() {
+        return {
+            nickname: {
+                helpers: nickname,
+                minLength: minLength(2),
             },
-        },
+            firstName: {
+                required: (val) => !nameRequired(val, this.lastName),
+                helpers: allNames,
+            },
+            lastName: {
+                required: (val) => !nameRequired(val, this.firstName),
+                helpers: allNames,
+            },
+            city: {
+                helpers: names,
+                minLength: minLength(2),
+            },
+            zipCode: {
+                zipCodeContain,
+                zipCodeWrongChars: function(zipCode) {
+                    if (!zipCode) {
+                        return true;
+                    }
+
+                    return zipCode.replace(/\s/g, '').length > 0;
+                },
+            },
+        };
     },
 });

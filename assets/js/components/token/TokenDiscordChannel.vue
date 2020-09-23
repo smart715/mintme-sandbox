@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3"
+            class="form-group col-12"
         >
             <label for="discord-err">Discord address:</label>
             <input
@@ -19,7 +19,7 @@
             >
                 Please provide a valid URL.
             </div>
-            <div class="col-12 text-left mt-3">
+            <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editDiscord"
@@ -36,11 +36,11 @@
         </div>
         <div
             v-else
-            class="d-block mx-0 my-1 p-0"
+            class="col text-truncate"
         >
-            <a
+            <span
                 id="discord-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -49,13 +49,17 @@
                         size="lg"
                     />
                 </span>
-                {{ computedDiscordUrl | truncate(35) }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedDiscordUrl }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentDiscord"
                 target="discord-link"
                 :title="computedDiscordUrl"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentDiscord"
                 @click.prevent="deleteDiscord"
@@ -120,20 +124,19 @@ export default {
                 this.checkDiscordUrl();
             }
 
-            if (this.showDiscordError) {
+            if (this.discordError) {
                 return;
             }
-
-            this.saveDiscord();
+            this.saveDiscord('edit');
         },
         checkDiscordUrl: function() {
             this.showDiscordError = !isValidDiscordUrl(this.newDiscord);
         },
         deleteDiscord: function() {
             this.newDiscord = '';
-            this.saveDiscord();
+            this.saveDiscord('delete');
         },
-        saveDiscord: function() {
+        saveDiscord: function(aux) {
             if (this.submitting) {
                 return;
             }
@@ -145,17 +148,17 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        let state = this.newDiscord ? 'added' : 'removed';
-                        this.$emit('saveDiscord', this.newDiscord);
-                        this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                        this.notifySuccess(`Discord invitation link ${state} successfully`);
-                        this.editing = false;
-                    } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Save discord network error', response);
+                       let state = this.newDiscord ? 'added' : 'removed';
+                       this.$emit('saveDiscord', this.newDiscord);
+                       this.newDiscord = this.newDiscord || 'https://discord.gg/';
+                       this.notifySuccess(`Discord invitation link ${state} successfully`);
+                       this.editing = false;
                     }
                     this.submitting = false;
-                });
+                }, (error) => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save discord', response);
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

@@ -14,9 +14,11 @@ import Axios from './axios';
 import Routing from './routing';
 import TokenSearcher from './components/token/TokenSearcher';
 import AdminMenu from './components/AdminMenu';
+import Avatar from './components/Avatar';
 import {directive as onClickaway} from 'vue-clickaway';
 import Notification from './components/Notification';
 import sanitizeHtml from './sanitize_html';
+import InfoBar from './components/InfoBar';
 
 /*
     To enable passive listeners,
@@ -40,7 +42,17 @@ Vue.use(Axios);
 Vue.use(Routing);
 Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
-Vue.use(VueTippy);
+Vue.use(VueTippy, {
+    directive: 'tippy',
+    flipDuration: 0,
+    popperOptions: {
+        modifiers: {
+            preventOverflow: {
+                boundariesElement: 'window',
+            },
+        },
+    },
+});
 Vue.use(Vuelidate);
 Vue.use(Toasted, {
     position: 'top-center',
@@ -60,6 +72,13 @@ const imagesContext = require.context(
 imagesContext.keys().forEach(imagesContext);
 
 new Vue({
+    el: '#info-bar',
+    components: {
+        InfoBar,
+    },
+});
+
+new Vue({
     el: '#navbar',
     directives: {
         onClickaway,
@@ -74,6 +93,7 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
+        Avatar,
     },
     methods: {
         toggleNavbarMenu: function() {

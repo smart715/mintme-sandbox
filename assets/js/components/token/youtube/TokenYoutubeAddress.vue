@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <div class="d-block mx-0 my-1 p-0">
-            <a
+    <div class="row">
+        <div class="col text-truncate">
+            <span
                 id="channel-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click="addChannel"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -12,13 +12,17 @@
                         size="lg"
                     />
                 </span>
-                {{ computedChannel | truncate(35) }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedChannel }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentChannelId"
                 target="channel-link"
                 :title="computedChannel"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentChannelId"
                 @click.prevent="deleteChannel"

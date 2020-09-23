@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="row">
         <div
             v-if="editing"
-            class="form-group my-3"
+            class="form-group col-12"
         >
             <label for="telegram-err">Telegram address:</label>
             <input
@@ -19,7 +19,7 @@
             >
                 Please provide a valid URL.
             </div>
-            <div class="col-12 text-left mt-3">
+            <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editTelegram"
@@ -36,11 +36,11 @@
         </div>
         <div
             v-else
-            class="d-block mx-0 my-1 p-0"
+            class="col text-truncate"
         >
-            <a
+            <span
                 id="telegram-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click.prevent="toggleEdit"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -49,13 +49,17 @@
                         size="lg"
                     />
                 </span>
-                {{ computedTelegramUrl | truncate(35) }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedTelegramUrl }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="currentTelegram"
                 target="telegram-link"
                 :title="computedTelegramUrl"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="currentTelegram"
                 @click.prevent="deleteTelegram"
@@ -120,7 +124,7 @@ export default {
                 this.checkTelegramUrl();
             }
 
-            if (this.showTelegramError) {
+            if (this.telegramError) {
                 return;
             }
 
@@ -150,12 +154,12 @@ export default {
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.notifySuccess(`Telegram invitation link ${state} successfully`);
                         this.editing = false;
-                    } else {
-                        this.notifyError(response.data.message || 'Network error');
-                        this.sendLogs('error', 'Can not save telegram', response);
                     }
                     this.submitting = false;
-                });
+                }, (error) => {
+                    this.notifyError(error.response.data.message);
+                    this.sendLogs('error', 'Can not save telegram', response);
+            });
         },
         toggleEdit: function() {
             this.editing = !this.editing;

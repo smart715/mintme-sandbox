@@ -68,11 +68,16 @@ class KernelSubscriber implements EventSubscriberInterface
             throw new AccessDeniedHttpException("Invalid token given");
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         if (is_object($this->tokenStorage->getToken()) &&
             is_object($this->tokenStorage->getToken()->getUser()) &&
-            !$request->getRequest()->isXmlHttpRequest()
+            !$request->getRequest()->isXmlHttpRequest() &&
+            !$this->isImgFilterRequest($request->getRequest())
         ) {
-            /** @var User $user */
+            /**
+             * @var User $user
+             * @psalm-suppress UndefinedDocblockClass
+             */
             $user = $this->tokenStorage->getToken()->getUser();
             $this->profileManager->createHash($user, true, $this->isAuth);
         }
@@ -88,5 +93,10 @@ class KernelSubscriber implements EventSubscriberInterface
         return $this->csrfTokenManager->isTokenValid(
             new CsrfToken('authenticate', $token ?? '')
         );
+    }
+
+    private function isImgFilterRequest(Request $request): bool
+    {
+        return 'liip_imagine_filter' === $request->attributes->get('_route');
     }
 }

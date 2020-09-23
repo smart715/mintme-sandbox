@@ -3,12 +3,15 @@
 namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Controller\Traits\CheckTokenNameBlacklistTrait;
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
+use App\Exception\InvalidAddressException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
@@ -18,6 +21,8 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
+use App\Manager\BlacklistManager;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -35,7 +40,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -45,10 +49,12 @@ use Throwable;
 
 /**
  * @Rest\Route("/api/tokens")
- * @Security(expression="is_granted('prelaunch')")
  */
-class TokensController extends AbstractFOSRestController
+class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
+
+    use CheckTokenNameBlacklistTrait;
+
     /** @var EntityManagerInterface */
     private $em;
 
@@ -67,11 +73,15 @@ class TokensController extends AbstractFOSRestController
     /** @var int */
     private $expirationTime;
 
+    /** @var BlacklistManagerInterface */
+    protected $blacklistManager;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
+        BlacklistManager $blacklistManager,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -81,6 +91,7 @@ class TokensController extends AbstractFOSRestController
         $this->userActionLogger = $userActionLogger;
         $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
+        $this->blacklistManager = $blacklistManager;
     }
 
     /**
@@ -109,12 +120,18 @@ class TokensController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name') && !$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to change token\'s name');
-        }
+        if ($request->get('name')) {
+            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+                throw new ApiBadRequestException('You need all your tokens to change token\'s name');
+            }
 
-        if ($request->get('name') && Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-            throw new ApiBadRequestException('Token is deploying or deployed.');
+            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+                throw new ApiBadRequestException('Token is deploying or deployed.');
+            }
+
+            if ($this->checkTokenNameBlacklist($request->get('name'))) {
+                throw new ApiBadRequestException('Forbidden token name, please try another');
+            }
         }
 
         $form = $this->createForm(TokenType::class, $token, [
@@ -255,7 +272,9 @@ class TokensController extends AbstractFOSRestController
         }
 
         if (!$lock->getId() || $isNotExchanged) {
-            $balance = $balanceHandler->balance($this->getUser(), $token);
+            /** @var  User $user*/
+            $user = $this->getUser();
+            $balance = $balanceHandler->balance($user, $token);
 
             if ($balance->isFailed()) {
                 return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
@@ -316,6 +335,9 @@ class TokensController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        /** @var User $user*/
+        $user = $this->getUser();
+
         try {
             $common = $balanceHandler->balances(
                 $user,
@@ -330,7 +352,7 @@ class TokensController extends AbstractFOSRestController
         }
 
         $predefined = $balanceHandler->balances(
-            $this->getUser(),
+            $user,
             $this->tokenManager->findAllPredefined()
         );
 
@@ -352,16 +374,10 @@ class TokensController extends AbstractFOSRestController
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        $balance = $balanceHandler->balance(
+        $balance = $balanceHandler->exchangeBalance(
             $token->getProfile()->getUser(),
             $token
-        )->getAvailable();
-
-        if ($token->getLockIn()) {
-            $balance = $token->isDeployed()
-                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
-                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
-        }
+        );
 
         return $this->view($balance);
     }
@@ -415,6 +431,36 @@ class TokensController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/is_deployed", name="is_token_deployed", options={"expose"=true})
+     */
+    public function isTokenDeployed(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/address", name="token_address", options={"expose"=true})
+     */
+    public function getTokenContractAddress(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['address' => $token->getAddress()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)
@@ -440,6 +486,10 @@ class TokensController extends AbstractFOSRestController
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException('You need all your tokens to delete token');
+        }
+
         /** @var User $user */
         $user = $this->getUser();
 
@@ -449,10 +499,9 @@ class TokensController extends AbstractFOSRestController
             if (!$response->getResult()) {
                 throw new ApiUnauthorizedException($response->getMessage());
             }
-        }
 
-        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to delete token');
+            $user->setEmailAuthCode('');
+            $this->em->persist($user);
         }
 
         $this->em->remove($token);
@@ -484,6 +533,7 @@ class TokensController extends AbstractFOSRestController
             throw new ApiNotFoundException('Token does not exist');
         }
 
+        /** @var User $user*/
         $user = $this->getUser();
         $message = null;
 
@@ -542,9 +592,12 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
+            /** @var User $user*/
+            $user = $this->getUser();
+
             $balances = [
                 'balance' => $balanceHandler->balance(
-                    $this->getUser(),
+                    $user,
                     Token::getFromSymbol(Token::WEB_SYMBOL)
                 )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
@@ -584,7 +637,10 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
-            $deployment->execute($this->getUser(), $token);
+            /** @var User $user*/
+            $user = $this->getUser();
+
+            $deployment->execute($user, $token);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException('Internal error, Please try again later');
         }
@@ -616,13 +672,21 @@ class TokensController extends AbstractFOSRestController
         }
 
         try {
+            if (!$this->validateEthereumAddress($request->get('address'))) {
+                throw new InvalidAddressException();
+            }
+
             $contractHandler->updateMintDestination($token, $request->get('address'));
             $token->setUpdatingMintDestination();
 
             $this->em->persist($token);
             $this->em->flush();
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            if ($ex instanceof  InvalidAddressException) {
+                throw new ApiBadRequestException('Invalid Address');
+            } else {
+                throw new ApiBadRequestException('Internal error, Please try again later');
+            }
         }
 
         $this->userActionLogger->info('Update token mintDestination', ['name' => $name]);
@@ -666,5 +730,24 @@ class TokensController extends AbstractFOSRestController
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
+     */
+    public function checkTokenNameBlacklistAction(string $name): View
+    {
+        return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
+    }
+
+    private function validateEthereumAddress(string $address): bool
+    {
+        return $this->startsWith($address, '0x') && 42 === strlen($address);
+    }
+
+    private function startsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 }

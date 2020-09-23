@@ -3,21 +3,29 @@
 namespace App\Manager;
 
 use App\Entity\Crypto;
+use App\Entity\DeployTokenReward;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
+use App\Repository\DeployTokenRewardRepository;
 use App\Repository\TokenRepository;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenManager implements TokenManagerInterface
 {
     /** @var TokenRepository */
     private $repository;
+
+    /** @var DeployTokenRewardRepository */
+    private $deployTokenRewardRepository;
 
     /** @var ProfileFetcherInterface */
     private $profileFetcher;
@@ -38,7 +46,12 @@ class TokenManager implements TokenManagerInterface
         CryptoManagerInterface $cryptoManager,
         Config $config
     ) {
-        $this->repository = $em->getRepository(Token::class);
+        /** @var TokenRepository $repository */
+        $repository = $em->getRepository(Token::class);
+        $this->repository = $repository;
+        /** @var DeployTokenRewardRepository $deployTokenRewardRepository */
+        $deployTokenRewardRepository = $em->getRepository(DeployTokenReward::class);
+        $this->deployTokenRewardRepository = $deployTokenRewardRepository;
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
         $this->cryptoManager = $cryptoManager;
@@ -119,13 +132,9 @@ class TokenManager implements TokenManagerInterface
 
     public function getOwnToken(): ?Token
     {
-        $profile = $this->getProfile();
-
-        if (null === $profile) {
-            return null;
-        }
-
-        return $profile->getToken();
+        return $this->getProfile()
+            ? $this->getProfile()->getToken()
+            : null;
     }
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
@@ -162,11 +171,28 @@ class TokenManager implements TokenManagerInterface
         if (null !== $toDashedToken && $tokenName !== $toDashedTokenName) {
             return true;
         }
-        
+
         $toSpaceTokenName = str_replace('-', ' ', $tokenName);
         $toSpaceToken = $this->findByName($toSpaceTokenName);
 
         return null !== $toSpaceToken && $tokenName !== $toSpaceTokenName;
+    }
+
+    public function getDeployedTokens(): array
+    {
+        return $this->repository->getDeployedTokens();
+    }
+
+    public function getUserDeployTokensReward(User $user): Money
+    {
+        $rewardZero = new Money(0, new Currency(Token::WEB_SYMBOL));
+        $rewards = $this->deployTokenRewardRepository->findBy([
+            'user' => $user,
+        ]);
+
+        return array_reduce($rewards, function (Money $sum, DeployTokenReward $deployTokenReward) {
+            return $deployTokenReward->getReward()->add($sum);
+        }, $rewardZero);
     }
 
     private function getProfile(): ?Profile
@@ -179,6 +205,7 @@ class TokenManager implements TokenManagerInterface
     {
         $token = $this->storage->getToken();
 
+        /** @psalm-suppress UndefinedDocblockClass */
         return $token
             ? $token->getUser()
             : null;

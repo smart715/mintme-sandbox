@@ -11,13 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class MediaAdmin extends BaseMediaAdmin
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function configureFormFields(FormMapper $formMapper)
+
+    protected function configureFormFields(FormMapper $formMapper): void
     {
         $media = $this->getSubject();
 
+        /** @var mixed $media */
         if (!$media) {
             $media = $this->getNewInstance();
         }

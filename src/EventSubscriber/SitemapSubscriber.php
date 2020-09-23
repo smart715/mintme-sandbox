@@ -2,10 +2,12 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\KnowledgeBase\KnowledgeBase;
 use App\Entity\News\Post;
 use App\Entity\Profile;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Service\UrlContainerInterface;
@@ -30,16 +32,21 @@ class SitemapSubscriber implements EventSubscriberInterface
     /** @var MarketFactoryInterface  */
     private $marketFactory;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenRepository,
-        MarketFactoryInterface $marketFactory
+        MarketFactoryInterface $marketFactory,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->tokenRepository = $tokenRepository;
         $this->marketFactory = $marketFactory;
+        $this->rebrandingConverter = $rebrandingConverter;
     }
 
     /**
@@ -56,6 +63,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     {
         $this->registerDefaultUrls($event->getUrlContainer());
         $this->registerNewsUrls($event->getUrlContainer());
+        $this->registerKBUrls($event->getUrlContainer());
         $this->registerProfilesUrls($event->getUrlContainer());
         $this->registerTokensUrls($event->getUrlContainer());
         $this->registerMarketsUrls($event->getUrlContainer());
@@ -65,7 +73,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     {
         $lastUrls = [
             $this->urlGenerator->generate(
-                'sonata_news_archive',
+                'sonata_news_home',
                 [],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
@@ -95,6 +103,7 @@ class SitemapSubscriber implements EventSubscriberInterface
 
         $news = $newsRepository->findAll();
 
+        /** @var Post $new */
         foreach ($news as $new) {
             $urls->addUrl(
                 new UrlConcrete(
@@ -109,18 +118,40 @@ class SitemapSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function registerKBUrls(UrlContainerInterface $urls): void
+    {
+        $kbRepository = $this->entityManager->getRepository(KnowledgeBase::class);
+
+        /** @var KnowledgeBase[] $kbs */
+        $kbs = $kbRepository->findAll();
+
+        foreach ($kbs as $kb) {
+            $urls->addUrl(
+                new UrlConcrete(
+                    $this->urlGenerator->generate(
+                        'kb_show',
+                        ['url' => $kb->getUrl()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                ),
+                'help'
+            );
+        }
+    }
+
     private function registerProfilesUrls(UrlContainerInterface $urls): void
     {
         $profilesRepository = $this->entityManager->getRepository(Profile::class);
 
         $profiles = $profilesRepository->findAll();
 
+        /** @var Profile $profile */
         foreach ($profiles as $profile) {
             $urls->addUrl(
                 new UrlConcrete(
                     $this->urlGenerator->generate(
                         'profile-view',
-                        ['pageUrl' => $profile->getPageUrl()],
+                        ['nickname' => $profile->getNickname()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     )
                 ),
@@ -146,6 +177,7 @@ class SitemapSubscriber implements EventSubscriberInterface
             );
         }
     }
+
     private function registerMarketsUrls(UrlContainerInterface $urls): void
     {
         $markets = $this->marketFactory->getCoinMarkets();
@@ -155,7 +187,12 @@ class SitemapSubscriber implements EventSubscriberInterface
                 new UrlConcrete(
                     $this->urlGenerator->generate(
                         'coin',
-                        ['base' => $market->getBase()->getSymbol(), 'quote' => $market->getQuote()->getSymbol()],
+                        [
+                            'base' => $market->getBase()->getSymbol(),
+                            'quote' => $this->rebrandingConverter->convert(
+                                $market->getQuote()->getSymbol()
+                            ),
+                        ],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ) //$market->getBase()  $market->getQuote()
                 ),

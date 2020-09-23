@@ -50,7 +50,13 @@
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
-                    Deploy is pending.
+                    <font-awesome-icon
+                        icon="circle-notch"
+                        spin
+                        class="loading-spinner"
+                        fixed-width
+                    />
+                    Deployment is pending. It may take a few moments.
                 </p>
             </div>
             <div
@@ -117,7 +123,7 @@ export default {
             return null !== this.webCost || null !== this.balance;
         },
         costExceed: function() {
-            return new Decimal(this.webCost).greaterThan(this.balance);
+            return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
         },
     },
     methods: {
@@ -179,7 +185,7 @@ export default {
     },
     filters: {
         toMoney: function(val, precision) {
-            return toMoney(val, precision);
+            return toMoney(val || 0, precision);
         },
         formatMoney: function(val) {
             return formatMoney(val);

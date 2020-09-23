@@ -2,13 +2,18 @@
 
 namespace App\Entity\Token;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\Image;
+use App\Entity\ImagineInterface;
+use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -23,17 +28,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class Token implements TradebleInterface
+class Token implements TradebleInterface, ImagineInterface
 {
     public const MINTME_SYMBOL = "MINTME";
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
+    public const ETH_SYMBOL = "ETH";
     public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const NOT_DEPLOYED = 'not-deployed';
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
+    public const TOKEN_SUBUNIT = 4;
 
     /**
      * @ORM\Id()
@@ -46,10 +53,11 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[a-zA-Z0-9\-\s]*$/", message="Invalid token name.")
+     * @Assert\Regex(pattern="/^[a-zA-Z0-9\s]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
-     * @AppAssert\IsNotBlacklisted(type="token", message="This value is not allowed")
+     * @AppAssert\IsNotBlacklisted(type="token", message="Forbidden token name, please try another")
+     * @AppAssert\DisallowedWord()
      * @Groups({"API", "API_TOK"})
      * @var string
      */
@@ -100,6 +108,11 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Assert\Regex(
+      *     pattern="/^https:\/\/t\.me\/joinchat\/([-\w]{1,})$/",
+      *     match=true,
+      *     message="Invalid telegram link"
+      * )
      * @var string|null
      */
     protected $telegramUrl;
@@ -107,12 +120,17 @@ class Token implements TradebleInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url()
+     * @Assert\Regex(
+      *     pattern="/^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\w]{1,})$/",
+      *     match=true,
+      *     message="Invalid discord link"
+      * )
      * @var string|null
      */
     protected $discordUrl;
 
     /**
-     * @ORM\Column(type="string", length=60000, nullable=true)
+     * @ORM\Column(type="text", length=60000, nullable=true)
      * @Groups({"API_TOK"})
      * @var string|null
      */
@@ -170,11 +188,54 @@ class Token implements TradebleInterface
      */
     protected $withdrawn = '0';
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+     * @Groups({"Default", "API"})
+     * @var Image
+     */
+    protected $image;
+
      /**
      * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
     private $mintedAmount;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\AirdropCampaign\Airdrop",
+     *     mappedBy="token",
+     *     orphanRemoval=true,
+     *     fetch="EXTRA_LAZY"
+     * )
+     * @var ArrayCollection
+     */
+    private $airdrops;
+
+    /**
+     * @ORM\Column(type="string")
+     * @var string
+     */
+    protected $airdropsAmount = '0';
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="token")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     * @var ArrayCollection
+     */
+    protected $posts;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
+    public function __construct()
+    {
+        $this->airdrops = new ArrayCollection();
+    }
 
     /** @return User[] */
     public function getUsers(): array
@@ -447,6 +508,16 @@ class Token implements TradebleInterface
         return $this;
     }
 
+    public function setImage(Image $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): Image
+    {
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL);
+    }
+
     public function getMintedAmount(): Money
     {
         return new Money($this->mintedAmount ?? 0, new Currency(self::TOK_SYMBOL));
@@ -455,5 +526,88 @@ class Token implements TradebleInterface
     public function setMintedAmount(Money $mintedAmount): void
     {
         $this->mintedAmount = $mintedAmount->getAmount();
+    }
+
+    /** @codeCoverageIgnore */
+    public function getAirdrops(): Collection
+    {
+        return $this->airdrops;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getActiveAirdrop(): ?Airdrop
+    {
+        $activeAirdrop = $this->getAirdrops()->filter(function (Airdrop $airdrop) {
+            return Airdrop::STATUS_ACTIVE === $airdrop->getStatus();
+        });
+
+        return $activeAirdrop->isEmpty()
+            ? null
+            : $activeAirdrop->first();
+    }
+
+    /** @codeCoverageIgnore */
+    public function addAirdrop(Airdrop $airdrop): self
+    {
+        if (!$this->airdrops->contains($airdrop)) {
+            $this->airdrops->add($airdrop);
+            $airdrop->setToken($this);
+        }
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function removeAirdrop(Airdrop $airdrop): self
+    {
+        if ($this->airdrops->contains($airdrop)) {
+            $this->airdrops->removeElement($airdrop);
+        }
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getAirdropsAmount(): Money
+    {
+        return new Money($this->airdropsAmount, new Currency(self::TOK_SYMBOL));
+    }
+
+    /** @codeCoverageIgnore */
+    public function setAirdropsAmount(Money $airdropsAmount): self
+    {
+        $this->airdropsAmount = $airdropsAmount->getAmount();
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getPosts(): array
+    {
+        return $this->posts->toArray();
+    }
+
+    public function getOwner(): ?User
+    {
+        $profile = $this->getProfile();
+
+        return $profile
+            ? $profile->getUser()
+            : null;
     }
 }

@@ -17,7 +17,10 @@ class ApiKeyManager implements ApiKeyManagerInterface
     public function __construct(EntityManagerInterface $ormAdapter)
     {
         $this->ormAdapter = $ormAdapter;
-        $this->repository = $this->ormAdapter->getRepository(ApiKey::class);
+
+        /** @var ApiKeyRepository */
+        $repository = $this->ormAdapter->getRepository(ApiKey::class);
+        $this->repository = $repository;
     }
 
     public function findApiKey(string $keyValue): ?ApiKey

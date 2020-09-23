@@ -4,14 +4,11 @@ namespace App\Tests\Manager;
 
 use App\Entity\User;
 use App\Manager\EmailAuthManager;
-use App\Manager\Model\EmailAuthResultModel;
 use App\Utils\DateTime;
 use DateInterval;
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 
 class EmailAuthManagerTest extends TestCase
 {

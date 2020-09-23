@@ -49,6 +49,7 @@
     },
     "assets": [
         {"name": "WEB","prec_save": 20,"prec_show": 8},
+        {"name": "ETH","prec_save": 20,"prec_show": 8},
         {"name": "BTC","prec_save": 20,"prec_show": 8}
     ],
     "markets": [
@@ -62,11 +63,26 @@
                 "name": "BTC",
                 "prec": 8
             },
-            "min_amount": "0.001"
+          "min_amount": "0.001"
+        },
+        {
+          "name": "WEBETH",
+          "stock": {
+            "name": "WEB",
+            "prec": 8
+          },
+          "money": {
+            "name": "ETH",
+            "prec": 8
+          },
+          "min_amount": "0.001"
         }
     ],
     "tokens_num": 100000,
     "brokers": "mq:9092",
+    "balances_topic": "balances",
+    "orders_topic": "orders",
+    "deals_topic": "deals",
     "slice_interval": 3600,
     "slice_keeptime": 259200
 }

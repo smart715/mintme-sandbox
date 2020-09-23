@@ -17,11 +17,13 @@
             </div>
             <div class="card-body">
                 <div v-if="balanceLoaded" class="row">
-                    <div class="col-12">
-                        <label
-                            for="buy-price-input"
-                            class="text-white">
-                            Price in {{ market.base.symbol | rebranding }}:
+                    <div v-if="loggedIn" class="col-12">
+                        <div class="form-group">
+                            <label
+                                for="buy-price-input"
+                                class="text-white">
+                                Price in {{ market.base.symbol | rebranding }}:
+                            </label>
                             <guide>
                                 <template slot="header">
                                     Price in {{ market.base.symbol | rebranding }}
@@ -30,7 +32,7 @@
                                     The price at which you want to buy one {{ market.quote | rebranding }}.
                                 </template>
                             </guide>
-                        </label>
+                        </div>
                         <div class="d-flex">
                             <input
                                 v-model="buyPrice"
@@ -41,40 +43,51 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
+                                tabindex="3"
                             >
-                            <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
+                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
-                                <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
-                                    <span class="text-white">
-                                        <span class="text-nowrap">
-                                            {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
-                                        </span>
-                                        <span class="text-nowrap">
-                                            <a
-                                                v-if="showDepositMoreLink"
-                                                :href="depositMoreLink"
-                                            >Deposit more</a>
-                                            <guide>
-                                                <template slot="header">
-                                                    Your {{ market.base.symbol | rebranding }}
-                                                </template>
-                                                <template slot="body">
-                                                    Your {{ market.base.symbol | rebranding }} balance.
-                                                </template>
-                                            </guide>
+                                <span>
+                                    <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
+                                        <span class="text-white">
+                                            <span class="text-nowrap">
+                                                {{ immutableBalance | toMoney(market.base.subunit) | formatMoney }}
+                                            </span>
                                         </span>
                                     </span>
+                                    <guide>
+                                        <template slot="header">
+                                            Your {{ tokenSymbol }}
+                                        </template>
+                                        <template slot="body">
+                                            Your {{ market.base.symbol | rebranding }} balance.
+                                        </template>
+                                    </guide>
                                 </span>
+                                <p class="text-nowrap">
+                                    <a
+                                        v-if="showDepositMoreLink"
+                                        :href="depositMoreLink"
+                                        tabindex="1"
+                                    >Deposit more</a>
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 pt-2">
+                    <div v-if="loggedIn" class="col-12 pt-2">
                         <label
                             for="buy-price-amount"
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
                             <span class="d-inline-block text-nowrap">Amount in </span>
-                            <span class="d-inline-block truncate-name ml-1">{{ market.quote | rebranding }}</span>
+                            <span v-if="shouldTruncate"
+                                  v-b-tooltip="{title:market.quote.symbol, boundary: 'window', customClass: 'tooltip-custom'}"
+                                  class="d-inline-block ml-1">
+                                {{ market.quote | rebranding | truncate(17) }}
+                            </span>
+                            <span v-else class="d-inline-block ml-1">
+                                {{ market.quote | rebranding }}
+                            </span>
                             <span class="d-inline-block">:</span>
                         </label>
                         <div class="d-flex">
@@ -87,37 +100,39 @@
                                 :disabled="!loggedIn"
                                 @keypress="checkAmountInput"
                                 @paste="checkAmountInput"
+                                tabindex="4"
                             >
                             <div v-if="loggedIn" class="w-50 m-auto pl-4">
-                                <label
+                                <div
                                     v-if="!disabledMarketPrice"
-                                    class="custom-control custom-checkbox pb-0">
+                                    class="form-group custom-control custom-checkbox pb-0">
                                     <input
                                         v-model="useMarketPrice"
                                         step="0.00000001"
                                         type="checkbox"
                                         id="buy-price"
                                         class="custom-control-input"
+                                        tabindex="2"
                                     >
                                     <label
                                         class="custom-control-label pb-0"
                                         for="buy-price">
                                         Market Price
-                                        <guide>
-                                            <template slot="header">
-                                                Market Price
-                                            </template>
-                                            <template slot="body">
-                                                Checking this box fetches current best market price
-                                                for which you can buy {{ market.quote.symbol | rebranding }}.
-                                            </template>
-                                        </guide>
                                     </label>
-                                </label>
+                                    <guide>
+                                        <template slot="header">
+                                            Market Price
+                                        </template>
+                                        <template slot="body">
+                                            Checking this box fetches current best market price
+                                            for which you can buy {{ market.quote.symbol | rebranding }}.
+                                        </template>
+                                    </guide>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 pt-2">
+                    <div v-if="loggedIn" class="col-12 pt-2">
                         Total Price:
                         {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
@@ -130,10 +145,13 @@
                         </guide>
                     </div>
                     <div class="col-12 pt-3 text-left">
-                        <button @click="placeOrder"
+                        <button
+                            @click="placeOrder"
                             v-if="loggedIn"
                             class="btn btn-primary"
-                            :disabled="!buttonValid">
+                            :disabled="!buttonValid"
+                            tabindex="5"
+                        >
                             Create buy order
                         </button>
                         <template v-else>
@@ -163,6 +181,7 @@ import {
     RebrandingFilterMixin,
     OrderMixin,
     LoggerMixin,
+    FiltersMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
@@ -178,6 +197,7 @@ export default {
         RebrandingFilterMixin,
         OrderMixin,
         LoggerMixin,
+        FiltersMixin,
     ],
     components: {
         Guide,
@@ -237,24 +257,27 @@ export default {
                             this.resetOrder();
                         }
                         this.showNotification(data);
-                        this.placingOrder = false;
                     })
                     .catch((error) => {
                         this.handleOrderError(error);
                         this.sendLogs('error', 'Can not get place order', error);
                     })
-                    .then(() => this.hasOrderPlaced = false);
+                    .then(() => this.placingOrder = false);
             }
         },
         resetOrder: function() {
-            this.buyPrice = 0;
+            if (!this.useMarketPrice) {
+                this.buyPrice = 0;
+            }
             this.buyAmount = 0;
-            this.useMarketPrice = false;
         },
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.buyPrice = this.price || 0;
+            } else {
+                this.buyPrice = 0;
             }
+
             if (this.disabledMarketPrice) {
                 this.useMarketPrice = false;
             }
@@ -283,6 +306,9 @@ export default {
         ]),
     },
     computed: {
+        shouldTruncate: function() {
+            return this.market.quote.symbol.length > 17;
+        },
         totalPrice: function() {
             return new Decimal(this.buyPrice && !isNaN(this.buyPrice) ? this.buyPrice : 0)
                 .times(this.buyAmount && !isNaN(this.buyAmount) ? this.buyAmount : 0)

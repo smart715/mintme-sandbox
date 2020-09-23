@@ -3,6 +3,9 @@
 namespace App\Controller\Dev\API\User;
 
 use App\Controller\Dev\API\DevApiController;
+use App\Entity\Token\Token;
+use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -18,14 +21,12 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/orders")
- * @Security(expression="is_granted('prelaunch')")
  */
 class OrdersController extends DevApiController
 {
@@ -96,13 +97,14 @@ class OrdersController extends DevApiController
      *     allowBlank=false,
      *     strict=true
      * )
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0], required=true")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101], required=true")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
     public function getActiveOrders(ParamFetcherInterface $request): array
     {
+        /** @var User $user*/
         $user = $this->getUser();
         $markets = $this->marketFactory->createUserRelated($user);
 
@@ -148,14 +150,16 @@ class OrdersController extends DevApiController
      *     allowBlank=false,
      *     strict=true
      * )
-     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
-     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0], required=true")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101], required=true")
      * @SWG\Tag(name="User Orders")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
     public function getFinishedOrders(ParamFetcherInterface $request): array
     {
+        /** @var User $user*/
         $user = $this->getUser();
+
         $markets = $this->marketFactory->createUserRelated($user);
 
         if (!$markets) {
@@ -224,13 +228,19 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
+        $this->denyAccessUnlessGranted('not-blocked', $quote);
+
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
         }
 
         $market = new Market($base, $quote);
+
+        /** @var User $user*/
+        $user = $this->getUser();
+
         $tradeResult = $exchanger->placeOrder(
-            $this->getUser(),
+            $user,
             $market,
             (string)$request->get('amountInput'),
             (string)$request->get('priceInput'),
@@ -249,14 +259,14 @@ class OrdersController extends DevApiController
      *
      * @Rest\View()
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
-     * @SWG\Response(response="204", description="Order succsessfully removed",)
+     * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
      * @SWG\Response(response="404", description="Market not found")
-     * @Rest\QueryParam(name="base", allowBlank=false)
-     * @Rest\QueryParam(name="quote", allowBlank=false)
+     * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
+     * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)
      * @SWG\Parameter(name="base", in="query", description="Base name", type="string", required=true)
      * @SWG\Parameter(name="quote", in="query", description="Quote name", type="string", required=true)
-     * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer")
+     * @SWG\Parameter(name="id", in="path", description="Order identifier", type="integer", required=true)
      * @SWG\Tag(name="User Orders")
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): View
@@ -273,11 +283,25 @@ class OrdersController extends DevApiController
             throw new ApiNotFoundException('Market not found');
         }
 
-        $order = Order::createCancelOrder($id, $this->getUser(), new Market($base, $quote));
+        /** @var User $user*/
+        $user = $this->getUser();
 
-        $this->trader->cancelOrder($order);
-        $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+        if ($quote instanceof Token && $user === $quote->getOwner()) {
+            $this->denyAccessUnlessGranted('not-blocked', $quote);
+        }
 
-        return $this->view(Response::HTTP_OK);
+        $order = Order::createCancelOrder($id, $user, new Market($base, $quote));
+
+        $tradeResult = $this->trader->cancelOrder($order);
+
+        if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
+            throw new ApiBadRequestException('Invalid request');
+        } else {
+            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+
+            return $this->view([
+                'message' => 'Order successfully removed',
+            ], Response::HTTP_ACCEPTED);
+        }
     }
 }

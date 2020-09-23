@@ -30,6 +30,13 @@ parameters:
         username: user
         password: null
     webchain_transfer_options: {  }
+    etherium_wallet_address: '0xc26dcee6092beb24b42ebd789f82bb6f8d63387c'
+    etherium_rpc_url: 'http://openethereum:8545'
+    etherium_auth:
+        type: digest
+        username: user
+        password: null
+    etherium_transfer_options: {  }
     bitcoin_wallet_password: foobarbaz
     bitcoin_rpc_url: 'http://electrum:7777'
     bitcoin_auth:
@@ -37,50 +44,5 @@ parameters:
         username: electrum
         password: changeme
     bitcoin_transfer_options: {  }
+    bitcoin_duplicate_transactions_interval: 2
     payment_retry_delay_minutes: 2
-doctrine:
-    host: db
-    port: 3306
-    user: root
-    password: root
-    dbname: withdraw
-    driver: pdo_mysql
-    charset: utf8
-    default_table_options:
-        charset: utf8mb4
-        collate: utf8mb4_unicode_ci
-rabbitmq:
-    host: rabbitmq
-    port: 5672
-    user: guest
-    password: guest
-    vhost: /
-wallets:
-    monero:
-        wallet_address: notNecessaryForMonero
-        rpc_url: 'http://localhost:18081/json_rpc'
-        auth:
-            type: digest
-            username: user
-            password: null
-        transfer_options:
-            mixin: 2
-            priority: 1
-    webchain:
-        wallet_address: '0x9139413fe7247da35ae0797f9270271ba758d248'
-        rpc_url: 'http://webchaind:39573'
-        auth:
-            type: digest
-            username: user
-            password: null
-        transfer_options: {  }
-    bitcoin:
-        wallet_address: notNecessaryForBitcoin
-        rpc_url: 'http://electrum:7777'
-        auth:
-            type: basic
-            username: electrum
-            password: changeme
-        transfer_options: {  }
-payment:
-    retry_delay_minutes: 2

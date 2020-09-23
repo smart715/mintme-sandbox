@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <div class="d-block mx-0 my-1 p-0">
-            <a
+    <div class="row">
+        <div class="col text-truncate">
+            <span
                 id="address-link"
-                class="c-pointer"
+                class="c-pointer text-white hover-icon"
                 @click="addPage"
             >
                 <span class="token-introduction-profile-icon text-center d-inline-block">
@@ -12,13 +12,17 @@
                         size="lg"
                     />
                 </span>
-                {{ computedAddress | truncate(35) }}
-            </a>
+                <a href="#" class="text-reset">
+                    {{ computedAddress }}
+                </a>
+            </span>
             <b-tooltip
                 v-if="address"
                 target="address-link"
                 :title="computedAddress"
             />
+        </div>
+        <div class="col-auto">
             <a
                 v-if="address"
                 @click.prevent="deleteAddress"

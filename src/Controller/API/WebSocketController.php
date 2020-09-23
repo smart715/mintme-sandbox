@@ -8,12 +8,10 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use RuntimeException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Rest\Route("/api/ws")
- * @Security(expression="is_granted('prelaunch')")
  */
 class WebSocketController extends AbstractFOSRestController
 {
@@ -43,14 +41,6 @@ class WebSocketController extends AbstractFOSRestController
 
             if (null === $token) {
                 throw new RuntimeException('"Authorization" header was not found in HTTP request from via btc server', 1);
-            }
-
-            if (is_array($token)) {
-                throw new RuntimeException(
-                    'Array returned in "Authorization" header instead of an integer: '
-                    . implode(', ', $token),
-                    2
-                );
             }
 
             if (!$this->isAuth) {

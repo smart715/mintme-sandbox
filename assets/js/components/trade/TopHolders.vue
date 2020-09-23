@@ -1,31 +1,20 @@
 <template>
-    <div class="card h-100">
+    <div class="card h-100 top-holders">
         <div class="card-header">
             Top Holders
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive fixed-head-table">
+            <div class="table-responsive">
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
-                     ref="table"
-                    :items="traders"
-                    :fields="fields">
-                    <template v-slot:cell(trader)="row">
-                        <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                            <a
-                                :href="row.item.url"
-                                class="d-inline-block truncate-name w-100 mr-1"
-                                v-b-tooltip="{title: row.value, boundary:'viewport'}"
-                            >
-                                {{ row.value }}
-                            </a>
-                            <img
-                                src="../../../img/avatar.png"
-                                class="d-block"
-                                alt="avatar">
-                        </div>
-                    </template>
-                </b-table>
+                        ref="table"
+                        :items="traders"
+                        :fields="fields"
+                    >
+                        <template v-slot:cell(trader)="row">
+                            <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                        </template>
+                    </b-table>
                     <div v-else>
                         <p class="text-center p-5">No Holders yet</p>
                     </div>
@@ -36,13 +25,6 @@
                     </div>
                 </template>
             </div>
-            <div class="text-center pb-2" v-if="showDownArrow">
-                <img
-                    src="../../../img/down-arrows.png"
-                    class="icon-arrows-down c-pointer"
-                    alt="arrow down"
-                    @click="scrollDown">
-            </div>
         </div>
     </div>
 </template>
@@ -52,10 +34,14 @@ import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins';
+import HolderName from './HolderName';
 
 export default {
     name: 'TopHolders',
     mixins: [FiltersMixin, LoggerMixin, NotificationMixin],
+    components: {
+        HolderName,
+    },
     props: {
       tokenName: String,
     },
@@ -80,9 +66,6 @@ export default {
         };
     },
     computed: {
-        showDownArrow: function() {
-            return null !== this.traders && this.traders.length > 7;
-        },
         loaded: function() {
             return null !== this.traders;
         },
@@ -101,8 +84,9 @@ export default {
             }))
             .then(({data}) => this.traders = data.map((row) => {
                 return {
-                    trader: `${row.user.profile.firstName} ${row.user.profile.lastName}`,
-                    url: this.$routing.generate('profile-view', {pageUrl: row.user.profile.page_url}),
+                    trader: row.user.profile.nickname,
+                    traderAvatar: row.user.profile.image.avatar_small,
+                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
                     date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };

@@ -39,15 +39,16 @@ parameters:
     # Permanent quantity of each token asset
     token_quantity: 10000000
 
-    # Show all hidden from prelaunch content automatically when prelaunch finishes
-    prelaunch_autostart: true
-    # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
-    prelaunch_finish_datetime: '2019-04-01 10:00:00'
-
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
+    donation:
+        fee: 5
+        minBtcAmount: 0.000001
+        minMintmeAmount: 0.01
+        minEthAmount: 0.0001
+        minTokensAmount: 0.0001
 
-    google_tracking_id: 'UA-2289508-20'
+    google_tracking_id: 'UA-2289508-22'
 
     tawk_api_key: '328536796c72787602bf8a9c6c59045f456d434c'
 
@@ -68,6 +69,7 @@ parameters:
 
     # the cost of deploying token to blockchain in USD
     deploy_cost: 99
+    deploy_cost_referral_reward: 0.1
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
 
@@ -120,6 +122,15 @@ parameters:
     # max top holders for each token
     top_holders: 10
 
+    # where to store images
+    images_path: "/uploads/images"
+
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+
     # forward proxy for hiding real mintme server IP when verifying token owner's website
     # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
     # to disable the proxy, set empty string ''
@@ -127,3 +138,36 @@ parameters:
 
     #host for urls generated on commands
     mintme_url: 'mintme.com'
+
+    contact_email: support@mintme.com
+
+    # enable it to be able to use market consumer for test
+    # this param have to be removed after splitting consumers for all branches.
+    market_consumer_enabled: false
+
+    # expiration time for withdraws (in seconds)
+    # should be kept to values that represent hours (3600, 7200, etc) unless for testing purposes
+    withdraw_expiration_time: 14400
+
+    # enable sending web site visit stats to google, should only be enabled for prod,
+    # default value is disabled (false)
+    enable_google_analytics: false
+
+    #HMAC SHA1 key
+    hmac_sha_one_key: 'qwerty'
+
+    #Social media links
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+
+    # Disable deposit and withdraw for specified crypto (should be null by default)
+    # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
+    # Example for ETH and BTC:
+    # blockchain_disabled:
+    #     - ETH
+    #     - BTC
+    blockchain_disabled: null

@@ -1,23 +1,49 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="active-orders table-responsive table-restricted" ref="table">
                 <b-table
                     thead-class="trading-head"
                     ref="btable"
                     v-if="hasOrders"
                     :items="history"
-                    :fields="fields">
+                    :fields="fieldsArray"
+                    :sort-compare="$sortCompare(fields)"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                    sort-icon-left
+                    no-sort-reset
+                >
                     <template v-slot:cell(name)="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
-                            <a :href="row.item.pairUrl" class="text-white">
-                                {{ row.value.truncate }}
-                            </a>
+                        <div v-if="row.value.full.length <= 7">
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
+                        </div>
+                        <div v-else v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
                         </div>
                     </template>
                     <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
-                            <span class="icon-cancel c-pointer"></span>
+                            <span class="icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
                         </a>
                     </template>
                 </b-table>
@@ -60,6 +86,7 @@ import {
     NotificationMixin,
     LoggerMixin,
     PairNameMixin,
+    OrderMixin,
 } from '../../mixins/';
 
 export default {
@@ -72,12 +99,12 @@ export default {
         NotificationMixin,
         LoggerMixin,
         PairNameMixin,
+        OrderMixin,
     ],
-    components: {
-        ConfirmModal,
-    },
+    components: {ConfirmModal},
     props: {
         userId: Number,
+        isUserBlocked: Boolean,
     },
     data() {
         return {
@@ -90,10 +117,20 @@ export default {
             tokenName: null,
             amount: null,
             price: null,
-            fields: [
-                {key: 'date', label: 'Date', sortable: true},
-                {key: 'type', label: 'Type', sortable: true},
-                {
+            fields: {
+                date: {
+                    key: 'date',
+                    label: 'Date',
+                    sortable: true,
+                    type: 'date',
+                },
+                type: {
+                    key: 'type',
+                    label: 'Type',
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
                     key: 'name',
                     label: 'Name',
                     sortable: true,
@@ -103,23 +140,35 @@ export default {
                             truncate: this.truncateFunc(name, 7),
                         };
                     },
+                    type: 'string',
                 },
-                {key: 'amount', label: 'Amount', sortable: true},
-                {
+                amount: {
+                    key: 'amount',
+                    label: 'Amount',
+                    sortable: true,
+                    type: 'numeric',
+                },
+                price: {
                     key: 'price',
                     label: 'Price',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {
+                total: {
                     key: 'total',
                     label: 'Total cost',
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                {key: 'fee', label: 'Fee', sortable: true},
-                {key: 'action', label: 'Action', sortable: false},
-            ],
+                fee: {key: 'fee', label: 'Fee', sortable: true, type: 'numeric'},
+                action: {
+                    key: 'action',
+                    label: 'Action',
+                    sortable: false,
+                },
+            },
         };
     },
     computed: {
@@ -135,11 +184,14 @@ export default {
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
         },
+        fieldsArray: function() {
+            return Object.values(this.fields);
+        },
         history: function() {
             return this.tableData.map((order) => {
                 return {
                     date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
+                    type: this.getSideByType(order.side),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(order.market.base),
                         this.rebrandingFunc(order.market.quote)
@@ -154,6 +206,8 @@ export default {
                     }),
                     id: order.id,
                     pairUrl: this.generatePairUrl(order.market),
+                    blocked: order.market.quote.hasOwnProperty('blocked') ? order.market.quote.blocked : this.isUserBlocked,
+                    isCryptoMarket: !order.market.base.exchangeble,
                 };
             });
         },
@@ -222,13 +276,17 @@ export default {
                 return this.$routing.generate('coin', {
                     base: this.rebrandingFunc(market.base),
                     quote: this.rebrandingFunc(market.quote),
+                    tab: 'trade',
                 });
             }
-            return this.$routing.generate('token_show', {name: market.quote.name});
+            return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        removeOrderModal: function(row) {
-            this.currentRow = row;
-            this.actionUrl = row.action;
+        removeOrderModal: function(item) {
+            if (item.blocked) {
+                return;
+            }
+            this.currentRow = item;
+            this.actionUrl = item.action;
             this.switchConfirmModal(true);
         },
         switchConfirmModal: function(val) {

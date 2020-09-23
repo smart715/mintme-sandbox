@@ -5,7 +5,7 @@
 
 {% block fos_user_content %}
     <div class="container">
-        <div class="row pt-5 justify-content-center notification">
+        <div class="row pt-4 justify-content-center notification">
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
@@ -23,11 +23,7 @@
                         <p class="text">your account is now activated</p>
                         <p class="mt-1 pb-0 mb-0">
                             {% if targetUrl is empty %}
-                                {% if prelaunch.isFinished() %}
-                                    <a href="{{ path('trading') }}" class="link">Go to Trading</a>
-                                {% else %}
-                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
-                                {% endif %}
+                                <a href="{{ path('trading') }}" class="link">Go to Trading</a>
                             {% else %}
                                 <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
                             {% endif %}

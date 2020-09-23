@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\RefererTrait;
 use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -18,11 +19,11 @@ use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -30,6 +31,9 @@ use Throwable;
 
 class RegistrationController extends FOSRegistrationController
 {
+
+    use RefererTrait;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -103,11 +107,28 @@ class RegistrationController extends FOSRegistrationController
         ]);
     }
 
+    /**
+     * @Route("/register", name="register", options = {"expose": true})
+     */
     public function registerAction(Request $request): Response
     {
         $form = $this->formFactory->createForm();
 
-        $response = $this->checkForm($form, $request);
+        try {
+            $response = $this->checkForm($form, $request);
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', 'an error occurred please try again!');
+
+            return $this->render('@FOSUser/Registration/register.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+        $refers = $request->headers->get('Referer');
+
+        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
+            $this->get('session')->set('register_referer', $refers);
+        }
 
         if ($response) {
             return $response;
@@ -130,7 +151,8 @@ class RegistrationController extends FOSRegistrationController
         $user->setEnabled(true);
 
         $event = new GetResponseUserEvent($user, $request);
-        $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
 
         if (null !== $event->getResponse()) {
             return $event->getResponse();
@@ -143,7 +165,9 @@ class RegistrationController extends FOSRegistrationController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $event = new FormEvent($form, $request);
-                $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
+
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_SUCCESS);
 
                 $this->userManager->updateUser($user);
 
@@ -167,21 +191,25 @@ class RegistrationController extends FOSRegistrationController
                     $response = $event->getResponse();
                 }
 
+                /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch(
-                    FOSUserEvents::REGISTRATION_COMPLETED,
-                    new FilterUserResponseEvent($user, $request, $response)
+                    new FilterUserResponseEvent($user, $request, $response),
+                    FOSUserEvents::REGISTRATION_COMPLETED
                 );
 
                 return $response;
             }
 
             $event = new FormEvent($form, $request);
-            $this->eventDispatcher->dispatch(FOSUserEvents::REGISTRATION_FAILURE, $event);
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_FAILURE);
 
             if (null !== $response = $event->getResponse()) {
                 return $response;
             }
         }
+
+        return null;
     }
 
     public function confirmedAction(Request $request): Response
@@ -220,6 +248,16 @@ class RegistrationController extends FOSRegistrationController
             } catch (Throwable $exception) {
                 $this->em->rollback();
             }
+        }
+
+        /** @var Session $session */
+        $session = $this->get('session');
+        $referer = $session->get('register_referer');
+
+        if ($referer && $this->isRefererValid($referer)) {
+            $session->remove('register_referer');
+
+            return $this->redirect($referer);
         }
 
         return parent::confirmedAction($request);

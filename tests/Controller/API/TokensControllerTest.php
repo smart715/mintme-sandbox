@@ -12,7 +12,6 @@ class TokensControllerTest extends WebTestCase
     public function testUpdate(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('PATCH', '/api/tokens/' . $tokName, [
@@ -50,7 +49,6 @@ class TokensControllerTest extends WebTestCase
     public function testSetTokenReleasePeriod(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/tokens/' . $tokName .'/lock-in', [
@@ -80,7 +78,6 @@ class TokensControllerTest extends WebTestCase
     public function testLockPeriod(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/tokens/' . $tokName .'/lock-in', [
@@ -112,7 +109,6 @@ class TokensControllerTest extends WebTestCase
     public function testTokenSearch(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/tokens/search', [
@@ -128,7 +124,6 @@ class TokensControllerTest extends WebTestCase
     public function testGetTokens(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/tokens');
@@ -145,7 +140,6 @@ class TokensControllerTest extends WebTestCase
     public function testGetTokenExchange(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -164,7 +158,6 @@ class TokensControllerTest extends WebTestCase
     public function testGetTokenWithdrawn(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var Token $token */
@@ -237,7 +230,7 @@ class TokensControllerTest extends WebTestCase
         $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
-        /** @var Token $tokem */
+        /** @var Token $token */
         $token = $this->getToken($tokName);
 
         $user = $token->getProfile()->getUser();
@@ -252,7 +245,7 @@ class TokensControllerTest extends WebTestCase
             'code' => '123456',
         ]);
 
-        /** @var Token $tokem */
+        /** @var Token|null $token */
         $token = $this->getToken($tokName);
 
         $this->assertNull($token);
@@ -354,7 +347,6 @@ class TokensControllerTest extends WebTestCase
     public function testCheckTokenNameExists(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
 
@@ -372,7 +364,6 @@ class TokensControllerTest extends WebTestCase
     public function testTokenDeployBalances(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -387,7 +378,6 @@ class TokensControllerTest extends WebTestCase
     public function testDeployIfAlreadyDeployed(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var Token $token */
@@ -404,7 +394,6 @@ class TokensControllerTest extends WebTestCase
     public function testDeployWithNoReleasePeriod(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/tokens/' . $tokName . '/deploy');
@@ -415,7 +404,6 @@ class TokensControllerTest extends WebTestCase
     public function testDeployIfCantEdit(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $fooClient = self::createClient();
@@ -429,7 +417,6 @@ class TokensControllerTest extends WebTestCase
     public function testDeploy(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 

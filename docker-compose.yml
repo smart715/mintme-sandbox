@@ -42,6 +42,7 @@ services:
       - rabbitmq
       - webchain-cli
     volumes:
+      - .docker/deposit:/src
       - .docker/deposit.conf.yaml:/src/config/default.yaml
       - .docker/deposit.env:/src/.env
     networks:
@@ -57,6 +58,7 @@ services:
       - rabbitmq
       - webchain-cli
     volumes:
+      - .docker/tokdeploy/contract-gateway:/src
       - .docker/tokdeploy.yaml:/src/config/default.yaml
       - .docker/tokdeploy.env:/src/.env
       - webchaind_root:/src/webchain_root
@@ -86,10 +88,34 @@ services:
       - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
       - webchaind_root:/root/.webchain/morden
 
+  openethereum:
+    image: parity/parity:v2.5.12-stable
+    volumes:
+      - .docker/default/ETH/:/root/eth/
+    ports:
+      - 8545:8545
+      - 8080:8080
+    command:
+      --light
+      --chain=ropsten
+      --jsonrpc-interface=all
+      --jsonrpc-cors=all
+      --jsonrpc-apis=web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,parity_accounts,personal
+      --unlock=0xc26dcee6092beb24b42ebd789f82bb6f8d63387c
+      --password /root/eth/pass
+      --base-path /root/eth
+    working_dir: /home/openethereum
+    user: root
+    mem_limit: 2gb
+    cpuset: '0,3'
+    networks:
+      - middleend
+
   nginx:
     image: nginx:latest
     ports:
       - 80:80
+      - 443:443
       - 16614:16614
       - 8000:8000 # php-withdraw debug
       - 8008:8008
@@ -118,10 +144,10 @@ services:
     volumes:
       - .docker/sql:/docker-entrypoint-initdb.d
       - .docker/my.cnf:/etc/mysql/my.cnf
-      - .docker/db:/var/lib/mysql
+      - mariadb-data:/var/lib/mysql
 
   rabbitmq:
-    image: rabbitmq:3-management
+    build: .docker/rabbitmq
     ports:
       - 15672:15672
       - 5672:5672
@@ -214,7 +240,7 @@ services:
   mq:
     container_name: btc-kafka
     image: wurstmeister/kafka
-    restart: on-failure:5
+    restart: on-failure
     ports:
       - 19092:9092
     environment:
@@ -228,7 +254,8 @@ services:
       - backend
 
 volumes:
-  webchaind_root: ~
+  webchaind_root:
+  mariadb-data:
 
 networks:
   backward:

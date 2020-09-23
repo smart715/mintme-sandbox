@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Manager\MainDocumentsManagerInterfaces;
 use App\Manager\ReciprocalLinksManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\Store\PdoStore;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
@@ -42,7 +44,7 @@ class DefaultController extends Controller
     /**
      * @Route("/privacy-policy",
      *      name="privacy_policy",
-     *      options={"sitemap" = true}
+     *      options={"sitemap" = true, "2fa_progress"=false}
      * )
      */
     public function privacyPolicy(): Response
@@ -53,7 +55,7 @@ class DefaultController extends Controller
     /**
      * @Route("/terms-of-service",
      *      name="terms_of_service",
-     *      options={"sitemap" = true}
+     *      options={"sitemap" = true, "2fa_progress"=false}
      * )
      */
     public function termsOfService(): Response
@@ -62,7 +64,9 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/mintme-press-kit.pdf", name="press_kit")
+     * @Route("/mintme-press-kit.pdf", name="press_kit",
+     *      options={"2fa_progress"=false}
+     * )
      */
     public function pressKit(MainDocumentsManagerInterfaces $mainDocs): Response
     {

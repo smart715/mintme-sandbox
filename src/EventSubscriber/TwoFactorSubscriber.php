@@ -2,11 +2,12 @@
 
 namespace App\EventSubscriber;
 
+use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
@@ -43,15 +44,22 @@ class TwoFactorSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => 'onRequest',
+            KernelEvents::CONTROLLER => 'onRequest',
         ];
     }
 
     /** {@inheritDoc} */
-    public function onRequest(GetResponseEvent $request): void
+    public function onRequest(FilterControllerEvent $event): void
     {
+        $controller = $event->getController();
+
+        if (!is_array($controller) || !$controller[0] instanceof TwoFactorAuthenticatedInterface) {
+            return;
+        }
+
+        $request = $event->getRequest();
         $route = $this->router->getRouteCollection()->get(
-            $request->getRequest()->attributes->get('_route')
+            $request->attributes->get('_route')
         );
 
         if (!$route) {
@@ -77,6 +85,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
             throw new UnauthorizedHttpException("2fa", "Invalid user");
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         $user = $token->getUser();
 
         if (!$user instanceof User) {
@@ -91,10 +100,10 @@ class TwoFactorSubscriber implements EventSubscriberInterface
             }
         }
 
-        $needToCheckCode = $request->getRequest()->get('needToCheckCode') ?? true;
+        $needToCheckCode = $request->get('needToCheckCode') ?? true;
 
         if ($needToCheckCode) {
-            $code = $request->getRequest()->get('code');
+            $code = $request->get('code');
 
             if (!$code || !$this->twoFactorManager->checkCode($user, $code)) {
                 throw new UnauthorizedHttpException("2fa", "Invalid 2FA code");

@@ -13,14 +13,12 @@ use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route(path="/dev/api/v1/markets")
- * @Security(expression="is_granted('prelaunch')")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
 class MarketsController extends DevApiController
@@ -85,14 +83,24 @@ class MarketsController extends DevApiController
      */
     public function getMarkets(ParamFetcherInterface $request): array
     {
-        return array_map(function ($market) {
-            return $this->rebrandingConverter->convertMarketStatus($market);
-        }, array_values(
-            $this->marketManager->getMarketsInfo(
-                (int)$request->get('offset'),
-                (int)$request->get('limit')
-            )
-        ));
+        $offset = (int)$request->get('offset');
+        $limit = (int)$request->get('limit');
+
+        return array_slice(
+            array_map(function ($market) {
+                return $this->rebrandingConverter->convertMarketStatus($market);
+            }, array_values(
+                $this->marketManager->getMarketsInfo(
+                    $offset,
+                    $limit,
+                    'monthVolume',
+                    'DESC',
+                    1
+                )
+            )),
+            0,
+            $limit
+        );
     }
 
     /**

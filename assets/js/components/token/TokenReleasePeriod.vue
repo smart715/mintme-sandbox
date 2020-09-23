@@ -78,6 +78,7 @@ import vueSlider from 'vue-slider-component';
 import Guide from '../Guide';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenReleasePeriod',
@@ -90,7 +91,7 @@ export default {
     data() {
         return {
             loading: true,
-            released: 0,
+            released: 1,
             releasePeriod: 0,
             hasLockin: false,
         };
@@ -135,6 +136,20 @@ export default {
             });
     },
     methods: {
+        updateTokenStatistics: function(newTokenStatistics) {
+            this.setStats({
+                releasePeriod: newTokenStatistics.releasePeriod,
+                hourlyRate: newTokenStatistics.hourlyRate,
+                releasedAmount: newTokenStatistics.releasedAmount,
+                frozenAmount: newTokenStatistics.frozenAmount,
+            });
+            this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
+            .then((res) => this.setTokenExchangeAmount(res.data))
+            .catch((err) => {
+                this.notifyError('Can not load statistic data. Try again later');
+                this.sendLogs('error', 'Can not load statistic data', err);
+            });
+        },
         saveReleasePeriod: function() {
             this.$axios.single.post(this.$routing.generate('lock_in', {
                 name: this.tokenName,
@@ -143,6 +158,7 @@ export default {
                 releasePeriod: !this.showAreaUnlockedTokens ? 0 : this.releasePeriod,
             }).then((response) => {
                 this.$emit('update', response);
+                this.updateTokenStatistics(response.data);
                 this.notifySuccess('Release period updated.');
             }).catch(({response}) => {
                 if (!response) {
@@ -156,6 +172,14 @@ export default {
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             });
+        },
+        ...mapMutations('tokenStatistics', [
+            'setStats',
+            'setTokenExchangeAmount',
+        ]),
+        refreshSliders: function() {
+            this.$refs['released-slider'].refresh();
+            this.$refs['release-period-slider'].refresh();
         },
     },
 };

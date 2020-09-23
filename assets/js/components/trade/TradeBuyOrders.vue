@@ -17,46 +17,46 @@
             </div>
             <div class="card-body p-0">
                 <template v-if="ordersLoaded">
-                    <div class="table-responsive fixed-head-table">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table v-if="hasOrders"
-                            ref="table"
                             @row-clicked="orderClicked"
                             :items="tableData"
                             :fields="fields"
+                            :tbody-tr-class="rowClass"
+                            :tbody-class="'table-orders'"
                         >
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                    <span v-if="row.item.isAnonymous" class="d-inline-block truncate-name flex-grow-1">
-                                        {{ row.value }}
-                                    </span>
-                                    <a v-else :href="row.item.traderUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                        <span class="d-inline-block truncate-name flex-grow-1" v-b-tooltip="{title: row.item.traderFullName, boundary:'viewport'}">
-                                            {{ row.value }}
-                                        </span>
+                                    <div class="col-11 pl-0 ml-0">
+                                    <a
+                                        :href="row.item.traderUrl"
+                                        class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white"
+                                    >
                                         <img
-                                            src="../../../img/avatar.png"
-                                            class="d-block flex-grow-0"
+                                            :src="row.item.traderAvatar"
+                                            class="rounded-circle d-block flex-grow-0 pointer-events-none pull-right mr-1"
                                             alt="avatar">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span
+                                                v-b-tooltip="popoverConfig"
+                                                v-on:mouseover="mouseoverHandler(fullOrdersList, basePrecision, row.item.price)"
+                                            >
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
                                     </a>
-                                    <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
-                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                                    </a>
+                                    </div>
+                                    <div class="col-1 pull-right pl-0 ml-0">
+                                        <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                            <font-awesome-icon icon="times" class="text-danger c-pointer" />
+                                        </a>
+                                    </div>
                                 </div>
                             </template>
                         </b-table>
                         <div v-else>
                             <p class="text-center p-5">No order was added yet</p>
                         </div>
-                    </div>
-                    <div class="text-center pb-2" v-if="showDownArrow && !loading">
-                        <img
-                            src="../../../img/down-arrows.png"
-                            class="icon-arrows-down c-pointer"
-                            alt="arrow down"
-                            @click="scrollDown">
-                    </div>
-                    <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                     </div>
                 </template>
                 <template v-else>
@@ -73,18 +73,37 @@
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
-import {LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin} from '../../mixins/';
+import {
+    LazyScrollTableMixin,
+    MoneyFilterMixin,
+    OrderClickedMixin,
+    RebrandingFilterMixin,
+    TraderHoveredMixin,
+    OrderHighlights,
+} from '../../mixins/';
 
 export default {
     name: 'TradeBuyOrders',
-    mixins: [LazyScrollTableMixin, MoneyFilterMixin, OrderClickedMixin, RebrandingFilterMixin],
+    mixins: [
+        LazyScrollTableMixin,
+        MoneyFilterMixin,
+        OrderClickedMixin,
+        RebrandingFilterMixin,
+        TraderHoveredMixin,
+        OrderHighlights,
+    ],
     props: {
+        fullOrdersList: [Array],
         ordersList: [Array],
         tokenName: String,
         fields: Array,
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
+        ordersUpdated: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -116,10 +135,25 @@ export default {
                 this.$emit('update-data', {attach, resolve});
             });
         },
+        rowClass: function(item, type) {
+            return 'row' === type && item.highlightClass
+                ? item.highlightClass
+                : '';
+        },
     },
     watch: {
-        ordersList: function(val) {
-            this.tableData = val;
+        ordersList: function(newOrders) {
+            let delayOrdersUpdating = this.ordersUpdated
+                ? this.handleOrderHighlights(this.tableData, newOrders)
+                : false;
+
+            if (delayOrdersUpdating) {
+                setTimeout(()=> this.tableData = newOrders, 1000);
+            } else {
+                this.tableData = newOrders;
+            }
+
+            setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
         },
     },
 };

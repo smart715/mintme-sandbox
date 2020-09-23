@@ -1,5 +1,7 @@
 twig:
-    paths: ['%kernel.project_dir%/templates']
+    paths:
+        '%kernel.project_dir%/templates': ~
+        '%kernel.project_dir%/public': public
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     form_themes:
@@ -13,7 +15,6 @@ twig:
         is_beta_version: '%is_beta_version%'
         global_websocket_url: '%env(WEBSOCKET_URL)%'
         global_coinbase_url: '%coinbase_api_url%'
-        prelaunch: '@App\Exchange\Trade\Config\PrelaunchConfig'
         google_tracking_id: '%google_tracking_id%'
         tawk_api_key: '%tawk_api_key%'
         is_hacker_allowed: '%is_hacker_allowed%'
@@ -25,3 +26,14 @@ twig:
         mintme_coin_link: '%mintme_coin_link%'
         minimum_volume_for_marketcap: '%minimum_volume_for_marketcap%'
         landing_web_bonus: '%landing_web_bonus%'
+        airdrop_params: '%airdrop_params%'
+        global_contact_email: '%contact_email%'
+        donation_params: '%donation%'
+        withdraw_expiration_time: '%withdraw_expiration_time%'
+        enable_google_analytics: '%enable_google_analytics%'
+        twitter_footer_link: '%twitter_social_media_link%'
+        reddit_footer_link: '%reddit_social_media_link%'
+        discord_footer_link: '%discord_social_media_link%'
+        telegram_chat_footer_link: '%telegram_chat_social_media_link%'
+        telegram_public_footer_link: '%telegram_webchain_network_social_media_link%'
+        facebook_footer_link: '%facebook_social_media_link%'

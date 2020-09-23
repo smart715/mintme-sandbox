@@ -12,13 +12,13 @@
                 :class="{ 'is-invalid': $v.newAddress.$error }"
             >
             <div v-if="$v.newAddress.$error" class="invalid-feedback">
-                Wrong address
+                Wallet address has to be 42 characters long with leading 0x
             </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
             <button
                 class="btn btn-primary float-left"
-                :disabled="submitting || sameAddress"
+                :disabled="buttonDisabled"
                 @click="editAddress"
             >
                 Save
@@ -52,7 +52,7 @@
 <script>
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-import {addressLength, addressContain} from '../../utils/constants';
+import {addressLength, addressContain, addressFirstSymbol} from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
 export default {
@@ -82,6 +82,9 @@ export default {
         sameAddress: function() {
             return this.currentAddress === this.newAddress;
         },
+        buttonDisabled: function() {
+            return this.submitting || this.sameAddress || this.$v.newAddress.$error;
+        },
     },
     methods: {
         closeTwoFactorModal: function() {
@@ -105,14 +108,8 @@ export default {
             if (this.currentAddress === this.newAddress) {
                 this.closeModal();
                 return;
-            } else if (!this.$v.newAddress.addressContain) {
-                this.notifyError('Release address can contain alphabets and numbers');
-                return;
-            } else if (!this.$v.newAddress.minLength) {
-                this.notifyError(`Release address should have at least ${addressLength.WEB.min} symbols`);
-                return;
-            } else if (!this.$v.newAddress.maxLength) {
-                this.notifyError(`Release address can not be longer than ${addressLength.WEB.max} characters`);
+            } else if (this.$v.newAddress.$error) {
+                this.notifyError('Wallet address has to be 42 characters long with leading 0x');
                 return;
             }
 
@@ -135,9 +132,11 @@ export default {
                 code,
             })
             .then(() => {
+                this.submitting = false;
                 this.setUpdatingState();
                 this.notifySuccess('Updating address is pending.');
             }, (error) => {
+                this.submitting = false;
                 if (!error.response) {
                     this.notifyError('Network error');
                     this.sendLogs('error', 'Edit address network error', error);
@@ -158,6 +157,7 @@ export default {
                 addressContain,
                 minLength: minLength(addressLength.WEB.min),
                 maxLength: maxLength(addressLength.WEB.max),
+                addressFirstSymbol: addressFirstSymbol['WEB'],
             },
         };
     },

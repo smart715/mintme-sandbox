@@ -54,6 +54,19 @@
                     <br>
                     {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
+                <div class="my-1 text-center" v-if="isToken">
+                    <span>Buy Depth: </span>
+                    <guide>
+                        <template slot="header">
+                            Buy Depth
+                        </template>
+                        <template slot="body">
+                            Buy depth is amount of buy orders in MINTME on each market. This might better represent token market size than marketcap.
+                        </template>
+                    </guide>
+                    <br>
+                    {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
+                </div>
                 <div class="my-1 text-center text-lg-right">
                     <span>Market Cap: </span>
                     <guide>
@@ -73,7 +86,6 @@
                     <ve-candle
                         class="m-2"
                         :extend="additionalAttributes"
-                        :right-label="rightLabel"
                         :data="chartData"
                         :settings="chartSettings"
                         :theme="chartTheme(market.base.subunit)"
@@ -99,7 +111,7 @@ import {
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
-import {WEB} from '../../utils/constants.js';
+import {WEB, webBtcSymbol} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
@@ -109,11 +121,12 @@ export default {
         market: Object,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        buyDepth: String,
+        isToken: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
         return {
-            rightLabel: true,
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
@@ -148,8 +161,13 @@ export default {
                         min,
                         minInterval: min,
                         axisLabel: {
-                            formatter: (val) => parseFloat(toMoney(val, this.market.base.subunit))
-                                .toFixed(8).toString().replace(/0+$/, ''),
+                            formatter: (val) => toMoney(val, this.market.base.subunit),
+                        },
+                    },
+                    {
+                        apply: [1],
+                        axisLabel: {
+                            show: false,
                         },
                     },
                 ],
@@ -216,7 +234,7 @@ export default {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
 
-        if ('WEBBTC' === this.market.identifier) {
+        if (webBtcSymbol === this.market.identifier) {
             this.fetchWEBsupply().then(() => {
                 this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
             });
@@ -229,30 +247,7 @@ export default {
             this.stats = res.data;
             this.chartSettings.start = this.getStartTradingPeriod();
 
-            this.addMessageHandler((result) => {
-                if (result.method === 'state.update') {
-                    this.updateMarketData(result);
-                }
-                if (result.method === 'kline.update') {
-                    let lastCandle = this.stats[this.stats.length - 1];
-
-                    if (lastCandle && this.getDate(result.params[0][0]) === this.getDate(lastCandle.time)) {
-                        this.stats.pop();
-                    }
-
-                    this.stats.push({
-                        time: result.params[0][0],
-                        open: result.params[0][1],
-                        close: result.params[0][2],
-                        highest: result.params[0][3],
-                        lowest: result.params[0][4],
-                        volume: result.params[0][5],
-                    });
-                }
-                if (result.id === this.monthInfoRequestId) {
-                    this.updateMonthMarketData(result.result);
-                }
-            }, 'trade-chart-state');
+            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state');
 
             this.sendMessage(JSON.stringify({
                 method: 'state.subscribe',
@@ -311,7 +306,7 @@ export default {
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
             let marketCap;
 
-            if ('WEBBTC' === this.market.identifier && 1e7 === this.supply) {
+            if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
                 this.notifyError('Can not update the market cap for BTC / MINTME');
                 marketCap = 0;
             } else {
@@ -340,7 +335,7 @@ export default {
             return 0;
         },
         handleRightLabel() {
-            this.rightLabel = ['lg', 'xl'].includes(getBreakPoint());
+            this.additionalAttributes.yAxis[1].axisLabel.show = ['lg', 'xl'].includes(getBreakPoint());
         },
         fetchWEBsupply: function() {
             return new Promise((resolve, reject) => {
@@ -362,6 +357,30 @@ export default {
                         reject(err);
                     });
             });
+        },
+        messageHandler: function(result) {
+            if (result.method === 'state.update') {
+                this.updateMarketData(result);
+            }
+            if (result.method === 'kline.update') {
+                let lastCandle = this.stats[this.stats.length - 1];
+
+                if (lastCandle && this.getDate(result.params[0][0]) === this.getDate(lastCandle.time)) {
+                    this.stats.pop();
+                }
+
+                this.stats.push({
+                    time: result.params[0][0],
+                    open: result.params[0][1],
+                    close: result.params[0][2],
+                    highest: result.params[0][3],
+                    lowest: result.params[0][4],
+                    volume: result.params[0][5],
+                });
+            }
+            if (result.id === this.monthInfoRequestId) {
+                this.updateMonthMarketData(result.result);
+            }
         },
     },
     components: {

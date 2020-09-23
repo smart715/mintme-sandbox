@@ -4,7 +4,7 @@ namespace App\DataFixtures\Factory;
 
 use App\DataFixtures\FakerHelper;
 use App\Entity\User;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 
 /** @codeCoverageIgnore */
@@ -22,7 +22,7 @@ class UserFixturesFactory extends AbstractFixturesFactory
     /** @var UserManagerInterface */
     private $userManager;
 
-    public function __construct(ObjectManager $objectManager, UserManagerInterface $userManager)
+    public function __construct(EntityManagerInterface $objectManager, UserManagerInterface $userManager)
     {
         $this->userManager = $userManager;
 

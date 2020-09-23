@@ -7,13 +7,11 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sirprize\PostalCodeValidator\Validator as PostalCodeValidator;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Rest\Route("/api/profile")
- * @Security(expression="is_granted('prelaunch')")
  */
 class ProfileController extends AbstractFOSRestController
 {
@@ -46,13 +44,13 @@ class ProfileController extends AbstractFOSRestController
                 $replace = ['\d', '[a-z]', '\s'];
 
                 foreach ($patterns as &$pattern) {
-                    $pattern = '('.str_replace($search, $replace, $pattern).')';
+                    $pattern = '(' . str_replace($search, $replace, $pattern) . ')';
                 }
 
                 $finalPattern = implode('|', $patterns);
 
                 if (count($patterns) > 1) {
-                    $finalPattern = '('.$finalPattern.')';
+                    $finalPattern = '(' . $finalPattern . ')';
                 }
             }
         }

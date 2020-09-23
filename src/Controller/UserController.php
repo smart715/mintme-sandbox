@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\ApiKey;
+use App\Entity\Unsubscriber;
 use App\Entity\User;
-use App\Exchange\Trade\Config\PrelaunchConfig;
+use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
+use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TwoFactorManagerInterface;
@@ -14,8 +16,10 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -26,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class UserController extends AbstractController
+class UserController extends AbstractController implements TwoFactorAuthenticatedInterface
 {
     /** @var UserManagerInterface */
     protected $userManager;
@@ -63,6 +67,7 @@ class UserController extends AbstractController
      */
     public function editUser(Request $request): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         $keys = $user
             ? $user->getApiKey()
@@ -70,6 +75,7 @@ class UserController extends AbstractController
         $clients = $user
             ? $user->getApiClients()
             : null;
+
         $passwordForm = $this->getPasswordForm($request, $keys);
 
         return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
@@ -78,12 +84,16 @@ class UserController extends AbstractController
     /**
      * @Route("/referral-program", name="referral-program")
      */
-    public function referralProgram(PrelaunchConfig $prelaunchConfig): Response
+    public function referralProgram(DeployCostConfig $deployCostConfig): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/referral.html.twig', [
-            'referralCode' => $this->getUser()->getReferralCode(),
-            'referralPercentage' => $prelaunchConfig->getReferralFee() * 100,
-            'referralsCount' => count($this->getUser()->getReferrals()),
+            'referralCode' => $user->getReferralCode(),
+            'referralPercentage' => $this->getParameter('referral_fee') * 100,
+            'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
+            'referralsCount' => count($user->getReferrals()),
         ]);
     }
 
@@ -108,6 +118,7 @@ class UserController extends AbstractController
         Request $request,
         TwoFactorManagerInterface $twoFactorManager
     ): Response {
+        /** @var User $user */
         $user = $this->getUser();
         $form = $this->createForm(TwoFactorType::class);
         $isTwoFactor = $user->isGoogleAuthenticatorEnabled();
@@ -162,11 +173,14 @@ class UserController extends AbstractController
             ? "\r\n"
             : "\n";
 
-        if (!$this->container->get('session')->getBag('attributes')->remove('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if (!$bag->remove('download_backup_codes')) {
             return $this->redirectToRoute('settings');
         }
 
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
         $backupCodes = $user->getGoogleAuthenticatorBackupCodes();
 
@@ -186,7 +200,10 @@ class UserController extends AbstractController
 
     private function addDownloadCodesToResponse(Response $response): Response
     {
-        if ($this->container->get('session')->getBag('attributes')->has('download_backup_codes')) {
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        if ($bag->has('download_backup_codes')) {
             $response->headers->set('Refresh', "5;{$this->generateUrl('download_backup_codes', [], UrlGeneratorInterface::ABSOLUTE_URL)}");
         }
 
@@ -196,12 +213,18 @@ class UserController extends AbstractController
     public function getBackupCodes(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $twoFactorManager->generateBackupCodes();
+
+        /** @var User $user*/
         $user = $this->getUser();
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
-        $this->container->get('session')->getBag('attributes')->set('download_backup_codes', 'download');
+
+        /** @var mixed $bag */
+        $bag = $this->container->get('session')->getBag('attributes');
+
+        $bag->set('download_backup_codes', 'download');
 
         return $backupCodes;
     }
@@ -231,8 +254,8 @@ class UserController extends AbstractController
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
             $this->addFlash('success', 'Password was updated successfully');
+            /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED,
                 new FilterUserResponseEvent(
                     $user,
                     $request,
@@ -241,7 +264,8 @@ class UserController extends AbstractController
                         $apiKey,
                         $user->GetApiClients()
                     )
-                )
+                ),
+                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
             );
         }
 
@@ -250,6 +274,9 @@ class UserController extends AbstractController
 
     private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
                 "groups" => ["API"],
@@ -258,7 +285,7 @@ class UserController extends AbstractController
                 "groups" => ["API"],
             ]),
             'passwordForm' => $passwordForm->createView(),
-            'twoFactorAuth' => $this->getUser()->isGoogleAuthenticatorEnabled(),
+            'twoFactorAuth' => $user->isGoogleAuthenticatorEnabled(),
         ]);
     }
 
@@ -274,7 +301,7 @@ class UserController extends AbstractController
 
     private function turnOffAuthenticator(TwoFactorManagerInterface $twoFactorManager): void
     {
-        /** @var User */
+        /** @var User $user*/
         $user = $this->getUser();
         $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
         $entityManager = $this->getDoctrine()->getManager();
@@ -287,9 +314,74 @@ class UserController extends AbstractController
 
     private function generateBackupCodesFileName(): string
     {
-        $name = $this->getUser()->getUsername();
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $name = $user->getUsername();
         $time = date("H-i-d-m-Y");
 
         return "backup-codes-{$name}-{$time}.txt";
+    }
+
+    /**
+     * @Route("user/unsubscribe/{key}/{mail}", name="unsubscribe")
+     */
+    public function unsubscribe(
+        Request $request,
+        string $key,
+        string $mail,
+        LoggerInterface $unsubscribeLogger
+    ): Response {
+        if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+            return $this->render('pages/404.html.twig');
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $entityManager->getRepository(Unsubscriber::class);
+
+        if ($repo->findOneBy(['email' => $mail])) {
+            return $this->render('pages/unsubscribe.html.twig', [
+                'mail' => $mail,
+                'alreadyUnsubscribed' => true,
+            ]);
+        }
+
+        $form = $this->createForm(UnsubscribeType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $date = new \DateTimeImmutable();
+                $unsubscriber = new Unsubscriber($mail, $date);
+                $entityManager->persist($unsubscriber);
+                $entityManager->flush();
+            } catch (\Throwable $e) {
+                $form->addError(new FormError("Error when unsubscribing {$mail}"));
+
+                return $this->render('pages/unsubscribe.html.twig', [
+                    'mail' => $mail,
+                    'form' => $form->createView(),
+                    'alreadyUnsubscribed' => false,
+                ]);
+            }
+
+            $unsubscribeLogger->info(
+                sprintf("%s %s\n", $mail, $date->format('Y-m-d H:i:s'))
+            );
+
+            $this->addFlash('success', "{$mail} was successfully unsubscribed");
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        if (hash_hmac('sha1', $mail, $this->getParameter('hmac_sha_one_key')) === $key) {
+            return $this->render('pages/unsubscribe.html.twig', [
+                'mail' => $mail,
+                'form' => $form->createView(),
+                'alreadyUnsubscribed' => false,
+            ]);
+        }
+
+        return $this->render('pages/404.html.twig');
     }
 }

@@ -11,11 +11,13 @@ abstract class AbstractOrder
     public const ALL_SIDE = 0;
     public const SELL_SIDE = 1;
     public const BUY_SIDE = 2;
+    public const DONATION_SIDE = 3;
 
     public const SIDE_MAP = [
         'all' => self::ALL_SIDE,
         'sell' => self::SELL_SIDE,
         'buy' => self::BUY_SIDE,
+        'donation' => self::DONATION_SIDE,
     ];
 
     /** @var int|null */
@@ -24,9 +26,12 @@ abstract class AbstractOrder
     /** @var int|null */
     protected $timestamp;
 
+    /** @var int|null */
+    protected $createdTimestamp;
+
     /**
      * @var int
-     * @SWG\Property(description="1 - sell, 2 - buy")
+     * @SWG\Property(description="1 - sell, 2 - buy, 3 - donation")
      */
     protected $side;
 
@@ -99,5 +104,11 @@ abstract class AbstractOrder
     public function getTimestamp(): ?int
     {
         return $this->timestamp;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getCreatedTimestamp(): ?int
+    {
+        return $this->createdTimestamp;
     }
 }

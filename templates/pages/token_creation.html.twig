@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="container" id="token">
-        <div class="row pt-5 justify-content-center">
+        <div class="row pt-4 justify-content-center">
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
@@ -41,34 +41,46 @@
                                                 Token name is already taken
                                             </div>
                                         </div>
+                                        <div class="float-right">
+                                            <div
+                                                v-cloak="$v.tokenName"
+                                                v-if="tokenNameInBlacklist"
+                                                class="alert alert-danger alert-token-name-exists"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                Forbidden token name.
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                 </div>
                                 <div class="col">
                                     {{ form_widget(form.name, {'attr': {
                                         'v-model': '$v.tokenName.$model',
                                         'class' : 'form-control',
-                                        'oninvalid': 'setCustomValidity("Invalid token name.")',
-                                        'onchange': 'setCustomValidity("")',
-                                        'oninput': 'setCustomValidity("")',
                                     }}) }}
                                 </div>
                             </div>
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
-                            Token name can contain only alphabets, numbers, spaces and dashes
+                            Token name can contain only alphabets, numbers and spaces
                         </div>
                         <div v-cloak="$v.tokenName" v-if="tokenName.length > 0 && (!$v.tokenName.validFirstChars || !$v.tokenName.validLastChars || !$v.tokenName.noSpaceBetweenDashes)" class="text-danger text-center">
-                            Token name can't start or end with a dash or space, or have spaces between dashes
+                            Token name can't start or end with a space
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
                             Token name should have at least 4 symbols
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
-                            Token name can't be longer than 255 characters
+                            Token name can't be longer than 60 characters
+                        </div>
+                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.hasNotBlockedWords" class="text-danger text-center">
+                            Token name can't contain "token" or "coin" words
                         </div>
                         <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
-                                <input type="submit" :disabled="saveBtnDisabled" class="btn btn-primary" value="Create token" />
+                                <input type="submit" :disabled="saveBtnDisabled" @click="createToken" class="btn btn-primary" value="Create token" />
                                 <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
                             </div>
                         </div>
@@ -77,21 +89,17 @@
                 </div>
             </div>
         </div>
-        <modal
-            :no-close="false"
-            @close="redirectToProfile"
-            :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
-            <template slot="close"> &nbsp; </template>
-            <template slot="body">
-                <div class="text-center">
-                    <p class="text-white">You need to create a profile, only then you'll be able to create a token</p>
-                    <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
-                </div>
-            </template>
-        </modal>
     </div>
 {% endblock %}
 
 {% block pagescripts %}
     <script src="{{ asset('build/token_creation.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let tokenCreateName = document.getElementById('token_create_name');
+            tokenCreateName.addEventListener('invalid', tokenCreateName.setCustomValidity("Invalid token name."));
+            tokenCreateName.addEventListener('change', tokenCreateName.setCustomValidity(""));
+            tokenCreateName.addEventListener('input', tokenCreateName.setCustomValidity(""));
+        });
+    </script>
 {% endblock %}

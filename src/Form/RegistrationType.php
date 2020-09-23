@@ -2,10 +2,12 @@
 
 namespace App\Form;
 
+use App\Form\Type\NicknameType;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /** @codeCoverageIgnore  */
@@ -16,6 +18,7 @@ class RegistrationType extends AbstractType
         $builder
             ->remove('username')
             ->remove('plainPassword')
+            ->add('nickname', NicknameType::class)
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [
@@ -31,6 +34,9 @@ class RegistrationType extends AbstractType
             ])
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Password:',
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                ],
             ])
         ;
     }

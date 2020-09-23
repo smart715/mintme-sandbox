@@ -24,4 +24,6 @@ interface ContractHandlerInterface
     public function withdraw(User $user, Money $balance, string $address, Token $token): void;
 
     public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
+
+    public function ping(): bool;
 }

@@ -19,7 +19,7 @@
                         <span class="card-header-icon">
                             <font-awesome-icon
                                 v-if="showEditIcon"
-                                class="float-right c-pointer icon-edit"
+                                class="float-right c-pointer icon-default"
                                 icon="edit"
                                 transform="shrink-4 up-1.5"
                                 @click="editingDescription = true"

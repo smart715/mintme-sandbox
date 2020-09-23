@@ -18,6 +18,9 @@ Encore
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
+    .addEntry('mail', './assets/scss/mail.sass')
+    .addEntry('news', './assets/js/news.js')
+    .addEntry('edit_post', './assets/js/edit_post.js')
 
     .enablePostCssLoader()
 
@@ -29,7 +32,7 @@ Encore
 
     .enableSassLoader()
 
-    .enableVueLoader()
+    .enableVueLoader(() => {}, {runtimeCompilerBuild: false})
 
     .configureFilenames({
         'images': 'images/[name].[hash:8].[ext]',

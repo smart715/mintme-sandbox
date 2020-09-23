@@ -1,4 +1,4 @@
-FROM php:7.2.19-fpm
+FROM php:7.4-fpm
 
 RUN apt-get update && apt-get install -y \
     openssl \
@@ -10,12 +10,14 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     libpng-dev \
     libfontconfig \
-    netcat
+    netcat \
+    iproute2
 
 RUN yes | pecl install xdebug \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable=on" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
+    && echo "xdebug.remote_enable=true" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.idekey=Docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_host=$(ip route show | awk '/default/ {print $3}')" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini

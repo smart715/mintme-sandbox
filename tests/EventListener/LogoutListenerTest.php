@@ -6,6 +6,7 @@ use App\EventListener\LogoutListener;
 use App\Logger\UserActionLogger;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,11 @@ class LogoutListenerTest extends TestCase
         $response = $this->createMock(Response::class);
         $token = $this->createMock(TokenInterface::class);
         $request->cookies = $this->createMock(ParameterBag::class);
+
+        $hb = $this->createMock(HeaderBag::class);
+        $hb->method('get')->willReturn(false);
+
+        $request->headers = $hb;
 
         $event->method('getUser')->willReturn($token);
         $event->method('getRequest')->willReturn($request);
@@ -68,6 +74,11 @@ class LogoutListenerTest extends TestCase
         $response = $this->createMock(Response::class);
         $token = $this->createMock(TokenInterface::class);
         $request->cookies = $this->createMock(ParameterBag::class);
+
+        $hb = $this->createMock(HeaderBag::class);
+        $hb->method('get')->willReturn(false);
+
+        $request->headers = $hb;
 
         $event->method('getUser')->willReturn($token);
         $event->method('getRequest')->willReturn($request);

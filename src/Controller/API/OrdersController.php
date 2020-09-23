@@ -8,24 +8,23 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
+use App\Manager\MarketStatusManager;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Psr\Log\LoggerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Rest\Route("/api/orders")
- * @Security(expression="is_granted('prelaunch')")
  */
 class OrdersController extends AbstractFOSRestController
 {
@@ -68,10 +67,15 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         foreach ($request->get('orderData') as $id) {
             $order = new Order(
                 $id,
-                $this->getUser(),
+                $currentUser,
                 null,
                 $market,
                 new Money('0', new Currency($market->getQuote()->getSymbol())),
@@ -97,11 +101,26 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(
         Market $market,
+        MoneyWrapperInterface $moneyWrapper,
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
+        $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
+
+        $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+
+        if ($priceInput->greaterThanOrEqual($maximum)) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => 'Invalid price quantity',
+            ], Response::HTTP_ACCEPTED);
+        }
+
         $tradeResult = $exchanger->placeOrder(
-            $this->getUser(),
+            $currentUser,
             $market,
             (string)$request->get('amountInput'),
             (string)$request->get('priceInput'),
@@ -122,7 +141,7 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\View()
      * @return mixed[]
      */
-    public function getPendingOrders(Market $market, int $page): array
+    public function getPendingOrders(Market $market, MarketStatusManager $marketStatusManager, int $page): array
     {
         $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
             $market,
@@ -134,10 +153,12 @@ class OrdersController extends AbstractFOSRestController
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+        $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
+            'buyDepth' => $buyDepth,
         ];
     }
 
@@ -162,7 +183,9 @@ class OrdersController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
+        /** @var User $user*/
         $user = $this->getUser();
+
         $markets = $this->marketManager->createUserRelated($user);
 
         if (!$markets) {

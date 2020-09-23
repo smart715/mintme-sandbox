@@ -9,7 +9,7 @@
         :no-close-on-esc="noClose"
     >
         <div slot="modal-header" class="d-flex flex-nowrap justify-content-between">
-            <span class="d-inline-block truncate-name flex-grow-1 modal-title p-2 pl-4">
+            <span class="d-inline-block flex-grow-1 modal-title p-2 pl-4">
                 <slot name="header"></slot>
             </span>
             <slot name="close">

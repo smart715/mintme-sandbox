@@ -6,22 +6,20 @@
 
 {% block content %}
     <div id="trading" class="container-fluid">
-        <div class="row pt-5 justify-content-center">
+        <div class="row pt-4 justify-content-center">
             <div class="col-12">
-                <div class="card card-fixed-large mx-auto">
-                    <div class="card-body p-0">
-                        <trading
-                            websocket-url="{{ global_websocket_url }}"
-                            coinbase-url="{{ global_coinbase_url }}"
-                            :page="{{ page }}"
-                            :tokens-count="{{ tokensCount }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}"
-                            mintme-supply-url="{{ mintme_supply }}"
-                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
-                        >
-                        </trading>
-                    </div>
-                </div>
+                <trading
+                        websocket-url="{{ global_websocket_url }}"
+                        coinbase-url="{{ global_coinbase_url }}"
+                        :page="{{ page }}"
+                        :tokens-count="{{ tokensCount }}"
+                        :user-id="{{ app.user ? app.user.id : 0 }}"
+                        mintme-supply-url="{{ mintme_supply }}"
+                        :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                        sort="{{ sort }}"
+                        :order="{{ order ? 'true' : 'false' }}"
+                >
+                </trading>
             </div>
         </div>
     </div>

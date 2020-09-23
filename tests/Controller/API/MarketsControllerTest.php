@@ -9,7 +9,6 @@ class MarketsControllerTest extends WebTestCase
     public function testGetMarkets(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/markets');

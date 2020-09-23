@@ -10,7 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 class KnowledgeBaseController extends Controller
 {
     /**
-     * @Route(path="/kb", name="kb")
+     * @Route(
+     *     path="/kb",
+     *     name="kb",
+     *     options={"expose"=true,
+     *          "sitemap" = true,
+     *          "2fa_progress"=false
+     *     }
+     * )
      */
     public function showAll(KnowledgeBaseManagerInterface $kbManager): Response
     {
@@ -29,9 +36,26 @@ class KnowledgeBaseController extends Controller
         if (!$article) {
             throw new NotFoundKnowledgeBaseException();
         }
+        
+        $metaDescription = trim(
+            preg_replace(
+                '/ +/',
+                ' ',
+                preg_replace(
+                    '/[^A-Za-z0-9 ]/',
+                    ' ',
+                    urldecode(
+                        html_entity_decode(
+                            strip_tags($article->getDescription())
+                        )
+                    )
+                )
+            )
+        );
 
         return $this->render('pages/knowledge_base_show.html.twig', [
            'article' => $article,
+           'metaDescription' => substr($metaDescription, 0, 200),
         ]);
     }
 }

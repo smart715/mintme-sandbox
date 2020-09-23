@@ -69,6 +69,15 @@ class MarketInfo
      */
     private $cryptoSymbol;
 
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
+    private $buyDepth;
+
+    /** @var \DateTimeImmutable|null */
+    private $expires;
+
     public function __construct(
         string $cryptoSymbol,
         string $tokenName,
@@ -79,7 +88,9 @@ class MarketInfo
         Money $high,
         Money $low,
         Money $deal,
-        Money $monthDeal
+        Money $monthDeal,
+        Money $buyDepth,
+        ?\DateTimeImmutable $expires
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -91,6 +102,8 @@ class MarketInfo
         $this->low = $low;
         $this->deal = $deal;
         $this->monthDeal = $monthDeal;
+        $this->buyDepth = $buyDepth;
+        $this->expires = $expires;
     }
 
     /**
@@ -169,5 +182,16 @@ class MarketInfo
     public function setTokenName(string $tokenName): void
     {
         $this->tokenName = $tokenName;
+    }
+
+    /** @Groups({"dev"}) */
+    public function getBuyDepth(): Money
+    {
+        return $this->buyDepth;
+    }
+
+    public function getExpires(): ?\DateTimeImmutable
+    {
+        return $this->expires;
     }
 }

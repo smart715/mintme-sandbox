@@ -34,6 +34,7 @@ $primary: #0E3B58;
 $primary-light: #017bbc;
 $blue: #1da1f3;
 $meterbg-list: (#b71c1c, #d32f2f, #f9a825, #8bc34a, #558b2f);
+$gold: #C1AE83;
 // This variable affects the `.h-*` and `.w-*` classes.
 $sizes: () !default;
 
@@ -73,8 +74,8 @@ $body-background-sm: linear-gradient(#184b80, #193a5d);
 $module-background: linear-gradient(#0b3c57, #19263d);
 $body-text-color: #1a1a1a;
 $color-nav: $dark-white;
-$color-nav-active: #0071bc;
-$color-nav-hover: #0071bc;
+$color-nav-active: $gold;
+$color-nav-hover: $gold;
 $color-link: $blue;
 $color-link-hover: #90c7ff;
 $color-tabs: $primary;
@@ -82,7 +83,7 @@ $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
 $color-facebook: #3b5998;
 $color-twitter: $blue;
-$color-tooltip: #007DC0;
+$color-tooltip: #5B6C7E;
 $color-badge: #4FC2F8;
 $color-linkedin: #0077b5;
 $color-toggle-password-active: #0071bc;
@@ -91,19 +92,25 @@ $modal-alert-border-color: $primary;
 $index-description-bg: linear-gradient(180deg, #102238, #102238, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: $grey-dark;
+$input-bg: #1D3D61;
 $input-btn-padding-y: .25rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
 $input-btn-focus-color: $input-bg;
+$input-focus: #193554;
+$search-input: #1D3D61;
 
 // Card
 $card-border-width: 0.6rem;
 $card-border-color: $ghost-dark;
-$card-input-color: $grey-dark;
+$card-input-color: $input-bg;
 $card-header-bg: $primary;
 $card-body-bg: $secondary;
 $card-text-color: $dark-white;
+
+//Donation
+$donation-header-bg: $primary;
+$donation-body-bg: $secondary;
 
 // Pagination
 $pagination-color: $primary;
@@ -130,3 +137,6 @@ $toast-success-bg: #8dd7a6;
 $toast-success-text: #2e7d32;
 $toast-warning-bg: #ffcc7c;
 $toast-warning-text: #de3300;
+
+// spaces
+$token-avatar-margin-left: 115px

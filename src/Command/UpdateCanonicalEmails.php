@@ -44,7 +44,7 @@ class UpdateCanonicalEmails extends Command
     }
 
     /** {@inheritdoc} */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -67,6 +67,8 @@ class UpdateCanonicalEmails extends Command
         $io->comment('Updating db...');
         $this->em->flush();
         $io->success('All canonical fields was updated');
+
+        return 0;
     }
 
     private function isCanonicalExist(array $allUsers, User $currentUser): bool

@@ -30,6 +30,7 @@ interface BalanceHandlerInterface
 
     public function summary(Token $token): SummaryResult;
     public function balance(User $user, Token $token): BalanceResult;
+    public function exchangeBalance(User $user, Token $token): Money;
     public function balances(User $user, array $tokens): BalanceResultContainer;
     public function isNotExchanged(Token $token, int $amount): bool;
 
@@ -56,4 +57,7 @@ interface BalanceHandlerInterface
         int $incrementer = 5,
         int $max = 40
     ): array;
+
+    public function update(User $user, Token $token, Money $amount, string $type): void;
+    public function updateUserTokenRelation(User $user, Token $token): void;
 }

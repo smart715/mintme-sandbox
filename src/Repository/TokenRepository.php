@@ -43,10 +43,23 @@ class TokenRepository extends EntityRepository
     {
         return $this->createQueryBuilder('token')
             ->where('LOWER(token.name) LIKE LOWER(:like)')
+            ->andWhere('token.isBlocked=false')
             ->setParameter('like', "$pattern%")
             ->orderBy('token.name', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getDeployedTokens(): array
+    {
+        return $this->createQueryBuilder('token')
+            ->where('token.deployed IS NOT NULL')
+            ->getQuery()
+            ->execute();
     }
 }

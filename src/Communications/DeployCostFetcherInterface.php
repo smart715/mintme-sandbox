@@ -12,4 +12,5 @@ interface DeployCostFetcherInterface
      * @return Money
      */
     public function getDeployWebCost(): Money;
+    public function getDeployCostReferralReward(): Money;
 }

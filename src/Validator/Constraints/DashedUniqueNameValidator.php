@@ -2,6 +2,7 @@
 
 namespace App\Validator\Constraints;
 
+use App\Entity\User;
 use App\Manager\TokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
@@ -19,9 +20,15 @@ class DashedUniqueNameValidator extends ConstraintValidator
         TokenManagerInterface $tokenManager,
         TokenStorageInterface $tokenStorage
     ) {
+        /**
+         * @var User $user
+         * @psalm-suppress UndefinedDocblockClass
+         */
+        $user = $tokenStorage->getToken()->getUser();
+        $tokens = $user->getTokens();
         $this->userTokenNames = array_map(function ($token) {
             return $token->getName();
-        }, $tokenStorage->getToken()->getUser()->getTokens());
+        }, $tokens);
         $this->tokenManager = $tokenManager;
     }
 
