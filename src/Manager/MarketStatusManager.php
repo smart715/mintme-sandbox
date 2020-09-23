@@ -290,4 +290,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $market->getQuote()->getSymbol()
         );
     }
+
+    public function getExpired(): array
+    {
+        return $this->repository->getExpired();
+    }
 }
