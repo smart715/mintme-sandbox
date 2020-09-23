@@ -44,6 +44,8 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Markets")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
     public function getMarkets(ParamFetcherInterface $request): Response
     {

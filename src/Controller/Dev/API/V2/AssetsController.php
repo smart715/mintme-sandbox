@@ -16,14 +16,9 @@ use Swagger\Annotations as SWG;
  */
 class AssetsController extends AbstractFOSRestController
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+    private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
@@ -47,6 +42,7 @@ class AssetsController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @return mixed[]
      */
     public function getAssets(): array
     {

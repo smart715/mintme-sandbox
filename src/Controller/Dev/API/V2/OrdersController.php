@@ -60,6 +60,8 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
     public function getActiveOrders(ParamFetcherInterface $request): Response
     {
@@ -106,6 +108,8 @@ class OrdersController extends AbstractFOSRestController
      * @SWG\Parameter(name="lastId", in="query", type="integer", description="Identifier of last order [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Orders")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
     public function getFinishedOrders(ParamFetcherInterface $request): Response
     {

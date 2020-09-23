@@ -23,17 +23,10 @@ class TickerController extends AbstractFOSRestController
 
     use BaseQuoteOrderTrait;
 
-    /** @var MarketStatusManagerInterface */
-    private $marketStatusManager;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private MarketStatusManagerInterface $marketStatusManager;
+    private MarketHandlerInterface $marketHandler;
+    private MarketFactoryInterface $marketFactory;
+    private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
         MarketStatusManagerInterface $marketStatusManager,
@@ -60,6 +53,7 @@ class TickerController extends AbstractFOSRestController
      * @SWG\Tag(name="Open")
      * @Security(name="")
      * @throws ApiNotFoundException
+     * @return mixed[]
      */
     public function getTicker(): array
     {

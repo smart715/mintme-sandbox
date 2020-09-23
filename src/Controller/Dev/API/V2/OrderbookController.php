@@ -28,17 +28,10 @@ class OrderbookController extends AbstractFOSRestController
     public const ARRANGED_BY_BEST = 2;
     public const NO_AGGREGATION = 3;
 
-    /** @var MarketFinderInterface */
-    private $marketFinder;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var MarketStatusManagerInterface */
-    private $marketStatusManager;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private MarketFinderInterface $marketFinder;
+    private MarketHandlerInterface $marketHandler;
+    private MarketStatusManagerInterface $marketStatusManager;
+    private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
         MarketFinderInterface $marketFinder,
@@ -85,6 +78,8 @@ class OrderbookController extends AbstractFOSRestController
      * @SWG\Parameter(name="level", in="query", type="integer")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @param ParamFetcherInterface $request
+     * @param string $base_quote
      * @return mixed[]
      * @throws ApiNotFoundException
      */

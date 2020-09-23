@@ -23,20 +23,11 @@ class TradesController extends AbstractFOSRestController
 
     use BaseQuoteOrderTrait;
 
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var MarketFinderInterface */
-    private $marketFinder;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var MarketStatusManagerInterface */
-    private $marketStatusManager;
+    private MarketHandlerInterface $marketHandler;
+    private MarketFinderInterface $marketFinder;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private MoneyWrapperInterface $moneyWrapper;
+    private MarketStatusManagerInterface $marketStatusManager;
 
     public function __construct(
         MarketFinderInterface $marketFinder,
@@ -64,6 +55,7 @@ class TradesController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
+     * @return mixed[]
      */
     public function getTrades(string $market_pair): array
     {
