@@ -201,7 +201,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
 import {
@@ -363,7 +362,7 @@ export default {
     },
     methods: {
         isDisabledCrypto: function(name) {
-            return _.includes(JSON.parse(this.disabledCrypto), name);
+          return JSON.parse(this.disabledCrypto).includes(name);
         },
         openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
             if (this.isDisabledCrypto(currency)) {
