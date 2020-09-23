@@ -295,7 +295,7 @@ class OrdersController extends DevApiController
 
             return $this->view([
                 'message' => 'Access denied',
-            ], Response::HTTP_ACCEPTED);
+            ], Response::HTTP_FORBIDDEN);
         } else {
             $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
 
