@@ -290,18 +290,20 @@ class OrdersController extends DevApiController
         
         if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
             throw new ApiBadRequestException('Invalid request');
-        } elseif ($tradeResult->getResult() === $tradeResult::USER_NOT_MATCH) {
+        }
+
+        if ($tradeResult->getResult() === $tradeResult::USER_NOT_MATCH) {
             $this->userActionLogger->info('[API] Access denied for cancel order', ['id' => $order->getId()]);
 
             return $this->view([
                 'message' => 'Access denied',
             ], Response::HTTP_FORBIDDEN);
-        } else {
-            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
-
-            return $this->view([
-                'message' => 'Order successfully removed',
-            ], Response::HTTP_ACCEPTED);
         }
+
+        $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+
+        return $this->view([
+            'message' => 'Order successfully removed',
+        ], Response::HTTP_ACCEPTED);
     }
 }
