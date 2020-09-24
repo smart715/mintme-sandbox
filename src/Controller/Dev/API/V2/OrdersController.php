@@ -1,14 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API;
+namespace App\Controller\Dev\API\V2;
 
-use App\Exception\ApiNotFoundException;
-use App\Exchange\Market;
-use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\Order;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Utils\Converter\RebrandingConverterInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -18,34 +12,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Cache(smaxage=15, mustRevalidate=true)
- * @Rest\Route(path="/dev/api/v1/orders")
+ * @Rest\Route(path="/dev/api/v2/auth/orders")
  */
-class OrdersController extends DevApiController
+class OrdersController extends AbstractFOSRestController
 {
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    public function __construct(
-        MarketHandlerInterface $marketHandler,
-        RebrandingConverterInterface $rebrandingConverter,
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
-    ) {
-        $this->marketHandler = $marketHandler;
-        $this->rebrandingConverter = $rebrandingConverter;
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-    }
-
     /**
      * List active orders of a specific market
      *
@@ -90,33 +60,22 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
-    public function getActiveOrders(ParamFetcherInterface $request): array
+    public function getActiveOrders(ParamFetcherInterface $request): Response
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
-
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
-
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-
-        if (is_null($base) || is_null($quote)) {
-            throw new ApiNotFoundException('Market not found');
-        }
-
-        $market = new Market($base, $quote);
-        $method = Order::BUY_SIDE === Order::SIDE_MAP[$request->get('side')]
-            ? 'getPendingBuyOrders'
-            : 'getPendingSellOrders';
-
-        return array_map(function ($order) {
-            return $this->rebrandingConverter->convertOrder($order);
-        }, $this->marketHandler->$method(
-            $market,
-            (int)$request->get('offset'),
-            (int)$request->get('limit')
-        ));
+        return $this->forward(
+            'App\Controller\Dev\API\V1\OrdersController::getActiveOrders',
+            ['request' => $request,],
+            [
+                'base' => (int)$request->get('base'),
+                'quote' => (int)$request->get('quote'),
+                'offset' => (int)$request->get('offset'),
+                'limit' => (int)$request->get('limit'),
+                'side' => (int)$request->get('side'),
+            ]
+        );
     }
 
     /**
@@ -149,27 +108,20 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="lastId", in="query", type="integer", description="Identifier of last order [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Orders")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
-    public function getFinishedOrders(ParamFetcherInterface $request): array
+    public function getFinishedOrders(ParamFetcherInterface $request): Response
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
-
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
-
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-
-        if (is_null($base) || is_null($quote)) {
-            throw new ApiNotFoundException('Market not found');
-        }
-
-        return array_map(function ($order) {
-            return $this->rebrandingConverter->convertOrder($order);
-        }, $this->marketHandler->getExecutedOrders(
-            new Market($base, $quote),
-            (int)$request->get('lastId'),
-            (int)$request->get('limit')
-        ));
+        return $this->forward(
+            'App\Controller\Dev\API\V1\OrdersController::getFinishedOrders',
+            ['request' => $request,],
+            [
+                'base' => (int)$request->get('base'),
+                'quote' => (int)$request->get('quote'),
+                'lastId' => (int)$request->get('lastId'),
+                'limit' => (int)$request->get('limit'),
+            ]
+        );
     }
 }

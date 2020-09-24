@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Controller\Dev\API;
+namespace App\Tests\Controller\Dev\API\V1\User;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
@@ -11,9 +11,19 @@ class OrdersControllerTest extends WebTestCase
     public function testGetSellActiveOrders(): void
     {
         $email = $this->register($this->client);
+        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
+        $fooClient = self::createClient();
+        $this->register($fooClient);
+
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
             'priceInput' => 1,
             'amountInput' => 1,
             'action' => 'sell',
@@ -27,7 +37,7 @@ class OrdersControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
@@ -58,8 +68,13 @@ class OrdersControllerTest extends WebTestCase
     public function testGetBuyActiveOrders(): void
     {
         $email = $this->register($this->client);
+        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
+
+        $fooClient = self::createClient();
+        $fooEmail = $this->register($fooClient);
+        $this->sendWeb($fooEmail);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
             'priceInput' => 1,
@@ -67,15 +82,21 @@ class OrdersControllerTest extends WebTestCase
             'action' => 'buy',
         ]);
 
+        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
-           'email' => $email,
+            'email' => $email,
         ]);
         $keys = ApiKey::fromNewUser($user);
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'buy',
@@ -103,107 +124,10 @@ class OrdersControllerTest extends WebTestCase
         );
     }
 
-    public function testGetSellActiveOrdersSorting(): void
-    {
-        $email = $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 1,
-            'amountInput' => 1,
-            'action' => 'sell',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 3,
-            'amountInput' => 1,
-            'action' => 'sell',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 2,
-            'amountInput' => 1,
-            'action' => 'sell',
-        ]);
-
-        /** @var User $user */
-        $user = $this->em->getRepository(User::class)->findOneBy([
-            'email' => $email,
-        ]);
-        $keys = ApiKey::fromNewUser($user);
-        $this->em->persist($keys);
-        $this->em->flush();
-
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'sell',
-            'offset' => 0,
-            'limit' => 100,
-        ], [], [
-            'HTTP_X-API-ID' => $keys->getPublicKey(),
-            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
-        ]);
-        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-
-        $this->assertEquals('1.000000000000', $res[0]['price']);
-        $this->assertEquals('2.000000000000', $res[1]['price']);
-        $this->assertEquals('3.000000000000', $res[2]['price']);
-    }
-
-    public function testGetBuyActiveOrdersSorting(): void
-    {
-        $email = $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-        $this->sendWeb($email);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 1,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 3,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 2,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        /** @var User $user */
-        $user = $this->em->getRepository(User::class)->findOneBy([
-            'email' => $email,
-        ]);
-        $keys = ApiKey::fromNewUser($user);
-        $this->em->persist($keys);
-        $this->em->flush();
-
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'buy',
-            'offset' => 0,
-            'limit' => 100,
-        ], [], [
-            'HTTP_X-API-ID' => $keys->getPublicKey(),
-            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
-        ]);
-
-        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
-
-        $this->assertEquals('3.000000000000', $res[0]['price']);
-        $this->assertEquals('2.000000000000', $res[1]['price']);
-        $this->assertEquals('1.000000000000', $res[2]['price']);
-    }
-
     public function testGetSellActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
+        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -232,7 +156,7 @@ class OrdersControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
@@ -244,7 +168,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
         $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
             'quote' => $tokName,
             'side' => 'sell',
@@ -259,10 +183,10 @@ class OrdersControllerTest extends WebTestCase
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
         $this->assertEquals('1.000000000000', $res1[0]['price']);
-        $this->assertEquals('2.000000000000', $res2[0]['price']);
+        $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
-    public function testGetFinishedOrders(): void
+    public function testGetBuyActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
         $tokName = $this->createToken($this->client);
@@ -271,11 +195,17 @@ class OrdersControllerTest extends WebTestCase
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
             'priceInput' => 1,
             'amountInput' => 1,
-            'action' => 'sell',
+            'action' => 'buy',
         ]);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 1,
+            'priceInput' => 3,
+            'amountInput' => 1,
+            'action' => 'buy',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 2,
             'amountInput' => 1,
             'action' => 'buy',
         ]);
@@ -288,38 +218,36 @@ class OrdersControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        sleep(10);
-
-        $this->client->request('GET', '/dev/api/v1/orders/finished', [
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
             'base' => 'MINTME',
             'quote' => $tokName,
-            'side' => 'sell',
+            'side' => 'buy',
             'offset' => 0,
-            'limit' => 100,
+            'limit' => 1,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
-        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(1, $res);
-        $this->assertEquals(
-            [
-                'MINTME',
-                $tokName,
-                '1.000000000000',
-                '0.998000000000',
-            ],
-            [
-                $res[0]['market']['base']['symbol'],
-                $res[0]['market']['quote']['symbol'],
-                $res[0]['price'],
-                $res[0]['amount'],
-            ]
-        );
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'buy',
+            'offset' => 1,
+            'limit' => 1,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $res1);
+        $this->assertCount(1, $res2);
+        $this->assertEquals('1.000000000000', $res1[0]['price']);
+        $this->assertEquals('3.000000000000', $res2[0]['price']);
     }
 
-    // todo fix offset then creating a test
     public function testGetFinishedOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
@@ -360,67 +288,7 @@ class OrdersControllerTest extends WebTestCase
 
         sleep(10);
 
-        $this->client->request('GET', '/dev/api/v1/orders/finished', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'sell',
-            'offset' => 0,
-            'limit' => 1,
-        ], [], [
-            'HTTP_X-API-ID' => $keys->getPublicKey(),
-            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
-        ]);
-
-        $this->client->request('GET', '/dev/api/v1/orders/finished', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'sell',
-            'offset' => 1,
-            'limit' => 1,
-        ], [], [
-            'HTTP_X-API-ID' => $keys->getPublicKey(),
-            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
-        ]);
-
-        $this->assertTrue(true);
-    }
-
-    public function testGetBuyActiveOrdersWithOffset(): void
-    {
-        $email = $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-        $this->sendWeb($email);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 1,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 3,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
-            'priceInput' => 2,
-            'amountInput' => 1,
-            'action' => 'buy',
-        ]);
-
-        /** @var User $user */
-        $user = $this->em->getRepository(User::class)->findOneBy([
-            'email' => $email,
-        ]);
-        $keys = ApiKey::fromNewUser($user);
-        $this->em->persist($keys);
-        $this->em->flush();
-
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'buy',
+        $this->client->request('GET', '/dev/api/v1/user/orders/finished', [
             'offset' => 0,
             'limit' => 1,
         ], [], [
@@ -429,10 +297,7 @@ class OrdersControllerTest extends WebTestCase
         ]);
         $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->client->request('GET', '/dev/api/v1/orders/active', [
-            'base' => 'MINTME',
-            'quote' => $tokName,
-            'side' => 'buy',
+        $this->client->request('GET', '/dev/api/v1/user/orders/finished', [
             'offset' => 1,
             'limit' => 1,
         ], [], [
@@ -443,7 +308,118 @@ class OrdersControllerTest extends WebTestCase
 
         $this->assertCount(1, $res1);
         $this->assertCount(1, $res2);
-        $this->assertEquals('3.000000000000', $res1[0]['price']);
-        $this->assertEquals('2.000000000000', $res2[0]['price']);
+        $this->assertEquals($res1[0]['id'], $res2[0]['id']);
+        $this->assertNotEquals($res1[0]['side'], $res2[0]['side']);
+    }
+
+    public function testPlaceOrder(): void
+    {
+        $email = $this->register($this->client);
+        $tokName = $this->createToken($this->client);
+
+        /** @var User $user */
+        $user = $this->em->getRepository(User::class)->findOneBy([
+            'email' => $email,
+        ]);
+        $keys = ApiKey::fromNewUser($user);
+        $this->em->persist($keys);
+        $this->em->flush();
+
+        $this->client->request('POST', '/dev/api/v1/user/orders', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+            ], [], [
+                'HTTP_X-API-ID' => $keys->getPublicKey(),
+                'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+            ]);
+
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $res);
+        $this->assertEquals(
+            [
+                'MINTME',
+                $tokName,
+                '1.000000000000',
+                '1.000000000000',
+            ],
+            [
+                $res[0]['market']['base']['symbol'],
+                $res[0]['market']['quote']['symbol'],
+                $res[0]['price'],
+                $res[0]['amount'],
+            ]
+        );
+    }
+
+    public function testCancelOrder(): void
+    {
+        $email = $this->register($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 1,
+            'action' => 'sell',
+        ]);
+
+        /** @var User $user */
+        $user = $this->em->getRepository(User::class)->findOneBy([
+            'email' => $email,
+        ]);
+        $keys = ApiKey::fromNewUser($user);
+        $this->em->persist($keys);
+        $this->em->flush();
+
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res1 = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->client->request(
+            'DELETE',
+            '/dev/api/v1/user/orders/' . $res1[0]['id'] . '?base=MINTME&quote=' . $tokName,
+            [],
+            [],
+            [
+                'HTTP_X-API-ID' => $keys->getPublicKey(),
+                'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+            ]
+        );
+
+        $this->client->request('GET', '/dev/api/v1/user/orders/active', [
+            'base' => 'MINTME',
+            'quote' => $tokName,
+            'side' => 'sell',
+            'offset' => 0,
+            'limit' => 100,
+        ], [], [
+            'HTTP_X-API-ID' => $keys->getPublicKey(),
+            'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
+        ]);
+        $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $res1);
+        $this->assertCount(0, $res2);
     }
 }

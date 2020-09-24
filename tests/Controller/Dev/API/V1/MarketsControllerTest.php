@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Tests\Controller\Dev\API;
+namespace App\Tests\Controller\Dev\API\V1;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
