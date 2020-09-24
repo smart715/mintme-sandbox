@@ -1,30 +1,21 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API;
+namespace App\Controller\Dev\API\V2;
 
-use App\Entity\Token\Token;
-use App\Exception\ApiNotFoundException;
-use App\Manager\TokenManagerInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Rest\Route(path="/dev/api/v1/currencies")
+ * @Rest\Route(path="/dev/api/v2/auth/currencies")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
-class CurrenciesController extends DevApiController
+class CurrenciesController extends AbstractFOSRestController
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    public function __construct(TokenManagerInterface $tokenManager)
-    {
-        $this->tokenManager = $tokenManager;
-    }
-
     /**
      * List currencies
      *
@@ -53,12 +44,18 @@ class CurrenciesController extends DevApiController
      * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Currencies")
+     * @param ParamFetcherInterface $request
+     * @return Response
      */
-    public function getCurrencies(ParamFetcherInterface $request): array
+    public function getCurrencies(ParamFetcherInterface $request): Response
     {
-        return $this->tokenManager->findAll(
-            (int)$request->get('offset'),
-            (int)$request->get('limit')
+        return $this->forward(
+            'App\Controller\Dev\API\V1\CurrenciesController::getCurrencies',
+            ['request' => $request,],
+            [
+                'offset' => (int)$request->get('offset'),
+                'limit' => (int)$request->get('limit'),
+            ]
         );
     }
 
@@ -76,15 +73,14 @@ class CurrenciesController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Parameter(name="name", in="path", description="Currency name", type="string")
      * @SWG\Tag(name="Currencies")
+     * @param string $name
+     * @return Response
      */
-    public function getCurrency(string $name): Token
+    public function getCurrency(string $name): Response
     {
-        $token = $this->tokenManager->findByName($name);
-
-        if (!$token) {
-            throw new ApiNotFoundException("Currency not found");
-        }
-
-        return $token;
+        return $this->forward(
+            'App\Controller\Dev\API\V1\CurrenciesController::getCurrency',
+            ['request' => $name,]
+        );
     }
 }
