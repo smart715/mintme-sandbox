@@ -95,12 +95,12 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
-            'tokenName' => $userToken,
+            'userToken' => $userToken,
         ]);
     }
 
     /**
-     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
+     * @Rest\Route("/token/{usertoken}/invite", name="register-referral", schemes={"https"})
      */
     public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
     {
