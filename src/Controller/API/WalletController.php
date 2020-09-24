@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Controller\TwoFactorAuthenticatedInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -96,7 +97,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         $user = $this->getUser();
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
-        $this->denyAccessUnlessGranted('not-disabled', $tradable);
+
+        if ($tradable instanceof Crypto) {
+            $this->denyAccessUnlessGranted('not-disabled', $tradable);
+        }
 
         try {
             $pendingWithdraw = $wallet->withdrawInit(
