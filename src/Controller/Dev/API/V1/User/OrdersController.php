@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API\User;
+namespace App\Controller\Dev\API\V1\User;
 
-use App\Controller\Dev\API\DevApiController;
+use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
