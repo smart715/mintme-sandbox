@@ -67,13 +67,13 @@ class OrdersController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\OrdersController::getActiveOrders',
-            ['request' => $request,],
+            ['request' => $request],
             [
-                'base' => (int)$request->get('base'),
-                'quote' => (int)$request->get('quote'),
-                'offset' => (int)$request->get('offset'),
-                'limit' => (int)$request->get('limit'),
-                'side' => (int)$request->get('side'),
+                'base' => $request->get('base'),
+                'quote' => $request->get('quote'),
+                'offset' => $request->get('offset'),
+                'limit' => $request->get('limit'),
+                'side' => $request->get('side'),
             ]
         );
     }
@@ -115,12 +115,14 @@ class OrdersController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\OrdersController::getFinishedOrders',
-            ['request' => $request,],
             [
-                'base' => (int)$request->get('base'),
-                'quote' => (int)$request->get('quote'),
-                'lastId' => (int)$request->get('lastId'),
-                'limit' => (int)$request->get('limit'),
+                'request' => $request,
+            ],
+            [
+                'base' => $request->get('base'),
+                'quote' => $request->get('quote'),
+                'lastId' => $request->get('lastId'),
+                'limit' => $request->get('limit'),
             ]
         );
     }

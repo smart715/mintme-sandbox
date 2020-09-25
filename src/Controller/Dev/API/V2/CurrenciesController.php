@@ -51,10 +51,12 @@ class CurrenciesController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\CurrenciesController::getCurrencies',
-            ['request' => $request,],
             [
-                'offset' => (int)$request->get('offset'),
-                'limit' => (int)$request->get('limit'),
+                'request' => $request,
+            ],
+            [
+                'offset' => $request->get('offset'),
+                'limit' => $request->get('limit'),
             ]
         );
     }
@@ -80,7 +82,9 @@ class CurrenciesController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\CurrenciesController::getCurrency',
-            ['request' => $name,]
+            [
+                'request' => $name,
+            ]
         );
     }
 }
