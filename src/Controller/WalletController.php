@@ -8,6 +8,7 @@ use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
+use App\Security\Config\DisabledBlockchainConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -45,7 +46,7 @@ class WalletController extends Controller
      * @Route(name="wallet", options={"expose"=true})
      * @return Response
      */
-    public function wallet(Request $request): Response
+    public function wallet(Request $request, DisabledBlockchainConfig $disabledBlockchainConfig): Response
     {
         $depositMore = $request->get('depositMore') ?? '';
 
@@ -55,6 +56,7 @@ class WalletController extends Controller
         return $this->render('pages/wallet.html.twig', [
             'hash' => $user->getHash(),
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
+            'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
         ]);
     }
 
@@ -96,6 +98,15 @@ class WalletController extends Controller
             return $this->createWalletRedirection(
                 'danger',
                 'Account or token was blocked. Withdrawing is not possible'
+            );
+        }
+
+        if ($pendingWithdraw instanceof PendingWithdraw &&
+            !$this->isGranted('not-disabled', $pendingWithdraw->getCrypto())
+        ) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdraw for this crypto was disabled. Please try again later'
             );
         }
 
