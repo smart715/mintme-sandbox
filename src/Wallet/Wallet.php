@@ -86,7 +86,7 @@ class Wallet implements WalletInterface
     /** {@inheritdoc} */
     public function getWithdrawDepositHistory(User $user, int $offset, int $limit): array
     {
-        // todo: store transations in mintme DB to make pagination more efficient
+        // todo: store transactions in mintme DB to make pagination more efficient
         $gatewayLimit = $offset + $limit;
 
         $depositHistory = $this->depositCommunicator->getTransactions($user, 0, $gatewayLimit);
