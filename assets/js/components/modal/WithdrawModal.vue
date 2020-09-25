@@ -50,7 +50,7 @@
                             Invalid amount.
                         </div>
                 </div>
-                <div v-if="twofAEnabled" class="col-12 pb-3">
+                <div v-if="twoFAEnabled" class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
                         Two Factor Authentication Code:
                     </label>
@@ -117,7 +117,7 @@ export default {
         maxAmount: String,
         availableWeb: String,
         subunit: Number,
-        twofa: Boolean,
+        twofa: String,
         noClose: Boolean,
         expirationTime: Number,
     },
@@ -132,7 +132,7 @@ export default {
     },
     computed: {
         twoFAEnabled: function() {
-          return this.twofa === true;
+          return this.twofa === '1';
         },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
