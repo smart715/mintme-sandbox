@@ -67,7 +67,9 @@ class OrdersController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\OrdersController::getActiveOrders',
-            ['request' => $request],
+            [
+                'request' => $request,
+            ],
             [
                 'base' => $request->get('base'),
                 'quote' => $request->get('quote'),

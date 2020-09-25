@@ -148,7 +148,8 @@ class WalletController extends AbstractFOSRestController
             'App\Controller\Dev\API\V1\User\WalletController::withdraw',
             [
                 'request' => $request,
-                'moneyWrapper' => $moneyWrapper, 'mailer' => $mailer,
+                'moneyWrapper' => $moneyWrapper,
+                'mailer' => $mailer,
             ],
             [
                 'currency' => $request->get('currency'),

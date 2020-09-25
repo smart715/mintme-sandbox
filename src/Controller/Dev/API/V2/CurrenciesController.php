@@ -83,7 +83,7 @@ class CurrenciesController extends AbstractFOSRestController
         return $this->forward(
             'App\Controller\Dev\API\V1\CurrenciesController::getCurrency',
             [
-                'request' => $name,
+                'name' => $name,
             ]
         );
     }
