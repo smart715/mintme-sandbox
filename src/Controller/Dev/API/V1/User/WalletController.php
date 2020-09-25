@@ -92,16 +92,20 @@ class WalletController extends DevApiController
         /** @var  User $user*/
         $user = $this->getUser();
 
-        $depositAddresses = $depositCommunicator->getDepositCredentials(
+        $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
             $this->cryptoManager->findAll()
-        );
+        ) : [];
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($user);
+        $isBlockedToken = $user->getProfile()->getToken()
+            ? $user->getProfile()->getToken()->isBlocked()
+            : false;
+
+        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
         $rebrandedAddresses = [];
 
-        foreach (array_merge($depositAddresses, $tokenDepositAddress) as $symbol => $address) {
+        foreach (array_merge($cryptoDepositAddresses, $tokenDepositAddress) as $symbol => $address) {
             $rebrandedAddresses[$this->rebrandingConverter->convert((string)$symbol)] = $address;
         }
 

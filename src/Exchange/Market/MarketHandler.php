@@ -330,6 +330,18 @@ class MarketHandler implements MarketHandlerInterface
 
         $buyDepth = $this->getBuyDepth($market);
 
+        $expires = new \DateTimeImmutable();
+
+        if (isset($result['expires'], $monthResult['expires'])) {
+            $expires = $expires->setTimestamp(min($result['expires'], $monthResult['expires']));
+        } elseif (isset($result['expires'])) {
+            $expires = $expires->setTimestamp($result['expires']);
+        } elseif (isset($monthResult['expires'])) {
+            $expires = $expires->setTimestamp($monthResult['expires']);
+        } else {
+            $expires = null;
+        }
+
         return new MarketInfo(
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol(),
@@ -368,7 +380,8 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $buyDepth,
                 $this->getSymbol($market->getBase())
-            )
+            ),
+            $expires
         );
     }
 
