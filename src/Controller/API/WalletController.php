@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Controller\TwoFactorAuthenticatedInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiUnauthorizedException;
@@ -100,6 +101,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
 
+        if ($tradable instanceof Crypto) {
+            $this->denyAccessUnlessGranted('not-disabled', $tradable);
+        }
+
         try {
             $pendingWithdraw = $wallet->withdrawInit(
                 $user,
@@ -159,13 +164,9 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             $cryptoManager->findAll()
         ) : [];
 
-        $isBlockedToken = $user->getProfile()->getToken()
-            ? $user->getProfile()->getToken()->isBlocked()
-            : false;
+        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
 
-        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
-
-        return $this->view(array_merge($depositAddresses, $tokenDepositAddress));
+        return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
     }
 
     /**
