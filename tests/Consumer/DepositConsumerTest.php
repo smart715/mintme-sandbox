@@ -22,7 +22,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Security;
 
 class DepositConsumerTest extends TestCase
 {
@@ -39,7 +41,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -64,7 +68,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -89,7 +95,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -114,7 +122,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -138,7 +148,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -164,7 +176,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -195,7 +209,9 @@ class DepositConsumerTest extends TestCase
             $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockContainer(),
+            $this->mockSecurity()
         );
 
         $this->assertFalse(
@@ -304,5 +320,15 @@ class DepositConsumerTest extends TestCase
     private function mockEventDispatcher(): EventDispatcherInterface
     {
         return $this->createMock(EventDispatcherInterface::class);
+    }
+
+    private function mockContainer(): ContainerInterface
+    {
+        return $this->createMock(ContainerInterface::class);
+    }
+
+    private function mockSecurity(): Security
+    {
+        return $this->createMock(Security::class);
     }
 }

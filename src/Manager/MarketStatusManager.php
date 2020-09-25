@@ -144,7 +144,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $queryBuilder->addOrderBy($sort, $order)
             ->addOrderBy('ms.id', $order);
-        
+
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
@@ -303,5 +303,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $quote instanceof Token ||
                 $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())
             );
+    }
+
+    public function getExpired(): array
+    {
+        return $this->repository->getExpired();
     }
 }
