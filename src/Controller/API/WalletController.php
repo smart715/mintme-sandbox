@@ -76,7 +76,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      *      allowBlank=false,
      *      requirements="^[a-zA-Z0-9]+$"
      *     )
-     * @Rest\RequestParam(name="code", allowBlank=false)
+     * @Rest\RequestParam(name="code", allowBlank=true)
      */
     public function withdraw(
         ParamFetcherInterface $request,
