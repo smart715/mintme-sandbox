@@ -54,6 +54,7 @@ let propsForTestCorrectlyRenders = {
     depositMore: 'depositMore',
     twofa: 'twofa',
     websocketUrl: '',
+    disabledCrypto: '["CRYPTO"]',
 };
 
 const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};

@@ -28,7 +28,7 @@
                     <div class="row pl-2">
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked}"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div class="text-white hover-icon">
                                 <font-awesome-icon
@@ -40,7 +40,7 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked}"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -247,6 +247,7 @@ export default {
         depositMore: String,
         twofa: Boolean,
         expirationTime: Number,
+        disabledCrypto: String,
         isUserBlocked: Boolean,
     },
     data() {
@@ -366,7 +367,15 @@ export default {
         });
     },
     methods: {
+        isDisabledCrypto: function(name) {
+          return JSON.parse(this.disabledCrypto).includes(name);
+        },
         openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Withdrawals for this crypto was disabled. Please try again later');
+
+              return;
+            }
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
@@ -387,6 +396,12 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Deposit for this crypto was disabled. Please try again later');
+
+              return;
+            }
+
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
