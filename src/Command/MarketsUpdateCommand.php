@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -11,6 +12,7 @@ use App\Utils\LockFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -60,7 +62,7 @@ class MarketsUpdateCommand extends Command
         $this
             ->setDescription('Update markets with information from viabtc server')
             ->addArgument('market', InputArgument::OPTIONAL, 'The market to update (e.g. BTC/MINTME)')
-        ;
+            ->addOption('cron', null, InputOption::VALUE_NONE, 'Run in cron mode');
     }
 
     /** @inheritDoc */
@@ -79,16 +81,21 @@ class MarketsUpdateCommand extends Command
 
         $result = $market
             ? $this->updateOne($this->rebrandingConverter->reverseConvert($market), $io)
-            : $this->updateAll($io);
+            : $this->updateAll($io, (bool)$input->getOption('cron'));
 
         $lock->release();
 
         return $result;
     }
 
-    protected function updateAll(SymfonyStyle $io): int
+    protected function updateAll(SymfonyStyle $io, bool $cron = false): int
     {
-        $markets = $this->marketFactory->createAll();
+        $markets = $cron
+            ? array_map(
+                fn ($ms) => new Market($ms->getCrypto(), $ms->getQuote()),
+                $this->marketStatusManager->getExpired()
+            )
+            : $this->marketFactory->createAll();
         $io->progressStart(count($markets));
 
         foreach ($markets as $market) {
