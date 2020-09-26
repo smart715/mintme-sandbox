@@ -37,7 +37,7 @@
                 />
             </a>
         </div>
-        <template v-if="loggedIn">
+        <template>
             <p v-if="post.content">
                 <bbcode-view :value="post.content"/>
             </p>
@@ -45,9 +45,6 @@
               To see this post you need to have <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> in your balance. Visit trade page and create buy order to get required tokens.
             </p>
         </template>
-        <p v-else>
-            To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
-        </p>
         <a :href="singlePageUrl" class="hover-icon text-decoration-none text-white">
             <font-awesome-icon
                 class="c-pointer align-middle"

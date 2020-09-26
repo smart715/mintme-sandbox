@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Dev\API\User;
+namespace App\Controller\Dev\API\V1\User;
 
-use App\Controller\Dev\API\DevApiController;
+use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -92,16 +92,20 @@ class WalletController extends DevApiController
         /** @var  User $user*/
         $user = $this->getUser();
 
-        $depositAddresses = $depositCommunicator->getDepositCredentials(
+        $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
             $this->cryptoManager->findAll()
-        );
+        ) : [];
 
-        $tokenDepositAddress = $depositCommunicator->getTokenDepositCredentials($user);
+        $isBlockedToken = $user->getProfile()->getToken()
+            ? $user->getProfile()->getToken()->isBlocked()
+            : false;
+
+        $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
         $rebrandedAddresses = [];
 
-        foreach (array_merge($depositAddresses, $tokenDepositAddress) as $symbol => $address) {
+        foreach (array_merge($cryptoDepositAddresses, $tokenDepositAddress) as $symbol => $address) {
             $rebrandedAddresses[$this->rebrandingConverter->convert((string)$symbol)] = $address;
         }
 

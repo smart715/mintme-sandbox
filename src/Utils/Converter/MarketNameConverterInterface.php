@@ -6,5 +6,5 @@ use App\Exchange\Market;
 
 interface MarketNameConverterInterface
 {
-    public function convert(Market $market): string;
+    public function convert(Market $market, bool $baseFirst = false): string;
 }

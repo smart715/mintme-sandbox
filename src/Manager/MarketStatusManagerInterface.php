@@ -33,4 +33,8 @@ interface MarketStatusManagerInterface
     public function getMarketStatus(Market $market): ?MarketStatus;
 
     public function getUserMarketStatus(User $user, int $offset, int $limit, bool $deployed = false): array;
+
+    public function isValid(Market $market): bool;
+
+    public function getExpired(): array;
 }

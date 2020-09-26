@@ -26,8 +26,9 @@
                 </template>
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
-                        <div class="d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked}"
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div class="text-white hover-icon">
                                 <font-awesome-icon
@@ -36,10 +37,10 @@
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
-                        </div>
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked}"
+                        </button>
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
+                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -53,7 +54,7 @@
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </template>
             </b-table>
@@ -107,11 +108,13 @@
                 <template v-slot:cell(action)="data">
                     <div
                         v-if="data.item.deployed"
-                        class="row pl-2">
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                        class="row pl-2"
+                    >
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
-                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
+                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)"
+                        >
                             <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
@@ -119,9 +122,9 @@
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
-                        </div>
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                        </button>
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openWithdraw(
                                         data.item.name,
@@ -133,14 +136,14 @@
                         >
                             <div>
                                 <div class="text-white hover-icon">
-                                    <font-awesome-icon
-                                        class="icon-default"
-                                        :icon="['fac', 'withdraw']"
-                                    />
-                                    <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                <font-awesome-icon
+                                    class="icon-default"
+                                    :icon="['fac', 'withdraw']"
+                                />
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
                                 </div>
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </template>
             </b-table>
@@ -244,6 +247,7 @@ export default {
         depositMore: String,
         twofa: String,
         expirationTime: Number,
+        disabledCrypto: String,
         isUserBlocked: Boolean,
     },
     data() {
@@ -363,7 +367,15 @@ export default {
         });
     },
     methods: {
+        isDisabledCrypto: function(name) {
+          return JSON.parse(this.disabledCrypto).includes(name);
+        },
         openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Withdrawals for this crypto was disabled. Please try again later');
+
+              return;
+            }
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
@@ -387,6 +399,12 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+            if (this.isDisabledCrypto(currency)) {
+              this.notifyError('Deposit for this crypto was disabled. Please try again later');
+
+              return;
+            }
+
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }

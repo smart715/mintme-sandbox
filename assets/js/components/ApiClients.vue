@@ -15,9 +15,15 @@
                             <copy-link class="code-copy c-pointer ml-2" id="client-copy-btn" :content-to-copy="row.item.id">
                                 <font-awesome-icon :icon="['far', 'copy']" class="hover-icon"></font-awesome-icon>
                             </copy-link>
-                            <a @click="setInvalidateModal(true, row.item.id)">
-                                <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
-                            </a><br />
+                            <button
+                                class="btn btn-transparent p-0"
+                                @click="setInvalidateModal(true, row.item.id)"
+                            >
+                                <font-awesome-icon
+                                    icon="times"
+                                    class="text-danger c-pointer ml-2"
+                                />
+                            </button><br />
                             Secret:<br />
                             <div v-if="row.item.secret">
                                 <template>
@@ -41,7 +47,12 @@
             </template>
         </b-table>
         <p>Create New Client for OAuth:</p>
-        <div class="btn btn-primary c-pointer" @click="createClient">Create</div>
+        <button
+            class="btn btn-primary c-pointer"
+            @click="createClient"
+        >
+            Create
+        </button>
         <confirm-modal :visible="invalidateModal" @confirm="deleteClient(clientId)" @close="setInvalidateModal(false, clientId)">
             <p class="text-white modal-title pt-2">
                 Are you sure you want to delete your API Client.

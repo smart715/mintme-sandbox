@@ -181,6 +181,10 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
+    App\Security\Config\DisabledBlockchainConfig:
+        arguments:
+            $disabledCrypto: '%blockchain_disabled%'
+
     # SonataAdminBundle Registered Admin Classes
     # =======================================
     admin.user:
@@ -598,7 +602,7 @@ services:
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
 
-    App\Controller\Dev\API\User\WalletController:
+    App\Controller\Dev\API\V1\User\WalletController:
         arguments:
             $withdrawExpirationTime: '%withdraw_expiration_time%'
 

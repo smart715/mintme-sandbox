@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\DepositCompletedEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
@@ -22,7 +23,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Security;
 
 class DepositConsumer implements ConsumerInterface
 {
@@ -56,6 +60,13 @@ class DepositConsumer implements ConsumerInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var Security */
+    private $security;
+
+    /** @var ContainerInterface */
+    private $container;
+
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -66,7 +77,9 @@ class DepositConsumer implements ConsumerInterface
         ClockInterface $clock,
         WalletInterface $depositCommunicator,
         EntityManagerInterface $em,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ContainerInterface $container,
+        Security $security
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -78,6 +91,8 @@ class DepositConsumer implements ConsumerInterface
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
+        $this->security = $security;
+        $this->container = $container;
     }
 
     /** {@inheritdoc} */
@@ -133,16 +148,15 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
-            if ($tradable instanceof Token && $tradable->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit token to user with blocked token. Cancelled.');
+            if ($tradable instanceof Crypto) {
+                $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
+                $this->container->get('security.token_storage')->setToken($token);
 
-                return true;
-            }
+                if (!$this->security->isGranted('not-disabled', $tradable)) {
+                    $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');
 
-            if ($tradable instanceof Crypto && $user->isBlocked()) {
-                $this->logger->info('[deposit-consumer] Deposit crypto to blocked user. Cancelled.');
-
-                return true;
+                    return true;
+                }
             }
 
             $strategy = $tradable instanceof Token
@@ -164,12 +178,18 @@ class DepositConsumer implements ConsumerInterface
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
-            $this->logger->error(
-                '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
-            );
-            $this->clock->sleep(10);
+            if ($exception instanceof BalanceException) {
+                $this->logger->error(
+                    '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
+                );
+                $this->clock->sleep(10);
 
-            return false;
+                return false;
+            }
+
+            $this->logger->error(
+                '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
+            );
         }
 
         return true;

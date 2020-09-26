@@ -5,6 +5,7 @@ Encore
 
     .setPublicPath('/build')
 
+    .addEntry('api', './assets/js/api.js')
     .addEntry('main', './assets/js/main.js')
     .addEntry('home', './assets/js/home.js')
     .addEntry('trading', './assets/js/trading.js')
