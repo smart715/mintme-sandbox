@@ -47,7 +47,6 @@ export default {
     },
     data() {
         return {
-            interval: null,
             traders: null,
             fields: [
                 {
@@ -92,10 +91,6 @@ export default {
                     amount: Math.round(row.balance),
                 };
             })).catch((err) => {
-                if (this.interval) {
-                    clearInterval(this.interval);
-                }
-                this.notifyError('Can not get top holders. Please, try again');
                 this.sendLogs('error', 'Can not get top holders', err)
                 .then(() => {}, () => {});
             });
@@ -103,7 +98,7 @@ export default {
     },
     mounted: function() {
         this.getTraders();
-        this.interval = setInterval(() => this.getTraders(), 20 * 1000);
+        setInterval(() => this.getTraders(), 20 * 1000);
     },
 };
 </script>
