@@ -1,12 +1,15 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
 
-const METHOD_AUTH = 12345;
-
 export default {
     props: {
         websocketUrl: {type: String, required: true},
         hash: {type: String},
+    },
+    data() {
+        return {
+            requestId: null,
+        };
     },
     computed: {
         ...mapGetters('websocket', {
@@ -26,11 +29,12 @@ export default {
         _authCallback: function() {
             let auth = this._getClient(this.websocketUrl).auth;
 
+            this.requestId = parseInt(Math.random().toString().replace('0.', ''));
             if (auth === status.FAILED) {
                 this.sendMessage(JSON.stringify({
                     method: 'server.auth',
                     params: [this.hash, 'auth_api'],
-                    id: METHOD_AUTH,
+                    id: this.requestId,
                 }));
                 this._loginClient(this.websocketUrl);
             }
@@ -55,7 +59,7 @@ export default {
 
                 this.addOnOpenHandler(this._authCallback);
                 this.addMessageHandler((result) => {
-                    if (result.id === METHOD_AUTH) {
+                    if (result.id === this.requestId) {
                         let auth = this._getClient(this.websocketUrl).auth;
 
                         if (auth === status.SUCCESS) {
