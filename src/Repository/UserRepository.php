@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\Token;
 use Doctrine\ORM\EntityRepository;
 
 class UserRepository extends EntityRepository
@@ -51,5 +52,19 @@ class UserRepository extends EntityRepository
             ->getArrayResult();
 
             return 0 != count($user);
+    }
+
+    /** @codeCoverageIgnore  */
+    public function findByTokenName(string $tokenName): ?User
+    {
+        $query = $this->createQueryBuilder('t')
+            ->innerJoin('p.user', 'u', 'p.user = u.id')
+            ->where('p.description is null')
+            ->andWhere('p.numberOfReminder <> :numberOfReminder')
+            ->andWhere('p.nextReminderDate = :nextReminderDate OR p.nextReminderDate is null')
+            ->setParameter('numberOfReminder', $numberOfReminder)
+            ->setParameter('nextReminderDate', \Date('Y-m-d'));
+
+        return $query->getQuery()->getResult();
     }
 }
