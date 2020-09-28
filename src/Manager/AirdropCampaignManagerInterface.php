@@ -19,4 +19,5 @@ interface AirdropCampaignManagerInterface
     public function checkIfUserClaimed(?User $user, Token $token): bool;
     public function claimAirdropCampaign(User $user, Token $token): void;
     public function updateOutdatedAirdrops(): int;
+    public function tokenBlockAirDropBalance(Airdrop $activeAirdrop): void;
 }
