@@ -147,11 +147,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdropReward = $activeAirdrop->getLockedAmount()
             ->divide($activeAirdrop->getParticipants());
 
-        $this->checkUserBalance(
-            $token->getProfile()->getUser(),
-            $token,
-            $airdropReward
-        );
+        $this->tokenBlockAirDropBalance($activeAirdrop);
 
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
 
@@ -202,6 +198,16 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
 
         return count($outdatedAirdrops);
+    }
+
+    public function tokenBlockAirDropBalance(Airdrop $activeAirdrop): void
+    {
+        $airdropAmount = $activeAirdrop->getAmount();
+        $airdropActualAmount = $activeAirdrop->getActualAmount();
+
+        if ($airdropAmount->equals($airdropActualAmount)) {
+            throw new ApiBadRequestException('Insufficient funds.');
+        }
     }
 
     private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant
