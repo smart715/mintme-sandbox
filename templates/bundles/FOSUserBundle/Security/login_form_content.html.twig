@@ -1,4 +1,4 @@
-<form action="{{ path("login") }}" method="post">
+<form action="{{ path("login") }}" method="post" id="login">
     {% if app.session.flashbag.peekAll() is not empty %}
         <div class="row">
             {% for label, messages in app.flashes %}
@@ -74,6 +74,6 @@
         <a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a>
     </div>
     {% if csrf_token %}
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+        <input type="hidden" id="fos_user_registration_login__token" name="_csrf_token" value="{{ csrf_token }}" />
     {% endif %}
 </form>
