@@ -12,7 +12,7 @@
                             <div v-if="loggedIn" class="h-100">
                                 <div>
                                     <div>
-                                        <p class="info">Donation is non-refundable</p>
+                                        <p class="info">Donations go to token creator and are non-refundable.</p>
                                     </div>
                                     <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
                                         <div class="col">
