@@ -33,7 +33,7 @@ class Post
      * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
-     *     max = 10000,
+     *     max = 1000,
      * )
      * @var string
      */
