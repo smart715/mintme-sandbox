@@ -2,26 +2,12 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
-use App\Controller\Dev\API\V1\DevApiController;
-use App\Entity\Token\Token;
-use App\Entity\User;
-use App\Exception\ApiBadRequestException;
-use App\Exception\ApiNotFoundException;
-use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Utils\Converter\RebrandingConverterInterface;
-use App\Utils\ValidatorFactoryInterface;
-use App\Wallet\Model\Address;
-use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
