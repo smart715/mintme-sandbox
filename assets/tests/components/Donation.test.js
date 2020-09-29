@@ -5,6 +5,7 @@ import axios from 'axios';
 import Vuex from 'vuex';
 import {webSymbol, btcSymbol, tokSymbol, MINTME} from '../../js/utils/constants';
 
+
 /**
  * @return {Wrapper<Vue>}
  */
@@ -63,7 +64,6 @@ describe('Donation', () => {
 
         expect(wrapper.vm.dropdownText).toBe('Select currency');
         expect(wrapper.vm.isCurrencySelected).toBe(false);
-        expect(wrapper.vm.loginFormLoaded).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.find('.donation-header span').text()).toBe('Donations');
@@ -80,11 +80,10 @@ describe('Donation', () => {
             },
         });
 
-        expect(wrapper.vm.loginFormLoaded).toBe(false);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.vm.dropdownText).toBe('Select currency');
-        expect(wrapper.find('.donation-header span').text()).toBe('To make a donation you have to be logged in');
+        expect(wrapper.find('.donation-header span').text()).toBe('To make a donation, you have to sign up or log in');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(false);
     });
 
@@ -326,32 +325,6 @@ describe('Donation', () => {
         wrapper.vm.onSelect(btcSymbol);
         expect(wrapper.vm.selectedCurrency).toBe(btcSymbol);
         expect(wrapper.vm.balanceLoaded).toBe(false);
-    });
-
-    it('can load login form', (done) => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: false,
-                donationParams: {fee: .01},
-                market: {quote: 'tok1'},
-                websocketUrl: '',
-            },
-        });
-
-        moxios.stubRequest('login', {
-            status: 200,
-            response: '<form></form>',
-        });
-
-        wrapper.vm.loadLoginForm();
-
-        moxios.wait(() => {
-            expect(wrapper.vm.loginFormLoaded).toBe(true);
-            expect(wrapper.html()).toContain('<form>');
-            done();
-        });
     });
 
     it('can load token balance', (done) => {
