@@ -83,6 +83,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
+        showTokenEditModal: Boolean,
     },
     components: {
         FontAwesomeIcon,
@@ -94,7 +95,6 @@ export default {
             currentName: this.name,
             isTokenExchanged: true,
             isTokenNotDeployed: false,
-            showTokenEditModal: false,
             maxLengthToTruncate: 30,
         };
     },

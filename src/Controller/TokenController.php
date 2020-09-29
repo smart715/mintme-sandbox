@@ -97,7 +97,7 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/{tab}",
      *     name="token_show",
-     *     defaults={"tab" = "intro"},
+     *     defaults={"tab" = "intro","modal" = false},
      *     methods={"GET", "POST"},
      *     requirements={"tab" = "trade|intro|donate|posts"},
      *     options={"expose"=true,"2fa_progress"=false}
@@ -107,6 +107,7 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
+        bool $modal,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig
@@ -185,6 +186,7 @@ class TokenController extends Controller
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
+            'showTokenEditModal' => $modal,
         ]);
     }
 
@@ -315,7 +317,14 @@ class TokenController extends Controller
         return $response;
     }
 
-    private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
+    /**
+     * @Route(name="token_show_modal", options={"expose"=true})
+     */
+    public function showModal(): Response {
+        return $this->redirectToOwnToken('intro', true);
+    }
+
+    private function redirectToOwnToken(?string $showtab = 'trade', bool $showTokenEditModal = false): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -328,6 +337,7 @@ class TokenController extends Controller
         return $this->redirectToRoute('token_show', [
             'name' => $tokenDashed,
             'tab' => $showtab,
+            'modal' => $showTokenEditModal,
         ]);
     }
 
