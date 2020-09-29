@@ -116,7 +116,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                     $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
                     new Currency($transaction['crypto'])
                 ),
-                $this->moneyWrapper->parse($transaction['fee'] ?? '0', $transaction['crypto']),
+                new Money($transaction['fee'] ?? 0, new Currency($transaction['crypto'])),
                 $this->cryptoManager->findBySymbol(
                     strtoupper($transaction['crypto'])
                 ),

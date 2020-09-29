@@ -5,7 +5,7 @@ _IS_FAST=${IS_FAST:=1}
 _RPC_HOST=${RPC_HOST:="0.0.0.0"}
 _RPC_PORT=${RPC_PORT:=39573}
 _RPC_CORS=${RPC_CORS:="*"}
-_RPC_API=${RPC_API:="admin,debug,webchain,miner,eth,net,web3"}
+_RPC_API=${RPC_API:="admin,debug,webchain,miner,eth,net,web3,txpool"}
 
 
 #webchaind  --password ${_PASS} account import ${_ACCOUNT}
