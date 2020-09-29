@@ -9,18 +9,15 @@ new Vue({
         Passwordmeter,
         Guide,
     },
-    data: {
-        nickname: '',
-        password: '',
-        disabled: false,
-        passwordInput: null,
-        isPass: true,
-        eyeIcon: null,
-    },
-    mounted() {
-        this.passwordInput = document.getElementById('fos_user_registration_form_plainPassword');
-        this.eyeIcon = document.querySelector('.show-password');
-        this.nickname = this.$refs.nickname.getAttribute('value');
+    data() {
+      return {
+          nickname: '',
+          password: '',
+          disabled: false,
+          passwordInput: null,
+          isPass: true,
+          eyeIcon: null,
+      };
     },
     methods: {
         toggleError: function(val) {
@@ -37,6 +34,11 @@ new Vue({
                 this.isPass = true;
             }
         },
+    },
+    mounted() {
+        this.passwordInput = document.getElementById('fos_user_registration_form_plainPassword');
+        this.eyeIcon = document.querySelector('.show-password');
+        this.nickname = this.$refs.nickname.getAttribute('value');
     },
     validations: {
         nickname: {
