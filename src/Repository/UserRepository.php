@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\User;
 use App\Entity\Token;
+use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 class UserRepository extends EntityRepository
@@ -55,7 +55,7 @@ class UserRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore  */
-    public function findByTokenName(string $tokenName): ?User
+    public function findReferenceByTokenName(string $tokenName): ?User
     {
         $query = $this->createQueryBuilder('t')
             ->innerJoin('p.user', 'u', 'p.user = u.id')

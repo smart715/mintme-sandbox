@@ -104,8 +104,6 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
      */
     public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
     {
-        $referralCode = $this->getUserByTokenName();
-        dd($referralCode);
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);
