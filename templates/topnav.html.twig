@@ -125,6 +125,12 @@
                                 <span>Settings</span>
                             </a>
                         </li>
+                        <li class="nav-item align-self-center d-lg-none {{ route starts with 'token' ? 'active' : '' }}">
+                            <a href="{{ path('token_create') }}" class="nav-link">
+                                <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
+                                Token settings
+                            </a>
+                        </li>
                         <li class="nav-item align-self-center d-lg-none {{ route == 'fos_user_security_logout' ? 'active' : '' }}">
                             <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
@@ -175,6 +181,10 @@
                                     <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Settings
+                                    </a>
+                                    <a class="dropdown-item {{ route == 'token_create' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('token_create') }}">
+                                        <span class="icon-token float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                        Token settings
                                     </a>
                                     <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
                                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
