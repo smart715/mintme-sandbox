@@ -78,16 +78,6 @@ export default {
                         return resolve();
                     }
                 });
-
-                setTimeout(() => {
-                    let auth = this._getClient(this.websocketUrl).auth;
-
-                    if (auth === status.PENDING) {
-                        return reject(new Error(
-                            'Server did not respond'
-                        ));
-                    }
-                }, 10000);
             });
         },
         /**
