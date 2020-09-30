@@ -30,6 +30,7 @@
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
+{% set showTokenEditModal = showTokenEditModal ? 'true' : 'false' %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -71,7 +72,7 @@
                 :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
                 :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
-                :show-token-edit-modal="showTokenEditModal"
+                :show-token-edit-modal="{{ showTokenEditModal }}"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
