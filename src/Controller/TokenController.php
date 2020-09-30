@@ -161,7 +161,8 @@ class TokenController extends Controller
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
-            'tokenDescription' => substr($metaDescription, 0, 200),
+            'tokenDescription' => $metaDescription,
+            'metaTokenDescription' => substr($metaDescription, 0, 200),
             'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
