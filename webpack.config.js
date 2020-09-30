@@ -22,6 +22,7 @@ Encore
     .addEntry('mail', './assets/scss/mail.sass')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
+    .addEntry('show_post', './assets/js/show_post.js')
 
     .enablePostCssLoader()
 
