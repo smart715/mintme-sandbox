@@ -51,8 +51,13 @@ class MarketsController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\MarketsController::getMarkets',
-            ['request' => $request,],
-            [ 'offset' => (int)$request->get('offset'), 'limit' => (int)$request->get('limit'), ]
+            [
+                'request' => $request,
+            ],
+            [
+                'offset' => $request->get('offset'),
+                'limit' => $request->get('limit'),
+            ]
         );
     }
 
@@ -84,7 +89,14 @@ class MarketsController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\MarketsController::getMarket',
-            ['base' => $base, 'quote' => $quote, 'request' => $request]
+            [
+                'base' => $base,
+                'quote' => $quote,
+                'request' => $request,
+            ],
+            [
+                'interval' => $request->get('interval'),
+            ]
         );
     }
 }
