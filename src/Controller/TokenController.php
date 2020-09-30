@@ -320,7 +320,8 @@ class TokenController extends Controller
     /**
      * @Route(name="token_show_modal", options={"expose"=true})
      */
-    public function showModal(): Response {
+    public function showModal(): Response
+    {
         return $this->redirectToOwnToken('intro', true);
     }
 
