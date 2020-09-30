@@ -22,14 +22,18 @@ class CoinmarketcapCommunicator implements CryptoSynchronizerInterface
         );
 
         $cryptos = json_decode($response, true);
-        $names = [];
+        $blacklisted = [];
+        $blacklisted['names'] = [];
+        $blacklisted['symbols'] = [];
 
-        array_walk($cryptos, function (array $res) use (&$names): void {
-            $names[] = trim(strtolower($res['id']));
-            $names[] = trim(strtolower($res['symbol']));
-            $names[] = trim(strtolower($res['name']));
+        array_walk($cryptos, static function (array $res) use (&$blacklisted): void {
+            $blacklisted['names'][] = strtolower(trim($res['name']));
+            $blacklisted['symbols'][] = strtolower(trim($res['symbol']));
         });
 
-        return array_unique($names);
+        $blacklisted['names'] = array_unique($blacklisted['names']);
+        $blacklisted['symbols'] = array_unique($blacklisted['symbols']);
+        
+        return $blacklisted;
     }
 }
