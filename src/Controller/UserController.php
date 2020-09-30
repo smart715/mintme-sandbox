@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\Entity\ApiKey;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
+use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
 use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\TokenManager;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
@@ -47,18 +49,23 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     /** @var NormalizerInterface */
     private $normalizer;
 
+    /** @var TokenManager */
+    private $token;
+
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        TokenManager $token
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->normalizer = $normalizer;
+        $this->token = $token;
     }
 
     /**
@@ -104,12 +111,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
      */
     public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
     {
+        $token =$this->token->findByName($userToken);
+        $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
         $response->headers->setCookie(
-            new Cookie('referral-code', $userToken)
+            new Cookie('referral-code', $referralCode)
         );
 
         return $response;
