@@ -67,9 +67,7 @@ export default {
         };
     },
     mounted() {
-        setTimeout(()=> {
-            this.checkPostsHeight();
-        }, 100);
+        new ResizeObserver(this.updateReadMore.bind(this)).observe(this.$refs.postsContainer);
     },
     computed: {
         postsCount() {
@@ -87,6 +85,11 @@ export default {
                 location.href = this.readMoreUrl;
             }
         },
+        updateReadMore() {
+          let postsContainer = document.querySelector('.posts');
+          this.readMore = postsContainer.scrollHeight > postsContainer.clientHeight;
+        },
     },
+
 };
 </script>
