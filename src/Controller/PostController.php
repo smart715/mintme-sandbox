@@ -25,7 +25,25 @@ class PostController extends Controller
     }
 
     /**
-     * @Route("/edit/{id}", name="edit_post_page", options={"expose"=true})
+     * @Route("/{id<\d+>}", name="show_post", options={"expose"=true})
+     */
+    public function show(int $id): Response
+    {
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new NotFoundPostException();
+        }
+
+        return $this->render('pages/show_post.html.twig', [
+            'post' => $this->normalize($post),
+            'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
+            'comments' => $this->normalize($post->getComments()),
+        ]);
+    }
+
+    /**
+     * @Route("/edit/{id<\d+>}", name="edit_post_page", options={"expose"=true})
      */
     public function edit(int $id): Response
     {
