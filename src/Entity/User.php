@@ -45,7 +45,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     protected $id;
 
@@ -176,6 +176,22 @@ class User extends BaseUser implements
      */
     protected $isBlocked = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
+     */
+    protected $comments;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @ORM\JoinTable(name="`like`",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")}
+     *      )
+     * @var ArrayCollection
+     */
+    protected $likes;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -228,7 +244,7 @@ class User extends BaseUser implements
 
     /**
      * @codeCoverageIgnore
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     public function getProfile(): Profile
     {
@@ -480,6 +496,18 @@ class User extends BaseUser implements
     public function setIsBlocked(bool $isBlocked): self
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments->toArray();
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        $this->comments->add($comment);
 
         return $this;
     }
