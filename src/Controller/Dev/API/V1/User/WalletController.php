@@ -167,7 +167,7 @@ class WalletController extends DevApiController
      *     name="amount",
      *     allowBlank=false
      * )
-     * * @Rest\RequestParam(
+     * @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
      *     requirements="^[a-zA-Z0-9]+$"
