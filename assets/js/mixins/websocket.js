@@ -8,7 +8,7 @@ export default {
     },
     data() {
         return {
-            requestId: null,
+            requestId: parseInt(Math.random().toString().replace('0.', '')),
         };
     },
     computed: {
@@ -29,7 +29,6 @@ export default {
         _authCallback: function() {
             let auth = this._getClient(this.websocketUrl).auth;
 
-            this.requestId = parseInt(Math.random().toString().replace('0.', ''));
             if (auth === status.FAILED) {
                 this.sendMessage(JSON.stringify({
                     method: 'server.auth',
