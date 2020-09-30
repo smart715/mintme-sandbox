@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @Rest\Route(path="/dev/api/v1/user/wallet")
+ * @Rest\Route(path="/dev/api/v2/user/wallet")
  */
 class WalletController extends AbstractFOSRestController
 {
