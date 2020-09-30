@@ -112,12 +112,14 @@
                             <div class="card-header py-3 px-4">
                                 <div class="row justify-content-md-center align-items-center">
                                     <div class="col"><h2 class="m-0">API Documentation</h2></div>
+                                    <!--
                                     <div id="api-version" class="col-auto mr-auto">
                                         <api-version
                                             url-version={{ version }}
                                         >
                                         </api-version>
                                     </div>
+                                    -->
                                 </div>
                             </div>
                             <div class="card-body py-2 px-0">
@@ -130,6 +132,7 @@
                                     </p>
                                     {% endif %}
                                     <p>
+                                        All requests must be provided with unique API keys or OAuth token, which you can generate in dashboard.<br />
                                         You have to pass API keys with each request in headers as <span class="text-danger">X-API-ID</span> (public)
                                         and <span class="text-danger">X-API-KEY</span> (private) parameters.<br />
                                         Or you have to pass OAuth token with each request in headers as <span class="text-danger">Authorization: Bearer {token}</span> parameter.<br />
