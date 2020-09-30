@@ -95,7 +95,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/{tab}",
+     * @Route("/{name}/{tab}/{modal}",
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = false},
      *     methods={"GET", "POST"},
