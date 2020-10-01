@@ -12,7 +12,7 @@
                 :precision="precision"
                 :status-prop="statusProp"
                 :twofa="twofa"
-                :visible="true"
+                :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
                 :release-address="releaseAddress"
                 :discord-url="discordUrl"
