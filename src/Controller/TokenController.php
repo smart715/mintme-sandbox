@@ -99,7 +99,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = false},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts"},
+     *     requirements={"tab" = "trade|intro|donate|posts","modal" = true|false},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -318,7 +318,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/settings", name="token_show_modal", options={"expose"=true})
+     * @Route("/show/settings", name="token_show_modal", options={"expose"=true})
      */
     public function showModal(): Response
     {
