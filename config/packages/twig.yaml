@@ -37,3 +37,6 @@ twig:
         telegram_chat_footer_link: '%telegram_chat_social_media_link%'
         telegram_public_footer_link: '%telegram_webchain_network_social_media_link%'
         facebook_footer_link: '%facebook_social_media_link%'
+        global_coinify_ui_url: '%coinify_ui_url%'
+        global_partner_id: '%coinify_partner_id%'
+        global_coinify_crypto_currencies: '%coinify_crypto_currencies%'

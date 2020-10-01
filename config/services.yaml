@@ -88,6 +88,12 @@ services:
             $url: '%deploy_rpc%'
             $timeoutSeconds: '%deploy_response_timeout_seconds%'
 
+    coinify.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%coinify_api_url%'
+            $timeoutSeconds: '%coinify_api_timeout%'
+
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
@@ -99,6 +105,11 @@ services:
     App\Communications\DeployCostFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CoinifyCommunicator:
+        arguments:
+            $rpc: '@coinify.rest_rpc'
+            $partnerId: '%coinify_partner_id%'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:

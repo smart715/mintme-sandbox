@@ -192,6 +192,12 @@ class User extends BaseUser implements
      */
     protected $likes;
 
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @var string
+     */
+    protected $coinifyOfflineToken;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -508,6 +514,18 @@ class User extends BaseUser implements
     public function addComment(Comment $comment): self
     {
         $this->comments->add($comment);
+
+        return $this;
+    }
+
+    public function getCoinifyOfflineToken(): ?string
+    {
+        return $this->coinifyOfflineToken;
+    }
+
+    public function setCoinifyOfflineToken(string $coinifyOfflineToken): self
+    {
+        $this->coinifyOfflineToken = $coinifyOfflineToken;
 
         return $this;
     }

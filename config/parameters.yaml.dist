@@ -164,6 +164,15 @@ parameters:
     telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
     facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
 
+    # coinify parameters
+    coinify_api_url: 'https://app-api.sandbox.coinify.com'
+    coinify_ui_url: 'https://trade-ui.sandbox.coinify.com'
+    coinify_api_timeout: 0.1
+    coinify_partner_id: 135
+    coinify_crypto_currencies:
+        - BTC
+        - ETH
+
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
     # Example for ETH and BTC:
