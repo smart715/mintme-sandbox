@@ -99,7 +99,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = false},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts","modal" = true|false},
+     *     requirements={"tab" = "trade|intro|donate|posts","modal" = "true|false"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
