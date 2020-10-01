@@ -116,3 +116,5 @@ export const sanitizeOptions = {
         'span': ['style', 'class'],
     },
 };
+
+export const primaryColor = '0E3B58';

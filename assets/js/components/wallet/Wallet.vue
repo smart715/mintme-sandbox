@@ -1,8 +1,12 @@
 <template>
     <div class="px-0 py-2">
-        <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-            Balance
-        </div>
+        <buy-crypto
+            class="px-4 py-2"
+            :coinify-ui-url="coinifyUiUrl"
+            :coinify-partner-id="coinifyPartnerId"
+            :coinify-crypto-currencies="coinifyCryptoCurrencies"
+            :addresses="depositAddresses"
+        />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
                 <font-awesome-icon
@@ -222,6 +226,7 @@ import {toMoney} from '../../utils';
 import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+import BuyCrypto from './BuyCrypto';
 
 library.add(depositIcon);
 library.add(withdrawIcon);
@@ -237,6 +242,7 @@ export default {
         LoggerMixin,
     ],
     components: {
+        BuyCrypto,
         WithdrawModal,
         DepositModal,
     },
@@ -249,6 +255,9 @@ export default {
         expirationTime: Number,
         disabledCrypto: String,
         isUserBlocked: Boolean,
+        coinifyUiUrl: String,
+        coinifyPartnerId: Number,
+        coinifyCryptoCurrencies: Array,
     },
     data() {
         return {
