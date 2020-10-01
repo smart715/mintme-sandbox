@@ -186,7 +186,7 @@ class TokenController extends Controller
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
-            'showTokenEditModal' => true,
+            'showTokenEditModal' => $modal,
         ]);
     }
 
@@ -318,7 +318,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route(name="token_show_modal", options={"expose"=true})
+     * @Route("/settings", name="token_show_modal", options={"expose"=true})
      */
     public function showModal(): Response
     {
