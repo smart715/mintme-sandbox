@@ -53,6 +53,7 @@ nelmio_security:
                 - 'https://va.tawk.to'
                 - 'https://www.youtube.com'
                 - 'https://www.google.com'
+                - 'https://*.coinify.com'
             base-uri:
                 - 'self'
             worker-src:
