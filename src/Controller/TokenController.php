@@ -186,7 +186,7 @@ class TokenController extends Controller
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
-            'showTokenEditModal' => $modal,
+            'showTokenEditModal' => true,
         ]);
     }
 
