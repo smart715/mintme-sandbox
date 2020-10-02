@@ -100,22 +100,13 @@ export default {
         TokenDeployIcon,
         TokenPointsProgress,
     },
-    data() {
-        return {
-            isShowTokenEditModalСomputed: false,
-        };
-    },
     computed: {
         showTokenEditModalReal: function() {
-            if (!this.isShowTokenEditModalСomputed) {
-                return this.showTokenEditModal;
-            } else {
-                return false;
-            }
+            return this.showTokenEditModal;
         },
     },
     mounted: function() {
-        this.isShowTokenEditModalСomputed = true;
+        this.showTokenEditModal = false;
     },
 };
 </script>
