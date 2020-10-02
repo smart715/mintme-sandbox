@@ -12,7 +12,7 @@
                 :precision="precision"
                 :status-prop="statusProp"
                 :twofa="twofa"
-                :visible="showTokenEditModal"
+                :visible="showTokenEditModalLocal"
                 :websocket-url="websocketUrl"
                 :release-address="releaseAddress"
                 :discord-url="discordUrl"
@@ -96,6 +96,7 @@ export default {
             isTokenExchanged: true,
             isTokenNotDeployed: false,
             maxLengthToTruncate: 30,
+            showTokenEditModalLocal: this.showTokenEditModal,
         };
     },
     computed: {
@@ -142,7 +143,7 @@ export default {
     },
     methods: {
         closeTokenEditModal: function() {
-            this.showTokenEditModal = false;
+            this.showTokenEditModalLocal = false;
         },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
@@ -159,7 +160,7 @@ export default {
                 return;
             }
 
-            this.showTokenEditModal = true;
+            this.showTokenEditModalLocal = true;
         },
         updateReleaseAddress: function() {
             this.releaseAddress = '0x';
