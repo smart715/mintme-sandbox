@@ -105,7 +105,7 @@ export default {
             showTokenEditModalReal: this.showTokenEditModal,
         };
     },
-    mounted: function() {
+    updated: function() {
         this.showTokenEditModalReal = false;
     },
 };
