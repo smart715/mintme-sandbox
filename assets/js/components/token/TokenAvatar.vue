@@ -105,7 +105,7 @@ export default {
             isShowTokenEditModalСomputed: false,
         };
     },
-    computed: {
+    methods: {
         showTokenEditModalReal: function() {
             if (!this.isShowTokenEditModalСomputed) {
                 this.isShowTokenEditModalСomputed = true;
