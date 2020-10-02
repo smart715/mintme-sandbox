@@ -34,8 +34,7 @@ class IsNotBlacklistedValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if (
-            (Blacklist::EMAIL === $constraint->type &&
+        if ((Blacklist::EMAIL === $constraint->type &&
             $this->blacklistManager->isBlacklistedEmail($value, $constraint->caseSensetive)) ||
             (Blacklist::EMAIL !== $constraint->type &&
             $this->blacklistManager->isBlackListedToken($value, $constraint->caseSensetive))
