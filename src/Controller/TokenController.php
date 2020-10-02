@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -44,8 +43,6 @@ use Throwable;
  */
 class TokenController extends Controller
 {
-
-    use CheckTokenNameBlacklistTrait;
 
     /** @var EntityManagerInterface */
     protected $em;
@@ -165,7 +162,8 @@ class TokenController extends Controller
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
-            'tokenDescription' => substr($metaDescription, 0, 200),
+            'tokenDescription' => $metaDescription,
+            'metaTokenDescription' => substr($metaDescription, 0, 200),
             'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
@@ -222,7 +220,7 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->checkTokenNameBlacklist($token->getName())) {
+            if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
                     ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
                     Response::HTTP_BAD_REQUEST
