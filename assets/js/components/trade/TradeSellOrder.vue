@@ -33,17 +33,27 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <input
-                                v-model="sellPrice"
-                                type="text"
-                                id="sell-price-input"
-                                class="form-control"
-                                :class="orderInputClass"
-                                :disabled="useMarketPrice || !loggedIn"
-                                @keypress="checkPriceInput"
-                                @paste="checkPriceInput"
-                                tabindex="8"
-                            >
+                            <div class="d-inline-block position-relative" :class="orderInputClass">
+                                <input
+                                    v-model="sellPrice"
+                                    type="text"
+                                    id="sell-price-input"
+                                    class="form-control"
+                                    :disabled="useMarketPrice || !loggedIn"
+                                    @keypress="checkPriceInput"
+                                    @keyup="updateDebouncedPrice(sellPrice)"
+                                    @paste="checkPriceInput"
+                                    tabindex="8"
+                                >
+                                <price-converter v-if="loggedIn"
+                                    class="position-absolute top-0 right-0 mr-0 h-100 d-flex align-items-center"
+                                    :amount="debouncedPrice"
+                                    :from="market.base.symbol"
+                                    :to="USD.symbol"
+                                    :subunit="USD.subunit"
+                                    symbol="$"
+                                />
+                            </div>
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 Your
                                 <span>
@@ -191,11 +201,14 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {MINTME} from '../../utils/constants';
+import {MINTME, USD} from '../../utils/constants';
+import PriceConverter from "../PriceConverter";
+import debounce from 'lodash/debounce';
 
 export default {
     name: 'TradeSellOrder',
     components: {
+        PriceConverter,
         Guide,
     },
     mixins: [
@@ -223,6 +236,8 @@ export default {
             action: 'sell',
             placingOrder: false,
             balanceManuallyEdited: false,
+            USD,
+            debouncedPrice: '0',
         };
     },
     methods: {
@@ -308,6 +323,9 @@ export default {
             'setQuoteBalance',
             'setUseSellMarketPrice',
         ]),
+        setDebouncedPrice: function(price) {
+            this.debouncedPrice = price;
+        }
     },
     computed: {
         tokenSymbol: function() {
@@ -405,6 +423,8 @@ export default {
                     });
             }
         }, 'trade-sell-order-asset');
+
+        this.updateDebouncedPrice = debounce(this.setDebouncedPrice, 1000);
     },
     filters: {
         toMoney: function(val, precision) {

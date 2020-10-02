@@ -57,7 +57,7 @@
                                     </span>
                                     <guide>
                                         <template slot="header">
-                                            Your {{ tokenSymbol }}
+                                            Your {{ market.base.symbol | rebranding }}
                                         </template>
                                         <template slot="body">
                                             Your {{ market.base.symbol | rebranding }} balance.
