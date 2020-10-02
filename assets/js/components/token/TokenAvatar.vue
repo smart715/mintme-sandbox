@@ -105,15 +105,17 @@ export default {
             isShowTokenEditModalСomputed: false,
         };
     },
-    methods: {
+    computed: {
         showTokenEditModalReal: function() {
             if (!this.isShowTokenEditModalСomputed) {
-                this.isShowTokenEditModalСomputed = true;
                 return this.showTokenEditModal;
             } else {
                 return false;
             }
         },
+    },
+    mounted: function() {
+        this.isShowTokenEditModalСomputed = true;
     },
 };
 </script>
