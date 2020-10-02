@@ -35,7 +35,7 @@
                 @updated-youtube="$emit('updated-youtube')"
                 @updated-discord="$emit('updated-discord')"
                 @updated-telegram="$emit('updated-telegram')"
-                :show-token-edit-modal="showTokenEditModal"
+                :show-token-edit-modal="showTokenEditModalReal"
             />
             <token-deploy-icon
                 class="ml-2 token-deploy-icon"
@@ -99,6 +99,21 @@ export default {
         TokenName,
         TokenDeployIcon,
         TokenPointsProgress,
+    },
+    data() {
+        return {
+            isShowTokenEditModalСomputed: false,
+        };
+    },
+    computed: {
+        showTokenEditModalReal: function() {
+            if (!this.isShowTokenEditModalСomputed) {
+                this.isShowTokenEditModalСomputed = true;
+                return this.showTokenEditModal;
+            } else {
+                return false;
+            }
+        },
     },
 };
 </script>
