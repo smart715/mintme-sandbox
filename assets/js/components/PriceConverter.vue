@@ -7,6 +7,7 @@
 import {mapMutations, mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
 import {toMoney} from '../utils';
+import debounce from 'lodash/debounce';
 
 export default {
     name: 'PriceConverter',
@@ -16,6 +17,16 @@ export default {
         to: String,
         subunit: Number,
         symbol: String,
+        delay: {
+            required: false,
+            type: Number,
+            default: 0,
+        },
+    },
+    data() {
+        return {
+            convertedAmount: '0',
+        };
     },
     methods: {
         ...mapMutations('rates', [
@@ -23,12 +34,15 @@ export default {
             'setRequesting',
             'setLoaded',
         ]),
+        convert() {
+            this.convertedAmount = toMoney(Decimal.mul(this.amount, ((this.rates[this.from] || [])[this.to] || 1)), this.subunit);
+        },
     },
     computed: {
         ...mapGetters('rates', [
             'getLoaded',
             'getRequesting',
-            'getRates'
+            'getRates',
         ]),
         rates: {
             get() {
@@ -36,7 +50,7 @@ export default {
             },
             set(val) {
                 this.setRates(val);
-            }
+            },
         },
         ratesLoaded: {
             get() {
@@ -52,10 +66,7 @@ export default {
             },
             set(val) {
                 this.setRequesting(val);
-            }
-        },
-        convertedAmount() {
-            return toMoney(Decimal.mul(this.amount, ((this.rates[this.from] || [])[this.to] || 1)), this.subunit);
+            },
         },
     },
     mounted() {
@@ -72,7 +83,14 @@ export default {
             .finally(() => {
                 this.requestingRates = false;
             });
+
+            this.convertAmount = !!this.delay ? debounce(this.convert, this.delay) : this.convert;
         }
     },
-}
+    watch: {
+        amount() {
+            this.convertAmount();
+        },
+    },
+};
 </script>

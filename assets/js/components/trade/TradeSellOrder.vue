@@ -41,13 +41,12 @@
                                     class="form-control"
                                     :disabled="useMarketPrice || !loggedIn"
                                     @keypress="checkPriceInput"
-                                    @keyup="updateDebouncedPrice(sellPrice)"
                                     @paste="checkPriceInput"
                                     tabindex="8"
                                 >
                                 <price-converter v-if="loggedIn"
                                     class="position-absolute top-0 right-0 mr-0 h-100 d-flex align-items-center"
-                                    :amount="debouncedPrice"
+                                    :amount="sellPrice"
                                     :from="market.base.symbol"
                                     :to="USD.symbol"
                                     :subunit="USD.subunit"
@@ -202,8 +201,7 @@ import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 import {MINTME, USD} from '../../utils/constants';
-import PriceConverter from "../PriceConverter";
-import debounce from 'lodash/debounce';
+import PriceConverter from '../PriceConverter';
 
 export default {
     name: 'TradeSellOrder',
@@ -237,7 +235,6 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
-            debouncedPrice: '0',
         };
     },
     methods: {
@@ -323,9 +320,6 @@ export default {
             'setQuoteBalance',
             'setUseSellMarketPrice',
         ]),
-        setDebouncedPrice: function(price) {
-            this.debouncedPrice = price;
-        }
     },
     computed: {
         tokenSymbol: function() {
@@ -423,8 +417,6 @@ export default {
                     });
             }
         }, 'trade-sell-order-asset');
-
-        this.updateDebouncedPrice = debounce(this.setDebouncedPrice, 1000);
     },
     filters: {
         toMoney: function(val, precision) {
