@@ -107,10 +107,12 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Rest\Route("/token/{userToken}/invite", name="register-referral", schemes={"https"})
+     * @Rest\Route("/token/{userToken}/invite", name="register-referral-by-token", schemes={"https"})
      */
-    public function registerReferral(string $userToken, AuthorizationCheckerInterface $authorizationChecker): Response
-    {
+    public function registerReferralByToken(
+        string $userToken,
+        AuthorizationCheckerInterface $authorizationChecker
+    ): Response {
         $token =$this->token->findByName($userToken);
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
@@ -119,6 +121,24 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
 
         $response->headers->setCookie(
             new Cookie('referral-code', $referralCode)
+        );
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Route("/invite/{code}", name="register-referral-by-code", schemes={"https"})
+     */
+    public function registerReferralByCode(
+        string $code,
+        AuthorizationCheckerInterface $authorizationChecker
+    ): Response {
+        $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+            ? $this->redirectToRoute('homepage', [], 301)
+            : $this->redirectToRoute('fos_user_registration_register', [], 301);
+
+        $response->headers->setCookie(
+            new Cookie('referral-code', $code)
         );
 
         return $response;
