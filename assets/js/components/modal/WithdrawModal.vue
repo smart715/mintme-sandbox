@@ -135,7 +135,7 @@ export default {
     },
     computed: {
         twoFAEnabled: function() {
-          return this.twofa;
+          return this.twofa && null !== this.code;
         },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
