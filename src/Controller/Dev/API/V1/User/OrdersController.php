@@ -261,6 +261,7 @@ class OrdersController extends DevApiController
      * @Rest\Delete("/{id}", requirements={"id"="\d+"})
      * @SWG\Response(response="202", description="Order successfully removed")
      * @SWG\Response(response="400", description="Invalid request")
+     * @SWG\Response(response="403", description="Access denied")
      * @SWG\Response(response="404", description="Market not found")
      * @Rest\QueryParam(name="base", allowBlank=false, strict=true)
      * @Rest\QueryParam(name="quote", allowBlank=false, strict=true)
@@ -296,12 +297,20 @@ class OrdersController extends DevApiController
 
         if ($tradeResult->getResult() === $tradeResult::ORDER_NOT_FOUND) {
             throw new ApiBadRequestException('Invalid request');
-        } else {
-            $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+        }
+
+        if ($tradeResult->getResult() === $tradeResult::USER_NOT_MATCH) {
+            $this->userActionLogger->info('[API] Access denied for cancel order', ['id' => $order->getId()]);
 
             return $this->view([
-                'message' => 'Order successfully removed',
-            ], Response::HTTP_ACCEPTED);
+                'message' => 'Access denied',
+            ], Response::HTTP_FORBIDDEN);
         }
+
+        $this->userActionLogger->info('[API] Cancel order', ['id' => $order->getId()]);
+
+        return $this->view([
+            'message' => 'Order successfully removed',
+        ], Response::HTTP_ACCEPTED);
     }
 }

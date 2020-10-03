@@ -75,7 +75,7 @@ class UpdateDisposableEmailDomains extends Command
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
-                $this->blacklistManager->addToBlacklist($name, 'email', false);
+                $this->blacklistManager->add($name, 'email', false);
             }
         }
 
@@ -91,7 +91,7 @@ class UpdateDisposableEmailDomains extends Command
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
-                $this->blacklistManager->addToBlacklist($name, 'email', false);
+                $this->blacklistManager->add($name, 'email', false);
             }
         }
 
