@@ -1,6 +1,6 @@
 <template>
     <div>
-        ( {{ symbol }} {{ convertedAmount }} )
+        ({{ symbol }} {{ convertedAmount }})
     </div>
 </template>
 <script>
@@ -35,7 +35,10 @@ export default {
             'setLoaded',
         ]),
         convert() {
-            this.convertedAmount = toMoney(Decimal.mul(this.amount, ((this.rates[this.from] || [])[this.to] || 1)), this.subunit);
+            let amount = !!parseFloat(this.amount) && this.rateLoaded
+                ? Decimal.mul(this.amount, this.rate)
+                : '0';
+            this.convertedAmount = toMoney(amount, this.subunit);
         },
     },
     computed: {
@@ -44,21 +47,11 @@ export default {
             'getRequesting',
             'getRates',
         ]),
-        rates: {
-            get() {
-                return this.getRates;
-            },
-            set(val) {
-                this.setRates(val);
-            },
+        rate() {
+            return (this.getRates[this.from] || [])[this.to];
         },
-        ratesLoaded: {
-            get() {
-                return this.getLoaded;
-            },
-            set(val) {
-                this.setLoaded(val);
-            },
+        rateLoaded() {
+            return this.rate !== undefined;
         },
         requestingRates: {
             get() {
@@ -70,12 +63,11 @@ export default {
         },
     },
     mounted() {
-        if (!this.ratesLoaded && !this.requestingRates) {
+        if (!this.rateLoaded && !this.requestingRates) {
             this.requestingRates = true;
             this.$axios.retry.get(this.$routing.generate('exchange_rates'))
             .then((res) => {
-                this.rates = res.data;
-                this.ratesLoaded = true;
+                this.setRates(res.data);
             })
             .catch((err) => {
 
@@ -89,6 +81,9 @@ export default {
     },
     watch: {
         amount() {
+            this.convertAmount();
+        },
+        rate() {
             this.convertAmount();
         },
     },

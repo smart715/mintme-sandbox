@@ -49,8 +49,9 @@
                                     :amount="sellPrice"
                                     :from="market.base.symbol"
                                     :to="USD.symbol"
-                                    :subunit="USD.subunit"
+                                    :subunit="2"
                                     symbol="$"
+                                    :delay="1000"
                                 />
                             </div>
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
