@@ -13,6 +13,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Blacklist
 {
+    public const CRYPTO_NAME = 'crypto-name';
+    public const CRYPTO_SYMBOL = 'crypto-symbol';
+    public const TOKEN = 'token';
+    public const EMAIL = 'email';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
