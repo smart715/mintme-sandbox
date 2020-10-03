@@ -12,19 +12,16 @@ class CoinmarketcapCommunicatorTest extends TestCase
     {
         $data = [
             [
-                'id' => '1',
-                'symbol' => 'FOO',
                 'name' => 'FooBar',
+                'symbol' => 'foo',
             ],
             [
-                'id' => '2',
-                'symbol' => 'BAR',
                 'name' => 'BarBaz',
+                'symbol' => 'bar',
             ],
             [
-                'id' => '3',
-                'symbol' => 'BAZ',
                 'name' => 'BazQux',
+                'symbol' => 'baz',
             ],
         ];
 
@@ -33,7 +30,10 @@ class CoinmarketcapCommunicatorTest extends TestCase
 
         $communicator = new CoinmarketcapCommunicator($rpc);
         $this->assertEquals(
-            ['1', 'foo', 'foobar', '2', 'bar', 'barbaz', '3', 'baz', 'bazqux'],
+            [
+                'names' => ['foobar', 'barbaz', 'bazqux'],
+                'symbols' => ['foo', 'bar', 'baz'],
+            ],
             $communicator->fetchCryptos()
         );
     }
