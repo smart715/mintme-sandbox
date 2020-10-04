@@ -53,18 +53,4 @@ class UserRepository extends EntityRepository
 
             return 0 != count($user);
     }
-
-    /** @codeCoverageIgnore  */
-    public function findReferenceByTokenName(string $tokenName): ?User
-    {
-        $query = $this->createQueryBuilder('t')
-            ->innerJoin('p.user', 'u', 'p.user = u.id')
-            ->where('p.description is null')
-            ->andWhere('p.numberOfReminder <> :numberOfReminder')
-            ->andWhere('p.nextReminderDate = :nextReminderDate OR p.nextReminderDate is null')
-            ->setParameter('numberOfReminder', $numberOfReminder)
-            ->setParameter('nextReminderDate', \Date('Y-m-d'));
-
-        return $query->getQuery()->getResult();
-    }
 }

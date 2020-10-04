@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\ApiKey;
+use App\Entity\Token\Token;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
-use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
@@ -95,14 +95,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
-        $userToken = $user->getProfile()->getToken()->getName();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
-            'userToken' => $userToken,
+            'userToken' => null == $user->getProfile()->getToken()
+                ? null : $user->getProfile()->getToken()->getName(),
         ]);
     }
 
