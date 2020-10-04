@@ -18,6 +18,7 @@ use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
+use App\Manager\UserManagerInterface as UserManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -58,10 +59,13 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var UserManager */
+    private $userManagerLocal;
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
+        UserManager $userManagerLocal,
         TokenStorageInterface $tokenStorage,
         BonusManagerInterface $bonusManager,
         BalanceHandlerInterface $balanceHandler,
@@ -72,6 +76,7 @@ class RegistrationController extends FOSRegistrationController
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
+        $this->userManagerLocal = $userManagerLocal;
         $this->bonusManager = $bonusManager;
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
@@ -262,8 +267,8 @@ class RegistrationController extends FOSRegistrationController
 
         $refCode = $request->cookies->get('referral-code');
 
-        if ($refCode && $this->userManager->findByReferralCode($refCode)->getProfile()->getToken()) {
-            return $this->redirectToRoute("token_show", ["name" => $this->userManager->findByReferralCode($refCode)->getProfile()->getToken()->getName()]);
+        if ($refCode && $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken()) {
+            return $this->redirectToRoute("token_show", ["name" => $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken()->getName()]);
         }
 
         return parent::confirmedAction($request);
