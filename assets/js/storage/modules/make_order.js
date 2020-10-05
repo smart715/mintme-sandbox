@@ -5,7 +5,7 @@ const storage = {
         baseBalance: 0,
         useSellMarketPrice: false,
         useBuyMarketPrice: false,
-        sellPriceInput: 0,
+        sellPriceInput: '0',
         sellAmountInput: 0,
         buyPriceInput: 0,
         buyAmountInput: 0,

@@ -22,10 +22,11 @@ export default {
             type: Number,
             default: 0,
         },
+        convertedAmountProp: String,
     },
     data() {
         return {
-            convertedAmount: '0',
+            convertedAmount: this.convertedAmountProp,
         };
     },
     methods: {
@@ -39,6 +40,7 @@ export default {
                 ? Decimal.mul(this.amount, this.rate)
                 : '0';
             this.convertedAmount = toMoney(amount, this.subunit);
+            this.$emit('update:convertedAmountProp',this.convertedAmount);
         },
     },
     computed: {
