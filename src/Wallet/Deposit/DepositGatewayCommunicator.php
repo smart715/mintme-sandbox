@@ -83,7 +83,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return $this->parseTransactions($response->getResult());
+        return $this->parseTransactions($response->getResult(), $user);
     }
 
     public function getDepositInfo(string $crypto): DepositInfo
@@ -104,14 +104,14 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         );
     }
 
-    private function parseTransactions(array $transactions): array
+    private function parseTransactions(array $transactions, User $user): array
     {
-        return array_map(function (array $transaction) {
+        return array_map(function (array $transaction) use ($user) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 $transaction['hash'],
                 $transaction['from'],
-                $transaction['to'],
+                !$user->isBlocked() ? $transaction['to'] : '',
                 new Money(
                     $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
                     new Currency($transaction['crypto'])

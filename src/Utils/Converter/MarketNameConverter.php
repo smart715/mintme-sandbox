@@ -16,11 +16,12 @@ class MarketNameConverter implements MarketNameConverterInterface
         $this->tokenConverter = $converter;
     }
 
-    public function convert(Market $market): string
+    public function convert(Market $market, bool $baseFirst = false): string
     {
-        return strtoupper(
-            $this->convertTradable($market->getQuote()) . $this->convertTradable($market->getBase())
-        );
+        $base = $this->convertTradable($market->getBase());
+        $quote = $this->convertTradable($market->getQuote());
+
+        return strtoupper($baseFirst ? $base . $quote : $quote . $base);
     }
 
     private function convertTradable(TradebleInterface $tradeble): string

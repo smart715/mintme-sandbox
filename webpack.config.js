@@ -5,6 +5,7 @@ Encore
 
     .setPublicPath('/build')
 
+    .addEntry('api', './assets/js/api.js')
     .addEntry('main', './assets/js/main.js')
     .addEntry('home', './assets/js/home.js')
     .addEntry('trading', './assets/js/trading.js')
@@ -21,6 +22,7 @@ Encore
     .addEntry('mail', './assets/scss/mail.sass')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
+    .addEntry('show_post', './assets/js/show_post.js')
 
     .enablePostCssLoader()
 

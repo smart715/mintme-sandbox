@@ -6,13 +6,13 @@
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
                             <span v-if="loggedIn">Donations</span>
-                            <span v-else>To make a donation you have to be logged in</span>
+                            <span v-else>To make a donation, you have to sign up or log in</span>
                         </div>
                         <div class="card-body donation-body">
                             <div v-if="loggedIn" class="h-100">
                                 <div>
                                     <div>
-                                        <p class="info">Donation is non-refundable</p>
+                                        <p class="info">Donations go to token creator and are non-refundable.</p>
                                     </div>
                                     <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
                                         <div class="col">
@@ -138,10 +138,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="!loginFormLoaded" class="p-5 text-center">
-                                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                            </div>
-                            <div v-if="!loggedIn" ref="tab-login-form-container"></div>
+                            <Register v-if="!loggedIn"
+                            :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                            ></Register>
                         </div>
                     </div>
                 </div>
@@ -162,6 +161,7 @@ import {
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
+import Register from '../Register';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
@@ -179,6 +179,7 @@ export default {
     components: {
         Guide,
         ConfirmModal,
+        Register,
     },
     props: {
         market: Object,
@@ -194,7 +195,6 @@ export default {
                 ethSymbol,
             },
             selectedCurrency: null,
-            loginFormLoaded: false,
             amountToDonate: 0,
             amountToReceive: 0,
             tokensWorth: 0,
@@ -266,11 +266,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.loggedIn) {
-            this.loadLoginForm();
-        } else {
-            this.loginFormLoaded = true;
-
+        if (this.loggedIn) {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
                 params: [this.market.identifier],
@@ -283,7 +279,6 @@ export default {
                 }
             });
         }
-
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
@@ -292,27 +287,6 @@ export default {
                 this.balanceLoaded = false;
                 this.selectedCurrency = newCurrency;
             }
-        },
-        loadLoginForm: function() {
-            this.$axios.retry.get(this.$routing.generate('login', {
-                formContentOnly: true,
-            }))
-                .then((res) => {
-                    this.$refs['tab-login-form-container'].innerHTML = res.data;
-                    this.loginFormLoaded = true;
-
-                    let captchaContainer = document.querySelector('.g-recaptcha');
-                    let googleRecaptchaSiteKey = this.googleRecaptchaSiteKey;
-                    grecaptcha.ready(function() {
-                        grecaptcha.render(captchaContainer, {
-                            'sitekey': googleRecaptchaSiteKey,
-                        });
-                    });
-                })
-                .catch((error) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not load tab content.', error);
-                });
         },
         getTokenBalance: function() {
             this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))

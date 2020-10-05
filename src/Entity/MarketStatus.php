@@ -81,6 +81,12 @@ class MarketStatus
      */
     private $buyDepth = '0';
 
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable|null
+     */
+    private $expires = null;
+
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
@@ -170,6 +176,7 @@ class MarketStatus
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
+        $this->expires = $marketInfo->getExpires();
 
         return $this;
     }
@@ -180,5 +187,10 @@ class MarketStatus
     public function getBuyDepth(): Money
     {
         return new Money($this->buyDepth, new Currency($this->crypto->getSymbol()));
+    }
+
+    public function getExpires(): ?\DateTimeImmutable
+    {
+        return $this->expires;
     }
 }

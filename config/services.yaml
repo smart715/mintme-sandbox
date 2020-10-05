@@ -88,6 +88,12 @@ services:
             $url: '%deploy_rpc%'
             $timeoutSeconds: '%deploy_response_timeout_seconds%'
 
+    coinify.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%coinify_api_url%'
+            $timeoutSeconds: '%coinify_api_timeout%'
+
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
@@ -99,6 +105,11 @@ services:
     App\Communications\DeployCostFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CoinifyCommunicator:
+        arguments:
+            $rpc: '@coinify.rest_rpc'
+            $partnerId: '%coinify_partner_id%'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -180,6 +191,10 @@ services:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
+
+    App\Security\Config\DisabledBlockchainConfig:
+        arguments:
+            $disabledCrypto: '%blockchain_disabled%'
 
     # SonataAdminBundle Registered Admin Classes
     # =======================================
@@ -598,7 +613,7 @@ services:
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
 
-    App\Controller\Dev\API\User\WalletController:
+    App\Controller\Dev\API\V1\User\WalletController:
         arguments:
             $withdrawExpirationTime: '%withdraw_expiration_time%'
 

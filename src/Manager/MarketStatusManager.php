@@ -2,14 +2,13 @@
 
 namespace App\Manager;
 
+use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Exchange\MarketInfo;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\Common\Collections\Criteria;
@@ -77,11 +76,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms');
+            ->from(MarketStatus::class, 'ms')
+            ->join('ms.quoteToken', 'qt');
 
         if (self::DEPLOYED_ONLY === $deployed) {
-            $qb->join('ms.quoteToken', 'qt')
-                ->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+            $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         return (int)$qb->getQuery()->getSingleScalarResult();
@@ -123,9 +122,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         }
 
         if (self::DEPLOYED_FIRST === $deployed) {
-            $queryBuilder->addOrderBy('qt.deployed', 'DESC');
+            $queryBuilder->addSelect(
+                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
+            )->orderBy('deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $deployed) {
-            $queryBuilder->andWhere('qt.deployed IS NOT NULL');
+            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
         }
 
         if (self::SORT_BY_CHANGE === $sort) {
@@ -187,7 +188,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     public function updateMarketStatus(Market $market): void
     {
-        $marketInfo = $this->marketHandler->getMarketInfo($market);
         $marketStatus = $this->repository->findByBaseQuoteNames(
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol()
@@ -198,6 +198,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 "Nonexistent market: {$market->getBase()->getSymbol()}/{$market->getQuote()->getSymbol()}"
             );
         }
+
+        $marketInfo = $this->marketHandler->getMarketInfo($market);
 
         $marketStatus->updateStats($marketInfo);
 
@@ -286,5 +288,25 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol()
         );
+    }
+
+    public function isValid(Market $market): bool
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        return
+            !(
+                $base instanceof Crypto && !$base->isExchangeble() ||
+                $quote instanceof Crypto && !$quote->isTradable() ||
+                $base instanceof Token && $base->isBlocked() ||
+                $quote instanceof Token ||
+                $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())
+            );
+    }
+
+    public function getExpired(): array
+    {
+        return $this->repository->getExpired();
     }
 }

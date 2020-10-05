@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Communications\DisposableEmailCommunicatorInterface;
 use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -27,16 +28,21 @@ class UpdateDisposableEmailDomains extends Command
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         LoggerInterface $logger,
         BlacklistManagerInterface $blacklistManager,
         DisposableEmailCommunicatorInterface $domainSynchronizer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->blacklistManager = $blacklistManager;
         $this->domainSynchronizer = $domainSynchronizer;
         $this->em = $em;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -50,6 +56,12 @@ class UpdateDisposableEmailDomains extends Command
     /** @inheritDoc */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $lock = $this->lockFactory->createLock('synchronize-domains');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $io = new SymfonyStyle($input, $output);
 
         $this->logger->info('[blacklist] Update job started..');
@@ -63,7 +75,7 @@ class UpdateDisposableEmailDomains extends Command
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
-                $this->blacklistManager->addToBlacklist($name, 'email', false);
+                $this->blacklistManager->add($name, 'email', false);
             }
         }
 
@@ -79,7 +91,7 @@ class UpdateDisposableEmailDomains extends Command
 
         foreach ($list as $name) {
             if (!$this->isValueExists($name, $existed)) {
-                $this->blacklistManager->addToBlacklist($name, 'email', false);
+                $this->blacklistManager->add($name, 'email', false);
             }
         }
 
@@ -87,6 +99,8 @@ class UpdateDisposableEmailDomains extends Command
 
         $io->success('Synchronization completed');
         $this->logger->info('[blacklist] Update job finished..');
+
+        $lock->release();
 
         return 0;
     }

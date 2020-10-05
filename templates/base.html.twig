@@ -21,7 +21,7 @@
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div onload="document.body.classList.remove('hidden')" class="content-wrapper hidden d-flex flex-column {% block contentclass %}{% endblock %}">
+            <div class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
                 {% block header %}
                     {% include 'topnav.html.twig' %}
                 {% endblock %}

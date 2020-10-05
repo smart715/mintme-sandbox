@@ -35,9 +35,13 @@
                             :deposit-more="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
                             :expiration-time="{{ withdraw_expiration_time }}"
+                            disabled-crypto="{{ disabledBlockchain | json_encode }}"
                             {% if app.user.isBlocked %}
                             is-user-blocked
                             {% endif %}
+                            coinify-ui-url="{{ global_coinify_ui_url }}"
+                            :coinify-partner-id="{{ global_partner_id }}"
+                            :coinify-crypto-currencies="{{ global_coinify_crypto_currencies | json_encode }}"
                         >
                         </wallet>
                     </b-tab>

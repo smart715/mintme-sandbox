@@ -32,6 +32,7 @@ nelmio_api_doc:
             - PublicKey: []
               PrivateKey: []
               OAuthToken: []
+            - {}
 
     models:
         use_jms: false
@@ -48,6 +49,9 @@ nelmio_api_doc:
         default:
             path_patterns:
                 - ^/dev/api/v1
-        version_1:
+        v1:
             path_patterns:
                 - ^/dev/api/v1
+        v2:
+            path_patterns:
+                - ^/dev/api/v2
