@@ -86,10 +86,9 @@ export default {
             }
         },
         updateReadMore() {
-          let postsContainer = document.querySelector('.posts');
-          this.readMore = postsContainer.scrollHeight > postsContainer.clientHeight;
+            let postsContainer = document.querySelector('.posts');
+            this.readMore = postsContainer.scrollHeight > postsContainer.clientHeight;
         },
     },
-
 };
 </script>
