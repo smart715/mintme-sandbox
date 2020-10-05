@@ -1,6 +1,6 @@
 <template>
     <div>
-        ({{ symbol }} {{ convertedAmount }})
+        {{ symbol }}{{ convertedAmount }}
     </div>
 </template>
 <script>

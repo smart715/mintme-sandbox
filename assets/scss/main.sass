@@ -1269,3 +1269,32 @@ li.trade-post
 
 .right-0
   right: 0
+
+.h-fit-content
+  height: fit-content
+
+.trade-price-input
+  @media (min-width: 992px) and (max-width: 1199px), (max-width: 575px)
+    box-sizing: content-box
+    padding-bottom: 22px
+    padding-right: 0
+    width: calc(100% - 15px)
+
+.trade-price-input-converter
+  position: absolute
+  top: 0
+  right: 0
+  margin-right: 5px
+  height: 100%
+  display: flex
+  align-items: center
+  font-size: 12px
+
+  @media (min-width: 992px) and (max-width: 1199px), (max-width: 575px)
+    top: initial
+    right: initial
+    bottom: 0
+    left: 0
+    height: 22px
+    padding-left: 15px
+    align-items: baseline

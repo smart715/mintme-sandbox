@@ -33,19 +33,19 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <div class="d-inline-block position-relative" :class="orderInputClass">
+                            <div class="d-inline-block position-relative h-fit-content" :class="orderInputClass">
                                 <input
                                     v-model="sellPrice"
                                     type="text"
                                     id="sell-price-input"
-                                    class="form-control"
+                                    class="form-control trade-price-input"
                                     :disabled="useMarketPrice || !loggedIn"
                                     @keypress="checkPriceInput"
                                     @paste="checkPriceInput"
                                     tabindex="8"
                                 >
                                 <price-converter v-if="loggedIn"
-                                    class="position-absolute top-0 right-0 mr-0 h-100 d-flex align-items-center"
+                                    class="trade-price-input-converter"
                                     :amount="sellPrice"
                                     :from="market.base.symbol"
                                     :to="USD.symbol"
