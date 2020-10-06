@@ -5,19 +5,18 @@
         </div>
         <div
             class="card-body posts overflow-hidden position-relative"
-            ref="postsContainer"
         >
-            <template v-if="posts.length > 0">
+            <div v-if="posts.length > 0" id="posts-container" ref="postsContainer" class="w-100">
                 <post v-for="(n, i) in postsCount"
-                    :post="posts[i]"
-                    :key="i"
-                    :index="i"
-                    @delete-post="$emit('delete-post', $event)"
-                    :show-edit="showEdit"
-                    @go-to-trade="$emit('go-to-trade', $event)"
-                    :logged-in="loggedIn"
+                      :post="posts[i]"
+                      :key="i"
+                      :index="i"
+                      @delete-post="$emit('delete-post', $event)"
+                      :show-edit="showEdit"
+                      @go-to-trade="$emit('go-to-trade', $event)"
+                      :logged-in="loggedIn"
                 />
-            </template>
+            </div>
             <div v-else :class="{ 'position-absolute top-50': tokenPage }">
                 The token creator has not added any posts yet.
             </div>
@@ -86,8 +85,9 @@ export default {
             }
         },
         updateReadMore() {
-            let postsContainer = document.querySelector('.posts');
-            this.readMore = postsContainer.scrollHeight > postsContainer.clientHeight;
+            let posts = document.querySelector('.posts');
+            let postsContainer = document.querySelector('#posts-container');
+            this.readMore = postsContainer.clientHeight > posts.clientHeight;
         },
     },
 };
