@@ -105,6 +105,7 @@ import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
+import he from 'he';
 
 library.add(faEdit);
 
@@ -137,18 +138,12 @@ export default {
             return !this.editingDescription && this.editable;
         },
         newDescriptionHtmlDecode: function() {
-            return this.newDescription
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&quot;/g, '"')
-                .replace(/&amp;/g, '&')
-                .replace(/&#x27;/g, '\'')
-                .replace(/&#x2F;/g, '/');
+            return he.decode(this.newDescription);
         },
     },
     methods: {
         onDescriptionChange: function(val) {
-            this.newDescription = val;
+            this.newDescription = he.encode(val);
             this.readyToSave = true;
         },
         editDescription: function() {
@@ -166,7 +161,7 @@ export default {
             this.$axios.single.patch(this.$routing.generate('token_update', {
                 name: this.name,
             }), {
-                description: this.newDescription,
+                description: this.newDescriptionHtmlDecode,
                 needToCheckCode: false,
             })
                 .then((response) => {
