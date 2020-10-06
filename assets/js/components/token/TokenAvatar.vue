@@ -35,7 +35,7 @@
                 @updated-youtube="$emit('updated-youtube')"
                 @updated-discord="$emit('updated-discord')"
                 @updated-telegram="$emit('updated-telegram')"
-                :show-token-edit-modal="showTokenEditModal"
+                :show-token-edit-modal-prop="showTokenEditModal"
             />
             <token-deploy-icon
                 class="ml-2 token-deploy-icon"
