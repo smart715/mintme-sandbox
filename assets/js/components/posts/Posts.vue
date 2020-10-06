@@ -8,13 +8,13 @@
         >
             <div v-if="posts.length > 0" id="posts-container" ref="postsContainer" class="w-100">
                 <post v-for="(n, i) in postsCount"
-                      :post="posts[i]"
-                      :key="i"
-                      :index="i"
-                      @delete-post="$emit('delete-post', $event)"
-                      :show-edit="showEdit"
-                      @go-to-trade="$emit('go-to-trade', $event)"
-                      :logged-in="loggedIn"
+                    :post="posts[i]"
+                    :key="i"
+                    :index="i"
+                    @delete-post="$emit('delete-post', $event)"
+                    :show-edit="showEdit"
+                    @go-to-trade="$emit('go-to-trade', $event)"
+                    :logged-in="loggedIn"
                 />
             </div>
             <div v-else :class="{ 'position-absolute top-50': tokenPage }">
