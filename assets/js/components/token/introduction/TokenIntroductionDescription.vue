@@ -139,7 +139,11 @@ export default {
         newDescriptionHtmlDecode: function() {
             return this.newDescription
                 .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>');
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&amp;/g, '&')
+                .replace(/&#x27;/g, '\'')
+                .replace(/&#x2F;/g, '/');
         },
     },
     methods: {

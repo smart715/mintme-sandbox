@@ -5,9 +5,9 @@
   "main": "main.js",
   "directories": {},
   "dependencies": {
-    "@bbob/core": "^2.5.1",
-    "@bbob/html": "^2.5.1",
-    "@bbob/preset-html5": "^2.5.1",
+    "@bbob/core": "^2.5.8",
+    "@bbob/html": "^2.5.8",
+    "@bbob/preset-html5": "^2.5.8",
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free": "^5.12.1",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
