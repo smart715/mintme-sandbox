@@ -12,7 +12,7 @@
                 :precision="precision"
                 :status-prop="statusProp"
                 :twofa="twofa"
-                :visible="showTokenEditModalLocal"
+                :visible="showTokenEditModal"
                 :websocket-url="websocketUrl"
                 :release-address="releaseAddress"
                 :discord-url="discordUrl"
@@ -83,7 +83,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
-        showTokenEditModal: Boolean,
+        showTokenEditModalProp: Boolean,
     },
     components: {
         FontAwesomeIcon,
@@ -96,7 +96,7 @@ export default {
             isTokenExchanged: true,
             isTokenNotDeployed: false,
             maxLengthToTruncate: 30,
-            showTokenEditModalLocal: this.showTokenEditModal,
+            showTokenEditModal: this.showTokenEditModalProp,
         };
     },
     computed: {
@@ -143,7 +143,7 @@ export default {
     },
     methods: {
         closeTokenEditModal: function() {
-            this.showTokenEditModalLocal = false;
+            this.showTokenEditModal = false;
         },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
@@ -160,7 +160,7 @@ export default {
                 return;
             }
 
-            this.showTokenEditModalLocal = true;
+            this.showTokenEditModal = true;
         },
         updateReleaseAddress: function() {
             this.releaseAddress = '0x';
