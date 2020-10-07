@@ -63,15 +63,29 @@
                                         <div>
                                             <label for="amount-to-donate">Amount:</label>
                                             <div class="input-group">
-                                                <input
-                                                    v-model="amountToDonate"
-                                                    id="amount-to-donate"
-                                                    type="text"
-                                                    class="form-control"
-                                                    @keypress="checkAmountInput"
-                                                    @paste="checkAmountInput"
-                                                    @keyup="onKeyup"
-                                                >
+                                                <div class="h-fit-content d-block position-relative flex-grow-1">
+                                                    <input
+                                                        v-model="amountToDonate"
+                                                        id="amount-to-donate"
+                                                        type="text"
+                                                        class="form-control"
+                                                        :class="{ 'trade-price-input': mediaMatches }"
+                                                        @keypress="checkAmountInput"
+                                                        @paste="checkAmountInput"
+                                                        @keyup="onKeyup"
+                                                    >
+                                                    <price-converter
+                                                        class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
+                                                        :class="{ 'trade-price-input-converter': mediaMatches }"
+                                                        :amount="amountToDonate"
+                                                        :from="selectedCurrency"
+                                                        :to="USD.symbol"
+                                                        :subunit="2"
+                                                        symbol="$"
+                                                        :delay="1000"
+                                                        :converted-amount-prop.sync="convertedAmount"
+                                                    />
+                                                </div>
                                                 <div class="input-group-append">
                                                     <button
                                                         @click="all"
@@ -164,7 +178,8 @@ import Guide from '../Guide';
 import Register from '../Register';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
+import PriceConverter from '../PriceConverter';
 
 export default {
     name: 'Donation',
@@ -180,6 +195,7 @@ export default {
         Guide,
         ConfirmModal,
         Register,
+        PriceConverter,
     },
     props: {
         market: Object,
@@ -205,6 +221,9 @@ export default {
             donationInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
+            convertedAmount: '0',
+            USD,
+            mediaMatches: false,
         };
     },
     computed: {
@@ -280,6 +299,10 @@ export default {
             });
         }
         this.debouncedCheck = debounce(this.checkDonation, 500);
+
+        window.matchMedia('(max-width: 575px)').addEventListener('change', (e) => {
+            this.mediaMatches = e.matches;
+        });
     },
     methods: {
         onSelect: function(newCurrency) {

@@ -64,6 +64,9 @@ export default {
             },
         },
     },
+    created() {
+        this.convertAmount = !!this.delay ? debounce(this.convert, this.delay) : this.convert;
+    },
     mounted() {
         if (!this.rateLoaded && !this.requestingRates) {
             this.requestingRates = true;
@@ -77,8 +80,6 @@ export default {
             .finally(() => {
                 this.requestingRates = false;
             });
-
-            this.convertAmount = !!this.delay ? debounce(this.convert, this.delay) : this.convert;
         }
     },
     watch: {
