@@ -323,7 +323,7 @@ class TokenController extends Controller
         return $this->redirectToOwnToken('trade', 'settings');
     }
 
-    private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal): RedirectResponse
+    private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
