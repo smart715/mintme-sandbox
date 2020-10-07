@@ -126,7 +126,7 @@ export default {
     },
     data() {
         return {
-            code: null,
+            code: '',
             amount: 0,
             address: '',
             withdrawing: true,
@@ -135,7 +135,7 @@ export default {
     },
     computed: {
         twoFAEnabled: function() {
-          return this.twofa && null !== this.code;
+          return this.twofa;
         },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
