@@ -6,19 +6,21 @@
         <div
             class="card-body posts overflow-hidden position-relative"
         >
-            <div v-if="posts.length > 0" id="posts-container" ref="postsContainer" class="w-100">
-                <post v-for="(n, i) in postsCount"
-                    :post="posts[i]"
-                    :key="i"
-                    :index="i"
-                    @delete-post="$emit('delete-post', $event)"
-                    :show-edit="showEdit"
-                    @go-to-trade="$emit('go-to-trade', $event)"
-                    :logged-in="loggedIn"
-                />
-            </div>
-            <div v-else :class="{ 'position-absolute top-50': tokenPage }">
-                The token creator has not added any posts yet.
+            <div id="posts-container" ref="postsContainer" class="w-100 d-flex justify-content-center">
+                <template v-if="posts.length > 0">
+                    <post v-for="(n, i) in postsCount"
+                          :post="posts[i]"
+                          :key="i"
+                          :index="i"
+                          @delete-post="$emit('delete-post', $event)"
+                          :show-edit="showEdit"
+                          @go-to-trade="$emit('go-to-trade', $event)"
+                          :logged-in="loggedIn"
+                    />
+                </template>
+                <div v-else :class="{ 'position-absolute top-50': tokenPage }">
+                    The token creator has not added any posts yet.
+                </div>
             </div>
             <div v-if="showReadMore" class="read-more">
                 <a
@@ -63,10 +65,12 @@ export default {
         return {
             readMoreUrl: this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'}),
             readMore: false,
+            resizeObserver: null,
         };
     },
     mounted() {
-        new ResizeObserver(this.updateReadMore.bind(this)).observe(this.$refs.postsContainer);
+        this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
+        this.resizeObserver.observe(this.$refs.postsContainer);
     },
     computed: {
         postsCount() {
@@ -89,6 +93,9 @@ export default {
             let postsContainer = document.querySelector('#posts-container');
             this.readMore = postsContainer.clientHeight > posts.clientHeight;
         },
+    },
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
     },
 };
 </script>
