@@ -71,7 +71,7 @@
                 :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
                 :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
-                :show-token-edit-modal="{{ showTokenEditModal }}"
+                :show-token-edit-modal="'{{ showTokenEditModal }}'"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
