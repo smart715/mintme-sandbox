@@ -104,7 +104,7 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        string $modal,
+        ?string $modal,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig
@@ -320,10 +320,10 @@ class TokenController extends Controller
      */
     public function showModal(): Response
     {
-        return $this->redirectToOwnToken('trade', true);
+        return $this->redirectToOwnToken('trade', 'settings');
     }
 
-    private function redirectToOwnToken(?string $showtab = 'trade', bool $showTokenEditModal = false): RedirectResponse
+    private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -336,9 +336,7 @@ class TokenController extends Controller
         return $this->redirectToRoute('token_show', [
             'name' => $tokenDashed,
             'tab' => $showtab,
-            'modal' => $showTokenEditModal ?
-                'settings' :
-                'false',
+            'modal' => $showTokenEditModal,
         ]);
     }
 
