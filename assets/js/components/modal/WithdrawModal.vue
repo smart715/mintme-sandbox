@@ -126,7 +126,7 @@ export default {
     },
     data() {
         return {
-            code: '',
+            code: null,
             amount: 0,
             address: '',
             withdrawing: true,
