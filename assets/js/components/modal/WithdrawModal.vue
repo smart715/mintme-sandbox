@@ -202,7 +202,7 @@ export default {
                 'crypto': this.currency,
                 'amount': this.amount,
                 'address': this.address,
-                'code': this.code || null,
+                'code': this.code,
             })
             .then((response) => {
                 if (this.twoFAEnabled) {
