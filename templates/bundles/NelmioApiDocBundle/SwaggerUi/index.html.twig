@@ -50,7 +50,7 @@
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
     %}
-    {% include 'scripts.html.twig' %}
+    {% include 'base_scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
     <script src="{{ asset('build/api.js') }}"></script>
