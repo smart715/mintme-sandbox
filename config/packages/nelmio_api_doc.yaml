@@ -52,6 +52,4 @@ nelmio_api_doc:
         v1:
             path_patterns:
                 - ^/dev/api/v1
-        v2:
-            path_patterns:
-                - ^/dev/api/v2
+

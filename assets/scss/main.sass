@@ -4,8 +4,8 @@
 @import '~bootstrap-vue/src/index.scss'
 @import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
 @import '~vue-range-slider/dist/vue-range-slider'
-@import '~aos/dist/aos.css'
 @import url('https://fonts.googleapis.com/css?family=Lato')
+@import '~aos/dist/aos.css'
 @import '../fonts/AlphaCloud/AlphaCloud.css'
 @import 'topnav'
 @import 'header'
@@ -27,8 +27,6 @@
 @import 'sign-up-landing'
 @import 'spinner'
 @import 'posts'
-
-@include font-face(ConcordBold, '../fonts/Concord-Bold', null, null, ttf)
 
 *, *:before, *:after
   box-sizing: inherit
@@ -558,6 +556,7 @@ a
     padding-top: 0.35rem
     padding-bottom: 0.35rem
     vertical-align: middle
+    padding-left: calc(0.75rem + 0.65em)
 
     &:first-child
       padding-left: 1.5rem
@@ -764,7 +763,6 @@ a
 .parent-trade-tab
   ul
     margin-top: 1.4rem
-    height: 35px
 
 .modal-content
   background: $secondary

@@ -29,6 +29,7 @@ use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Utils\EscapeHtmlControlCharacters;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -109,6 +110,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
+        $description = $request->get('description');
+        $description = EscapeHtmlControlCharacters::encode($description);
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -157,6 +161,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $token->setNumberOfReminder(0);
             $token->setNextReminderDate(new \DateTime('+1 month'));
         }
+
+        $token->setDescription($description);
 
         $this->em->persist($token);
         $this->em->flush();
