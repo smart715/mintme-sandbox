@@ -32,6 +32,7 @@
     "form-serialize": "^0.7.2",
     "gapi": "0.0.3",
     "generate-password": "1.4.1",
+    "he": "^1.2.0",
     "locutus": "^2.0.10",
     "lodash": "^4.17.15",
     "markitup": "^3.0.0-0",
