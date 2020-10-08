@@ -2,7 +2,7 @@
     <div class="h-100">
         <div class="card h-100">
             <div class="card-header">
-                Sell Orders
+                {{ $t('trade.sell_orders.header') }}
                 <span class="card-header-icon">
                     Total: {{ total | formatMoney }}
                     <span v-if="shouldTruncate"
@@ -14,10 +14,10 @@
                     </span>
                     <guide>
                         <template slot="header">
-                            Sell Orders
+                            {{ $t('trade.sell_orders.guide_header') }}
                         </template>
                         <template slot="body">
-                            List of all active sell orders for {{ market.quote |rebranding }}.
+                            {{ $t('trade.sell_orders.guide_body', translationsContext) }}
                         </template>
                     </guide>
                 </span>
@@ -66,7 +66,7 @@
                             </template>
                         </b-table>
                         <div v-else>
-                            <p class="text-center p-5">No order was added yet</p>
+                            <p class="text-center p-5">{{ $t('trade.sell_orders.no_orders') }}</p>
                         </div>
                     </div>
                 </template>
@@ -140,6 +140,11 @@ export default {
         },
         hasOrders: function() {
             return this.tableData.length > 0;
+        },
+        translationsContext: function() {
+            return {
+                name: this.rebrandingFunc(this.tokenName),
+            };
         },
     },
     methods: {

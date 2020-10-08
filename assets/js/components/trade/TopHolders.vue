@@ -16,7 +16,9 @@
                         </template>
                     </b-table>
                     <div v-else>
-                        <p class="text-center p-5">No Holders yet</p>
+                        <p class="text-center p-5">
+                            {{ $t('trade.top_holders.no_holders') }}
+                        </p>
                     </div>
                 </template>
                 <template v-else>
@@ -51,15 +53,15 @@ export default {
             fields: [
                 {
                     key: 'trader',
-                    label: 'Trader',
+                    label: this.$t('trade.top_holders.trader'),
                 },
                 {
                     key: 'date',
-                    label: 'Date',
+                    label: this.$t('trade.top_holders.date'),
                 },
                 {
                     key: 'amount',
-                    label: 'Amount',
+                    label: this.$t('trade.top_holders.amount'),
                     formatter: formatMoney,
                 },
             ],

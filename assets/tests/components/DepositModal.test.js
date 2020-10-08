@@ -32,6 +32,11 @@ function mockVue() {
     localVue.component('font-awesome-icon', {});
     localVue.directive('clipboard', {});
     localVue.directive('tippy', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 

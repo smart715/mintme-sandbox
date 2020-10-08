@@ -5,7 +5,7 @@
         v-tippy="tooltipOptions"
         v-clipboard:success="onCopy"
         v-clipboard:error="onError">
-        <slot>Copy to clipboard</slot>
+        <slot>{{ $t('copy_link.label') }}</slot>
     </a>
 </template>
 
@@ -29,11 +29,11 @@ export default {
     },
     methods: {
         onCopy: function(e) {
-            this.tooltipMessage = 'Copied!';
+            this.tooltipMessage = this.$t('copy_link.copied');
             this.hideTooltip();
         },
         onError: function(e) {
-            this.tooltipMessage = 'Press Ctrl+C to copy';
+            this.tooltipMessage = this.$t('copy_link.press_ctrl_c');
             this.hideTooltip();
         },
         hideTooltip: function() {
