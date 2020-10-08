@@ -28,6 +28,7 @@ use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExchangerTest extends TestCase
 {
@@ -49,7 +50,8 @@ class ExchangerTest extends TestCase
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
-            $this->mockValidator(true)
+            $this->mockValidator(true),
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder($user, $this->mockMarket(
             $this->mockCrypto('WEB'),
@@ -75,7 +77,8 @@ class ExchangerTest extends TestCase
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
-            $this->mockValidator(false)
+            $this->mockValidator(false),
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder($user, $this->mockMarket(
             $this->mockCrypto('WEB'),
@@ -101,7 +104,8 @@ class ExchangerTest extends TestCase
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
-            $this->mockValidator(true)
+            $this->mockValidator(true),
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder($user, $this->mockMarket(
             $this->mockCrypto('WEB'),
@@ -127,7 +131,8 @@ class ExchangerTest extends TestCase
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
-            $this->mockValidator(true)
+            $this->mockValidator(true),
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder($user, $this->mockMarket(
             $this->mockCrypto('WEB'),
@@ -279,5 +284,10 @@ class ExchangerTest extends TestCase
     private function mockTradeResult(): TradeResult
     {
         return $this->createMock(TradeResult::class);
+    }
+
+    private function mockTranslator(): TranslatorInterface
+    {
+        return $this->createMock(TranslatorInterface::class);
     }
 }

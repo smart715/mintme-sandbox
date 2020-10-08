@@ -8,6 +8,7 @@
 </template>
 
 <script>
+
 export default {
     name: 'LimitedTextarea',
     props: {
@@ -36,7 +37,7 @@ export default {
     },
     computed: {
         tooltipMessage: function() {
-            return 'The value can not be more than ' + this.max + ' characters';
+            return this.$t('limited_textarea.tooltip', {max: this.max});
         },
         charactersLeft: function() {
             return (parseInt(this.max) - this.internalValue.length);

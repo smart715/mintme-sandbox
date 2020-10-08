@@ -2,15 +2,15 @@
     <div class="h-100">
         <div class="card h-100">
             <div class="card-header">
-                Buy Orders
+                {{ $t('trade.buy_orders.header') }}
                 <span class="card-header-icon">
-                    Total: {{ total | formatMoney }} {{ tokenName|rebranding }}
+                    {{ $t('trade.buy_orders.header_total') }} {{ total | formatMoney }} {{ tokenName|rebranding }}
                     <guide>
                         <template slot="header">
-                            Buy Orders
+                            {{ $t('trade.buy_orders.guide_header') }}
                         </template>
                         <template slot="body">
-                            List of all active buy orders for {{ tokenName|rebranding }}.
+                            {{ $t('trade.buy_orders.guide_body', translationsContext) }}
                         </template>
                     </guide>
                 </span>
@@ -55,7 +55,7 @@
                             </template>
                         </b-table>
                         <div v-else>
-                            <p class="text-center p-5">No order was added yet</p>
+                            <p class="text-center p-5">{{ $t('trade.buy_orders.no_orders') }}</p>
                         </div>
                     </div>
                 </template>
@@ -124,6 +124,11 @@ export default {
         },
         hasOrders: function() {
             return this.tableData.length > 0;
+        },
+        translationsContext: function() {
+            return {
+                name: this.rebrandingFunc(this.tokenName),
+            };
         },
     },
     methods: {

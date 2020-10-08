@@ -19,6 +19,7 @@ function mockVue() {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {info: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -94,7 +95,7 @@ describe('TokenDeploy', () => {
         const wrapper = mockTokenDeploy(true);
         const message = wrapper.find('.bg-info');
         expect(message.exists()).toBe(true);
-        expect(message.text()).toBe('Please edit token release period before deploying.');
+        expect(message.text()).toBe('token.deploy.edit_release_period');
     });
 
     it('should disabled button if the cost is higher than the balance or is deploying', () => {

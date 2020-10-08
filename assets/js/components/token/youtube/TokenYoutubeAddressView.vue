@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col text-truncate">
-            Youtube:
+            {{ $t('token.youtube.view_label') }}
             <a
                 :href="youTubeUrl"
                 target="_blank"
@@ -17,10 +17,10 @@
         <div class="col-auto social-help">
             <guide>
                 <template slot="header">
-                    Youtube
+                    {{ $t('token.youtube.guide_header') }}
                 </template>
                 <template slot="body">
-                    Link to token creator’s YouTube. Before adding it, we confirmed ownership.
+                    <span v-html="this.$t('token.youtube.guide_body')"></span>
                 </template>
             </guide>
         </div>

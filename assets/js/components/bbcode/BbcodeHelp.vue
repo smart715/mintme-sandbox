@@ -2,12 +2,12 @@
     <div>
         <guide :placement="placement">
             <template  slot="header">
-                BBcode Help
+                {{ $t('bbcode.help.title') }}
             </template>
             <template slot="body">
                 <table class="table table-sm table-bordered bbcode-help-table text-center">
                     <tr>
-                        <th colspan="3">Text styles</th>
+                        <th colspan="3">{{ $t('bbcode.help.text_styles') }}</th>
                     </tr>
                     <tr>
                         <td>
@@ -15,8 +15,8 @@
                                 <path d="M747 1521q74 32 140 32 376 0 376-335 0-114-41-180-27-44-61.5-74t-67.5-46.5-80.5-25-84-10.5-94.5-2q-73 0-101 10 0 53-.5 159t-.5 158q0 8-1 67.5t-.5 96.5 4.5 83.5 12 66.5zm-14-746q42 7 109 7 82 0 143-13t110-44.5 74.5-89.5 25.5-142q0-70-29-122.5t-79-82T979 245t-124-14q-50 0-130 13 0 50 4 151t4 152q0 27-.5 80t-.5 79q0 46 1 69zm-541 889l2-94q15-4 85-16t106-27q7-12 12.5-27t8.5-33.5 5.5-32.5 3-37.5.5-34V1297q0-982-22-1025-4-8-22-14.5t-44.5-11-49.5-7-48.5-4.5-30.5-3l-4-83q98-2 340-11.5t373-9.5q23 0 68.5.5t67.5.5q70 0 136.5 13t128.5 42 108 71 74 104.5 28 137.5q0 52-16.5 95.5t-39 72T1398 722t-73 45-84 40q154 35 256.5 134t102.5 248q0 100-35 179.5t-93.5 130.5-138 85.5T1170 1633t-176 14q-44 0-132-3t-132-3q-106 0-307 11t-231 12z"/>
                             </svg>
                         </td>
-                        <td>[b]Bold[/b]</td>
-                        <td v-html-sanitize="parse('[b]Bold[/b]')"></td>
+                        <td>{{ $t('bbcode.help.bold') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.bold'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -24,8 +24,8 @@
                                 <path d="M384 1662l17-85q6-2 81.5-21.5T594 1518q28-35 41-101 1-7 62-289t114-543.5T863 288v-25q-24-13-54.5-18.5t-69.5-8-58-5.5l19-103q33 2 120 6.5t149.5 7T1090 144q48 0 98.5-2.5t121-7 98.5-6.5q-5 39-19 89-30 10-101.5 28.5T1179 279q-8 19-14 42.5t-9 40-7.5 45.5-6.5 42q-27 148-87.5 419.5T977 1224q-2 9-13 58t-20 90-16 83.5-6 57.5l1 18q17 4 185 31-3 44-16 99-11 0-32.5 1.5t-32.5 1.5q-29 0-87-10t-86-10q-138-2-206-2-51 0-143 9t-121 11z"/>
                             </svg>
                         </td>
-                        <td>[i]Italic[/i]</td>
-                        <td v-html-sanitize="parse('[i]Italic[/i]')"></td>
+                        <td>{{ $t('bbcode.help.italic') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.italic'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -33,8 +33,8 @@
                                 <path d="M176 223q-37-2-45-4l-3-88q13-1 40-1 60 0 112 4 132 7 166 7 86 0 168-3 116-4 146-5 56 0 86-2l-1 14 2 64v9q-60 9-124 9-60 0-79 25-13 14-13 132 0 13 .5 32.5t.5 25.5l1 229 14 280q6 124 51 202 35 59 96 92 88 47 177 47 104 0 191-28 56-18 99-51 48-36 65-64 36-56 53-114 21-73 21-229 0-79-3.5-128t-11-122.5T1372 396l-4-59q-5-67-24-88-34-35-77-34l-100 2-14-3 2-86h84l205 10q76 3 196-10l18 2q6 38 6 51 0 7-4 31-45 12-84 13-73 11-79 17-15 15-15 41 0 7 1.5 27t1.5 31q8 19 22 396 6 195-15 304-15 76-41 122-38 65-112 123-75 57-182 89-109 33-255 33-167 0-284-46-119-47-179-122-61-76-83-195-16-80-16-237V475q0-188-17-213-25-36-147-39zm1488 1409v-64q0-14-9-23t-23-9H160q-14 0-23 9t-9 23v64q0 14 9 23t23 9h1472q14 0 23-9t9-23z"/>
                             </svg>
                         </td>
-                        <td>[u]Underline[/u]</td>
-                        <td v-html-sanitize="parse('[u]Underline[/u]')"></td>
+                        <td>{{ $t('bbcode.help.underline') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.underline'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -42,8 +42,8 @@
                                 <path d="M1760 896q14 0 23 9t9 23v64q0 14-9 23t-23 9H32q-14 0-23-9t-9-23v-64q0-14 9-23t23-9h1728zM483 832q-28-35-51-80-48-97-48-188 0-181 134-309 133-127 393-127 50 0 167 19 66 12 177 48 10 38 21 118 14 123 14 183 0 18-5 45l-12 3-84-6-14-2q-50-149-103-205-88-91-210-91-114 0-182 59-67 58-67 146 0 73 66 140t279 129q69 20 173 66 58 28 95 52H483zm507 256h411q7 39 7 92 0 111-41 212-23 55-71 104-37 35-109 81-80 48-153 66-80 21-203 21-114 0-195-23l-140-40q-57-16-72-28-8-8-8-22v-13q0-108-2-156-1-30 0-68l2-37v-44l102-2q15 34 30 71t22.5 56 12.5 27q35 57 80 94 43 36 105 57 59 22 132 22 64 0 139-27 77-26 122-86 47-61 47-129 0-84-81-157-34-29-137-71z"/>
                             </svg>
                         </td>
-                        <td>[s]Strikethrough[/s]</td>
-                        <td v-html-sanitize="parse('[s]Strikethrough[/s]')"></td>
+                        <td>{{ $t('bbcode.help.strikethrough') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.strikethrough'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -51,8 +51,8 @@
                                 <path d="M1682 1664q-44 0-132.5-3.5T1416 1657q-44 0-132 3.5t-132 3.5q-24 0-37-20.5t-13-45.5q0-31 17-46t39-17 51-7 45-15q33-21 33-140l-1-391q0-21-1-31-13-4-50-4H560q-38 0-51 4-1 10-1 31l-1 371q0 142 37 164 16 10 48 13t57 3.5 45 15 20 45.5q0 26-12.5 48t-36.5 22q-47 0-139.5-3.5T387 1657q-43 0-128 3.5t-127 3.5q-23 0-35.5-21T84 1598q0-30 15.5-45t36-17.5 47.5-7.5 42-15q33-23 33-143l-1-57V500q0-3 .5-26t0-36.5T256 399t-3.5-42-6.5-36.5-11-31.5-16-18q-15-10-45-12t-53-2-41-14-18-45q0-26 12-48t36-22q46 0 138.5 3.5T387 135q42 0 126.5-3.5T640 128q25 0 37.5 22t12.5 48q0 30-17 43.5T634.5 256t-49.5 4-43 13q-35 21-35 160l1 320q0 21 1 32 13 3 39 3h699q25 0 38-3 1-11 1-32l1-320q0-139-35-160-18-11-58.5-12.5t-66-13T1102 198q0-26 12.5-48t37.5-22q44 0 132 3.5t132 3.5q43 0 129-3.5t129-3.5q25 0 37.5 22t12.5 48q0 30-17.5 44t-40 14.5-51.5 3-44 12.5q-35 23-35 161l1 943q0 119 34 140 16 10 46 13.5t53.5 4.5 41.5 15.5 18 44.5q0 26-12 48t-36 22z"/>
                             </svg>
                         </td>
-                        <td>[h1]header 1[/h1]</td>
-                        <td>Headers 1-6 levels</td>
+                        <td>{{ $t('bbcode.help.header') }}</td>
+                        <td>{{ $t('bbcode.help.headers') }}</td>
                     </tr>
                     <tr>
                         <td>
@@ -60,11 +60,11 @@
                                 <path d="M1534 189v73q0 29-18.5 61t-42.5 32q-50 0-54 1-26 6-32 31-3 11-3 64v1152q0 25-18 43t-43 18h-108q-25 0-43-18t-18-43V385h-143v1218q0 25-17.5 43t-43.5 18H842q-26 0-43.5-18t-17.5-43v-496q-147-12-245-59-126-58-192-179-64-117-64-259 0-166 88-286 88-118 209-159 111-37 417-37h479q25 0 43 18t18 43z"/>
                             </svg>
                         </td>
-                        <td>[p]Paragraph[/p]</td>
-                        <td v-html-sanitize="parse('[p]Paragraph[/p]')"></td>
+                        <td>{{ $t('bbcode.help.paragraph') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.paragraph'))"></td>
                     </tr>
                     <tr>
-                        <th colspan="3">Lists</th>
+                        <th colspan="3">{{ $t('bbcode.help.lists') }}</th>
                     </tr>
                     <tr>
                         <td>
@@ -74,11 +74,11 @@
                         </td>
                         <td class="text-left pl-3">
                             [ul]<br>
-                            &emsp;[li]One[/li]<br>
-                            &emsp;[li]Two[/li]<br>
+                            &emsp;[li]{{ $t('bbcode.help.one') }}[/li]<br>
+                            &emsp;[li]{{ $t('bbcode.help.two') }}[/li]<br>
                             [/ul]
                         </td>
-                        <td v-html-sanitize="parse('Unordered list:[ul][li]One[/li][li]Two[/li][/ul]')"></td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.unordered_list'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -88,11 +88,11 @@
                         </td>
                         <td class="text-left pl-3">
                             [ol]<br>
-                            &emsp;[li]One[/li]<br>
-                            &emsp;[li]Two[/li]<br>
+                            &emsp;[li]{{ $t('bbcode.help.one') }}[/li]<br>
+                            &emsp;[li]{{ $t('bbcode.help.two') }}[/li]<br>
                             [/ol]
                         </td>
-                        <td v-html-sanitize="parse('Ordered list:[ol][li]One[/li][li]Two[/li][/ol]')"></td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.ordered_list'))"></td>
                     </tr>
                     <tr>
                         <td>
@@ -100,11 +100,11 @@
                                 <path d="M1671 566q0 40-28 68l-724 724-136 136q-28 28-68 28t-68-28l-136-136-362-362q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 295 656-657q28-28 68-28t68 28l136 136q28 28 28 68z"/>
                             </svg>
                         </td>
-                        <td>[li]Item[/li]</td>
-                        <td v-html-sanitize="parse('List item:[li]Item[/li]')"></td>
+                        <td>{{ $t('bbcode.help.item') }}</td>
+                        <td v-html-sanitize="parse(this.$t('bbcode.help.list_item'))"></td>
                     </tr>
                     <tr>
-                        <th colspan="3">Links</th>
+                        <th colspan="3">{{ $t('bbcode.help.links') }}</th>
                     </tr>
                     <tr>
                         <td>
@@ -114,12 +114,12 @@
                         </td>
                         <td>
                             [url]link.com[/url]<br>
-                            [url=link.com]Link[/url]
+                            [url=link.com]{{ $t('bbcode.help.link') }}[/url]
                         </td>
-                        <td v-html-sanitize="parse('[url=#]link.com[/url][p][url=#]Link[/url][/p]')"></td>
+                      <td v-html-sanitize="parse('[url=#]link.com[/url][p][url=#]' + this.$t('bbcode.help.link') + '[/url][/p]')"></td>
                     </tr>
                     <tr>
-                        <th colspan="3">Images</th>
+                        <th colspan="3">{{ $t('bbcode.help.images') }}</th>
                     </tr>
                     <tr>
                         <td>
@@ -128,10 +128,10 @@
                             </svg>
                         </td>
                         <td>[img]link.com[/img]</td>
-                        <td>Image</td>
+                        <td>{{ $t('bbcode.help.image') }}</td>
                     </tr>
                     <tr>
-                        <th colspan="3">YouTube</th>
+                        <th colspan="3">{{ $t('bbcode.help.youtube') }}</th>
                     </tr>
                     <tr>
                         <td>
@@ -139,8 +139,8 @@
                                 <path d="M352 832q0 14-9 23L55 1143q-9 9-23 9-13 0-22.5-9.5T0 1120V544q0-13 9.5-22.5T32 512q14 0 23 9l288 288q9 9 9 23zm1440 480v192q0 13-9.5 22.5t-22.5 9.5H32q-13 0-22.5-9.5T0 1504v-192q0-13 9.5-22.5T32 1280h1728q13 0 22.5 9.5t9.5 22.5zm0-384v192q0 13-9.5 22.5t-22.5 9.5H672q-13 0-22.5-9.5T640 1120V928q0-13 9.5-22.5T672 896h1088q13 0 22.5 9.5t9.5 22.5zm0-384v192q0 13-9.5 22.5T1760 768H672q-13 0-22.5-9.5T640 736V544q0-13 9.5-22.5T672 512h1088q13 0 22.5 9.5t9.5 22.5zm0-384v192q0 13-9.5 22.5T1760 384H32q-13 0-22.5-9.5T0 352V160q0-13 9.5-22.5T32 128h1728q13 0 22.5 9.5t9.5 22.5z"></path>
                             </svg>
                         </td>
-                        <td>[yt]link[/yt]</td>
-                        <td>YouTube Video</td>
+                        <td>[yt]{{ $t('bbcode.help.link') }}[/yt]</td>
+                        <td>{{ $t('bbcode.help.youtube_video') }}</td>
                     </tr>
                 </table>
             </template>

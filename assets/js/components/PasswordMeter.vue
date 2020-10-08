@@ -6,12 +6,10 @@
         </div>
         <div class="py-2 mb-2 bg-danger text-white text-center" v-if="strengthtext">
             <ul class="pl-2 pr-2 m-0 list-unstyled">
-                <li v-if="strengthtext === 1">This value is too short. It should have 8 characters or more.</li>
-                <li v-if="strengthtext === 2">
-                    The password must contain at least one uppercase letter, a lowercase letter, and a number.
-                </li>
-                <li v-if="strengthtext === 3">This value is too long. It should have 72 characters or less.</li>
-                <li v-if="strengthtext === 4">The password must not contain spaces.</li>
+              <li v-if="strengthtext === 1">{{ $t('passwordmeter.strength_1') }}</li>
+              <li v-if="strengthtext === 2">{{ $t('passwordmeter.strength_2') }}</li>
+              <li v-if="strengthtext === 3">{{ $t('passwordmeter.strength_3') }}</li>
+              <li v-if="strengthtext === 4">{{ $t('passwordmeter.strength_4') }}</li>
             </ul>
         </div>
     </div>
@@ -19,6 +17,7 @@
 
 <script>
 import zxcvbn from 'zxcvbn';
+
 export default {
     name: 'passwordmeter',
     props: {

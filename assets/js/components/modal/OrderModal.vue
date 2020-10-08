@@ -13,7 +13,7 @@
                 <button
                     class="btn btn-primary"
                     @click="closeModal()">
-                    Ok
+                    {{ $t('order_modal.ok') }}
                 </button>
             </div>
         </template>

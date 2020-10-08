@@ -11,6 +11,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -62,7 +63,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('p').html()).toContain('To see this post you need to have <a href="#">0 tok</a> in your balance. Visit trade page and create buy order to get required tokens.');
+        expect(wrapper.find('p').html()).toContain('post.logged_in.1 <a href="#">0 tok</a> post.logged_in.2');
     });
 
     it('shows edit and delete icons if showEdit is true', () => {

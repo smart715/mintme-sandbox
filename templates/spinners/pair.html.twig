@@ -30,7 +30,7 @@
                             href="#"
                             class="nav-link {% if tab|default and tab == 'intro' %}active{% endif %}"
                         >
-                            Introduction
+                            {% trans %}page.pair.tab.introduction{% endtrans %}
                         </a>
                     </li>
                     <li
@@ -43,7 +43,7 @@
                             target="_self" href="#"
                             class="nav-link {% if tab and tab == 'trade' %}active{% endif %}"
                         >
-                            Trade
+                            {% trans %}page.pair.tab.trade{% endtrans %}
                         </a>
                     </li>
                     <li role="presentation" class="nav-item">
@@ -55,7 +55,7 @@
                            href="#"
                            class="nav-link {% if tab and tab == 'donate' %}active{% endif %}"
                         >
-                            Donate
+                            {% trans %}page.pair.donate_title{% endtrans %}
                         </a>
                     </li>
                     <li role="presentation" class="nav-item">
@@ -67,7 +67,7 @@
                            href="#"
                            class="nav-link {% if tab and tab == 'posts' %}active{% endif %}"
                         >
-                            Posts
+                            {% trans %}page.pair.posts_title{% endtrans %}
                         </a>
                     </li>
                     <li class="nav-item-token">
@@ -86,7 +86,7 @@
                         <div class="col-12 pb-3">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    Description
+                                    {% trans %}token.intro.description.header{% endtrans %}
                                     <div class="d-inline float-right">
                                         <a>
                                             <div class="ml-1 rounded-circle square blue-question mtrouneded">
@@ -113,7 +113,7 @@
                         <div class="col-12 col-lg-7 pr-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    Recent posts
+                                    {% trans %}page.pair.recent_posts{% endtrans %}
                                 </div>
                                 <div class="card-body">
                                     <div class="p-5 text-center">
@@ -125,7 +125,7 @@
                         <div class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
-                                    Statistics
+                                    {% trans %}token.intro.statistics.header{% endtrans %}
                                     <div class="d-inline float-right">
                                         <a>
                                             <div class="ml-1 rounded-circle square blue-question mtrouneded">
@@ -143,7 +143,7 @@
                         </div>
                         <div class="card h-100 col-12 mt-3">
                             <div class="card-header">
-                                Top Holders
+                                {% trans %}trade.top_holders.header{% endtrans %}
                             </div>
                             <div class="card-body p-0">
                                 <div class="p-5 text-center">
@@ -182,7 +182,7 @@
                             class="nav-link active"
                             id="__BVID__35___BV_tab_button__"
                             aria-controls="__BVID__35">
-                            Trade
+                            {% trans %}page.pair.tab.trade{% endtrans %}
                         </a>
                     </li>
                 </ul>
@@ -214,7 +214,7 @@
                                 <div class="h-100">
                                     <div class="card h-100">
                                         <div class="card-header text-left">
-                                            Buy Order
+                                            {% trans %}trade.buy_order.header{% endtrans %}
                                         </div>
                                         <div class="card-body" style="height: 200px"></div>
                                     </div>
@@ -223,7 +223,9 @@
                             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
                                 <div class="h-100">
                                     <div class="card h-100">
-                                        <div class="card-header text-left">Sell Order</div>
+                                        <div class="card-header text-left">
+                                            {% trans %}trade.sell_order.header{% endtrans %}
+                                        </div>
                                         <div class="card-body" style="height: 200px"></div>
                                     </div>
                                 </div>
@@ -232,7 +234,7 @@
                         <div class="row mt-3">
                             <div class="col">
                                 <div class="card">
-                                    <div class="card-header">Trade History</div>
+                                    <div class="card-header">{% trans %}trade.history.header{% endtrans %}</div>
                                     <div class="card-body p-0" style="height: 200px;"></div>
                                 </div>
                             </div>

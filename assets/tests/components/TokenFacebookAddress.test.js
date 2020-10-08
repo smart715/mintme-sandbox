@@ -13,6 +13,7 @@ function mockVue() {
         install(Vue) {
             Vue.prototype.$axios = {single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -36,7 +37,7 @@ describe('TokenFacebookAddress', () => {
                 tokenName: 'foo token name',
            },
         });
-        expect(wrapper.vm.computedAddress).toBe('Add Facebook address');
+        expect(wrapper.vm.computedAddress).toBe('token.facebook.empty_address');
     });
 
     it('should equal to address props when address props is not empty', () => {

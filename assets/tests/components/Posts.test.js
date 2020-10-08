@@ -9,6 +9,7 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -41,7 +42,7 @@ describe('Post', () => {
         });
 
         expect(wrapper.findAll('post-stub').length).toBe(0);
-        expect(wrapper.find('.posts').html()).toContain('The token creator has not added any posts yet.');
+        expect(wrapper.find('.posts').html()).toContain('post.not_any_post');
     });
 
     it('shows posts if posts is not empty', () => {

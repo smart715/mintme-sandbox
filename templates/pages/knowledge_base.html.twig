@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Knowledge Base | mintMe{% endblock %}
+{% block title %}{% trans %}page.kb.title{% endtrans %} | mintMe{% endblock %}
 
 {% block content %}
     <div id="kb" class="container">
@@ -8,7 +8,7 @@
             <div class="h-100 pt-4">
                 <div class="row">
                     <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
-                        <h1>No articles found</h1>
+                        <h1>{% trans %}page.kb.404{% endtrans %}</h1>
                     </div>
                 </div>
             </div>

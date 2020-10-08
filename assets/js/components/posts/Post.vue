@@ -42,7 +42,7 @@
                 <bbcode-view :value="post.content"/>
             </p>
             <p v-else>
-              To see this post you need to have <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> in your balance. Visit trade page and create buy order to get required tokens.
+              {{ $t('post.logged_in.1') }} <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> {{ $t('post.logged_in.2') }}
             </p>
         </template>
         <a :href="singlePageUrl" class="hover-icon text-decoration-none text-white">
@@ -59,7 +59,7 @@
             @close="closeModal"
         >
             <p class="text-white modal-title pt-2">
-                Do you really want to delete this post?
+                {{ $t('post.delete') }}
             </p>
         </confirm-modal>
     </div>

@@ -17,6 +17,11 @@ describe('TradeSellOrder', () => {
     const localVue = createLocalVue();
     localVue.use(Axios);
     localVue.use(Vuex);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     const store = new Vuex.Store({
         modules: {
             makeOrder,

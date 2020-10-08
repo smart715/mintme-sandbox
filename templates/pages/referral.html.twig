@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Referral Program | mintMe{% endblock %}
+{% block title %}{% trans %}page.referral.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}referral{% endblock %}
 
@@ -8,16 +8,12 @@
     <div id="referral" class="container">
         <div class="row pt-4 pb-3 justify-content-center">
             <div class="col-12 card-fixed-large px-0 card">
-                <div class="card-header">Referral Program</div>
+                <div class="card-header">{% trans %}page.referral.header{% endtrans %}</div>
                 <div class="card-body text-center m-0 pt-4">
-                    <p class="m-0">When you refer someone, <span class="text-bold">YOU WILL GET {{ referralPercentage }}%</span> of his trading fees, but that's not all!</p>
-                    <p>If the referred person deploys token to the blockchain, each of you will receive {{ deployCostReward }}% of deployment cost.</p>
-                    <p>
-                        How to get started? It's very easy!<br />
-                        Below is a unique link to registration. If a user registers via this link, you will get {{ referralPercentage }}% of his trading fees!<br />
-                        Everything goes from our pocket, so neither you nor the referred person loses anything!
-                    </p>
-                    <p>Share this registration link with your friends:</p>
+                    <p>{% trans %}page.referral.body_1{% endtrans %} <span class="text-bold">{% trans with {'%referralPercentage%': referralPercentage} %}page.referral.body_2{% endtrans %}</span> {% trans %}page.referral.body_3{% endtrans %}</p>
+                    <p>{% trans with {'%deployCostReward%': deployCostReward} %}page.referral.body_4{% endtrans %}</p>
+                    <p>{% trans with {'%referralPercentage%': referralPercentage} %}page.referral.body_5{% endtrans %}</p>
+                    <p>{% trans %}page.referral.body_6{% endtrans %}</p>
                     <div class="mt-3 mx-auto text-center">
                         <div class="mb-1" id="referral-link-text">
                             <code class="p-2 text-blue">
@@ -30,17 +26,17 @@
                         </div>
                         <div class="row justify-content-center text-bold mt-4">
                             <div class="col-auto p-2 mt-2">
-                                Total earned:
+                                {% trans %}page.referral.body_7{% endtrans %}
                                 <span>
                                     <span v-if="referralBalance" v-text="balance"></span>
                                     <span v-else>
                                         <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                                     </span>
-                                    <small> MINTME</small>
+                                    <small>MINTME</small>
                                 </span>
                             </div>
                             <div class="col-auto p-2 mt-2">
-                                Referrals:
+                                {% trans %}page.referral.body_8{% endtrans %}
                                 <span>
                                     {{ referralsCount }}
                                 </span>
