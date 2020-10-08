@@ -35,19 +35,16 @@ class SetKBPositionCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
         $this->em->getConnection()->beginTransaction();
-        try {
 
+        try {
             $io->progressStart(3);
-            
             $this->updateTable('knowledge_base');
             $io->progressAdvance();
             $this->updateTable('knowledge_base_category');
             $io->progressAdvance();
             $this->updateTable('knowledge_base_subcategory');
             $io->progressAdvance();
-
             $this->em->getConnection()->commit();
             $io->progressFinish();
             $io->success('Correct positions are set');
@@ -72,7 +69,7 @@ class SetKBPositionCommand extends Command
         
         while ($count-- > 0) {
             $dql = 'UPDATE '.$tableName.' SET position = ? WHERE id = ?';
-            $this->em->getConnection()->executeUpdate($dql,[$count+1, $rows[$count]['id']]);
+            $this->em->getConnection()->executeUpdate($dql, [$count+1, $rows[$count]['id']]);
         }
 
         return true;
