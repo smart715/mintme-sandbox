@@ -14,6 +14,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -75,7 +76,7 @@ describe('TokenWebsiteAddress', () => {
                 editingWebsite: false,
             },
         });
-        expect(wrapper.find('#website-link').text()).toBe('Add Website');
+        expect(wrapper.find('#website-link').text()).toBe('token.website.empty_address');
     });
 
     it('show link when specified', () => {

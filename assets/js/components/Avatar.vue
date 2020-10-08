@@ -19,64 +19,64 @@
 </template>
 
 <script>
-    import ImageUploader from './ImageUploader';
+import ImageUploader from './ImageUploader';
 
-    export default {
-        name: 'Avatar',
-        components: {
-            ImageUploader,
+export default {
+    name: 'Avatar',
+    components: {
+        ImageUploader,
+    },
+    props: {
+        image: {
+            type: String,
         },
-        props: {
-            image: {
-                type: String,
-            },
-            editable: {
-                type: Boolean,
-                default: false,
-            },
-            type: {
-                type: String,
-                default: 'profile',
-            },
-            size: {
-                type: String,
-                default: 'small',
-            },
-            fallback: {
-                type: String,
-                default: '',
-            },
+        editable: {
+            type: Boolean,
+            default: false,
         },
-        data() {
+        type: {
+            type: String,
+            default: 'profile',
+        },
+        size: {
+            type: String,
+            default: 'small',
+        },
+        fallback: {
+            type: String,
+            default: '',
+        },
+    },
+    data() {
+        return {
+            currentImage: this.image,
+        };
+    },
+    computed: {
+        classObject: function() {
             return {
-                currentImage: this.image,
+                [`avatar__${this.size}`]: true,
+                'c-pointer avatar_owner': this.editable,
             };
         },
-        computed: {
-            classObject: function() {
-                return {
-                    [`avatar__${this.size}`]: true,
-                    'c-pointer avatar_owner': this.editable,
-                };
-            },
-            imageUrl: function() {
-                return this.currentImage ? this.currentImage : this.fallback;
-            },
-            isTabIndex: function() {
-                return this.editable ? 0 : -1;
-            },
+        imageUrl: function() {
+            return this.currentImage ? this.currentImage : this.fallback;
         },
-        methods: {
-            setImage(image) {
-                this.currentImage = image;
-            },
-            upload() {
-                if (!this.editable) {
-                    return;
-                }
+        isTabIndex: function() {
+            return this.editable ? 0 : -1;
+        },
+    },
+    methods: {
+        setImage(image) {
+            this.currentImage = image;
+        },
+        upload() {
+            if (!this.editable) {
+                return;
+            }
 
-                this.$refs.uploader.chooseImage();
-            },
+            this.$refs.uploader.chooseImage();
         },
-    };
+    },
+};
 </script>

@@ -1,5 +1,11 @@
+import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import TokenEditModal from '../../js/components/modal/TokenEditModal';
+Vue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
 
 let propsForTestCorrectlyRenders = {
     currentName: 'testCurrentName',
@@ -28,6 +34,7 @@ describe('TokenEditModal', () => {
     it('should be true when statusProp props is equal "not-deployed"', () => {
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         expect(wrapper.vm.isTokenNotDeployed).toBe(true);
     });
@@ -36,6 +43,7 @@ describe('TokenEditModal', () => {
         propsForTestCorrectlyRenders.statusProp = 'deployed';
         const wrapper = shallowMount(TokenEditModal, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         expect(wrapper.vm.isTokenDeployed).toBe(true);
     });

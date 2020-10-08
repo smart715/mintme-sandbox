@@ -2,18 +2,18 @@
     <div>
         <template v-if="btnDisabled">
             <span class="btn-cancel px-0 m-1 text-muted">
-                Delete this token
+                {{ $t('token.delete.delete_token') }}
             </span>
             <guide>
                 <template slot="header">
-                    Delete token
+                    {{ $t('token.delete.header') }}
                 </template>
                 <template slot="body">
                     <p v-if="isTokenExchanged">
-                        You need all your tokens to delete token.
+                        {{ $t('token.delete.body.all_tokens') }}
                     </p>
                     <p v-else-if="!isTokenNotDeployed">
-                        Token is deploying or deployed.
+                        {{ $t('token.delete.body.deploying_or_deployed') }}
                     </p>
                 </template>
             </guide>
@@ -23,7 +23,7 @@
             class="btn-cancel px-0 c-pointer m-1"
             @click="deleteToken"
         >
-            Delete this token
+            {{ $t('token.delete.delete_token') }}
         </span>
         <two-factor-modal
             :visible="showTwoFactorModal"
@@ -38,8 +38,7 @@
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
-
-const HTTP_ACCEPTED = 202;
+import {HTTP_ACCEPTED} from '../../utils/constants';
 
 export default {
     name: 'TokenDelete',
@@ -80,10 +79,10 @@ export default {
         },
         doDeleteToken: function(code = '') {
             if (this.isTokenExchanged) {
-                this.notifyError('You need all your tokens to delete token.');
+                this.notifyError(this.$t('token.delete.body.all_tokens'));
                 return;
             } else if (!this.isTokenNotDeployed) {
-                this.notifyError('Token is deploying or deployed.');
+                this.notifyError(this.$t('token.delete.body.deploying_or_deployed'));
                 return;
             }
 
@@ -100,7 +99,7 @@ export default {
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.notifyError('Network error');
+                        this.notifyError(this.$t('toasted.error.network'));
                         this.sendLogs('error', 'Delete token network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
@@ -109,7 +108,7 @@ export default {
                             this.sendConfirmCode();
                         }
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                         this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 });
@@ -130,13 +129,13 @@ export default {
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.notifyError('Network error');
+                        this.notifyError(this.$t('toasted.error.network'));
                         this.sendLogs('error', 'Send confirm code network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                         this.sendLogs('error', 'Can not send confirm code', error);
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                         this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 });

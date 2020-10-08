@@ -2,7 +2,7 @@
 
 {% block contentClass %}wrap-main-form py-4{% endblock %}
 
-{% set formHeader = 'Two-Factor Authentication' %}
+{% set formHeader = '2fa.auth.title'|trans %}
 
 {% block title %}{{ formHeader }} | mintMe{% endblock %}
 
@@ -15,7 +15,7 @@
                         {{ formHeader }}
                     </div>
                     <div class="card-body">
-                        {% if authenticationError  and 'Invalid CSRF token.' != authenticationError  %}
+                        {% if authenticationError  and 'error.csrf'|trans != authenticationError  %}
                             <div class="p-2 mb-2 bg-danger text-center text-white">
                                 {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}
                             </div>
@@ -23,7 +23,7 @@
                         {% block formBody %}
                             <form action="{{ path("2fa_login_check") }}" method="post">
                                 <div class="form-group">
-                                    <label for="code">Two-factor authentication code:</label>
+                                    <label for="code">{% trans %}page.login_2fa.header{% endtrans %}</label>
                                     <input
                                         type="text" name="{{ authCodeParameterName }}" required="required"
                                         class="form-control form-control-md" id="code" autofocus
@@ -31,8 +31,7 @@
                                 </div>
                                 <div class="form-group mb-0" style="line-height: 0.8em;">
                                     <small>
-                                        Enter the code from the two-factor app on your mobile device.
-                                        If you've lost your device, you may enter one of your recovery codes.
+                                        {% trans %}page.login_2fa.body{% endtrans %}
                                     </small>
                                 </div>
                                 {{ block('trusted_device', 'form/fields.html.twig') }}

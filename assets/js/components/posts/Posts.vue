@@ -1,7 +1,7 @@
 <template>
     <div class="card h-100">
         <div class="card-header">
-            <slot name="title">Posts</slot>
+            <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
         <div class="card-body posts">
             <template v-if="posts.length > 0">
@@ -16,14 +16,14 @@
                 />
             </template>
             <div v-else>
-                The token creator has not added any posts yet.
+                {{ $t('post.not_any_post') }}
             </div>
             <a v-if="showReadMore"
                 class="align-self-center"
                 :href="readMoreUrl"
                 @click.prevent="goToPosts"
             >
-                All Posts
+                {{ $t('posts.all') }}
             </a>
         </div>
     </div>

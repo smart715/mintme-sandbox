@@ -7,24 +7,27 @@
             <div class="text-center">
                 <div class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
-                        {{ label }}
+                        {{ $t(label) }}
                     </label>
                     <input
                         v-model="code"
                         type="text"
                         id="twofactor"
-                        class="form-control">
+                        class="form-control"
+                    >
                 </div>
                 <div class="col-12 pt-2 text-center">
                     <button
                         class="btn btn-primary"
-                        @click="onVerify">
-                        Verify Code
+                        @click="onVerify"
+                    >
+                        {{ $t('2fa_modal.submit') }}
                     </button>
                     <span
                         class="btn-cancel pl-3 c-pointer"
-                        @click="closeModal">
-                        <slot name="cancel">Cancel</slot>
+                        @click="closeModal"
+                    >
+                        <slot name="cancel">{{ $t('2fa_modal.cancel') }}</slot>
                     </span>
                 </div>
             </div>
@@ -51,7 +54,7 @@ export default {
     data() {
         return {
             code: '',
-            label: this.twofa ? 'Two Factor Authentication Code:' : 'Email Verification Code:',
+            label: this.twofa ? '2fa_modal.label.2fa' : '2fa_modal.label.email',
         };
     },
     methods: {
@@ -62,7 +65,7 @@ export default {
         onVerify: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.notifyError('Code is required');
+                this.notifyError(this.$t('2fa_modal.require'));
                 return;
             }
             this.$emit('verify', this.code);

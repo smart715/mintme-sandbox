@@ -4,13 +4,14 @@ import ActiveOrders from './components/wallet/ActiveOrders';
 import DepositWithdrawHistory from './components/wallet/DepositWithdrawHistory';
 import tableSortPlugin from './table_sort_plugin.js';
 import store from './storage';
-
+import i18n from './utils/i18n/i18n';
 
 // load the tables sorting plugin
 Vue.use(tableSortPlugin);
 
 new Vue({
   el: '#wallet',
+  i18n,
   data() {
     return {
       tabIndex: 0,

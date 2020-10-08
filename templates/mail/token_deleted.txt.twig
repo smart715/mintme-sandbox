@@ -1,6 +1,6 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-Hello
+{% trans %}hello{% endtrans %}
 {{username}}
-Your request to delete token {{tokenName}} from Mintme.com was finished successfully.
+{% trans with {'%tokenName%': tokenName}%}token_deleted.finished{% endtrans %}
 {% endblock %}

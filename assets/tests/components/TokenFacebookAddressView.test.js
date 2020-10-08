@@ -1,5 +1,12 @@
+import Vue from 'vue';
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenFacebookAddressView from '../../js/components/token/facebook/TokenFacebookAddressView';
+
+Vue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
 
 describe('TokenFacebookAddressView', () => {
     it('show facebook link and button', () => {

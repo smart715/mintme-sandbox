@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col text-truncate">
-            Web:
+            {{ $t('token.website.view_label') }}
             <a
                 :href="currentWebsite"
                 target="_blank"
@@ -14,11 +14,10 @@
         <div class="col-auto social-help">
             <guide>
                 <template  slot="header">
-                    Web
+                  {{ $t('token.website.guide_header') }}
                 </template>
                 <template slot="body">
-                    Link to token creator’s website.
-                    Before adding it, we confirmed ownership.
+                  {{ $t('token.website.guide_body') }}
                 </template>
             </guide>
         </div>

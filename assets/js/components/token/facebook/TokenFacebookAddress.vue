@@ -40,9 +40,13 @@
             <template slot="body">
                 <div class="row">
                     <div class="col-12">
-                        <h3 class="modal-title text-center pb-2">Facebook page Confirmation</h3>
+                        <h3 class="modal-title text-center pb-2">
+                            {{ $t('token.facebook.confirmation_title') }}
+                        </h3>
                         <div class="form-group">
-                            <label for="select-fb-pages">Select Facebook page to show:</label>
+                            <label for="select-fb-pages">
+                                {{ $t('token.facebook.select_label') }}
+                            </label>
                             <select
                                 id="select-fb-pages"
                                 v-model="selectedUrl"
@@ -64,13 +68,13 @@
                             class="btn btn-primary"
                             @click="savePage"
                         >
-                            Confirm
+                            {{ $t('token.facebook.submit') }}
                         </button>
                         <span
                             class="btn-cancel c-pointer pl-3"
                             @click="showConfirmModal = false"
                         >
-                            Cancel
+                            {{ $t('token.facebook.cancel') }}
                         </span>
                     </div>
                 </div>
@@ -87,10 +91,9 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
+import {HTTP_ACCEPTED} from '../../../utils/constants';
 
 library.add(faFacebookSquare, faTimes);
-
-const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenFacebookAddress',
@@ -103,7 +106,11 @@ export default {
         Guide,
         Modal,
     },
-    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        FiltersMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     data() {
         return {
             pages: [],
@@ -117,7 +124,7 @@ export default {
     },
     computed: {
         computedAddress: function() {
-            return this.address || 'Add Facebook address';
+            return this.address || this.$t('token.facebook.empty_address');
         },
     },
     mounted() {
@@ -129,7 +136,7 @@ export default {
                 if (response.status === 'connected') {
                     FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
                         if (accountsData.error) {
-                            this.notifyError('An error has ocurred, please try again later');
+                            this.notifyError(this.$t('toasted.error.try_later'));
                             this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error);
                             return;
                         }
@@ -159,18 +166,21 @@ export default {
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
-                        this.notifySuccess(`Facebook page ${state}`);
+                        this.notifySuccess(this.$t(
+                            'toasted.success.facebook.' + state,
+                            {address: this.selectedUrl}
+                        ));
                         this.$emit('saveFacebook', this.selectedUrl);
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.notifyError('Network error');
+                        this.notifyError(this.$t('toasted.error.network'));
                         this.sendLogs('error', 'Save facebook address network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                         this.sendLogs('error', 'Can not save facebook', error);
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                         this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })

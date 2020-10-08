@@ -3,10 +3,10 @@
         <div v-if="deployed" class="deployed-icon">
             <guide>
                 <template slot="icon">
-                    <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="deployed">
+                    <img class="h-100" src="../../../../img/mintmecoin_W.png" :alt="this.$t('token.deploy_icon.img_alt.deployed')">
                 </template>
                 <template slot="body">
-                    This token exists on the blockchain.
+                    {{ $t('token.deploy_icon.body') }}
                 </template>
             </guide>
         </div>
@@ -16,10 +16,10 @@
         <div v-else-if="notDeployed" class="not-deployed-icon">
             <guide>
                 <template slot="icon">
-                    <img class="h-100" src="../../../../img/mintmecoin_W.png" alt="not-deployed">
+                    <img class="h-100" src="../../../../img/mintmecoin_W.png" :alt="this.$t('token.deploy_icon.img_alt.not_deployed')">
                 </template>
                 <template slot="body">
-                    This token does not exist on the blockchain. Tokens on a blockchain allow withdrawals to user wallet and are promoted on trading page. Token creator can activate it by clicking on edit icon on this page.
+                    {{ $t('token.deploy_icon.doesnt_exist_on_blockchain') }}
                 </template>
             </guide>
         </div>

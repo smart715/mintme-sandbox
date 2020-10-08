@@ -1,7 +1,7 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-Hello
+{% trans %}hello{% endtrans %}
 {{username}}
-Your deposit of {{ amount }} {{ tradable.symbol|rebranding }} was completed.
-You can now see it available on your account.
+{% trans with {'%amount%': amount, '%symbol%': symbol} %}deposit_completed.msg{% endtrans %}
+{% trans %}deposit_completed.msg.available{% endtrans %}
 {% endblock %}
