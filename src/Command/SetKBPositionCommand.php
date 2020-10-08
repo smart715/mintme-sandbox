@@ -37,7 +37,6 @@ class SetKBPositionCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $this->em->getConnection()->beginTransaction();
-
         try {
 
             $io->progressStart(3);
@@ -73,9 +72,7 @@ class SetKBPositionCommand extends Command
         
         while ($count-- > 0) {
             $dql = 'UPDATE '.$tableName.' SET position = ? WHERE id = ?';
-            $this->em->getConnection()->executeUpdate($dql,
-            	[$count+1, $rows[$count]['id']]
-            );
+            $this->em->getConnection()->executeUpdate($dql,[$count+1, $rows[$count]['id']]);
         }
 
         return true;
