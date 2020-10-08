@@ -14,7 +14,7 @@ final class Version20201008123106 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'Set correct values for positioning function to KB';
     }
 
     public function up(Schema $schema) : void
@@ -30,6 +30,10 @@ final class Version20201008123106 extends AbstractMigration
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
+        $this->addSql('UPDATE knowledge_base SET position = 0');
+        $this->addSql('UPDATE knowledge_base_category SET position = 0');
+        $this->addSql('UPDATE knowledge_base_subcategory SET position = 0');
     }
 }
