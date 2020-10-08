@@ -6,16 +6,16 @@
             <div class="row py-2 py-md-2 py-xl-0">
                 <div class="d-inline-block col-lg-10 col-md-12 pr-lg-0 align-self-center">
                     <span class="message">
-                        <span class="text-bold">Ongoing airdrop!</span>
-                        For first {{ airdropCampaign.participants }} participants {{ airdropReward }}
+                        <span class="text-bold">{{ $t('ongoing_airdrop.title') }}</span>
+                        {{ $t('ongoing_airdrop.msg.1', {participants: airdropCampaign.participants, airdropReward: airdropReward}) }}
                     </span>
                     <span class="message">
-                        {{ tokenName }} for free. Currently {{ actualParticipants }}/{{ airdropCampaign.participants }} participants.
+                        {{ $t('ongoing_airdrop.msg.2', {tokenName: tokenName,actualParticipants: actualParticipants, participants: airdropCampaign.participants}) }}
                     </span>
                     <span
                         v-if="showEndDate"
                         class="m-0 message">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
+                        {{ $t('ongoing_airdrop.ends', {endsDate: endsDate, endsTime: endsTime}) }}
                         <span v-if="showDuration">
                             ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d
                             {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
@@ -28,7 +28,7 @@
                         :disabled="btnDisabled"
                         @click="showModal = true"
                         class="btn btn-primary">
-                        Participate
+                        {{ $t('ongoing_airdrop.participate') }}
                     </button>
                     <confirm-modal
                         :visible="showModal"
@@ -132,7 +132,7 @@ export default {
             let button = '';
 
             if (!this.loggedIn) {
-                button = 'Log In';
+                button = this.$t('log_in');
             }
 
             if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
@@ -143,22 +143,28 @@ export default {
         },
         confirmModalMessage: function() {
             if (!this.loggedIn) {
-                return `You have to be logged in to claim ${this.airdropReward} ${this.tokenName}.`;
+                return this.$t('ongoing_airdrop.confirm_message.logged_in', {
+                    airdropReward: this.airdropReward,
+                    tokenName: this.tokenName,
+                });
             }
 
             if (this.isOwner) {
-                return 'Sorry, you can\'t participate in your own airdrop.';
+                return this.$t('ongoing_airdrop.confirm_message.cant_participate');
             }
 
             if (this.alreadyClaimed) {
-                return 'You already claimed tokens from this airdrop.';
+                return this.$t('ongoing_airdrop.confirm_message.claimed');
             }
 
             if (this.timeElapsed) {
-                return 'Sorry, this airdrop has ended.';
+              return this.$t('ongoing_airdrop.ended');
             }
 
-            return `Are you sure you want to claim ${this.airdropReward} ${this.tokenName}?`;
+            return this.$t('ongoing_airdrop.confirm_message', {
+                airdropReward: this.airdropReward,
+                tokenName: this.tokenName,
+            });
         },
     },
     methods: {
@@ -180,7 +186,7 @@ export default {
                     this.loaded = true;
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
@@ -215,7 +221,7 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
-                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);

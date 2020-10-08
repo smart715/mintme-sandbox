@@ -2,7 +2,7 @@
     <div v-if="canUpdate">
         <div class="col-12 pb-3 px-0">
             <label for="address" class="d-block text-left">
-                New address:
+                {{ $t('token.release.new_address') }}
             </label>
             <input
                 id="address"
@@ -12,7 +12,7 @@
                 :class="{ 'is-invalid': $v.newAddress.$error }"
             >
             <div v-if="$v.newAddress.$error" class="invalid-feedback">
-                Wallet address has to be 42 characters long with leading 0x
+                {{ $t('withdraw_modal.length') }}
             </div>
         </div>
         <div class="col-12 pt-2 px-0 clearfix">
@@ -21,7 +21,7 @@
                 :disabled="buttonDisabled"
                 @click="editAddress"
             >
-                Save
+                {{ $t('save') }}
             </button>
         </div>
         <two-factor-modal
@@ -36,7 +36,7 @@
         class="text-left"
     >
         <p class="bg-info m-0 py-1 px-3">
-            Token is not deployed yet.
+            {{ $t('token.release.not_deployed') }}
         </p>
     </div>
     <div
@@ -44,7 +44,7 @@
         class="text-left"
     >
         <p class="bg-info m-0 py-1 px-3">
-            Updating address is pending.
+            {{ $t('token.release.updating_address_pending') }}
         </p>
     </div>
 </template>
@@ -109,7 +109,7 @@ export default {
                 this.closeModal();
                 return;
             } else if (this.$v.newAddress.$error) {
-                this.notifyError('Wallet address has to be 42 characters long with leading 0x');
+                this.notifyError(this.$t('withdraw_modal.length'));
                 return;
             }
 
@@ -134,17 +134,17 @@ export default {
             .then(() => {
                 this.submitting = false;
                 this.setUpdatingState();
-                this.notifySuccess('Updating address is pending.');
+                this.notifySuccess(this.$t('token.release.updating_address_pending'));
             }, (error) => {
                 this.submitting = false;
                 if (!error.response) {
-                    this.notifyError('Network error');
+                    this.notifyError(this.$t('toasted.error.network'));
                     this.sendLogs('error', 'Edit address network error', error);
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
                     this.sendLogs('error', 'Can not edit address', error);
                 } else {
-                    this.notifyError('An error has occurred, please try again later');
+                    this.notifyError(this.$t('toasted.error.try_later'));
                     this.sendLogs('error', 'An error has occurred, please try again later', error);
                 }
             });

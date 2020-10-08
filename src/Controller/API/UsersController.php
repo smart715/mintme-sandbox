@@ -22,6 +22,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/users")
@@ -40,16 +41,21 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
     /** @var ClientManager */
     private $clientManager;
 
+    /** @var TranslatorInterface */
+    private $translations;
+
     public function __construct(
         UserManagerInterface $userManager,
         UserActionLogger $userActionLogger,
         ClientManager $clientManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translations
     ) {
         $this->userManager = $userManager;
         $this->userActionLogger = $userActionLogger;
         $this->clientManager = $clientManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translations = $translations;
     }
 
     /**
@@ -67,7 +73,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         }
 
         if (!$keys) {
-            throw new ApiNotFoundException("No keys attached to the account");
+            throw new ApiNotFoundException($this->translations->trans('api.user.no_keys_attached'));
         }
 
         return $keys;
@@ -83,12 +89,12 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $user = $this->getUser();
 
         if (!$user) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            throw new ApiBadRequestException($this->translations->trans('api.tokens.internal_error'));
         }
 
         /** @var User $user */
         if ($user->getApiKey()) {
-            throw new ApiBadRequestException("Keys already created");
+            throw new ApiBadRequestException($this->translations->trans('api.user.key_already_created'));
         }
 
         $keys = ApiKey::fromNewUser($user);
@@ -112,7 +118,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $keys = $user->getApiKey();
 
         if (!$keys) {
-            throw new ApiNotFoundException("No keys attached to the account");
+            throw new ApiNotFoundException($this->translations->trans('api.user.no_keys_attached'));
         }
 
         $this->getEm()->remove($keys);
@@ -130,7 +136,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $user = $this->getUser();
 
         if (!$user) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            throw new ApiBadRequestException($this->translations->trans('api.tokens.internal_error'));
         }
 
         /** @var Client $client */
@@ -162,7 +168,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $client = $this->clientManager->findClientBy(['user' => $user, 'randomId' => $ids[1], 'id' => $ids[0]]);
 
         if (!($client instanceof Client)) {
-            throw new ApiNotFoundException("No clients attached to the account");
+            throw new ApiNotFoundException($this->translations->trans('api.user.no_clients_attached'));
         }
 
         $this->clientManager->deleteClient($client);
@@ -189,7 +195,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $user = $this->getUser();
 
         if (!$user) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            throw new ApiBadRequestException($this->translations->trans('api.tokens.internal_error'));
         }
 
         $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
@@ -230,7 +236,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         $user = $this->getUser();
 
         if (!$user) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            throw new ApiBadRequestException($this->translations->trans('api.tokens.internal_error'));
         }
 
         $errorOnPasswordForm = $this->checkStoredUserPassword($request, $user);
@@ -264,7 +270,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
                 }
             }
 
-            return 'Invalid Argument';
+            return $this->translations->trans('api.tokens.invalid_argument');
         }
 
         return null;

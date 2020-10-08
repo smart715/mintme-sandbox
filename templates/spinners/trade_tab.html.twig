@@ -4,7 +4,7 @@
             <div class="card-body p-2">
                 <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
                     <div class="my-1 text-center text-lg-left">
-                        <span>Last price: </span>
+                        <span>{% trans %}trade.chart.last_price.header{% endtrans %} </span>
                         <div class="d-inline">
                             <a data-tippy="">
                                 <svg
@@ -27,20 +27,20 @@
                             <div id="guide_96" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        Last price
+                                        {% trans %}trade.chart.last_price.guide_header{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        Price per one newsupertestokenone for last transaction.
+                                        {% trans %}trade.chart.last_price.guide_body.spinner{% endtrans %}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <br />
-                        0 MINTME
+                        {% trans %}trade.chart.spinner.mintme{% endtrans %}
                     </div>
                     <div class="my-1 text-center">
                         <span>
-                            24h/30d change:
+                            {% trans %}trade.chart.change.header{% endtrans %}
                         </span>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -64,10 +64,10 @@
                             <div id="guide_97" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        24h/30d change
+                                        {% trans %}trade.chart.change.guide_header{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        Price change in last 24 hours and last 30 days.
+                                        {% trans %}trade.chart.change.guide_body{% endtrans %}
                                     </p>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                     </div>
                     <div class="my-1 text-center">
                         <span>
-                            24h/30d volume:
+                            {% trans %}trade.chart.volume_token.header{% endtrans %}
                         </span>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -101,10 +101,10 @@
                             <div id="guide_98" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        24h/30d volume
+                                        {% trans %}trade.chart.volume_token.header{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        The amount of newsupertestokenone that has been traded in the last 24 hours and the last 30 days.
+                                        {% trans %}trade.chart.volume_token.guide_body.spinner{% endtrans %}
                                     </p>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@
                     </div>
                     <div class="my-1 text-center">
                         <span>
-                            24h/30d volume:
+                            {% trans %}trade.chart.volume_token.header{% endtrans %}
                         </span>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -138,20 +138,20 @@
                             <div id="guide_99" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        24h/30d volume
+                                        {% trans %}trade.chart.volume_token.header{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        The amount of MINTME that has been traded in the last 24 hours and the last 30 days.
+                                        {% trans with {'%quoteSymbol%': 'MINTME'} %}trade.chart.volume_token.guide_body{% endtrans %}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <br />
-                        0/0 MINTME
+                        {% trans %}trade.chart.spinner.0_mintme{% endtrans %}
                     </div>
                     <div class="my-1 text-center">
                         <span>
-                            Buy Depth:
+                            {% trans %}trade.chart.buy_depth{% endtrans %}
                         </span>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -175,20 +175,20 @@
                             <div id="guide_100" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        Buy Depth
+                                        {% trans %}trade.chart.buy_depth_guide{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        Buy depth is amount of buy orders in MINTME on each market. This might better represent token market size than marketcap.
+                                        {% trans with {'%symbol%': 'MINTME'} %}trade.chart.buy_depth_guide_body{% endtrans %}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <br />
-                        0 MINTME
+                        0 {% trans %}mintme{% endtrans %}
                     </div>
                     <div class="my-1 text-center text-lg-right">
                         <span>
-                            Market Cap:
+                            {% trans %}trade.chart.market_cap{% endtrans %}
                         </span>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -212,7 +212,7 @@
                             <div id="guide_101" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        Market Cap
+                                        {% trans %}trade.chart.market_cap.body{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
                                         Market cap of newsupertestokenone based on 10 million tokens created.
@@ -224,7 +224,7 @@
                             </div>
                         </div>
                         <br />
-                        0 MINTME
+                        0 {% trans %}mintme{% endtrans %}
                     </div>
                 </div>
                 <div class="row">
@@ -270,7 +270,7 @@
             <div class="h-100">
                 <div class="card h-100">
                     <div class="card-header text-left">
-                        Buy Order
+                        {% trans %}trade.buy_order.header{% endtrans %}
                         <span class="card-header-icon">
                             <div class="d-inline">
                                 <a data-tippy="">
@@ -294,10 +294,10 @@
                                 <div id="guide_106" class="d-none">
                                     <div class="m-2">
                                         <h5 class="font-bold">
-                                            Buy Order
+                                            {% trans %}trade.buy_order.guide_header{% endtrans %}
                                         </h5>
                                         <p class="overflow-wrap-break-word">
-                                            Form used to create an order so you can buy MINTME or make offer.
+                                            {% trans with {'%baseSymbol%': 'MINTME'} %}trade.buy_order.guide_body{% endtrans %}
                                         </p>
                                     </div>
                                 </div>
@@ -332,7 +332,7 @@
             <div class="h-100">
                 <div class="card h-100">
                     <div class="card-header text-left">
-                        Sell Order
+                        {% trans %}trade.sell_order.header{% endtrans %}
                         <span class="card-header-icon">
                             <div class="d-inline">
                                 <a data-tippy="">
@@ -356,10 +356,10 @@
                                 <div id="guide_108" class="d-none">
                                     <div class="m-2">
                                         <h5 class="font-bold">
-                                            Sell Order
+                                            {% trans %}trade.sell_order.header{% endtrans %}
                                         </h5>
                                         <p class="overflow-wrap-break-word">
-                                            Form used to create an order so you can sell newsupertestokenone or make offer.
+                                            {% trans with {'%baseSymbol%': 'newsupertestokenone'} %}trade.sell_order.guide_body{% endtrans %}
                                         </p>
                                     </div>
                                 </div>
@@ -398,9 +398,9 @@
                     <div class="h-100">
                         <div class="card h-100">
                             <div class="card-header">
-                                Buy Orders
+                                {% trans %}trade.buy_orders.header{% endtrans %}
                                 <span class="card-header-icon">
-                                    Total: 0 MINTME
+                                    {% trans %}trade.buy_orders.header_total{% endtrans%} 0 {% trans %}mintme{% endtrans %}
                                     <div class="d-inline">
                                         <a data-tippy="">
                                             <svg
@@ -423,10 +423,10 @@
                                         <div id="guide_111" class="d-none">
                                             <div class="m-2">
                                                 <h5 class="font-bold">
-                                                    Buy Orders
+                                                    {% trans %}trade.buy_orders.header{% endtrans %}
                                                 </h5>
                                                 <p class="overflow-wrap-break-word">
-                                                    List of all active buy orders for MINTME.
+                                                    {% trans with {'%name%': 'MINTME'} %}trade.buy_orders.guide_body{% endtrans %}
                                                 </p>
                                             </div>
                                         </div>
@@ -437,7 +437,7 @@
                                 <div class="table-responsive fixed-head-table mb-0">
                                     <div>
                                         <p class="text-center p-5">
-                                            No order was added yet
+                                            {% trans %}trade.buy_orders.no_orders{% endtrans %}
                                         </p>
                                     </div>
                                 </div>
@@ -449,9 +449,9 @@
                     <div class="h-100">
                         <div class="card h-100">
                             <div class="card-header">
-                                Sell Orders
+                                {% trans %}trade.sell_orders.header{% endtrans %}
                                 <span class="card-header-icon">
-                                    Total: 0
+                                    {% trans %}trade.sell_orders.header_total{% endtrans %}: 0
                                     <span>
                                         newsupertestokeno...
                                     </span>
@@ -477,10 +477,10 @@
                                         <div id="guide_114" class="d-none">
                                             <div class="m-2">
                                                 <h5 class="font-bold">
-                                                    Sell Orders
+                                                    {% trans %}trade.sell_orders.header{% endtrans %}
                                                 </h5>
                                                 <p class="overflow-wrap-break-word">
-                                                    List of all active sell orders for newsupertestokenone.
+                                                    {% trans with {'%name%': 'newsupertesttokeone'} %}trade.sell_orders.guide_body{% endtrans%}
                                                 </p>
                                             </div>
                                         </div>
@@ -491,7 +491,7 @@
                                 <div class="table-responsive fixed-head-table mb-0">
                                     <div>
                                         <p class="text-center p-5">
-                                            No order was added yet
+                                            {% trans %}trade.sell_orders.no_orders{% endtrans %}
                                         </p>
                                     </div>
                                 </div>
@@ -506,7 +506,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Trade History
+                    {% trans %}trade.history.header{% endtrans %}
                     <span class="card-header-icon">
                         <div class="d-inline">
                             <a data-tippy="">
@@ -530,10 +530,10 @@
                             <div id="guide_119" class="d-none">
                                 <div class="m-2">
                                     <h5 class="font-bold">
-                                        Trade History
+                                        {% trans %}trade.history.guide_header{% endtrans %}
                                     </h5>
                                     <p class="overflow-wrap-break-word">
-                                        List of last closed orders for MINTME.
+                                        {% trans with {'%baseSymbol%': 'MINTME'} %}trade.history.guide_body{% endtrans %}
                                     </p>
                                 </div>
                             </div>
@@ -544,7 +544,7 @@
                     <div class="table-responsive fixed-head-table mb-0">
                         <div>
                             <p class="text-center p-5">
-                                No deal was made yet
+                                {% trans %}trade.history.no_deals{% endtrans %}
                             </p>
                         </div>
                     </div>

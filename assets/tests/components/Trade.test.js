@@ -41,6 +41,7 @@ function mockVue() {
                 },
             });
             Vue.prototype.$toasted = {show: () => false};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;

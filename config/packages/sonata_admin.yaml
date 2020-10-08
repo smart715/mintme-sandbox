@@ -53,6 +53,13 @@ sonata_admin:
                     - sonata.classification.admin.collection
                     - sonata.classification.admin.context
 
+            translations:
+                label: Translations
+                items:
+                    - route: translation_index
+                      label: All translations
+                icon: '<i class="fa fa-language"></i>'
+
     templates:
         layout: admin/custom_layout.html.twig
         edit: admin/custom_edit.html.twig

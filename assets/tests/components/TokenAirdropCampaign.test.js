@@ -25,6 +25,7 @@ function mockVue() {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -347,8 +348,7 @@ describe('TokenAirdropCampaign', () => {
 
         expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.vm.isRewardValid).toBe(false);
-        expect(wrapper.vm.errorMessage).toBe('Reward can\'t be lower than 0.0001 test5. ' +
-            'Set higher amount of tokens for airdrop or lower amount of participants.');
+        expect(wrapper.vm.errorMessage).toBe('airdrop.error_message');
     });
 
     it('can delete ongoing airdrop campaign', (done) => {

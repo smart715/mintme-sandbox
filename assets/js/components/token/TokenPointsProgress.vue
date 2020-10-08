@@ -9,8 +9,7 @@
             />
         </template>
         <template slot="body">
-            The more information you provide about your token and profile,
-            the higher this number will be. Also you get big boost if you deploy your token to blockchain.
+            {{ $t('token.progress.body') }}
         </template>
     </guide>
 </div>

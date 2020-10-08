@@ -8,7 +8,7 @@ import {zipCodeContain} from './utils/constants.js';
 import {HTTP_ACCEPTED} from './utils/constants.js';
 import Guide from './components/Guide';
 import {names, allNames, nickname} from './utils/constants';
-
+import i18n from './utils/i18n/i18n';
 const REGEX_CHINESE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]/;
 const nameRequired = function(val, other) {
     return !val && other;
@@ -16,6 +16,7 @@ const nameRequired = function(val, other) {
 
 new Vue({
     el: '#profile',
+    i18n,
     components: {
         BbcodeEditor,
         BbcodeHelp,
@@ -115,7 +116,7 @@ new Vue({
                         this.zipCodeValidate();
                     }
                 }, (error) => {
-                    this.$toasted.error('An error has occurred, please try again later');
+                    this.$toasted.error(this.$t('toasted.error.try_later'));
                 })
                 .then(() => {
                     this.zipCodeProcessing = false;

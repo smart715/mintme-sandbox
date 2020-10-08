@@ -17,7 +17,7 @@
                     class="btn-cancel px-0 c-pointer m-1"
                     @click="showModal = true"
                 >
-                    End this airdrop
+                    {{ $t('airdrop.end') }}
                 </span>
                 <confirm-modal
                     :visible="showModal"
@@ -25,17 +25,17 @@
                     @confirm="deleteAirdropCampaign"
                     @close="showModal = false">
                     <p class="text-white modal-title pt-2 pb-4">
-                        Are you sure?
+                        {{ $t('confirm_modal.body') }}
                     </p>
-                    <template v-slot:confirm>Yes</template>
-                    <template v-slot:cancel>No</template>
+                    <template v-slot:confirm>{{ $t('yes') }}</template>
+                    <template v-slot:cancel>{{ $t('no') }}</template>
                 </confirm-modal>
             </div>
         </div>
         <div v-else>
             <div class="col-12 pb-3 px-0">
                 <label for="tokensAmount" class="d-block text-left">
-                    Amount of tokens for airdrop:
+                    {{ $t('airdrop.amount_tokens') }}
                 </label>
                 <input
                     id="tokensAmount"
@@ -48,16 +48,16 @@
                     autocomplete="off"
                 >
                 <div v-if="balanceLoaded && insufficientBalance" class="w-100 mt-1 text-danger">
-                    Insufficient funds for airdrop campaign.
+                    {{ $t('airdrop.insufficient_funds') }}
                 </div>
                 <div v-else-if="balanceLoaded && !isAmountValid" class="w-100 mt-1 text-danger">
-                    Minimum amount of {{ tokenName }} {{ minTokensAmount }}, limit
+                    {{ $t('airdrop.min_amount', {tokenName: tokenName, minTokensAmount: minTokensAmount}) }}
                     {{ tokenBalance | toMoney(precision, false) | formatMoney }}.
                 </div>
             </div>
             <div class="col-12 pb-3 px-0">
                 <label for="participantsAmount" class="d-block text-left">
-                    Amount of participants:
+                    {{ $t('airdrop.amount_participants') }}
                 </label>
                 <input
                     id="participantsAmount"
@@ -70,7 +70,7 @@
                     autocomplete="off"
                 >
                 <div v-show="!isParticipantsAmountValid" class="w-100 mt-1 text-danger">
-                    Minimum amount of participants {{ minParticipantsAmount }}, limit {{ maxParticipantsAmount }}.
+                    {{ $t('airdrop.min_amount_participants', {minParticipantsAmount: minParticipantsAmount, maxParticipantsAmount: maxParticipantsAmount}) }}
                 </div>
             </div>
             <div v-if="!hasAirdropCampaign" class="col-12 pb-3 px-0">
@@ -86,14 +86,14 @@
                     <label
                         class="custom-control-label pb-0"
                         for="showEndDate">
-                        Add end date
+                      {{ $t('airdrop.add_end_date') }}
                     </label>
                 </label>
             </div>
             <b-collapse id="collapse-end-date">
                 <div class="w-60 pb-3 px-0">
                     <label for="endDate" class="d-block text-left">
-                        End date:
+                        {{ $t('airdrop.end_date') }}
                     </label>
                     <date-picker
                         v-model="endDate"
@@ -112,7 +112,7 @@
                     :disabled="btnDisabled || insufficientBalance"
                     @click="createAirdropCampaign"
                 >
-                    Save
+                    {{ $t('save') }}
                 </button>
             </div>
         </div>
@@ -239,7 +239,7 @@ export default {
                     this.balanceLoaded = true;
                 })
                 .catch((err) => {
-                    this.notifyError('Can not load token balance data. Try again later');
+                    this.notifyError(this.$t('toasted.error.can_not_load_token_balance'));
                     this.sendLogs('error', 'Can not load token balance data', err);
                 });
         },
@@ -260,7 +260,7 @@ export default {
                     this.loading = false;
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
@@ -270,8 +270,11 @@ export default {
             }
 
             if (!this.isRewardValid) {
-                this.errorMessage = `Reward can't be lower than ${this.minTokenReward} ${this.tokenName}.`
-                    + ` Set higher amount of tokens for airdrop or lower amount of participants.`;
+                this.errorMessage = this.$t('airdrop.error_message', {
+                    minTokenReward: this.minTokenReward,
+                    tokenName: this.tokenName,
+                });
+
                 return;
             }
 
@@ -292,7 +295,7 @@ export default {
                 .then((result) => {
                     this.airdropCampaignId = result.data.id;
                     this.loading = false;
-                    this.notifySuccess('Your airdrop was created successfully.');
+                    this.notifySuccess(this.$t('airdrop.msg_created'));
 
                     if (this.airdropCampaignRemoved) {
                         this.airdropCampaignRemoved = false;
@@ -315,7 +318,7 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('token_create');
                     } else {
-                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
                     this.loading = false;
@@ -333,14 +336,14 @@ export default {
             }))
                 .then(() => {
                     this.airdropCampaignId = null;
-                    this.notifySuccess('Your airdrop was removed successfully.');
+                    this.notifySuccess(this.$t('airdrop.msg_removed'));
                     window.localStorage.removeItem(AIRDROP_DELETED);
                     window.localStorage.setItem(AIRDROP_DELETED, this.tokenName);
                     this.closeEditModal();
                     location.reload();
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not delete airdrop.', err);
                 });
         },

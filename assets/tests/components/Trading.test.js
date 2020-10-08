@@ -17,6 +17,7 @@ function mockVue() {
                     return val + Object.entries(params).reduce((acc, param) => acc + `?${param[0]}=${param[1]}`, '');
                 }};
             Vue.prototype.$toasted = {show: () => false};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -79,9 +80,9 @@ describe('Trading', () => {
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
 
-        expect(wrapper.html().includes('No one deployed tokens yet')).toBe(true);
+        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No one deployed tokens yet')).toBe(false);
+        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(false);
     });
     it('show message if user has no any token yet', () => {
         const wrapper = mockTrading();
@@ -90,9 +91,9 @@ describe('Trading', () => {
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
 
-        expect(wrapper.html().includes('No any token yet')).toBe(true);
+        expect(wrapper.html().includes('trading.no_any_token')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No any token yet')).toBe(false);
+        expect(wrapper.html().includes('trading.no_any_token')).toBe(false);
     });
     it('show rest of token link', () => {
         const wrapper = mockTrading();
@@ -100,9 +101,9 @@ describe('Trading', () => {
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
-        expect(wrapper.html().includes('Show all tokens')).toBe(false);
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('Show all tokens')).toBe(true);
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
     });
     it('make sure that expected "user=1" will be sent', (done) => {
         const wrapper = mockTrading();

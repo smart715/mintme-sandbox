@@ -2,6 +2,11 @@ import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TokenYoutubeAddressView from '../../js/components/token/youtube/TokenYoutubeAddressView';
 
 const localVue = createLocalVue();
+localVue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
 localVue.directive('b-tooltip', () => {});
 
 let objectForTestCorrectlyMouning = {
