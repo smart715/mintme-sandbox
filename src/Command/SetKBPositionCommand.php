@@ -61,7 +61,7 @@ class SetKBPositionCommand extends Command
 
     private function updateTable(string $tableName): bool
     {
-        $sql = 'SELECT id, position FROM '.$tableName;
+        $sql = 'SELECT id FROM '.$tableName;
         $stmt = $this->em->getConnection()->prepare($sql);
         $stmt->execute([]);
         $rows =  $stmt->fetchAll();
