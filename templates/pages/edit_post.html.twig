@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-   Edit Post | mintMe
+	{% trans %}edit_post{% endtrans %} | mintMe
 {% endblock %}
 
 {% block content %}
     <div id="edit_post" class="container">
     	<div class="row justify-content-center">
-	        <edit-post edit 
+	        <edit-post edit
 	            class="col-12 col-md-10 col-lg-8"
 	            :post="{{ post | json_encode }}"
 	        />

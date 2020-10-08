@@ -67,7 +67,7 @@
                        >
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon icon="envelope" />
-                               <span class="social-link">Email</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.email')"></span>
                            </a>
                        </network>
                    </div>
@@ -76,38 +76,38 @@
                    :title="twitterDescription"
                    :description="description"
                    :quote="description"
-                   hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                   :hashtags="this.$t('token.social_media.hashtags')"
                    inline-template
                >
                    <div class="px-2">
                        <network class="d-block c-pointer" network="facebook">
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon :icon="['fab', 'facebook']"/>
-                               <span class="social-link">Facebook</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.facebook')"></span>
                            </a>
                        </network>
                        <network class="d-block c-pointer" network="linkedin">
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon :icon="['fab', 'linkedin']"/>
-                               <span class="social-link">LinkedIn</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.linkedin')"></span>
                            </a>
                        </network>
                        <network class="d-block c-pointer" network="reddit">
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon :icon="['fab', 'reddit']"/>
-                               <span class="social-link">Reddit</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.reddit')"></span>
                            </a>
                        </network>
                        <network class="d-block c-pointer" network="telegram">
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon :icon="['fab', 'telegram']"/>
-                               <span class="social-link">Telegram</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.telegram')"></span>
                            </a>
                        </network>
                        <network class="d-block c-pointer" network="twitter">
                            <a href="#" class="text-white hover-icon text-decoration-none">
                                <font-awesome-icon :icon="['fab', 'twitter']"/>
-                               <span class="social-link">Twitter</span>
+                               <span class="social-link" v-html="$parent.$t('token.social_media.twitter')"></span>
                            </a>
                        </network>
                    </div>
@@ -159,7 +159,7 @@ export default {
     data() {
         return {
             showSocialMediaMenu: false,
-            twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
+            twitterDescription: this.$t('token.social_media.twitter_description'),
         };
     },
     methods: {

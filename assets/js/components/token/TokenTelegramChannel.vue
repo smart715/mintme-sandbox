@@ -4,7 +4,9 @@
             v-if="editing"
             class="form-group col-12"
         >
-            <label for="telegram-err">Telegram address:</label>
+            <label for="telegram-err">
+                {{ $t('token.telegram.label') }}
+            </label>
             <input
                 id="telegram-err"
                 v-model="newTelegram"
@@ -17,20 +19,20 @@
                 v-if="showTelegramError"
                 class="invalid-feedback"
             >
-                Please provide a valid URL.
+                {{ $t('token.telegram.invalid_url') }}
             </div>
             <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editTelegram"
                 >
-                    Save
+                    {{ $t('token.telegram.submit') }}
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
                     @click="editing = false"
                 >
-                    Cancel
+                    {{ $t('token.telegram.cancel') }}
                 </span>
             </div>
         </div>
@@ -80,10 +82,9 @@ import {faTelegram} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
+import {HTTP_ACCEPTED} from '../../utils/constants';
 
 library.add(faTelegram, faTimes);
-
-const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenTelegramChannel',
@@ -115,7 +116,7 @@ export default {
     },
     computed: {
         computedTelegramUrl: function() {
-            return this.currentTelegram || 'Add Telegram invitation link';
+            return this.currentTelegram || this.$t('token.telegram.empty_address');
         },
     },
     methods: {
@@ -152,8 +153,10 @@ export default {
                         let state = this.newTelegram ? 'added' : 'removed';
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
-                        this.notifySuccess(`Telegram invitation link ${state} successfully`);
+                        this.notifySuccess(this.$t('toasted.success.telegram.' + state));
                         this.editing = false;
+                    } else {
+                        this.$toasted.error(response.data.message || this.$t('toasted.error.network'));
                     }
                     this.submitting = false;
                 }, (error) => {

@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block title %}
-    {% if token|default %} Information about {{ token.name }} token{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+    {% if token|default %} {% trans with {'%name%': token.name}%}page.pair.title_info{% endtrans %}{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
 {% endblock %}
 
 {% block content %}
@@ -110,7 +110,7 @@
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
-                        title="Introduction"
+                        title="{% trans %}page.pair.tab.introduction{% endtrans %}"
                         title-link-class="token-intro-tab-link"
                         {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
@@ -138,7 +138,7 @@
                                 @go-to-trade="goToTrade"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
                             >
-                                <template v-slot:title>Recent posts</template>
+                                <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
                             <token-introduction-statistics
                                 class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
@@ -163,7 +163,7 @@
                 {% endif %}
                 {% if showTrade %}
                     <b-tab
-                        title="Trade"
+                        title="{% trans %}page.pair.tab.trade{% endtrans %}"
                         title-link-class="token-trade-tab-link"
                         {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
                         {% if tab == 'trade' %} {{ 'active' }} {% endif %}
@@ -190,7 +190,7 @@
                 {% endif %}
                 {% if showDonation %}
                     <b-tab
-                        title="Donate"
+                        title="{% trans %}page.pair.donate_title{% endtrans %}"
                         title-link-class="token-donate-tab-link"
                         {% if tab == 'donate' %} {{ 'active' }} {% endif %}
                     >
@@ -208,7 +208,7 @@
                 {% endif %}
                 {% if isTokenPage %}
                     <b-tab
-                        title="Posts"
+                        title="{% trans %}page.pair.posts_title{% endtrans %}"
                         title-link-class="token-posts-tab-link"
                         {% if isTokenPage %} title-item-class="trade-post" {% endif %}
                         {% if tab == 'posts' %} {{ 'active' }} {% endif %}

@@ -4,10 +4,23 @@ import {tokenDeploymentStatus} from '../../js/utils/constants';
 import Vuex from 'vuex';
 import tokenStatistics from '../../js/storage/modules/token_statistics';
 
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use(Vuex);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
+    return localVue;
+}
+
 describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly with any item', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -34,8 +47,7 @@ describe('TokenPointsProgress', () => {
         expect(wrapper.vm.tokenPointsGained).toBe(0);
     });
     it('should calculate token points gained correctly "release period"', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -64,8 +76,7 @@ describe('TokenPointsProgress', () => {
         expect(wrapper.vm.tokenPointsGained).toBe(0);
     });
     it('should calculate token points gained correctly "token description"', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -94,8 +105,7 @@ describe('TokenPointsProgress', () => {
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
     it('should calculate token points gained correctly "user profile with out trade anonymously"', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -124,8 +134,7 @@ describe('TokenPointsProgress', () => {
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
     it('should calculate token points gained correctly with all items', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -152,8 +161,7 @@ describe('TokenPointsProgress', () => {
         expect(wrapper.vm.tokenPointsGained).toBe(18);
     });
     describe('token status', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });
@@ -194,8 +202,7 @@ describe('TokenPointsProgress', () => {
         });
     });
     describe('social media status', () => {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
+        const localVue = mockVue();
         const store = new Vuex.Store({
             modules: {tokenStatistics},
         });

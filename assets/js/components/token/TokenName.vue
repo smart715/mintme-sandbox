@@ -151,7 +151,7 @@ export default {
             }))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError('Can not fetch token data now. Try later');
+                this.notifyError(this.$t('toasted.error.can_not_fetch_token_data'));
                 this.sendLogs('error', 'Can not fetch token data now', err);
             });
         },

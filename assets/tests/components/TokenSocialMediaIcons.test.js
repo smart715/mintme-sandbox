@@ -5,7 +5,10 @@ const $routing = {generate: (val, params) => val};
 
 let objectForTestCorrectlyMounting = {
     stubs: ['social-sharing', 'network', 'font-awesome-icon', 'b-dropdown'],
-    mocks: {$routing},
+    mocks: {
+        $routing,
+        $t: (val) => val,
+    },
     propsData: {
         discordUrl: 'testDiscordUrl',
         facebookUrl: 'testFacebookUrl',
@@ -19,7 +22,10 @@ let objectForTestCorrectlyMounting = {
 
  let emptyUrls = {
     stubs: ['social-sharing', 'network', 'font-awesome-icon', 'b-dropdown'],
-    mocks: {$routing},
+    mocks: {
+        $routing,
+        $t: (val) => val,
+    },
     propsData: {
         discordUrl: '',
         facebookUrl: '',

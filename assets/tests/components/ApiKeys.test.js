@@ -15,6 +15,7 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;

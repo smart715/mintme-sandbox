@@ -1,4 +1,3 @@
-
 let generator = require('generate-password');
 
 window.onload = function() {

@@ -15,6 +15,7 @@ function mockVue() {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;

@@ -16,6 +16,11 @@ function mockVue() {
     const localVue = createLocalVue();
     localVue.component('font-awesome-icon', {});
     localVue.use(Axios);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 

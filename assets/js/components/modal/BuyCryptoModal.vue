@@ -6,7 +6,7 @@
             @close="$emit('close')"
         >
             <template slot="header">
-                <p class="word-break-all">Buy Crypto</p>
+                <p class="word-break-all">{{ $t('wallet.buy_crypto') }}</p>
             </template>
             <template slot="body">
                 <iframe

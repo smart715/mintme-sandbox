@@ -18,7 +18,7 @@
         <div class="row pt-4 justify-content-center text-white">
             <div class="col-md-8 text-white bg-primary p-4">
                 <div class="text-center">
-                    <h2 class="page-title">Links</h2>
+                    <h2 class="page-title">{% trans %}page.links.header{% endtrans %}</h2>
                 </div>
                 {% for link in links %}
                 <a href="{{ link.url }}" rel=”nofollow”>{{ link.title }}</a>

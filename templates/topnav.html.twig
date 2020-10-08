@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ path('homepage') }}">
             {% if is_beta_version %}
-                <div class="badge">BETA</div>
+                <div class="badge">{% trans %}beta{% endtrans %}</div>
             {% endif %}
             <img
                 {% if is_beta_version %}
@@ -75,31 +75,41 @@
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
                             <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
-                            My Token
+                            {% trans %}navbar.my_token{% endtrans %}
                         </a>
                     </li>
                 {% endif %}
                 <li class="nav-item align-self-center {{ route == 'trading' ? 'active' : '' }}">
-                    <a href="{{ path('trading') }}" class="nav-link">Trading</a>
+                    <a href="{{ path('trading') }}" class="nav-link">
+                        {% trans %}navbar.trading{% endtrans %}
+                    </a>
                 </li>
                 <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
-                    <a href="{{ path('sonata_news_home') }}" class="nav-link">News</a>
+                    <a href="{{ path('sonata_news_home') }}" class="nav-link">
+                        {% trans %}navbar.news{% endtrans %}
+                    </a>
                 </li>
                 {% if show_links %}
                     <li class="nav-item align-self-center {{ route == 'referral-program' ? 'active' : '' }}">
-                        <a href="{{ path('referral-program') }}" class="nav-link">Referrals</a>
+                        <a href="{{ path('referral-program') }}" class="nav-link">
+                            {% trans %}navbar.referrals{% endtrans %}
+                        </a>
                     </li>
                 {% endif %}
                 <li class="nav-item align-self-center {{ route starts with 'kb' ? 'active' : '' }}">
-                    <a href="{{ path('kb') }}" class="nav-link">Help</a>
+                    <a href="{{ path('kb') }}" class="nav-link">
+                        {% trans %}navbar.help{% endtrans %}
+                    </a>
                 </li>
                 {% if not app.user %}
                     <li class="nav-item align-self-center {{ route == 'fos_user_security_login' ? 'active' : '' }}">
-                        <a href="{{ path('fos_user_security_login') }}" class="nav-link">Log In</a>
+                        <a href="{{ path('fos_user_security_login') }}" class="nav-link">
+                            {% trans %}log_in{% endtrans %}
+                        </a>
                     </li>
                     <li class="nav-item align-self-center {{ route == 'fos_user_registration_register' ? 'active' : '' }}">
                         <a href="{{ path('fos_user_registration_register') }}" class="nav-link">
-                            Sign Up
+                            {% trans %}sign_up{% endtrans %}
                         </a>
                     </li>
                 {% else %}
@@ -109,7 +119,7 @@
                                 href="{{ path('wallet') }}"
                                 class="nav-link"
                             >
-                                <span>Wallet</span>
+                                <span>{% trans %}navbar.wallet{% endtrans %}</span>
                             </a>
                         </li>
                         <li class="nav-item align-self-center d-lg-none {{ route starts with 'profile' ? 'active' : '' }}">
@@ -117,7 +127,7 @@
                                 href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
                                 class="nav-link"
                             >
-                                <span>Profile</span>
+                                <span>{% trans %}navbar.profile{% endtrans %}</span>
                             </a>
                         </li>
                         <li class="nav-item align-self-center d-lg-none {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}">
@@ -142,7 +152,7 @@
                                         id="_submit"
                                         name="_submit"
                                 >
-                                    Log Out
+                                    {% trans %}log_out{% endtrans %}
                                 </button>
                             </form>
                         </li>
@@ -170,7 +180,7 @@
                                 >
                                     <a class="dropdown-item {{ route == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
                                         <span class="icon-wallet float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        Wallet
+                                        {% trans %}navbar.wallet{% endtrans %}
                                     </a>
                                     <a
                                         class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
@@ -178,11 +188,11 @@
                                         tabindex="0"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        Profile
+                                        {% trans %}navbar.profile{% endtrans %}
                                     </a>
                                     <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        Settings
+                                        {% trans %}navbar.settings{% endtrans %}
                                     </a>
                                     {% if app.user.profile.token %}
                                         <a class="dropdown-item {{ route == 'token_show_modal' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('token_show_modal') }}">
@@ -201,7 +211,7 @@
                                                     tabindex="0"
                                             >
                                                 <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                                Log Out
+                                                {% trans %}log_out{% endtrans %}
                                             </button>
                                         </span>
                                     </form>
@@ -218,12 +228,13 @@
                                         id="_submit"
                                         name="_submit"
                                 >
-                                    Log Out
+                                    {% trans %}log_out{% endtrans %}
                                 </button>
                             </form>
                         </li>
                     {% endif %}
                 {% endif %}
+                <locale-switcher current-locale="{{ app.session.get('_locale') ?: app.request.attributes.get('_locale') }}"></locale-switcher>
             </ul>
         </div>
     </div>
