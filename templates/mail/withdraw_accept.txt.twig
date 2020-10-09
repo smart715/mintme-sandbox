@@ -1,8 +1,8 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-Hello
+{% trans %}hello{% endtrans %}
 {{user.userName}}
-Confirm your withdrawal!
-You can confirm your withdrawal by click on the following link:
+{% trans %}email.withdraw.confirm{% endtrans %}
+{% trans %}email.withdraw.body{% endtrans %}
 {{confirmationUrl}}
 {% endblock %}

@@ -9,8 +9,11 @@ import {
     FORBIDDEN_WORDS,
     HTTP_ACCEPTED,
 } from './utils/constants';
+import i18n from './utils/i18n/i18n';
+
 new Vue({
     el: '#token',
+    i18n,
     mixins: [NotificationMixin],
     data() {
         return {
@@ -53,7 +56,7 @@ new Vue({
                                                 this.tokenNameExists = response.data.exists;
                                             }
                                         }, (error) => {
-                                            this.notifyError('An error has occurred, please try again later');
+                                            this.notifyError(this.$t('toasted.error.try_later'));
                                         })
                                         .then(() => {
                                             this.tokenNameProcessing = false;
@@ -61,7 +64,7 @@ new Vue({
                                 }
                             }
                         }, (error) => {
-                            this.notifyError('An error has occurred, please try again later');
+                            this.notifyError(this.$t('toasted.error.try_later'));
                         });
                     }, 2000);
             }

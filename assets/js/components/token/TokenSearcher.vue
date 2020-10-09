@@ -5,7 +5,7 @@
                     ref="searchInput"
                     :value="searchValue"
                     :input-class="inputClass"
-                    placeholder="Search for the token"
+                    :placeholder="this.$t('token.searcher.placeholder')"
                     :auto-select-one-item="false"
                     @update-items="searchUpdate"
                     @item-clicked="onItemSelected"
@@ -63,7 +63,7 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                this.notifyError('Service timeout');
+                this.notifyError(this.$t('toasted.error.service_timeout'));
                 this.sendLogs('error', 'Service timeout error', error);
             });
         },

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}
     {% spaceless %}
-        News | mintMe
+        {% trans %}page.news.title{% endtrans %} | mintMe
     {% endspaceless %}
 {% endblock %}
 
@@ -34,7 +34,7 @@
                                     {{ post.abstract }}
                                 </p>
                                 <div class="col-12 pt-3 read-more">
-                                    <a class="py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">Read More</a>
+                                    <a class="py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{% trans %}page.news.read_more{% endtrans %}</a>
                                 </div>
                             </div>
                         </div>
@@ -47,19 +47,19 @@
                             <li class="page-item {% if pager.page == pager.firstPage %} disabled {% endif %}">
                                 <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pager.previouspage})) }}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Previous</span>
+                                    <span class="sr-only">{% trans %}previous{% endtrans %}</span>
                                 </a>
                             </li>
                             {% for pageNumber in pager.getLinks(5) %}
                                 <li class="page-item {% if pager.page == pageNumber %} active {% endif %}">
                                     <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pageNumber})) }}">{{ pageNumber }}</a>
-                                    {% if pager.page == pageNumber %} <span class="sr-only">(current)</span> {% endif %}
+                                    {% if pager.page == pageNumber %} <span class="sr-only">{% trans %}page.news.current{% endtrans %}</span> {% endif %}
                                 </li>
                             {% endfor %}
                             <li class="page-item {% if pager.page == pager.lastPage %} disabled{% endif %}">
                                 <a class="page-link" href="{{ url(route, route_parameters|merge({'page': pager.nextpage})) }}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Next</span>
+                                    <span class="sr-only">{% trans %}next{% endtrans %}</span>
                                 </a>
                             </li>
                         </ul>

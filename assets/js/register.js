@@ -2,9 +2,11 @@ import Passwordmeter from './components/PasswordMeter';
 import Guide from './components/Guide';
 import {minLength} from 'vuelidate/lib/validators';
 import {nickname} from './utils/constants';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
     el: '#register',
+    i18n,
     components: {
         Passwordmeter,
         Guide,

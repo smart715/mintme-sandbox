@@ -10,7 +10,11 @@ import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';
 import TraderHoveredMixin from './trader_hovered';
 import WebSocketMixin from './websocket';
-import {MoneyFilterMixin, RebrandingFilterMixin, TruncateFilterMixin as FiltersMixin} from './filters';
+import {
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    TruncateFilterMixin as FiltersMixin,
+} from './filters';
 
 export {
     CheckInputMixin,

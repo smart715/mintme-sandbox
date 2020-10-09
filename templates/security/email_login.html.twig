@@ -2,7 +2,7 @@
 
 {% block contentClass %}wrap-main-form py-4{% endblock %}
 
-{% set formHeader = 'Email Authentication' %}
+{% set formHeader = '2fa.login.title'|trans %}
 
 {% block title %}{{ formHeader }} | mintMe{% endblock %}
 
@@ -15,7 +15,7 @@
                         {{ formHeader }}
                     </div>
                     <div class="card-body">
-                        {% if authenticationError and 'Invalid CSRF token.' != authenticationError %}
+                        {% if authenticationError and 'error.csrf'|trans != authenticationError %}
                             <div class="p-2 mb-2 bg-danger text-center text-white">
                                 {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}
                             </div>
@@ -23,7 +23,7 @@
                         {% block formBody %}
                             <form action="{{ path("2fa_login_check") }}" method="post">
                                 <div class="form-group">
-                                    <label for="code">Verification code:</label>
+                                    <label for="code">{% trans %}2fa.verification_code{% endtrans %}</label>
                                     <input
                                         type="text" name="{{ authCodeParameterName }}" required="required"
                                         class="form-control form-control-md" id="code" autofocus
@@ -31,16 +31,14 @@
                                 </div>
                                 <div class="form-group mb-0" style="line-height: 0.8em;">
                                     <small>
-                                        An email has been sent to your address<br>
-                                        it contains verification code you must fill to log in into your account <br/>
-                                        Do not forget to check your spam folder
+                                        {% trans %}2fa.email_sent{% endtrans %}
                                     </small>
                                 </div>
                                 {{ block('trusted_device', 'form/fields.html.twig') }}
                                 <div class="form-group">
                                     <input
                                         type="submit" id="_submit" name="_submit"
-                                        class="btn btn-primary" value="Verify Code"
+                                        class="btn btn-primary" value="{% trans %}2fa_modal.submit{% endtrans %}"
                                         >
                                 </div>
                                 {% if isCsrfProtectionEnabled %}

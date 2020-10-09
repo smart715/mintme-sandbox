@@ -56,6 +56,7 @@ function mockVue() {
             Vue.prototype.$sortCompare = () => {};
             Vue.prototype.$routing = $routing;
             Vue.prototype.$store = $store;
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;

@@ -14,6 +14,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -101,7 +102,7 @@ describe('TokenOngoingAirdropCampaign', () => {
             },
         });
 
-        expect(wrapper.vm.confirmButtonText).toBe('Log In');
+        expect(wrapper.vm.confirmButtonText).toBe('log_in');
         wrapper.setProps({loggedIn: true});
         expect(wrapper.vm.confirmButtonText).toBe('');
         wrapper.setProps({isOwner: true});
@@ -132,16 +133,16 @@ describe('TokenOngoingAirdropCampaign', () => {
             },
         });
 
-        expect(wrapper.vm.confirmModalMessage).toBe('You have to be logged in to claim 3 test77.');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.logged_in');
         wrapper.setProps({loggedIn: true});
         wrapper.setProps({isOwner: true});
-        expect(wrapper.vm.confirmModalMessage).toBe('Sorry, you can\'t participate in your own airdrop.');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.cant_participate');
         wrapper.setProps({isOwner: false});
         wrapper.vm.alreadyClaimed = true;
-        expect(wrapper.vm.confirmModalMessage).toBe('You already claimed tokens from this airdrop.');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.claimed');
         wrapper.setProps({isOwner: false});
         wrapper.vm.alreadyClaimed = false;
-        expect(wrapper.vm.confirmModalMessage).toBe('Are you sure you want to claim 3 test77?');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message');
     });
 
     it('should check airdrop end date', () => {

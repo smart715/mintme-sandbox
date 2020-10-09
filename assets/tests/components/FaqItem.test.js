@@ -13,6 +13,11 @@ function mockVue() {
     localVue.component('b-card', {});
     localVue.component('b-card-header', {});
     localVue.component('b-btn', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 

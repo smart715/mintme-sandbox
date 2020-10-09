@@ -21,6 +21,7 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 class Exchanger implements ExchangerInterface
@@ -55,6 +56,9 @@ class Exchanger implements ExchangerInterface
     /** @var ValidatorFactoryInterface */
     private $vf;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
     public function __construct(
         TraderInterface $trader,
         MoneyWrapperInterface $moneyWrapper,
@@ -65,7 +69,8 @@ class Exchanger implements ExchangerInterface
         ParameterBagInterface $bag,
         MarketHandlerInterface $marketHandler,
         TokenManagerInterface $tokenManager,
-        ValidatorFactoryInterface $validatorFactory
+        ValidatorFactoryInterface $validatorFactory,
+        TranslatorInterface $translator
     ) {
         $this->trader = $trader;
         $this->mw = $moneyWrapper;
@@ -77,6 +82,7 @@ class Exchanger implements ExchangerInterface
         $this->mh = $marketHandler;
         $this->tm = $tokenManager;
         $this->vf = $validatorFactory;
+        $this->translator = $translator;
     }
 
     public function cancelOrder(Market $market, Order $order): TradeResult
@@ -117,11 +123,11 @@ class Exchanger implements ExchangerInterface
             $market->getQuote()->getSymbol(),
             $amountInput
         )) {
-            return new TradeResult(TradeResult::INSUFFICIENT_BALANCE);
+            return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
         if (!$this->vf->createOrderValidator($market, $priceInput, $amountInput)->validate()) {
-            return new TradeResult(TradeResult::SMALL_AMOUNT);
+            return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
         }
 
         $price = $this->mw->parse(

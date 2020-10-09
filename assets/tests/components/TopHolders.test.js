@@ -13,6 +13,7 @@ function mockVue() {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => false};
+            Vue.prototype.$t = (val) => val;
         },
     });
     localVue.component('font-awesome-icon', {});

@@ -6,7 +6,7 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center">
-                <h3 class="modal-title overflow-wrap-break-word">DEPOSIT ({{ currency|rebranding }})</h3>
+                <h3 class="modal-title overflow-wrap-break-word">{{ $t('deposit_modal.title') }} ({{ currency|rebranding }})</h3>
                 <div class="col-12 pt-2">
                     <code class="wallet-code text-blue" id="walletaddress">
                         <span>
@@ -25,16 +25,17 @@
                     </b-row>
                     <b-row>
                         <b-col v-if="min" cols="auto" class="text-left overflow-wrap-break-word word-break-all">
-                            Minimal value: {{ min }} {{ currency|rebranding }}
+                            {{ $t('deposit_modal.min_value') }} {{ min }} {{ currency|rebranding }}
                         </b-col>
-                        <b-col v-if="fee" class="text-right overflow-wrap-break-word word-break-all">Fee: {{ fee }} {{ feeCurrency|rebranding }}</b-col>
+                        <b-col v-if="fee" class="text-right overflow-wrap-break-word word-break-all">{{ $t('deposit_modal.fee') }} {{ fee }} {{ feeCurrency|rebranding }}</b-col>
                     </b-row>
                 </div>
                 <div class="pt-2 text-center">
                     <button
                         class="btn btn-primary"
-                        @click="onSuccess">
-                        OK
+                        @click="onSuccess"
+                    >
+                        {{ $t('deposit_modal.ok') }}
                     </button>
                 </div>
             </div>

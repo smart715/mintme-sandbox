@@ -3,9 +3,23 @@ import PasswordMeter from '../../js/components/PasswordMeter';
 
 jest.requireActual('zxcvbn');
 
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
+    const localVue = createLocalVue();
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
+
+    return localVue;
+}
+
 describe('PasswordMeter', () => {
     const wrapper = shallowMount(PasswordMeter, {
-        localVue: createLocalVue(),
+        localVue: mockVue(),
         propsData: {
             password: 'foo',
         },

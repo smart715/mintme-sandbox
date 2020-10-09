@@ -22,6 +22,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -34,8 +35,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     /** @var UserActionLogger */
     private $userActionLogger;
 
-    public function __construct(UserActionLogger $userActionLogger)
-    {
+    /** @var TranslatorInterface */
+    private $translations;
+
+    public function __construct(
+        TranslatorInterface $translations,
+        UserActionLogger $userActionLogger
+    ) {
+        $this->translations = $translations;
         $this->userActionLogger = $userActionLogger;
     }
 
@@ -89,7 +96,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
         if (!$tradable) {
             return $this->view([
-                'error' => 'Not found',
+                'error' => $this->translations->trans('api.wallet.not_found'),
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -114,13 +121,16 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             );
         } catch (Throwable $exception) {
             return $this->view([
-                'error' => 'Withdrawal failed',
+                'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
             ], Response::HTTP_BAD_GATEWAY);
         }
 
         $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
-        $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
+        $this->userActionLogger->info($this->translations->trans(
+            'api.wallet.went_withdrawal_email',
+            ['%symbol%' => $tradable->getSymbol()]
+        ), [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
@@ -163,7 +173,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
         if (!$crypto) {
             return $this->view([
-                'error' => 'Not found currency',
+                'error' => $this->translations->trans('api.wallet.not_found_currency'),
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 

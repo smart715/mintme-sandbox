@@ -9,6 +9,7 @@ use Scheb\TwoFactorBundle\DependencyInjection\Factory\Security\TwoFactorFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -24,8 +25,8 @@ class TwoFactorRequireHandlerTest extends TestCase
     public function setUp(): void
     {
         $this->routeCollection = new RouteCollection();
-        $this->routeCollection->add('secure', new Route('secure', [], [], ['2fa_progress' => true]));
-        $this->routeCollection->add('free', new Route('free', [], [], ['2fa_progress' => false]));
+        $this->routeCollection->add('en__RG__secure', new Route('secure', [], [], ['2fa_progress' => true]));
+        $this->routeCollection->add('en__RG__free', new Route('free', [], [], ['2fa_progress' => false]));
     }
 
     public function testOnAuthenticationRequiredSecure(): void
@@ -34,7 +35,8 @@ class TwoFactorRequireHandlerTest extends TestCase
         $handler = new TwoFactorRequireHandler(
             $this->mockHttpUtils($request),
             $this->createMock(TokenStorageInterface::class),
-            $this->mockRouter()
+            $this->mockRouter(),
+            $this->mockUrlGenerator()
         );
         $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
         $this->assertEquals('/2fa', $response->getContent());
@@ -46,7 +48,8 @@ class TwoFactorRequireHandlerTest extends TestCase
         $handler = new TwoFactorRequireHandler(
             $this->mockHttpUtils($request),
             $this->createMock(TokenStorageInterface::class),
-            $this->mockRouter()
+            $this->mockRouter(),
+            $this->mockUrlGenerator()
         );
         $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
         $this->assertEquals('/free', $response->getContent());
@@ -73,13 +76,21 @@ class TwoFactorRequireHandlerTest extends TestCase
         $httpUtils->method('generateUri')->with($request, $name)->willReturn("/{$name}");
         $uri = 'secure' === $name
             ? TwoFactorFactory::DEFAULT_AUTH_FORM_PATH
-            : $this->routeCollection->get('free')->getPath();
+            : $this->routeCollection->get('en__RG__free')->getPath();
         $httpUtils
             ->method('createRedirectResponse')
             ->with($this->mockRequest($name), $uri)
             ->willReturn($this->mockResponse($uri));
 
         return $httpUtils;
+    }
+
+    private function mockUrlGenerator(): UrlGeneratorInterface
+    {
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('/2fa');
+
+        return $urlGenerator;
     }
 
     /** @return MockObject|Response */
