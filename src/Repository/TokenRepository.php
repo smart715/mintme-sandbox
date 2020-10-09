@@ -66,7 +66,6 @@ class TokenRepository extends EntityRepository
     /** @codeCoverageIgnore */
     public function findAllTokensWithEmptyDescription(int $numberOfReminder = 14): ?array
     {
-
         $query = $this->createQueryBuilder('t')
             ->select('t, p, u')
             ->innerJoin('t.profile', 'p', 't.profile = p.id')
