@@ -6,7 +6,7 @@
         <div
             class="card-body posts overflow-hidden position-relative"
         >
-            <div id="posts-container" ref="postsContainer" class="w-100 d-flex justify-content-center">
+            <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
                 <template v-if="posts.length > 0">
                     <post v-for="(n, i) in postsCount"
                           :post="posts[i]"
