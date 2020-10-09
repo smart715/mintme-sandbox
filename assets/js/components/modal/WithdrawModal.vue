@@ -25,21 +25,37 @@
                     <label for="wamount"  class="d-block text-left">
                         Amount (balance):
                     </label>
-                        <input
-                            id="wamount"
-                            v-model="$v.amount.$model"
-                            type="text"
-                            @change="setFirstTimeOpen"
-                            @keypress="checkAmount"
-                            @paste="checkAmount"
-                            :class="{ 'is-invalid': $v.amount.$error }"
-                            class="form-control form-control-btn text-left input-custom-padding">
+                    <div class="d-flex">
+                        <div class="d-inline-block position-relative h-fit-content flex-grow-1">
+                            <input
+                                id="wamount"
+                                v-model="$v.amount.$model"
+                                type="text"
+                                @change="setFirstTimeOpen"
+                                @keypress="checkAmount"
+                                @paste="checkAmount"
+                                :class="{ 'is-invalid': $v.amount.$error, 'trade-price-input': mediaMatches}"
+                                class="form-control form-control-btn text-left input-custom-padding"
+                            >
+                            <price-converter v-if="!isToken"
+                                class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
+                                :class="{ 'trade-price-input-converter': mediaMatches }"
+                                :amount="$v.amount.$model"
+                                :from="currency"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                                :delay="1000"
+                                :converted-amount-prop.sync="convertedAmount"
+                            />
+                        </div>
                         <button
-                            class="btn btn-primary btn-input float-right"
+                            class="btn btn-primary btn-input"
                             type="button"
                             @click="setMaxAmount">
                             All
                         </button>
+                    </div>
                         <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
                             You don't have enough {{ currency|rebranding }}
                         </div>
@@ -102,13 +118,15 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
+import PriceConverter from '../PriceConverter';
 
 export default {
     name: 'WithdrawModal',
     mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Modal,
+        PriceConverter
     },
     props: {
         visible: Boolean,
@@ -131,6 +149,9 @@ export default {
             address: '',
             withdrawing: true,
             flag: true,
+            USD,
+            convertedAmount: '0',
+            mediaMatches: false,
         };
     },
     computed: {
@@ -228,6 +249,11 @@ export default {
             }
             this.flag = false;
         },
+    },
+    mounted() {
+        window.matchMedia('(max-width: 575px)').addEventListener('change', (e) => {
+            this.mediaMatches = e.matches;
+        });
     },
     validations() {
         return {

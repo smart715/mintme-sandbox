@@ -83,7 +83,6 @@
                                                         :subunit="2"
                                                         symbol="$"
                                                         :delay="1000"
-                                                        :converted-amount-prop.sync="convertedAmount"
                                                     />
                                                 </div>
                                                 <div class="input-group-append">
@@ -221,7 +220,6 @@ export default {
             donationInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
-            convertedAmount: '0',
             USD,
             mediaMatches: false,
         };
