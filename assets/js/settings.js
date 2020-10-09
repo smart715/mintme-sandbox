@@ -4,9 +4,11 @@ import ApiClients from './components/ApiClients';
 import TwoFactorModal from './components/modal/TwoFactorModal';
 import {NotificationMixin} from './mixins/';
 import {HTTP_UNAUTHORIZED} from './utils/constants';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
     el: '#settings',
+    i18n,
     components: {Passwordmeter, ApiKeys, ApiClients, TwoFactorModal},
     mixins: [NotificationMixin],
     data: {
@@ -50,7 +52,7 @@ new Vue({
                     } else if (error.response.data.message) {
                         this.showErrorMessage = true;
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                     }
                 });
         },
@@ -63,16 +65,16 @@ new Vue({
             .then(() => {
                 this.clearInputs();
                 this.twoFaVisible = false;
-                this.notifySuccess('Password was updated successfully.');
+                this.notifySuccess(this.$t('toasted.success.password_updated'));
             }, (error) => {
                 if (!error.response) {
-                    this.notifyError('Network error');
+                    this.notifyError(this.$t('toasted.error.network'));
                 } else if (HTTP_UNAUTHORIZED === error.response.status) {
-                    this.notifyError('Invalid 2FA code');
+                    this.notifyError(this.$t('page.settings_invalid_2fa'));
                 } else if (error.response.data.message) {
                     this.notifyError(error.response.data.message);
                 } else {
-                    this.notifyError('An error has occurred, please try again later');
+                    this.notifyError(this.$t('toasted.error.try_later'));
                 }
              });
         },

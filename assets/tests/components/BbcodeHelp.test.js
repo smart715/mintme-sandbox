@@ -11,6 +11,11 @@ let propsForTestCorrectlyRenders = {
 function mockVue() {
     const localVue = createLocalVue();
     localVue.directive('html-sanitize', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 

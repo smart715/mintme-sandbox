@@ -10,13 +10,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NicknameType extends AbstractType
 {
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'label' => 'Nickname (Alias):',
+            'label' => $this->translator->trans('form.nickname.label'),
             'attr' => [
                 'minlength' => 2,
                 'maxlength' => 30,
@@ -27,7 +36,7 @@ class NicknameType extends AbstractType
                 new IsNotBlacklisted([
                     'type' => 'nickname',
                     'caseSensetive' => false,
-                    'message' => 'This value is not allowed',
+                    'message' => $this->translator->trans('form.nickname.constraint'),
                 ]),
                 new UniqueNickname(),
                 new NotBlank(),

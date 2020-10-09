@@ -1,10 +1,10 @@
 {{ form_label(form.nickname) }}
 <guide>
     <template slot="header">
-        Nickname
+        {% trans %}nickname_field.header{% endtrans %}
     </template>
     <template slot="body">
-        Name used in our service, visible for everyone.
+        {% trans %}nickname_field.body{% endtrans %}
     </template>
 </guide>
 {{ form_errors(form.nickname) }}

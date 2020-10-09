@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Settings | mintMe{% endblock %}
+{% block title %}{% trans %}page.settings.title{% endtrans%} | mintMe{% endblock %}
 
 {% block content %}
     <div id="settings" class="container">
         <div class="row pt-4 justify-content-center">
             <div class="card-two-divs-fixed-large pl-xl-0 col-md-6">
                 <div class="card">
-                    <div class="card-header">Account settings</div>
+                    <div class="card-header">{% trans %}page.settings.account.header{% endtrans %}</div>
                     <div class="card-body m-0">
                         <div id="settings">
                         {% if twoFactorAuth %}
@@ -34,7 +34,7 @@
                                 {{ form_row(passwordForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
                                 <div class="pwdmeter" v-if="false"><meter max="5" value="0"></meter></div>
                             </passwordmeter>
-                            <button type="submit" :disabled="disabled" class="btn btn-primary">Save</button>
+                            <button type="submit" :disabled="disabled" class="btn btn-primary">{% trans %}page.settings.account.submit{% endtrans %}</button>
                             {{ form_end(passwordForm) }}
                         </div>
                     </div>
@@ -42,18 +42,18 @@
             </div>
             <div class="card-two-divs-fixed-large pr-xl-0 pr-lg-3 col-md-6 pt-2 pt-md-0">
                 <div class="card card-featured">
-                    <div class="card-header">Two-Factor Authentication</div>
+                    <div class="card-header">{% trans %}page.settings.2fa.header{% endtrans %}</div>
                     <div class="card-body m-0">
                         <div class="text-center">
-                            <p>Increase your account's security by enabling Two-Factor Authentication (2FA).</p>
+                            <p>{% trans %}page.settings.2fa.body{% endtrans %}</p>
                         </div>
                         {% if twoFactorAuth %}
                             <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
-                                Manage two-factor authentication
+                                {% trans %}page.settings.2fa.manage{% endtrans %}
                             </a>
                         {% else %}
                             <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
-                                Enable two-factor authentication
+                                {% trans %}page.settings.2fa.enable{% endtrans %}
                             </a>
                         {% endif %}
                     </div>
@@ -63,7 +63,7 @@
         <div class="row justify-content-center">
             <div class="card-fixed-large m-3 pl-0">
                 <div class="card">
-                    <div class="card-header text-uppercase">API</div>
+                    <div class="card-header text-uppercase">{% trans %}page.settings.api.header{% endtrans %}</div>
                     <div class="card-body m-0 pt-4">
                         <div class="text-center">
                             <div v-cloak>
@@ -87,7 +87,7 @@
                                 <api-clients class="mb-2" :api-clients="{{ clients | json_encode }}" v-cloak></api-clients>
                             </div>
                             <p>
-                                Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information
+                                {% trans %}page.settings.api.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.api.body_2{% endtrans %}</a> {% trans %}page.settings.api.body_3{% endtrans %}
                             </p>
                         </div>
                     </div>

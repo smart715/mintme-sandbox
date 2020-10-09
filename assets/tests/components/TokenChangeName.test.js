@@ -22,9 +22,10 @@ describe('TokenChangeName', () => {
                 currentName: 'foobar',
                 twofa: false,
             },
+            mocks: {$t: (val) => val},
         });
-        const deployedErrorMessage = 'The name of a deployed token can\'t be changed';
-        const exchangedErrorMessage = 'You must own all your tokens in order to change the token\'s name';
+        const deployedErrorMessage = 'token.change_name.cant_be_changed';
+        const exchangedErrorMessage = 'token.change_name.must_own_all';
         expect(wrapper.vm.currentName).toBe('foobar');
         expect(wrapper.vm.newName).toBe('foobar');
         expect(wrapper.find('input').element.value).toBe('foobar');
@@ -72,6 +73,7 @@ describe('TokenChangeName', () => {
                 isTokenExchanged: false,
                 isTokenNotDeployed: true,
             },
+            mocks: {$t: jest.fn()},
         });
         expect(wrapper.vm.showTwoFactorModal).toBe(false);
         wrapper.vm.newName = 'newName';
@@ -96,6 +98,7 @@ describe('TokenChangeName', () => {
                 isTokenExchanged: false,
                 isTokenNotDeployed: true,
             },
+            mocks: {$t: jest.fn()},
         });
         expect(wrapper.vm.showTwoFactorModal).toBe(false);
         wrapper.vm.newName = 'newName';
@@ -107,6 +110,7 @@ describe('TokenChangeName', () => {
         it('when token name has spaces in the beginning', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('  newName');
             wrapper.vm.editName();
@@ -117,6 +121,7 @@ describe('TokenChangeName', () => {
         it('when token name has dashes in the beginning', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('----newName');
             wrapper.vm.editName();
@@ -127,6 +132,7 @@ describe('TokenChangeName', () => {
         it('when token name has spaces in the end', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('newName  ');
             wrapper.vm.editName();
@@ -137,6 +143,7 @@ describe('TokenChangeName', () => {
         it('when token name has dashes in the end', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('newName----');
             wrapper.vm.editName();
@@ -147,6 +154,7 @@ describe('TokenChangeName', () => {
         it('when token name has spaces between dashes', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('new--- ---Name');
             wrapper.vm.editName();
@@ -157,6 +165,7 @@ describe('TokenChangeName', () => {
         it('when token name has chars outside of alphabet, numbers, - and spaces', () => {
             const wrapper = shallowMount(TokenChangeName, {
                 propsData: {currentName: 'foobar'},
+                mocks: {$t: jest.fn()},
             });
             wrapper.find('input').setValue('new$Name!');
             wrapper.vm.editName();

@@ -8,10 +8,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore  */
 class ChangePasswordType extends AbstractType
 {
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraintsOptions = [
@@ -37,7 +46,7 @@ class ChangePasswordType extends AbstractType
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                'label' => 'New password:',
+                'label' => $this->translator->trans('form.change_password.plain_password'),
                 'translation_domain' => 'FOSUserBundle',
                 'attr' => [
                     'autocomplete' => 'new-password',

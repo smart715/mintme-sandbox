@@ -5,7 +5,7 @@
                     class="btn btn-primary"
                     @click="buyCrypto"
             >
-                Buy Crypto
+                {{ $t('wallet.buy_crypto') }}
             </button>
             <font-awesome-icon
                 class="ml-2"

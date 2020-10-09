@@ -8,6 +8,11 @@ function mockVue() {
     const localVue = createLocalVue();
     localVue.directive('clipboard', {});
     localVue.directive('tippy', {});
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 
@@ -27,10 +32,10 @@ describe('CopyLink', () => {
     });
     it('triggers on copy success', () => {
         copyLink.vm.onCopy('e');
-        expect(copyLink.vm.tooltipMessage).toBe('Copied!');
+        expect(copyLink.vm.tooltipMessage).toBe('copy_link.copied');
     });
     it('triggers on copy error', () => {
         copyLink.vm.onError('e');
-        expect(copyLink.vm.tooltipMessage).toBe('Press Ctrl+C to copy');
+        expect(copyLink.vm.tooltipMessage).toBe('copy_link.press_ctrl_c');
     });
 });

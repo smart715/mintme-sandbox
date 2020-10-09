@@ -17,20 +17,33 @@ import InfoBar from './components/InfoBar';
 import Routing from './routing';
 import Axios from './axios';
 import Avatar from './components/Avatar';
+import LocaleSwitcher from './components/LocaleSwitcher';
+import VueI18n from 'vue-i18n';
+import CustomFormatter from './utils/i18n/custom-formatter';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
 Vue.use(Routing);
 Vue.use(Axios);
+Vue.use(VueI18n);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 library.add(fas, far, fab, faSearch, faCog);
 dom.watch();
 
+const i18n = new VueI18n({
+    locale: 'locale',
+    formatter: new CustomFormatter(),
+    messages: {
+        'locale': window.translations,
+    },
+});
+
 if (document.getElementById('info-bar')) {
     new Vue({
         el: '#info-bar',
+        i18n,
         components: {
             InfoBar,
         },
@@ -47,6 +60,7 @@ Vue.use(Toasted, {
 if (document.getElementById('notifications')) {
     new Vue({
         el: '#notifications',
+        i18n,
         components: {
             Notification,
         },
@@ -55,6 +69,7 @@ if (document.getElementById('notifications')) {
 
 new Vue({
     el: '#navbar',
+    i18n,
     directives: {
         onClickaway,
     },
@@ -68,6 +83,7 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
+        LocaleSwitcher,
         Avatar,
     },
     methods: {
@@ -86,6 +102,7 @@ new Vue({
 if (document.getElementById('description')) {
     new Vue({
         el: '#description',
+        i18n,
         components: {
             Countdown,
             FaqItem,
@@ -95,6 +112,7 @@ if (document.getElementById('description')) {
 
 new Vue({
     el: '#footer',
+    i18n,
     components: {
         FontAwesomeIcon,
         FontAwesomeLayers,

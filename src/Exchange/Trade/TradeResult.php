@@ -3,6 +3,7 @@
 namespace App\Exchange\Trade;
 
 use Exception;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TradeResult
 {
@@ -15,39 +16,43 @@ class TradeResult
 
     private const MESSAGES = [
         self::SUCCESS =>
-            'Order Created',
+            'place_order.created',
 
         self::FAILED =>
-            'Order has failed. Try again later.',
+            'place_order.failed.',
 
         self::INSUFFICIENT_BALANCE =>
-            'Insufficient Balance',
+            'place_order.insufficient_balance',
 
         self::ORDER_NOT_FOUND =>
-            'Order has not been found',
+            'place_order.not_found',
 
         self::USER_NOT_MATCH =>
-            'You don\'t match with this order',
+            'place_order.not_match',
 
         self::SMALL_AMOUNT =>
-            'Amount is too small',
+            'place_order.too_small',
     ];
 
     /** @var int */
     private $result;
 
-    public function __construct(int $result)
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(int $result, TranslatorInterface $translator)
     {
         if (!in_array($result, array_keys(self::MESSAGES))) {
             throw new Exception('Undefined error message');
         }
 
         $this->result = $result;
+        $this->translator = $translator;
     }
 
     public function getMessage(): string
     {
-        return self::MESSAGES[$this->result];
+        return $this->translator->trans(self::MESSAGES[$this->result]);
     }
 
     public function getResult(): int
