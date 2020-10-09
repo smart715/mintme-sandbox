@@ -17,9 +17,6 @@ class UpdateProfiles extends Command
 {
     private EntityManagerInterface $em;
 
-    /** @var array<bool> */
-    private $newNicknames = [];
-
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -73,10 +70,10 @@ class UpdateProfiles extends Command
                 $this->getNickname($profile)
             );
             $this->em->persist($profile);
+            $this->em->flush();
             $updatedUsers++;
         }
 
-        $this->em->flush();
         $progressBar->finish();
         $section->clear();
         $style->success("$updatedUsers users updated");
@@ -100,14 +97,12 @@ class UpdateProfiles extends Command
             return $this->getNickname($profile, ++$sequence);
         }
 
-        $this->newNicknames[$nickname] = true;
-
         return $nickname;
     }
 
     private function nicknameHasProfile(string $nickname): bool
     {
-        return isset($this->newNicknames[$nickname]) || $this->getProfileRepository()->findBy([
+        return (bool)$this->getProfileRepository()->findBy([
                 'nickname' => $nickname,
             ]);
     }
