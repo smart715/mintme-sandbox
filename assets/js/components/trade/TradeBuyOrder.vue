@@ -390,7 +390,7 @@ export default {
         },
         priceInputClass: function() {
             return this.mediaMatches || (this.convertedAmount.replace('.', '').length + this.buyPrice.toString().replace('.', '').length) > 24;
-        }
+        },
     },
     watch: {
         useMarketPrice: function() {

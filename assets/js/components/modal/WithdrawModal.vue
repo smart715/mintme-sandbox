@@ -126,7 +126,7 @@ export default {
     mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
         Modal,
-        PriceConverter
+        PriceConverter,
     },
     props: {
         visible: Boolean,

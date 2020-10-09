@@ -394,7 +394,7 @@ export default {
         },
         priceInputClass: function() {
             return this.mediaMatches || (this.convertedAmount.replace('.', '').length + this.sellPrice.toString().replace('.', '').length) > 24;
-        }
+        },
     },
     watch: {
         useMarketPrice: function() {

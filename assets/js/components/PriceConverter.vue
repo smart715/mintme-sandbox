@@ -40,7 +40,7 @@ export default {
                 ? Decimal.mul(this.amount, this.rate)
                 : '0';
             this.convertedAmount = toMoney(amount, this.subunit);
-            this.$emit('update:convertedAmountProp',this.convertedAmount);
+            this.$emit('update:convertedAmountProp', this.convertedAmount);
         },
     },
     computed: {
