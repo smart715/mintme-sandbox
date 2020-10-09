@@ -14,6 +14,7 @@ function mockVue() {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -85,7 +86,7 @@ describe('TokenTelegramChannel', () => {
                 editingTelegram: false,
             },
         });
-        expect(wrapper.find('#telegram-link').text()).toBe('Add Telegram invitation link');
+        expect(wrapper.find('#telegram-link').text()).toBe('token.telegram.empty_address');
     });
 
     it('show link when specified', () => {

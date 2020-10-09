@@ -1,8 +1,9 @@
 <template>
     <div class="card h-100 posts-container">
         <div class="card-header">
-            <slot name="title">Posts</slot>
+            <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
+<<<<<<< HEAD
         <div
             class="card-body posts overflow-hidden position-relative"
         >
@@ -19,7 +20,7 @@
                     />
                 </template>
                 <div v-else :class="{ 'position-absolute top-50': tokenPage }">
-                    The token creator has not added any posts yet.
+                    {{ $t('post.not_any_post') }}
                 </div>
             </div>
             <div v-if="showReadMore" class="read-more">
@@ -28,7 +29,7 @@
                     :href="readMoreUrl"
                     @click.prevent="goToPosts"
                 >
-                    See all posts
+                    {{ $t('posts.all') }}
                 </a>
             </div>
         </div>

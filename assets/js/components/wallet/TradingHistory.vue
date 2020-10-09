@@ -47,7 +47,7 @@
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
             </div>
             <div v-else-if="!hasHistory">
-                <p class="text-center p-5">No deal was made yet</p>
+                <p class="text-center p-5">{{ $t('wallet.trading_history.no_deals') }}</p>
             </div>
         </template>
         <template v-else>
@@ -91,19 +91,19 @@ export default {
             fields: {
                 date: {
                     key: 'date',
-                    label: 'Date',
+                    label: this.$t('wallet.trading_history.table.date'),
                     sortable: true,
                     type: 'date',
                 },
                 side: {
                     key: 'side',
-                    label: 'Type',
+                    label: this.$t('wallet.trading_history.table.type'),
                     sortable: true,
                     type: 'string',
                 },
                 name: {
                     key: 'name',
-                    label: 'Name',
+                    label: this.$t('wallet.trading_history.table.name'),
                     sortable: true,
                     class: 'pair-cell',
                     formatter: (name) => {
@@ -115,28 +115,28 @@ export default {
                 },
                 amount: {
                     key: 'amount',
-                    label: 'Amount',
+                    label: this.$t('wallet.trading_history.table.amount'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
                 price: {
                     key: 'price',
-                    label: 'Price',
+                    label: this.$t('wallet.trading_history.table.price'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
                 total: {
                     key: 'total',
-                    label: 'Total cost',
+                    label: this.$t('wallet.trading_history.table.total_cost'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
                 fee: {
                     key: 'fee',
-                    label: 'Fee',
+                    label: this.$t('wallet.trading_history.table.fee'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
@@ -195,7 +195,7 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update trading history. Try again later.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_trading_history'));
                         this.sendLogs('error', 'Service unavailable. Can not update trading history', err);
                         reject([]);
                     });

@@ -1,6 +1,7 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
 
-{% block title %} Reset Password | mintMe{% endblock %}
+{% block title %} {% trans %}resetting.email.subject{% endtrans %} | mintMe{% endblock %}
 
 {% block fos_user_content %}
     {{ include("@FOSUser/Resetting/reset_content.html.twig") }}

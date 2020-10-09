@@ -2,16 +2,13 @@
     <div>
         <div class="card h-100">
             <div class="card-header">
-                Statistics
+                {{ $t('token.intro.statistics.header') }}
                 <guide class="float-right">
                     <div slot="header">
-                        <h5 class="font-bold">Statistics</h5>
+                        <h5 class="font-bold">{{ $t('token.intro.statistics.guide_header') }}</h5>
                     </div>
                     <template slot="body">
-                        Statistics associated with {{ market.quote.symbol }},
-                        here you can find out how token creator
-                        manages his tokens and if he set any restrictions
-                        on token release.
+                        <span v-html="this.$t('token.intro.statistics.guide_body', translationsContext)"></span>
                     </template>
                 </guide>
             </div>
@@ -20,7 +17,7 @@
                     <div class="d-flex flex-column px-3 pb-3">
                         <div v-if="isTokenDeployed">
                             <div class="row">
-                                <strong class="mr-2">Token contract address:</strong>
+                                <strong class="mr-2">{{ $t('token.intro.statistics.token_address') }}</strong>
                             </div>
                             <div class="row truncate-address d-flex flex-row flex-nowrap mt-auto">
                                 <span>{{ tokenContractAddress }}</span>
@@ -33,10 +30,10 @@
                                     </copy-link>
                                     <guide>
                                         <template slot="header">
-                                            Token contract address
+                                            {{ $t('token.intro.statistics.token_address.header') }}
                                         </template>
                                         <template slot="body">
-                                            Unique token contract address, created when token is deployed to blockchain. It's required when adding token to MintMe Wallet application.
+                                            {{ $t('token.intro.statistics.token_address.body') }}
                                         </template>
                                     </guide>
                                 </div>
@@ -46,140 +43,132 @@
                     <div class="row">
                         <div class="col pr-1">
                             <div class="font-weight-bold pb-4">
-                                Token balance:
+                                {{ $t('token.intro.statistics.balance') }}
                             </div>
                             <div class="pb-1">
-                                Wallet on exchange: <br>
+                                {{ $t('token.intro.statistics.exchange.header') }} <br>
                                 {{ walletBalance | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Wallet on exchange
+                                        {{ $t('token.intro.statistics.exchange.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        The amount of token units being held in
-                                        token creator's wallet on exchange.
+                                        {{ $t('token.intro.statistics.exchange.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Active orders: <br>
+                                {{ $t('token.intro.statistics.active.header') }} <br>
                                 {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Active orders
+                                        {{ $t('token.intro.statistics.active.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        The amount of token units, that token creator currently is selling.
+                                        {{ $t('token.intro.statistics.active.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Withdrawn: <br>
+                                {{ $t('token.intro.statistics.withdraw.header') }} <br>
                                 {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Withdrawn
+                                        {{ $t('token.intro.statistics.withdraw.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        The amount of token units, that token creator withdrew from exchange.
+                                        {{ $t('token.intro.statistics.withdraw.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Sold on the market: <br>
+                                {{ $t('token.intro.statistics.sold.header') }} <br>
                                 {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Sold on the market
+                                        {{ $t('token.intro.statistics.sold.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        The amount of token units currently in circulation.
+                                        {{ $t('token.intro.statistics.sold.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Donation volume: <br />
+                                {{ $t('token.intro.statistics.donation.header') }} <br />
                                 {{ donationVolume }}
                                 <guide>
                                     <template slot="header">
-                                        Donation volume
+                                        {{ $t('token.intro.statistics.donation.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        Donated tokens summary.
+                                        {{ $t('token.intro.statistics.donation.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                         </div>
                         <div class="col px-1">
                             <div class="font-weight-bold pb-4">
-                                Token release:
+                                {{ $t('token.intro.statistics.token_release.header') }}
                                 <guide>
                                     <template slot="header">
-                                        Token Release Period
+                                        {{ $t('token.intro.statistics.token_release.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        Period it will take for the full release of your newly created token,
-                                        something similar to escrow. Mintme acts as 3rd party that ensure
-                                        you won’t flood market with all of your tokens which could lower price
-                                        significantly, because unlocking all tokens take time. It’s released hourly
+                                        {{ $t('token.intro.statistics.token_release.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Release period: <br>
+                                {{ $t('token.intro.statistics.period.header') }} <br>
                                 {{ stats.releasePeriod }}
                                 <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
                                 <guide>
                                     <template slot="header">
-                                        Release period
+                                        {{ $t('token.intro.statistics.period.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        Total amount of time it will take to release all tokens.
-                                        If the release period is 0 years, it means that the creator
-                                        released 100% of the tokens during creation.
+                                        {{ $t('token.intro.statistics.period.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Hourly installment: <br>
+                                {{ $t('token.intro.statistics.hourly.header') }} <br>
                                 {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Hourly installment
+                                        {{ $t('token.intro.statistics.hourly.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        Amount of token released per hour.
+                                        {{ $t('token.intro.statistics.hourly.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Already released: <br>
+                                {{ $t('token.intro.statistics.already_released.header') }} <br>
                                 {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Already released
+                                        {{ $t('token.intro.statistics.already_released.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        The amount of token units released to token creator
-                                        at the moment of token creation.
+                                        {{ $t('token.intro.statistics.already_released.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                Not yet released: <br>
+                                {{ $t('token.intro.statistics.not_yet_released.header') }} <br>
                                 {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
-                                        Not yet released
+                                        {{ $t('token.intro.statistics.not_yet_released.guide_header') }}
                                     </template>
                                     <template slot="body">
-                                        Number of tokens not yet released to token creator
-                                        or sold on the market
+                                        {{ $t('token.intro.statistics.not_yet_released.guide_body') }}
                                     </template>
                                 </guide>
                             </div>
                             <div class="pb-1">
-                                created on: <br>
+                                {{ $t('token.intro.statistics.created') }} <br>
                                 {{ tokenCreated }}
                             </div>
                         </div>
@@ -203,7 +192,12 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
-import {LoggerMixin, MoneyFilterMixin, NotificationMixin, WebSocketMixin} from '../../../mixins';
+import {
+  LoggerMixin,
+  MoneyFilterMixin,
+  NotificationMixin,
+  WebSocketMixin,
+} from '../../../mixins';
 
 const defaultValue = '-';
 
@@ -242,21 +236,21 @@ export default {
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError('Can not load token data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_token_data'));
                 this.sendLogs('error', 'Can not load token data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
             .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
@@ -265,14 +259,14 @@ export default {
         }))
             .then((res) => this.soldOnMarket = res.data)
             .catch((err) => {
-                this.notifyError('Can not load soldOnMarket value. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_sold_on_market'));
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
             .then((res) => this.tokenWithdrawn = res.data)
             .catch((err) => {
-                this.notifyError('Can not load token withdrawn statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_withdrawn_data'));
                 this.sendLogs('error', 'Can not load token withdrawn value', err);
             });
 
@@ -282,7 +276,7 @@ export default {
         }))
             .then((res) => this.pendingSellOrders = res.data.sell)
             .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
@@ -292,7 +286,7 @@ export default {
         })).then((res) => {
             this.donationVolume = res.data.volumeDonation || 0;
         }).catch((err) => {
-            this.notifyError('Service unavailable now. Can not load donation volume.');
+            this.notifyError(this.$t('toasted.error.can_not_load_donation_volume'));
             this.sendLogs('error', 'Can not load market status', err);
         });
 
@@ -315,6 +309,11 @@ export default {
         ]),
     },
     computed: {
+        translationsContext: function() {
+          return {
+            symbol: this.market.quote.symbol,
+          };
+        },
         loaded: function() {
             return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },

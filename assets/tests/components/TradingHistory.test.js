@@ -11,6 +11,7 @@ describe('TradingHistory', () => {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$sortCompare = () => {};
+            Vue.prototype.$t = (val) => val;
         },
     });
 

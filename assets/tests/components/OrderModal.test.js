@@ -1,5 +1,11 @@
+import Vue from 'vue';
 import {shallowMount, mount} from '@vue/test-utils';
 import OrderModal from '../../js/components/modal/OrderModal';
+Vue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
 
 let rebrandingTest = (val) => {
     if (!val) {
@@ -27,6 +33,7 @@ describe('OrderModal', () => {
                 title: '',
                 visible: true,
             },
+            mocks: {$t: (val) => val},
         });
         expect(wrapper.vm.visible).toBe(true);
     });

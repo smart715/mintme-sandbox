@@ -8,7 +8,7 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label for="amount">
-                            Required amount of tokens:
+                            {% trans %}post.required{% endtrans %}
                         </label>
                         <div class="d-inline">
                             <a data-tippy="">
@@ -66,13 +66,13 @@
                                 <div id="guide_221" class="d-none">
                                     <div class="m-2">
                                         <h5 class="font-bold">
-                                            BBcode Help
+                                            {% trans %}bbcode.help.title{% endtrans %}
                                         </h5>
                                         <p class="overflow-wrap-break-word">
                                             <table class="table table-sm table-bordered bbcode-help-table text-center">
                                                 <tr>
                                                     <th colspan="3">
-                                                        Text styles
+                                                        {% trans %}bbcode.help.text_styles{% endtrans %}
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -89,11 +89,11 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [b]Bold[/b]
+                                                        {% trans %}bbcode.help.bold{% endtrans %}
                                                     </td>
                                                     <td>
                                                         <span style="font-weight:bold">
-                                                            Bold
+                                                            {% trans %}utils.markitup.bold{% endtrans %}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -111,11 +111,11 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [i]Italic[/i]
+                                                        {% trans %}bbcode.help.italic{% endtrans %}
                                                     </td>
                                                     <td>
                                                         <span style="font-style:italic">
-                                                            Italic
+                                                            {% trans %}utils.markitup.italic{% endtrans %}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -133,11 +133,11 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [u]Underline[/u]
+                                                        {% trans %}bbcode.help.underline{% endtrans %}
                                                     </td>
                                                     <td>
                                                         <span style="text-decoration:underline">
-                                                            Underline
+                                                            {% trans %}utils.markitup.underline{% endtrans %}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -155,11 +155,11 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [s]Strikethrough[/s]
+                                                        {% trans %}bbcode.help.strikethrough{% endtrans %}
                                                     </td>
                                                     <td>
                                                         <span style="text-decoration:line-through">
-                                                            Strikethrough
+                                                            {% trans %}utils.markitup.strikethrough{% endtrans %}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -177,10 +177,10 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [h1]header 1[/h1]
+                                                        {% trans %}bbcode.help.header{% endtrans %}
                                                     </td>
                                                     <td>
-                                                        Headers 1-6 levels
+                                                        {% trans %}bbcode.help.headers{% endtrans %}
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -197,17 +197,17 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [p]Paragraph[/p]
+                                                        {% trans %}bbcode.help.paragraph{% endtrans %}
                                                     </td>
                                                     <td>
                                                         <p>
-                                                            Paragraph
+                                                            {% trans %}utils.markitup.paragraph{% endtrans %}
                                                         </p>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th colspan="3">
-                                                        Lists
+                                                        {% trans %}bbcode.help.lists{% endtrans %}
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -224,18 +224,10 @@
                                                         </svg>
                                                     </td>
                                                     <td class="text-left pl-3">
-                                                        [ul]
-                                                            <br> [li]One[/li]
-                                                            <br> [li]Two[/li]
-                                                            <br>
-                                                        [/ul]
+                                                        {% trans %}post.tab.bbcode.ul{% endtrans %}
                                                     </td>
                                                     <td>
-                                                        Unordered list:
-                                                        <ul>
-                                                            <li>One</li>
-                                                            <li>Two</li>
-                                                        </ul>
+                                                        {% trans %}bbcode.help.unordered_list{% endtrans %}
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -252,18 +244,10 @@
                                                         </svg>
                                                     </td>
                                                     <td class="text-left pl-3">
-                                                        [ol]
-                                                            <br> [li]One[/li]
-                                                            <br> [li]Two[/li]
-                                                            <br>
-                                                        [/ol]
+                                                        {% trans %}post.tab.bbcode.ol{% endtrans %}
                                                     </td>
                                                     <td>
-                                                        Ordered list:
-                                                        <ol>
-                                                            <li>One</li>
-                                                            <li>Two</li>
-                                                        </ol>
+                                                        {% trans %}bbcode.help.ordered_list{% endtrans %}
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -280,16 +264,12 @@
                                                         </svg>
                                                     </td>
                                                     <td>
-                                                        [li]Item[/li]
-                                                    </td>
-                                                    <td>
-                                                        List item:
-                                                        <li>Item</li>
+                                                        {% trans %}bbcode.help.list_item{% endtrans %}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th colspan="3">
-                                                        Links
+                                                        {% trans %}bbcode.help.links{% endtrans %}
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -316,7 +296,7 @@
                                                 </tr>
                                                 <tr>
                                                     <th colspan="3">
-                                                        Images
+                                                        {% trans %}bbcode.help.images{% endtrans %}
                                                     </th>
                                                 </tr>
                                                 <tr>
@@ -336,7 +316,7 @@
                                                         [img]link[/img]
                                                     </td>
                                                     <td>
-                                                        Image
+                                                        {% trans %}bbcode.help.image{% endtrans %}
                                                     </td>
                                                 </tr>
                                             </table>
@@ -364,7 +344,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Link
+                                                    {% trans %}bbcode.help.link{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -383,7 +363,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Picture
+                                                    {% trans %}utils.markitup.picture{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -408,22 +388,34 @@
                                             </button>
                                             <ul class="markitup-dropdown">
                                                 <li>
-                                                    <a href="#">Heading level 1</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 1} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Heading level 2</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 2} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Heading level 3</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 3} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Heading level 4</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 4} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Heading level 5</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 5} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#">Heading level 6</a>
+                                                    <a href="#">
+                                                        {% trans with {'%level%': 6} %}utils.markitup.heading_level{% endtrans %}
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -442,7 +434,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Bold
+                                                    {% trans %}utils.markitup.bold{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -461,7 +453,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Italic
+                                                    {% trans %}utils.markitup.italic{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -480,7 +472,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Underline
+                                                    {% trans %}utils.markitup.underline{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -499,7 +491,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Strikethrough
+                                                    {% trans %}utils.markitup.strikethrough{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -518,7 +510,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Unordered list
+                                                    {% trans %}utils.markitup.unordered_list{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -537,7 +529,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Ordered list
+                                                    {% trans %}utils.markitup.ordered_list{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -556,7 +548,7 @@
                                                 </svg>
                                             </div>
                                             <span>
-                                                List item
+                                                {% trans %}utils.markitup.list_item{% endtrans %}
                                             </span>
                                             </button>
                                         </div>
@@ -575,7 +567,7 @@
                                                     </svg>
                                                 </div>
                                                 <span>
-                                                    Paragraph
+                                                    {% trans %}utils.markitup.paragraph{% endtrans %}
                                                 </span>
                                             </button>
                                         </div>
@@ -585,14 +577,14 @@
                             <textarea class="custom-scrollbar form-control w-100 markitup-textarea"></textarea>
                         </div>
                         <div class="invalid-feedback">
-                            Content can't be empty or contain only bbcodes and whitespaces
+                            {% trans %}post.tab.content{% endtrans %}
                         </div>
                     </div>
                     <button disabled="disabled" class="btn btn-primary">
-                        Save
+                        {% trans %}save{% endtrans %}
                     </button>
                     <button class="btn btn-cancel">
-                        Cancel
+                        {% trans %}cancel{% endtrans %}
                     </button>
                 </div>
             </div>
@@ -601,11 +593,11 @@
     <div class="row mt-3 justify-content-center">
         <div class="card h-100 col-12 col-md-10 col-lg-8">
             <div class="card-header">
-                Posts
+                {% trans %}page.pair.posts_title{% endtrans %}
             </div>
             <div class="card-body posts">
                 <div>
-                    The token creator has not added any posts yet.
+                    {% trans %}post.not_any_post{% endtrans %}
                 </div>
             </div>
         </div>
