@@ -3,7 +3,6 @@
         <div class="card-header">
             <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
-<<<<<<< HEAD
         <div
             class="card-body posts overflow-hidden position-relative"
         >
