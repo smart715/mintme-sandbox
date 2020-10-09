@@ -1,3 +1,4 @@
+import '../__mocks__/matchMedia';
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Donation from '../../js/components/donation/Donation';
 import moxios from 'moxios';

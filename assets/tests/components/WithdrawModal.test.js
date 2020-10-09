@@ -1,3 +1,4 @@
+import '../__mocks__/matchMedia';
 import Vuelidate from 'vuelidate';
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import WithdrawModal from '../../js/components/modal/WithdrawModal';

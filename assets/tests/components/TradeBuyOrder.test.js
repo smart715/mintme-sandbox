@@ -1,3 +1,4 @@
+import '../__mocks__/matchMedia';
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
 import Axios from '../../js/axios';
