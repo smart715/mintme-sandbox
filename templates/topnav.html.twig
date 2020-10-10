@@ -136,10 +136,10 @@
                             </a>
                         </li>
                         {% if app.user.profile.token %}
-                            <li class="nav-item align-self-center d-lg-none {{ route starts with 'token' ? 'active' : '' }}">
+                            <li class="nav-item align-self-center d-lg-none {{ route starts with 'token_show' ? 'active' : '' }}">
                                 <a href="{{ path('token_show_modal') }}" class="nav-link">
                                     <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token_show' ? 'icon-token-active' : '' }}"></span>
-                                    Token settings
+                                    <span>{% trans %}navbar.token_show_modal{% endtrans %}</span>
                                 </a>
                             </li>
                         {% endif %}
