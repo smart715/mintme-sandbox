@@ -96,7 +96,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts","modal" = "settings|false"},
+     *     requirements={"tab" = "trade|intro|donate|posts|modal","modal" = "settings"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -170,7 +170,7 @@ class TokenController extends Controller
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'isTokenCreated' => $this->isTokenCreated(),
-            'tab' => $tab,
+            'tab' => 'modal' !== $tab ?: 'intro',
             'showTrade' => true,
             'showDonation' => true,
             'market' => $this->normalize($market),
@@ -320,7 +320,7 @@ class TokenController extends Controller
      */
     public function showModal(): Response
     {
-        return $this->redirectToOwnToken('intro', 'settings');
+        return $this->redirectToOwnToken('modal', 'settings');
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
