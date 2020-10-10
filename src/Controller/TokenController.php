@@ -320,7 +320,7 @@ class TokenController extends Controller
      */
     public function showModal(): Response
     {
-        return $this->redirectToOwnToken('trade', 'settings');
+        return $this->redirectToOwnToken('intro', 'settings');
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
