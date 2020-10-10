@@ -96,7 +96,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts|modal","modal" = "settings"},
+     *     requirements={"tab" = "trade|intro|donate|posts","modal" = "settings"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -109,7 +109,7 @@ class TokenController extends Controller
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo())) {
+        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
@@ -170,7 +170,7 @@ class TokenController extends Controller
             'profile' => $token->getProfile(),
             'isOwner' => $token === $this->tokenManager->getOwnToken(),
             'isTokenCreated' => $this->isTokenCreated(),
-            'tab' => 'modal' !== $tab ?: 'intro',
+            'tab' => $tab,
             'showTrade' => true,
             'showDonation' => true,
             'market' => $this->normalize($market),
@@ -320,7 +320,7 @@ class TokenController extends Controller
      */
     public function showModal(): Response
     {
-        return $this->redirectToOwnToken('modal', 'settings');
+        return $this->redirectToOwnToken('intro', 'settings');
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
