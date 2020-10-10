@@ -136,7 +136,7 @@
                             </a>
                         </li>
                         {% if app.user.profile.token %}
-                            <li class="nav-item align-self-center d-lg-none {{ route starts with 'token_show' ? 'active' : '' }}">
+                            <li class="nav-item align-self-center d-lg-none">
                                 <a href="{{ path('token_show_modal') }}" class="nav-link">
                                     <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token_show' ? 'icon-token-active' : '' }}"></span>
                                     <span>{% trans %}navbar.token_show_modal{% endtrans %}</span>
@@ -195,7 +195,7 @@
                                         {% trans %}navbar.settings{% endtrans %}
                                     </a>
                                     {% if app.user.profile.token %}
-                                        <a class="dropdown-item {{ route == 'token_show_modal' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('token_show_modal') }}">
+                                        <a class="dropdown-item" href="{{ path('token_show_modal') }}">
                                             <span class="icon-token float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                             {% trans %}navbar.token_show_modal{% endtrans %}
                                         </a>
