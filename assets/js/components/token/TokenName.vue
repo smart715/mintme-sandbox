@@ -142,7 +142,7 @@ export default {
         }, 'token-name-asset-update');
 
         if (this.showTokenEditModalProp) {
-            router.replace({path: `/token/${this.name}`});
+            this.$router.replace({path: `/token/${this.name}`});
         }
     },
     methods: {
