@@ -1,4 +1,5 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
+import '../__mocks__/ResizeObserver';
 import Posts from '../../js/components/posts/Posts';
 
 /**
