@@ -47,9 +47,7 @@ class ProfileCreatingReminderCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-
-        $profiles= $this->profileManager->findAllProfilewithEmptyDescription();
+        $profiles = $this->profileManager->findAllProfileWithEmptyDescriptionAndNotAnonymous();
 
         foreach ($profiles as $p) {
             if (null === $p->getNextReminderDate()) {

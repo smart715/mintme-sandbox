@@ -87,8 +87,8 @@ class ProfileManager implements ProfileManagerInterface
         return $this->userRepository->findByHash($hash);
     }
 
-    public function findAllProfileWithEmptyDescription(int $param = 14): ?array
+    public function findAllProfileWithEmptyDescriptionAndNotAnonymous(int $param = 14): ?array
     {
-        return $this->profileRepository->findAllProfileWithEmptyDescription($param);
+        return $this->profileRepository->findAllProfileWithEmptyDescriptionAndNotAnonymous($param);
     }
 }

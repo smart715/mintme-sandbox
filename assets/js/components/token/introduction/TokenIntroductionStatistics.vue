@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
                 {{ $t('token.intro.statistics.header') }}
                 <guide class="float-right">
@@ -12,7 +12,7 @@
                     </template>
                 </guide>
             </div>
-            <div class="card-body">
+            <div class="card-body h-100 pb-0">
                 <template v-if="loaded">
                     <div class="d-flex flex-column px-3 pb-3">
                         <div v-if="isTokenDeployed">
@@ -175,8 +175,8 @@
                     </div>
                 </template>
                 <template v-else>
-                    <div class="p-5 text-center">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    <div class="text-center h-100">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner position-absolute top-50" fixed-width />
                     </div>
                 </template>
             </div>
