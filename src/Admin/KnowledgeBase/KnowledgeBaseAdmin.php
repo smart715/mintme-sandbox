@@ -82,7 +82,7 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
                 'actions' => [
                     'move' => [
                         'template' => '@PixSortableBehavior/Default/_sort.html.twig',
-                        'enable_top_bottom_buttons' => true,
+                        'enable_top_bottom_buttons' => false,
                     ],
                 ],
             ])
