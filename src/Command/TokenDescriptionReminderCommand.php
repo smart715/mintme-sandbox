@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Mailer\MailerInterface;
 use App\Manager\TokenManager;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,11 +27,19 @@ class TokenDescriptionReminderCommand extends Command
     /** @var TokenManager */
     protected $tokenManager;
 
-    public function __construct(EntityManagerInterface $em, MailerInterface $mailer, TokenManager $tm)
-    {
+    /** @var LockFactory */
+    private $lockFactory;
+
+    public function __construct(
+        EntityManagerInterface $em,
+        MailerInterface $mailer,
+        TokenManager $tm,
+        LockFactory $lockFactory
+    ) {
         $this->tokenManager = $tm;
         $this->em = $em;
         $this->mailer = $mailer;
+        $this->lockFactory = $lockFactory;
         parent::__construct();
     }
     protected function configure(): void
@@ -42,6 +51,12 @@ class TokenDescriptionReminderCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $lock = $this->lockFactory->createLock('token-description-reminder');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
         $tokens = $this->tokenManager->findAllTokensWithEmptyDescription();
 
         foreach ($tokens as $t) {
@@ -63,6 +78,7 @@ class TokenDescriptionReminderCommand extends Command
         $this->em->flush();
         $io = new SymfonyStyle($input, $output);
         $io->success('Done.');
+        $lock->release();
 
         return 0;
     }
