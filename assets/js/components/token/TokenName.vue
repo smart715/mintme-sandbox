@@ -140,6 +140,12 @@ export default {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
+
+        if (this.showTokenEditModalProp) {
+            location.href = this.$routing.generate('token_show', {
+                name: this.name,
+            });
+        }
     },
     methods: {
         closeTokenEditModal: function() {
