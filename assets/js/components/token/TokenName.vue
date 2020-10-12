@@ -140,10 +140,6 @@ export default {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
-
-        if (this.showTokenEditModalProp) {
-            this.$router.replace({path: `/token/${this.name}`});
-        }
     },
     methods: {
         closeTokenEditModal: function() {
