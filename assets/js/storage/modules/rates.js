@@ -2,7 +2,6 @@ export default {
     namespaced: true,
     state: {
         requesting: false,
-        loaded: false,
         rates: {},
     },
     getters: {

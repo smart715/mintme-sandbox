@@ -8,9 +8,13 @@ import {mapMutations, mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
 import {toMoney} from '../utils';
 import debounce from 'lodash/debounce';
+import {LoggerMixin} from '../mixins';
 
 export default {
     name: 'PriceConverter',
+    mixins: [
+        LoggerMixin,
+    ],
     props: {
         amount: [Number, String],
         from: String,
@@ -33,19 +37,19 @@ export default {
         ...mapMutations('rates', [
             'setRates',
             'setRequesting',
-            'setLoaded',
         ]),
         convert() {
-            let amount = !!parseFloat(this.amount) && this.rateLoaded
-                ? Decimal.mul(this.amount, this.rate)
-                : '0';
+            let amount = this.rateLoaded
+                ? (!!parseFloat(this.amount)
+                    ? Decimal.mul(this.amount, this.rate)
+                    : '0')
+                : '-';
             this.convertedAmount = toMoney(amount, this.subunit);
             this.$emit('update:convertedAmountProp', this.convertedAmount);
         },
     },
     computed: {
         ...mapGetters('rates', [
-            'getLoaded',
             'getRequesting',
             'getRates',
         ]),
@@ -75,7 +79,7 @@ export default {
                 this.setRates(res.data);
             })
             .catch((err) => {
-
+                this.sendLogs('error', 'Can\'t load conversion rates', err);
             })
             .finally(() => {
                 this.requestingRates = false;
