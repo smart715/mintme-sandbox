@@ -24,16 +24,15 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <span v-show="alreadyClaimed">
+                    <span v-if="alreadyClaimed">
                         <button
                                 :disabled="true"
                                 class="btn btn-primary">
                             {{ $t('ongoing_airdrop.claimed') }}
                         </button>
                     </span>
-                    <span v-show="notClaimed">
+                    <span v-else>
                         <button
-                                :disabled="btnDisabled"
                                 @click="showModal = true"
                                 class="btn btn-primary">
                             {{ $t('ongoing_airdrop.participate') }}
@@ -92,7 +91,6 @@ export default {
             loaded: false,
             btnDisabled: false,
             alreadyClaimed: this.userAlreadyClaimed,
-            notClaimed: !this.userAlreadyClaimed,
             timeElapsed: false,
             showDuration: true,
         };
@@ -206,7 +204,6 @@ export default {
                 return;
             }
 
-            this.btnDisabled = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -215,9 +212,7 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
-
                     this.alreadyClaimed = true;
-                    this.notClaimed = false;
                 })
                 .catch((err) => {
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {

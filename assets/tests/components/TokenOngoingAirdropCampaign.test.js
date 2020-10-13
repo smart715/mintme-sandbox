@@ -96,7 +96,6 @@ describe('TokenOngoingAirdropCampaign', () => {
                 isOwner: false,
             },
         });
-
         expect(wrapper.vm.confirmButtonText).toBe('log_in');
         wrapper.setProps({loggedIn: true});
         expect(wrapper.vm.confirmButtonText).toBe('');
@@ -215,8 +214,6 @@ describe('TokenOngoingAirdropCampaign', () => {
         };
 
         wrapper.vm.modalOnConfirm();
-        expect(wrapper.vm.btnDisabled).toBe(true);
-
         moxios.wait(() => {
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(14);
             expect(wrapper.vm.alreadyClaimed).toBe(true);
