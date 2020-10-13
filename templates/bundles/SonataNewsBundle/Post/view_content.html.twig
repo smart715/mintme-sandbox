@@ -19,7 +19,14 @@
                 </div>
             </div>
 
-            {{ include('share_buttons.html.twig', { 'url': url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }) }}
+            {% include 'share_buttons.html.twig' with
+                {
+                    'url': url(
+                        'sonata_news_view',
+                        { 'permalink': sonata_news_permalink(post) }
+                    )
+                }
+            %}
 
             {#            {% if post.iscommentable %}#}
             {#                {{ render(controller('SonataNewsBundle:Post:comments', {'postId': post.id})) }}#}
@@ -29,10 +36,12 @@
             {#                })) }}#}
             {#            {% endif %}#}
             <div class="mt-3 mb-3">
+                <a href="{{ path('homepage') }}">MintMe</a>
+                &gt;
                 {% if(app.request.headers.get('referer') == app.request.headers.get('url')) %}
-                    <a href="{{ path('sonata_news_home') }}">&lt; Back to news</a>
+                    <a href="{{ path('sonata_news_home') }}">News</a>
                 {% else %}
-                    <a href="{{ app.request.headers.get('referer') }}">&lt; Back to news</a>
+                    <a href="{{ app.request.headers.get('referer') }}">News</a>
                 {% endif %}
             </div>
         </div>

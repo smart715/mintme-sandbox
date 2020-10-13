@@ -91,8 +91,8 @@ export default {
                     amount: Math.round(row.balance),
                 };
             })).catch((err) => {
-                this.notifyError('Can not get top holders. Please, try again');
-                this.sendLogs('error', 'Can not get top holders', err);
+                this.sendLogs('error', 'Can not get top holders', err)
+                .then(() => {}, () => {});
             });
         },
     },

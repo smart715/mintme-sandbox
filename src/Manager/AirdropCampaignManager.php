@@ -20,6 +20,7 @@ use Money\Money;
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
     private const AIRDROP_REWARD_PRECISION = 4;
+    private const ONE_HOUR_IN_SEC = 3600;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -63,7 +64,12 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdrop->setParticipants($participants);
 
         if ($endDate instanceof \DateTimeImmutable && $endDate->getTimestamp() > time()) {
-            $airdrop->setEndDate($endDate);
+            if ($endDate->getTimestamp() - time() < self::ONE_HOUR_IN_SEC) {
+                $newEndDate = new \DateTimeImmutable('+1 hour');
+                $airdrop->setEndDate($newEndDate);
+            } else {
+                $airdrop->setEndDate($endDate);
+            }
         }
 
         $reward = $this->getAirdropReward($airdrop);
@@ -141,11 +147,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $airdropReward = $activeAirdrop->getLockedAmount()
             ->divide($activeAirdrop->getParticipants());
 
-        $this->checkUserBalance(
-            $token->getProfile()->getUser(),
-            $token,
-            $airdropReward
-        );
+        $this->tokenBlockAirDropBalance($activeAirdrop);
 
         $this->balanceHandler->update($user, $token, $airdropReward, 'reward');
 
@@ -196,6 +198,16 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         }
 
         return count($outdatedAirdrops);
+    }
+
+    public function tokenBlockAirDropBalance(Airdrop $activeAirdrop): void
+    {
+        $airdropAmount = $activeAirdrop->getAmount();
+        $airdropActualAmount = $activeAirdrop->getActualAmount();
+
+        if ($airdropAmount->equals($airdropActualAmount)) {
+            throw new ApiBadRequestException('Insufficient funds.');
+        }
     }
 
     private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant

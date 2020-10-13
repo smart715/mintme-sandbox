@@ -1,48 +1,54 @@
 <template>
-    <div class="post">
-        <template v-if="loggedIn">
+    <div class="post" :id="post.id">
+        <div>
+            <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
+                <img
+                    :src="post.author.image.avatar_small"
+                    class="rounded-circle d-inline-block"
+                    alt="avatar"
+                >
+                {{ post.author.nickname }}
+            </a>
+            <span class="post-date">
+                {{ date }}
+            </span>
+            <copy-link :content-to-copy="link" class="c-pointer ml-1">
+              <font-awesome-icon :icon="['far', 'copy']"/>
+            </copy-link>
+        </div>
+        <template>
             <p v-if="post.content">
                 <bbcode-view :value="post.content"/>
             </p>
             <p v-else>
-                To see this post you need to have {{post.amount | toMoney | formatMoney}} {{post.token.name}} in your balance. Visit trade page and create buy order to get required tokens.
+              To see this post you need to have <a href="#" @click.prevent="$emit('go-to-trade', post.amount)">{{post.amount | toMoney | formatMoney}} {{post.token.name}}</a> in your balance. Visit trade page and create buy order to get required tokens.
             </p>
         </template>
-        <p v-else>
-            To see this post you need to <a :href="$routing.generate('login')">log in</a> or <a :href="$routing.generate('register')">sign up</a>.
-        </p>
-        <span>
-            {{ date }}
-        </span>
-        <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
-            <img
-                :src="post.author.image.avatar_small"
-                class="rounded-circle d-inline-block"
-                alt="avatar"
+        <div v-if="showEdit" class="float-right">
+            <a
+                class="btn p-0 post-edit-icon text-decoration-none text-reset"
+                :href="$routing.generate('edit_post_page', {id: post.id})"
             >
-            {{ post.author.nickname }}
-        </a>
-        <button v-if="showEdit"
-            class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-            :disabled="deleteDisabled"
-            @click="showModal"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="trash"
-                transform="shrink-4 up-1.5"
-            />
-        </button>
-        <a v-if="showEdit"
-            class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-            :href="$routing.generate('edit_post_page', {id: post.id})"
-        >
-            <font-awesome-icon
-                class="icon-default c-pointer align-middle"
-                icon="edit"
-                transform="shrink-4 up-1.5"
-            />
-        </a>
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                />
+            </a>
+            <button
+                class="btn btn-link p-0 delete-icon text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showModal"
+                tabindex="0"
+                @keyup.enter="showModal"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="trash"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
+        </div>
         <confirm-modal
             :visible="isModalVisible"
             @confirm="deletePost"
@@ -63,6 +69,7 @@ import {faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin} from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
+import CopyLink from '../CopyLink';
 
 library.add(faEdit);
 library.add(faTrash);
@@ -77,6 +84,7 @@ export default {
         BbcodeView,
         ConfirmModal,
         FontAwesomeIcon,
+        CopyLink,
     },
     props: {
         post: Object,
@@ -99,6 +107,9 @@ export default {
     computed: {
         date() {
             return moment(this.post.createdAt).format('H:mm, MMM D, YYYY');
+        },
+        link() {
+            return this.$routing.generate('token_show', {name: this.post.token.name, tab: 'posts'}, true) + '#' + this.post.id;
         },
     },
     methods: {

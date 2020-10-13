@@ -143,6 +143,7 @@ export default {
         facebookUrl: String,
         telegramUrl: String,
         tokenName: String,
+        tokenUrl: String,
         websiteUrl: String,
         youtubeChannelId: String,
     },
@@ -158,10 +159,6 @@ export default {
     data() {
         return {
             showSocialMediaMenu: false,
-            tokenUrl: this.$routing.generate('token_show', {
-                name: this.tokenName,
-                tab: 'intro',
-            }),
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },

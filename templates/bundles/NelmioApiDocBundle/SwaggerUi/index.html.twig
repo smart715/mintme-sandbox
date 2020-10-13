@@ -6,12 +6,42 @@
 #}
 {% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
 
+{% if '/v1' in app.request.uri %}
+    {% set version = 'v1' %}
+{% else %}
+    {% set version = 'v2' %}
+{% endif %}
+
 {% block title %}
     API Documentation | mintMe
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <style>
+        .top-navbar .mintme-logo {
+          max-height: 42px !important;
+        }
+
+        @media (min-width: 768px) {
+          .top-navbar .mintme-logo {
+            max-height: 48px !important;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .top-navbar .mintme-logo {
+            max-height: 56px !important;
+          }
+        }
+
+        #footer .socialmedia img {
+          width: 45px !important;
+          height: 45px !important;
+          -webkit-transition: all .3s ease;
+          transition: all .3s ease;
+        }
+    </style>
     <link rel="stylesheet" href="{{ asset('build/main.css') }}">
 {% endblock stylesheets %}
 
@@ -20,9 +50,10 @@
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
     %}
+    {% include 'scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    {% include 'scripts.html.twig' %}
+    <script src="{{ asset('build/api.js') }}"></script>
     {% endapply %}
 {% endblock javascripts %}
 
@@ -78,11 +109,28 @@
                 <div class="row pt-4 justify-content-center">
                     <div class="col-12 px-3">
                         <div class="card card-fixed-large mx-auto">
-                            <div class="card-header">
-                                <h2>API Documentation</h2>
+                            <div class="card-header py-3 px-4">
+                                <div class="row justify-content-md-center align-items-center">
+                                    <div class="col"><h2 class="m-0">API Documentation</h2></div>
+                                    <!--
+                                    <div id="api-version" class="col-auto mr-auto">
+                                        <api-version
+                                            url-version={{ version }}
+                                        >
+                                        </api-version>
+                                    </div>
+                                    -->
+                                </div>
                             </div>
                             <div class="card-body py-2 px-0">
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
+                                    {% if version != 'v1' %}
+                                    <p>
+                                        All Open API requests don't require authorization. All non-open API requests
+                                        must be provided with unique API keys or OAuth token, which you can generate
+                                        in <a href="{{ path('settings') }}">settings</a>.
+                                    </p>
+                                    {% endif %}
                                     <p>
                                         All requests must be provided with unique API keys or OAuth token, which you can generate in dashboard.<br />
                                         You have to pass API keys with each request in headers as <span class="text-danger">X-API-ID</span> (public)

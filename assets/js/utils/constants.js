@@ -11,7 +11,7 @@ export const tokenValidFirstChars = helpers.regex('firstChars', /^[\s]+/u);
 export const tokenValidLastChars = helpers.regex('lastChars', /[\s]+$/u);
 export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
 export const tokenNameValidChars = helpers.regex('validChars', /^[\sA-Za-z0-9]+$/u);
-
+export const twoFACode = helpers.regex('numberInput', /^\d{6}$/);
 export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
 export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
@@ -106,8 +106,10 @@ export const MINTME = {
 };
 
 export const sanitizeOptions = {
-    allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p'],
+    allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p', 'iframe', 'div'],
     allowedAttributes: {
+        'iframe': ['height', 'width', 'allow', 'frameborder', 'src', 'allowfullscreen', 'class'],
+        'div': ['class'],
         'ul': ['class'],
         'img': ['style', 'src'],
         'a': ['href', 'rel', 'target'],

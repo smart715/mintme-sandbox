@@ -3,6 +3,7 @@
 namespace App\Entity\KnowledgeBase;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -56,6 +57,13 @@ class KnowledgeBase
      * @var string
      */
     protected $description;
+
+    /**
+     * @Gedmo\SortablePosition
+     * @ORM\Column(type="integer")
+     * @var int
+     */
+    private $position;
 
     public function getId(): int
     {
@@ -116,5 +124,17 @@ class KnowledgeBase
     public function setSubcategory(?Subcategory $subcategory): void
     {
         $this->subcategory = $subcategory;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
     }
 }

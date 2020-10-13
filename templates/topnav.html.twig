@@ -1,7 +1,8 @@
 {% set show_links = app.user and not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %}
 {% set route = app.request.get('_route') %}
+{% set show_info_bar = app.session.get('show_info_bar', true) %}
 
-{% if is_hacker_allowed %}
+{% if is_hacker_allowed and show_info_bar %}
     <div id="info-bar">
         <info-bar
             username="{{ app.user.username|default('') }}"
@@ -48,6 +49,8 @@
                         type="text"
                     >
                     <svg
+                        width="19.5"
+                        height="19.5"
                         aria-hidden="true"
                         focusable="false"
                         data-prefix="fas"
@@ -72,18 +75,13 @@
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
                             <span class="icon-token float-left mt-1 mr-1 d-none d-lg-inline {{ route starts with 'token' ? 'icon-token-active' : '' }}"></span>
-                            <span>My Token</span>
+                            My Token
                         </a>
                     </li>
                 {% endif %}
                 <li class="nav-item align-self-center {{ route == 'trading' ? 'active' : '' }}">
                     <a href="{{ path('trading') }}" class="nav-link">Trading</a>
                 </li>
-                {% if show_links %}
-                    <li class="nav-item align-self-center {{ route == 'wallet' ? 'active' : '' }}">
-                        <a href="{{ path('wallet') }}" class="nav-link">Wallet</a>
-                    </li>
-                {% endif %}
                 <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
                     <a href="{{ path('sonata_news_home') }}" class="nav-link">News</a>
                 </li>
@@ -101,11 +99,19 @@
                     </li>
                     <li class="nav-item align-self-center {{ route == 'fos_user_registration_register' ? 'active' : '' }}">
                         <a href="{{ path('fos_user_registration_register') }}" class="nav-link">
-                            <span>Sign Up</span>
+                            Sign Up
                         </a>
                     </li>
                 {% else %}
                     {% if show_links %}
+                        <li class="nav-item align-self-center d-lg-none {{ route == 'wallet' ? 'active' : '' }}">
+                            <a
+                                href="{{ path('wallet') }}"
+                                class="nav-link"
+                            >
+                                <span>Wallet</span>
+                            </a>
+                        </li>
                         <li class="nav-item align-self-center d-lg-none {{ route starts with 'profile' ? 'active' : '' }}">
                             <a
                                 href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
@@ -140,6 +146,8 @@
                                     :aria-expanded="showProfileMenu"
                                     @click="toggleProfileMenu"
                                     v-on-clickaway="hideProfileMenu"
+                                    tabindex="0"
+                                    @keyup.enter="toggleProfileMenu"
                                 >
                                     <avatar
                                         class="{% if app.user.profile.image.url == "/media/default_profile.png" %}default-user-avatar-topnav{% endif %}"
@@ -152,9 +160,14 @@
                                     class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
                                     :class="{ 'show': showProfileMenu }"
                                 >
+                                    <a class="dropdown-item {{ route == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                                        <span class="icon-wallet float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                        Wallet
+                                    </a>
                                     <a
                                         class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
                                         href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                                        tabindex="0"
                                     >
                                         <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         Profile
@@ -171,6 +184,7 @@
                                                     type="submit"
                                                     id="_submit"
                                                     name="_submit"
+                                                    tabindex="0"
                                             >
                                                 <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                                 Log Out

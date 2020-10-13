@@ -14,7 +14,7 @@ security:
             security: false
         api:
             anonymous: ~
-            pattern: ^/dev/api
+            pattern: ^/dev/api/v1
             stateless: true
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
@@ -68,7 +68,7 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
-        - { path: ^/dev/api,                                        role: ROLE_API }
+        - { path: ^/dev/api/v1,                                     role: ROLE_API }
         - { path: ^/api/media/upload,                               role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/send-code$,             role: ROLE_USER }
         - { path: ^/api/tokens/[a-zA-Z0-9]+/delete$,                role: ROLE_USER }

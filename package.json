@@ -5,10 +5,13 @@
   "main": "main.js",
   "directories": {},
   "dependencies": {
-    "@bbob/core": "^2.5.1",
-    "@bbob/html": "^2.5.1",
-    "@bbob/preset-html5": "^2.5.1",
+    "@bbob/core": "^2.5.8",
+    "@bbob/html": "^2.5.8",
+    "@bbob/preset-html5": "^2.5.8",
+    "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free": "^5.12.1",
+    "@fortawesome/fontawesome-free-brands": "^5.0.13",
+    "@fortawesome/fontawesome-free-regular": "^5.0.13",
     "@fortawesome/fontawesome-svg-core": "^1.2.10",
     "@fortawesome/free-brands-svg-icons": "^5.6.1",
     "@fortawesome/free-regular-svg-icons": "^5.12.1",
@@ -28,6 +31,7 @@
     "form-serialize": "^0.7.2",
     "gapi": "0.0.3",
     "generate-password": "1.4.1",
+    "he": "^1.2.0",
     "locutus": "^2.0.10",
     "lodash": "^4.17.15",
     "markitup": "^3.0.0-0",
@@ -117,7 +121,9 @@
       ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest",
       ".*\\.(coffee)$": "<rootDir>/coffee.processor.js"
     },
-    "transformIgnorePatterns": ["^node_modules(.(?!.*\\.coffee))*$"],
+    "transformIgnorePatterns": [
+      "^node_modules(.(?!.*\\.coffee))*$"
+    ],
     "moduleNameMapper": {
       "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assets/tests/__mocks__/fileMock.js"
     }

@@ -95,6 +95,7 @@
         padding: .125rem .5rem
         background-color: $secondary
         color: $dark-white
+
         &:hover
           background-color: $primary
 
@@ -125,6 +126,10 @@
     background-image: url('../img/settings-sprite.png')
     @extend .icon
 
+  .icon-wallet
+    background-image: url('../img/wallet-icon.png')
+    @extend .icon
+
   .dropdown-menu
     min-width: auto
     padding: 0.15rem
@@ -143,6 +148,9 @@
         background-color: transparent
         color: $color-nav-hover
         border: none
+
+        .icon-wallet
+          background-position: -18px 0
 
         .icon-profile
           background-position: -18px 0
@@ -192,6 +200,7 @@
   .menu-token
     @include media-breakpoint-down(lg)
     min-width: 7rem
+
     &:hover
       .icon-token
         background-position: -18px 0
@@ -205,21 +214,23 @@
   text-align: center
   color: black
   padding: 0 .7em
-  border-top: 0px
+  border-top: 0
   line-height: 20px
   font-weight: lighter
   margin: 0
+
   &:after
     content: ' '
     position: absolute
     right: -19px
-    top: 0px
+    top: 0
     border-right: 20px solid transparent
     border-bottom: 20px solid $color-badge
+
   &:before
     content: ' '
     position: absolute
     left: -19px
-    top: 0px
+    top: 0
     border-left: 20px solid transparent
     border-bottom: 20px solid $color-badge

@@ -53,7 +53,7 @@ class Token implements TradebleInterface, ImagineInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[a-zA-Z0-9\s]*$/", message="Invalid token name.")
+     * @Assert\Regex(pattern="/^[a-zA-Z0-9\s-]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
      * @AppAssert\DashedUniqueName(message="Token name is already exists.")
      * @AppAssert\IsNotBlacklisted(type="token", message="Forbidden token name, please try another")
@@ -231,6 +231,18 @@ class Token implements TradebleInterface, ImagineInterface
      * @var bool
      */
     protected $isBlocked = false;
+
+    /**
+     * @ORM\Column(name="number_of_reminder", type="smallint")
+     * @var int
+     */
+    private $numberOfReminder = 0;
+
+    /**
+     * @ORM\Column(name="next_reminder_date", type="datetime", nullable=true)
+     * @var \DateTime
+     */
+    private $nextReminderDate;
 
     public function __construct()
     {
@@ -609,5 +621,29 @@ class Token implements TradebleInterface, ImagineInterface
         return $profile
             ? $profile->getUser()
             : null;
+    }
+
+    public function getNumberOfReminder(): ?int
+    {
+        return $this->numberOfReminder;
+    }
+
+    public function setNumberOfReminder(int $numberOfReminder): self
+    {
+        $this->numberOfReminder = $numberOfReminder;
+
+        return $this;
+    }
+
+    public function getNextReminderDate(): ?\DateTime
+    {
+        return $this->nextReminderDate;
+    }
+
+    public function setNextReminderDate(\DateTime $nextReminderDate): self
+    {
+        $this->nextReminderDate = $nextReminderDate;
+
+        return $this;
     }
 }

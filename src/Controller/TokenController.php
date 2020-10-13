@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -10,6 +9,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
@@ -43,8 +43,6 @@ use Throwable;
  */
 class TokenController extends Controller
 {
-
-    use CheckTokenNameBlacklistTrait;
 
     /** @var EntityManagerInterface */
     protected $em;
@@ -107,7 +105,8 @@ class TokenController extends Controller
         string $name,
         ?string $tab,
         TokenNameConverterInterface $tokenNameConverter,
-        AirdropCampaignManagerInterface $airdropCampaignManager
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        LimitOrderConfig $orderConfig
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -144,7 +143,10 @@ class TokenController extends Controller
         $market = $webCrypto
             ? $this->marketManager->create($webCrypto, $token)
             : null;
-        $tokenDescription = $token->getDescription() ?? '';
+        $tokenDescription = $token->getDescription() ?: '';
+        $defaultDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
+        $tokenDescription = $tokenDescription ?: $defaultDescription;
+        $defaultActivated = $tokenDescription === $defaultDescription;
         $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
         $tokenDescription = preg_replace(
             '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
@@ -159,7 +161,9 @@ class TokenController extends Controller
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
-            'tokenDescription' => substr($metaDescription, 0, 200),
+            'tokenDescription' => $metaDescription,
+            'metaTokenDescription' => substr($metaDescription, 0, 200),
+            'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
@@ -178,6 +182,7 @@ class TokenController extends Controller
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
+            'taker_fee' => $orderConfig->getTakerFeeRate(),
         ]);
     }
 
@@ -213,7 +218,7 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($this->checkTokenNameBlacklist($token->getName())) {
+            if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
                     ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
                     Response::HTTP_BAD_REQUEST
@@ -224,6 +229,7 @@ class TokenController extends Controller
 
             /** @var User $user */
             $user = $this->getUser();
+            $token->setNextReminderDate(new \DateTime('+1 month'));
             $token->setProfile(
                 $this->profileManager->getProfile($this->getUser()) ?? new Profile($user)
             );

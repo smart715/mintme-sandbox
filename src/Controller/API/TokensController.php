@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
-use App\Controller\Traits\CheckTokenNameBlacklistTrait;
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
@@ -52,8 +51,6 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
-
-    use CheckTokenNameBlacklistTrait;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -129,7 +126,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
                 throw new ApiBadRequestException('Token is deploying or deployed.');
             }
 
-            if ($this->checkTokenNameBlacklist($request->get('name'))) {
+            if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
                 throw new ApiBadRequestException('Forbidden token name, please try another');
             }
         }
@@ -156,10 +153,22 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException('Invalid argument');
         }
 
+        if (null === $token->getDescription() || '' == $token->getDescription()) {
+            $token->setNumberOfReminder(0);
+            $token->setNextReminderDate(new \DateTime('+1 month'));
+        }
+
         $this->em->persist($token);
         $this->em->flush();
 
         $this->userActionLogger->info('Change token info', $request->all());
+
+        if ($request->get('description')) {
+            return $this->view(
+                ['tokenName' => $token->getName(), 'newDescription' => $token->getDescription()],
+                Response::HTTP_ACCEPTED
+            );
+        }
 
         return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
     }
@@ -613,6 +622,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
+     * @param string $name
+     * @param DeploymentFacadeInterface $deployment
+     * @return View
+     * @throws ApiBadRequestException
+     * @throws ApiNotFoundException
+     * @throws ApiUnauthorizedException
      */
     public function deploy(
         string $name,
@@ -655,6 +670,13 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\Post("/{name}/contract/update", name="token_contract_update", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="address", allowBlank=false)
      * @Rest\RequestParam(name="code", nullable=true)
+     * @param string $name
+     * @param ParamFetcherInterface $request
+     * @param ContractHandlerInterface $contractHandler
+     * @return View
+     * @throws ApiBadRequestException
+     * @throws ApiNotFoundException
+     * @throws ApiUnauthorizedException
      */
     public function contractUpdate(
         string $name,
@@ -673,7 +695,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         try {
             if (!$this->validateEthereumAddress($request->get('address'))) {
-                throw new InvalidAddressException();
+                throw new InvalidAddressException('Invalid Ethereum address');
             }
 
             $contractHandler->updateMintDestination($token, $request->get('address'));
@@ -697,6 +719,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /**
      * @Rest\View()
      * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
+     * @param string $name
+     * @param BalanceHandlerInterface $balanceHandler
+     * @param MarketHandlerInterface $marketHandler
+     * @return View
+     * @throws ApiNotFoundException
      */
     public function soldOnMarket(
         string $name,
@@ -724,6 +751,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /**
      * @Rest\View()
      * @Rest\Get("/{name}/check-token-name-exists", name="check_token_name_exists", options={"expose"=true})
+     * @param string $name
+     * @return View
      */
     public function checkTokenNameExists(string $name): View
     {
@@ -735,19 +764,19 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /**
      * @Rest\View()
      * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
+     * @param string $name
+     * @return View
      */
     public function checkTokenNameBlacklistAction(string $name): View
     {
-        return $this->view(['blacklisted' => $this->checkTokenNameBlacklist($name)], Response::HTTP_OK);
+        return $this->view(
+            ['blacklisted' => $this->blacklistManager->isBlacklistedToken($name)],
+            Response::HTTP_OK
+        );
     }
 
     private function validateEthereumAddress(string $address): bool
     {
-        return $this->startsWith($address, '0x') && 42 === strlen($address);
-    }
-
-    private function startsWith(string $haystack, string $needle): bool
-    {
-        return substr($haystack, 0, strlen($needle)) === $needle;
+        return 0 === strpos($address, '0x') && (42 === strlen($address));
     }
 }

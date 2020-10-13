@@ -55,6 +55,7 @@
                         Two Factor Authentication Code:
                     </label>
                     <input
+                        autocomplete="off"
                         v-model="code"
                         type="text"
                         id="twofactor"
@@ -80,12 +81,15 @@
                         :disabled="$v.$anyError || withdrawing"
                         @click="onWithdraw">
                         Withdraw
-                    </button>
-                    <span
-                        class="btn-cancel pl-3 c-pointer"
-                        @click="onCancel">
+                    </button>&nbsp;
+                    <button
+                        class="btn-cancel pl-3 c-pointer bg-transparent"
+                        @click="onCancel"
+                        @keyup.enter="onCancel"
+                        tabindex="0"
+                    >
                         <slot name="cancel">Cancel</slot>
-                    </span>
+                    </button>
                 </div>
             </div>
         </template>
@@ -98,7 +102,7 @@ import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
 
 export default {
     name: 'WithdrawModal',
@@ -141,7 +145,7 @@ export default {
             );
 
             return toMoney(
-                amount.add(amount.greaterThanOrEqualTo(this.fee) ? this.fee : 0).toString(),
+                amount.add(this.fee).toString(),
                 this.subunit
             );
         },
@@ -246,6 +250,10 @@ export default {
                 ),
                 addressFirstSymbol:
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
+            },
+            code: {
+              required,
+              twoFACode,
             },
         };
     },

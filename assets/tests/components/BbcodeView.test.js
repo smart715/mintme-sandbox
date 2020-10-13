@@ -37,7 +37,7 @@ describe('BbcodeView', () => {
             propsData: {value: '[url=foo]bar[/url]'},
         });
 
-        expect(wrapper.vm.parsedValue).toBe('<a rel="nofollow" target="_blank" href="https://foo">bar</a>');
+        expect(wrapper.vm.parsedValue).toBe('<a rel="noopener" target="_blank" href="https://foo">bar</a>');
     });
 
     it('parse bbcode li', () => {
@@ -52,7 +52,7 @@ describe('BbcodeView', () => {
     it('parse bbcode not allowed tags', () => {
         const wrapper = shallowMount(BbcodeView, {
             localVue: mockVue(),
-            propsData: {value: '<div>bar</div>'},
+            propsData: {value: '<button>bar</button>'},
         });
 
         expect(wrapper.vm.parsedValue).toBe('bar');

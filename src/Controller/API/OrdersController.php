@@ -9,7 +9,6 @@ use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
-use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
 use App\Wallet\Money\MoneyWrapper;
@@ -32,9 +31,6 @@ class OrdersController extends AbstractFOSRestController
     private const PENDING_OFFSET = 100;
     private const WALLET_OFFSET = 20;
 
-    /** @var TraderInterface */
-    private $trader;
-
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
@@ -45,12 +41,10 @@ class OrdersController extends AbstractFOSRestController
     private $userActionLogger;
 
     public function __construct(
-        TraderInterface $trader,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger
     ) {
-        $this->trader = $trader;
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
@@ -61,8 +55,11 @@ class OrdersController extends AbstractFOSRestController
      * @Rest\RequestParam(name="orderData", allowBlank=false, description="array of orders ids")
      * @Rest\View()
      */
-    public function cancelOrders(Market $market, ParamFetcherInterface $request): View
-    {
+    public function cancelOrders(
+        Market $market,
+        ParamFetcherInterface $request,
+        ExchangerInterface $exchanger
+    ): View {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
@@ -84,7 +81,7 @@ class OrdersController extends AbstractFOSRestController
                 ""
             );
 
-            $this->trader->cancelOrder($order);
+            $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
         }
 

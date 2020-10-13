@@ -149,7 +149,6 @@ class RegistrationController extends FOSRegistrationController
         /** @var User $user */
         $user = $this->userManager->createUser();
         $user->setEnabled(true);
-
         $event = new GetResponseUserEvent($user, $request);
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch($event, FOSUserEvents::REGISTRATION_INITIALIZE);
@@ -161,6 +160,7 @@ class RegistrationController extends FOSRegistrationController
         $form->setData($user);
 
         $form->handleRequest($request);
+        $user->getProfile()->setNextReminderDate(new \DateTime('+1 month'));
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {

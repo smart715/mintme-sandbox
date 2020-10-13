@@ -56,6 +56,11 @@ class ProfileController extends Controller
             );
         }
 
+        if (null === $profile->getDescription() || '' == $profile->getDescription()) {
+            $profile->setNumberOfReminder(0);
+            $profile->setNextReminderDate(new \DateTime('+1 month'));
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
 
@@ -129,6 +134,7 @@ class ProfileController extends Controller
             '\2',
             $profileDescription
         ) ?? '';
+        $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
         return $this->render('pages/profile.html.twig', [
             'token' => $profile->getToken(),

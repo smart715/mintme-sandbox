@@ -210,4 +210,10 @@ class TokenManager implements TokenManagerInterface
             ? $token->getUser()
             : null;
     }
+
+
+    public function findAllTokensWithEmptyDescription(int $param = 14): ?array
+    {
+        return $this->repository->findAllTokensWithEmptyDescription($param);
+    }
 }

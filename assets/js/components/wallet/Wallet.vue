@@ -26,21 +26,20 @@
                 </template>
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
-                        <div class="d-flex flex-row c-pointer pl-2"
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
-                            </div>
-                        </div>
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                        </button>
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
                             @click="openWithdraw(
                                         data.item.name,
@@ -48,16 +47,14 @@
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div>
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
                             </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
-                            </div>
-                        </div>
+                        </button>
                     </div>
                 </template>
             </b-table>
@@ -111,23 +108,23 @@
                 <template v-slot:cell(action)="data">
                     <div
                         v-if="data.item.deployed"
-                        class="row pl-2">
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                        class="row pl-2"
+                    >
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
-                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)">
-                            <div>
+                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)"
+                        >
+                            <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
                             </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Deposit</span>
-                            </div>
-                        </div>
-                        <div
-                            class="d-flex flex-row c-pointer pl-2"
+                        </button>
+                        <button
+                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
                             :class="{'text-muted': data.item.blocked}"
                             @click="openWithdraw(
                                         data.item.name,
@@ -138,39 +135,48 @@
                                         data.item.blocked)"
                         >
                             <div>
+                                <div class="text-white hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                </div>
                             </div>
-                            <div>
-                                <span class="pl-2 text-xs align-middle">Withdraw</span>
-                            </div>
-                        </div>
+                        </button>
                     </div>
                 </template>
             </b-table>
         </div>
-        <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2">Create <a :href="createTokenUrl">your own token</a></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        You have not bought tokens yet. Find favorite content creators or
-                        famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
-                        Start trading now.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
+                <thead>
+                    <tr>
+                        <th class="first-field">Name</th>
+                        <th class="field-table">Amount</th>
+                        <th >&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="first-field">
+                            <div class="truncate-name">
+                                Create <a :href="createTokenUrl">your own token</a>
+                            </div>
+                        </td>
+                        <td class="field-table">&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            You have not bought tokens yet. Find favorite content creators or
+                            famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
+                            Start trading now.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <withdraw-modal
             :visible="showModal"
             :currency="selectedCurrency"

@@ -14,8 +14,6 @@ class BlacklistManager implements BlacklistManagerInterface
     /** @var EntityManagerInterface */
     private $em;
 
-    private const EMAIL_TYPE = "email";
-
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
@@ -26,25 +24,92 @@ class BlacklistManager implements BlacklistManagerInterface
         $this->repository = $repository;
     }
 
-    public function isBlacklisted(string $value, string $type, bool $sensetive = true): bool
-    {
-        if (self::EMAIL_TYPE === $type) {
-            return $this->isBlackListedEmail($value, $sensetive);
-        }
-
-        return $this->repository->matchValue($value, $type, $sensetive);
-    }
-
-    private function isBlackListedEmail(string $email, bool $sensetive): bool
+    public function isBlackListedEmail(string $email, bool $sensitive = false): bool
     {
         $domain = substr($email, strrpos($email, '@') + 1);
 
-        return $this->repository->matchValue($domain, self::EMAIL_TYPE, $sensetive);
+        return $this->repository->matchValue($domain, Blacklist::EMAIL, $sensitive);
     }
 
-    public function addToBlacklist(string $value, string $type, bool $flush = true): void
+    public function isBlackListedToken(string $token, bool $sensitive = false): bool
     {
-        $this->add(utf8_encode($value), $type);
+        $token = trim($token);
+
+        $matches = [];
+        preg_match("/(\w+)[-\s]+(\w+)/", $token, $matches);
+        array_shift($matches);
+
+        $blacklistedNames = array_merge(
+            $this->getList(Blacklist::TOKEN),
+            $this->getList(Blacklist::CRYPTO_NAME),
+            $this->getList(Blacklist::CRYPTO_SYMBOL)
+        );
+
+        $firstMatch = false;
+        $secondMatch = false;
+
+        foreach ($blacklistedNames as $blacklistedName) {
+            $value = $blacklistedName->getValue();
+            $type = $blacklistedName->getType();
+
+            if (Blacklist::CRYPTO_SYMBOL === $type) {
+                return $this->repository->matchValue($token, Blacklist::CRYPTO_SYMBOL, $sensitive);
+            }
+
+            if ($this->nameMatches($token, $value)) {
+                return true;
+            }
+
+            if (isset($matches[0]) && $this->nameMatches($matches[0], $value)) {
+                if ($secondMatch) {
+                    return true;
+                }
+
+                $firstMatch = true;
+            }
+
+            if (isset($matches[1]) && $this->nameMatches($matches[1], $value)) {
+                if ($firstMatch) {
+                    return true;
+                }
+
+                $secondMatch = true;
+            }
+        }
+
+        return false;
+    }
+
+    public function add(string $value, string $type, bool $flush = true): void
+    {
+        $this->em->persist(new Blacklist(utf8_encode($value), $type));
+
+        if ($flush) {
+            $this->em->flush();
+        }
+    }
+
+    public function bulkAdd(array $values, string $type, int $batchSize = 1000): void
+    {
+        $index = 0;
+
+        foreach ($values as $value) {
+            $index++;
+            $this->em->persist(new Blacklist(utf8_encode($value), $type));
+
+            if ($index >= $batchSize) {
+                $this->em->flush();
+                $this->em->clear();
+            }
+        }
+
+        $this->em->flush();
+        $this->em->clear();
+    }
+
+    public function bulkDelete(string $type, bool $flush = true): void
+    {
+        $this->repository->bulkDelete($type);
 
         if ($flush) {
             $this->em->flush();
@@ -63,8 +128,9 @@ class BlacklistManager implements BlacklistManagerInterface
         ]);
     }
 
-    private function add(string $value, string $type): void
+    private function nameMatches(string $name, string $val): bool
     {
-        $this->em->persist(new Blacklist($value, $type));
+        return false !== stripos($name, $val)
+            && (strlen($name) - strlen($val)) <= 1;
     }
 }

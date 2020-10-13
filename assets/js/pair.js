@@ -11,6 +11,7 @@ import {NotificationMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
+import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
 
 new Vue({
@@ -35,6 +36,7 @@ new Vue({
       retryCountLimit: 15,
       tokenAddress: null,
       posts: null,
+      postFromUrl: null,
     };
   },
   components: {
@@ -54,6 +56,15 @@ new Vue({
     let divEl = document.createElement('div');
     let tabsEl = document.querySelectorAll('.nav.nav-tabs');
 
+    this.postFromUrl = (/(?:posts#)(\d+)/g.exec(window.location.href) || [])[1] || null;
+    if (this.postFromUrl !== null) {
+        // Prevent browser from restoring previous scroll height (if page was raloaded)
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+        document.getElementById(this.postFromUrl).scrollIntoView();
+    }
+
     divEl.className = 'tabs-left-margin-container';
     document.getElementsByClassName('tabs-wrapper')[0].insertBefore(divEl, tabsEl[0]);
 
@@ -61,8 +72,28 @@ new Vue({
     if (aux && aux.$attrs['showsuccess']) {
         this.notifySuccess('Token has been created successfully');
     }
+
+    let tokenName = this.tokenName;
+    if (tokenName) {
+      tokenName = tokenName.replace(/\s/g, '-');
+      document.addEventListener('DOMContentLoaded', () => {
+        let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
+        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
+        let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
+        let donateLink = document.querySelectorAll('a.token-donate-tab-link')[0];
+        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
+      });
+    }
   },
   methods: {
+    ...mapMutations('makeOrder', [
+      'setUseBuyMarketPrice',
+      'setBuyAmountInput',
+      'setSubtractQuoteBalanceFromBuyAmount',
+    ]),
     fetchAddress: function() {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
@@ -149,6 +180,22 @@ new Vue({
     },
     coalesce: function(a, b) {
       return null !== a ? a : b;
+    },
+    goToTrade: function(amount) {
+      this.tabIndex= 1;
+      this.setUseBuyMarketPrice(true);
+      this.setBuyAmountInput(amount);
+      this.setSubtractQuoteBalanceFromBuyAmount(true);
+    },
+  },
+  computed: {
+    ...mapGetters('makeOrder', [
+      'getQuoteBalance',
+    ]),
+  },
+  watch: {
+    getQuoteBalance: function() {
+      this.updatePosts();
     },
   },
   store,

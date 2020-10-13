@@ -52,6 +52,7 @@
       thead
         th:first-child
           display: table-cell !important
+
       tbody
         tr
           td:first-child
@@ -69,7 +70,7 @@
   ul.nav .token-avatar-left
     margin-left: 132px
     background: transparent
-    z-index: 99
+    z-index: 1
     @media(max-width: 1199px)
       margin-left: 128px
 
@@ -77,13 +78,13 @@
       margin-left: 112px
 
     @media(max-width: 767px)
-      margin-left: 0px
+      margin-left: 0
 
     a
       background: transparent
 
   .token-avatar
-    z-index: 9
+    z-index: 1
     min-width: 0
     margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
@@ -98,8 +99,9 @@
 
     .token-avatar-link
       position: absolute
-      top: 0%
+      top: 0
       left: 2%
+
       img
         width: 126px
 
@@ -134,9 +136,13 @@
       .current-token-name
         margin-bottom: -3px
         font-size: 25px
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        display: block
 
         @include media-breakpoint-down(md)
-          margin-bottom: -3px !important
+          margin-bottom: -2px !important
         @include media-breakpoint-down(sm)
           margin-bottom: 5px !important
         @include media-breakpoint-down(xs)
@@ -155,7 +161,8 @@
 
     .market-filter
       margin-top: 8px
-      padding-right: 0px !important
+      padding-right: 0 !important
+
 .card-title
   padding-top: 1rem
 
