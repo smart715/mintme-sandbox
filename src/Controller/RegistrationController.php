@@ -267,9 +267,10 @@ class RegistrationController extends FOSRegistrationController
         }
 
         $refCode = $request->cookies->get('referral-code');
+        $token = $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken();
 
-        if ($refCode && $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken()) {
-            return $this->redirectToRoute("token_show", ["name" => $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken()->getName()]);
+        if ($refCode && $token) {
+            return $this->redirectToRoute("token_show", ["name" => $token->getName()]);
         }
 
         return parent::confirmedAction($request);
