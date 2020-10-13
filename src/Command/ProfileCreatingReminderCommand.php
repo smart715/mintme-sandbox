@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\ProfileManager;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,13 +29,21 @@ class ProfileCreatingReminderCommand extends Command
     /** @var ProfileManager */
     protected $profileManager;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public const REMINDER_INTERVAL = [1, 2, 3, 6, 6, 6, 12, 12, 12, 12, 12, 12, 12, 12];
 
-    public function __construct(EntityManagerInterface $em, MailerInterface $mailer, ProfileManager $profileManager)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        MailerInterface $mailer,
+        ProfileManager $profileManager,
+        LockFactory $lockFactory
+    ) {
         $this->profileManager = $profileManager;
         $this->em = $em;
         $this->mailer = $mailer;
+        $this->lockFactory = $lockFactory;
         parent::__construct();
     }
 
@@ -47,9 +56,13 @@ class ProfileCreatingReminderCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $lock = $this->lockFactory->createLock('profile-creating-reminder');
 
+        if (!$lock->acquire()) {
+            return 0;
+        }
 
-        $profiles= $this->profileManager->findAllProfilewithEmptyDescription();
+        $profiles = $this->profileManager->findAllProfileWithEmptyDescriptionAndNotAnonymous();
 
         foreach ($profiles as $p) {
             if (null === $p->getNextReminderDate()) {
@@ -70,6 +83,7 @@ class ProfileCreatingReminderCommand extends Command
         $this->em->flush();
         $io = new SymfonyStyle($input, $output);
         $io->success('Done.');
+        $lock->release();
 
         return 0;
     }
