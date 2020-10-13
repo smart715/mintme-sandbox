@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\UserManagerInterface as UserManager;
+use App\Manager\UserManagerInterface as UserManagerLocal;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -59,14 +59,14 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var UserManager */
+    /** @var UserManagerLocal */
     private $userManagerLocal;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
-        UserManager $userManagerLocal,
+        UserManagerLocal $userManagerLocal,
         TokenStorageInterface $tokenStorage,
         BonusManagerInterface $bonusManager,
         BalanceHandlerInterface $balanceHandler,
