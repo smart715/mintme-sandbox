@@ -5,8 +5,9 @@ Encore
 
     .setPublicPath('/build')
 
+    .addEntry('api', './assets/js/api.js')
     .addEntry('main', './assets/js/main.js')
-    .addEntry('home', './assets/js/home.js')
+    .addEntry('base_main', './assets/js/base_main.js')
     .addEntry('trading', './assets/js/trading.js')
     .addEntry('profile', './assets/js/profile.js')
     .addEntry('wallet', './assets/js/wallet.js')
@@ -19,8 +20,10 @@ Encore
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
     .addEntry('mail', './assets/scss/mail.sass')
+    .addEntry('concord-bold', './assets/fonts/Concord-Bold.ttf')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
+    .addEntry('show_post', './assets/js/show_post.js')
 
     .enablePostCssLoader()
 

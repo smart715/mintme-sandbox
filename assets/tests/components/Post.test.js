@@ -11,6 +11,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -48,23 +49,6 @@ describe('Post', () => {
         expect(wrapper.find('bbcode-view-stub').html()).toContain('foo');
     });
 
-    it('shows link to sign up or log in if post.content is null and loggedIn is false', () => {
-        const localVue = mockVue();
-        const testPost2 = Object.assign({}, testPost);
-        testPost2.content = null;
-
-        const wrapper = shallowMount(Post, {
-            localVue,
-            propsData: {
-                post: testPost2,
-                showEdit: false,
-                loggedIn: false,
-            },
-        });
-
-        expect(wrapper.find('p').html()).toContain('To see this post you need to <a href="login">log in</a> or <a href="register">sign up</a>.');
-    });
-
     it('shows message to go to trade to buy tokens if post.content is null and loggedIn is true', () => {
         const localVue = mockVue();
         const testPost2 = Object.assign({}, testPost);
@@ -79,7 +63,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('p').html()).toContain('To see this post you need to have <a href="#">0 tok</a> in your balance. Visit trade page and create buy order to get required tokens.');
+        expect(wrapper.find('p').html()).toContain('post.logged_in.1 <a href="#">0 tok</a> post.logged_in.2');
     });
 
     it('shows edit and delete icons if showEdit is true', () => {
@@ -106,7 +90,7 @@ describe('Post', () => {
             },
         });
 
-        expect(wrapper.find('.post-edit-icon').exists()).toBe(false);
+        expect(wrapper.find('.icon-edit').exists()).toBe(false);
         expect(wrapper.find('.delete-icon').exists()).toBe(false);
     });
 });

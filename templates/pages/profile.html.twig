@@ -8,11 +8,11 @@
 
 {% block title %}
     {% if profile.anonymous %}
-        {{ profile.nickname }}'s profile | mintMe
+        {{ profile.nickname }}'s {% trans %}page.profile.title{% endtrans %} | mintMe
     {% else %}
         {{ profile.nickname }}
         {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
-         profile | mintMe
+         {% trans %}page.profile.title{% endtrans %} | mintMe
     {% endif %}
 {% endblock %}
 
@@ -37,15 +37,19 @@
                     </div>
                     <div class="card-body position-relative">
                         {%- if (canEdit == true) -%}
-                            <a @click="showEditForm = true" class="edit-icon">
+                            <a  @click="showEditForm = true"
+                                @keyup.enter="showEditForm = true"
+                                class="edit-icon"
+                                tabindex="0"
+                            >
                                 <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-default" v-if="!showEditForm"></font-awesome-icon>
                             </a>
-                        {%- endif -%}
-                        {%- if (profile.anonymous == true) -%}
+                        {% endif %}
+                        {% if (profile.anonymous == true) %}
                             <div v-if="!showEditForm">
-                                This profile is private
+                                {% trans %}page.profile.is_private{% endtrans %}
                             </div>
-                        {%- else -%}
+                        {% else %}
                             <div v-if="!showEditForm" class="row mr-1">
                             <div class="col-12">
                                 <div class="float-left mr-2" style="max-width: 50%;">
@@ -58,29 +62,29 @@
                                 </div>
                                 {% if profile.firstname is not empty %}
                                     <div class="pb-1">
-                                        Full name: {{ profile.firstname() }} {{ profile.lastname() }}
+                                        {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
                                     </div>
                                 {% endif %}
                                 {% if profile.country is not empty %}
                                     <div class="pb-1">
-                                        Country: {{ profile.getCountryFullName() }}
+                                        {% trans %}page.profile.form.country{% endtrans %} {{ profile.getCountryFullName() }}
                                     </div>
                                 {% endif %}
                                 {% if show_full_data_in_profile %}
                                     <div class="pb-1">
                                         {% if profile.city is not empty %}
-                                            City: {{ profile.city }}
+                                            {% trans %}page.profile.form.city{% endtrans %} {{ profile.city }}
                                         {% endif %}
                                     </div>
                                     <div class="pb-1">
                                         {% if profile.zipCode is not empty %}
-                                            ZIP code: {{ profile.zipCode }}
+                                            {% trans %}page.profile.form.zip_code{% endtrans %} {{ profile.zipCode }}
                                         {% endif %}
                                     </div>
                                 {% endif %}
                                 {% if token is not empty %}
                                     <div class="pb-1">
-                                        <div>Token:</div>
+                                        <div>{% trans %}page.profile.form.token{% endtrans %}</div>
                                         <a class="word-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
                                     </div>
                                 {% endif %}
@@ -89,9 +93,9 @@
                                 <bbcode-view value="{{ profile.description }}"></bbcode-view>
                             </div>
                         </div>
-                        {%- endif -%}
+                        {% endif %}
 
-                        {%- if (canEdit == true) -%}
+                        {% if (canEdit == true) %}
                             <div v-show="showEditForm" v-cloak>
                             {{ form_start(form) }}
                             <div class="row mb-3">
@@ -100,10 +104,10 @@
                                         {% include 'form/nickname_field.html.twig' %}
                                     </div>
                                     <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center">
-                                        Minimum length must be 2
+                                        {% trans %}page.profile.error.nickname.min{% endtrans %}
                                     </div>
                                     <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center">
-                                        Nickname can contain only latin letters and numbers
+                                        {% trans %}page.profile.error.nickname.letters_numbers{% endtrans %}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.firstName, {'attr':
@@ -116,13 +120,13 @@
                                         }) }}
                                     </div>
                                     <div v-cloak="$v.firstName" v-show="!$v.firstName.required" class="text-danger text-center">
-                                        First Name have to be filled whether the last name is filled
+                                        {% trans %}page.profile.error.fn.required{% endtrans %}
                                     </div>
                                     <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
-                                        First name can contain only letters, ` and -
+                                        {% trans %}page.profile.error.fn.letters{% endtrans %}
                                     </div>
                                     <div v-cloak="$v.firstName" v-if="firstNameAux" class="text-danger text-center">
-                                        First name must have at least 2 letters
+                                        {% trans %}page.profile.error.fn.min_letters{% endtrans %}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.lastName, {'attr':
@@ -135,13 +139,13 @@
                                         }) }}
                                     </div>
                                     <div v-cloak="$v.lastName" v-if="!$v.lastName.required" class="text-danger text-center">
-                                        Last Name have to be filled whether the first name is filled
+                                        {% trans %}page.profile.error.ln.required{% endtrans %}
                                     </div>
                                     <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
-                                        Last name can contain only letters, ` and -
+                                        {% trans %}page.profile.error.ln.letters{% endtrans %}
                                     </div>
                                     <div v-cloak="$v.lastName" v-if="lastNameAux" class="text-danger text-center">
-                                        Last name must have at least 2 letters
+                                        {% trans %}page.profile.error.ln.min_letters{% endtrans %}
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.country, {'attr':
@@ -162,10 +166,10 @@
                                             }) }}
                                         </div>
                                         <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
-                                            City can contain only letters, ` and -
+                                            {% trans %}page.profile.error.city.letters{% endtrans %}
                                         </div>
                                         <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
-                                            City must have at least 2 letters
+                                            {% trans %}page.profile.error.city.min_letters{% endtrans %}
                                         </div>
                                         <div class="pb-1">
                                             {{ form_row(form.zipCode, {'attr':
@@ -183,14 +187,14 @@
                                             v-cloak="$v.zipCode"
                                             class="text-danger text-center"
                                         >
-                                            Zip code can contain only letters, numbers, spaces and dashes
+                                            {% trans %}page.profile.error.zip_code.contain{% endtrans %}
                                         </div>
                                         <div
                                             v-else-if="!zipCodeValid"
                                             v-cloak="$v.zipCode"
                                             class="text-danger text-center"
                                         >
-                                            Zip code is not valid for selected country
+                                            {% trans %}page.profile.error.zip_code.not_valid{% endtrans %}
                                         </div>
 
                                         <div
@@ -198,7 +202,7 @@
                                             v-cloak="$v.zipCode"
                                             class="text-danger text-center"
                                         >
-                                            Zip code cannot consist only of spaces
+                                            {% trans %}page.profile.error.zip_code.consist{% endtrans %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -218,11 +222,10 @@
                                         {{ form_label(form.anonymous) }}
                                         <guide>
                                             <template slot="header">
-                                                Private profile
+                                                {% trans %}page.profile.guide.header{% endtrans %}
                                             </template>
                                             <template slot="body">
-                                                If you turn this on, no one will be able to see your personal data
-                                                when visiting your profile, only your nickname.
+                                                {% trans %}page.profile.guide.body{% endtrans %}
                                             </template>
                                         </guide>
                                     </div>
@@ -233,12 +236,20 @@
                                     type="submit"
                                     :disabled="disableSave"
                                     class="btn btn-primary"
-                                    value="Save">
-                                <a href="{{ path('profile') }}" @click="showEditForm = false" class="btn-cancel pl-3" >Cancel</a>
+                                    value="{% trans %}page.profile.save{% endtrans %}"
+                                >
+                                <span
+                                    class="btn-cancel pl-3 c-pointer"
+                                    @click="showEditForm = false"
+                                    @keyup.enter="showEditForm = false"
+                                    tabindex="0"
+                                >
+                                    <slot name="cancel">{% trans %}page.profile.cancel{% endtrans %}</slot>
+                                </span>
                             </div>
                             {{ form_end(form) }}
                         </div>
-                        {%- endif -%}
+                        {% endif %}
                     </div>
                     <input type="hidden" ref="editFormShowFirst" value="{{ editFormShowFirst }}"/>
                 </div>

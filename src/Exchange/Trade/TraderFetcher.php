@@ -5,6 +5,7 @@ namespace App\Exchange\Trade;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Config\Config;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TraderFetcher implements TraderFetcherInterface
 {
@@ -24,10 +25,14 @@ class TraderFetcher implements TraderFetcherInterface
     /** @var Config */
     private $config;
 
-    public function __construct(JsonRpcInterface $jsonRpc, Config $config)
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(JsonRpcInterface $jsonRpc, Config $config, TranslatorInterface $translator)
     {
         $this->jsonRpc = $jsonRpc;
         $this->config = $config;
+        $this->translator = $translator;
     }
 
     public function placeOrder(
@@ -55,14 +60,14 @@ class TraderFetcher implements TraderFetcherInterface
                 $referralFee,
             ]);
         } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED);
+            return new TradeResult(TradeResult::FAILED, $this->translator);
         }
 
         if ($response->hasError()) {
             return $this->getPlaceOrderErrorResult($response->getError()['code']);
         }
 
-        return new TradeResult(TradeResult::SUCCESS);
+        return new TradeResult(TradeResult::SUCCESS, $this->translator);
     }
 
     public function cancelOrder(int $userId, string $marketName, int $orderId): TradeResult
@@ -74,14 +79,14 @@ class TraderFetcher implements TraderFetcherInterface
                 $orderId,
             ]);
         } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED);
+            return new TradeResult(TradeResult::FAILED, $this->translator);
         }
 
         if ($response->hasError()) {
             return $this->getCancelOrderErrorResult($response->getError()['code']);
         }
 
-        return new TradeResult(TradeResult::SUCCESS);
+        return new TradeResult(TradeResult::SUCCESS, $this->translator);
     }
 
     public function getFinishedOrders(
@@ -135,8 +140,8 @@ class TraderFetcher implements TraderFetcherInterface
         ];
 
         return array_key_exists($errorCode, $errorMapping)
-            ? new TradeResult($errorMapping[$errorCode])
-            : new TradeResult(TradeResult::FAILED);
+            ? new TradeResult($errorMapping[$errorCode], $this->translator)
+            : new TradeResult(TradeResult::FAILED, $this->translator);
     }
 
     private function getPlaceOrderErrorResult(int $errorCode): TradeResult
@@ -147,7 +152,7 @@ class TraderFetcher implements TraderFetcherInterface
         ];
 
         return array_key_exists($errorCode, $errorMapping)
-            ? new TradeResult($errorMapping[$errorCode])
-            : new TradeResult(TradeResult::FAILED);
+            ? new TradeResult($errorMapping[$errorCode], $this->translator)
+            : new TradeResult(TradeResult::FAILED, $this->translator);
     }
 }

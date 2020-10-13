@@ -2,14 +2,14 @@
     <div>
         <div class="card">
             <div class="card-header">
-                Trade History
+                {{ $t('trade.history.header') }}
                 <span class="card-header-icon">
                     <guide>
                         <template slot="header">
-                            Trade History
+                            {{ $t('trade.history.guide_header') }}
                         </template>
                         <template slot="body">
-                            List of last closed orders for {{ market.base.symbol|rebranding }}.
+                            {{ $t('trade.history.guide_body', {baseSymbol: market.base.symbol}) | rebranding }}
                         </template>
                     </guide>
                 </span>
@@ -26,19 +26,19 @@
 
                             <template v-slot:head(pricePerQuote)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    Price per {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
                                 </span>
                                 <span v-else>
-                                    Price per {{ market.quote | rebranding }}
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding }}
                                 </span>
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} amount
+                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} {{ $t('trade.history.amount') }}
                                 </span>
                                  <span v-else>
-                                    {{ market.quote | rebranding }} amount
+                                    {{ market.quote | rebranding }} {{ $t('trade.history.amount') }}
                                 </span>
                             </template>
 
@@ -48,7 +48,7 @@
                                         <img
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
-                                            alt="avatar">
+                                            :alt="this.$t('avatar')">
                                         <span class="d-inline-block truncate-name flex-grow-1">
                                             <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                                 {{ row.value }}
@@ -86,7 +86,7 @@
                             </template>
                         </b-table>
                         <div v-if="!hasOrders">
-                            <p class="text-center p-5">No deal was made yet</p>
+                            <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
                         </div>
                         <div v-if="loading" class="p-1 text-center">
                             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
@@ -138,15 +138,15 @@ export default {
             fields: [
                 {
                     key: 'type',
-                    label: 'Type',
+                    label: this.$t('trade.history.type'),
                 },
                 {
                     key: 'orderMaker',
-                    label: 'Order maker',
+                    label: this.$t('trade.history.order_maker'),
                 },
                 {
                     key: 'orderTrader',
-                    label: 'Order taker',
+                    label: this.$t('trade.history.order_taker'),
                 },
                 {
                     key: 'pricePerQuote',
@@ -158,12 +158,12 @@ export default {
                 },
                 {
                     key: 'baseAmount',
-                    label: this.rebrandingFunc(this.market.base.symbol) + ' amount',
+                    label: this.rebrandingFunc(this.market.base.symbol) + this.$t('trade.history.amount'),
                     formatter: formatMoney,
                 },
                 {
                     key: 'dateTime',
-                    label: 'Date & Time',
+                    label: this.$t('trade.history.time'),
                 },
             ],
         };

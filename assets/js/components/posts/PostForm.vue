@@ -6,11 +6,11 @@
         <div class="card-body">
             <div class="form-group">
                 <label for="amount">
-                    Required amount of tokens:
+                    {{ $t('post_form.require_amount') }}
                 </label>
                 <guide>
                     <template slot="body">
-                        You can restrict view for this post or leave 0. User will need to own required amount of your tokens to see this post.
+                        {{ $t('post_form.body') }}
                     </template>
                 </guide>
                 <input class="form-control form-control-lg w-100"
@@ -43,12 +43,12 @@
                 :disabled="submitting || $v.$invalid"
                 @click="savePost"
             >
-                Save
+                {{ $t('save') }}
             </button>
             <button class="btn btn-cancel"
                 @click="cancel"
             >
-                Cancel
+               {{ $t('cancel') }}
             </button>
         </div>
     </div>
@@ -100,7 +100,7 @@ export default {
             content: this.post.content,
             amount: toMoney(this.post.amount),
             minContentLength: 2,
-            maxContentLength: 500,
+            maxContentLength: 1000,
             maxDecimals: 4,
             maxAmount: 999999.9999,
             contentError: false,
@@ -119,13 +119,13 @@ export default {
                 return this.contentErrorMessage;
             }
             if (!this.$v.content.required) {
-                return 'Content can\'t be empty or contain only bbcodes and whitespaces';
+                return this.$t('post_form.msg.empty');
             }
             if (!this.$v.content.minLength) {
-                return `Content must be at least ${this.minContentLength} characters long`;
+              return this.$t('post_form.msg.min_length', {minContentLength: this.minContentLength});
             }
             if (!this.$v.content.maxLength) {
-                return `Content can't be more than ${this.maxContentLength} characters long`;
+                return this.$t('post_form.msg.max_length', {maxContentLength: this.maxContentLength});
             }
 
             return '';
@@ -138,16 +138,16 @@ export default {
                 return this.amountErrorMessage;
             }
             if (!this.$v.amount.required) {
-                return 'Amount is required';
+                return this.$t('post_form.msg.amount.required');
             }
             if (!this.$v.amount.decimal) {
-                return 'Amount must be a numeric value';
+                return this.$t('post_form.msg.amount.numeric');
             }
             if (!this.$v.amount.maxDecimals) {
-                return `Amount can only have at most ${this.maxDecimals} decimals`;
+                return this.$t('post_form.msg.amount.max_decimals', {maxDecimals: this.maxDecimals});
             }
             if (!this.$v.amount.between) {
-                return `Amount must be between 0 and ${this.maxAmount}`;
+                return this.$t('post_form.msg.amount.between', {maxAmount: this.maxAmount});
             }
 
             return '';

@@ -21,7 +21,7 @@
                             transform="shrink-4 up-1.5"
                             @click="editingUrls = !editingUrls"
                         />
-                        <a :href="profileUrl">Visit token's creator profile</a>
+                        <a :href="profileUrl">{{ $t('token.intro.profile.visit') }}</a>
                     </div>
                     <div v-show="editingUrls" class="pb-1 pt-4 flex-grow-1 mb-2">
                         <token-website-address
@@ -97,7 +97,7 @@
                                     </div>
                                 </social-sharing>
                                 <social-sharing
-                                    :title="twitterDescription"
+                                    :title="this.$t('token.intro.profile.twitter_description')"
                                     :description="description"
                                     :quote="description"
                                     hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
@@ -123,7 +123,7 @@
                                 </social-sharing>
                             </b-dropdown>
                             <div class="tooltip-static tooltip-static-left">
-                                Do you want this token to grow? Spread the word!
+                                {{ $t('token.intro.profile.join_us') }}
                             </div>
                         </div>
                         <div class="row">
@@ -132,7 +132,7 @@
                                     v-if="currentTelegram || currentDiscord"
                                     class="d-inline-block mx-2 mb-1"
                                 >
-                                    Join us on:
+                                    {{ $t('token.intro.profile.join_us') }}
                                 </span>
                                 <div class="row justify-content-start pl-4">
                                     <a
@@ -170,7 +170,7 @@
                         v-if="isTokenDeployed"
                         class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto"
                     >
-                        <strong class="mr-2">Token contract address:</strong>
+                        <strong class="mr-2">{{ $t('token.intro.profile.contract_address') }}</strong>
                         <span>{{ tokenContractAddress }}</span>
                         <copy-link
                             class="c-pointer"
@@ -180,10 +180,10 @@
                         </copy-link>
                         <guide>
                             <template slot="header">
-                                Token contract address
+                                {{ $t('token.intro.profile.contract_address.header') }}
                             </template>
                             <template slot="body">
-                                Unique token contract address, created when token is deployed to blockchain. It's required when adding token to MintMe Wallet application.
+                                {{ $t('token.intro.profile.contract_address.body') }}
                             </template>
                         </guide>
                     </div>
@@ -269,7 +269,7 @@ export default {
     },
     computed: {
         description: function() {
-           return this.twitterDescription + this.tokenUrl;
+           return this.$t('token.intro.profile.twitter_description') + this.tokenUrl;
         },
         editingUrlsIcon: function() {
             return this.editingUrls ? 'times' : 'edit';

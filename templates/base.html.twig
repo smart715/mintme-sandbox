@@ -6,7 +6,7 @@
 <html lang="en">
     <head>
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+            <link rel="stylesheet" href="{{ asset('build/base_main.css') }}">
             {% block pagestyles %}{% endblock %}
         {% endblock %}
         {% block head %}{% endblock %}
@@ -21,7 +21,7 @@
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
         {% block body %}
-            <div onload="document.body.classList.remove('hidden')" class="content-wrapper hidden d-flex flex-column {% block contentclass %}{% endblock %}">
+            <div class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
                 {% block header %}
                     {% include 'topnav.html.twig' %}
                 {% endblock %}
@@ -49,7 +49,11 @@
             </div>
         {% endblock %}
         {% block javascripts %}
-            {% include 'scripts.html.twig' %}
+            {% include 'base_scripts.html.twig' %}
+            {% if (app.request.attributes.get('_route') != 'homepage') %}
+                {% include 'scripts.html.twig' %}
+            {% endif %}
+
             {% block pagescripts %}{% endblock %}
         {% endblock %}
     </body>

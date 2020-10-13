@@ -46,6 +46,11 @@
 <meta name="twitter:creator" content="Mintme">
 
 <style>
+    @font-face {
+        font-family: 'ConcordBold';
+        src: url({{ asset('build/fonts/Concord-Bold.ttf') }}) format('truetype');
+    }
+
     body {
         background-color: #0c1a29;
     }
@@ -56,6 +61,7 @@
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_tracking_id }}"></script>
+
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

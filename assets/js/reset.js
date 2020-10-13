@@ -1,7 +1,9 @@
 import Passwordmeter from './components/PasswordMeter';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
     el: '#reset',
+    i18n,
     components: {Passwordmeter},
     data: {
         password: '',

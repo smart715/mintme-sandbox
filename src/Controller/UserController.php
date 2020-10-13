@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\ApiKey;
-use App\Entity\Token\Token;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
 use App\Exchange\Config\DeployCostConfig;
@@ -50,7 +49,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     private $normalizer;
 
     /** @var TokenManager */
-    private $token;
+    private $tokenManager;
 
     public function __construct(
         UserManagerInterface $userManager,
@@ -58,14 +57,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
         NormalizerInterface $normalizer,
-        TokenManager $token
+        TokenManager $tokenManager
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->normalizer = $normalizer;
-        $this->token = $token;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -113,7 +112,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         string $userToken,
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
-        $token =$this->token->findByName($userToken);
+        $token =$this->tokenManager->findByName($userToken);
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)

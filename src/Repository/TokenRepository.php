@@ -66,14 +66,14 @@ class TokenRepository extends EntityRepository
     /** @codeCoverageIgnore */
     public function findAllTokensWithEmptyDescription(int $numberOfReminder = 14): ?array
     {
-
         $query = $this->createQueryBuilder('t')
             ->select('t, p, u')
             ->innerJoin('t.profile', 'p', 't.profile = p.id')
             ->innerJoin('p.user', 'u', 'u.id = p.user')
-            ->where('t.description is null')
+            ->where('t.description is null or p.description = :emptyString')
             ->andWhere('t.numberOfReminder <> :numberOfReminder')
             ->andWhere('t.nextReminderDate = :nextReminderDate OR t.nextReminderDate is null')
+            ->setParameter('emptyString', '')
             ->setParameter('numberOfReminder', $numberOfReminder)
             ->setParameter('nextReminderDate', \Date('Y-m-d'));
 

@@ -39,9 +39,9 @@
                 <a href="{{ path('homepage') }}">MintMe</a>
                 &gt;
                 {% if(app.request.headers.get('referer') == app.request.headers.get('url')) %}
-                    <a href="{{ path('sonata_news_home') }}">News</a>
+                    <a href="{{ path('sonata_news_home') }}">{% trans %}page.news.title{% endtrans %}</a>
                 {% else %}
-                    <a href="{{ app.request.headers.get('referer') }}">News</a>
+                    <a href="{{ app.request.headers.get('referer') }}">{% trans %}page.news.title{% endtrans %}</a>
                 {% endif %}
             </div>
         </div>

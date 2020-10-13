@@ -12,6 +12,7 @@ class OrderFilterConfig implements ArrayAccess
         'end_time' => 0,
         'offset' => 0,
         'limit' => 100,
+        'interval' => '0',
         'side' => 'all',
     ];
 

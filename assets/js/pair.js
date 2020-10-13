@@ -13,10 +13,12 @@ import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
   el: '#token',
   mixins: [NotificationMixin],
+  i18n,
   data() {
     return {
       tabIndex: 0,
@@ -70,12 +72,13 @@ new Vue({
 
     let aux = this.$refs['tokenAvatar'];
     if (aux && aux.$attrs['showsuccess']) {
-        this.notifySuccess('Token has been created successfully');
+        this.notifySuccess(this.$t('page.pair.token_created'));
     }
 
     let tokenName = this.tokenName;
-    tokenName = tokenName.replace(/\s/g, '-');
-    document.addEventListener('DOMContentLoaded', () => {
+    if (tokenName) {
+      tokenName = tokenName.replace(/\s/g, '-');
+      document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
         introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
@@ -84,7 +87,8 @@ new Vue({
         donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
         postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
-    });
+      });
+    }
   },
   methods: {
     ...mapMutations('makeOrder', [
@@ -99,7 +103,7 @@ new Vue({
             this.tokenAddress = response.data.address;
           }
         }, (error) => {
-            this.notifyError('An error has occurred, please try again later');
+            this.notifyError(this.$t('toasted.error.try_later'));
         });
     },
     checkTokenDeployment: function() {
@@ -115,14 +119,14 @@ new Vue({
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
-                this.notifyError('The token could not be deployed, please try again later');
+                this.notifyError(this.$t('toasted.error.can_not_be_deployed'));
                 this.tokenPending = false;
                 this.tokenDeployed = false;
                 clearInterval(this.deployInterval);
             }
           })
           .catch((error) => {
-            this.notifyError('An error has occured, please try again later');
+            this.notifyError(this.$t('toasted.error.try_later'));
           });
       }, 60000);
     },

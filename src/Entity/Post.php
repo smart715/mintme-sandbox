@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use App\Validator\Constraints\PositiveAmount;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -33,7 +34,7 @@ class Post
      * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
-     *     max = 500,
+     *     max = 1000,
      * )
      * @var string
      */
@@ -63,6 +64,13 @@ class Post
      * @var string
      */
     protected $amount = '0';
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY")
+     * @ORM\OrderBy({"likeCount" = "DESC"})
+     * @var ArrayCollection
+     */
+    protected $comments;
 
     /**
      * @Groups({"Default", "API"})
@@ -156,5 +164,25 @@ class Post
     public function getAuthor(): ?Profile
     {
         return $this->getToken()->getProfile();
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getCommentsCount(): int
+    {
+        return $this->comments->count();
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments->toArray();
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        $this->comments->add($comment);
+
+        return $this;
     }
 }

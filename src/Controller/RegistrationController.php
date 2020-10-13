@@ -61,6 +61,7 @@ class RegistrationController extends FOSRegistrationController
 
     /** @var UserManager */
     private $userManagerLocal;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,

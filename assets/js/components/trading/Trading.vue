@@ -3,7 +3,7 @@
         <div class="card card-fixed-large mx-auto mb-3">
             <div class="card-body p-0">
                 <div class="card-header">
-                    <span>MINTME Markets</span>
+                    <span>{{ $t('trading.mintme_markets') }}</span>
                 </div>
                 <template v-if="marketsOnTopIsLoaded">
                     <div class="row coin-markets">
@@ -34,10 +34,10 @@
                                 </div>
                             </a>
                             <div class="d-inline-block align-middle market-data">
-                                <span>30d Volume</span>
+                                <span>{{ $t('trading.table.volume_30d') }}</span>
                                 <span class="float-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
-                                <span>24h Volume</span>
+                                <span>{{ $t('trading.table.volume_24h') }}</span>
                                 <span class="float-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
                             </div>
                         </div>
@@ -53,7 +53,7 @@
         <div class="card card-fixed-large mx-auto">
             <div class="card-body p-0">
                 <div class="token-trading-title card-header d-flex flex-wrap align-items-center px-0 pb-0">
-                    <span class="px-3 pb-2 mr-auto">Tokens</span>
+                    <span class="px-3 pb-2 mr-auto">{{ $t('trading.tokens') }}</span>
                     <div>
                         <b-dropdown
                                 id="currency"
@@ -63,18 +63,18 @@
                         >
                             <template slot="button-content">
                                 <span v-if="showUsd">
-                                    USD
+                                    {{ $t('trading.currency.usd') }}
                                 </span>
                                 <span v-else>
-                                    Crypto
+                                    {{ $t('trading.currency.crypto') }}
                                 </span>
                             </template>
                             <template>
                                 <b-dropdown-item @click="toggleUsd(false)">
-                                    Crypto
+                                    {{ $t('trading.currency.crypto') }}
                                 </b-dropdown-item>
                                 <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                                    USD
+                                    {{ $t('trading.currency.usd') }}
                                 </b-dropdown-item>
                             </template>
                         </b-dropdown>
@@ -103,7 +103,7 @@
                     </div>
                 </div>
                 <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
-                    <span class="float-left">{{ tokensCount }} tokens | Market Cap: {{ globalMarketCap | formatMoney }}</span>
+                    <span class="float-left">{{ tokensCount }} {{ $t('trading.tokens_and_market_cap') }} {{ globalMarketCap | formatMoney }}</span>
                 </div>
                 <template v-if="loaded">
                     <div class="trading-table table-responsive text-nowrap">
@@ -233,7 +233,7 @@
                                             <img :src="row.item.baseImage" alt="deployed">
                                         </template>
                                         <template slot="body">
-                                            This token exists on the blockchain.
+                                            {{ $t('trading.exist_on_blockchain_guide') }}
                                         </template>
                                     </guide>
                                 </div>
@@ -243,18 +243,18 @@
                     <template v-if="!tableLoading">
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key && !tokens.length">
                             <div class="row justify-content-center">
-                                <p class="text-center p-5">No one deployed tokens yet</p>
+                                <p class="text-center p-5">{{ $t('trading.no_one_deployed') }}</p>
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && !tokens.length">
                             <div class="row justify-content-center">
-                                <p class="text-center p-5">No any token yet</p>
+                                <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
                         && tokens.length">
                             <div class="row justify-content-center">
-                                <b-link @click="toggleFilter('all')">Show all tokens</b-link>
+                                <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
                         </template>
                     </template>
@@ -281,7 +281,14 @@
 import _ from 'lodash';
 import Guide from '../Guide';
 import Avatar from '../Avatar';
-import {FiltersMixin, WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {
+  FiltersMixin,
+  WebSocketMixin,
+  MoneyFilterMixin,
+  RebrandingFilterMixin,
+  NotificationMixin,
+  LoggerMixin,
+} from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
@@ -292,7 +299,14 @@ const DEPLOYED_ONLY = 2;
 
 export default {
     name: 'Trading',
-    mixins: [WebSocketMixin, FiltersMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         page: Number,
         tokensCount: Number,
@@ -340,41 +354,40 @@ export default {
                 options: {
                     deployed: {
                         key: 'deployed',
-                        label: 'Deployed tokens',
+                        label: this.$t('trading.deployed.label'),
                     },
                     all: {
                         key: 'all',
-                        label: 'All tokens',
+                        label: this.$t('trading.all_tokens.label'),
                     },
                     user: {
                         key: 'user',
-                        label: 'Tokens I own',
+                        label: this.$t('trading.own_tokens.label'),
                     },
                 },
             },
             volumes: {
                 day: {
                     key: 'dayVolume',
-                    label: '24H Volume',
-                    help: 'The amount of crypto that has been traded in the last 24 hours.',
+                    label: this.$t('trading.day_volume.label'),
+                    help: this.$t('trading.day_volume.help'),
                 },
                 month: {
                     key: 'monthVolume',
-                    label: '30d Volume',
-                    help: 'The amount of crypto that has been traded in the last 30 days.',
+                    label: this.$t('trading.month_volume.label'),
+                    help: this.$t('trading.month_volume.help'),
                 },
             },
             marketCapOptions: {
                 marketCap: {
                     key: 'marketCap',
-                    label: 'Market Cap',
-                    help: 'Market cap based on max supply of 10 million tokens.',
+                    label: this.$t('trading.market_cap.label'),
+                    help: this.$t('trading.market_cap.help'),
                 },
                 buyDepth: {
                     key: 'buyDepth',
-                    label: 'Buy Depth',
-                    help: 'Buy depth is amount of buy orders in MINTME on each market. This might better represent ' +
-                    'token market size than marketcap.',
+                    label: this.$t('trading.buy_depth.label'),
+                    help: this.$t('trading.buy_depth.help'),
                 },
             },
         };
@@ -414,17 +427,17 @@ export default {
             return {
                 pair: {
                     key: 'pair',
-                    label: 'Market',
+                    label: this.$t('trading.fields.pair'),
                     sortable: true,
                     class: 'pair-cell-trading',
                 },
                 change: {
                     key: 'change',
-                    label: 'Change',
+                    label: this.$t('trading.fields.change'),
                     sortable: true,
                 },
                 lastPrice: {
-                    label: 'Last Price',
+                    label: this.$t('trading.fields.last_price'),
                     key: 'lastPrice' + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: formatMoney,
@@ -460,11 +473,14 @@ export default {
             return pair.indexOf('/') !== -1;
         },
         toggleFilter: function(value) {
+            let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
+                && (value === this.marketFilters.options.deployed.key || value === this.marketFilters.options.all.key)
+                && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
             this.sortBy = '';
             this.sortDesc = true;
-            this.updateMarkets(1, true);
+            this.updateMarkets(page, true);
         },
         toggleUsd: function(show) {
             this.showUsd = show;
@@ -586,7 +602,7 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update the markets data. Try again later.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_markets_data'));
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
@@ -838,7 +854,7 @@ export default {
                     })
                     .catch((err) => {
                         this.$emit('disable-usd');
-                        this.notifyError('Error fetching exchange rates for cryptos. Selecting USD as currency might not work');
+                        this.notifyError(this.$t('toasted.error.fetching_exchange_rates'));
                         this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                         reject();
                     });
@@ -866,7 +882,7 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update MINTME circulation supply. BTC/MINTME market cap might not be accurate.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });

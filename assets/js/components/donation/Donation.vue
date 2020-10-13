@@ -5,18 +5,18 @@
                 <div class="card h-100">
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
-                            <span v-if="loggedIn">Donations</span>
-                            <span v-else>To make a donation you have to be logged in</span>
+                            <span v-if="loggedIn">{{ $t('donation.header.logged') }}</span>
+                            <span v-else>{{ $t('donation.header.not_logged') }}</span>
                         </div>
                         <div class="card-body donation-body">
                             <div v-if="loggedIn" class="h-100">
                                 <div>
                                     <div>
-                                        <p class="info">Donation is non-refundable</p>
+                                        <p class="info">{{ $t('donation.nonrefund') }}</p>
                                     </div>
                                     <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
                                         <div class="col">
-                                            <p class="mb-2">Currency</p>
+                                            <p class="mb-2">{{ $t('donation.currency') }}</p>
                                             <b-dropdown
                                                 id="donation_currency"
                                                 :text="dropdownText"
@@ -36,7 +36,7 @@
                                             v-if="isCurrencySelected"
                                             class="col"
                                         >
-                                            <p class="mb-2">Your balance:</p>
+                                            <p class="mb-2">{{ $t('donation.balance') }}</p>
                                             <span v-if="balanceLoaded" class="d-block">
                                                 {{ balance | toMoney(currencySubunit) | formatMoney }}
                                             </span>
@@ -48,10 +48,10 @@
                                             />
                                             <div v-if="insufficientFunds">
                                                 <span class="d-block text-danger font-size-90">
-                                                    Insufficient funds for donation,
+                                                    {{ $t('donation.insufficient_funds') }}
                                                 </span>
                                                 <span class="d-block">
-                                                    please make <a :href="getDepositLink">deposit</a> first
+                                                    {{ $t('donation.make') }} <a :href="getDepositLink">{{ $t('donation.deposit') }}</a> {{ $t('donation.first') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -61,7 +61,7 @@
                                         class="w-100"
                                     >
                                         <div>
-                                            <label for="amount-to-donate">Amount:</label>
+                                            <label for="amount-to-donate">{{ $t('donation.amount') }}</label>
                                             <div class="input-group">
                                                 <input
                                                     v-model="amountToDonate"
@@ -83,10 +83,10 @@
                                             <div
                                                 v-if="insufficientFundsError"
                                                 class="w-100 mt-1 text-danger">
-                                                Minimum amount of {{ donationCurrency }} {{ currencyMinAmount }}.
+                                                {{ $t('donation.min_amount', {donationCurrency:donationCurrency, currencyMinAmount:currencyMinAmount}) }}
                                             </div>
                                             <p class="mt-2 mb-4 text-nowrap">
-                                                You will receive approximately:
+                                                {{ $t('donation.receive') }}
                                                 <font-awesome-icon
                                                     v-if="donationChecking"
                                                     icon="circle-notch"
@@ -102,20 +102,20 @@
                                                         :max-width="'200px'"
                                                     >
                                                         <template slot="body">
-                                                            The number of tokens you will receive may vary slightly, because of other traders' activity.
+                                                            {{ $t('donation.diff_number') }}
                                                         </template>
                                                     </guide>
                                                 </span>
                                             </p>
                                         </div>
                                         <div>
-                                            <p class="mb-2">Fee for donation: {{ donationParams.fee }}%</p>
+                                            <p class="mb-2">{{ $t('donation.fee', {fee: donationParams.fee}) }}</p>
                                             <button
                                                 :disabled="buttonDisabled"
                                                 @click="showConfirmationModal"
                                                 class="btn btn-primary btn-donate"
                                             >
-                                                Donate {{ donationCurrency }}
+                                              {{ $t('donation.donate') }} {{ donationCurrency }}
                                             </button>
                                             <confirm-modal
                                                 :visible="showModal"
@@ -124,13 +124,9 @@
                                                 @cancel="cancelDonation"
                                                 @close="showModal = false">
                                                 <p class="text-white modal-title pt-2 pb-4">
-                                                    Amount donated exceeds the worth of tokens available for sell.
-                                                    You can continue or cancel and adjust donation amount.
-                                                    Alternatively, you could ask token creator to set more sell orders on the market and then retry donation.
+                                                    {{ $t('donation.modal.1') }}
                                                     <br />
-                                                    Do you want to donate {{ amountToDonate }} {{ donationCurrency }}
-                                                    for {{ amountToReceive }} {{ market.quote.name }}
-                                                    worth {{ tokensWorth | toMoney(currencySubunit) | formatMoney }} {{ donationCurrency }}?
+                                                    {{ $t('donation.modal.2', translationsContext) }}
                                                 </p>
                                                 <template v-slot:confirm>Continue</template>
                                             </confirm-modal>
@@ -138,10 +134,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="!loginFormLoaded" class="p-5 text-center">
-                                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                            </div>
-                            <div v-if="!loggedIn" ref="tab-login-form-container"></div>
+                            <Register v-if="!loggedIn"
+                            :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                            ></Register>
                         </div>
                     </div>
                 </div>
@@ -162,8 +157,9 @@ import {
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
+import Register from '../Register';
 import Decimal from 'decimal.js';
-import {toMoney} from '../../utils';
+import {formatMoney, toMoney} from '../../utils';
 import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
 
 export default {
@@ -179,6 +175,7 @@ export default {
     components: {
         Guide,
         ConfirmModal,
+        Register,
     },
     props: {
         market: Object,
@@ -194,7 +191,6 @@ export default {
                 ethSymbol,
             },
             selectedCurrency: null,
-            loginFormLoaded: false,
             amountToDonate: 0,
             amountToReceive: 0,
             tokensWorth: 0,
@@ -208,6 +204,13 @@ export default {
         };
     },
     computed: {
+        translationsContext: function() {
+          return {
+            amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
+            amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
+            worth: formatMoney(toMoney(this.tokensWorth, this.currencySubunit)),
+          };
+        },
         donationCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
@@ -222,7 +225,7 @@ export default {
         dropdownText: function() {
             return this.isCurrencySelected
                 ? this.donationCurrency
-                : 'Select currency';
+                : this.$t('donation.currency.select');
         },
         currencySubunit: function() {
             return btcSymbol === this.selectedCurrency
@@ -266,11 +269,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.loggedIn) {
-            this.loadLoginForm();
-        } else {
-            this.loginFormLoaded = true;
-
+        if (this.loggedIn) {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
                 params: [this.market.identifier],
@@ -283,7 +282,6 @@ export default {
                 }
             });
         }
-
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
@@ -292,27 +290,6 @@ export default {
                 this.balanceLoaded = false;
                 this.selectedCurrency = newCurrency;
             }
-        },
-        loadLoginForm: function() {
-            this.$axios.retry.get(this.$routing.generate('login', {
-                formContentOnly: true,
-            }))
-                .then((res) => {
-                    this.$refs['tab-login-form-container'].innerHTML = res.data;
-                    this.loginFormLoaded = true;
-
-                    let captchaContainer = document.querySelector('.g-recaptcha');
-                    let googleRecaptchaSiteKey = this.googleRecaptchaSiteKey;
-                    grecaptcha.ready(function() {
-                        grecaptcha.render(captchaContainer, {
-                            'sitekey': googleRecaptchaSiteKey,
-                        });
-                    });
-                })
-                .catch((error) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
-                    this.sendLogs('error', 'Can not load tab content.', error);
-                });
         },
         getTokenBalance: function() {
             this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))

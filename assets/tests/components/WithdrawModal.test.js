@@ -15,6 +15,7 @@ function mockVue() {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -92,12 +93,12 @@ describe('WithdrawModal', () => {
         expect(wrapper.emitted('close').length).toBe(1);
     });
 
-    it('emit "cancel" and "close" when clicking on span "Cancel"', () => {
+    it('emit "cancel" and "close" when clicking on button "Cancel"', () => {
         const wrapper = shallowMount(WithdrawModal, {
             propsData: propsForTestCorrectlyRenders,
             localVue: mockVue(),
         });
-        wrapper.find('span.btn-cancel.pl-3.c-pointer').trigger('click');
+        wrapper.find('button.btn-cancel.pl-3.c-pointer').trigger('click');
         expect(wrapper.emitted('cancel').length).toBe(1);
         expect(wrapper.emitted('close').length).toBe(1);
     });

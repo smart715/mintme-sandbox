@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Wallet | mintMe{% endblock %}
+{% block title %}{% trans %}page.wallet.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}wallet{% endblock %}
 
@@ -9,9 +9,15 @@
         {% if app.user.profile.token is not empty and app.user.profile.token.isBlocked or app.user.isBlocked %}
             <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
                 <h1>
-                    {% if app.user.isBlocked %} Account {% else %} Token {% endif %}
-                    was blocked.<br> Withdrawing or depositing
-                    {% if not app.user.isBlocked%} for token {% endif %} is unavailable
+                    {% if app.user.isBlocked %}
+                        {% trans %}page.wallet.account{% endtrans %}
+                    {% else %}
+                        {% trans %}page.wallet.token {% endtrans %}
+                    {% endif %}
+                    {% trans %}page.wallet.blocked{% endtrans %}
+                    {% if not app.user.isBlocked%}
+                        {% trans %}page.wallet.for{% endtrans %}
+                    {% endif %} {% trans %}page.wallet.unavailable{% endtrans %}
                 </h1>
             </div>
         {% endif %}
@@ -35,9 +41,13 @@
                             :deposit-more="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
                             :expiration-time="{{ withdraw_expiration_time }}"
+                            disabled-crypto="{{ disabledBlockchain | json_encode }}"
                             {% if app.user.isBlocked %}
                             is-user-blocked
                             {% endif %}
+                            coinify-ui-url="{{ global_coinify_ui_url }}"
+                            :coinify-partner-id="{{ global_partner_id }}"
+                            :coinify-crypto-currencies="{{ global_coinify_crypto_currencies | json_encode }}"
                         >
                         </wallet>
                     </b-tab>
