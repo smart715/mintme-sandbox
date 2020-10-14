@@ -1,4 +1,5 @@
 navbar.my_token: 'Мой токен'
+navbar.token_show_modal: 'Token settings'
 navbar.trading: Торговля
 navbar.wallet: Кошелек
 navbar.news: Новости

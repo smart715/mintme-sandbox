@@ -135,6 +135,13 @@
                                 <span>Settings</span>
                             </a>
                         </li>
+                        {% if app.user.profile.token %}
+                            <li class="nav-item align-self-center d-lg-none">
+                                <a href="{{ path('token_show_modal') }}" class="nav-link">
+                                    <span>{% trans %}navbar.token_show_modal{% endtrans %}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="nav-item align-self-center d-lg-none {{ route == 'fos_user_security_logout' ? 'active' : '' }}">
                             <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
@@ -186,6 +193,13 @@
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         {% trans %}navbar.settings{% endtrans %}
                                     </a>
+
+                                    {% if app.user.profile.token %}
+                                        <a class="dropdown-item" href="{{ path('token_show_modal') }}">
+                                            <span class="icon-token-drop-down float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                            {% trans %}navbar.token_show_modal{% endtrans %}
+                                        </a>
+                                    {% endif %}
                                     <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
                                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
                                         <span class="dropdown-item">
