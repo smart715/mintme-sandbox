@@ -2,7 +2,8 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use FOS\RestBundle\Controller\AbstractFOSRestController;
+use App\Controller\Dev\API\V1\DevApiController;
+use App\Exception\ApiNotFoundException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @Rest\Route(path="/dev/api/v2/auth/currencies")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
-class CurrenciesController extends AbstractFOSRestController
+class CurrenciesController extends DevApiController
 {
     /**
      * List currencies
@@ -82,9 +83,7 @@ class CurrenciesController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\CurrenciesController::getCurrency',
-            [
-                'name' => $name,
-            ]
+            ['name' => $name,]
         );
     }
 }
