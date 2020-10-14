@@ -40,7 +40,7 @@ tests_php:
       - node_modules/
       - vendor/
   tags:
-    - mintme-test
+    - mintme-tests
 
 tests_assets:
   stage: tests
@@ -55,7 +55,7 @@ tests_assets:
       - node_modules/
       - vendor/
   tags:
-    - mintme-test
+    - mintme-tests
 
 phpfunctional_tests:
   stage: tests
