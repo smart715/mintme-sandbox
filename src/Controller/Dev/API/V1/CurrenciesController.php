@@ -76,9 +76,11 @@ class CurrenciesController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Parameter(name="name", in="path", description="Currency name", type="string")
      * @SWG\Tag(name="Currencies")
+     * @throws ApiNotFoundException
      */
     public function getCurrency(string $name): Token
     {
+        $this->checkForDisallowedValues($name);
         $token = $this->tokenManager->findByName($name);
 
         if (!$token) {

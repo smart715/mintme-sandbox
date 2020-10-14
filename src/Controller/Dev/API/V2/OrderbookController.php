@@ -2,7 +2,9 @@
 
 namespace App\Controller\Dev\API\V2;
 
+use App\Controller\Dev\API\V1\DevApiController;
 use App\Controller\Traits\BaseQuoteOrderTrait;
+use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -19,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Rest\Route("/dev/api/v2/open/orderbook")
  */
-class OrderbookController extends AbstractFOSRestController
+class OrderbookController extends DevApiController
 {
 
     use BaseQuoteOrderTrait;
@@ -90,9 +92,10 @@ class OrderbookController extends AbstractFOSRestController
         $base = $marketPair[0] ?? '';
         $quote = $marketPair[1] ?? '';
 
+        $this->checkForDisallowedValues($base, $quote);
+
         $base = $this->rebrandingConverter->reverseConvert($base);
         $quote = $this->rebrandingConverter->reverseConvert($quote);
-
         $market = $this->marketFinder->find($base, $quote);
 
         if (!$market || !$this->marketStatusManager->isValid($market)) {
