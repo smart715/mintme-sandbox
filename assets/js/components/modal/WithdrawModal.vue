@@ -235,7 +235,7 @@ export default {
                 'code': this.code || null,
             })
             .then((response) => {
-                this.notifySuccess(this.$t('toasted.error.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
                 this.closeModal();
             })
             .catch((error) => {
