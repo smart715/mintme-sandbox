@@ -4,12 +4,12 @@
             <div class="text-center">
                 <div class="text-left">
                     <div class="text-left d-inline-block ml-api">
-                        {{ $t('api_keys.public_key')<br />
+                        {{ $t('api_keys.public_key') }}<br />
                             <span class="text-danger word-break">{{ keys.publicKey }}</span>
                             <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
                                 <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                             </copy-link><br />
-                            {{ $t('api_keys.private_key') }}:<br />
+                            {{ $t('api_keys.private_key') }}<br />
                             <div v-if="keys.plainPrivateKey">
                                 <template>
                                     <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
