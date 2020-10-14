@@ -59,7 +59,7 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var UserManager */
+    /** @var UserManagerLocal */
     private $userManagerLocal;
 
     public function __construct(
