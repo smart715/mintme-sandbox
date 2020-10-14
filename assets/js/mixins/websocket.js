@@ -51,9 +51,7 @@ export default {
                 }
 
                 if (!this.hash) {
-                    return reject(new Error(
-                        'Hash is not set. Can not authorize the user'
-                    ));
+                    return reject(new Error(this.$t('mixin.websocket.hash_not_set')));
                 }
 
                 this.addOnOpenHandler(this._authCallback);
@@ -68,9 +66,7 @@ export default {
                         if (result.error !== null ||
                             (result.result !== null && result.result.status !== 'success')) {
                             this._logoutClient(this.websocketUrl);
-                            return reject(new Error(
-                                'Failed to authorize current user. Server responded with fail status'
-                            ));
+                            return reject(new Error(this.$t('mixin.websocket.authorize_failed')));
                         }
 
                         this._authorizeClient(this.websocketUrl);

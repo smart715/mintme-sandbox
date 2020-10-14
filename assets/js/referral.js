@@ -1,8 +1,10 @@
 import CopyLink from './components/CopyLink';
 import {toMoney} from './utils';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
     el: '#referral',
+    i18n,
     components: {
         CopyLink,
     },

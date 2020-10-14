@@ -48,7 +48,7 @@
                     </template>
                 </b-table>
                 <div v-if="!hasOrders">
-                    <p class="text-center p-5">No order was added yet</p>
+                    <p class="text-center p-5">{{ $t('wallet.active_orders.no_order') }}</p>
                 </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
@@ -60,8 +60,7 @@
                     @confirm="removeOrder"
             >
                 <div class="pt-2">
-                    Are you sure that you want to remove {{ this.currentRow.name }}
-                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
+                    {{ $t('wallet.active_orders.confirm_body', translationsContext) }}
                 </div>
             </confirm-modal>
         </template>
@@ -120,19 +119,19 @@ export default {
             fields: {
                 date: {
                     key: 'date',
-                    label: 'Date',
+                    label: this.$t('wallet.active_orders.table.date'),
                     sortable: true,
                     type: 'date',
                 },
                 type: {
                     key: 'type',
-                    label: 'Type',
+                    label: this.$t('wallet.active_orders.table.type'),
                     sortable: true,
                     type: 'string',
                 },
                 name: {
                     key: 'name',
-                    label: 'Name',
+                    label: this.$t('wallet.active_orders.table.name'),
                     sortable: true,
                     formatter: (name) => {
                         return {
@@ -144,28 +143,33 @@ export default {
                 },
                 amount: {
                     key: 'amount',
-                    label: 'Amount',
+                    label: this.$t('wallet.active_orders.table.amount'),
                     sortable: true,
                     type: 'numeric',
                 },
                 price: {
                     key: 'price',
-                    label: 'Price',
+                    label: this.$t('wallet.active_orders.table.price'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
                 total: {
                     key: 'total',
-                    label: 'Total cost',
+                    label: this.$t('wallet.active_orders.table.total_cost'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
-                fee: {key: 'fee', label: 'Fee', sortable: true, type: 'numeric'},
+                fee: {
+                    key: 'fee',
+                    label: this.$t('wallet.active_orders.table.fee'),
+                    sortable: true,
+                    type: 'numeric',
+                },
                 action: {
                     key: 'action',
-                    label: 'Action',
+                    label: this.$t('wallet.active_orders.table.action'),
                     sortable: false,
                 },
             },
@@ -211,6 +215,13 @@ export default {
                 };
             });
         },
+        translationsContext: function() {
+            return {
+                name: this.currentRow.name || '-',
+                amount: this.currentRow.amount || 0,
+                price: this.currentRow.price || 0,
+            };
+        },
     },
     mounted: function() {
         Promise.all([
@@ -239,7 +250,7 @@ export default {
                 }, 'active-tableData-update');
             })
             .catch((err) => {
-                this.notifyError('Can not update order list now. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_update_order_list'));
                 this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
             });
     },
@@ -265,7 +276,7 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update orders history. Try again later.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_orders_history'));
                         this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });
@@ -295,7 +306,7 @@ export default {
         removeOrder: function() {
             this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
                 .catch((err) => {
-                    this.notifyError('Service unavailable, try again later');
+                    this.notifyError(this.$t('toasted.error.service_unavailable'));
                     this.sendLogs('error', 'Service unavailable. Can not remove orders', err);
                 });
         },

@@ -82,7 +82,12 @@ export default {
         computedChannel: function() {
             return this.currentChannelId
                 ? 'https://www.youtube.com/channel/' + this.currentChannelId
-                : 'Add Youtube channel';
+                : this.$t('token.youtube.empty_address');
+        },
+        translationsContext: function() {
+            return {
+                address: this.buildYoutubeUrl(this.currentChannelId),
+            };
         },
     },
     methods: {
@@ -105,7 +110,7 @@ export default {
                     .then((channelId) => {
                         this.saveYoutubeChannel(channelId);
                     }), (error) => {
-                        this.notifyInfo('Operation canceled');
+                        this.notifyInfo(this.$t('toasted.info.operation_canceled'));
                     });
         },
         deleteChannel: function() {
@@ -123,22 +128,24 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
-                        let message = channelId
-                            ? `Youtube channel saved as ${this.buildYoutubeUrl(channelId)}`
-                            : 'Youtube channel deleted';
-                        this.notifySuccess(message);
                         this.currentChannelId = channelId;
+                        this.notifySuccess(
+                            this.$t(
+                                'toasted.success.youtube.' + (this.currentChannelId ? 'added' : 'deleted'),
+                                this.translationsContext
+                            )
+                        );
                         this.$emit('saveYoutube', channelId);
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.notifyError('Network error');
+                        this.notifyError(this.$t('toasted.error.network'));
                         this.sendLogs('error', 'Save YouTube channel network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                         this.sendLogs('error', 'Can not save YouTube channel', error);
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                         this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })

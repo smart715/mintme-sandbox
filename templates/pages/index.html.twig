@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mint or create token, create coin, monetize yourself - blockchain crowdfunding MintMe!{% endblock %}
+{% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
 
 {% block bgclass %}index-bg{% endblock %}
 
@@ -13,19 +13,19 @@
                         <div class="col d-flex justify-content-center">
                             <div class="align-self-center pt-4 pt-md-0">
                                 <h1 class="title text-white">
-                                    Create your coin<br />Monetize yourself
+                                    {% trans %}page.index.promo.main{% endtrans %}
                                 </h1>
                                 <h2 class="tip pt-2 px-3 d-inline-block text-white">
-                                    MintMe is a crowdfunding platform where patrons<br /> also earn on their favorite influencer success.
+                                    {% trans %}page.index.promo.description{% endtrans %}
                                 </h2>
                                 <div class="py-sm-4">
                                 {% if not app.user %}
                                     <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('fos_user_registration_register') }}">
-                                        Register Now
+                                        {% trans %}page.index.promo.btn.register{% endtrans %}
                                     </a>
                                 {% else %}
                                     <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
-                                        Trade Now
+                                        {% trans %}page.index.promo.btn.trade{% endtrans %}
                                     </a>
                                 {% endif %}
                                 </div>
@@ -40,17 +40,14 @@
         <div class="container px-5">
             <div class="row justify-content-center pt-md-3 pb-3">
                 <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">HOW DOES IT WORK?</h3>
+                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_1.header{% endtrans %}</h3>
                 </div>
             </div>
 
             <div class="row justify-content-center">
                 <div class="col">
                     <p class="text-white text-center pb-4">
-                        Anyone can mint or create a token (coin) that represents themselves or a project that they have created for their fanbase and supporters to support them.<br />
-                        It helps content creators to realize their maximum potential through a new innovative way of crowdfunding. It's also a social platform where traders <br />
-                        can interact with token creators and other traders. Tokens are created (minted) on top of our custom decentralized blockchain called <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br />
-                        When you create coin or create token, you become an owner of your own financial future. Create a token, create a coin for your project or yourself or just trade other people coins.
+                        {% trans %}page.index.block_1.body{% endtrans %}
                     </p>
                 </div>
             </div>
@@ -59,22 +56,14 @@
         <div class="feature-boxes container px-5">
             <div class="row justify-content-center text-white text-center">
                 <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="Content creator Icon">
-                    <h4 class="mb-4">If you are a content creator</h4>
-                    <p>
-                        Make your token/coin with just few clicks<br/>
-                        Create an order to sell it on the market<br/>
-                        Encourage your followers to support you by buying your token
-                    </p>
+                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="{% trans %}img.creator{% endtrans %}">
+                    <h4 class="mb-4">{% trans %}page.index.block_2.section_1.header{% endtrans %}</h4>
+                    <p>{% trans %}page.index.block_2.section_1.body{% endtrans %}</p>
                 </div>
                 <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="Token trading Icon">
-                    <h4 class="mb-4">If you are a trader</h4>
-                    <p>
-                        Search for a promising content creator with potential for growth<br/>
-                        Buy his or her token to support the creator<br/>
-                        Trade the token once the Creator's value has increased
-                    </p>
+                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="{% trans %}img.tok_trading{% endtrans %}">
+                    <h4 class="mb-4">{% trans %}page.index.block_2.section_2.header{% endtrans %}</h4>
+                    <p>{% trans %}page.index.block_2.section_2.body{% endtrans %}</p>
                 </div>
             </div>
         </div>
@@ -82,7 +71,7 @@
         <div class="container pb-3">
             <div class="row justify-content-center pt-md-3">
                 <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">it's very easy!</h3>
+                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_3.header{% endtrans %}</h3>
                 </div>
             </div>
         </div>
@@ -90,27 +79,27 @@
         <div class="feature-boxes container px-5">
             <div class="row justify-content-center text-white">
                 <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="Create your token/coin">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="{% trans %}img.tok_easy_icon_1{% endtrans %}">
                     <p>
-                        Mint/create your token (coin) for free and encourage others to support YOU
+                        {% trans %}page.index.block_3.section_1{% endtrans %}
                     </p>
                 </div>
                 <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="Supporting favorite creators">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="{% trans %}img.tok_easy_icon_2{% endtrans %}">
                     <p>
-                        Earn and help by supporting your favorite creators early
+                        {% trans %}page.index.block_3.section_2{% endtrans %}
                     </p>
                 </div>
                 <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="Socializing creators and other traders on Mintme">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="{% trans %}img.tok_easy_icon_3{% endtrans %}">
                     <p>
-                        Socialize with creators and other traders directly on the platform
+                        {% trans %}page.index.block_3.section_3{% endtrans %}
                     </p>
                 </div>
                 <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="Earning from Mintme referral program">
+                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="{% trans %}img.tok_easy_icon_4{% endtrans %}">
                     <p>
-                        Earn through our generous referral program that gives you 50% of all transactional fees from each referred user
+                        {% trans %}page.index.block_3.section_4{% endtrans %}
                     </p>
                 </div>
             </div>
@@ -118,16 +107,20 @@
         <div class="container my-5">
             <div class="text-center text-responsive">
             {% if not app.user %}
-                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">Register Now</a>
+                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">
+                    {% trans %}page.index.block_4.btn.register{% endtrans %}
+                </a>
             {% else %}
-                <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">Trade Now</a>
+                <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
+                    {% trans %}page.index.block_4.btn.trade{% endtrans %}
+                </a>
             {% endif %}
             </div>
         </div>
         <div class="container mb-3">
             <div class="row justify-content-center">
                 <div class="col">
-                    <h3 class="text-uppercase text-white text-center mb-0 mt-4">FUELED BY MINTME COIN (MINTME)</h3>
+                    <h3 class="text-uppercase text-white text-center mb-0 mt-4">{% trans %}page.index.block_5.header{% endtrans %}</h3>
                 </div>
             </div>
         </div>
@@ -136,14 +129,14 @@
             <div class="border container bg-secondary">
                 <div class="row">
                     <div class="col-lg-5 py-4 d-flex centered">
-                        <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="mintme coin graphics">
+                        <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="{% trans %}img.webchain_graph{% endtrans %}">
                     </div>
                     <div class="col-lg-7 pb-3 pt-lg-5 pb-lg-5 px-0 text-center">
                         <a href="https://mintme.com/coin" target="_blank">
-                            <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="mintme coin">
+                            <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="{% trans %}img.webchain{% endtrans %}">
                         </a>
                         <p class="px-4 px-lg-5">
-                            MintMe exchange is based on our custom blockchain solution called MintMe.com Coin - smart contracts platform, created for the World Wide Web. Traders on our exchange will use MINTME to trade people tokens and on top of that all token creators who want to tokenize themselves, will be using MintMe Coin as base for their projects. This will guarantee real non-speculative demand for MintMe Coin.
+                            {% trans %}page.index.block_5.body{% endtrans %}
                         </p>
                     </div>
                 </div>
@@ -152,7 +145,7 @@
         <div class="container mb-3">
             <div class="row justify-content-center pt-md-3">
                 <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">FAQ'S</h3>
+                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.faq.header{% endtrans %}</h3>
                 </div>
             </div>
         </div>
@@ -162,84 +155,60 @@
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        When I create a coin, does it have any value?
+                        {% trans %}page.index.faq.q1.header{% endtrans %}
                     </span>
                         <span slot="body">
-                        Coins are as valuable as you make them, you give them the value because they are a tokenized representation of yourself or your project.
+                        {% trans %}page.index.faq.q1.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        I've created a token. How can I give it a real value?
+                        {% trans %}page.index.faq.q2.header{% endtrans %}
                     </span>
-                        <span slot="body">
-                        That's totally up to you. There are many ways to add value to your token. You may have
-                        a service that you offer in which you only accept payment in your token or you might want to
-                        create a reward system for your top supporters that hold a certain amount of your token.
-                        Get as creative as you want, you make the rules.
+                    <span slot="body">
+                        {% trans %}page.index.faq.q2.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        Why would I accept token instead of USD for my work?
+                        {% trans %}page.index.faq.q3.header{% endtrans %}
                     </span>
                         <span slot="body">
-                        To get money when you need it. You might need tools to start earning, but you have no money
-                        to buy them, so how to start? By allowing potential customers to judge your offer and decide
-                        if you are worth their trust. If your offer will be credible, they could purchase tokens that
-                        will be worth your service, this way you first get tools needed for your work and customers
-                        get the service they needed.
+                        {% trans %}page.index.faq.q3.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        Why would anyone believe in me or my coin?
+                        {% trans %}page.index.faq.q4.header{% endtrans %}
                     </span>
                         <span slot="body">
-                        Because you have developed a reputation for yourself that certainly has value. You are
-                        a valuable asset that can be tokenized as such on the MintMe platform. Your supporters
-                        might also feel more comfortable in being able to benefit later from supporting you now.
+                        {% trans %}page.index.faq.q4.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        Are there any guarantees when I buy other people’s tokens?
+                        {% trans %}page.index.faq.q5.header{% endtrans %}
                     </span>
                         <span slot="body">
-                        No, there are no guarantees when purchasing other people's tokens. The demand of each token
-                        will solely depend on the buying pressure that the creator generates for their token through
-                        the method of their choosing. There are no guarantees that a certain token will increase in
-                        value just because it was created. We will provide verification tools to check if web pages
-                        and social profiles presented by token creators are official, but we cannot guarantee that
-                        each creator follows through with what they promised or proposed. Honest, ethical and
-                        hard-working creators should eventually be rewarded with large liquid markets that they
-                        have created from zero intrinsic value.
+                        {% trans %}page.index.faq.q5.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>
                 <div class="row faq-block mx-0">
                     <faq-item>
                     <span slot="title">
-                        I'm really skeptical about this, what if a token creator is just trying to cheat me out of my money?
+                        {% trans %}page.index.faq.q6.header{% endtrans %}
                     </span>
                         <span slot="body">
-                        With all that has ensued in the markets as of late, we totally understand your concern.
-                        Please be mindful, that it is always important for you to thoroughly conduct proper research
-                        on all token creators you plan to support and never spend more than you are willing to lose.
-                        Also, keep in mind that this is a form of crowdfunding so it might not always be your intention
-                        to even recoup your money. You could simply use this service as a donation platform and keep
-                        your tokens as a souvenirs of proof of early support. You never know, maybe one day the token
-                        creator that received early support from you, might decide to show appreciation for his or her
-                        early supporters and decide to buy back all tokens at a much higher price? The possibilities
-                        are unlimited.
+                        {% trans %}page.index.faq.q6.body{% endtrans %}
                     </span>
                     </faq-item>
                 </div>

@@ -39,7 +39,9 @@
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">
+                                  {{ $t('wallet.deposit') }}
+                                </span>
                             </div>
                         </button>
                         <button
@@ -56,7 +58,9 @@
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
-                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">
+                                  {{ $t('wallet.withdraw') }}
+                                </span>
                             </div>
                         </button>
                     </div>
@@ -64,7 +68,7 @@
             </b-table>
         </div>
         <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-            Tokens you own
+            {{ $t('wallet.own_tokens') }}
         </div>
         <div class="text-center p-5" v-if="showLoadingIcon">
             <font-awesome-icon
@@ -124,7 +128,9 @@
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
                                 />
-                                <span class="pl-2 text-xs align-middle wallet-action-txt">Deposit</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">
+                                  {{ $t('wallet.deposit') }}
+                                </span>
                             </div>
                         </button>
                         <button
@@ -156,8 +162,8 @@
             <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
                 <thead>
                     <tr>
-                        <th class="first-field">Name</th>
-                        <th class="field-table">Amount</th>
+                        <th class="first-field">{{ $t('wallet.name') }}</th>
+                        <th class="field-table">{{ $t('wallet.amount') }}</th>
                         <th >&nbsp;</th>
                     </tr>
                 </thead>
@@ -165,7 +171,7 @@
                     <tr>
                         <td class="first-field">
                             <div class="truncate-name">
-                                Create <a :href="createTokenUrl">your own token</a>
+                              {{ $t('wallet.create_token_1') }} <a :href="createTokenUrl">{{ $t('wallet.create_token_2') }}</a>
                             </div>
                         </td>
                         <td class="field-table">&nbsp;</td>
@@ -173,9 +179,8 @@
                     </tr>
                     <tr>
                         <td colspan="3">
-                            You have not bought tokens yet. Find favorite content creators or
-                            famous person through search bar or visit <a :href="tradingUrl">trading page</a>.
-                            Start trading now.
+                            {{ $t('wallet.no_tokens_1') }} <a :href="tradingUrl">{{ $t('wallet.no_tokens_2') }}</a>
+                            {{ $t('wallet.no_tokens_3') }}
                         </td>
                     </tr>
                 </tbody>
@@ -278,14 +283,14 @@ export default {
                 delay: [100, 200],
             },
             predefinedTokenFields: [
-                {key: 'name', label: 'Name', class: 'first-field'},
-                {key: 'available', label: 'Amount', class: 'field-table'},
-                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
+                {key: 'name', label: this.$t('wallet.table.name'), class: 'first-field'},
+                {key: 'available', label: this.$t('wallet.table.available'), class: 'field-table'},
+                {key: 'action', label: this.$t('wallet.table.action'), class: 'field-table', sortable: false},
             ],
             tokenFields: [
-                {key: 'name', label: 'Name', class: 'first-field'},
-                {key: 'available', label: 'Amount', class: 'field-table'},
-                {key: 'action', label: 'Actions', class: 'field-table', sortable: false},
+                {key: 'name', label: this.$t('wallet.table.name'), class: 'first-field'},
+                {key: 'available', label: this.$t('wallet.table.available'), class: 'field-table'},
+                {key: 'action', label: this.$t('wallet.table.action'), class: 'field-table', sortable: false},
             ],
             withdraw: {
                 fee: '0',
@@ -350,20 +355,20 @@ export default {
                         })
                         .catch((err) => {
                             this.notifyError(
-                                'Can not connect to internal services'
+                                this.$t('toasted.error.can_not_connect')
                             );
                             this.sendLogs('error', 'Can not connect to internal services', err);
                         });
                 })
                 .catch((err) => {
-                    this.notifyError('Can not update tokens now. Try again later.');
+                    this.notifyError(this.$t('toasted.error.can_not_update_tokens'));
                     this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
             this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
                 .then((res) => this.depositAddresses = res.data)
                 .catch((err) => {
-                    this.notifyError('Can not update deposit data now. Try again later.');
+                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_data'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
                 }),
         ])
@@ -371,7 +376,7 @@ export default {
             this.openDepositMore();
         })
         .catch((err) => {
-            this.notifyError('Can not load Wallet data. Try again later.');
+            this.notifyError(this.$t('toasted.error.can_not_load_wallet_data'));
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
         });
     },
@@ -389,7 +394,7 @@ export default {
                 return;
             }
             if (!this.twofa) {
-                this.notifyInfo('Please enable 2FA before withdrawing');
+                this.notifyInfo(this.$t('toasted.info.enable_2fa_before'));
                 return;
             }
             this.showModal = true;
@@ -418,8 +423,8 @@ export default {
                 return;
             }
             this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
-                || 'Loading..';
-            this.depositDescription = `Send ${currency} to the address above.`;
+                || this.$t('wallet.loading');
+            this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
@@ -434,7 +439,7 @@ export default {
                     this.deposit.min = res.data.minDeposit ? toMoney(res.data.minDeposit, subunit) : undefined;
                 })
                 .catch((err) => {
-                    this.notifyError('Can not update deposit fee status. Try again later.');
+                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_fee_status'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 

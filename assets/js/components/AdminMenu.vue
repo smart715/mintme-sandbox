@@ -29,44 +29,44 @@ export default {
                     child: [
                         {
                             href: this.$routing.generate('hacker-toggle-info-bar'),
-                            title: 'Tester widget show/hide',
+                            title: this.$t('hacker_menu.tester_widget'),
                         },
                     ],
                 },
             authorizedMenu: [
                 {
                     header: true,
-                    title: 'HACKER MENU',
+                    title: this.$t('hacker_menu.title'),
                 },
                 {
-                    title: 'Permissions',
+                    title: this.$t('hacker_menu.permissions.title'),
                     icon: 'fa fa-anchor',
                     child: [
                         {
                             href: this.$routing.generate('hacker-set-role', {role: 'admin'}),
-                            title: 'Make me Admin',
+                            title: this.$t('hacker_menu.permissions.admin'),
                         },
                         {
                             href: this.$routing.generate('hacker-set-role', {role: 'user'}),
-                            title: 'Make me User',
+                            title: this.$t('hacker_menu.permissions.user'),
                         },
                     ],
                 },
                 {
-                    title: 'Crypto',
+                    title: this.$t('hacker_menu.crypto.title'),
                     icon: 'fa fa-cubes',
                     child: [
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'web'}),
-                            title: 'Add 100 MINTME',
+                            title: this.$t('hacker_menu.crypto.web'),
                         },
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'eth'}),
-                            title: 'Add 0.05 ETH',
+                            title: this.$t('hacker_menu.crypto.eth'),
                         },
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
-                            title: 'Add 0.001 BTC',
+                            title: this.$t('hacker_menu.crypto.btc'),
                         },
                     ],
                 },
@@ -74,7 +74,7 @@ export default {
             nonAuthorizedMenu: [
                 {
                     header: true,
-                    title: 'HACKER MENU',
+                    title: this.$t('hacker_menu.permissions.title'),
                 },
                 {
                     title: 'Quick Menu',
@@ -82,7 +82,7 @@ export default {
                     child: [
                         {
                             href: this.$routing.generate('quick-registration'),
-                            title: 'Quick registration',
+                            title: this.$t('hacker_menu.quick_registration'),
                         },
                     ],
                 },

@@ -4,6 +4,7 @@
 @import '~bootstrap-vue/src/index.scss'
 @import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
 @import '~vue-range-slider/dist/vue-range-slider'
+@import '~flag-icon-css/sass/flag-icon'
 @import url('https://fonts.googleapis.com/css?family=Lato')
 @import '~aos/dist/aos.css'
 @import '../fonts/AlphaCloud/AlphaCloud.css'
@@ -27,6 +28,7 @@
 @import 'sign-up-landing'
 @import 'spinner'
 @import 'posts'
+@import 'lang-menu'
 
 *, *:before, *:after
   box-sizing: inherit
@@ -1001,11 +1003,30 @@ meter
   meter[value="#{$i}"]::-moz-meter-bar
     background: nth($meterbg-list, $i)
 
+.top-50
+  top: 50% !important
+
 @media (min-width: 992px)
   .resetlabel
     position: absolute
     bottom: 1.2rem
     right: 1rem
+
+  .token-info-container
+    min-height: 370px
+
+    .posts-container
+      position: absolute
+      top: 0
+      bottom: 0
+
+    .read-more
+      position: absolute
+      background-color: $card-body-bg
+      bottom: 0
+      padding: 10px
+      width: 100%
+      text-align: center
 
 #token, #profile
   [v-cloak]

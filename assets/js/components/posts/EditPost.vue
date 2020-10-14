@@ -5,7 +5,7 @@
         @save-success="redirect"
         @cancel="redirect"
     >
-        <template v-slot:title>Edit Post</template>
+        <template v-slot:title>{{ $t('edit_post') }}</template>
     </post-form>
 </template>
 

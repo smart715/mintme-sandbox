@@ -18,7 +18,7 @@
                                 <tr style=" margin-bottom:0">
                                     <td>
                                         <div class="text-dark-white bg-black" style="text-align: center; margin-top: 20px; margin-bottom: 0;">
-                                            2018 - {{ "now"|date("Y") }} mintMe. All rights reserved
+                                            {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
                                         </div>
                                     </td>
                                 </tr>

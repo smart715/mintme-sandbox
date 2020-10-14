@@ -41,6 +41,7 @@ describe('TradeChart', () => {
                                 },
                             },
                         });
+                        Vue.prototype.$t = (val) => val;
                     },
                 });
 

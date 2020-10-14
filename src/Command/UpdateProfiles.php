@@ -15,8 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UpdateProfiles extends Command
 {
-    /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -68,22 +67,44 @@ class UpdateProfiles extends Command
             }
 
             $profile->setNickname(
-                substr(
-                    "{$profile->getFirstname()} {$profile->getLastname()}",
-                    0,
-                    30
-                )
+                $this->getNickname($profile)
             );
             $this->em->persist($profile);
+            $this->em->flush();
             $updatedUsers++;
         }
 
-        $this->em->flush();
         $progressBar->finish();
         $section->clear();
         $style->success("$updatedUsers users updated");
 
         return 0;
+    }
+
+    private function getNickname(Profile $profile, int $sequence = 0): string
+    {
+        $nickname = strtolower(
+            substr(
+                "{$profile->getFirstname()} {$profile->getLastname()}",
+                0,
+                30
+            )
+        );
+
+        $nickname .= $sequence ?: '';
+
+        if ($this->nicknameHasProfile($nickname)) {
+            return $this->getNickname($profile, ++$sequence);
+        }
+
+        return $nickname;
+    }
+
+    private function nicknameHasProfile(string $nickname): bool
+    {
+        return (bool)$this->getProfileRepository()->findBy([
+                'nickname' => $nickname,
+            ]);
     }
 
     private function getProfileRepository(): ProfileRepository
