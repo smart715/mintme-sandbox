@@ -433,7 +433,9 @@ export default {
             }
         }, 'trade-sell-order-asset');
 
-        window.matchMedia('(min-width: 992px) and (max-width: 1199px), (max-width: 575px)').addEventListener('change', (e) => {
+        let media = window.matchMedia('(min-width: 992px) and (max-width: 1199px), (max-width: 575px)');
+        this.mediaMatches = media.matches;
+        media.addEventListener('change', (e) => {
                 this.mediaMatches = e.matches;
         });
     },

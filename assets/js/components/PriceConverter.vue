@@ -39,11 +39,9 @@ export default {
             'setRequesting',
         ]),
         convert() {
-            let amount = this.rateLoaded
-                ? (!!parseFloat(this.amount)
-                    ? Decimal.mul(this.amount, this.rate)
-                    : '0')
-                : '-';
+            let amount = !!parseFloat(this.amount) && this.rateLoaded
+                ? Decimal.mul(this.amount, this.rate)
+                : '0';
             this.convertedAmount = toMoney(amount, this.subunit);
             this.$emit('update:convertedAmountProp', this.convertedAmount);
         },

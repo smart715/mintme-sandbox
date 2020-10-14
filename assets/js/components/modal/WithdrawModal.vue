@@ -35,7 +35,7 @@
                                 @keypress="checkAmount"
                                 @paste="checkAmount"
                                 :class="{ 'is-invalid': $v.amount.$error, 'trade-price-input': mediaMatches}"
-                                class="form-control form-control-btn text-left input-custom-padding"
+                                class="form-control text-left input-custom-padding"
                             >
                             <price-converter v-if="!isToken"
                                 class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
@@ -263,7 +263,9 @@ export default {
         },
     },
     mounted() {
-        window.matchMedia('(max-width: 575px)').addEventListener('change', (e) => {
+        let media = window.matchMedia('(max-width: 575px)');
+        this.mediaMatches = media.matches;
+        media.addEventListener('change', (e) => {
             this.mediaMatches = e.matches;
         });
     },

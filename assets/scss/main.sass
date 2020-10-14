@@ -812,9 +812,11 @@ nav.top-navbar
 
 .btn-input
   position: relative
-  height: 28px
+  align-self: stretch
+  white-space: nowrap
   padding-top: 3px
   padding-bottom: 3px
+  margin-left: 2px
 
 .wallet-code
   @include font-scale(sm)
@@ -1294,16 +1296,22 @@ li.trade-post
   font-size: 12px
 
 .trade-price-input
-    box-sizing: content-box
-    padding-bottom: 22px
-    padding-right: 0
-    width: calc(100% - 15px)
+  box-sizing: content-box
+  padding-bottom: 22px
+  padding-right: 0
+  width: calc(100% - 15px)
+
+  &.is-invalid
+    padding-right: 0 !important
 
 .trade-price-input-converter
-    top: initial
-    right: initial
-    bottom: 0
-    left: 0
-    height: 22px !important
-    padding-left: 15px
-    align-items: baseline !important
+  top: initial
+  right: initial
+  bottom: 0
+  left: 0
+  height: 22px !important
+  padding-left: 15px
+  align-items: baseline !important
+  overflow: hidden
+  max-width: 100%
+  white-space: nowrap

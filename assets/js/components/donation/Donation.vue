@@ -301,7 +301,9 @@ export default {
         }
         this.debouncedCheck = debounce(this.checkDonation, 500);
 
-        window.matchMedia('(max-width: 575px)').addEventListener('change', (e) => {
+        let media = window.matchMedia('(max-width: 575px)');
+        this.mediaMatches = media.matches;
+        media.addEventListener('change', (e) => {
             this.mediaMatches = e.matches;
         });
     },
