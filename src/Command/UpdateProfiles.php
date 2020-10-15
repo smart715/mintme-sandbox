@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\Profile;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,11 +16,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UpdateProfiles extends Command
 {
+    private LoggerInterface $logger;
     private EntityManagerInterface $em;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger)
     {
         $this->em = $em;
+        $this->logger = $logger;
 
         parent::__construct();
     }
@@ -66,12 +69,16 @@ class UpdateProfiles extends Command
                 continue;
             }
 
-            $profile->setNickname(
-                $this->getNickname($profile)
-            );
-            $this->em->persist($profile);
-            $this->em->flush();
-            $updatedUsers++;
+            $nickname = $this->getNickname($profile);
+            $profile->setNickname($nickname);
+
+            try {
+                $this->em->persist($profile);
+                $this->em->flush();
+                $updatedUsers++;
+            } catch (\Throwable $exception) {
+                $this->logger->error("Can't update nickname({$nickname}): {$exception->getMessage()}");
+            }
         }
 
         $progressBar->finish();
