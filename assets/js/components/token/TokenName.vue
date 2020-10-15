@@ -83,6 +83,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
+        showTokenEditModalProp: Boolean,
     },
     components: {
         FontAwesomeIcon,
@@ -94,8 +95,8 @@ export default {
             currentName: this.name,
             isTokenExchanged: true,
             isTokenNotDeployed: false,
-            showTokenEditModal: false,
             maxLengthToTruncate: 30,
+            showTokenEditModal: this.showTokenEditModalProp,
         };
     },
     computed: {
@@ -139,6 +140,14 @@ export default {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
+
+        if (this.showTokenEditModalProp) {
+            window.history.replaceState(
+                {}, '', this.$routing.generate('token_show', {
+                    name: this.name,
+                })
+            );
+        }
     },
     methods: {
         closeTokenEditModal: function() {

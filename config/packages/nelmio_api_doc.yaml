@@ -48,8 +48,10 @@ nelmio_api_doc:
     areas:
         default:
             path_patterns:
-                - ^/dev/api/v1
+                - ^/dev/api/v2
         v1:
             path_patterns:
                 - ^/dev/api/v1
-
+        v2:
+            path_patterns:
+                - ^/dev/api/v2

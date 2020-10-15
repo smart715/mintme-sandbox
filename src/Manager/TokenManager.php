@@ -67,15 +67,16 @@ class TokenManager implements TokenManagerInterface
 
     public function findByName(string $name): ?Token
     {
-        if (!in_array(
-            strtoupper($name),
-            array_map(
-                function (Crypto $crypto) {
-                    return $crypto->getSymbol();
-                },
-                $this->cryptoManager->findAll()
-            )
-        )
+        $name = Token::MINTME_SYMBOL === strtoupper($name)
+            ? Token::WEB_SYMBOL
+            : strtoupper($name);
+
+        if (!in_array(strtoupper($name), array_map(
+            static function (Crypto $crypto) {
+                return $crypto->getSymbol();
+            },
+            $this->cryptoManager->findAll()
+        ), true)
         ) {
             $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
