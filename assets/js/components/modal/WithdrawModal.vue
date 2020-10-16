@@ -60,7 +60,7 @@
                             {{ $t('withdraw_modal.do_not_have', translationsContext) }}
                         </div>
                         <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
-                            {{ $t('withdraw_modal.min_withdraw') }}
+                            {{ $t('withdraw_modal.min_withdraw', translationsContext) }}
                         </div>
                         <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
                             {{ $t('withdraw_modal.invalid_amount') }}
