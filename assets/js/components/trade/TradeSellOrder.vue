@@ -33,30 +33,20 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <div class="d-inline-block position-relative h-fit-content" :class="orderInputClass">
-                                <input
-                                    v-model="sellPrice"
-                                    type="text"
-                                    id="sell-price-input"
-                                    class="form-control"
-                                    :class="{ 'trade-price-input': priceInputClass }"
-                                    :disabled="useMarketPrice || !loggedIn"
-                                    @keypress="checkPriceInput"
-                                    @paste="checkPriceInput"
-                                    tabindex="8"
-                                >
-                                <price-converter v-if="loggedIn"
-                                    class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
-                                    :class="{ 'trade-price-input-converter': priceInputClass }"
-                                    :amount="sellPrice"
-                                    :from="market.base.symbol"
-                                    :to="USD.symbol"
-                                    :subunit="2"
-                                    symbol="$"
-                                    :delay="1000"
-                                    :converted-amount-prop.sync="convertedAmount"
-                                />
-                            </div>
+                            <price-converter-input
+                                class="d-inline-block"
+                                :class="orderInputClass"
+                                v-model="sellPrice"
+                                input-id="sell-price-input"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                                tabindex="8"
+                                :from="market.base.symbol"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                            />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.sell_order.your.header') }}
                                 <span>
@@ -205,10 +195,12 @@ import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 import {MINTME, USD} from '../../utils/constants';
 import PriceConverter from '../PriceConverter';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeSellOrder',
     components: {
+        PriceConverterInput,
         PriceConverter,
         Guide,
     },
