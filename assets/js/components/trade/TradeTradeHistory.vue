@@ -48,7 +48,7 @@
                                         <img
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
-                                            :alt="this.$t('avatar')">
+                                            :alt="$t('avatar')">
                                         <span class="d-inline-block truncate-name flex-grow-1">
                                             <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                                 {{ row.value }}
