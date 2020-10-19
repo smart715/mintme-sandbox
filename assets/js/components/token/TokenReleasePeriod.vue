@@ -13,14 +13,14 @@
                 <div>{{ $t('token.release_period.amount', {released: released}) }}</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
-                        <b>10%</b>
+                        <b>20%</b>
                     </b-col>
                     <b-col class="p-0">
                         <vue-slider
                             ref="released-slider"
                             :disabled="releasedDisabled"
                             v-model="released"
-                            :min="10" :max="100"
+                            :min="20" :max="100"
                             :interval="1"
                             :tooltip="false"
                             width="100%"
@@ -90,7 +90,7 @@ export default {
     data() {
         return {
             loading: true,
-            released: 10,
+            released: 20,
             releasePeriod: 0,
             hasLockin: false,
         };
