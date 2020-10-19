@@ -1,30 +1,30 @@
 <template>
     <div class="position-relative h-fit-content">
         <input
-            :id="inputId"
-            :class="{ 'price-converter-input__input--overflow': overflow, ...inputClass }"
-            type="text"
+            ref="input"
             v-model="newValue"
+            type="text"
+            class="form-control price-converter-input__input"
+            :class="{ 'price-converter-input__input--overflow': overflow, ...inputClass }"
+            :id="inputId"
+            :disabled="disabled"
+            :tabindex="tabindex"
             @keypress="$emit('keypress', $event)"
             @paste="$emit('paste', $event)"
             @input="onInput"
             @change="$emit('change', $event)"
             @keyup="$emit('keyup', $event)"
-            :disabled="disabled"
-            :tabindex="tabindex"
-            class="form-control price-converter-input__input"
-            ref="input"
         >
         <price-converter v-if="showConverter"
             class="position-absolute top-0 right-0 h-100 mr-3 d-flex align-items-center text-white"
             :class="{ 'price-converter-input__converter--overflow': overflow }"
+            :amount="newValue"
+            :converted-amount-prop.sync="convertedValue"
             :from="from"
             :to="to"
             :symbol="symbol"
             :subunit="subunit"
             :delay="1000"
-            :amount="newValue"
-            :converted-amount-prop.sync="convertedValue"
         />
     </div>
 </template>
@@ -63,6 +63,9 @@ export default {
     mounted() {
         this.resizeObserver = new ResizeObserver(this.updateInputWidth.bind(this));
         this.resizeObserver.observe(this.$refs.input);
+    },
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
     },
     computed: {
         overflow() {

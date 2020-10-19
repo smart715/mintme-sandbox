@@ -36,8 +36,8 @@
                             :subunit="2"
                             symbol="$"
                             @change="setFirstTimeOpen"
-                            @keypress="checkAmount"
-                            @paste="checkAmount"
+                            @keypress="checkInput"
+                            @paste="checkInput"
                         />
                         <button
                             class="btn btn-primary btn-input"
@@ -110,21 +110,26 @@ import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vueli
 import {toMoney} from '../../utils';
 import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
 import {
+    CheckInputMixin,
     MoneyFilterMixin,
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
 } from '../../mixins/';
-import PriceConverter from '../PriceConverter';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        CheckInputMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
         PriceConverterInput,
         Modal,
-        PriceConverter,
     },
     props: {
         visible: Boolean,
@@ -180,23 +185,6 @@ export default {
         },
     },
     methods: {
-        checkAmount: function(event) {
-            let inputPos = event.target.selectionStart;
-            let amount = this.$v.amount.$model.toString();
-            let selected = getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${this.subunit}})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
-                return true;
-            }
-            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
-                event.preventDefault();
-                return false;
-            }
-        },
         closeModal: function() {
             this.$v.$reset();
             this.amount = 0;
