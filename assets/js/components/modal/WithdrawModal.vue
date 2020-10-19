@@ -26,29 +26,19 @@
                         {{ $t('withdraw_modal.amount') }}
                     </label>
                     <div class="d-flex">
-                        <div class="d-inline-block position-relative h-fit-content flex-grow-1">
-                            <input
-                                id="wamount"
-                                v-model="$v.amount.$model"
-                                type="text"
-                                @change="setFirstTimeOpen"
-                                @keypress="checkAmount"
-                                @paste="checkAmount"
-                                :class="{ 'is-invalid': $v.amount.$error, 'trade-price-input': mediaMatches}"
-                                class="form-control text-left input-custom-padding"
-                            >
-                            <price-converter v-if="!isToken"
-                                class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
-                                :class="{ 'trade-price-input-converter': mediaMatches }"
-                                :amount="$v.amount.$model"
-                                :from="currency"
-                                :to="USD.symbol"
-                                :subunit="2"
-                                symbol="$"
-                                :delay="1000"
-                                :converted-amount-prop.sync="convertedAmount"
-                            />
-                        </div>
+                        <price-converter-input class="d-inline-block flex-grow-1"
+                            input-id="wamount"
+                            v-model="$v.amount.$model"
+                            :input-class="{ 'is-invalid': $v.amount.$error }"
+                            :show-converter="!isToken"
+                            :from="currency"
+                            :to="USD.symbol"
+                            :subunit="2"
+                            symbol="$"
+                            @change="setFirstTimeOpen"
+                            @keypress="checkAmount"
+                            @paste="checkAmount"
+                        />
                         <button
                             class="btn btn-primary btn-input"
                             type="button"
@@ -126,11 +116,13 @@ import {
     LoggerMixin,
 } from '../../mixins/';
 import PriceConverter from '../PriceConverter';
+import PriceConverterInput from "../PriceConverterInput";
 
 export default {
     name: 'WithdrawModal',
     mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
     components: {
+        PriceConverterInput,
         Modal,
         PriceConverter,
     },
@@ -156,8 +148,6 @@ export default {
             withdrawing: true,
             flag: true,
             USD,
-            convertedAmount: '0',
-            mediaMatches: false,
         };
     },
     computed: {
@@ -261,13 +251,6 @@ export default {
             }
             this.flag = false;
         },
-    },
-    mounted() {
-        let media = window.matchMedia('(max-width: 575px)');
-        this.mediaMatches = media.matches;
-        media.addEventListener('change', (e) => {
-            this.mediaMatches = e.matches;
-        });
     },
     validations() {
         return {

@@ -33,30 +33,20 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <div class="d-inline-block position-relative h-fit-content" :class="orderInputClass">
-                                <input
-                                    v-model="buyPrice"
-                                    type="text"
-                                    id="buy-price-input"
-                                    class="form-control"
-                                    :class="{ 'trade-price-input': priceInputClass }"
-                                    :disabled="useMarketPrice || !loggedIn"
-                                    @keypress="checkPriceInput"
-                                    @paste="checkPriceInput"
-                                    tabindex="3"
-                                >
-                                <price-converter v-if="loggedIn"
-                                    class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
-                                    :class="{ 'trade-price-input-converter': priceInputClass }"
-                                    :amount="buyPrice"
-                                    :from="market.base.symbol"
-                                    :to="USD.symbol"
-                                    :subunit="2"
-                                    symbol="$"
-                                    :delay="1000"
-                                    :converted-amount-prop.sync="convertedAmount"
-                                />
-                            </div>
+                            <price-converter-input
+                                class="d-inline-block"
+                                :class="orderInputClass"
+                                v-model="buyPrice"
+                                input-id="buy-price-input"
+                                :disabled="useMarketPrice || !loggedIn"
+                                @keypress="checkPriceInput"
+                                @paste="checkPriceInput"
+                                tabindex="8"
+                                :from="market.base.symbol"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                            />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.buy_order.your.header') }}
                                 <span>
@@ -197,8 +187,8 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import PriceConverter from '../PriceConverter';
 import {USD} from '../../utils/constants';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeBuyOrder',
@@ -214,7 +204,7 @@ export default {
     ],
     components: {
         Guide,
-        PriceConverter,
+        PriceConverterInput,
     },
     props: {
         loginUrl: String,
@@ -232,8 +222,6 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
-            mediaMatches: false,
-            convertedAmount: '0',
         };
     },
     methods: {
@@ -393,9 +381,6 @@ export default {
                 this.setUseBuyMarketPrice(val);
             },
         },
-        priceInputClass: function() {
-            return this.mediaMatches || (this.convertedAmount.replace('.', '').length + this.buyPrice.toString().replace('.', '').length) > 24;
-        },
     },
     watch: {
         useMarketPrice: function() {
@@ -421,12 +406,6 @@ export default {
                 this.immutableBalance = response.params[0][this.market.base.identifier].available;
             }
         }, 'trade-buy-order-asset');
-
-        let media = window.matchMedia('(min-width: 992px) and (max-width: 1199px), (max-width: 575px)');
-        this.mediaMatches = media.matches;
-        media.addEventListener('change', (e) => {
-            this.mediaMatches = e.matches;
-        });
     },
 };
 </script>

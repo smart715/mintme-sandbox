@@ -194,14 +194,12 @@ import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
 import {MINTME, USD} from '../../utils/constants';
-import PriceConverter from '../PriceConverter';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeSellOrder',
     components: {
         PriceConverterInput,
-        PriceConverter,
         Guide,
     },
     mixins: [
@@ -230,8 +228,6 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
-            mediaMatches: false,
-            convertedAmount: '0',
         };
     },
     methods: {
@@ -390,9 +386,6 @@ export default {
                 this.setUseSellMarketPrice(val);
             },
         },
-        priceInputClass: function() {
-            return this.mediaMatches || (this.convertedAmount.replace('.', '').length + this.sellPrice.toString().replace('.', '').length) > 24;
-        },
     },
     watch: {
         useMarketPrice: function() {
@@ -424,12 +417,6 @@ export default {
                     });
             }
         }, 'trade-sell-order-asset');
-
-        let media = window.matchMedia('(min-width: 992px) and (max-width: 1199px), (max-width: 575px)');
-        this.mediaMatches = media.matches;
-        media.addEventListener('change', (e) => {
-                this.mediaMatches = e.matches;
-        });
     },
     filters: {
         toMoney: function(val, precision) {

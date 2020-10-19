@@ -63,28 +63,18 @@
                                         <div>
                                             <label for="amount-to-donate">{{ $t('donation.amount') }}</label>
                                             <div class="input-group">
-                                                <div class="h-fit-content d-block position-relative flex-grow-1">
-                                                    <input
-                                                        v-model="amountToDonate"
-                                                        id="amount-to-donate"
-                                                        type="text"
-                                                        class="form-control"
-                                                        :class="{ 'trade-price-input': mediaMatches }"
-                                                        @keypress="checkAmountInput"
-                                                        @paste="checkAmountInput"
-                                                        @keyup="onKeyup"
-                                                    >
-                                                    <price-converter
-                                                        class="position-absolute top-0 right-0 h-100 mr-1 d-flex align-items-center font-size-12"
-                                                        :class="{ 'trade-price-input-converter': mediaMatches }"
-                                                        :amount="amountToDonate"
-                                                        :from="selectedCurrency"
-                                                        :to="USD.symbol"
-                                                        :subunit="2"
-                                                        symbol="$"
-                                                        :delay="1000"
-                                                    />
-                                                </div>
+                                                <price-converter-input
+                                                    class="d-block flex-grow-1"
+                                                    v-model="amountToDonate"
+                                                    input-id="amount-to-donate"
+                                                    @keypress="checkAmountInput"
+                                                    @paste="checkAmountInput"
+                                                    @keyup="onKeyup"
+                                                    :from="selectedCurrency"
+                                                    :to="USD.symbol"
+                                                    :subunit="2"
+                                                    symbol="$"
+                                                />
                                                 <div class="input-group-append">
                                                     <button
                                                         @click="all"
@@ -174,7 +164,7 @@ import Register from '../Register';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
-import PriceConverter from '../PriceConverter';
+import PriceConverterInput from "../PriceConverterInput";
 
 export default {
     name: 'Donation',
@@ -187,10 +177,10 @@ export default {
         WebSocketMixin,
     ],
     components: {
+        PriceConverterInput,
         Guide,
         ConfirmModal,
         Register,
-        PriceConverter,
     },
     props: {
         market: Object,
@@ -217,7 +207,6 @@ export default {
             showModal: false,
             tokensAvailabilityChanged: false,
             USD,
-            mediaMatches: false,
         };
     },
     computed: {
@@ -300,12 +289,6 @@ export default {
             });
         }
         this.debouncedCheck = debounce(this.checkDonation, 500);
-
-        let media = window.matchMedia('(max-width: 575px)');
-        this.mediaMatches = media.matches;
-        media.addEventListener('change', (e) => {
-            this.mediaMatches = e.matches;
-        });
     },
     methods: {
         onSelect: function(newCurrency) {

@@ -2,19 +2,20 @@
     <div class="position-relative h-fit-content">
         <input
             :id="inputId"
-            :class="{ 'price-converter-input__input--overflow': overflow }"
+            :class="{ 'price-converter-input__input--overflow': overflow, ...inputClass }"
             type="text"
             v-model="newValue"
             @keypress="$emit('keypress', $event)"
             @paste="$emit('paste', $event)"
             @input="onInput"
             @change="$emit('change', $event)"
+            @keyup="$emit('keyup', $event)"
             :disabled="disabled"
             :tabindex="tabindex"
-            class="form-control"
+            class="form-control price-converter-input__input"
             ref="input"
         >
-        <price-converter
+        <price-converter v-if="showConverter"
             class="position-absolute top-0 right-0 h-100 mr-3 d-flex align-items-center text-white"
             :class="{ 'price-converter-input__converter--overflow': overflow }"
             :from="from"
@@ -45,6 +46,11 @@ export default {
         to: String,
         symbol: String,
         subunit: Number,
+        showConverter: {
+            type: Boolean,
+            default: true,
+        },
+        inputClass: Object,
     },
     data() {
         return {
