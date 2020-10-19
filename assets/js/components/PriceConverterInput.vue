@@ -55,7 +55,7 @@ export default {
     data() {
         return {
             newValue: this.value,
-            convertedValue: "0",
+            convertedValue: '0',
             inputWidth: 100,
             resizeObserver: null,
         };
@@ -75,7 +75,7 @@ export default {
         onInput() {
             this.$emit('input', this.newValue);
         },
-        updateInputWidth(){
+        updateInputWidth() {
             let styles = window.getComputedStyle(this.$refs.input, null);
             let width = parseFloat(styles.getPropertyValue('width'));
             let rightPadding = parseFloat(styles.getPropertyValue('padding-right'));

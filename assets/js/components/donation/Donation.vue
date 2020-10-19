@@ -164,7 +164,7 @@ import Register from '../Register';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
-import PriceConverterInput from "../PriceConverterInput";
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'Donation',
