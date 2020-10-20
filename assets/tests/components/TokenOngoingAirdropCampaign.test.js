@@ -95,20 +95,11 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loggedIn: false,
                 isOwner: false,
             },
-            data() {
-                return {
-                    alreadyClaimed: false,
-                };
-            },
         });
-
         expect(wrapper.vm.confirmButtonText).toBe('log_in');
         wrapper.setProps({loggedIn: true});
         expect(wrapper.vm.confirmButtonText).toBe('');
         wrapper.setProps({isOwner: true});
-        expect(wrapper.vm.confirmButtonText).toBe('OK');
-        wrapper.setProps({isOwner: false});
-        wrapper.vm.alreadyClaimed = true;
         expect(wrapper.vm.confirmButtonText).toBe('OK');
     });
 
@@ -137,9 +128,6 @@ describe('TokenOngoingAirdropCampaign', () => {
         wrapper.setProps({loggedIn: true});
         wrapper.setProps({isOwner: true});
         expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.cant_participate');
-        wrapper.setProps({isOwner: false});
-        wrapper.vm.alreadyClaimed = true;
-        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.claimed');
         wrapper.setProps({isOwner: false});
         wrapper.vm.alreadyClaimed = false;
         expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message');
@@ -226,12 +214,9 @@ describe('TokenOngoingAirdropCampaign', () => {
         };
 
         wrapper.vm.modalOnConfirm();
-        expect(wrapper.vm.btnDisabled).toBe(true);
-
         moxios.wait(() => {
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(14);
             expect(wrapper.vm.alreadyClaimed).toBe(true);
-            expect(wrapper.vm.btnDisabled).toBe(false);
             done();
         });
     });
