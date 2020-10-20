@@ -26,7 +26,6 @@ nelmio_security:
                 - 'https://*.tawk.to'
             connect-src:
                 - 'self'
-                - 'wss://self'
                 - 'wss://api.mintme.com/'
                 - 'wss://api.mintme.abchosting.org/'
                 - 'https://*.facebook.net'

@@ -510,8 +510,8 @@ export default {
         },
         generateCoinUrl: function(coin) {
             let params = {
-                base: !coin.exchangeble ? coin.name : this.predefinedTokens.BTC.name,
                 quote: coin.exchangeble && coin.tradable ? coin.name : this.predefinedTokens.WEB.name,
+                base: !coin.exchangeble ? coin.name : this.predefinedTokens.BTC.name,
             };
             return this.$routing.generate('coin', params);
         },

@@ -43,3 +43,6 @@ correct:
 	make syntax_correction
 	make syntax_correction_assets
 
+all:
+	make correct
+	make validate
