@@ -94,7 +94,7 @@
         "symfony/phpunit-bridge": "^4.4",
         "symfony/profiler-pack": "^1.0",
         "symfony/test-pack": "^1.0",
-        "symfony/var-dumper": "^4.4",
+        "symfony/var-dumper": "4.4.*",
         "symfony/web-server-bundle": "^4.4",
         "vimeo/psalm": "3.11.2"
     },

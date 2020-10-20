@@ -10,11 +10,11 @@ describe('pairNameMixin', () => {
     const wrapper = shallowMount(component);
 
     it('show full pair name if base quote is not MINTME', () => {
-        expect(wrapper.vm.pairNameFunc('BTC', 'MINTME')).toBe('BTC/MINTME');
+        expect(wrapper.vm.pairNameFunc('BTC', 'MINTME')).toBe('MINTME/BTC');
     });
 
     it('show full pair name if base quote is XMR', () => {
-        expect(wrapper.vm.pairNameFunc('XMR', 'MINTME')).toBe('XMR/MINTME');
+        expect(wrapper.vm.pairNameFunc('XMR', 'MINTME')).toBe('MINTME/XMR');
     });
 
     it('hide base quote equal to MINTME', () => {

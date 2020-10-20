@@ -258,7 +258,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.sanitizedMarketsOnTop).toMatchObject([
-                                {pair: 'BTC/WEB', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
+                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
                             ]);
                             done();
                         });

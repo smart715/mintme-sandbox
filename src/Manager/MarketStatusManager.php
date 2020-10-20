@@ -10,6 +10,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
@@ -72,6 +73,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
+    /** {@inheritDoc} */
     public function getMarketsCount(int $deployed = 0): int
     {
         $qb = $this->em->createQueryBuilder();
@@ -86,6 +88,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+    /** {@inheritDoc} */
     public function getUserRelatedMarketsCount(int $userId): int
     {
         return (int)$this->em->createQueryBuilder()
@@ -161,6 +164,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
+    /** {@inheritDoc} */
     public function createMarketStatus(array $markets): void
     {
         /** @var Market $market */
@@ -186,6 +190,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         }
     }
 
+    /** {@inheritDoc} */
     public function updateMarketStatus(Market $market): void
     {
         $marketStatus = $this->repository->findByBaseQuoteNames(
@@ -239,6 +244,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         ];
     }
 
+    /**
+     * @retrun array<MarketStatus>|null
+     */
     private function getPredefinedMarketStatuses(): array
     {
         return array_map(function (Market $market) {
@@ -251,7 +259,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /**
      * @param array<MarketStatus> $marketStatuses
-     * @return array<MarketStatus>
+     * @return array
      */
     private function parseMarketStatuses(array $marketStatuses): array
     {
@@ -266,22 +274,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
             $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
 
-            if (!$market) {
-                continue;
-            }
-
             $info[$this->marketNameConverter->convert($market)] = $marketStatus;
         }
 
         return $info;
     }
 
-    /**
-     * Return market status
-     *
-     * @param Market $market
-     * @return MarketStatus|null
-     */
+    /** {@inheritDoc} */
     public function getMarketStatus(Market $market): ?MarketStatus
     {
         return $this->repository->findByBaseQuoteNames(
@@ -290,21 +289,28 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
-    public function isValid(Market $market): bool
+    /** {@inheritDoc} */
+    public function isValid(Market $market, bool $reverseBaseQuote = false): bool
     {
+        if ($reverseBaseQuote) {
+            $market = BaseQuote::reverseMarket($market);
+        }
+
         $base = $market->getBase();
         $quote = $market->getQuote();
 
         return
             !(
-                $base instanceof Crypto && !$base->isExchangeble() ||
-                $quote instanceof Crypto && !$quote->isTradable() ||
-                $base instanceof Token && $base->isBlocked() ||
+                ($base instanceof Crypto && !$base->isExchangeble()) ||
+                ($quote instanceof Crypto && !$quote->isTradable()) ||
+                ($base instanceof Token && $base->isBlocked()) ||
                 $quote instanceof Token ||
-                $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())
+                $base === $quote ||
+                ($base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol()))
             );
     }
 
+    /** {@inheritDoc} */
     public function getExpired(): array
     {
         return $this->repository->getExpired();
