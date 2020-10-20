@@ -632,7 +632,7 @@ ongoing_airdrop.msg.1: 'For first %participants% participants %airdropReward%'
 ongoing_airdrop.msg.2: '%tokenName% for free. Currently %actualParticipants%/%participants% participants.'
 ongoing_airdrop.ends: 'Airdrop ends on %endsDate% at %endsTime%.'
 ongoing_airdrop.participate: Participate
-ongoing_airdrop.claimed: 'Çlaimed'
+ongoing_airdrop.claimed: 'Claimed'
 ongoing_airdrop.confirm_message.logged_in: 'You have to be logged in to claim %airdropReward% %tokenName%.'
 ongoing_airdrop.confirm_message.cant_participate: 'Sorry, you can''t participate in your own airdrop.'
 ongoing_airdrop.confirm_message: 'Are you sure you want to claim %airdropReward% %tokenName%?'
