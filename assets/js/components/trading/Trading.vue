@@ -687,7 +687,7 @@ export default {
                 : Decimal.mul(lastPrice, supply);
 
             return {
-                pair: BTC.symbol === currency || ETH.symbol === currency ? `${currency}/${token}` : `${token}`,
+                pair: BTC.symbol === currency || ETH.symbol === currency ? `${token}/${currency}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,

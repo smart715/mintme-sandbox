@@ -22,20 +22,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class MarketsController extends DevApiController
 {
-    /** @var MarketStatusManagerInterface */
-    private $marketManager;
-
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private MarketStatusManagerInterface $marketManager;
+    private MarketHandlerInterface $marketHandler;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
 
     public function __construct(
         MarketStatusManagerInterface $marketManager,
@@ -94,7 +85,8 @@ class MarketsController extends DevApiController
                     $limit,
                     'monthVolume',
                     'DESC',
-                    1
+                    1,
+                    null
                 )
             )),
             0,

@@ -14,11 +14,14 @@ security:
             security: false
         api:
             anonymous: ~
-            pattern: ^/dev/api/v1
+            pattern: ^/dev/api/(v1|v2/auth)
             stateless: true
             simple_preauth:
                 authenticator: App\Security\ApiKeyAuthenticator
             provider: api_key_user_provider
+        api_open:
+            pattern: ^/dev/api/v2/open
+            security: false
         main:
             pattern: ^/
             logout:
@@ -71,7 +74,7 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
-        - { path: ^(%locale_prefixes%)/dev/api/v1,                                      role: ROLE_API }
+        - { path: ^(%locale_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API }
         - { path: ^(%locale_prefixes%)/api/media/upload,                                role: ROLE_USER }
         - { path: ^(%locale_prefixes%)/api/tokens/[a-zA-Z0-9]+/send-code$,              role: ROLE_USER }
         - { path: ^(%locale_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER }
@@ -87,6 +90,7 @@ security:
         - { path: ^(%locale_prefixes%)/referral-program,                                role: ROLE_USER }
         - { path: ^(%locale_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS] }
         - { path: ^(%locale_prefixes%)/api,                                             role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^(%locale_prefixes%)/dev/api/v2/open,                                 role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%locale_prefixes%)/register,                                        role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%locale_prefixes%)/resetting,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%locale_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
