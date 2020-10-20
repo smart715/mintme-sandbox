@@ -2,13 +2,13 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -20,9 +20,6 @@ use Swagger\Annotations as SWG;
  */
 class TickerController extends AbstractFOSRestController
 {
-
-    use BaseQuoteOrderTrait;
-
     private MarketStatusManagerInterface $marketStatusManager;
     private MarketHandlerInterface $marketHandler;
     private MarketFactoryInterface $marketFactory;
@@ -52,8 +49,6 @@ class TickerController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @throws ApiNotFoundException
-     * @return mixed[]
      */
     public function getTicker(): array
     {
@@ -64,18 +59,9 @@ class TickerController extends AbstractFOSRestController
             function ($marketStatus) use ($assets) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
 
-                if (!$market) {
-                    throw new ApiNotFoundException(
-                        'Market pair not found: ' .
-                        $marketStatus->getQuote()->getSymbol() .
-                        '/' .
-                        $marketStatus->getCrypto()->getSymbol()
-                    );
-                }
-
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
-                $market = $this->reverseBaseQuote($market);
+                $market = BaseQuote::reverseMarket($market);
 
                 $base = $market->getBase();
                 $quote = $market->getQuote();

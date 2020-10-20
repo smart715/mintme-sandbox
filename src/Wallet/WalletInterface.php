@@ -12,14 +12,23 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
-use Money\Money;
 
 interface WalletInterface
 {
-    /** @return Transaction[] */
+    /**
+     * @param User $user
+     * @param int $offset
+     * @param int $limit
+     * @return Transaction[]
+     */
     public function getWithdrawDepositHistory(User $user, int $offset, int $limit): array;
 
     /**
+     * @param User $user
+     * @param Address $address
+     * @param Amount $amount
+     * @param TradebleInterface $tradable
+     * @return PendingWithdrawInterface
      * @throws \Throwable
      * @throws NotEnoughAmountException
      * @throws NotEnoughUserAmountException
@@ -33,11 +42,17 @@ interface WalletInterface
 
     public function withdrawCommit(PendingWithdrawInterface $pendingWithdraw): void;
 
-
-    /** @return array<Address> */
+    /**
+     * @param User $user
+     * @param array $cryptos
+     * @return array<Address>
+     */
     public function getDepositCredentials(User $user, array $cryptos): array;
 
-    /** @return array<Address> */
+    /**
+     * @param User $user
+     * @return array<Address>
+     */
     public function getTokenDepositCredentials(User $user): array;
 
     public function getDepositCredential(User $user, Crypto $crypto): Address;
