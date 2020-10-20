@@ -89,7 +89,7 @@ class WalletController extends DevApiController
      */
     public function getDepositAddresses(WalletInterface $depositCommunicator): array
     {
-        /** @var  User $user*/
+        /** @var User $user */
         $user = $this->getUser();
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
@@ -147,7 +147,7 @@ class WalletController extends DevApiController
      */
     public function getDepositWithdrawHistory(ParamFetcherInterface $request): array
     {
-        /** @var  User $user*/
+        /** @var User $user */
         $user = $this->getUser();
 
         return $this->wallet->getWithdrawDepositHistory(

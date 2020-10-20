@@ -2,11 +2,10 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Traits\BaseQuoteOrderTrait;
-use App\Exception\ApiNotFoundException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -18,9 +17,6 @@ use Swagger\Annotations as SWG;
  */
 class SummaryController extends AbstractFOSRestController
 {
-
-    use BaseQuoteOrderTrait;
-
     private MarketStatusManagerInterface $marketStatusManager;
     private MarketHandlerInterface $marketHandler;
     private MarketFactoryInterface $marketFactory;
@@ -50,8 +46,6 @@ class SummaryController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @throws ApiNotFoundException
-     * @return mixed[]
      */
     public function getSummary(): array
     {
@@ -60,15 +54,6 @@ class SummaryController extends AbstractFOSRestController
         return array_map(
             function ($marketStatus) {
                 $market = $this->marketFactory->create($marketStatus->getCrypto(), $marketStatus->getQuote());
-
-                if (!$market) {
-                    throw new ApiNotFoundException(
-                        'Market pair not found: ' .
-                        $marketStatus->getQuote()->getSymbol() .
-                        '/' .
-                        $marketStatus->getCrypto()->getSymbol()
-                    );
-                }
 
                 $marketStatusToday = $this->marketHandler->getMarketStatus($market);
 
@@ -85,7 +70,7 @@ class SummaryController extends AbstractFOSRestController
                     $this->marketHandler->getPendingSellOrders($market)
                 );
 
-                $market = $this->reverseBaseQuote($market);
+                $market = BaseQuote::reverseMarket($market);
 
                 $rebrandedBaseSymbol = $this->rebrandingConverter->convert($market->getBase()->getSymbol());
                 $rebrandedQuoteSymbol = $this->rebrandingConverter->convert($market->getQuote()->getSymbol());

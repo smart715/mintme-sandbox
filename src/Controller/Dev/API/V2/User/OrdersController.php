@@ -55,6 +55,7 @@ class OrdersController extends AbstractFOSRestController
             'App\Controller\Dev\API\V1\User\OrdersController::getActiveOrders',
             [
                 'request' => $request,
+                'reverseBaseQuote' => true,
             ],
             [
                 'offset' => (int)$request->get('offset'),
@@ -102,6 +103,7 @@ class OrdersController extends AbstractFOSRestController
             'App\Controller\Dev\API\V1\User\OrdersController::getFinishedOrders',
             [
                 'request' => $request,
+                'reverseBaseQuote' => true,
             ],
             [
                 'offset' => (int)$request->get('offset'),
@@ -159,6 +161,7 @@ class OrdersController extends AbstractFOSRestController
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
+                'reverseBaseQuote' => true,
             ],
             [
                 'base' => $request->get('base'),
@@ -193,6 +196,7 @@ class OrdersController extends AbstractFOSRestController
             [
                 'request' => $request,
                 'id' => $id,
+                'reverseBaseQuote' => true,
             ],
             [
                 'base' => $request->get('base'),

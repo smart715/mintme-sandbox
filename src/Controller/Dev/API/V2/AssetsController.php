@@ -45,7 +45,6 @@ class AssetsController extends AbstractFOSRestController
      * @SWG\Tag(name="Open")
      * @Rest\QueryParam(name="deployed", nullable=true, allowBlank=true)
      * @Security(name="")
-     * @return mixed[]
      */
     public function getAssets(ParamFetcherInterface $paramFetcher): array
     {
