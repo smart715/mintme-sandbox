@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\UserManagerInterface as UserManagerInterfaceLocal;
+use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -18,7 +18,6 @@ use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -59,14 +58,10 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
-    /** @var UserManagerInterfaceLocal */
-    private $userManagerLocal;
-
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
         UserManagerInterface $userManager,
-        UserManagerInterfaceLocal $userManagerLocal,
         TokenStorageInterface $tokenStorage,
         BonusManagerInterface $bonusManager,
         BalanceHandlerInterface $balanceHandler,
@@ -77,7 +72,6 @@ class RegistrationController extends FOSRegistrationController
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
-        $this->userManagerLocal = $userManagerLocal;
         $this->bonusManager = $bonusManager;
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
@@ -269,7 +263,7 @@ class RegistrationController extends FOSRegistrationController
         $refCode = $request->cookies->get('referral-code');
 
         if (!is_null($refCode)) {
-            $token = $this->userManagerLocal->findByReferralCode($refCode)->getProfile()->getToken();
+            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getToken();
         }
 
         if (isset($token)) {
