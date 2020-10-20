@@ -2,24 +2,46 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use FOS\RestBundle\Controller\AbstractFOSRestController;
+use App\Controller\Dev\API\V1\DevApiController;
+use App\Exception\ApiNotFoundException;
+use App\Exchange\Market\MarketFinderInterface;
+use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\MarketInfo;
+use App\Manager\MarketStatusManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route(path="/dev/api/v2/auth/markets")
  * @Cache(smaxage=15, mustRevalidate=true)
  */
-class MarketsController extends AbstractFOSRestController
+class MarketsController extends DevApiController
 {
+    private MarketStatusManagerInterface $marketManager;
+    private MarketHandlerInterface $marketHandler;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private MarketFinderInterface $marketFinder;
+
+    public function __construct(
+        MarketStatusManagerInterface $marketManager,
+        MarketHandlerInterface $marketHandler,
+        RebrandingConverterInterface $rebrandingConverter,
+        MarketFinderInterface $marketFinder
+    ) {
+        $this->marketManager = $marketManager;
+        $this->marketHandler = $marketHandler;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->marketFinder = $marketFinder;
+    }
+
     /**
      * List markets with a day volume information
      *
-     * @Rest\View(serializerGroups={"dev"})
+     * @Rest\View(serializerGroups={"dev", "APIv2"})
      * @Rest\Get()
      * @SWG\Response(
      *     response="200",
@@ -44,20 +66,27 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Markets")
-     * @param ParamFetcherInterface $request
-     * @return Response
      */
-    public function getMarkets(ParamFetcherInterface $request): Response
+    public function getMarkets(ParamFetcherInterface $request): array
     {
-        return $this->forward(
-            'App\Controller\Dev\API\V1\MarketsController::getMarkets',
-            [
-                'request' => $request,
-            ],
-            [
-                'offset' => $request->get('offset'),
-                'limit' => $request->get('limit'),
-            ]
+        $offset = (int)$request->get('offset');
+        $limit = (int)$request->get('limit');
+
+        return array_slice(
+            array_map(function ($market) {
+                return $this->rebrandingConverter->convertMarketStatus($market);
+            }, array_values(
+                $this->marketManager->getMarketsInfo(
+                    $offset,
+                    $limit,
+                    'monthVolume',
+                    'DESC',
+                    1,
+                    null
+                )
+            )),
+            0,
+            $limit
         );
     }
 
@@ -85,18 +114,33 @@ class MarketsController extends AbstractFOSRestController
      * @SWG\Parameter(name="quote", in="path", description="Quote name", type="string")
      * @SWG\Tag(name="Markets")
      */
-    public function getMarket(string $base, string $quote, ParamFetcherInterface $request): Response
+    public function getMarket(string $base, string $quote, ParamFetcherInterface $request): MarketInfo
     {
-        return $this->forward(
-            'App\Controller\Dev\API\V1\MarketsController::getMarket',
-            [
-                'base' => $base,
-                'quote' => $quote,
-                'request' => $request,
-            ],
-            [
-                'interval' => $request->get('interval'),
-            ]
-        );
+        $this->checkForDisallowedValues($base, $quote);
+
+        $periods = [
+            '1h'   => 3600,
+            '1d'   => 86400,
+            '7d'   => 604800,
+        ];
+
+        $convertedBase = $this->rebrandingConverter->reverseConvert(mb_strtolower($base));
+        $convertedQuote = $this->rebrandingConverter->reverseConvert(mb_strtolower($quote));
+
+        $market = $this->marketFinder->find($convertedQuote, $convertedBase);
+
+        if (!$market) {
+            throw new ApiNotFoundException('Market not found');
+        }
+
+        $marketInfo = $this->rebrandingConverter->convertMarketInfo($this->marketHandler->getMarketInfo(
+            $market,
+            $periods[$request->get('interval')]
+        ));
+
+        $marketInfo->setTokenName($quote);
+        $marketInfo->setCryptoSymbol($base);
+
+        return $marketInfo;
     }
 }
