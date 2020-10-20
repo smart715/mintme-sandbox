@@ -24,12 +24,20 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <button
-                        :disabled="btnDisabled"
-                        @click="showModal = true"
-                        class="btn btn-primary">
-                        {{ $t('ongoing_airdrop.participate') }}
-                    </button>
+                    <span v-if="alreadyClaimed">
+                        <button
+                                :disabled="true"
+                                class="btn btn-primary">
+                            {{ $t('ongoing_airdrop.claimed') }}
+                        </button>
+                    </span>
+                    <span v-else>
+                        <button
+                                @click="showModal = true"
+                                class="btn btn-primary">
+                            {{ $t('ongoing_airdrop.participate') }}
+                        </button>
+                    </span>
                     <confirm-modal
                         :visible="showModal"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
@@ -41,7 +49,7 @@
                             {{ confirmModalMessage }}
                         </p>
                         <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
-                        <template v-if="!loggedIn || isOwner || alreadyClaimed || timeElapsed" v-slot:confirm>
+                        <template v-if="!loggedIn || isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
                     </confirm-modal>
@@ -135,7 +143,7 @@ export default {
                 button = this.$t('log_in');
             }
 
-            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
+            if (this.isOwner || this.timeElapsed) {
                 button = 'OK';
             }
 
@@ -151,10 +159,6 @@ export default {
 
             if (this.isOwner) {
                 return this.$t('ongoing_airdrop.confirm_message.cant_participate');
-            }
-
-            if (this.alreadyClaimed) {
-                return this.$t('ongoing_airdrop.confirm_message.claimed');
             }
 
             if (this.timeElapsed) {
@@ -196,11 +200,10 @@ export default {
                 return;
             }
 
-            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
+            if (this.isOwner || this.timeElapsed) {
                 return;
             }
 
-            this.btnDisabled = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -209,7 +212,6 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
-
                     this.alreadyClaimed = true;
                 })
                 .catch((err) => {
@@ -225,8 +227,7 @@ export default {
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
-                })
-                .then(() => this.btnDisabled = false);
+                });
         },
         modalOnCancel: function() {
             if (!this.loggedIn) {
