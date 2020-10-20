@@ -86,5 +86,10 @@ export default {
             this.inputWidth = width - rightPadding - leftPadding;
         },
     },
+    watch: {
+        value() {
+            this.newValue = this.value;
+        },
+    },
 };
 </script>
