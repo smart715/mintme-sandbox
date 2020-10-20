@@ -347,7 +347,7 @@ export default {
                 USD: 0,
             },
             activeVolume: 'month',
-            activeMarketCap: 'marketCap',
+            activeMarketCap: 'buyDepth',
             marketFilters: {
                 userSelected: false,
                 selectedFilter: 'deployed',
