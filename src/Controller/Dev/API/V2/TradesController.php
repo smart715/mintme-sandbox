@@ -2,16 +2,15 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Dev\API\V1\DevApiController;
-use App\Controller\Traits\BaseQuoteOrderTrait;
-use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
@@ -19,11 +18,8 @@ use Swagger\Annotations as SWG;
 /**
  * @Rest\Route("/dev/api/v2/open/trades")
  */
-class TradesController extends DevApiController
+class TradesController extends AbstractFOSRestController
 {
-
-    use BaseQuoteOrderTrait;
-
     private MarketHandlerInterface $marketHandler;
     private MarketFinderInterface $marketFinder;
     private RebrandingConverterInterface $rebrandingConverter;
@@ -56,8 +52,6 @@ class TradesController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @return mixed[]
-     * @throws ApiNotFoundException
      */
     public function getTrades(string $market_pair): array
     {
@@ -66,17 +60,16 @@ class TradesController extends DevApiController
         $base = $marketPair[0] ?? '';
         $quote = $marketPair[1] ?? '';
 
-        $this->checkForDisallowedValues($base, $quote);
-
         $base = $this->rebrandingConverter->reverseConvert($base);
         $quote = $this->rebrandingConverter->reverseConvert($quote);
+
         $market = $this->marketFinder->find($base, $quote);
 
         if (!$market || !$this->marketStatusManager->isValid($market)) {
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $market = $this->reverseBaseQuote($market);
+        $market = BaseQuote::reverseMarket($market);
 
         return array_map(function ($order) {
             $rebrandedOrder = $this->rebrandingConverter->convertOrder($order);

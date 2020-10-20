@@ -112,39 +112,49 @@
                             <div class="card-header py-3 px-4">
                                 <div class="row justify-content-md-center align-items-center">
                                     <div class="col"><h2 class="m-0">{% trans %}api.page.title{% endtrans %}</h2></div>
-                                    <!--
                                     <div id="api-version" class="col-auto mr-auto">
                                         <api-version
                                             url-version={{ version }}
                                         >
                                         </api-version>
                                     </div>
-                                    -->
                                 </div>
                             </div>
                             <div class="card-body py-2 px-0">
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
                                     {% if version != 'v1' %}
-                                        <p>
-                                            {% trans %}api.page.v1.body.1{% endtrans %}
-                                            <a href="{{ path('settings') }}">{% trans %}api.page.v1.body.2{% endtrans %}</a>.
-                                        </p>
+                                    <p>
+                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.v2.body.2{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.v2.body.3{% endtrans %}
+                                    </p>
+                                    {% else %}
+                                    <p>
+                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.body.2{% endtrans %}
+                                    </p>
                                     {% endif %}
                                     <p>
-                                        {% trans %}api.page.body.1{% endtrans %}<br />
-                                        {% trans %}api.page.body.2{% endtrans %}<span class="text-danger">{% trans %}api.page.x_api_id{% endtrans %}</span>
-                                        {% trans %}api.page.body.3{% endtrans %}<span class="text-danger">{% trans %}api.page.x_api_key{% endtrans %}</span>
-                                        {% trans %}api.page.body.4{% endtrans %}<br />
-                                        {% trans %}api.page.body.5{% endtrans %}<span class="text-danger">{% trans %}api.page.body.6{% endtrans %}</span>
-                                        {% trans %}api.page.body.7{% endtrans %}<br />
-                                        {% trans %}api.page.body.8{% endtrans %}<span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span><br />
+                                        {% trans %}api.page.body.3{% endtrans %}
+                                        <span class="text-danger">X-API-ID</span>
+                                        {% trans %}api.page.body.4{% endtrans %}
+                                        <span class="text-danger">X-API-KEY</span>
+                                        {% trans %}api.page.body.5{% endtrans %}
+                                        <span class="text-danger">Authorization: Bearer {token}</span>
+                                        {% trans %}api.page.body.6{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.body.7{% endtrans %}
+                                        <span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span>.
+                                        {% trans %}api.page.body.8{% endtrans %}
+                                    </p>
+                                    <p>
                                         {% trans %}api.page.body.9{% endtrans %}
                                     </p>
                                     <p>
-                                        {% trans %}api.page.body.10{% endtrans %}
-                                    </p>
-                                    <p>
                                         {% if app.user is not null %}
+                                            {% trans %}api.page.body.10{% endtrans %}
+                                            <a href="{{ path('settings') }}">settings</a>
                                             {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
                                         {% else %}
                                             {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}

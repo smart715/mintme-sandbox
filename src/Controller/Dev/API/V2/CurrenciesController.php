@@ -3,7 +3,6 @@
 namespace App\Controller\Dev\API\V2;
 
 use App\Controller\Dev\API\V1\DevApiController;
-use App\Exception\ApiNotFoundException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -45,8 +44,6 @@ class CurrenciesController extends DevApiController
      * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Currencies")
-     * @param ParamFetcherInterface $request
-     * @return Response
      */
     public function getCurrencies(ParamFetcherInterface $request): Response
     {
@@ -76,8 +73,6 @@ class CurrenciesController extends DevApiController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Parameter(name="name", in="path", description="Currency name", type="string")
      * @SWG\Tag(name="Currencies")
-     * @param string $name
-     * @return Response
      */
     public function getCurrency(string $name): Response
     {
