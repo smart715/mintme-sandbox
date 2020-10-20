@@ -112,7 +112,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         string $userToken,
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
-        $token =$this->tokenManager->findByName($userToken);
+        $token = $this->tokenManager->findByName($userToken);
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)
