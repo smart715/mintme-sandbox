@@ -36,8 +36,8 @@
                             :subunit="2"
                             symbol="$"
                             @change="setFirstTimeOpen"
-                            @keypress="checkInput(8, 8)"
-                            @paste="checkInput(8, 8)"
+                            @keypress="checkInput(subunit, 8)"
+                            @paste="checkInput(subunit, 8)"
                         />
                         <button
                             class="btn btn-primary btn-input"
