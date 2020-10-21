@@ -823,11 +823,11 @@ nav.top-navbar
 
 .btn-input
   position: relative
-  right: 5px
-  top: -30px
-  height: 28px
+  align-self: stretch
+  white-space: nowrap
   padding-top: 3px
   padding-bottom: 3px
+  margin-left: 2px
 
 .wallet-code
   @include font-scale(sm)
@@ -1288,3 +1288,33 @@ li.trade-post
 
 .text-gold
   color: $gold
+
+.top-0
+  top: 0
+
+.right-0
+  right: 0
+
+.h-fit-content
+  height: fit-content
+
+.price-converter-input__input
+  &.is-invalid
+    background-position-x: 100%
+
+.price-converter-input__input--overflow
+  padding-bottom: 24px
+  height: 48px !important
+
+.price-converter-input__converter--overflow
+  top: initial
+  right: initial
+  bottom: 0
+  left: 0
+  height: 20px !important
+  padding-left: 15px
+  align-items: start !important
+  overflow: hidden
+  width: 100%
+  white-space: nowrap
+  line-height: 16px
