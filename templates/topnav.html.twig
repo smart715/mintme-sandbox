@@ -234,7 +234,12 @@
                         </li>
                     {% endif %}
                 {% endif %}
-                <locale-switcher current-locale="{{ app.session.get('_locale') ?: app.request.attributes.get('_locale') }}"></locale-switcher>
+                {% if global_translation_flags|length > 1 %}
+                    <locale-switcher
+                            current-locale="{{ app.session.get('_locale') ?: app.request.attributes.get('_locale') }}"
+                            flags="{{ global_translation_flags | json_encode(constant('JSON_UNESCAPED_UNICODE')) }}"
+                    ></locale-switcher>
+                {% endif %}
             </ul>
         </div>
     </div>
