@@ -1,5 +1,5 @@
 translation:
-    locales: ['ar', 'en', 'es', 'fr', 'pl', 'ru', 'uk']
+    locales: '%translation_locales%'
     edit_in_place:
         enabled: true
         config_name: app
