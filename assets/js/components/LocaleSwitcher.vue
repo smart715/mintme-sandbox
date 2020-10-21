@@ -19,29 +19,8 @@
                 :class="{ 'show': showLangMenu }"
                 aria-labelledby="dropdownLangMenuButton"
             >
-                <a class="dropdown-item" @click="changeLocale('en')">
-                    <span class="flag-icon flag-icon-gb"></span> English
-                </a>
-                <a class="dropdown-item" @click="changeLocale('es')">
-                    <span class="flag-icon flag-icon-es"></span> Español
-                </a>
-                <a class="dropdown-item" @click="changeLocale('ar')">
-                    <span class="flag-icon flag-icon-ar"></span> العربية
-                </a>
-                <a class="dropdown-item" @click="changeLocale('ru')">
-                    <span class="flag-icon flag-icon-ru"></span> Русский
-                </a>
-                <a class="dropdown-item" @click="changeLocale('pt')">
-                    <span class="flag-icon flag-icon-pt"></span> Portugues
-                </a>
-                <a class="dropdown-item" @click="changeLocale('fr')">
-                    <span class="flag-icon flag-icon-fr"></span> Française
-                </a>
-                <a class="dropdown-item" @click="changeLocale('pl')">
-                    <span class="flag-icon flag-icon-pl"></span> Polski
-                </a>
-                <a class="dropdown-item" @click="changeLocale('uk')">
-                    <span class="flag-icon flag-icon-uk"></span> Українська
+                <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item" @click="changeLocale(locale.locale)">
+                    <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
                 </a>
             </div>
         </div>
@@ -59,17 +38,31 @@ export default {
     },
     props: {
         currentLocale: String,
+        flags: String,
     },
     data() {
         return {
-            currentLocaleClass: 'flag-icon flag-icon-' + this.currentLocale,
             showLangMenu: false,
             engLocale: 'en',
         };
     },
     computed: {
-        userLocale: function() {
-            return 'uk' === this.currentLocale ? 'ua' : this.currentLocale;
+        currentLocaleClass: function() {
+            return 'flag-icon flag-icon-' + this.flagNames[this.currentLocale].flag;
+        },
+        flagNames: function() {
+          return JSON.parse(this.flags);
+        },
+        flagsWithLocales: function() {
+            let locales = Object.keys(this.flagNames);
+
+            return locales.map((loc) => {
+                return {
+                  locale: loc,
+                  flag: this.flagNames[loc].flag,
+                  label: this.flagNames[loc].label,
+                };
+            });
         },
     },
     methods: {
@@ -82,17 +75,16 @@ export default {
                         let hrefWithLocale = '';
                         let href = location.href;
 
-                        if (this.engLocale === this.userLocale && this.engLocale !== locale ) {
+                        if (this.engLocale === this.currentLocale && this.engLocale !== locale ) {
                             let origin = location.origin;
                             hrefWithLocale = href.replace(origin, origin+'/'+locale);
-                        } else if (this.engLocale !== this.userLocale && this.engLocale === locale) {
-                            hrefWithLocale = href.replace(this.userLocale + '/', '');
+                        } else if (this.engLocale !== this.currentLocale && this.engLocale === locale) {
+                            hrefWithLocale = href.replace(this.currentLocale + '/', '');
                         } else {
-                            hrefWithLocale = href.replace(this.userLocale, locale);
+                            hrefWithLocale = href.replace(this.currentLocale, locale);
                         }
 
                         window.location.href = hrefWithLocale;
-                        // location.reload();
                     } else {
                         this.$toasted.error(this.$t('toasted.error.try_later'));
                     }
