@@ -193,19 +193,20 @@
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         {% trans %}navbar.settings{% endtrans %}
                                     </a>
+
                                     {% if app.user.profile.token %}
                                         <a class="dropdown-item" href="{{ path('token_show_modal') }}">
                                             <span class="icon-token-drop-down float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                             {% trans %}navbar.token_show_modal{% endtrans %}
                                         </a>
                                     {% endif %}
-                                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
+                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
                                         <span class="dropdown-item">
                                             <button
                                                     class="logout"
                                                     type="submit"
-                                                    id="_submit"
+                                                    id="_submit_lg"
                                                     name="_submit"
                                                     tabindex="0"
                                             >
@@ -219,12 +220,12 @@
                         </li>
                     {% else %}
                         <li class="align-self-center">
-                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
-                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
+                            <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
                                 <button
                                         class="logout-link"
                                         type="submit"
-                                        id="_submit"
+                                        id="_submit_lg"
                                         name="_submit"
                                 >
                                     {% trans %}log_out{% endtrans %}
