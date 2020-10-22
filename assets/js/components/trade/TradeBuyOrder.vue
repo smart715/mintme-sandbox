@@ -359,7 +359,8 @@ export default {
         },
         buyAmount: {
             get() {
-                return new Decimal(this.getBuyAmountInput).toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
+                return new Decimal(this.getBuyAmountInput === '' ? 0 : this.getBuyAmountInput)
+                    .toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
             },
             set(val) {
                 this.setBuyAmountInput(val);
