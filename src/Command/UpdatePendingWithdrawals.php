@@ -23,25 +23,25 @@ use Throwable;
 class UpdatePendingWithdrawals extends Command
 {
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
     /** @var DateTime */
-    private $date;
+    private DateTime $date;
 
     /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private BalanceHandlerInterface $balanceHandler;
 
     /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
     /** @var int */
-    public $expirationTime;
+    public int $expirationTime;
 
     /** @var LockFactory */
-    private $lockFactory;
+    private LockFactory $lockFactory;
 
     public function __construct(
         LoggerInterface $logger,
@@ -61,7 +61,6 @@ class UpdatePendingWithdrawals extends Command
         parent::__construct();
     }
 
-    /** {@inheritdoc} */
     protected function configure(): void
     {
         $this
@@ -70,8 +69,7 @@ class UpdatePendingWithdrawals extends Command
             ->setHelp('This command deletes all expired withdrawals and do a payment rollback');
     }
 
-    /** @inheritDoc */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $lock = $this->lockFactory->createLock('update-pending-withdrawals');
 
@@ -101,29 +99,31 @@ class UpdatePendingWithdrawals extends Command
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
-                        $item->getAmount()->getAmount()
+                        $item->getAmount()->getAmount(),
+                        $item->getId()
                     );
 
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
-                        $fee
+                        $fee,
+                        $item->getId()
                     );
 
                     $this->em->remove($item);
                     $this->em->flush();
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdraval to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
                     $pendingCount++;
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
-                    $this->logger->info("[withdrawals] Pending withdraval error: $message ...");
+                    $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
                     $this->em->rollback();
                 }
             }
         }
 
-        $this->logger->info("[withdrawals] Pending withdraval total: $itemsCount, deleted: $pendingCount ..");
+        $this->logger->info("[withdrawals] Pending withdrawal total: $itemsCount, deleted: $pendingCount ..");
 
         $items = $this->getPendingTokenWithdrawRepository()->findAll();
 
@@ -147,29 +147,31 @@ class UpdatePendingWithdrawals extends Command
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
-                        $item->getAmount()->getAmount()
+                        $item->getAmount()->getAmount(),
+                        $item->getId()
                     );
 
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $feeToken,
-                        $fee
+                        $fee,
+                        $item->getId()
                     );
 
                     $this->em->remove($item);
                     $this->em->flush();
                     $this->em->commit();
                     $pendingCount++;
-                    $this->logger->info("[withdrawals] $pendingCount Pending token withdraval ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
+                    $this->logger->info("[withdrawals] $pendingCount Pending token withdrawal ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
-                    $this->logger->info("[withdrawals] Pending token withdraval error: $message ...");
+                    $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
                     $this->em->rollback();
                 }
             }
         }
 
-        $this->logger->info("[withdrawals] Pending token withdraval total: $itemsCount, deleted: $pendingCount ..");
+        $this->logger->info("[withdrawals] Pending token withdrawal total: $itemsCount, deleted: $pendingCount ..");
 
         $this->logger->info('[withdrawals] Update job finished..');
 

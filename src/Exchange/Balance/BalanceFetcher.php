@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
@@ -12,6 +11,11 @@ use App\Exchange\Config\Config;
 use App\Utils\RandomNumberInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 
+/**
+ * Class BalanceFetcher
+ *
+ * @package App\Exchange\Balance
+ */
 class BalanceFetcher implements BalanceFetcherInterface
 {
     private const UPDATE_BALANCE_METHOD = 'balance.update';
@@ -20,17 +24,25 @@ class BalanceFetcher implements BalanceFetcherInterface
     private const BALANCE_TOP_METHOD = 'balance.top';
 
     /** @var JsonRpcInterface */
-    private $jsonRpc;
+    private JsonRpcInterface $jsonRpc;
 
     /** @var RandomNumberInterface */
-    private $random;
+    private RandomNumberInterface $random;
 
     /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
     /** @var Config */
-    private $config;
+    private Config $config;
 
+    /**
+     * BalanceFetcher constructor.
+     *
+     * @param JsonRpcInterface $jsonRpc
+     * @param RandomNumberInterface $randomNumber
+     * @param MoneyWrapperInterface $moneyWrapper
+     * @param Config $config
+     */
     public function __construct(
         JsonRpcInterface $jsonRpc,
         RandomNumberInterface $randomNumber,
@@ -43,18 +55,18 @@ class BalanceFetcher implements BalanceFetcherInterface
         $this->config = $config;
     }
 
-    public function update(int $userId, string $tokenName, string $amount, string $type): void
+    public function update(int $userId, string $tokenName, string $amount, string $type, ?int $businessId = null): void
     {
-        $responce = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
+        $response = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
             $userId + $this->config->getOffset(),
             $tokenName,
             $type,
-            $this->random->getNumber(),
+            $businessId ?? $this->random->getNumber(),
             $amount,
             ['extra' => 1],
         ]);
 
-        if ($responce->hasError()) {
+        if ($response->hasError()) {
             throw new BalanceException();
         }
     }
