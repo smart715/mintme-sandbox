@@ -96,7 +96,6 @@ export default {
         };
     },
     mounted: function() {
-        this.showCountdown();
         this.getAirdropCampaign();
     },
     computed: {
@@ -188,6 +187,7 @@ export default {
                 .then((result) => {
                     this.airdropCampaign = result.data;
                     this.loaded = true;
+                    this.showCountdown();
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_reload'));
