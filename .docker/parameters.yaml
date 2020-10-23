@@ -83,4 +83,23 @@ parameters:
     telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
     telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
     facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+    coinify_api_url: 'https://app-api.sandbox.coinify.com'
+    coinify_ui_url: 'https://trade-ui.sandbox.coinify.com'
+    coinify_api_timeout: 0.1
+    coinify_partner_id: 135
+    coinify_crypto_currencies:
+        - BTC
+        - ETH
     blockchain_disabled: null
+    translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
+    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    translation_flags:
+        en: gb
+        ru: ru
+        ua: ua
+        es: es
+        ar: ae
+        pt: pt
+        fr: fr
+        pl: pl

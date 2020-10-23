@@ -33,17 +33,20 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <input
-                                v-model="buyPrice"
-                                type="text"
-                                id="buy-price-input"
-                                class="form-control"
+                            <price-converter-input
+                                class="d-inline-block"
                                 :class="orderInputClass"
+                                v-model="buyPrice"
+                                input-id="buy-price-input"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
-                                tabindex="3"
-                            >
+                                tabindex="8"
+                                :from="market.base.symbol"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                            />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.buy_order.your.header') }}
                                 <span>
@@ -184,6 +187,8 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
+import {USD} from '../../utils/constants';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeBuyOrder',
@@ -199,6 +204,7 @@ export default {
     ],
     components: {
         Guide,
+        PriceConverterInput,
     },
     props: {
         loginUrl: String,
@@ -215,6 +221,7 @@ export default {
             action: 'buy',
             placingOrder: false,
             balanceManuallyEdited: false,
+            USD,
         };
     },
     methods: {

@@ -63,15 +63,18 @@
                                         <div>
                                             <label for="amount-to-donate">{{ $t('donation.amount') }}</label>
                                             <div class="input-group">
-                                                <input
+                                                <price-converter-input
+                                                    class="d-block flex-grow-1"
                                                     v-model="amountToDonate"
-                                                    id="amount-to-donate"
-                                                    type="text"
-                                                    class="form-control"
+                                                    input-id="amount-to-donate"
                                                     @keypress="checkAmountInput"
                                                     @paste="checkAmountInput"
                                                     @keyup="onKeyup"
-                                                >
+                                                    :from="selectedCurrency"
+                                                    :to="USD.symbol"
+                                                    :subunit="2"
+                                                    symbol="$"
+                                                />
                                                 <div class="input-group-append">
                                                     <button
                                                         @click="all"
@@ -160,7 +163,8 @@ import Guide from '../Guide';
 import Register from '../Register';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME} from '../../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'Donation',
@@ -173,6 +177,7 @@ export default {
         WebSocketMixin,
     ],
     components: {
+        PriceConverterInput,
         Guide,
         ConfirmModal,
         Register,
@@ -201,6 +206,7 @@ export default {
             donationInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
+            USD,
         };
     },
     computed: {

@@ -17,7 +17,7 @@ class LocaleAPIController extends APIController
      * @Rest\Post(
      *     "/change/{locale}",
      *     name="change_locale",
-     *     requirements={"locale" = "en|es|ar|ru|pt|fr|pl|uk"},
+     *     requirements={"locale" = "%translation_requirements%"},
      *     options={"expose"=true}
      *     )
      */

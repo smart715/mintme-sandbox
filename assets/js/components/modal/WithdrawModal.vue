@@ -25,21 +25,27 @@
                     <label for="wamount"  class="d-block text-left">
                         {{ $t('withdraw_modal.amount') }}
                     </label>
-                        <input
-                            id="wamount"
+                    <div class="d-flex">
+                        <price-converter-input class="d-inline-block flex-grow-1"
+                            input-id="wamount"
                             v-model="$v.amount.$model"
-                            type="text"
+                            :input-class="{ 'is-invalid': $v.amount.$error }"
+                            :show-converter="!isToken"
+                            :from="currency"
+                            :to="USD.symbol"
+                            :subunit="2"
+                            symbol="$"
                             @change="setFirstTimeOpen"
-                            @keypress="checkAmount"
-                            @paste="checkAmount"
-                            :class="{ 'is-invalid': $v.amount.$error }"
-                            class="form-control form-control-btn text-left input-custom-padding">
+                            @keypress="checkInput(subunit, 8)"
+                            @paste="checkInput(subunit, 8)"
+                        />
                         <button
-                            class="btn btn-primary btn-input float-right"
+                            class="btn btn-primary btn-input"
                             type="button"
                             @click="setMaxAmount">
                           {{ $t('withdraw_modal.all') }}
                         </button>
+                    </div>
                         <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
                             {{ $t('withdraw_modal.do_not_have', translationsContext) }}
                         </div>
@@ -102,18 +108,27 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
 import {
+    CheckInputMixin,
     MoneyFilterMixin,
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
 } from '../../mixins/';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        CheckInputMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
+        PriceConverterInput,
         Modal,
     },
     props: {
@@ -137,6 +152,7 @@ export default {
             address: '',
             withdrawing: true,
             flag: true,
+            USD,
         };
     },
     computed: {
@@ -169,23 +185,6 @@ export default {
         },
     },
     methods: {
-        checkAmount: function(event) {
-            let inputPos = event.target.selectionStart;
-            let amount = this.$v.amount.$model.toString();
-            let selected = getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${this.subunit}})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
-                return true;
-            }
-            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
-                event.preventDefault();
-                return false;
-            }
-        },
         closeModal: function() {
             this.$v.$reset();
             this.amount = 0;

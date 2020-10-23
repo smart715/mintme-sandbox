@@ -20,12 +20,19 @@ let options = {
     localVue: mockVue(),
     propsData: {
         currentLocale: 'en',
+        flags: '{"en":{"label":"English","flag":"gb"},"es":{"label":"Español","flag":"es"}}',
     },
+};
+
+let expectedFlagClassName = {
+    en: 'gb',
+    es: 'es',
 };
 
 describe('LocaleSwitcher', () => {
    it('should show flag with current locale', () => {
        const wrapper = shallowMount(LocaleSwitcher, options);
-       expect(wrapper.html().includes('flag-icon-'+options.propsData.currentLocale)).toBe(true);
+       expect(wrapper.html().includes('flag-icon-'+expectedFlagClassName.en)).toBe(true);
+       expect(wrapper.html().includes('flag-icon-'+expectedFlagClassName.es)).toBe(true);
    });
 });

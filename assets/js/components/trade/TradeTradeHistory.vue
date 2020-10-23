@@ -176,24 +176,25 @@ export default {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.tableData !== false ? this.tableData.map((order) => {
-                return {
-                    dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    orderMaker: order.maker.profile.nickname,
-                    orderTrader: order.taker.profile.nickname,
-                    makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
-                    takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
-                    type: this.getSideByType(order.side),
-                    pricePerQuote: toMoney(order.price, this.market.base.subunit),
-                    quoteAmount: toMoney(order.amount, this.market.quote.subunit),
-                    baseAmount: toMoney(
-                        new Decimal(order.price).mul(order.amount).toString(),
-                        this.market.base.subunit
-                    ),
-                    makerAvatar: order.maker.profile.image.avatar_small,
-                    takerAvatar: order.taker.profile.image.avatar_small,
-                };
-            }) : [];
+            return this.tableData !== false ? this.tableData.filter((order) => order.maker && order.taker)
+                .map((order) => {
+                    return {
+                        dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                        orderMaker: order.maker.profile.nickname,
+                        orderTrader: order.taker.profile.nickname,
+                        makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
+                        takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
+                        type: this.getSideByType(order.side),
+                        pricePerQuote: toMoney(order.price, this.market.base.subunit),
+                        quoteAmount: toMoney(order.amount, this.market.quote.subunit),
+                        baseAmount: toMoney(
+                            new Decimal(order.price).mul(order.amount).toString(),
+                            this.market.base.subunit
+                        ),
+                        makerAvatar: order.maker.profile.image.avatar_small,
+                        takerAvatar: order.taker.profile.image.avatar_small,
+                    };
+                }) : [];
         },
         loaded: function() {
             return this.tableData !== null;
