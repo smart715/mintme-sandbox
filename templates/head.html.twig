@@ -32,10 +32,7 @@
 <meta property="og:site_name" content="Mintme">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ app.request.uri }}">
-<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) }}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) | absolute_url }}">
 <meta
     property="og:image:alt"
     content="{{ metaImageAlt | default('Mintme logo. Create your own token, monetize yourself!') }}"

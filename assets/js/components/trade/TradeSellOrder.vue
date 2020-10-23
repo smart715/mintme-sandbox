@@ -33,17 +33,20 @@
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <input
-                                v-model="sellPrice"
-                                type="text"
-                                id="sell-price-input"
-                                class="form-control"
+                            <price-converter-input
+                                class="d-inline-block"
                                 :class="orderInputClass"
+                                v-model="sellPrice"
+                                input-id="sell-price-input"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
                                 tabindex="8"
-                            >
+                                :from="market.base.symbol"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                            />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.sell_order.your.header') }}
                                 <span>
@@ -190,11 +193,13 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {MINTME} from '../../utils/constants';
+import {MINTME, USD} from '../../utils/constants';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeSellOrder',
     components: {
+        PriceConverterInput,
         Guide,
     },
     mixins: [
@@ -222,6 +227,7 @@ export default {
             action: 'sell',
             placingOrder: false,
             balanceManuallyEdited: false,
+            USD,
         };
     },
     methods: {

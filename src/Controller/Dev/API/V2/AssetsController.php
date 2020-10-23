@@ -42,7 +42,6 @@ class AssetsController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @return mixed[]
      */
     public function getAssets(): array
     {
