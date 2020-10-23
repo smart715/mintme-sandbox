@@ -23,7 +23,7 @@ final class Version20200405131321 extends AbstractMigration
 
         $this->addSql('CREATE TABLE post (id INT AUTO_INCREMENT NOT NULL, content LONGTEXT DEFAULT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, token_id INT NOT NULL, amount VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
 
-        $this->addSql('ALTER TABLE post ADD CONSTRAINT FK_Posts_Tokens FOREIGN KEY (token_id) REFERENCES token(id)');
+        $this->addSql('ALTER TABLE post ADD CONSTRAINT FK_Posts_Tokens FOREIGN KEY (token_id) REFERENCES token(id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema) : void
