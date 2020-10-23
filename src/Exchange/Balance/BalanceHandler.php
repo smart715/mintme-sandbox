@@ -88,12 +88,12 @@ class BalanceHandler implements BalanceHandlerInterface
 
     public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount, 'deposit');
+        $this->update($user, $token, $amount, 'deposit', $businessId);
     }
 
     public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount->negative(), 'withdraw');
+        $this->update($user, $token, $amount->negative(), 'withdraw', $businessId);
     }
 
     public function summary(Token $token): SummaryResult
