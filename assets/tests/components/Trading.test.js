@@ -114,21 +114,21 @@ describe('Trading', () => {
             done();
         });
     });
-    it('make sure that expected "deployed=2" will be sent', (done) => {
+    it('make sure that expected "filter=2" will be sent', (done) => {
         const wrapper = mockTrading();
         wrapper.vm.toggleFilter('deployed');
         moxios.wait(() => {
             let request = moxios.requests.mostRecent();
-            expect(request.url).toContain('deployed=2');
+            expect(request.url).toContain('filter=2');
             done();
         });
     });
-    it('make sure that "user=1" or "deployed=2" is not will be sent when user selected "all tokens"', (done) => {
+    it('make sure that "user=1" or "filter=2" is not will be sent when user selected "all tokens"', (done) => {
         const wrapper = mockTrading();
         wrapper.vm.toggleFilter('all');
         moxios.wait(() => {
             let request = moxios.requests.mostRecent();
-            expect(request.url).not.toContain('deployed=2');
+            expect(request.url).not.toContain('filter=2');
             expect(request.url).not.toContain('user=1');
             done();
         });
