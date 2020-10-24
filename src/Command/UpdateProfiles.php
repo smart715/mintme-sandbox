@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Entity\Profile;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,12 +16,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UpdateProfiles extends Command
 {
-    /** @var EntityManagerInterface */
-    private $em;
+    private LoggerInterface $logger;
+    private EntityManagerInterface $em;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger)
     {
         $this->em = $em;
+        $this->logger = $logger;
 
         parent::__construct();
     }
@@ -67,23 +69,49 @@ class UpdateProfiles extends Command
                 continue;
             }
 
-            $profile->setNickname(
-                substr(
-                    "{$profile->getFirstname()} {$profile->getLastname()}",
-                    0,
-                    30
-                )
-            );
-            $this->em->persist($profile);
-            $updatedUsers++;
+            $nickname = $this->getNickname($profile);
+            $profile->setNickname($nickname);
+
+            try {
+                $this->em->persist($profile);
+                $this->em->flush();
+                $updatedUsers++;
+            } catch (\Throwable $exception) {
+                $this->logger->error("Can't update nickname({$nickname}): {$exception->getMessage()}");
+            }
         }
 
-        $this->em->flush();
         $progressBar->finish();
         $section->clear();
         $style->success("$updatedUsers users updated");
 
         return 0;
+    }
+
+    private function getNickname(Profile $profile, int $sequence = 0): string
+    {
+        $nickname = strtolower(
+            substr(
+                "{$profile->getFirstname()} {$profile->getLastname()}",
+                0,
+                30
+            )
+        );
+
+        $nickname .= $sequence ?: '';
+
+        if ($this->nicknameHasProfile($nickname)) {
+            return $this->getNickname($profile, ++$sequence);
+        }
+
+        return $nickname;
+    }
+
+    private function nicknameHasProfile(string $nickname): bool
+    {
+        return (bool)$this->getProfileRepository()->findBy([
+                'nickname' => $nickname,
+            ]);
     }
 
     private function getProfileRepository(): ProfileRepository

@@ -83,6 +83,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
+        showTokenEditModalProp: Boolean,
     },
     components: {
         FontAwesomeIcon,
@@ -94,8 +95,8 @@ export default {
             currentName: this.name,
             isTokenExchanged: true,
             isTokenNotDeployed: false,
-            showTokenEditModal: false,
             maxLengthToTruncate: 30,
+            showTokenEditModal: this.showTokenEditModalProp,
         };
     },
     computed: {
@@ -139,6 +140,14 @@ export default {
                 this.checkIfTokenExchanged();
             }
         }, 'token-name-asset-update');
+
+        if (this.showTokenEditModalProp) {
+            window.history.replaceState(
+                {}, '', this.$routing.generate('token_show', {
+                    name: this.name,
+                })
+            );
+        }
     },
     methods: {
         closeTokenEditModal: function() {
@@ -150,7 +159,7 @@ export default {
             }))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError('Can not fetch token data now. Try later');
+                this.notifyError(this.$t('toasted.error.can_not_fetch_token_data'));
                 this.sendLogs('error', 'Can not fetch token data now', err);
             });
         },

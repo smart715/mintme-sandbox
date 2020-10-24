@@ -22,13 +22,15 @@ class ProfileRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore */
-    public function findAllProfileWithEmptyDescription(int $numberOfReminder = 14): ?array
+    public function findAllProfileWithEmptyDescriptionAndNotAnonymous(int $numberOfReminder = 14): ?array
     {
         $query = $this->createQueryBuilder('p')
             ->innerJoin('p.user', 'u', 'p.user = u.id')
-            ->where('p.description is null')
+            ->where('p.description is null or p.description = :emptyString')
+            ->andWhere('p.anonymous = 0')
             ->andWhere('p.numberOfReminder <> :numberOfReminder')
             ->andWhere('p.nextReminderDate = :nextReminderDate OR p.nextReminderDate is null')
+            ->setParameter('emptyString', '')
             ->setParameter('numberOfReminder', $numberOfReminder)
             ->setParameter('nextReminderDate', \Date('Y-m-d'));
 

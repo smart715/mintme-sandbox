@@ -1,6 +1,6 @@
 {% extends "@FOSUser/layout.html.twig" %}
 
-{% block title %} Sign Up | mintMe{% endblock %}
+{% block title %} {% trans from 'messages' %}sign_up{% endtrans %} | mintMe{% endblock %}
 
 {% block fos_user_content %}
     {{ include("@FOSUser/Registration/register_content.html.twig") }}

@@ -248,7 +248,7 @@ export default {
                         })
                         .catch((err) => {
                             this.notifyError(
-                                'Can not connect to internal services'
+                                this.$t('toasted.error.can_not_connect')
                             );
                             this.sendLogs('error', 'Can not connect to internal services', err);
                         });
@@ -257,7 +257,7 @@ export default {
                     if (!isRetryableError(err)) {
                         this.balances = false;
                     } else {
-                        this.notifyError('Can not load current balance. Try again later.');
+                        this.notifyError(this.$t('toasted.error.can_not_load_balance'));
                         this.sendLogs('error', 'Can not load current balance', err);
                     }
                 });
@@ -280,7 +280,7 @@ export default {
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
-                        this.notifyError('Something went wrong. Can not update orders.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_orders'));
                         this.sendLogs('error', 'Can not update orders', err);
                     });
                     break;

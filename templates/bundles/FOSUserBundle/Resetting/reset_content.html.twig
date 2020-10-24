@@ -1,7 +1,7 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
 
-{% set formHeader = "Reset Password" %}
+{% set formHeader = "resetting.header"|trans %}
 {% block formBody %}
     {{ form_start(resettingForm, { 'action': path('fos_user_resetting_reset', {'token': token}), 'attr': { 'class': 'fos_user_resetting_reset', 'id': 'reset' } }) }}
         <div>

@@ -10,6 +10,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     private const DEPLOYED_FIRST = 1;
     private const DEPLOYED_ONLY = 2;
+    private const AIRDROP_ONLY = 3;
+    private const AIRDROP_ACTIVE = 1;
 
     /** @var MarketStatusRepository */
     protected $repository;
@@ -72,20 +75,26 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->em = $em;
     }
 
-    public function getMarketsCount(int $deployed = 0): int
+    /** {@inheritDoc} */
+    public function getMarketsCount(int $filter = 0): int
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('COUNT(ms)')
             ->from(MarketStatus::class, 'ms')
             ->join('ms.quoteToken', 'qt');
 
-        if (self::DEPLOYED_ONLY === $deployed) {
+        if (self::DEPLOYED_ONLY === $filter) {
             $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        } elseif (self::AIRDROP_ONLY === $filter) {
+            $qb->innerJoin('qt.airdrops', 'a')
+                ->where('a.status = :active')
+                ->setParameter('active', self::AIRDROP_ACTIVE);
         }
 
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
+    /** {@inheritDoc} */
     public function getUserRelatedMarketsCount(int $userId): int
     {
         return (int)$this->em->createQueryBuilder()
@@ -104,7 +113,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        int $deployed = 1,
+        int $filter = 1,
         ?int $userId = null
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
@@ -121,12 +130,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 ->setParameter('id', $userId);
         }
 
-        if (self::DEPLOYED_FIRST === $deployed) {
+        if (self::DEPLOYED_FIRST === $filter) {
             $queryBuilder->addSelect(
                 "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
             )->orderBy('deployed', 'DESC');
-        } elseif (self::DEPLOYED_ONLY === $deployed) {
+        } elseif (self::DEPLOYED_ONLY === $filter) {
             $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        } elseif (self::AIRDROP_ONLY === $filter) {
+            $queryBuilder->innerJoin('qt.airdrops', 'a')
+                ->andWhere('a.status = :active')
+                ->setParameter('active', self::AIRDROP_ACTIVE);
         }
 
         if (self::SORT_BY_CHANGE === $sort) {
@@ -161,6 +174,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
+    /** {@inheritDoc} */
     public function createMarketStatus(array $markets): void
     {
         /** @var Market $market */
@@ -186,6 +200,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         }
     }
 
+    /** {@inheritDoc} */
     public function updateMarketStatus(Market $market): void
     {
         $marketStatus = $this->repository->findByBaseQuoteNames(
@@ -239,6 +254,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         ];
     }
 
+    /**
+     * @retrun array<MarketStatus>|null
+     */
     private function getPredefinedMarketStatuses(): array
     {
         return array_map(function (Market $market) {
@@ -251,7 +269,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     /**
      * @param array<MarketStatus> $marketStatuses
-     * @return array<MarketStatus>
+     * @return array
      */
     private function parseMarketStatuses(array $marketStatuses): array
     {
@@ -266,22 +284,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
             $market = $this->marketFactory->create($marketStatus->getCrypto(), $quote);
 
-            if (!$market) {
-                continue;
-            }
-
             $info[$this->marketNameConverter->convert($market)] = $marketStatus;
         }
 
         return $info;
     }
 
-    /**
-     * Return market status
-     *
-     * @param Market $market
-     * @return MarketStatus|null
-     */
+    /** {@inheritDoc} */
     public function getMarketStatus(Market $market): ?MarketStatus
     {
         return $this->repository->findByBaseQuoteNames(
@@ -290,21 +299,28 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
     }
 
-    public function isValid(Market $market): bool
+    /** {@inheritDoc} */
+    public function isValid(Market $market, bool $reverseBaseQuote = false): bool
     {
+        if ($reverseBaseQuote) {
+            $market = BaseQuote::reverseMarket($market);
+        }
+
         $base = $market->getBase();
         $quote = $market->getQuote();
 
         return
             !(
-                $base instanceof Crypto && !$base->isExchangeble() ||
-                $quote instanceof Crypto && !$quote->isTradable() ||
-                $base instanceof Token && $base->isBlocked() ||
+                ($base instanceof Crypto && !$base->isExchangeble()) ||
+                ($quote instanceof Crypto && !$quote->isTradable()) ||
+                ($base instanceof Token && $base->isBlocked()) ||
                 $quote instanceof Token ||
-                $base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol())
+                $base === $quote ||
+                ($base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol()))
             );
     }
 
+    /** {@inheritDoc} */
     public function getExpired(): array
     {
         return $this->repository->getExpired();

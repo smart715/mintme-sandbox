@@ -11,6 +11,7 @@ use App\Form\TwoFactorType;
 use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\TokenManager;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
@@ -47,18 +48,23 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     /** @var NormalizerInterface */
     private $normalizer;
 
+    /** @var TokenManager */
+    private $tokenManager;
+
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
-        NormalizerInterface $normalizer
+        NormalizerInterface $normalizer,
+        TokenManager $tokenManager
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->normalizer = $normalizer;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -94,14 +100,38 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
+            'userToken' => null == $user->getProfile()->getToken()
+                ? null : $user->getProfile()->getToken()->getName(),
         ]);
     }
 
     /**
-     * @Rest\Route("/invite/{code}", name="register-referral", schemes={"https"})
+     * @Rest\Route("/token/{userToken}/invite", name="register-referral-by-token", schemes={"https"})
      */
-    public function registerReferral(string $code, AuthorizationCheckerInterface $authorizationChecker): Response
-    {
+    public function registerReferralByToken(
+        string $userToken,
+        AuthorizationCheckerInterface $authorizationChecker
+    ): Response {
+        $token = $this->tokenManager->findByName($userToken);
+        $referralCode = $token->getProfile()->getUser()->getReferralCode();
+        $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
+            ? $this->redirectToRoute('homepage', [], 301)
+            : $this->redirectToRoute('fos_user_registration_register', [], 301);
+
+        $response->headers->setCookie(
+            new Cookie('referral-code', $referralCode)
+        );
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Route("/invite/{code}", name="register-referral-by-code", schemes={"https"})
+     */
+    public function registerReferralByCode(
+        string $code,
+        AuthorizationCheckerInterface $authorizationChecker
+    ): Response {
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('homepage', [], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);

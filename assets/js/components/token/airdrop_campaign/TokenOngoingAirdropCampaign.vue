@@ -6,16 +6,16 @@
             <div class="row py-2 py-md-2 py-xl-0">
                 <div class="d-inline-block col-lg-10 col-md-12 pr-lg-0 align-self-center">
                     <span class="message">
-                        <span class="text-bold">Ongoing airdrop!</span>
-                        For first {{ airdropCampaign.participants }} participants {{ airdropReward }}
+                        <span class="text-bold">{{ $t('ongoing_airdrop.title') }}</span>
+                        {{ $t('ongoing_airdrop.msg.1', {participants: airdropCampaign.participants, airdropReward: airdropReward}) }}
                     </span>
                     <span class="message">
-                        {{ tokenName }} for free. Currently {{ actualParticipants }}/{{ airdropCampaign.participants }} participants.
+                        {{ $t('ongoing_airdrop.msg.2', {tokenName: tokenName,actualParticipants: actualParticipants, participants: airdropCampaign.participants}) }}
                     </span>
                     <span
                         v-if="showEndDate"
                         class="m-0 message">
-                        Airdrop ends on {{ endsDate }} at {{ endsTime }}
+                        {{ $t('ongoing_airdrop.ends', {endsDate: endsDate, endsTime: endsTime}) }}
                         <span v-if="showDuration">
                             ({{ duration.years() }}y {{ duration.months() }}m {{ duration.days() }}d
                             {{ duration.hours() }}h {{ duration.minutes() }}m {{ duration.seconds() }}s).
@@ -24,12 +24,20 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <button
-                        :disabled="btnDisabled"
-                        @click="showModal = true"
-                        class="btn btn-primary">
-                        Participate
-                    </button>
+                    <span v-if="alreadyClaimed">
+                        <button
+                                :disabled="true"
+                                class="btn btn-primary">
+                            {{ $t('ongoing_airdrop.claimed') }}
+                        </button>
+                    </span>
+                    <span v-else>
+                        <button
+                                @click="showModal = true"
+                                class="btn btn-primary">
+                            {{ $t('ongoing_airdrop.participate') }}
+                        </button>
+                    </span>
                     <confirm-modal
                         :visible="showModal"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
@@ -41,7 +49,7 @@
                             {{ confirmModalMessage }}
                         </p>
                         <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
-                        <template v-if="!loggedIn || isOwner || alreadyClaimed || timeElapsed" v-slot:confirm>
+                        <template v-if="!loggedIn || isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
                     </confirm-modal>
@@ -88,7 +96,6 @@ export default {
         };
     },
     mounted: function() {
-        this.showCountdown();
         this.getAirdropCampaign();
     },
     computed: {
@@ -132,10 +139,10 @@ export default {
             let button = '';
 
             if (!this.loggedIn) {
-                button = 'Log In';
+                button = this.$t('log_in');
             }
 
-            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
+            if (this.isOwner || this.timeElapsed) {
                 button = 'OK';
             }
 
@@ -143,22 +150,24 @@ export default {
         },
         confirmModalMessage: function() {
             if (!this.loggedIn) {
-                return `You have to be logged in to claim ${this.airdropReward} ${this.tokenName}.`;
+                return this.$t('ongoing_airdrop.confirm_message.logged_in', {
+                    airdropReward: this.airdropReward,
+                    tokenName: this.tokenName,
+                });
             }
 
             if (this.isOwner) {
-                return 'Sorry, you can\'t participate in your own airdrop.';
-            }
-
-            if (this.alreadyClaimed) {
-                return 'You already claimed tokens from this airdrop.';
+                return this.$t('ongoing_airdrop.confirm_message.cant_participate');
             }
 
             if (this.timeElapsed) {
-                return 'Sorry, this airdrop has ended.';
+              return this.$t('ongoing_airdrop.ended');
             }
 
-            return `Are you sure you want to claim ${this.airdropReward} ${this.tokenName}?`;
+            return this.$t('ongoing_airdrop.confirm_message', {
+                airdropReward: this.airdropReward,
+                tokenName: this.tokenName,
+            });
         },
     },
     methods: {
@@ -178,9 +187,10 @@ export default {
                 .then((result) => {
                     this.airdropCampaign = result.data;
                     this.loaded = true;
+                    this.showCountdown();
                 })
                 .catch((err) => {
-                    this.notifyError('Something went wrong. Try to reload the page.');
+                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
@@ -190,11 +200,10 @@ export default {
                 return;
             }
 
-            if (this.isOwner || this.alreadyClaimed || this.timeElapsed) {
+            if (this.isOwner || this.timeElapsed) {
                 return;
             }
 
-            this.btnDisabled = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -203,7 +212,6 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
-
                     this.alreadyClaimed = true;
                 })
                 .catch((err) => {
@@ -215,12 +223,11 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
-                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
-                })
-                .then(() => this.btnDisabled = false);
+                });
         },
         modalOnCancel: function() {
             if (!this.loggedIn) {

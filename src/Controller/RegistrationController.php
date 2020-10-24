@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -17,7 +18,6 @@ use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
 use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
-use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -258,6 +258,16 @@ class RegistrationController extends FOSRegistrationController
             $session->remove('register_referer');
 
             return $this->redirect($referer);
+        }
+
+        $refCode = $request->cookies->get('referral-code');
+
+        if (!is_null($refCode)) {
+            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getToken();
+        }
+
+        if (isset($token)) {
+            return $this->redirectToRoute("token_show", ["name" => $token->getName()]);
         }
 
         return parent::confirmedAction($request);

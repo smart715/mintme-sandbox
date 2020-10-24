@@ -180,3 +180,23 @@ parameters:
     #     - ETH
     #     - BTC
     blockchain_disabled: null
+
+    # Prefixes for security access_control.
+    # For add additional language just add slash + lang
+    # (for ex.: if you want to add USA(us) you need to add /us| . Should be like '/us|/ru|/uk|/es|/ar|/pt|/fr|/pl|\s*'
+    # if you want to remove lang, just remove /{language_prefix}|
+    translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
+    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # Flag value should be in ISO 3166-1-alpha-2 code of a country.
+    # Check this https://www.iso.org/obp/ui/#search/code/
+    # To disable language selector menu you need to remove all languages except en or just set this var to ~
+    translation_flags:
+        en: {label: English, flag: gb}
+        es: {label: Español, flag: es}
+        ru: {label: Русский, flag: ru}
+        ua: {label: Українська, flag: ua}
+        pl: {label: Polski, flag: pl}
+        ar: {label: العربية, flag: ae}
+        pt: {label: Portugues, flag: pt}
+        fr: {label: Française, flag: fr}

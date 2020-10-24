@@ -17,6 +17,7 @@ function mockVue() {
                     return val + Object.entries(params).reduce((acc, param) => acc + `?${param[0]}=${param[1]}`, '');
                 }};
             Vue.prototype.$toasted = {show: () => false};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -79,9 +80,9 @@ describe('Trading', () => {
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
 
-        expect(wrapper.html().includes('No one deployed tokens yet')).toBe(true);
+        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No one deployed tokens yet')).toBe(false);
+        expect(wrapper.html().includes('trading.no_one_deployed')).toBe(false);
     });
     it('show message if user has no any token yet', () => {
         const wrapper = mockTrading();
@@ -90,9 +91,9 @@ describe('Trading', () => {
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
 
-        expect(wrapper.html().includes('No any token yet')).toBe(true);
+        expect(wrapper.html().includes('trading.no_any_token')).toBe(true);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('No any token yet')).toBe(false);
+        expect(wrapper.html().includes('trading.no_any_token')).toBe(false);
     });
     it('show rest of token link', () => {
         const wrapper = mockTrading();
@@ -100,9 +101,9 @@ describe('Trading', () => {
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.markets = {};
         wrapper.vm.loading = false;
-        expect(wrapper.html().includes('Show all tokens')).toBe(false);
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
         wrapper.vm.sanitizedMarkets = market;
-        expect(wrapper.html().includes('Show all tokens')).toBe(true);
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
     });
     it('make sure that expected "user=1" will be sent', (done) => {
         const wrapper = mockTrading();
@@ -113,21 +114,21 @@ describe('Trading', () => {
             done();
         });
     });
-    it('make sure that expected "deployed=2" will be sent', (done) => {
+    it('make sure that expected "filter=2" will be sent', (done) => {
         const wrapper = mockTrading();
         wrapper.vm.toggleFilter('deployed');
         moxios.wait(() => {
             let request = moxios.requests.mostRecent();
-            expect(request.url).toContain('deployed=2');
+            expect(request.url).toContain('filter=2');
             done();
         });
     });
-    it('make sure that "user=1" or "deployed=2" is not will be sent when user selected "all tokens"', (done) => {
+    it('make sure that "user=1" or "filter=2" is not will be sent when user selected "all tokens"', (done) => {
         const wrapper = mockTrading();
         wrapper.vm.toggleFilter('all');
         moxios.wait(() => {
             let request = moxios.requests.mostRecent();
-            expect(request.url).not.toContain('deployed=2');
+            expect(request.url).not.toContain('filter=2');
             expect(request.url).not.toContain('user=1');
             done();
         });
@@ -257,7 +258,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.sanitizedMarketsOnTop).toMatchObject([
-                                {pair: 'BTC/WEB', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
+                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
                             ]);
                             done();
                         });

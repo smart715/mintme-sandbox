@@ -2,14 +2,14 @@
     <div class="h-100">
         <div class="card h-100">
             <div class="card-header text-left">
-                Sell Order
+                {{ $t('trade.sell_order.header') }}
                 <span  class="card-header-icon">
                     <guide>
                         <template slot="header">
-                            Sell Order
+                            {{ $t('trade.sell_order.guide_header') }}
                         </template>
                         <template slot="body">
-                            Form used to create  an order so you can sell {{ market.quote | rebranding }} or make offer.
+                            {{ $t('trade.sell_order.guide_body', translationsContext) }}
                         </template>
                     </guide>
                 </span>
@@ -21,31 +21,34 @@
                             <label
                                 for="sell-price-input"
                                 class="text-white">
-                                Price in {{ market.base.symbol | rebranding }}:
+                                {{ $t('trade.sell_order.price_in.header', translationsContext) }}
                             </label>
                             <guide>
                                 <template slot="header">
-                                    Price in {{ market.base.symbol | rebranding }}
+                                  {{ $t('trade.sell_order.price_in.guide_header', translationsContext) }}
                                 </template>
                                 <template slot="body">
-                                    The price at which you want to sell one {{ market.quote | rebranding }}.
+                                    {{ $t('trade.sell_order.price_in.guide_body', translationsContext) }}
                                 </template>
                             </guide>
                         </div>
                         <div class="d-flex">
-                            <input
-                                v-model="sellPrice"
-                                type="text"
-                                id="sell-price-input"
-                                class="form-control"
+                            <price-converter-input
+                                class="d-inline-block"
                                 :class="orderInputClass"
+                                v-model="sellPrice"
+                                input-id="sell-price-input"
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
                                 tabindex="8"
-                            >
+                                :from="market.base.symbol"
+                                :to="USD.symbol"
+                                :subunit="2"
+                                symbol="$"
+                            />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
-                                Your
+                                {{ $t('trade.sell_order.your.header') }}
                                 <span>
                                     <span v-if="shouldTruncate" class="c-pointer" @click="balanceClicked"
                                         v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'window', customClass:'tooltip-custom'}">
@@ -59,10 +62,10 @@
                                             {{ immutableBalance | toMoney(market.quote.subunit) | formatMoney }}
                                                 <guide>
                                                     <template slot="header">
-                                                        Your {{ tokenSymbol }}
+                                                        {{ $t('trade.sell_order.your.guide_header', translationsContext) }}
                                                     </template>
                                                     <template slot="body">
-                                                        Your {{ market.quote.symbol | rebranding }} balance.
+                                                        {{ $t('trade.sell_order.your.guide_body', translationsContext) }}
                                                     </template>
                                                 </guide>
                                         </span>
@@ -71,7 +74,7 @@
                                                 v-if="showDepositMoreLink"
                                                 :href="depositMoreLink"
                                                 tabindex="6"
-                                            >Deposit more</a>
+                                            >{{ $t('trade.sell_order.deposit_more') }}</a>
                                         </span>
                                     </span>
                                 </span>
@@ -83,7 +86,7 @@
                             for="sell-price-amount"
                             class="d-flex flex-row flex-nowrap justify-content-start w-50"
                         >
-                            <span class="d-inline-block text-nowrap">Amount in </span>
+                            <span class="d-inline-block text-nowrap">{{ $t('trade.sell_order.amount') }}</span>
                             <span v-if="shouldTruncate"
                                   v-b-tooltip="{title:market.quote.symbol, boundary:'window', customClass:'tooltip-custom'}"
                                   class="d-inline-block ml-1"
@@ -122,15 +125,14 @@
                                     <label
                                         class="custom-control-label pb-0"
                                         for="sell-price">
-                                        Market Price
+                                        {{ $t('trade.sell_order.market_price.header') }}
                                     </label>
                                     <guide>
                                         <template slot="header">
-                                            Market Price
+                                            {{ $t('trade.sell_order.market_price.guide_header') }}
                                         </template>
                                         <template slot="body">
-                                            Checking this box fetches current best market price
-                                            for which you can sell {{ market.quote.symbol | rebranding }}.
+                                            {{ $t('trade.sell_order.market_price.guide_body', {quoteSymbol: market.quote.symbol }) | rebranding }}
                                         </template>
                                     </guide>
                                 </div>
@@ -138,14 +140,14 @@
                         </div>
                     </div>
                     <div v-if="loggedIn" class="col-12 pt-2">
-                        Total Price:
+                        {{ $t('trade.sell_order.total_price.header') }}
                         {{ totalPrice | toMoney(market.base.subunit) | formatMoney }} {{ market.base.symbol | rebranding }}
                         <guide>
                             <template slot="header">
-                                Total Price
+                                {{ $t('trade.sell_order.total_price.guide_header') }}
                             </template>
                             <template slot="body">
-                                Total amount to pay, including exchange fee.
+                                {{ $t('trade.buy_order.total_price.guide_body') }}
                             </template>
                         </guide>
                     </div>
@@ -160,9 +162,9 @@
                             Create sell order
                         </button>
                         <template v-else>
-                            <a :href="loginUrl" class="btn btn-primary">Log In</a>
-                            <span class="px-2">or</span>
-                            <a :href="signupUrl">Sign Up</a>
+                            <a :href="loginUrl" class="btn btn-primary">{{ $t('log_in') }}</a>
+                            <span class="px-2">{{ $t('or') }}</span>
+                            <a :href="signupUrl">{{ $t('sign_up') }}</a>
                         </template>
                     </div>
                 </div>
@@ -191,11 +193,13 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {MINTME} from '../../utils/constants';
+import {MINTME, USD} from '../../utils/constants';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'TradeSellOrder',
     components: {
+        PriceConverterInput,
         Guide,
     },
     mixins: [
@@ -223,6 +227,7 @@ export default {
             action: 'sell',
             placingOrder: false,
             balanceManuallyEdited: false,
+            USD,
         };
     },
     methods: {
@@ -239,10 +244,9 @@ export default {
         placeOrder: function() {
             if (this.sellPrice && this.sellAmount) {
                 if ((new Decimal(this.sellPrice)).times(this.sellAmount).lessThan(this.minTotalPrice)) {
-                    let symbol = this.rebrandingFunc(this.market.base.symbol);
                     this.showNotification({
                         result: 2,
-                        message: `Total amount has to be at least ${this.minTotalPrice} ${symbol}`,
+                        message: this.$t('trade.sell_order.amount_has_to_be', this.translationsContext),
                     });
                     return;
                 }
@@ -335,6 +339,14 @@ export default {
         },
         disabledMarketPrice: function() {
             return !this.marketPrice > 0 || !this.loggedIn;
+        },
+        translationsContext: function() {
+            return {
+                baseSymbol: this.rebrandingFunc(this.market.base.symbol),
+                quoteSymbol: this.rebrandingFunc(this.market.quote),
+                minTotalPrice: this.minTotalPrice,
+                tokenSymbol: this.tokenSymbol,
+            };
         },
         ...mapGetters('makeOrder', [
             'getSellPriceInput',

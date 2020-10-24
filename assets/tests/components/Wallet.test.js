@@ -42,6 +42,7 @@ function mockVue() {
                 modules: {status},
             });
             Vue.prototype.$toasted = {show: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -197,8 +198,8 @@ describe('Wallet', () => {
                 propsData: propsForTestCorrectlyRenders,
             });
             wrapper.vm.openDeposit(webSymbol, 8);
-            expect(wrapper.vm.depositAddress).toBe('Loading..');
-            expect(wrapper.vm.depositDescription).toBe('Send WEB to the address above.');
+            expect(wrapper.vm.depositAddress).toBe('wallet.loading');
+            expect(wrapper.vm.depositDescription).toBe('wallet.send_to_address');
             expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
             expect(wrapper.vm.deposit.fee).toBeUndefined();
             expect(wrapper.vm.isTokenModal).toBe(false);

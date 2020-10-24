@@ -37,9 +37,12 @@ validate:
 	make phpunit
 	make syntax_check
 	make syntax_check_assets
-	make karma
+	make jest
 
 correct:
 	make syntax_correction
 	make syntax_correction_assets
 
+all:
+	make correct
+	make validate

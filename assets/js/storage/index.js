@@ -6,6 +6,7 @@ import makeOrder from './modules/make_order';
 import newsImages from './modules/news_images';
 import interval from '../utils/interval';
 import tokenStatistics from './modules/token_statistics';
+import rates from './modules/rates';
 
 Vue.use(Vuex);
 
@@ -20,5 +21,6 @@ export default new Vuex.Store({
         makeOrder,
         tokenStatistics,
         newsImages,
+        rates,
     },
 });

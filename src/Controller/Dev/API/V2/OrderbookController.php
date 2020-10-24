@@ -2,11 +2,11 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrderbookController extends AbstractFOSRestController
 {
-
-    use BaseQuoteOrderTrait;
-
     public const ONLY_BEST = 1;
     public const ARRANGED_BY_BEST = 2;
     public const NO_AGGREGATION = 3;
@@ -62,9 +59,7 @@ class OrderbookController extends AbstractFOSRestController
      *     name="level",
      *     requirements=@Assert\Range(min="1", max="3"),
      *     nullable=false,
-     *     description="Level 1 – Only the best bid and ask.
-    Level 2 – Arranged by best bids and asks.
-    Level 3 – Complete order book, no aggregation.",
+     *     description="Level 1 – Only the best bid and ask. Level 2 – Arranged by best bids and asks. Level 3 – Complete order book, no aggregation.",
      *     allowBlank=false,
      *     strict=true
      * )
@@ -78,10 +73,6 @@ class OrderbookController extends AbstractFOSRestController
      * @SWG\Parameter(name="level", in="query", type="integer")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @param ParamFetcherInterface $request
-     * @param string $base_quote
-     * @return mixed[]
-     * @throws ApiNotFoundException
      */
     public function getOrderbook(ParamFetcherInterface $request, string $base_quote): array
     {
@@ -102,9 +93,9 @@ class OrderbookController extends AbstractFOSRestController
         $depth =
             !empty($request->get('depth')) ?
                 (int)$request->get('depth') :
-            100;
+                100;
 
-        $market = $this->reverseBaseQuote($market);
+        $market = BaseQuote::reverseMarket($market);
 
         $orderDepth = [];
 

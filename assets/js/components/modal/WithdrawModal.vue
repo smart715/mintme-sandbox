@@ -5,10 +5,10 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center overflow-wrap-break-word word-break-all">
-                <h3 class="col-12 modal-title">WITHDRAW ({{ currency | rebranding }})</h3>
+                <h3 class="col-12 modal-title">{{ $t('withdraw_modal.title') }}({{ currency | rebranding}})</h3>
                 <div class="col-12 pt-2">
                     <label for="address" class="d-block text-left">
-                        Address:
+                        {{ $t('withdraw_modal.address') }}
                     </label>
                     <input
                         v-model="$v.address.$model"
@@ -18,58 +18,65 @@
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
                     <div v-if="$v.address.$error" class="invalid-feedback">
-                        {{ 'WEB' === currency || true === isToken ? 'Wallet address has to be 42 characters long with leading 0x' : 'Invalid wallet address'}}
+                        {{ ('WEB' === currency || true === isToken ? $t('withdraw_modal.length') : $t('withdraw_modal.invalid_addr'))}}
                     </div>
                 </div>
                 <div class="col-12 pt-2 pb-5 withdraw-amount">
                     <label for="wamount"  class="d-block text-left">
-                        Amount (balance):
+                        {{ $t('withdraw_modal.amount') }}
                     </label>
-                        <input
-                            id="wamount"
+                    <div class="d-flex">
+                        <price-converter-input class="d-inline-block flex-grow-1"
+                            input-id="wamount"
                             v-model="$v.amount.$model"
-                            type="text"
+                            :input-class="{ 'is-invalid': $v.amount.$error }"
+                            :show-converter="!isToken"
+                            :from="currency"
+                            :to="USD.symbol"
+                            :subunit="2"
+                            symbol="$"
                             @change="setFirstTimeOpen"
-                            @keypress="checkAmount"
-                            @paste="checkAmount"
-                            :class="{ 'is-invalid': $v.amount.$error }"
-                            class="form-control form-control-btn text-left input-custom-padding">
+                            @keypress="checkInput(subunit, 8)"
+                            @paste="checkInput(subunit, 8)"
+                        />
                         <button
-                            class="btn btn-primary btn-input float-right"
+                            class="btn btn-primary btn-input"
                             type="button"
                             @click="setMaxAmount">
-                            All
+                          {{ $t('withdraw_modal.all') }}
                         </button>
+                    </div>
                         <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
-                            You don't have enough {{ currency|rebranding }}
+                            {{ $t('withdraw_modal.do_not_have', translationsContext) }}
                         </div>
                         <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
-                            Minimum withdraw amount is {{ minAmount }} {{ currency|rebranding }}
+                            {{ $t('withdraw_modal.min_withdraw', translationsContext) }}
                         </div>
                         <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
-                            Invalid amount.
+                            {{ $t('withdraw_modal.invalid_amount') }}
                         </div>
                 </div>
                 <div v-if="twoFAEnabled" class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
-                        Two Factor Authentication Code:
+                        {{ $t('withdraw_modal.twofa_code') }}
                     </label>
                     <input
                         autocomplete="off"
                         v-model="code"
                         type="text"
                         id="twofactor"
-                        class="form-control">
+                        class="form-control"
+                    >
                 </div>
                 <div class="col-12 text-left">
                     <label>
-                        Withdrawal fee:
+                      {{ $t('withdraw_modal.fee') }}
                     </label>
                     <span class="float-right">{{ feeAmount }} {{ feeCurrency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
-                        Total to be withdrawn:
+                      {{ $t('withdraw_modal.total') }}
                     </label>
                     <span class="overflow-wrap-break-word word-break-all float-right">
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
@@ -88,7 +95,7 @@
                         @keyup.enter="onCancel"
                         tabindex="0"
                     >
-                        <slot name="cancel">Cancel</slot>
+                        <slot name="cancel">{{ $t('withdraw_modal.cancel') }}</slot>
                     </button>
                 </div>
             </div>
@@ -101,13 +108,27 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, requiredIf, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode} from '../../utils/constants';
+import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
+import {
+    CheckInputMixin,
+    MoneyFilterMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+} from '../../mixins/';
+import PriceConverterInput from '../PriceConverterInput';
 
 export default {
     name: 'WithdrawModal',
-    mixins: [MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        CheckInputMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
+        PriceConverterInput,
         Modal,
     },
     props: {
@@ -131,6 +152,7 @@ export default {
             address: '',
             withdrawing: true,
             flag: true,
+            USD,
         };
     },
     computed: {
@@ -158,25 +180,14 @@ export default {
         feeCurrency: function() {
             return this.isToken ? webSymbol : this.currency;
         },
+        translationsContext: function() {
+            return {
+                currency: this.currency,
+                minAmount: this.minAmount,
+            };
+        },
     },
     methods: {
-        checkAmount: function(event) {
-            let inputPos = event.target.selectionStart;
-            let amount = this.$v.amount.$model.toString();
-            let selected = getSelection().toString();
-            let regex = new RegExp(`^([0-9]?)+(\\.?([0-9]?){1,${this.subunit}})?$`);
-            let input = event instanceof ClipboardEvent
-                ? event.clipboardData.getData('text')
-                : String.fromCharCode(!event.charCode ? event.which : event.charCode);
-
-            if (selected && regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos + selected.length))) {
-                return true;
-            }
-            if (!regex.test(amount.slice(0, inputPos) + input + amount.slice(inputPos))) {
-                event.preventDefault();
-                return false;
-            }
-        },
         closeModal: function() {
             this.$v.$reset();
             this.amount = 0;
@@ -187,12 +198,12 @@ export default {
         onWithdraw: function() {
             this.$v.$touch();
             if (this.$v.$error) {
-                this.notifyError('Correct your form fields');
+                this.notifyError(this.$t('toasted.error.correct_form'));
                 return;
             }
 
             if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
-                this.notifyError('You do not have enough ' + this.rebrandingFunc(this.feeCurrency) + ' to pay the fee');
+                this.notifyError(this.$t('toasted.error.do_not_have_enough', {currency: this.rebrandingFunc(this.feeCurrency)}));
                 return;
             }
 
