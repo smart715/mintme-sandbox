@@ -56,7 +56,7 @@
                             {{ $t('withdraw_modal.invalid_amount') }}
                         </div>
                 </div>
-                <div v-if="twoFAEnabled" class="col-12 pb-3">
+                <div v-if="twofa" class="col-12 pb-3">
                     <label for="twofactor" class="d-block text-left">
                         {{ $t('withdraw_modal.twofa_code') }}
                     </label>
@@ -106,7 +106,7 @@
 <script>
 import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
-import {required, requiredIf, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
+import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
 import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
 import {
@@ -147,7 +147,7 @@ export default {
     },
     data() {
         return {
-            code: '',
+            code: null,
             amount: 0,
             address: '',
             withdrawing: true,
@@ -156,9 +156,6 @@ export default {
         };
     },
     computed: {
-        twoFAEnabled: function() {
-          return this.twofa;
-        },
         minAmount: function() {
             return toMoney('1e-' + this.subunit, this.subunit);
         },
@@ -192,7 +189,7 @@ export default {
             this.$v.$reset();
             this.amount = 0;
             this.address = '';
-            this.code = '';
+            this.code = null;
             this.$emit('close');
         },
         onWithdraw: function() {
@@ -213,13 +210,13 @@ export default {
                 'crypto': this.currency,
                 'amount': this.amount,
                 'address': this.address,
-                'code': this.code || null,
+                'code': this.code,
             })
             .then((response) => {
-                if (this.twoFAEnabled) {
+                if (this.code === null) {
                     this.notifySuccess('Withdrawal request successfully confirmed and added to queue.');
                 } else {
-                    this.notifySuccess(`Confirmation email has been sent to your email. It will expire in ${Math.floor(this.expirationTime / 3600)} hours.`);
+                    this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
                 }
                 this.closeModal();
             })
@@ -270,7 +267,6 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
-                required: requiredIf('twoFAEnabled'),
                 twoFACode,
             },
         };
