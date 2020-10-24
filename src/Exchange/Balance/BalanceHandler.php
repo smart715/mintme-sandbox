@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;

@@ -2,8 +2,10 @@
 
 namespace App\Exchange\Balance;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Exception\RepeatUpdateException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\BalanceResultFactory;
 use App\Exchange\Balance\Model\SummaryResult;
@@ -57,17 +59,23 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function update(int $userId, string $tokenName, string $amount, string $type, ?int $businessId = null): void
     {
-        $response = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
-            $userId + $this->config->getOffset(),
-            $tokenName,
-            $type,
-            $businessId ?? $this->random->getNumber(),
-            $amount,
-            ['extra' => 1],
-        ]);
+        try {
+            $response = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
+                $userId + $this->config->getOffset(),
+                $tokenName,
+                $type,
+                $businessId ?? $this->random->getNumber(),
+                $amount,
+                ['extra' => 1],
+            ]);
+        } catch (FetchException $e) {
+            if ('repeat update' === $e->getMessage()) {
+                throw new RepeatUpdateException('The balance has already been updated.');
+            }
+        }
 
-        if ($response->hasError()) {
-            throw new BalanceException();
+        if (isset($response) && $response->hasError()) {
+            throw new BalanceException($response->getError()['message'] ?? 'Unknown response error');
         }
     }
 

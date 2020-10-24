@@ -3,6 +3,7 @@
 namespace App\Exchange\Balance;
 
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Exception\RepeatUpdateException;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 
@@ -20,6 +21,7 @@ interface BalanceFetcherInterface
      * @param string $type
      * @param int|null $businessId
      * @throws BalanceException
+     * @throws RepeatUpdateException
      */
     public function update(int $userId, string $tokenName, string $amount, string $type, ?int $businessId = null): void;
 
