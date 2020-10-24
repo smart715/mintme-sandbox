@@ -116,8 +116,9 @@ class UpdatePendingWithdrawals extends Command
                     $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
                     $pendingCount++;
-                } catch (RepeatUpdateException $e) {
-                    // Do no roll back the item removal in case it is a repeat update, because the withdraw was successful.
+                } catch (RepeatUpdateException $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
                     $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
@@ -166,8 +167,9 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->commit();
                     $pendingCount++;
                     $this->logger->info("[withdrawals] $pendingCount Pending token withdrawal ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
-                } catch (RepeatUpdateException $e) {
-                    // Do no roll back the item removal in case it is a repeat update, because the withdraw was successful.
+                } catch (RepeatUpdateException $exception) {
+                    $message = $exception->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
                 } catch (Throwable $exception) {
                     $message = $exception->getMessage();
                     $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
