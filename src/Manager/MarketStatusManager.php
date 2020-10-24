@@ -34,6 +34,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     private const DEPLOYED_FIRST = 1;
     private const DEPLOYED_ONLY = 2;
+    private const AIRDROP_ONLY = 3;
+    private const AIRDROP_ACTIVE = 1;
 
     /** @var MarketStatusRepository */
     protected $repository;
@@ -74,15 +76,19 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getMarketsCount(int $deployed = 0): int
+    public function getMarketsCount(int $filter = 0): int
     {
         $qb = $this->em->createQueryBuilder();
         $qb->select('COUNT(ms)')
             ->from(MarketStatus::class, 'ms')
             ->join('ms.quoteToken', 'qt');
 
-        if (self::DEPLOYED_ONLY === $deployed) {
+        if (self::DEPLOYED_ONLY === $filter) {
             $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        } elseif (self::AIRDROP_ONLY === $filter) {
+            $qb->innerJoin('qt.airdrops', 'a')
+                ->where('a.status = :active')
+                ->setParameter('active', self::AIRDROP_ACTIVE);
         }
 
         return (int)$qb->getQuery()->getSingleScalarResult();
@@ -107,7 +113,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        int $deployed = 1,
+        int $filter = 1,
         ?int $userId = null
     ): array {
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
@@ -124,12 +130,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 ->setParameter('id', $userId);
         }
 
-        if (self::DEPLOYED_FIRST === $deployed) {
+        if (self::DEPLOYED_FIRST === $filter) {
             $queryBuilder->addSelect(
                 "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
             )->orderBy('deployed', 'DESC');
-        } elseif (self::DEPLOYED_ONLY === $deployed) {
+        } elseif (self::DEPLOYED_ONLY === $filter) {
             $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+        } elseif (self::AIRDROP_ONLY === $filter) {
+            $queryBuilder->innerJoin('qt.airdrops', 'a')
+                ->andWhere('a.status = :active')
+                ->setParameter('active', self::AIRDROP_ACTIVE);
         }
 
         if (self::SORT_BY_CHANGE === $sort) {

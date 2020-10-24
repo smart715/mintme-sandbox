@@ -246,6 +246,11 @@
                                 <p class="text-center p-5">{{ $t('trading.no_one_deployed') }}</p>
                             </div>
                         </template>
+                        <template v-if="marketFilters.selectedFilter === marketFilters.options.airdrop.key && !tokens.length">
+                            <div class="row justify-content-center">
+                                <p class="text-center p-5">{{ $t('trading.no_one_airdrop') }}</p>
+                            </div>
+                        </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.user.key && !tokens.length">
                             <div class="row justify-content-center">
                                 <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
@@ -296,6 +301,7 @@ import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
+const AIRDROP_ONLY = 3;
 
 export default {
     name: 'Trading',
@@ -355,6 +361,10 @@ export default {
                     deployed: {
                         key: 'deployed',
                         label: this.$t('trading.deployed.label'),
+                    },
+                    airdrop: {
+                        key: 'airdrop',
+                        label: this.$t('trading.airdrop.label'),
                     },
                     all: {
                         key: 'all',
@@ -474,7 +484,11 @@ export default {
         },
         toggleFilter: function(value) {
             let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
-                && (value === this.marketFilters.options.deployed.key || value === this.marketFilters.options.all.key)
+                && (
+                    value === this.marketFilters.options.deployed.key
+                    || value === this.marketFilters.options.all.key
+                    || value === this.marketFilters.options.airdrop.key
+                )
                 && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
@@ -555,9 +569,13 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.deployed = DEPLOYED_ONLY;
+                    params.filter = DEPLOYED_ONLY;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
+                ) {
+                    params.filter = AIRDROP_ONLY;
                 } else if (deployedFirst) {
-                    params.deployed = DEPLOYED_FIRST;
+                    params.filter = DEPLOYED_FIRST;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))

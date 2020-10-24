@@ -17,7 +17,7 @@ interface MarketStatusManagerInterface
      * @param int $limit
      * @param string $sort
      * @param string $order
-     * @param int $deployed
+     * @param int $filter
      * @param int|null $userId
      * @return array<MarketStatus>
      */
@@ -26,7 +26,7 @@ interface MarketStatusManagerInterface
         int $limit,
         string $sort = "monthVolume",
         string $order = "DESC",
-        int $deployed = 0,
+        int $filter = 0,
         ?int $userId = null
     ): array;
 

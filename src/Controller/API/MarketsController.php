@@ -46,7 +46,7 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
-     * @Rest\QueryParam(name="deployed", default=0)
+     * @Rest\QueryParam(name="filter", default=0)
      * @Rest\QueryParam(name="sort", default="monthVolume")
      * @Rest\QueryParam(name="order", default="DESC")
      */
@@ -61,14 +61,14 @@ class MarketsController extends APIController
             ? $user->getId()
             : null;
 
-        $deployed = (int)$request->get('deployed');
+        $filter = (int)$request->get('filter');
 
         $markets = $marketStatusManager->getMarketsInfo(
             self::TOKENS_ON_PAGE * ($page - 1),
             self::TOKENS_ON_PAGE,
             $request->get('sort'),
             $request->get('order'),
-            $deployed,
+            $filter,
             $user
         );
 
@@ -76,7 +76,7 @@ class MarketsController extends APIController
             'markets' => $markets['markets'] ?? $markets,
             'rows' => $user
                 ? $marketStatusManager->getUserRelatedMarketsCount($user)
-                : $marketStatusManager->getMarketsCount($deployed),
+                : $marketStatusManager->getMarketsCount($filter),
             'limit' => self::TOKENS_ON_PAGE,
         ]);
     }
