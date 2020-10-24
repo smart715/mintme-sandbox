@@ -18,9 +18,10 @@ interface BalanceFetcherInterface
      * @param string $tokenName
      * @param string $amount
      * @param string $type
+     * @param int|null $businessId
      * @throws BalanceException
      */
-    public function update(int $userId, string $tokenName, string $amount, string $type): void;
+    public function update(int $userId, string $tokenName, string $amount, string $type, ?int $businessId = null): void;
 
     public function summary(string $tokenName): SummaryResult;
 

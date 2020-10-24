@@ -182,7 +182,8 @@ class BalanceHandler implements BalanceHandlerInterface
                 $user->getId(),
                 $this->converter->convert($token),
                 $this->moneyWrapper->format($amount),
-                $type
+                $type,
+                $businessId
             );
         } catch (BalanceException $exception) {
             $this->logger->error(
