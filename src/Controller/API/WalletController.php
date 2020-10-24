@@ -127,21 +127,13 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
             ], Response::HTTP_BAD_GATEWAY);
         }
-
         $code = $request->get('code');
 
-        if (!$user->isGoogleAuthenticatorEnabled()
-            && null === $code) {
-            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            if (empty($code) || !$twoFactorManager->checkCode($user, strval($code))) {
+                throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
+            }
 
-            $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
-                'address' => $pendingWithdraw->getAddress()->getAddress(),
-                'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
-            ]);
-        }
-
-        if ($user->isGoogleAuthenticatorEnabled()
-            && $twoFactorManager->checkCode($user, strval($code))) {
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
             } catch (Throwable $exception) {
@@ -150,7 +142,15 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 ], Response::HTTP_BAD_GATEWAY);
             }
         } else {
-            throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
+            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+
+            $this->userActionLogger->info($this->translations->trans(
+                'api.wallet.went_withdrawal_email',
+                ['%symbol%' => $tradable->getSymbol()]
+            ), [
+                'address' => $pendingWithdraw->getAddress()->getAddress(),
+                'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+            ]);
         }
 
         return $this->view();
