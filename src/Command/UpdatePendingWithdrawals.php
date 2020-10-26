@@ -173,8 +173,7 @@ class UpdatePendingWithdrawals extends Command
                     if ('repeat update' !== $e->getMessage()) {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
-                    }
-                    else {
+                    } else {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
                         $this->em->rollback();
