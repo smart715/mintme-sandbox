@@ -92,6 +92,7 @@ class UpdatePendingWithdrawals extends Command
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $pendingCount++;
+                $errorMessage = '';
                 $crypto = $item->getCrypto();
                 $fee   = $crypto->getFee();
                 $token = Token::getFromCrypto($crypto);
@@ -104,23 +105,25 @@ class UpdatePendingWithdrawals extends Command
                         $item->getAmount()->getAmount(),
                         $item->getId()
                     );
+                } catch (Throwable $e) {
+                    $errorMessage = $e->getMessage();
+                    $this->logger->info("[withdrawals] Pending withdrawal error: $errorMessage");
+                }
 
+                try {
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
                         $fee,
-                        $item->getId()
+                        $item->getId() + 1000000
                     );
                 } catch (Throwable $e) {
-                    if ('repeat update' === $e->getMessage()) {
-                        $message = $e->getMessage();
-                        $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
-                    } else {
-                        $message = $e->getMessage();
-                        $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
+                    $errorMessage = $e->getMessage();
+                    $this->logger->info("[withdrawals] Pending withdrawal error: $errorMessage");
+                }
 
-                        break;
-                    }
+                if ('' !== $errorMessage && 'repeat update' !== $errorMessage) {
+                    break;
                 }
 
                 $this->em->remove($item);
@@ -131,7 +134,6 @@ class UpdatePendingWithdrawals extends Command
         }
 
         $this->logger->info("[withdrawals] Pending withdrawal total: $itemsCount, deleted: $pendingCount ..");
-
         $items = $this->getPendingTokenWithdrawRepository()->findAll();
 
         $itemsCount = count($items);
@@ -141,6 +143,7 @@ class UpdatePendingWithdrawals extends Command
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
                 $pendingCount++;
+                $errorMessage = '';
                 $token = $item->getToken();
                 $this->em->beginTransaction();
                 $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
@@ -154,23 +157,25 @@ class UpdatePendingWithdrawals extends Command
                         $item->getAmount()->getAmount(),
                         $item->getId()
                     );
+                } catch (Throwable $e) {
+                    $errorMessage = $e->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
+                }
 
+                try {
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $feeToken,
                         $fee,
-                        $item->getId()
+                        $item->getId() + 1000000
                     );
                 } catch (Throwable $e) {
-                    if ('repeat update' === $e->getMessage()) {
-                        $message = $e->getMessage();
-                        $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
-                    } else {
-                        $message = $e->getMessage();
-                        $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
+                    $errorMessage = $e->getMessage();
+                    $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
+                }
 
-                        break;
-                    }
+                if ('' !== $errorMessage && 'repeat update' !== $errorMessage) {
+                    break;
                 }
 
                 $this->em->remove($item);
@@ -181,7 +186,6 @@ class UpdatePendingWithdrawals extends Command
         }
 
         $this->logger->info("[withdrawals] Pending token withdrawal total: $itemsCount, deleted: $pendingCount ..");
-
         $this->logger->info('[withdrawals] Update job finished..');
 
         $lock->release();
