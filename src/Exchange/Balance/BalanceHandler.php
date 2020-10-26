@@ -87,12 +87,20 @@ class BalanceHandler implements BalanceHandlerInterface
 
     public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount, 'deposit', $businessId);
+        try {
+            $this->update($user, $token, $amount, 'deposit', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
     public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount->negative(), 'withdraw', $businessId);
+        try {
+            $this->update($user, $token, $amount->negative(), 'withdraw', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
     public function summary(Token $token): SummaryResult
@@ -184,13 +192,15 @@ class BalanceHandler implements BalanceHandlerInterface
                 $type,
                 $businessId
             );
-        } catch (\Throwable $exception) {
+        } catch (BalanceException $e) {
             $this->logger->error(
                 "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
-                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$exception->getMessage()}"
+                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$e->getMessage()}"
             );
 
-            throw $exception;
+            throw $e;
+        } catch (\Throwable $e) {
+            throw $e;
         }
 
         $this->updateUserTokenRelation($user, $token);
