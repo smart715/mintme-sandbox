@@ -45,9 +45,10 @@ const storage = {
             state.quoteBalance = n;
 
             if (state.subtractQuoteBalanceFromBuyAmount) {
-                state.buyAmountInput = (new Decimal(state.buyAmountInput)
-                    .toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber() - state.quoteBalance)
-                    / (1 - state.takerFee);
+                let amount = (state.buyAmountInput - state.quoteBalance) / (1 - state.takerFee);
+
+                state.buyAmountInput = new Decimal(amount)
+                    .toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
                 state.subtractQuoteBalanceFromBuyAmount = false;
             }
         },
