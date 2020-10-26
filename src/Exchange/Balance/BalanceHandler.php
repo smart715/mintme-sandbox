@@ -184,7 +184,7 @@ class BalanceHandler implements BalanceHandlerInterface
                 $type,
                 $businessId
             );
-        } catch (BalanceException $exception) {
+        } catch (\Throwable $exception) {
             $this->logger->error(
                 "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
                 Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$exception->getMessage()}"
