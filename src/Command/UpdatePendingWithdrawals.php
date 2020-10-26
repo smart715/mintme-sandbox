@@ -117,7 +117,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->commit();
                     $pendingCount++;
                 } catch (Throwable $e) {
-                    if ('repeat update' !== $e->getMessage()) {
+                    if ('repeat update' === $e->getMessage()) {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
                     } else {
@@ -170,7 +170,7 @@ class UpdatePendingWithdrawals extends Command
                     $pendingCount++;
                     $this->logger->info("[withdrawals] $pendingCount Pending token withdrawal ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
                 } catch (Throwable $e) {
-                    if ('repeat update' !== $e->getMessage()) {
+                    if ('repeat update' === $e->getMessage()) {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
                     } else {
