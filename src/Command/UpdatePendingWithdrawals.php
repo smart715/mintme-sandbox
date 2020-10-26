@@ -6,7 +6,6 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Balance\Exception\RepeatUpdateException;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
@@ -75,6 +74,7 @@ class UpdatePendingWithdrawals extends Command
         $lock = $this->lockFactory->createLock('update-pending-withdrawals');
 
         if (!$lock->acquire()) {
+            $this->logger->info('Cannot acquire lock, another app:update-pending-withdrawals is in progress.');
             return 0;
         }
 
