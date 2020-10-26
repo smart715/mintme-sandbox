@@ -59,23 +59,17 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function update(int $userId, string $tokenName, string $amount, string $type, ?int $businessId = null): void
     {
-        try {
-            $response = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
-                $userId + $this->config->getOffset(),
-                $tokenName,
-                $type,
-                $businessId ?? $this->random->getNumber(),
-                $amount,
-                ['extra' => 1],
-            ]);
-        } catch (FetchException $e) {
-            if ('repeat update' === $e->getMessage()) {
-                throw new RepeatUpdateException('The balance has already been updated.');
-            }
-        }
+        $response = $this->jsonRpc->send(self::UPDATE_BALANCE_METHOD, [
+            $userId + $this->config->getOffset(),
+            $tokenName,
+            $type,
+            $businessId ?? $this->random->getNumber(),
+            $amount,
+            ['extra' => 1],
+        ]);
 
-        if (isset($response) && $response->hasError()) {
-            throw new BalanceException($response->getError()['message'] ?? 'Unknown response error');
+        if ($response->hasError()) {
+            throw new BalanceException();
         }
     }
 
