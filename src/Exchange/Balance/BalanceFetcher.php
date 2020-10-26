@@ -69,7 +69,7 @@ class BalanceFetcher implements BalanceFetcherInterface
         ]);
 
         if ($response->hasError()) {
-            throw new BalanceException();
+            throw new BalanceException($response->getError()['message'] ?? 'unknown error');
         }
     }
 
