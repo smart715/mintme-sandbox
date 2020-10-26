@@ -38,7 +38,7 @@ class UpdatePendingWithdrawals extends Command
     private CryptoManagerInterface $cryptoManager;
 
     /** @var int */
-    public int $expirationTime;
+    public int $withdrawExpirationTime;
 
     /** @var int */
     public int $viabtcResponseTimeout;
@@ -83,8 +83,8 @@ class UpdatePendingWithdrawals extends Command
         }
 
         try {
-            $this->logger->info("[withdrawals] Update job started with expiration time: {$this->expirationTime}S.. ");
-            $expires = new DateInterval('PT' . $this->expirationTime . 'S');
+            $this->logger->info("[withdrawals] Update job started with expiration time: {$this->withdrawExpirationTime}S.. ");
+            $expires = new DateInterval('PT' . $this->withdrawExpirationTime . 'S');
             $items = $this->getPendingWithdrawRepository()->findAll();
             $itemsCount = count($items);
             $pendingCount = 0;
