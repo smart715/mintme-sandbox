@@ -75,6 +75,7 @@ class UpdatePendingWithdrawals extends Command
 
         if (!$lock->acquire()) {
             $this->logger->info('Cannot acquire lock, another app:update-pending-withdrawals is in progress.');
+
             return 0;
         }
 
