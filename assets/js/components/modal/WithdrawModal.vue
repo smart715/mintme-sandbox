@@ -87,7 +87,7 @@
                         class="btn btn-primary"
                         :disabled="$v.$anyError || withdrawing"
                         @click="onWithdraw">
-                        Withdraw
+                        {{ $t('withdraw_modal.submit') }}
                     </button>&nbsp;
                     <button
                         class="btn-cancel pl-3 c-pointer bg-transparent"
