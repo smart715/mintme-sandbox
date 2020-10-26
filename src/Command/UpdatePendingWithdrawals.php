@@ -105,7 +105,7 @@ class UpdatePendingWithdrawals extends Command
                         $item->getAmount()->getAmount(),
                         $item->getId()
                     );
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     $errorMessage = $e->getMessage();
                     $this->logger->info("[withdrawals] Pending withdrawal error: $errorMessage");
                 }
@@ -117,7 +117,7 @@ class UpdatePendingWithdrawals extends Command
                         $fee,
                         $item->getId() + 1000000
                     );
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     $errorMessage = $e->getMessage();
                     $this->logger->info("[withdrawals] Pending withdrawal error: $errorMessage");
                 }
@@ -157,7 +157,7 @@ class UpdatePendingWithdrawals extends Command
                         $item->getAmount()->getAmount(),
                         $item->getId()
                     );
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     $errorMessage = $e->getMessage();
                     $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
                 }
@@ -169,7 +169,7 @@ class UpdatePendingWithdrawals extends Command
                         $fee,
                         $item->getId() + 1000000
                     );
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     $errorMessage = $e->getMessage();
                     $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
                 }
