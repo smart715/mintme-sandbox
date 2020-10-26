@@ -90,8 +90,8 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
+                $pendingCount++;
                 $crypto = $item->getCrypto();
-
                 $fee   = $crypto->getFee();
                 $token = Token::getFromCrypto($crypto);
                 $this->em->beginTransaction();
@@ -110,12 +110,6 @@ class UpdatePendingWithdrawals extends Command
                         $fee,
                         $item->getId()
                     );
-
-                    $this->em->remove($item);
-                    $this->em->flush();
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
-                    $this->em->commit();
-                    $pendingCount++;
                 } catch (Throwable $e) {
                     if ('repeat update' === $e->getMessage()) {
                         $message = $e->getMessage();
@@ -123,9 +117,15 @@ class UpdatePendingWithdrawals extends Command
                     } else {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending withdrawal error: $message ...");
-                        $this->em->rollback();
+
+                        break;
                     }
                 }
+
+                $this->em->remove($item);
+                $this->em->flush();
+                $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                $this->em->commit();
             }
         }
 
@@ -139,17 +139,14 @@ class UpdatePendingWithdrawals extends Command
         /** @var PendingTokenWithdraw $item */
         foreach ($items as $item) {
             if ($item->getDate()->add($expires) < $this->date->now()) {
+                $pendingCount++;
                 $token = $item->getToken();
-
                 $this->em->beginTransaction();
+                $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+                $fee = $crypto->getFee();
+                $feeToken = Token::getFromCrypto($crypto);
 
                 try {
-                    $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
-                    $fee = $crypto->getFee();
-
-                    $feeToken = Token::getFromCrypto($crypto);
-
                     $this->balanceHandler->deposit(
                         $item->getUser(),
                         $token,
@@ -163,12 +160,6 @@ class UpdatePendingWithdrawals extends Command
                         $fee,
                         $item->getId()
                     );
-
-                    $this->em->remove($item);
-                    $this->em->flush();
-                    $this->em->commit();
-                    $pendingCount++;
-                    $this->logger->info("[withdrawals] $pendingCount Pending token withdrawal ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
                 } catch (Throwable $e) {
                     if ('repeat update' === $e->getMessage()) {
                         $message = $e->getMessage();
@@ -176,9 +167,15 @@ class UpdatePendingWithdrawals extends Command
                     } else {
                         $message = $e->getMessage();
                         $this->logger->info("[withdrawals] Pending token withdrawal error: $message ...");
-                        $this->em->rollback();
+
+                        break;
                     }
                 }
+
+                $this->em->remove($item);
+                $this->em->flush();
+                $this->em->commit();
+                $this->logger->info("[withdrawals] $pendingCount Pending token withdrawal ({$item->getSymbol()}, user id={$item->getUser()->getId()}) returns.");
             }
         }
 
