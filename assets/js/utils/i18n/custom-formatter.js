@@ -9,7 +9,12 @@ export default class CustomFormatter {
      * @return {string} String with interpolated translation
      */
     interpolate(translation, context) {
-        let result = translation;
+        let result = translation
+            .replaceAll('&#039;', '\'')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>');
 
         if (typeof context === 'object') {
             const matches = result.match(/(%([^%]|%%)*%)/g);
