@@ -14,7 +14,7 @@
                     </div>
                     <div class="pt-3 text-justify">
                         <p>{% trans %}page.privacy.intro.1{% endtrans %}</p>
-                        <p>{% trans %}page.privacy.intro.2{% endtrans %} {{ global_contact_email }}</a></p>
+                        <p>{% trans with {'%email%': global_contact_email}%}page.privacy.intro.2{% endtrans %}</a></p>
                     </div>
 
                     <div class="text-justify">
