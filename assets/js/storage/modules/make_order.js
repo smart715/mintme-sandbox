@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 const storage = {
     namespaced: true,
     state: {
@@ -43,7 +45,10 @@ const storage = {
             state.quoteBalance = n;
 
             if (state.subtractQuoteBalanceFromBuyAmount) {
-                state.buyAmountInput = (state.buyAmountInput - state.quoteBalance) / (1 - state.takerFee);
+                let amount = (state.buyAmountInput - state.quoteBalance) / (1 - state.takerFee);
+
+                state.buyAmountInput = new Decimal(amount)
+                    .toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
                 state.subtractQuoteBalanceFromBuyAmount = false;
             }
         },
