@@ -29,21 +29,21 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Groups({"API"})
      * @var DateTimeImmutable
      */
-    private $date;
+    private DateTimeImmutable $date;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
      * @Groups({"API"})
      * @var Token
      */
-    private $token;
+    private Token $token;
 
     /**
      * @ORM\Column(type="string")
@@ -56,7 +56,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingWithdrawals")
      * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * @Assert\NotBlank()
@@ -69,7 +69,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $hash;
+    protected string $hash;
 
     public function __construct(User $user, Token $token, Amount $amount, Address $address)
     {
@@ -77,6 +77,11 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         $this->token = $token;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getHash(): string
