@@ -52,7 +52,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockLockFactory()
         );
 
-        $upw->expirationTime = 1;
+        $upw->withdrawExpirationTime = 1;
 
         $application->add($upw);
 
@@ -89,7 +89,7 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockLockFactory()
         );
 
-        $upw->expirationTime = 1;
+        $upw->withdrawExpirationTime = 1;
 
         $application->add($upw);
 

@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -23,32 +22,49 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class BalanceHandler
+ *
+ * @package App\Exchange\Balance
+ */
 class BalanceHandler implements BalanceHandlerInterface
 {
     /** @var TokenNameConverterInterface */
-    private $converter;
+    private TokenNameConverterInterface $converter;
 
     /** @var BalanceFetcherInterface */
-    private $balanceFetcher;
+    private BalanceFetcherInterface $balanceFetcher;
 
     /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     /** @var UserManagerInterface */
-    private $userManager;
+    private UserManagerInterface $userManager;
 
     /** @var BalancesArrayFactoryInterface */
-    private $balanceArrayFactory;
+    private BalancesArrayFactoryInterface $balanceArrayFactory;
 
     /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
     /** @var TraderBalanceViewFactoryInterface */
-    private $traderBalanceViewFactory;
+    private TraderBalanceViewFactoryInterface $traderBalanceViewFactory;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
+    /**
+     * BalanceHandler constructor.
+     *
+     * @param TokenNameConverterInterface $converter
+     * @param BalanceFetcherInterface $balanceFetcher
+     * @param EntityManagerInterface $entityManager
+     * @param UserManagerInterface $userManager
+     * @param BalancesArrayFactoryInterface $balanceArrayFactory
+     * @param MoneyWrapperInterface $moneyWrapper
+     * @param TraderBalanceViewFactoryInterface $traderBalanceViewFactory
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         TokenNameConverterInterface $converter,
         BalanceFetcherInterface $balanceFetcher,
@@ -69,16 +85,22 @@ class BalanceHandler implements BalanceHandlerInterface
         $this->logger = $logger;
     }
 
-    /** {@inheritdoc} */
-    public function deposit(User $user, Token $token, Money $amount): void
+    public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount, 'deposit');
+        try {
+            $this->update($user, $token, $amount, 'deposit', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
-    /** {@inheritdoc} */
-    public function withdraw(User $user, Token $token, Money $amount): void
+    public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount->negative(), 'withdraw');
+        try {
+            $this->update($user, $token, $amount->negative(), 'withdraw', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
     public function summary(Token $token): SummaryResult
@@ -86,9 +108,6 @@ class BalanceHandler implements BalanceHandlerInterface
         return $this->balanceFetcher->summary($this->converter->convert($token));
     }
 
-    /**
-     * @param Token[] $tokens
-     */
     public function balances(User $user, array $tokens): BalanceResultContainer
     {
         return $this->balanceFetcher
@@ -116,7 +135,6 @@ class BalanceHandler implements BalanceHandlerInterface
         return $balance;
     }
 
-    /** @inheritDoc */
     public function topHolders(
         TradebleInterface $tradable,
         int $limit,
@@ -164,26 +182,25 @@ class BalanceHandler implements BalanceHandlerInterface
         return $init->subtract($withdrawn)->subtract($available);
     }
 
-    /**
-     * @throws FetchException
-     * @throws BalanceException
-     */
-    public function update(User $user, Token $token, Money $amount, string $type): void
+    public function update(User $user, Token $token, Money $amount, string $type, ?int $businessId = null): void
     {
         try {
             $this->balanceFetcher->update(
                 $user->getId(),
                 $this->converter->convert($token),
                 $this->moneyWrapper->format($amount),
-                $type
+                $type,
+                $businessId
             );
-        } catch (BalanceException $exception) {
+        } catch (BalanceException $e) {
             $this->logger->error(
                 "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
-                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$exception->getMessage()}"
+                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$e->getMessage()}"
             );
 
-            throw $exception;
+            throw $e;
+        } catch (\Throwable $e) {
+            throw $e;
         }
 
         $this->updateUserTokenRelation($user, $token);
@@ -192,7 +209,7 @@ class BalanceHandler implements BalanceHandlerInterface
     public function updateUserTokenRelation(User $user, Token $token): void
     {
         if ($token->getId()) {
-            $tokenExist = array_filter($user->getTokens(), function (Token $userToken) use ($token) {
+            $tokenExist = array_filter($user->getTokens(), static function (Token $userToken) use ($token) {
                 return $userToken->getId() === $token->getId();
             });
 
@@ -208,6 +225,11 @@ class BalanceHandler implements BalanceHandlerInterface
 
     /**
      * @param array[] $balances
+     * @param TradebleInterface $tradable
+     * @param int $limit
+     * @param int $extend
+     * @param int $incrementer
+     * @param int $max
      * @return TraderBalanceView[]
      */
     private function createBalanceViewWithExtension(
@@ -218,7 +240,7 @@ class BalanceHandler implements BalanceHandlerInterface
         int $incrementer,
         int $max
     ): array {
-        if (0 === count($balances) || $tradable instanceof Token && null === $tradable->getId()) {
+        if (0 === count($balances) || ($tradable instanceof Token && null === $tradable->getId())) {
             return [];
         }
 
@@ -234,19 +256,28 @@ class BalanceHandler implements BalanceHandlerInterface
         return $this->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
     }
 
-    private function getUserTradables(TradebleInterface $tradeble, array $userIds): array
+    /**
+     * @param TradebleInterface $tradable
+     * @param array $userIds
+     * @return array
+     */
+    private function getUserTradables(TradebleInterface $tradable, array $userIds): array
     {
-        if ($tradeble instanceof Token) {
-            return $this->userManager->getUserToken($tradeble, $userIds);
+        if ($tradable instanceof Token) {
+            return $this->userManager->getUserToken($tradable, $userIds);
         }
 
-        if ($tradeble instanceof Crypto) {
-            return $this->userManager->getUserCrypto($tradeble, $userIds);
+        if ($tradable instanceof Crypto) {
+            return $this->userManager->getUserCrypto($tradable, $userIds);
         }
 
         return [];
     }
 
+    /**
+     * @param array $balances
+     * @return array
+     */
     private function normalizeBalances(array $balances): array
     {
         return array_filter($balances, static function ($key) {
