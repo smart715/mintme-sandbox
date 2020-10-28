@@ -180,7 +180,8 @@ services:
 
     App\Command\UpdatePendingWithdrawals:
         properties:
-            expirationTime: '%withdraw_expiration_time%'
+            withdrawExpirationTime: '%withdraw_expiration_time%'
+            viabtcResponseTimeout: '%viabtc_response_timeout_seconds%'
         arguments:
             $logger: '@logger'
         tags:

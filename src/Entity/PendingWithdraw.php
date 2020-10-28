@@ -26,21 +26,21 @@ class PendingWithdraw implements PendingWithdrawInterface
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Groups({"API"})
      * @var DateTimeImmutable
      */
-    private $date;
+    private DateTimeImmutable $date;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
      * @Groups({"API"})
      * @var Crypto
      */
-    private $crypto;
+    private Crypto $crypto;
 
     /**
      * @ORM\Column(type="string")
@@ -53,7 +53,7 @@ class PendingWithdraw implements PendingWithdrawInterface
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingWithdrawals")
      * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * @Assert\NotBlank()
@@ -66,7 +66,7 @@ class PendingWithdraw implements PendingWithdrawInterface
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $hash;
+    protected string $hash;
 
     public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
     {
@@ -74,6 +74,11 @@ class PendingWithdraw implements PendingWithdrawInterface
         $this->crypto = $crypto;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getHash(): string
