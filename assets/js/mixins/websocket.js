@@ -66,7 +66,7 @@ export default {
                         if (result.error !== null ||
                             (result.result !== null && result.result.status !== 'success')) {
                             this._logoutClient(this.websocketUrl);
-                            return reject(new Error(this.$t('mixin.websocket.authorize_failed')));
+                            return reject(new Error(this.$t('mixin.websocket.authorize_failed') + JSON.stringify(result.error)));
                         }
 
                         this._authorizeClient(this.websocketUrl);
