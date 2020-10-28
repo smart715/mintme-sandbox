@@ -33,8 +33,8 @@ final class Version20200825163628 extends AbstractMigration
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
 
-        $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_Comments_Posts FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_Comments_Users FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_Comments_Posts FOREIGN KEY (post_id) REFERENCES post(id)');
+        $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_Comments_Users FOREIGN KEY (user_id) REFERENCES user(id)');
     }
 
     public function down(Schema $schema) : void
