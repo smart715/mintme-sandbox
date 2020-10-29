@@ -247,4 +247,63 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             ->addPart($textBody, 'text/plain');
         $this->mailer->send($msg);
     }
+
+    public function sendKnowledgeBaseMail(User $user, Token $token): void
+    {
+        $tokenSalesUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $aimingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Aiming-at-a-strong-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $ideasUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Ideas-to-promote-and-sell-your-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $stuckUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Stuck-not-knowing-what-to-do-next'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $talkingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $deployUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'How-to-deploy-my-token-to-the-blockchain'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/knowledge_base_suggestions.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+            'deployUrl' => $deployUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/knowledge_base_suggestions.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $subjectMsg = 'What Now?';
+        $msg = (new Swift_Message($subjectMsg))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
 }

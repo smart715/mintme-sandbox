@@ -13,6 +13,7 @@ use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
@@ -196,7 +197,8 @@ class TokenController extends Controller
         Request $request,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
-        MarketStatusManagerInterface $marketStatusManager
+        MarketStatusManagerInterface $marketStatusManager,
+        MailerInterface $mailer
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
@@ -237,6 +239,8 @@ class TokenController extends Controller
             );
             $this->em->persist($token);
             $this->em->flush();
+
+            $mailer->sendKnowledgeBaseMail($user, $token);
 
             try {
                 /** @var User $user*/
