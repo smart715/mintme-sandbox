@@ -26,16 +26,21 @@
                 alt="mintMe"
             >
         </a>
-        <button
-            class="navbar-toggler"
-            :class="{ 'collapsed': !showNavbarMenu }"
-            type="button"
-            :aria-expanded="showNavbarMenu"
-            aria-label="Toggle navigation"
-            @click="toggleNavbarMenu"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div>
+            {% if show_links %}
+                <user-notification class="d-lg-none float-left small-bell"></user-notification>
+            {% endif %}
+            <button
+                    class="navbar-toggler"
+                    :class="{ 'collapsed': !showNavbarMenu }"
+                    type="button"
+                    :aria-expanded="showNavbarMenu"
+                    aria-label="Toggle navigation"
+                    @click="toggleNavbarMenu"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
         <div class="collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
             <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-auto">
                 <token-searcher
@@ -101,6 +106,11 @@
                         {% trans %}navbar.help{% endtrans %}
                     </a>
                 </li>
+                {% if show_links %}
+                    <li class="align-self-center c-pointer desktop-notification-bell">
+                        <user-notification></user-notification>
+                    </li>
+                {% endif %}
                 {% if not app.user %}
                     <li class="nav-item align-self-center {{ route == 'fos_user_security_login' ? 'active' : '' }}">
                         <a href="{{ path('fos_user_security_login') }}" class="nav-link">

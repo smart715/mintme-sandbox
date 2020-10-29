@@ -30,7 +30,7 @@ class SecurityController extends FOSSecurityController
 
     /** @var UserActionLogger */
     private $userActionLogger;
-    
+
     /** @var SessionInterface */
     private $session;
 

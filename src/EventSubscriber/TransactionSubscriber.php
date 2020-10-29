@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TransactionSubscriber implements EventSubscriberInterface
@@ -81,7 +82,7 @@ class TransactionSubscriber implements EventSubscriberInterface
 
         try {
             $this->mailer->checkConnection();
-            $this->mailer->sendTransactionCompletedMail($tradable, $user, $amount, $event::TYPE);
+            $this->mailer->sendTransactionCompletedMail($user, $event::TYPE);
             $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
         } catch (\Throwable $e) {
             $this->logger->error("Couldn't send ".$event::TYPE." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}");
@@ -118,7 +119,6 @@ class TransactionSubscriber implements EventSubscriberInterface
             $tradable->setWithdrawn($withdrawnObj->getAmount());
             $this->em->persist($tradable);
             $this->em->flush();
-
             $this->logger->info(
                 "[transaction-subscriber] Success token update withdrawn operation.",
                 [

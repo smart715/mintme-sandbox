@@ -11,7 +11,7 @@
         <tr>
             <th>
                 <p class="text-dark-white" style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal;">
-                    {% trans with {'%amount%': amount, '%symbol%': tradable.symbol|rebranding} %}withdraw.completed{% endtrans %}
+                    {% trans with {'%urlWallet%':urlWallet}%}withdrawal.msg{% endtrans %}
                 </p>
             </th>
         </tr>

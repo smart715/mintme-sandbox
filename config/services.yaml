@@ -193,6 +193,10 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
+    App\Command\CheckUserSellOrdersCommand:
+        properties:
+            timeIntervals: '%time_intervals%'
+
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
             $disabledCrypto: '%blockchain_disabled%'
@@ -642,3 +646,7 @@ services:
             - [setAnnotationReader, ['@annotation_reader']]
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    App\Manager\ScheduledNotificationManager:
+        properties:
+            timeIntervals: '%time_intervals%'

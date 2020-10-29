@@ -2,6 +2,5 @@
 {% block content %}
 {% trans %}hello{% endtrans %}
 {{username}}
-{% trans with {'%amount%': amount, '%symbol%': symbol} %}deposit_completed.msg{% endtrans %}
-{% trans %}deposit_completed.msg.available{% endtrans %}
+{% trans with {'%urlWallet%':urlWallet}%}deposit.msg{% endtrans %}
 {% endblock %}
