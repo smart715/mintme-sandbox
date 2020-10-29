@@ -20,4 +20,5 @@ interface MailerInterface
     public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userLoginInfo): void;
     public function sendProfileFillingReminderMail(User $user): void;
     public function sendTokenDescriptionReminderMail(User $user): void;
+    public function sendKnowledgeBaseMail(User $user, Token $token): void;
 }
