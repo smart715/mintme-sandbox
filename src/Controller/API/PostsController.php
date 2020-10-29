@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Entity\Comment;
-use App\Entity\Like;
 use App\Entity\Post;
 use App\Entity\User;
 use App\Exception\ApiNotFoundException;
@@ -200,14 +199,10 @@ class PostsController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        $like = $this->entityManager
-            ->getRepository(Like::class)
-            ->findOneBy(['user' => $user, 'comment' => $comment]);
+        $isAlreadyliked = $comment->getLikedBy($user);
 
-        if ($like) {
-            $this->entityManager->remove($like);
-
-            $comment->removeLike();
+        if ($isAlreadyliked) {
+            $comment->removeLike($user);
             $this->entityManager->persist($comment);
 
             $this->entityManager->flush();
@@ -215,12 +210,8 @@ class PostsController extends AbstractFOSRestController
             return $this->view(['message' => 'Like removed.', Response::HTTP_OK]);
         }
 
-        $like = (new Like())->setComment($comment)->setUser($user);
-        $this->entityManager->persist($like);
-
-        $comment->addLike();
+        $comment->addLike($user);
         $this->entityManager->persist($comment);
-
         $this->entityManager->flush();
 
         return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
