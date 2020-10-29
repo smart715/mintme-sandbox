@@ -200,3 +200,6 @@ parameters:
         ar: {label: العربية, flag: ae}
         pt: {label: Portugues, flag: pt}
         fr: {label: Française, flag: fr}
+
+    # min amount of a specific tokens to start DM the owner
+    dm_min_amount: 1

@@ -5,6 +5,7 @@ import Trade from '../../js/components/trade/Trade';
 import moxios from 'moxios';
 import axios from 'axios';
 import {Constants} from '../../js/utils';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 
 const $routing = {generate: (val, params) => val};
 
@@ -27,6 +28,7 @@ function mockVue() {
             Vue.prototype.$store = new Vuex.Store({
                 modules: {
                     status,
+                    tradeBalance,
                     websocket: {
                         namespaced: true,
                         actions: {
@@ -117,29 +119,65 @@ describe('Trade', () => {
 
     it('should compute baseBalance correctly', () => {
         const localVue = mockVue();
-        const wrapper = shallowMount(Trade, {
+        let wrapper = shallowMount(Trade, {
             localVue,
+            computed: {
+                balances: () => false,
+            },
             propsData: propsForTestCorrectlyRenders,
         });
-        wrapper.vm.balances = false;
         expect(wrapper.vm.baseBalance).toBe(false);
-        wrapper.vm.balances = [];
+
+        wrapper = shallowMount(Trade, {
+            localVue,
+            computed: {
+                balances: () => [],
+            },
+            propsData: propsForTestCorrectlyRenders,
+        });
         expect(wrapper.vm.baseBalance).toBe(false);
-        wrapper.vm.balances = {'BTC': {available: '10'}};
+
+        wrapper = shallowMount(Trade, {
+            localVue,
+            computed: {
+                balances: () => {
+                    return {BTC: {available: '10'}};
+                },
+            },
+            propsData: propsForTestCorrectlyRenders,
+        });
         expect(wrapper.vm.baseBalance).toBe('10');
     });
 
     it('should compute quoteBalance correctly', () => {
         const localVue = mockVue();
-        const wrapper = shallowMount(Trade, {
+        let wrapper = shallowMount(Trade, {
             localVue,
+            computed: {
+                balances: () => false,
+            },
             propsData: propsForTestCorrectlyRenders,
         });
-        wrapper.vm.balances = false;
         expect(wrapper.vm.quoteBalance).toBe(false);
-        wrapper.vm.balances = [];
+
+        wrapper = shallowMount(Trade, {
+            localVue,
+            computed: {
+                balances: () => [],
+            },
+            propsData: propsForTestCorrectlyRenders,
+        });
         expect(wrapper.vm.quoteBalance).toBe(false);
-        wrapper.vm.balances = {'WEB': {available: '11'}};
+
+        wrapper = shallowMount(Trade, {
+            localVue,
+            computed: {
+                balances() {
+                    return {WEB: {available: '11'}};
+                },
+            },
+            propsData: propsForTestCorrectlyRenders,
+        });
         expect(wrapper.vm.quoteBalance).toBe('11');
     });
 
@@ -311,60 +349,6 @@ describe('Trade', () => {
             moxios.wait(() => {
                 expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}, {price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.buyPage).toBe(3);
-                done();
-            });
-        });
-    });
-
-    describe('updateAssets', () => {
-        it('set balances to false when not logged in', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.balances = 'foo';
-            wrapper.setProps({loggedIn: false});
-            wrapper.vm.updateAssets();
-            expect(wrapper.vm.balances).toBe(false);
-        });
-
-        it('should do $axios request and set balances correctly when market quote symbol is undefined', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.updateAssets();
-            wrapper.vm.loggedIn = true;
-
-            moxios.stubRequest('tokens', {
-                status: 200,
-                response: {common: ['foo'], predefined: ['bar']},
-            });
-
-            moxios.wait(() => {
-                expect(wrapper.vm.balances['WEB']).toMatchObject({available: '0'});
-                done();
-            });
-        });
-
-        it('should do $axios request and set balances correctly when market quote symbol is defined', (done) => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(Trade, {
-                localVue,
-                propsData: propsForTestCorrectlyRenders,
-            });
-            wrapper.vm.updateAssets();
-            wrapper.vm.loggedIn = true;
-
-            moxios.stubRequest('tokens', {
-                status: 200,
-                response: {common: {WEB: 'foo'}, predefined: ['bar']},
-            });
-
-            moxios.wait(() => {
-                expect(wrapper.vm.balances).toMatchObject({'0': 'bar', 'WEB': 'foo'});
                 done();
             });
         });

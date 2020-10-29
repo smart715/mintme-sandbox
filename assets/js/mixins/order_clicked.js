@@ -9,7 +9,7 @@ export default {
         loggedIn: Boolean,
     },
     computed: {
-        ...mapGetters('makeOrder', [
+        ...mapGetters('tradeBalance', [
             'getBaseBalance',
             'getQuoteBalance',
             'getUseSellMarketPrice',
@@ -40,7 +40,7 @@ export default {
                     : toMoney(order.amount, this.quotePrecision)
             );
         },
-        ...mapMutations('makeOrder', [
+        ...mapMutations('tradeBalance', [
             'setSellPriceInput',
             'setSellAmountInput',
             'setBuyPriceInput',
