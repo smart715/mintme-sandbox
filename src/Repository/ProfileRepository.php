@@ -16,6 +16,12 @@ class ProfileRepository extends EntityRepository
     }
 
     /** @codeCoverageIgnore */
+    public function getProfileById(int $id): ?Profile
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
+
+    /** @codeCoverageIgnore */
     public function getProfileByNickname(string $nickname): ?Profile
     {
         return $this->findOneBy(['nickname' => $nickname]);

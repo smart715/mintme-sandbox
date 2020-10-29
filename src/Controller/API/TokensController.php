@@ -7,6 +7,8 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
@@ -39,6 +41,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -77,6 +80,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -84,6 +90,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -95,6 +102,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
         $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -458,6 +466,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if (!$token) {
             throw $this->createNotFoundException('Token does not exist');
         }
+
+        /** @var User */
+        $user = $this->getUser();
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent(
+                $user,
+                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+            ),
+            UserNotificationEvent::NAME
+        );
 
         return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
     }

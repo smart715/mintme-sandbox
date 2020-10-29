@@ -201,5 +201,9 @@ parameters:
         pt: {label: Portugues, flag: pt}
         fr: {label: Française, flag: fr}
 
+    #time Interval for scheduled notifications
+    time_intervals: [10, 1440, 43200]
+
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 1
+

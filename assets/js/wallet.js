@@ -27,6 +27,13 @@ new Vue({
     };
   },
   mounted: function() {
+    let urlPath = window.location;
+    let parser = document.createElement('a');
+    parser.href = urlPath;
+    if (parser.pathname === this.$routing.generate('wallet', {tab: 'dw-history'})) {
+      this.goToDepositWithdrawalHistoryTab();
+      window.history.replaceState({}, '', this.$routing.generate('wallet'));
+    }
     this.depositMore = this.$refs.depositMore.getAttribute('value');
   },
   computed: {
@@ -46,6 +53,9 @@ new Vue({
   methods: {
     tabUpdated: function() {
       this.depositMore = '';
+    },
+    goToDepositWithdrawalHistoryTab() {
+      this.tabIndex = 2;
     },
   },
   store,

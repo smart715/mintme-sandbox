@@ -118,3 +118,13 @@ export const sanitizeOptions = {
 };
 
 export const primaryColor = '0E3B58';
+
+export const notificationTypes = {
+    filled: 'filled',
+    cancelled: 'cancelled',
+    deposit: 'deposit',
+    withdrawal: 'withdrawal',
+    deployed: 'deployed',
+    newPost: 'new_post',
+    newInvestor: 'new_investor',
+};
