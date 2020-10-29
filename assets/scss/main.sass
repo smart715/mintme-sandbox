@@ -29,6 +29,7 @@
 @import 'spinner'
 @import 'posts'
 @import 'lang-menu'
+@import 'chat'
 
 *, *:before, *:after
   box-sizing: inherit
@@ -1238,8 +1239,11 @@ a.hover-icon:hover, div.hover-icon:hover
   position: absolute
   right: 15px
 
+  .chat-envelope
+    background: $secondary
+
   .div-container-avatar
-    background: #152D47
+    background: $secondary
     padding-left: 5px
     padding-right: 17px
 
@@ -1264,7 +1268,7 @@ ul.spinner-tabs
 
 li.trade-post
   a.nav-link
-    margin-right: 32px
+    margin-right: 64px
 
 .default-user-avatar-topnav:hover, .default-user-avatar-navbar:hover
   filter: invert(26%) sepia(52%) saturate(255%) hue-rotate(4deg) brightness(87%) contrast(64%)
@@ -1284,6 +1288,9 @@ li.trade-post
 
 .text-gold
   color: $gold
+
+.bg-secondary-dark
+  background-color: $secondary-dark !important
 
 .top-0
   top: 0

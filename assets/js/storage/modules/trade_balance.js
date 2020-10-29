@@ -13,6 +13,7 @@ const storage = {
         buyAmountInput: 0,
         subtractQuoteBalanceFromBuyAmount: false,
         takerFee: 0,
+        balances: null,
     },
     getters: {
         getQuoteBalance: function(state) {
@@ -38,6 +39,9 @@ const storage = {
         },
         getBuyAmountInput: function(state) {
             return state.buyAmountInput;
+        },
+        getBalances: function(state) {
+            return state.balances;
         },
     },
     mutations: {
@@ -78,6 +82,9 @@ const storage = {
         },
         setTakerFee: function(state, n) {
           state.takerFee = n;
+        },
+        setBalances: function(state, n) {
+            state.balances = n;
         },
     },
 };

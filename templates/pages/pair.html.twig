@@ -33,6 +33,17 @@
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
+    <balance-init
+            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+            websocket-url="{{ global_websocket_url }}"
+            hash="{{ hash }}"
+            :market="{{ market | json_encode }}"
+            :logged-in="{{ loggedIn }}"
+            :is-owner="{{ isOwner }}"
+            :precision="{{ precision }}"
+    >
+    </balance-init>
+
     {% if isTokenPage %}
     <div class="row justify-content-center pair-container">
         <div class="col-md-10 d-flex justify-content-between">
@@ -236,7 +247,14 @@
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto small-profile-link">
-                            <div class="div-container-avatar">
+                            <div class="d-flex align-items-center h-100">
+                                <a
+                                    v-if="getQuoteBalance >= {{ dMMinAmount }} || {{ isOwner }}"
+                                    href="{{ isOwner == 'true' ? path('chat') : path('new_dm_message', {'tokenName': token.name}) }}"
+                                    class="chat-envelope d-block text-white pl-2 pr-2">
+                                    <font-awesome-icon icon="envelope" size="lg" />
+                                </a>
+                                <div class="div-container-avatar">
                                 <a
                                     href="{{ path('profile') }}/{{ profile.nickname }}"
                                 >
@@ -247,6 +265,7 @@
                                         image="{{ profile.image.url | imagine_filter('avatar_small') }}"
                                     ></avatar>
                                 </a>
+                            </div>
                             </div>
                         </li>
                     {% endif %}

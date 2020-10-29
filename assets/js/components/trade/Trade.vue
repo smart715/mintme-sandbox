@@ -71,7 +71,6 @@ import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
-import {isRetryableError} from 'axios-retry';
 import {
     CheckInputMixin,
     LoggerMixin,
@@ -79,6 +78,7 @@ import {
     WebSocketMixin,
 } from '../../mixins';
 import {toMoney, Constants} from '../../utils';
+import {mapGetters} from 'vuex';
 
 const WSAPI = Constants.WSAPI;
 
@@ -118,7 +118,6 @@ export default {
         return {
             buyOrders: null,
             sellOrders: null,
-            balances: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
@@ -126,6 +125,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('tradeBalance', {
+            balances: 'getBalances',
+        }),
         baseBalance: function() {
             return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
                 : false;
@@ -160,16 +162,6 @@ export default {
                     this.processOrders(response.params[1], response.params[0]);
                 }
             }, 'trade-update-orders');
-        });
-
-        this.addOnOpenHandler(() => {
-            this.sendMessage(JSON.stringify({
-                method: 'deals.subscribe',
-                params: [this.market.identifier],
-                id: parseInt(Math.random().toString().replace('0.', '')),
-            }));
-
-            this.updateAssets();
         });
     },
     methods: {
@@ -223,44 +215,6 @@ export default {
                     });
                 }
             });
-        },
-        updateAssets: function() {
-            if (!this.loggedIn) {
-                this.balances = false;
-                return;
-            }
-
-            this.$axios.retry.get(this.$routing.generate('tokens'))
-                .then((res) => {
-                    this.balances = {...res.data.common, ...res.data.predefined};
-
-                    if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
-                        this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
-                    }
-
-                    this.authorize()
-                        .then(() => {
-                            this.sendMessage(JSON.stringify({
-                                method: 'asset.subscribe',
-                                params: [this.market.base.identifier, this.market.quote.identifier],
-                                id: parseInt(Math.random().toString().replace('0.', '')),
-                            }));
-                        })
-                        .catch((err) => {
-                            this.notifyError(
-                                this.$t('toasted.error.can_not_connect')
-                            );
-                            this.sendLogs('error', 'Can not connect to internal services', err);
-                        });
-                })
-                .catch((err) => {
-                    if (!isRetryableError(err)) {
-                        this.balances = false;
-                    } else {
-                        this.notifyError(this.$t('toasted.error.can_not_load_balance'));
-                        this.sendLogs('error', 'Can not load current balance', err);
-                    }
-                });
         },
         processOrders: function(data, type) {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
