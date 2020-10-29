@@ -180,6 +180,7 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($user, $token),

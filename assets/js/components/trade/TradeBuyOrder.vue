@@ -303,7 +303,7 @@ export default {
                 this.market.quote.subunit
             );
         },
-        ...mapMutations('makeOrder', [
+        ...mapMutations('tradeBalance', [
             'setBuyPriceInput',
             'setBuyAmountInput',
             'setBaseBalance',
@@ -343,7 +343,7 @@ export default {
                 minTotalPrice: this.minTotalPrice,
             };
         },
-        ...mapGetters('makeOrder', [
+        ...mapGetters('tradeBalance', [
             'getBuyPriceInput',
             'getBuyAmountInput',
             'getBaseBalance',

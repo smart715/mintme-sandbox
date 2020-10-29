@@ -306,10 +306,9 @@ export default {
 
             this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
         },
-        ...mapMutations('makeOrder', [
+        ...mapMutations('tradeBalance', [
             'setSellPriceInput',
             'setSellAmountInput',
-            'setQuoteBalance',
             'setUseSellMarketPrice',
         ]),
     },
@@ -348,7 +347,7 @@ export default {
                 tokenSymbol: this.tokenSymbol,
             };
         },
-        ...mapGetters('makeOrder', [
+        ...mapGetters('tradeBalance', [
             'getSellPriceInput',
             'getSellAmountInput',
             'getQuoteBalance',
@@ -374,9 +373,6 @@ export default {
             get() {
                 return this.getQuoteBalance;
             },
-            set(val) {
-                this.setQuoteBalance(val);
-            },
         },
         useMarketPrice: {
             get() {
@@ -394,29 +390,6 @@ export default {
         marketPrice: function() {
             this.updateMarketPrice();
         },
-        balance: function() {
-            this.immutableBalance = this.balance;
-        },
-    },
-    mounted: function() {
-        this.addMessageHandler((response) => {
-            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
-                if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
-                    this.immutableBalance = response.params[0][this.market.quote.identifier].available;
-                    return;
-                }
-
-                this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.name}))
-                    .then((res) => this.immutableBalance = res.data ?
-                        new Decimal(response.params[0][this.market.quote.identifier].available).sub(
-                            res.data.frozenAmountWithReceived
-                        ) : response.params[0][this.market.quote.identifier].available
-                    )
-                    .catch((err) => {
-                        this.sendLogs('error', 'Can not get immutable balance', err);
-                    });
-            }
-        }, 'trade-sell-order-asset');
     },
     filters: {
         toMoney: function(val, precision) {
