@@ -2,6 +2,5 @@
 {% block content %}
 {% trans %}hello{% endtrans %}
 {{username}}
-{% trans with {'%amount%': amount, '%symbol%': tradable.symbol|rebranding} %}withdraw.completed{% endtrans %}
-{% trans %}withdraw.completed.see_soon{% endtrans %}
+{% trans with {'%urlWallet%':urlWallet}%}withdrawal.msg{% endtrans %}
 {% endblock %}
