@@ -184,10 +184,6 @@ class User extends BaseUser implements
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
-     * @ORM\JoinTable(name="`like`",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")}
-     *      )
      * @var ArrayCollection
      */
     protected $likes;
