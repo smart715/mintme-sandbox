@@ -3,17 +3,12 @@ import TradeSellOrder from '../../js/components/trade/TradeSellOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/make_order';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 
-describe('TradeSellOrder', () => {
-    beforeEach(() => {
-       moxios.install();
-    });
-    afterEach(() => {
-        moxios.uninstall();
-    });
-
-    const $routing = {generate: () => 'URL'};
+/**
+ * @return {Wrapper<Vue>}
+ */
+function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Axios);
     localVue.use(Vuex);
@@ -22,9 +17,19 @@ describe('TradeSellOrder', () => {
             Vue.prototype.$t = (val) => val;
         },
     });
+    return localVue;
+}
+
+/**
+ * @param {number} balance
+ * @return {Wrapper<Vue>}
+ */
+function mockVm(balance = 1) {
+    const localVue = mockVue();
+    const $routing = {generate: () => 'URL'};
     const store = new Vuex.Store({
         modules: {
-            makeOrder,
+            tradeBalance,
             websocket: {
                 namespaced: true,
                 actions: {
@@ -34,12 +39,15 @@ describe('TradeSellOrder', () => {
         },
     });
 
-    const wrapper = shallowMount(TradeSellOrder, {
+    return shallowMount(TradeSellOrder, {
         store,
         localVue,
         mocks: {
             $routing,
             $toasted: {show: () => {}},
+        },
+        computed: {
+            immutableBalance: () => balance,
         },
         propsData: {
             loginUrl: 'loginUrl',
@@ -65,6 +73,17 @@ describe('TradeSellOrder', () => {
             websocketUrl: '',
         },
     });
+}
+
+describe('TradeSellOrder', () => {
+    beforeEach(() => {
+       moxios.install();
+    });
+    afterEach(() => {
+        moxios.uninstall();
+    });
+
+    let wrapper = mockVm();
 
     it('hide sell order  contents and show loading instead', () => {
         wrapper.setProps({balanceLoaded: false});
@@ -154,7 +173,7 @@ describe('TradeSellOrder', () => {
         };
 
         it('should add all the balance to the amount input', () => {
-            wrapper.vm.immutableBalance = 5;
+            wrapper = mockVm(5);
             wrapper.setProps({marketPrice: 7});
             wrapper.vm.balanceClicked(event);
 
@@ -163,7 +182,7 @@ describe('TradeSellOrder', () => {
         });
 
         it('shouldn\'t add price if the price edited manually', () => {
-            wrapper.vm.immutableBalance = 5;
+            wrapper = mockVm(5);
             wrapper.setProps({marketPrice: 7});
             wrapper.vm.sellPrice = 2;
             wrapper.vm.balanceManuallyEdited = true;
@@ -185,7 +204,8 @@ describe('TradeSellOrder', () => {
         });
 
         it('should add price if the price edited manually but has null value', () => {
-            wrapper.vm.immutableBalance = 5;
+            // wrapper.vm.immutableBalance = 5;
+            // wrapper.setProps({balance: 5});
             wrapper.setProps({marketPrice: 7});
             wrapper.vm.sellPrice = null;
             wrapper.vm.balanceManuallyEdited = false;

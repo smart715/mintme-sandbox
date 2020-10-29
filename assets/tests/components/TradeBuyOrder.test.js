@@ -3,7 +3,7 @@ import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/make_order';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 
 describe('TradeBuyOrder', () => {
     beforeEach(() => {
@@ -24,7 +24,7 @@ describe('TradeBuyOrder', () => {
     });
     const store = new Vuex.Store({
         modules: {
-            makeOrder,
+            tradeBalance,
             websocket: {
                 namespaced: true,
                 actions: {
