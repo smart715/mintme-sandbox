@@ -179,15 +179,17 @@ class Comment
         return $this->likes->contains($user);
     }
 
-    public function removeLike(): self
+    public function removeLike(User $user): self
     {
+        $this->likes->removeElement($user);
         $this->likeCount--;
 
         return $this;
     }
 
-    public function addLike(): self
+    public function addLike(User $user): self
     {
+        $this->likes->add($user);
         $this->likeCount++;
 
         return $this;
