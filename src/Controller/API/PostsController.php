@@ -5,6 +5,8 @@ namespace App\Controller\API;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
@@ -15,6 +17,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -32,14 +35,19 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
-        PostManagerInterface $postManager
+        PostManagerInterface $postManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -229,6 +237,17 @@ class PostsController extends AbstractFOSRestController
 
         $this->entityManager->persist($post);
         $this->entityManager->flush();
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent($user, $notificationType),
+            UserNotificationEvent::NAME,
+        );
 
         return $this->view(["message" => $message], Response::HTTP_OK);
     }

@@ -1,0 +1,22 @@
+{% extends 'mail/layout.html.twig' %}
+
+{% block content %}
+    <table width="100%">
+        <tr>
+            <th>
+                <h3 class="text-dark-white" style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >{% trans %}hello{% endtrans %}</h3>
+                <h1 class="text-blue" style="font-size: 34px; margin-top: 0px; margin-bottom: 0px;"><strong>{{username}}</strong></h1>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <p class="text-dark-white" style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal;">
+                    {% trans with {'%urlToken%':absolute_url(path('token_show', {'name': userTokenName })), '%urlProfile%':absolute_url(path('profile-view', {'nickname': investorProfile })), '%profile%': investorProfile, '%userTokenName%': userTokenName} %}new_investor.msg{% endtrans %}
+                </p>
+            </th>
+        </tr>
+        <tr>
+            <th class="text-dark-white" style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
+        </tr>
+    </table>
+{% endblock %}

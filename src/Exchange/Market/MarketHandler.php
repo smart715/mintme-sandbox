@@ -498,4 +498,15 @@ class MarketHandler implements MarketHandlerInterface
 
         return $this->moneyWrapper->format($sellOrdersSum);
     }
+
+    public function getSellOrdersSummaryByUser(User $user, Market $market): array
+    {
+        $offset = 0;
+
+        return $this->marketFetcher->getPendingOrdersByUser(
+            $user->getId(),
+            $this->marketNameConverter->convert($market),
+            $offset,
+        );
+    }
 }

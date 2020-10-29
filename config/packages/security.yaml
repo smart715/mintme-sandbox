@@ -88,6 +88,7 @@ security:
         - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/wallet,                                          role: ROLE_USER }
+        - { path: ^(%translation_prefixes%)/api/userNotification,                            role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/api/wallet,                                      role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS] }
