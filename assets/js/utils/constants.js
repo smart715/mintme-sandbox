@@ -38,6 +38,7 @@ export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
 export const webBtcSymbol = 'WEBBTC';
+export const usdSign = '$';
 
 export const cryptoSymbols = [
     webSymbol,
