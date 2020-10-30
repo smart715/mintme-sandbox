@@ -100,14 +100,10 @@ class TwoFactorSubscriber implements EventSubscriberInterface
             }
         }
 
-        $needToCheckCode = $request->get('needToCheckCode') ?? true;
+        $code = $request->get('code');
 
-        if ($needToCheckCode) {
-            $code = $request->get('code');
-
-            if (!$code || !$this->twoFactorManager->checkCode($user, $code)) {
-                throw new UnauthorizedHttpException("2fa", "Invalid 2FA code");
-            }
+        if (!$code || !$this->twoFactorManager->checkCode($user, $code)) {
+            throw new UnauthorizedHttpException("2fa", "Invalid 2FA code");
         }
     }
 }
