@@ -107,14 +107,55 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="optional", "expose"=true})
-     * @Rest\RequestParam(name="name", nullable=true)
+     * @Rest\Patch("/update/{name}", name="token_update_name", options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="name", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=false)
+     */
+    public function updateName(
+        ParamFetcherInterface $request,
+        BalanceHandlerInterface $balanceHandler,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.you_need_all_tokens_to_change_name'));
+        }
+
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.deploying'));
+        }
+
+        if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.forbidden_name'));
+        }
+
+        $this->handleUpdateForm($token, $request);
+
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->userActionLogger->info('Change token info', $request->all());
+
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="off", "expose"=true})
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="telegramUrl", nullable=true)
      * @Rest\RequestParam(name="discordUrl", nullable=true)
      * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
-     * @Rest\RequestParam(name="code", nullable=true)
      */
     public function update(
         ParamFetcherInterface $request,
@@ -131,41 +172,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name')) {
-            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.you_need_all_tokens_to_change_name'));
-            }
-
-            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.deploying'));
-            }
-
-            if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.forbidden_name'));
-            }
-        }
-
-        $form = $this->createForm(TokenType::class, $token, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
-        ]);
-
-        $form->submit(array_filter($request->all(), function ($value) {
-            return null !== $value;
-        }), false);
-
-        if (!$form->isValid()) {
-            foreach ($form->all() as $childForm) {
-                /** @var FormError[] $fieldErrors */
-                $fieldErrors = $form->get($childForm->getName())->getErrors();
-
-                if (count($fieldErrors) > 0) {
-                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
-                }
-            }
-
-            throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
-        }
+        $this->handleUpdateForm($token, $request);
 
         if (null === $token->getDescription() || '' == $token->getDescription()) {
             $token->setNumberOfReminder(0);
@@ -810,5 +817,30 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     private function validateEthereumAddress(string $address): bool
     {
         return 0 === strpos($address, '0x') && (42 === strlen($address));
+    }
+
+    private function handleUpdateForm(Token $token, ParamFetcherInterface $request): void
+    {
+        $form = $this->createForm(TokenType::class, $token, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+
+        $form->submit(array_filter($request->all(), function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$form->isValid()) {
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
+        }
     }
 }
