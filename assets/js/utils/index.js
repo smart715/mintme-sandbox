@@ -155,6 +155,27 @@ function getBreakPoint() {
         .getPropertyValue('content').replace(/"/g, '');
 }
 
+/**
+ * @param {string} amount
+ * @return {string}
+ */
+function removeSpaces(amount) {
+    return amount.replace(/\s+/g, '');
+}
+
+/**
+ * @param {string} amount
+ * @param {int} rate
+ * @param {string} symbol
+ * @param {int} subunit
+ * @return {string}
+ */
+function currencyConversion(amount, rate, symbol, subunit = 2) {
+    amount = Decimal.mul(amount, rate);
+    let currencySymbol = rate !== 1 ? symbol : '';
+    return currencySymbol + toMoney(amount, subunit);
+}
+
 export {
     isValidUrl,
     isValidTelegramUrl,
@@ -168,4 +189,6 @@ export {
     getUserOffset,
     useMarkitup,
     getBreakPoint,
+    removeSpaces,
+    currencyConversion,
 };
