@@ -59,7 +59,8 @@
                 class="col"
                 :hash="hash"
                 :websocket-url="websocketUrl"
-                :market="market" />
+                :market="market"
+            />
         </div>
     </div>
 </template>
@@ -77,8 +78,8 @@ import {
     NotificationMixin,
     WebSocketMixin,
 } from '../../mixins';
+import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
-import {mapGetters} from 'vuex';
 
 const WSAPI = Constants.WSAPI;
 
@@ -125,6 +126,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRequesting',
+        ]),
         ...mapGetters('tradeBalance', {
             balances: 'getBalances',
         }),
@@ -148,6 +152,14 @@ export default {
         marketPriceBuy: function() {
             return this.sellOrders && this.sellOrders[0] ? this.sellOrders.reduce((min, order) => Math.min(parseFloat(order.price), min), Infinity) : 0;
         },
+        requestingRates: {
+            get() {
+                return this.getRequesting;
+            },
+            set(val) {
+                this.setRequesting(val);
+            },
+        },
     },
     mounted() {
         this.updateOrders().then(() => {
@@ -163,8 +175,26 @@ export default {
                 }
             }, 'trade-update-orders');
         });
+
+        if (!this.requestingRates) {
+            this.requestingRates = true;
+            this.$axios.retry.get(this.$routing.generate('exchange_rates'))
+            .then((res) => {
+                this.setRates(res.data);
+            })
+            .catch((err) => {
+                this.sendLogs('error', 'Can\'t load conversion rates', err);
+            })
+            .finally(() => {
+                this.requestingRates = false;
+            });
+        }
     },
     methods: {
+        ...mapMutations('rates', [
+            'setRates',
+            'setRequesting',
+        ]),
         /**
          * @param {undefined|{type, isAssigned, resolve}} context
          * @return {Promise}
