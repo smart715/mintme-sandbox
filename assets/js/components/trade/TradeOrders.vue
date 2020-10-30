@@ -98,7 +98,7 @@ export default {
                 },
                 {
                     key: 'sum',
-                    label: this.$t('trade.orders.sum') + ' ' + this.rebrandingFunc(this.market.base.symbol),
+                    label: this.$t('trade.orders.sum'),
                     formatter: formatMoney,
                 },
                 {

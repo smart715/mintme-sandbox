@@ -342,7 +342,7 @@ export default {
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
             ],
-            showUsd: false,
+            showUsd: true,
             enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
