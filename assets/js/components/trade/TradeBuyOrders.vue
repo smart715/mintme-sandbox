@@ -25,6 +25,27 @@
                             :tbody-tr-class="rowClass"
                             :tbody-class="'table-orders'"
                         >
+                            <template v-slot:cell(price)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span
+                                                v-b-tooltip="{title: currencyConvert(row.value, rate, 2), boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-slot:cell(sum)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
                             <template v-slot:cell(trader)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
@@ -71,7 +92,9 @@
 
 <script>
 import Guide from '../Guide';
-import {toMoney} from '../../utils';
+import {toMoney, removeSpaces, currencyConversion} from '../../utils';
+import {mapGetters} from 'vuex';
+import {USD, usdSign} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
@@ -117,6 +140,9 @@ export default {
         this.startScrollListeningOnce(this.ordersList);
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRates',
+        ]),
         total: function() {
             return toMoney(this.tableData.reduce((sum, order) =>
                 new Decimal(order.sum).add(sum), 0), this.basePrecision
@@ -129,6 +155,9 @@ export default {
             return {
                 name: this.rebrandingFunc(this.tokenName),
             };
+        },
+        rate: function() {
+            return (this.getRates[this.tokenName] || [])[USD.symbol] || 1;
         },
     },
     methods: {
@@ -145,6 +174,9 @@ export default {
                 ? item.highlightClass
                 : '';
         },
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+        },
     },
     watch: {
         ordersList: function(newOrders) {
@@ -159,6 +191,11 @@ export default {
             }
 
             setTimeout(()=> this.tableData.forEach((order) => order.highlightClass = ''), 1000);
+        },
+    },
+    filters: {
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
         },
     },
 };

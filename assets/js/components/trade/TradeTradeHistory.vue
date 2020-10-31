@@ -79,6 +79,27 @@
                                     </a>
                                 </div>
                             </template>
+                            <template v-slot:cell(pricePerQuote)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span
+                                                v-b-tooltip="{title: currencyConvert(row.value, rate, 2), boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-slot:cell(baseAmount)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
                             <template v-slot:cell(dateTime)="row">
                                 <span class="truncate-name" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                     {{ row.value | truncate(11) }}
@@ -106,7 +127,9 @@
 <script>
 import moment from 'moment';
 import Guide from '../Guide';
-import {formatMoney, toMoney} from '../../utils';
+import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
+import {mapGetters} from 'vuex';
+import {USD, usdSign} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {GENERAL} from '../../utils/constants';
 import {
@@ -158,7 +181,7 @@ export default {
                 },
                 {
                     key: 'baseAmount',
-                    label: this.rebrandingFunc(this.market.base.symbol) + this.$t('trade.history.amount'),
+                    label: this.$t('trade.orders.sum'),
                     formatter: formatMoney,
                 },
                 {
@@ -169,6 +192,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRates',
+        ]),
         shouldTruncate: function() {
             return this.market.quote.symbol.length > this.maxLengthToTruncate;
         },
@@ -203,6 +229,9 @@ export default {
             return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
                 this.tableData[0].id :
                 0;
+        },
+        rate: function() {
+            return (this.getRates[this.market.base.symbol] || [])[USD.symbol] || 1;
         },
     },
     mounted: function() {
@@ -266,6 +295,14 @@ export default {
                     resolve(result.data);
                 }).catch(reject);
             });
+        },
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+        },
+    },
+    filters: {
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
         },
     },
 };
