@@ -62,6 +62,10 @@ class UserNotificationsController extends AbstractFOSRestController implements T
 
         return new Response(Response::HTTP_ACCEPTED);
     }
+
+
+
+
     /**
      * @return UserInterface|object|null
      */

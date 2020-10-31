@@ -59,16 +59,12 @@
                     </div>
                 </div>
                 <div class="card card-featured mt-3">
-                    <div class="card-header">Notifications</div>
-                    {#<div class="card-header">{% trans %}notification.title{% endtrans %}</div>#}
+                    <div class="card-header">{% trans %}userNotification.title{% endtrans %}</div>
                     <div class="card-body m-0">
-{#                        <div class="text-center">
-                            <p>{% trans %}page.settings.2fa.body{% endtrans %}</p>
-                        </div>#}
-                        <a href="{{ path('two_factor_auth') }}" class="btn btn-primary btn-block" role="button">
-                            Manage Notification
-                            {#{% trans %}page.settings.2fa.manage{% endtrans %}#}
-                        </a>
+                        <notification-management></notification-management>
+                       {# <span @click="notificationModalToggle()" class="btn btn-primary btn-block">
+                            {% trans %}userNotification.manage{% endtrans %}
+                        </span>#}
                     </div>
                 </div>
             </div>

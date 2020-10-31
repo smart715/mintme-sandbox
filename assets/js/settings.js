@@ -5,11 +5,12 @@ import TwoFactorModal from './components/modal/TwoFactorModal';
 import {NotificationMixin} from './mixins/';
 import {HTTP_UNAUTHORIZED} from './utils/constants';
 import i18n from './utils/i18n/i18n';
+import NotificationManagement from './components/notifications/NotificationManagement';
 
 new Vue({
     el: '#settings',
     i18n,
-    components: {Passwordmeter, ApiKeys, ApiClients, TwoFactorModal},
+    components: {Passwordmeter, ApiKeys, ApiClients, TwoFactorModal, NotificationManagement},
     mixins: [NotificationMixin],
     data: {
         password: '',
