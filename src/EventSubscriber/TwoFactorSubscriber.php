@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 use InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
@@ -49,7 +49,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
     }
 
     /** {@inheritDoc} */
-    public function onRequest(FilterControllerEvent $event): void
+    public function onRequest(ControllerEvent $event): void
     {
         $controller = $event->getController();
 
@@ -59,7 +59,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
         $route = $this->router->getRouteCollection()->get(
-            $request->attributes->get('_route')
+            'en__RG__'.$request->attributes->get('_route')
         );
 
         if (!$route) {
@@ -71,7 +71,7 @@ class TwoFactorSubscriber implements EventSubscriberInterface
 
         if (!in_array($option, self::VALUES)) {
             throw new InvalidArgumentException(
-                "'2fa' option can only cointains: " . (string)json_encode(self::VALUES)
+                "'2fa' option can only contain: " . (string)json_encode(self::VALUES)
             );
         }
 
@@ -95,9 +95,9 @@ class TwoFactorSubscriber implements EventSubscriberInterface
         if (!$user->isGoogleAuthenticatorEnabled()) {
             if (self::OPTIONAL === $option) {
                 return;
-            } else {
-                throw new UnauthorizedHttpException("2fa", "2FA is not enabled");
             }
+
+            throw new UnauthorizedHttpException("2fa", "2FA is not enabled");
         }
 
         $needToCheckCode = $request->get('needToCheckCode') ?? true;

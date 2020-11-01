@@ -74,7 +74,7 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
-        - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                                      role: ROLE_API }
+        - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API }
         - { path: ^(%translation_prefixes%)/api/media/upload,                                role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/send-code$,              role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER }
@@ -93,7 +93,7 @@ security:
         - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER }
         - { path: ^(%translation_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS] }
         - { path: ^(%translation_prefixes%)/api,                                             role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^(%translation_prefixes%)/dev/api/v2/open,                                             role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^(%translation_prefixes%)/dev/api/v2/open,                                 role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%translation_prefixes%)/register,                                        role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%translation_prefixes%)/resetting,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
