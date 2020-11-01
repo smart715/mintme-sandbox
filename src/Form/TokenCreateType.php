@@ -5,14 +5,10 @@ namespace App\Form;
 use App\Entity\Token\Token;
 use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\RegexValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore  */
@@ -40,6 +36,10 @@ class TokenCreateType extends AbstractType
                     'pattern' => "[a-zA-Z0-9\s]*",
                     'title' => $this->translator->trans('form.token.name.invalid'),
                 ],
+            ])
+            ->add('description', HiddenType::class, [
+                'label' => 'Description:',
+                'required' => true,
             ]);
 
         $builder->get('name')
