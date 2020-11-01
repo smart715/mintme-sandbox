@@ -24,7 +24,7 @@ function mockVue() {
 }
 
 let propsForTestCorrectlyRenders = {
-    description: 'fooDescription',
+    description: 'Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit',
     editable: true,
     name: 'fooName',
  };
@@ -46,9 +46,9 @@ describe('TokenIntroductionDescription', () => {
             },
             mocks: {$t: (val) => propsForTestCorrectlyRenders.name + val},
         });
-        expect(wrapper.vm.newDescription).toBe('fooDescription');
+        expect(wrapper.vm.newDescription).toBe('Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit');
         expect(wrapper.html()).toContain('token.intro.description.plan.header');
-        expect(wrapper.html()).toContain('fooDescription');
+        expect(wrapper.html()).toContain('Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit');
         expect(wrapper.html()).toContain('fooName');
     });
 
@@ -121,7 +121,7 @@ describe('TokenIntroductionDescription', () => {
             propsData: propsForTestCorrectlyRenders,
             mocks: {$t: (val) => val},
         });
-        wrapper.vm.newDescription = 'foobar';
+        wrapper.vm.newDescription = 'Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit';
         wrapper.vm.$v.$touch();
         expect(!wrapper.vm.$v.newDescription.$error).toBe(true);
     });
@@ -136,7 +136,7 @@ describe('TokenIntroductionDescription', () => {
             },
             mocks: {$t: (val) => val},
         });
-        wrapper.vm.newDescription = 'f';
+        wrapper.vm.newDescription = 'foobar';
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
@@ -154,6 +154,7 @@ describe('TokenIntroductionDescription', () => {
             mocks: {$t: (val) => val},
         });
         wrapper.vm.editingDescription = true;
+        wrapper.vm.minDescriptionLength = 2;
         wrapper.vm.icon = 'foo';
         wrapper.vm.editDescription();
 

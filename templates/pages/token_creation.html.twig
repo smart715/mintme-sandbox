@@ -51,17 +51,55 @@
                                                 {% trans %}page.token_creation.error.forbidden{% endtrans %}
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col py-2">
                                     {{ form_widget(form.name, {'attr': {
                                         'v-model': '$v.tokenName.$model',
                                         'class' : 'form-control',
                                     }}) }}
                                 </div>
+                                <div class="col-12 text-left">
+                                    <div class="clearfix">
+                                        <div class="float-left">
+                                            {{ form_label(form.description, null, {'label_attr': {'class': 'mb-1'}}) }}
+                                        </div>
+                                        <div class="float-right">
+                                        </div>
+                                        <div class="float-right">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="description">
+                                        <bbcode-editor
+                                            rows="2"
+                                            class="form-control"
+                                            :class="{ 'is-invalid': newDescription.length > 0 && !$v.newDescription.minLength}"
+                                            :value="newDescriptionHtmlDecode"
+                                            @change="onDescriptionChange"
+                                            @input="onDescriptionChange"
+                                        />
+                                    </div>
+                                    {{ form_widget(form.description, {'attr': {
+                                        'v-model': '$v.newDescription.$model',
+                                    }}) }}
+                                </div>
                             </div>
+                        </div>
+                        <div
+                            v-cloak="$v.newDescription"
+                            v-if="newDescription.length > 0 && !$v.newDescription.minLength"
+                            class="text-danger text-center"
+                        >
+                            Token Description must be more than 200 character
+                        </div>
+                        <div
+                            v-cloak="$v.newDescription"
+                            v-if="!$v.newDescription.maxLength"
+                            class="text-danger text-center"
+                        >
+                            Token Description must be less than 10000 characters
                         </div>
                         <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
                             {% trans %}page.token_creation.error.contain{% endtrans %}
