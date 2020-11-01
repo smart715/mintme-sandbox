@@ -1,5 +1,9 @@
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import BbcodeEditor from './components/bbcode/BbcodeEditor';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
+import i18n from './utils/i18n/i18n';
+import he from 'he';
 import {
     HTTP_OK,
     tokenNameValidChars,
@@ -9,8 +13,6 @@ import {
     FORBIDDEN_WORDS,
     HTTP_ACCEPTED,
 } from './utils/constants';
-import i18n from './utils/i18n/i18n';
-
 new Vue({
     el: '#token',
     i18n,
@@ -23,12 +25,20 @@ new Vue({
             tokenNameProcessing: false,
             tokenNameTimeout: null,
             tokenNameInBlacklist: false,
+            newDescription: '',
         };
+    },
+    components: {
+        BbcodeEditor,
+        FontAwesomeIcon,
     },
     computed: {
         saveBtnDisabled: function() {
             return this.$v.$anyError || !this.tokenName ||
                 this.tokenNameExists || this.tokenNameProcessing;
+        },
+        newDescriptionHtmlDecode: function() {
+            return he.decode(this.newDescription);
         },
     },
     watch: {
@@ -88,6 +98,10 @@ new Vue({
                     }
                 }, (err) => this.notifyError(err.response.data.message));
         },
+        onDescriptionChange: function(val) {
+            this.newDescription = he.encode(val);
+        },
+
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
@@ -105,6 +119,11 @@ new Vue({
             validChars: tokenNameValidChars,
             minLength: minLength(4),
             maxLength: maxLength(60),
+        },
+        newDescription: {
+            required: (val) => required(val.trim()),
+            minLength: minLength(200),
+            maxLength: maxLength(10000),
         },
     },
 });
