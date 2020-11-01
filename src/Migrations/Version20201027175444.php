@@ -25,6 +25,10 @@ final class Version20201027175444 extends AbstractMigration
 
         $this->addSql('ALTER TABLE comment DROP FOREIGN KEY FK_Comments_Users');
         $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_Comments_Users FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE');
+
+        $this->addSql('ALTER TABLE `like` DROP FOREIGN KEY FK_Likes_Comments');
+        $this->addSql('ALTER TABLE `like` ADD CONSTRAINT FK_Likes_Comments FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE');
+
     }
 
     public function down(Schema $schema) : void
@@ -37,5 +41,10 @@ final class Version20201027175444 extends AbstractMigration
         $this->addSql('ALTER TABLE comment DROP FOREIGN KEY FK_Comments_Posts');
         $this->addSql('ALTER TABLE comment DROP FOREIGN KEY FK_Comments_Users');
         $this->addSql('DROP TABLE comment');
+
+        $this->addSql('ALTER TABLE like DROP FOREIGN KEY FK_Likes_Comments');
+        $this->addSql('DROP TABLE like');
+
+
     }
 }
