@@ -122,7 +122,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         } catch (Throwable $exception) {
             return $this->view([
                 'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
-            ], Response::HTTP_BAD_GATEWAY);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
