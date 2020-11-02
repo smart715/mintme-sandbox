@@ -283,6 +283,7 @@ export default {
             }));
 
             this.addMessageHandler((response) => {
+                this.sendLogsIfWsError(response, 'Websocket error while mounting Donation.vue.');
                 if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }

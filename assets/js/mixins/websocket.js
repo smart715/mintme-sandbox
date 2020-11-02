@@ -1,5 +1,6 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
+import LoggerMixin from './logger';
 
 export default {
     props: {
@@ -101,6 +102,12 @@ export default {
                     request: message,
                 });
             });
+        },
+        sendLogsIfWsError: function(response, message) {
+            if (response.error !== null ||
+                (response.result !== null && response.result.status !== 'success')) {
+                this.sendLogs('error', message, JSON.stringify(response.error));
+            }
         },
     },
 };
