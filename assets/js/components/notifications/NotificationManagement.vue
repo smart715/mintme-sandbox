@@ -6,6 +6,7 @@
         </button>
 
         <notifications-management-modal
+            :notifications-type="notificationsType"
             :visible="visible"
             :noClose="noClose"
             @close="closeModal"
@@ -26,9 +27,30 @@ export default {
         return {
             visible: false,
             noClose: false,
+            notificationsType: [
+                {
+                    id: 1,
+                    type: 'deployed',
+                    email: true,
+                    website: true,
+                },
+                {
+                    id: 2,
+                    type: 'withdrawal',
+                    email: true,
+                    website: false,
+                },
+                {
+                    id: 3,
+                    type: 'deposit',
+                    email: false,
+                    website: true,
+                },
+            ],
         };
     },
     methods: {
+        // todo fetch all notification type
         closeModal: function() {
             this.visible = false;
         },
