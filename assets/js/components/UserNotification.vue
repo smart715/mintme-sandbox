@@ -23,7 +23,7 @@
           :class="{ 'show': showUserNotifications }"
       >
           <div class="notification-header">
-              <span>Notifications</span>
+              <span> {{ $t('userNotification.title') }}</span>
           </div>
           <vue-scroll
               ref="notificationsScroll"
@@ -42,7 +42,7 @@
                           <NotificationType :notification="notification"/>
                       </div>
                       <div v-if="!hasNotifications" class="text-center notification-body">
-                          Any notifications yet.
+                          {{ $t('userNotification.any_notifications_yet') }}
                       </div>
                   </template>
                   <template v-else>
