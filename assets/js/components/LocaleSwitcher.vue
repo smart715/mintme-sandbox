@@ -1,28 +1,27 @@
 <template>
-    <div>
-        <div
-            class="dropdown dropup lang-dropdown"
-            :class="{ 'show': showLangMenu }"
-            v-on-clickaway="hideLangMenu"
+    <div
+        class="dropdown dropup lang-dropdown"
+        :class="{ 'show': showLangMenu }"
+        v-on-clickaway="hideLangMenu"
+    >
+        <button
+            class="btn btn-lang-menu dropdown-toggle"
+            type="button"
+            aria-haspopup="true"
+            :aria-expanded="showLangMenu"
+            @click="showLangMenu = true"
         >
-            <button
-                class="btn btn-lang-menu dropdown-toggle"
-                type="button"
-                aria-haspopup="true"
-                :aria-expanded="showLangMenu"
-                @click="showLangMenu = true"
-            >
-                <span :class="currentLocaleClass"></span>
-            </button>
-            <div
-                class="dropdown-menu lang-menu"
-                :class="{ 'show': showLangMenu }"
-                aria-labelledby="dropdownLangMenuButton"
-            >
-                <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item" @click="changeLocale(locale.locale)">
-                    <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
-                </a>
-            </div>
+            <span :class="currentLocaleClass"></span>
+        </button>
+        <div
+            class="dropdown-menu lang-menu"
+            :class="{ 'show': showLangMenu }"
+            aria-labelledby="dropdownLangMenuButton"
+        >
+            <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item"
+               @click="changeLocale(locale.locale)">
+                <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
+            </a>
         </div>
     </div>
 </template>
