@@ -119,6 +119,7 @@ export default {
             editingDescription: false,
             newDescription: this.description || '',
             maxDescriptionLength: 10000,
+            minDescriptionLength: 200,
             readyToSave: false,
         };
     },
@@ -187,7 +188,7 @@ export default {
         return {
             newDescription: {
                 required,
-                minLength: minLength(2),
+                minLength: minLength(this.minDescriptionLength),
                 maxLength: maxLength(this.maxDescriptionLength),
             },
         };
