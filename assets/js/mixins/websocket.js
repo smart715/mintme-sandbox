@@ -3,6 +3,7 @@ import {status} from '../storage/modules/websocket';
 import LoggerMixin from './logger';
 
 export default {
+    mixins: [LoggerMixin],
     props: {
         websocketUrl: {type: String, required: true},
         hash: {type: String},
