@@ -217,7 +217,7 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.notifyError(error.response.data.message);
+                this.notifyError(this.$t('api.wallet.withdrawal_failed'));
                 this.sendLogs('error', 'Withdraw response error', error);
             })
             .then(() => this.withdrawing = false);
