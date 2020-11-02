@@ -240,6 +240,7 @@ export default {
                 }));
 
                 this.addMessageHandler((response) => {
+                    this.sendLogsIfWsError(response, 'Websocket error while mounting ActiveOrders.vue.');
                     if ('order.update' === response.method &&
                         this.userId + getUserOffset() === response.params[1].user) {
                         this.updateOrders(response.params[1], response.params[0]);

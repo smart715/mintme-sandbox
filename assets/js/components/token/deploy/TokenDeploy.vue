@@ -170,6 +170,7 @@ export default {
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
+                this.sendLogsIfWsError(response, 'Websocket error while mounting TokenDeploy.vue.');
                 if (
                     'asset.update' === response.method &&
                     response.params[0].hasOwnProperty(webSymbol)

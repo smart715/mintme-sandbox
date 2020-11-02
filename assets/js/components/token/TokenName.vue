@@ -133,6 +133,7 @@ export default {
         this.checkIfTokenExchanged();
 
         this.addMessageHandler((response) => {
+            this.sendLogsIfWsError(response, 'Websocket error while mounting TokenName.vue.');
             if (
                 ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier))
                 || 'order.update' === response.method

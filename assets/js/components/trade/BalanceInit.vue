@@ -93,6 +93,7 @@ export default {
         },
         listenForAssetsUpdate: function() {
             this.addMessageHandler((response) => {
+                this.sendLogsIfWsError(response, 'Websocket error while mounting BalanceInit.vue.');
                 if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.quote.identifier)) {
                     if (!this.isOwner || this.market.quote.identifier.slice(0, 3) !== 'TOK') {
                         this.quoteBalance = response.params[0][this.market.quote.identifier].available;

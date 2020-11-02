@@ -379,6 +379,7 @@ export default {
             });
         },
         messageHandler: function(result) {
+            this.sendLogsIfWsError(result, 'Websocket error while mounting TradeChart.vue.');
             if (result.method === 'state.update') {
                 this.updateMarketData(result);
             }

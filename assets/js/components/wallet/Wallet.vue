@@ -342,6 +342,7 @@ export default {
                     this.authorize()
                         .then(() => {
                             this.addMessageHandler((response) => {
+                                this.sendLogsIfWsError(response, 'Websocket error while mounting Wallet.vue.');
                                 if ('asset.update' === response.method) {
                                     this.updateBalances(response.params[0]);
                                 }
