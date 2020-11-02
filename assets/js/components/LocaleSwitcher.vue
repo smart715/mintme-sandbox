@@ -1,7 +1,7 @@
 <template>
-    <li class="nav-item d-flex justify-content-center align-items-center">
+    <div>
         <div
-            class="dropdown lang-dropdown"
+            class="dropdown dropup lang-dropdown"
             :class="{ 'show': showLangMenu }"
             v-on-clickaway="hideLangMenu"
         >
@@ -24,7 +24,7 @@
                 </a>
             </div>
         </div>
-    </li>
+    </div>
 </template>
 
 <script>
