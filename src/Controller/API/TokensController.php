@@ -150,7 +150,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="off", "expose"=true})
+     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
      * @Rest\RequestParam(name="description", nullable=true)
      * @Rest\RequestParam(name="facebookUrl", nullable=true)
      * @Rest\RequestParam(name="telegramUrl", nullable=true)
@@ -159,7 +159,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      */
     public function update(
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
