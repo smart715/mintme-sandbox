@@ -51,8 +51,8 @@ class WalletController extends Controller
     /**
      * @Route("/{tab}",
      *     name="wallet",
-     *     defaults={"tab" = "null"},
-     *     requirements={"tab" = "dw-history"},
+     *     defaults={"tab"="wallet"},
+     *     requirements={"tab"="dw-history"},
      *     options={"expose"=true}
      * )
      * @param Request $request

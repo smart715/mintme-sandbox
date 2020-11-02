@@ -108,7 +108,7 @@ export default {
             }
         },
         updateReadNotifications: function() {
-            this.$axios.retry.get(this.$routing.generate('update-read-notifications'))
+            this.$axios.retry.get(this.$routing.generate('update_read_notifications'))
                 .catch((err) => {
                     this.sendLogs('error', 'Error Updating Notifications', err);
                 });
@@ -128,9 +128,9 @@ export default {
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
         },
         fetchUserNotifications: function() {
-            this.$axios.retry.get(this.$routing.generate('user-notifications'))
+            this.$axios.retry.get(this.$routing.generate('user_notifications'))
                 .then((res) => {
-                    this.userNotifications = res.data.data;
+                    this.userNotifications = res.data[0];
                     this.loadNotifications();
                 })
                 .catch((err) => {
