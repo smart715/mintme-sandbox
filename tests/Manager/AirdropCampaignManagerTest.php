@@ -3,6 +3,7 @@
 namespace App\Tests\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
+use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -13,6 +14,8 @@ use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
 use App\Tests\MockMoneyWrapper;
 use App\Wallet\Money\MoneyWrapper;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -269,5 +272,80 @@ class AirdropCampaignManagerTest extends TestCase
         $this->assertEquals(2, $countUpdated);
         $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrops[0]->getStatus());
         $this->assertEquals(Airdrop::STATUS_REMOVED, $airdrops[1]->getStatus());
+    }
+
+    public function testCreateAction(): void
+    {
+        $airdrop = $this->createMock(Airdrop::class);
+
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+
+        $em->expects($this->exactly(8))
+            ->method('persist')
+            ->withConsecutive(
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 0 === $action->getType() && 'twitterMessage' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 1 === $action->getType() && 'twitterRetweet' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 2 === $action->getType() && 'facebookMessage' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 3 === $action->getType() && 'facebookPage' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 4 === $action->getType() && 'facebookPost' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 5 === $action->getType() && 'linkedinMessage' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 6 === $action->getType() && 'youtubeSubscribe' === $action->getData())],
+                [$this->callback(fn ($action) => $action->getAirdrop() === $airdrop && 7 === $action->getType() && 'postLink' === $action->getData())]
+            );
+
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        foreach (array_keys(AirdropAction::TYPE_MAP) as $key) {
+            $airdropManager->createAction($key, $key, $airdrop);
+        }
+    }
+
+    public function testClaimAirdropAction(): void
+    {
+        $user = $this->createMock(User::class);
+        $action = $this->createMock(AirdropAction::class);
+        $action->expects($this->once())->method('addUser')->with($user);
+
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('persist')->with($action);
+
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        $airdropManager->claimAirdropAction($action, $user);
+    }
+
+    public function testCheckIfUserCompletedActions(): void
+    {
+        $user = $this->createMock(User::class);
+        $usersCollection = new ArrayCollection([]);
+
+        $action = $this->createMock(AirdropAction::class);
+        $action->method('getUsers')->willReturn($usersCollection);
+
+        $actionsCollection = new ArrayCollection([$action]);
+
+        $airdrop = $this->createMock(Airdrop::class);
+        $airdrop->method('getActions')->willReturn($actionsCollection);
+
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        /** @var BalanceHandlerInterface|MockObject $bh */
+        $bh = $this->createMock(BalanceHandlerInterface::class);
+
+        $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh);
+
+        $this->assertFalse($airdropManager->checkIfUserCompletedActions($airdrop, $user));
+
+        $usersCollection->add($user);
+
+        $this->assertTrue($airdropManager->checkIfUserCompletedActions($airdrop, $user));
     }
 }

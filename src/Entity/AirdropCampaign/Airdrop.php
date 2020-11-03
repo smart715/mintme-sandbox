@@ -95,9 +95,16 @@ class Airdrop
      */
     private $claimedParticipants;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction", mappedBy="airdrop")
+     * @var ArrayCollection
+     */
+    private $actions;
+
     public function __construct()
     {
         $this->claimedParticipants = new ArrayCollection();
+        $this->actions = new ArrayCollection();
     }
 
     public function getId(): int
@@ -231,6 +238,18 @@ class Airdrop
         if ($this->claimedParticipants->contains($claimedParticipant)) {
             $this->claimedParticipants->removeElement($claimedParticipant);
         }
+
+        return $this;
+    }
+
+    public function getActions(): Collection
+    {
+        return $this->actions;
+    }
+
+    public function addAction(AirdropAction $action): self
+    {
+        $this->actions->add($action);
 
         return $this;
     }

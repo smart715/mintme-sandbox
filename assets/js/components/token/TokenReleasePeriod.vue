@@ -124,7 +124,7 @@ export default {
                     this.released = percent.toNumber();
                 } else if (HTTP_NO_CONTENT === res.status) {
                     this.releasePeriod = 10;
-                    this.released = 10;
+                    this.released = 20;
                 }
 
                 this.loading = false;
