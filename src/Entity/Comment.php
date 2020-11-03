@@ -62,8 +62,8 @@ class Comment
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User")
      * @ORM\JoinTable(name="`like`",
-     *      joinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id",  onDelete="CASCADE")}
      *      )
      * @var ArrayCollection
      */
