@@ -15,6 +15,8 @@ export const twoFACode = helpers.regex('numberInput', /^\d{6}$|^[A-Za-z\d]{12}$/
 export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
 export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
+export const tweetLink = helpers.regex('tweetLink', /^(https?:\/\/)?(www\.)?twitter\.com\/[\S]+\/status\/[\d]+$/u);
+export const facebookPostLink = helpers.regex('facebookPostLink', /^(https?:\/\/)?(www\.)?facebook\.com\/[\S]+\/posts\/[\d]+$/u);
 
 export const FORBIDDEN_WORDS = ['token', 'coin'];
 export const HTTP_OK = 200;
