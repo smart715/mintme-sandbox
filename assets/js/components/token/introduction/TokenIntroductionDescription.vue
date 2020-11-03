@@ -160,7 +160,6 @@ export default {
                 name: this.name,
             }), {
                 description: this.newDescriptionHtmlDecode,
-                needToCheckCode: false,
             })
                 .then((response) => {
                     this.newDescription = response.data.newDescription;

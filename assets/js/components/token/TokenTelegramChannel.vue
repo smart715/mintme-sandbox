@@ -146,7 +146,6 @@ export default {
             this.submitting = true;
             this.$axios.single.patch(this.updateUrl, {
                 telegramUrl: this.newTelegram,
-                needToCheckCode: false,
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {

@@ -143,7 +143,6 @@ export default {
             this.submitting = true;
             this.$axios.single.patch(this.updateUrl, {
                 discordUrl: this.newDiscord,
-                needToCheckCode: false,
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
