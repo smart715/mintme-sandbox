@@ -211,7 +211,7 @@ export default {
             }
 
             this.submitting = true;
-            this.$axios.single.patch(this.$routing.generate('token_update', {
+            this.$axios.single.patch(this.$routing.generate('token_update_name', {
                 name: this.currentName,
             }), {
                 name: this.newName,

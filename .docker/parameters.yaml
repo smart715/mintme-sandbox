@@ -92,7 +92,15 @@ parameters:
         - ETH
     blockchain_disabled: null
     translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
-    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_locales:
+        - en
+        - ru
+        - ua
+        - es
+        - ar
+        - pt
+        - fr
+        - pl
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
     translation_flags:
         en: gb
@@ -103,4 +111,8 @@ parameters:
         pt: pt
         fr: fr
         pl: pl
+    time_intervals:
+        - 10
+        - 1440
+        - 43200
     dm_min_amount: 1
