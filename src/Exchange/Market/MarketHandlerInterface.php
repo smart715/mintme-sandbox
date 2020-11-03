@@ -100,6 +100,8 @@ interface MarketHandlerInterface
 
     public function getSellOrdersSummary(Market $market): string;
 
+    public function getSellOrdersSummaryByUser(User $user, Market $market): array;
+
     /**
      * @param Market $market
      * @param int $period

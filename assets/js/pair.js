@@ -1,3 +1,4 @@
+import BalanceInit from './components/trade/BalanceInit';
 import CreatePost from './components/posts/CreatePost';
 import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
@@ -42,6 +43,7 @@ new Vue({
     };
   },
   components: {
+    BalanceInit,
     CreatePost,
     Donation,
     Posts,
@@ -91,7 +93,7 @@ new Vue({
     }
   },
   methods: {
-    ...mapMutations('makeOrder', [
+    ...mapMutations('tradeBalance', [
       'setUseBuyMarketPrice',
       'setBuyAmountInput',
       'setSubtractQuoteBalanceFromBuyAmount',
@@ -191,7 +193,7 @@ new Vue({
     },
   },
   computed: {
-    ...mapGetters('makeOrder', [
+    ...mapGetters('tradeBalance', [
       'getQuoteBalance',
     ]),
   },

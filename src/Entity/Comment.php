@@ -62,8 +62,8 @@ class Comment
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User")
      * @ORM\JoinTable(name="`like`",
-     *      joinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="comment_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id",  onDelete="CASCADE")}
      *      )
      * @var ArrayCollection
      */
@@ -179,15 +179,17 @@ class Comment
         return $this->likes->contains($user);
     }
 
-    public function removeLike(): self
+    public function removeLike(User $user): self
     {
+        $this->likes->removeElement($user);
         $this->likeCount--;
 
         return $this;
     }
 
-    public function addLike(): self
+    public function addLike(User $user): self
     {
+        $this->likes->add($user);
         $this->likeCount++;
 
         return $this;

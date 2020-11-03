@@ -11,10 +11,12 @@ export const tokenValidFirstChars = helpers.regex('firstChars', /^[\s]+/u);
 export const tokenValidLastChars = helpers.regex('lastChars', /[\s]+$/u);
 export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
 export const tokenNameValidChars = helpers.regex('validChars', /^[\sA-Za-z0-9]+$/u);
-export const twoFACode = helpers.regex('numberInput', /^\d{6}$/);
+export const twoFACode = helpers.regex('numberInput', /^\d{6}$|^[A-Za-z\d]{12}$/);
 export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
 export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
+export const tweetLink = helpers.regex('tweetLink', /^(https?:\/\/)?(www\.)?twitter\.com\/[\S]+\/status\/[\d]+$/u);
+export const facebookPostLink = helpers.regex('facebookPostLink', /^(https?:\/\/)?(www\.)?facebook\.com\/[\S]+\/posts\/[\d]+$/u);
 
 export const FORBIDDEN_WORDS = ['token', 'coin'];
 export const HTTP_OK = 200;
@@ -38,6 +40,7 @@ export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
 export const webBtcSymbol = 'WEBBTC';
+export const usdSign = '$';
 
 export const cryptoSymbols = [
     webSymbol,
@@ -118,3 +121,13 @@ export const sanitizeOptions = {
 };
 
 export const primaryColor = '0E3B58';
+
+export const notificationTypes = {
+    filled: 'filled',
+    cancelled: 'cancelled',
+    deposit: 'deposit',
+    withdrawal: 'withdrawal',
+    deployed: 'deployed',
+    newPost: 'new_post',
+    newInvestor: 'new_investor',
+};

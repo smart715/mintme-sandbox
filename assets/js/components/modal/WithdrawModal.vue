@@ -43,7 +43,7 @@
                             class="btn btn-primary btn-input"
                             type="button"
                             @click="setMaxAmount">
-                          {{ $t('withdraw_modal.all') }}
+                            {{ $t('withdraw_modal.all') }}
                         </button>
                     </div>
                         <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
@@ -70,13 +70,13 @@
                 </div>
                 <div class="col-12 text-left">
                     <label>
-                      {{ $t('withdraw_modal.fee') }}
+                        {{ $t('withdraw_modal.fee') }}
                     </label>
                     <span class="float-right">{{ feeAmount }} {{ feeCurrency|rebranding }}</span>
                 </div>
                 <div class="col-12 pt-3 text-left">
                     <label>
-                      {{ $t('withdraw_modal.total') }}
+                        {{ $t('withdraw_modal.total') }}
                     </label>
                     <span class="overflow-wrap-break-word word-break-all float-right">
                         {{ fullAmount | toMoney(subunit) }} {{ currency|rebranding }}
@@ -87,7 +87,7 @@
                         class="btn btn-primary"
                         :disabled="$v.$anyError || withdrawing"
                         @click="onWithdraw">
-                        Withdraw
+                        {{ $t('withdraw_modal.submit') }}
                     </button>&nbsp;
                     <button
                         class="btn-cancel pl-3 c-pointer bg-transparent"
@@ -221,7 +221,7 @@ export default {
                 this.closeModal();
             })
             .catch((error) => {
-                this.notifyError(error.response.data.message);
+                this.notifyError(this.$t('api.wallet.withdrawal_failed'));
                 this.sendLogs('error', 'Withdraw response error', error);
             })
             .then(() => this.withdrawing = false);
@@ -267,6 +267,7 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
+                required,
                 twoFACode,
             },
         };

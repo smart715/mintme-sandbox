@@ -8,6 +8,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
+use App\Events\OrderCompletedEvent;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
@@ -19,6 +20,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class Trader implements TraderInterface
@@ -47,6 +49,9 @@ class Trader implements TraderInterface
     /** @var float */
     private $referralFee;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
@@ -55,7 +60,8 @@ class Trader implements TraderInterface
         MarketNameConverterInterface $marketNameConverter,
         NormalizerInterface $normalizer,
         LoggerInterface $logger,
-        float $referralFee
+        float $referralFee,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
@@ -65,6 +71,7 @@ class Trader implements TraderInterface
         $this->normalizer = $normalizer;
         $this->logger = $logger;
         $this->referralFee = $referralFee;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function placeOrder(Order $order): TradeResult
@@ -84,6 +91,15 @@ class Trader implements TraderInterface
         $quote = $order->getMarket()->getQuote();
 
         if (TradeResult::SUCCESS === $result->getResult()) {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new OrderCompletedEvent(
+                    $order,
+                    $quote
+                ),
+                OrderCompletedEvent::CREATED
+            );
+
             if ($quote instanceof Token) {
                 $this->updateUserTokenReferencer($order->getMaker(), $quote);
             } elseif ($quote instanceof Crypto) {

@@ -3,7 +3,7 @@ import TradeBuyOrder from '../../js/components/trade/TradeBuyOrder';
 import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/make_order';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 
 describe('TradeBuyOrder', () => {
     beforeEach(() => {
@@ -24,7 +24,7 @@ describe('TradeBuyOrder', () => {
     });
     const store = new Vuex.Store({
         modules: {
-            makeOrder,
+            tradeBalance,
             websocket: {
                 namespaced: true,
                 actions: {
@@ -157,7 +157,7 @@ describe('TradeBuyOrder', () => {
             wrapper.setProps({marketPrice: 5});
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe(2);
+            expect(wrapper.vm.buyAmount).toBe('2');
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -168,7 +168,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe(5);
+            expect(wrapper.vm.buyAmount).toBe('5');
             expect(wrapper.vm.buyPrice).toBe(2);
         });
 
@@ -179,7 +179,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe(2);
+            expect(wrapper.vm.buyAmount).toBe('2');
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -190,7 +190,7 @@ describe('TradeBuyOrder', () => {
             wrapper.vm.balanceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe(2);
+            expect(wrapper.vm.buyAmount).toBe('2');
             expect(wrapper.vm.buyPrice).toBe('5');
         });
 
@@ -202,7 +202,7 @@ describe('TradeBuyOrder', () => {
             event.target.tagName = 'a';
             wrapper.vm.balanceClicked(event);
 
-            expect(wrapper.vm.buyAmount).toBe(0);
+            expect(wrapper.vm.buyAmount).toBe('0');
             expect(wrapper.vm.buyPrice).toBe('0');
         });
     });

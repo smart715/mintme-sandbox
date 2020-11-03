@@ -4,7 +4,7 @@ import VueBootstrap from 'bootstrap-vue';
 import Countdown from './components/Countdown.vue';
 import FaqItem from './components/FaqItem';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
-import {faCog, fas, faSearch} from '@fortawesome/free-solid-svg-icons';
+import {faCog, fas, faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import {library, dom} from '@fortawesome/fontawesome-svg-core';
 import {far} from '@fortawesome/free-regular-svg-icons';
 import {fab} from '@fortawesome/free-brands-svg-icons';
@@ -20,6 +20,8 @@ import Avatar from './components/Avatar';
 import LocaleSwitcher from './components/LocaleSwitcher';
 import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
+import UserNotification from './components/UserNotification';
+
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
@@ -29,7 +31,7 @@ Vue.use(VueI18n);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
-library.add(fas, far, fab, faSearch, faCog);
+library.add(fas, far, fab, faSearch, faCog, faEnvelope);
 dom.watch();
 
 const i18n = new VueI18n({
@@ -85,6 +87,7 @@ new Vue({
         AdminMenu,
         LocaleSwitcher,
         Avatar,
+        UserNotification,
     },
     methods: {
         toggleNavbarMenu: function() {

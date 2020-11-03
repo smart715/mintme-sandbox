@@ -32,7 +32,211 @@
                 </confirm-modal>
             </div>
         </div>
-        <div v-else>
+        <div v-else class="airdrop-campaign">
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.twitterMessage"
+                        type="checkbox"
+                        id="twitter-message"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="twitter-message"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'twitter']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.twitter_message') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.twitterRetweet"
+                        type="checkbox"
+                        id="twitter-retweet"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="twitter-retweet"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'twitter']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.twitter_retweet') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <div class="ml-4" v-if="actions.twitterRetweet">
+                <input class="form-control token-name-input w-100 px-2"
+                    type="text"
+                    placeholder="URL to the tweet"
+                    v-model="actionsData.twitterRetweet"
+                >
+            </div>
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.facebookMessage"
+                        type="checkbox"
+                        id="facebook-message"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="facebook-message"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.facebook_message') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.facebookPage"
+                        type="checkbox"
+                        id="facebook-page"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="facebook-page"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.facebook_page') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <token-facebook-address
+                class="airdrop-campaign__token-facebook-address"
+                :address="currentFacebook"
+                :tokenName="tokenName"
+                @saveFacebook="saveFacebook"
+            />
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.facebookPost"
+                        type="checkbox"
+                        id="facebook-post"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="facebook-post"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.facebook_post') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <div class="ml-4" v-if="actions.facebookPost">
+                <input class="form-control token-name-input w-100 px-2"
+                    type="text"
+                    placeholder="URL to the post"
+                    v-model="actionsData.facebookPost"
+                >
+            </div>
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.linkedinMessage"
+                        type="checkbox"
+                        id="linkedin-message"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="linkedin-message"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'linkedin-in']" transform="right-3 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.linkedin_message') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.youtubeSubscribe"
+                        type="checkbox"
+                        id="youtube-subscribe"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="youtube-subscribe"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon :icon="['fab', 'youtube']" transform="right-2 down-1 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.youtube_subscribe') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
+            <token-youtube-address
+                class="airdrop-campaign__token-youtube-address"
+                :channel-id="currentYoutube"
+                :client-id="youtubeClientId"
+                :editable="true"
+                :tokenName="tokenName"
+                @saveYoutube="saveYoutube"
+            />
+            <div>
+                <label class="custom-control custom-checkbox pb-0 my-3">
+                    <input
+                        v-model="actions.postLink"
+                        type="checkbox"
+                        id="post-link"
+                        class="custom-control-input"
+                    >
+                    <label
+                        class="custom-control-label pb-0"
+                        for="post-link"
+                    >
+                        <font-awesome-layers class="ml-2">
+                            <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                            <font-awesome-icon icon="globe" transform="right-3 shrink-1"/>
+                        </font-awesome-layers>
+                        <span class="ml-3">
+                            {{ $t('airdrop.actions.post_link') }}
+                        </span>
+                    </label>
+                </label>
+            </div>
             <div class="col-12 pb-3 px-0">
                 <label for="tokensAmount" class="d-block text-left">
                     {{ $t('airdrop.amount_tokens') }}
@@ -125,8 +329,12 @@ import Decimal from 'decimal.js';
 import datePicker from 'vue-bootstrap-datetimepicker';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED, tweetLink, facebookPostLink} from '../../../utils/constants';
 import {mapGetters} from 'vuex';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
+import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
+import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
+import {requiredIf} from 'vuelidate/lib/validators';
 
 export default {
     name: 'TokenAirdropCampaign',
@@ -134,10 +342,17 @@ export default {
     components: {
         datePicker,
         ConfirmModal,
+        FontAwesomeIcon,
+        FontAwesomeLayers,
+        TokenFacebookAddress,
+        TokenYoutubeAddress,
     },
     props: {
         tokenName: String,
         airdropParams: Object,
+        facebookUrl: String,
+        youtubeChannelId: String,
+        youtubeClientId: String,
     },
     data() {
         return {
@@ -158,6 +373,22 @@ export default {
             },
             errorMessage: '',
             precision: TOK.subunit,
+            actions: {
+                twitterMessage: true,
+                twitterRetweet: true,
+                facebookMessage: true,
+                facebookPage: true,
+                facebookPost: true,
+                linkedinMessage: true,
+                youtubeSubscribe: true,
+                postLink: true,
+            },
+            actionsData: {
+                twitterRetweet: '',
+                facebookPost: '',
+            },
+            currentFacebook: this.facebookUrl || '',
+            currentYoutube: this.youtubeChannelId || '',
         };
     },
     mounted: function() {
@@ -181,7 +412,7 @@ export default {
             return parseInt(this.airdropCampaignId) > 0;
         },
         btnDisabled: function() {
-            return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid);
+            return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid) || this.$v.$invalid;
         },
         insufficientBalance: function() {
             if (this.balanceLoaded) {
@@ -265,7 +496,7 @@ export default {
                 });
         },
         createAirdropCampaign: function() {
-            if (this.btnDisabled || this.insufficientBalance) {
+            if (this.btnDisabled || this.insufficientBalance || this.$v.$invalid) {
                 return;
             }
 
@@ -281,6 +512,8 @@ export default {
             let data = {
                 amount: this.tokensAmount,
                 participants: this.participantsAmount,
+                actions: this.actions,
+                actionsData: this.actionsData,
             };
 
             if (this.isDateValid) {
@@ -380,6 +613,14 @@ export default {
         closeEditModal: function() {
             this.$emit('close');
         },
+        saveFacebook: function(newFacebook) {
+            this.currentFacebook = newFacebook;
+            this.$emit('updated-facebook', newFacebook);
+        },
+        saveYoutube: function(newChannelId) {
+            this.currentYoutube = newChannelId;
+            this.$emit('updated-youtube', newChannelId);
+        },
     },
     beforeDestroy() {
         if (!this.hasAirdropCampaign && this.airdropCampaignRemoved) {
@@ -395,6 +636,26 @@ export default {
         tokenExchangeAmount: function() {
             this.tokenBalance = this.tokenExchangeAmount;
         },
+    },
+    validations() {
+        return {
+            actionsData: {
+                twitterRetweet: {
+                    required: (val) => requiredIf(() => this.actions.twitterRetweet)(val.trim()),
+                    validUrl: (val) => !this.actions.twitterRetweet || tweetLink(val.trim()),
+                },
+                facebookPost: {
+                    required: (val) => requiredIf(() => this.actions.facebookPost)(val.trim()),
+                    validUrl: (val) => !this.actions.facebookPost || facebookPostLink(val.trim()),
+                },
+            },
+            currentYoutube: {
+                required: (val) => requiredIf(() => this.actions.youtubeSubscribe)(val.trim()),
+            },
+            currentFacebook: {
+                required: (val) => requiredIf(() => this.actions.facebookPage)(val.trim()),
+            },
+        };
     },
 };
 </script>

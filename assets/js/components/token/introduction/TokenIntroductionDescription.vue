@@ -119,6 +119,7 @@ export default {
             editingDescription: false,
             newDescription: this.description || '',
             maxDescriptionLength: 10000,
+            minDescriptionLength: 200,
             readyToSave: false,
         };
     },
@@ -159,7 +160,6 @@ export default {
                 name: this.name,
             }), {
                 description: this.newDescriptionHtmlDecode,
-                needToCheckCode: false,
             })
                 .then((response) => {
                     this.newDescription = response.data.newDescription;
@@ -187,7 +187,7 @@ export default {
         return {
             newDescription: {
                 required,
-                minLength: minLength(2),
+                minLength: minLength(this.minDescriptionLength),
                 maxLength: maxLength(this.maxDescriptionLength),
             },
         };

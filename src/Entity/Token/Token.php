@@ -6,6 +6,8 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
+use App\Entity\Message\Thread;
+use App\Entity\Message\ThreadMetadata;
 use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
@@ -130,7 +132,9 @@ class Token implements TradebleInterface, ImagineInterface
     protected $discordUrl;
 
     /**
-     * @ORM\Column(type="text", length=60000, nullable=true)
+     * @Assert\NotBlank()
+     * @ORM\Column(type="text", length=10000, nullable=true)
+     * @Assert\Length(min=200)
      * @Groups({"API_TOK"})
      * @var string|null
      */
@@ -243,6 +247,12 @@ class Token implements TradebleInterface, ImagineInterface
      * @var \DateTime
      */
     private $nextReminderDate;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Message\Thread", mappedBy="token", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     */
+    private $threads;
 
     public function __construct()
     {
@@ -645,5 +655,17 @@ class Token implements TradebleInterface, ImagineInterface
         $this->nextReminderDate = $nextReminderDate;
 
         return $this;
+    }
+
+    public function addThread(Thread $thread): self
+    {
+        $this->threads[] = $thread;
+
+        return $this;
+    }
+
+    public function getThreads(): array
+    {
+        return $this->threads->toArray();
     }
 }

@@ -103,3 +103,4 @@ parameters:
         pt: pt
         fr: fr
         pl: pl
+    dm_min_amount: 1

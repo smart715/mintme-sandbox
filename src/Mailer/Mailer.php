@@ -3,8 +3,8 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
+use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
@@ -104,18 +104,22 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendTransactionCompletedMail(TradebleInterface $tradable, User $user, string $amount, string $transactionType): void
+    public function sendTransactionCompletedMail(User $user, string $transactionType): void
     {
+        $confirmLink = $this->urlGenerator->generate(
+            'wallet',
+            ['tab' => 'dw-history'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
         $body = $this->twigEngine->render("mail/{$transactionType}_completed.html.twig", [
             'username' => $user->getUsername(),
-            'tradable' => $tradable,
-            'amount' => $amount,
+            'urlWallet' => $confirmLink,
         ]);
 
         $textBody = $this->twigEngine->render("mail/{$transactionType}_completed.txt.twig", [
             'username' => $user->getUsername(),
-            'tradable' => $tradable,
-            'amount' => $amount,
+            'urlWallet' => $confirmLink,
         ]);
 
         $msg = (new Swift_Message(ucfirst($transactionType)." Completed"))
@@ -245,6 +249,151 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
             ->addPart($textBody, 'text/plain');
+        $this->mailer->send($msg);
+    }
+
+    public function sendNewInvestorMail(User $user, string $newInvestor): void
+    {
+        $body = $this->twigEngine->render("mail/new_investor.html.twig", [
+            'username' => $user->getUsername(),
+            'investorProfile' => $newInvestor,
+            'userTokenName' => $user->getProfile()->getToken()->getName(),
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/new_investor.txt.twig", [
+            'username' => $user->getUsername(),
+            'investorProfile' => $newInvestor,
+            'userTokenName' => $user->getProfile()->getToken()->getName(),
+        ]);
+
+        $msg = (new Swift_Message('New Investor'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendNewPostMail(User $user, String $tokenName): void
+    {
+        $body = $this->twigEngine->render("mail/new_post.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/new_post.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $msg = (new Swift_Message('New Post'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendTokenDeployedMail(User $user, String $tokenName): void
+    {
+        $body = $this->twigEngine->render("mail/new_token_deployed.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/new_token_deployed.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $msg = (new Swift_Message('New Token Deployed'))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendNoOrdersMail(User $user, String $tokenName): void
+    {
+        $body = $this->twigEngine->render("mail/no_orders.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/no_orders.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $msg = (new Swift_Message('Orders'))
+        ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendKnowledgeBaseMail(User $user, Token $token): void
+    {
+        $tokenSalesUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $aimingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Aiming-at-a-strong-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $ideasUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Ideas-to-promote-and-sell-your-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $stuckUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Stuck-not-knowing-what-to-do-next'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $talkingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $deployUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'How-to-deploy-my-token-to-the-blockchain'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/knowledge_base_suggestions.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+            'deployUrl' => $deployUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/knowledge_base_suggestions.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $token->getName(),
+        ]);
+
+        $subjectMsg = 'What Now?';
+        $msg = (new Swift_Message($subjectMsg))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
         $this->mailer->send($msg);
     }
 }

@@ -303,7 +303,7 @@ export default {
                 this.market.quote.subunit
             );
         },
-        ...mapMutations('makeOrder', [
+        ...mapMutations('tradeBalance', [
             'setBuyPriceInput',
             'setBuyAmountInput',
             'setBaseBalance',
@@ -343,7 +343,7 @@ export default {
                 minTotalPrice: this.minTotalPrice,
             };
         },
-        ...mapGetters('makeOrder', [
+        ...mapGetters('tradeBalance', [
             'getBuyPriceInput',
             'getBuyAmountInput',
             'getBaseBalance',
@@ -359,7 +359,7 @@ export default {
         },
         buyAmount: {
             get() {
-                return new Decimal(this.getBuyAmountInput).toDP(this.market.quote.subunit, Decimal.ROUND_CEIL).toNumber();
+                return this.getBuyAmountInput;
             },
             set(val) {
                 this.setBuyAmountInput(val);

@@ -7,6 +7,8 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
@@ -39,6 +41,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -77,6 +80,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -84,6 +90,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -95,20 +102,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
         $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="optional", "expose"=true})
-     * @Rest\RequestParam(name="name", nullable=true)
-     * @Rest\RequestParam(name="description", nullable=true)
-     * @Rest\RequestParam(name="facebookUrl", nullable=true)
-     * @Rest\RequestParam(name="telegramUrl", nullable=true)
-     * @Rest\RequestParam(name="discordUrl", nullable=true)
-     * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
-     * @Rest\RequestParam(name="code", nullable=true)
+     * @Rest\Patch("/update/{name}", name="token_update_name", options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="name", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=false)
      */
-    public function update(
+    public function updateName(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
         string $name
@@ -123,41 +126,52 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name')) {
-            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.you_need_all_tokens_to_change_name'));
-            }
-
-            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.deploying'));
-            }
-
-            if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
-                throw new ApiBadRequestException($this->translator->trans('api.tokens.forbidden_name'));
-            }
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.you_need_all_tokens_to_change_name'));
         }
 
-        $form = $this->createForm(TokenType::class, $token, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
-        ]);
-
-        $form->submit(array_filter($request->all(), function ($value) {
-            return null !== $value;
-        }), false);
-
-        if (!$form->isValid()) {
-            foreach ($form->all() as $childForm) {
-                /** @var FormError[] $fieldErrors */
-                $fieldErrors = $form->get($childForm->getName())->getErrors();
-
-                if (count($fieldErrors) > 0) {
-                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
-                }
-            }
-
-            throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.deploying'));
         }
+
+        if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.forbidden_name'));
+        }
+
+        $this->handleUpdateForm($token, $request);
+
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->userActionLogger->info('Change token info', $request->all());
+
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
+     * @Rest\RequestParam(name="description", nullable=true)
+     * @Rest\RequestParam(name="facebookUrl", nullable=true)
+     * @Rest\RequestParam(name="telegramUrl", nullable=true)
+     * @Rest\RequestParam(name="discordUrl", nullable=true)
+     * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
+     */
+    public function update(
+        ParamFetcherInterface $request,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        $this->handleUpdateForm($token, $request);
 
         if (null === $token->getDescription() || '' == $token->getDescription()) {
             $token->setNumberOfReminder(0);
@@ -458,6 +472,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if (!$token) {
             throw $this->createNotFoundException('Token does not exist');
         }
+
+        /** @var User */
+        $user = $this->getUser();
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent(
+                $user,
+                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+            ),
+            UserNotificationEvent::NAME
+        );
 
         return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
     }
@@ -790,5 +816,30 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     private function validateEthereumAddress(string $address): bool
     {
         return 0 === strpos($address, '0x') && (42 === strlen($address));
+    }
+
+    private function handleUpdateForm(Token $token, ParamFetcherInterface $request): void
+    {
+        $form = $this->createForm(TokenType::class, $token, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+
+        $form->submit(array_filter($request->all(), function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$form->isValid()) {
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
+        }
     }
 }

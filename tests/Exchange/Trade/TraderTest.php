@@ -7,11 +7,13 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandler;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderFetcherInterface;
+use App\Manager\ScheduledNotificationManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +23,7 @@ use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class TraderTest extends TestCase
@@ -45,7 +48,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -82,7 +86,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -122,7 +127,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', false);
@@ -158,7 +164,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -195,7 +202,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $trader->cancelOrder(
@@ -226,7 +234,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $trader->cancelOrder(
@@ -261,7 +270,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $user = $this->mockUser(2);
@@ -314,7 +324,8 @@ class TraderTest extends TestCase
             $this->mockMarketNameConverter(),
             $this->createMock(NormalizerInterface::class),
             $this->createMock(LoggerInterface::class),
-            0.5
+            0.5,
+            $this->mockEvenDispatcher(),
         );
 
         $user = $this->mockUser(2);
@@ -437,5 +448,10 @@ class TraderTest extends TestCase
         });
 
         return $mw;
+    }
+
+    private function mockEvenDispatcher(): EventDispatcher
+    {
+        return $this->createMock(EventDispatcher::class);
     }
 }

@@ -2,7 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenDeploy from '../../js/components/token/deploy/TokenDeploy';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/make_order';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 import Axios from '../../js/axios';
 import axios from 'axios';
 
@@ -39,7 +39,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
     localVue.component('font-awesome-icon', {});
     const store = new Vuex.Store({
         modules: {
-            makeOrder,
+            tradeBalance,
             websocket: {
                 namespaced: true,
                 actions: {

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div id="chat" class="container">
+        <chat-widget
+            class="pt-4"
+            nickname="{{ app.user.profile.nickname }}"
+            :threads="{{ threads | json_encode }}"
+            :thread-id="{{ threadId }}"
+        />
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/chat.js') }}"></script>
+{% endblock %}

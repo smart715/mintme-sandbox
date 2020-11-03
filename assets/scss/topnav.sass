@@ -126,6 +126,9 @@
     background-image: url('../img/settings-sprite.png')
     @extend .icon
 
+  .icon-chat
+    @extend .icon
+
   .icon-wallet
     background-image: url('../img/wallet-icon.png')
     @extend .icon
@@ -178,7 +181,7 @@
       border-right: 6px solid transparent
       position: absolute
       display: inline-block
-      left: 76%
+      left: 84%
       -webkit-transform: rotate(45deg)
       transform: rotate(45deg)
       margin-top: -9px
@@ -241,3 +244,53 @@
     top: 0
     border-left: 20px solid transparent
     border-bottom: 20px solid $color-badge
+
+.desktop-notification-bell
+  @include media-breakpoint-down(md)
+    display: none
+
+.mobile-notification-bell
+  @include media-breakpoint-up(lg)
+    display: none
+
+.bell-notification-dropdown
+  width: 284px
+  height: 197px
+  cursor: default
+
+  &:before
+    left: 94% !important
+
+  span
+    font-size: 15px
+
+.notification-header
+  padding: 4px
+  background: $primary
+
+.notification-container
+  background: $primary
+
+.notification-body
+  padding: 1px
+  background: $secondary
+  margin-bottom: 6px
+
+  .notification-type a
+    color: $notification-link
+
+  p
+    margin-left: 4px
+    margin-bottom: 4px
+
+.hasVBar
+  height: 84% !important
+
+.bell-notification svg
+  pointer-events: none
+
+.static-container-notification
+  margin-top: 21%
+
+.small-bell svg
+  margin-left: 7px

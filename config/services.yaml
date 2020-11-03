@@ -180,7 +180,8 @@ services:
 
     App\Command\UpdatePendingWithdrawals:
         properties:
-            expirationTime: '%withdraw_expiration_time%'
+            withdrawExpirationTime: '%withdraw_expiration_time%'
+            viabtcResponseTimeout: '%viabtc_response_timeout_seconds%'
         arguments:
             $logger: '@logger'
         tags:
@@ -191,6 +192,10 @@ services:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
+
+    App\Command\CheckUserSellOrdersCommand:
+        properties:
+            timeIntervals: '%time_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -641,3 +646,7 @@ services:
             - [setAnnotationReader, ['@annotation_reader']]
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    App\Manager\ScheduledNotificationManager:
+        properties:
+            timeIntervals: '%time_intervals%'

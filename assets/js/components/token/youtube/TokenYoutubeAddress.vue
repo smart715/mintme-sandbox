@@ -12,7 +12,7 @@
                         size="lg"
                     />
                 </span>
-                <a href="#" class="text-reset">
+                <a href="#" class="text-reset text-nowrap">
                     {{ computedChannel }}
                 </a>
             </span>
