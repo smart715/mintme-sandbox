@@ -10,7 +10,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -225,9 +225,9 @@ class TwoFactorSubscriberTest extends TestCase
         return $router;
     }
 
-    private function mockGetControllerEvent(string $code): FilterControllerEvent
+    private function mockGetControllerEvent(string $code): ControllerEvent
     {
-        $event = $this->createMock(FilterControllerEvent::class);
+        $event = $this->createMock(ControllerEvent::class);
         $event->method('getController')->willReturn(
             [$this->createMock(TwoFactorAuthenticatedInterface::class)]
         );
