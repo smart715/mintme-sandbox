@@ -88,6 +88,11 @@
                                 <token-airdrop-campaign
                                     :token-name="currentName"
                                     :airdrop-params="airdropParams"
+                                    :facebook-url="facebookUrl"
+                                    :youtube-client-id="youtubeClientId"
+                                    :youtube-channel-id="youtubeChannelId"
+                                    @updated-facebook="$emit('updated-facebook', $event)"
+                                    @updated-youtube="$emit('updated-youtube', $event)"
                                     @close="$emit('close')"
                                 />
                             </template>
