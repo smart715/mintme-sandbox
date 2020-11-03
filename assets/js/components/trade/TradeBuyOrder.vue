@@ -229,7 +229,7 @@ export default {
             this.balanceManuallyEdited = val;
         },
         checkPriceInput() {
-            this.$emit('check-input', this.market.base.subunit);
+            this.$emit('check-input', this.market.base.subunit, 4);
             this.setBalanceManuallyEdited(true);
         },
         checkAmountInput() {
