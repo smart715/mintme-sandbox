@@ -33,7 +33,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/user_notifications", name="user_notifications", options={"expose"=true})
+     * @Rest\Get("/user-notifications", name="user_notifications", options={"expose"=true})
      * @Rest\View()
      * @return View
      */
@@ -48,7 +48,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/update_read_notifications", name="update_read_notifications", options={"expose"=true})
+     * @Rest\Get("/update-read-notifications", name="update_read_notifications", options={"expose"=true})
      * @Rest\View()
      * @return Response
      */

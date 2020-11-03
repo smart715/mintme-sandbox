@@ -39,7 +39,6 @@ class UserNotification
 
     /**
      * @ORM\Column(type="json", nullable=true)
-     * @Groups({"user_notification"})
      */
     private ?array $json_data;
 
