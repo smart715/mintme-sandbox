@@ -9,7 +9,6 @@ use App\Exception\ApiBadRequestException;
 use App\Mailer\MailerInterface;
 use App\Repository\UserNotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class UserNotificationManager implements UserNotificationManagerInterface
 {
@@ -22,19 +21,14 @@ class UserNotificationManager implements UserNotificationManagerInterface
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
-    /** @var SerializerInterface */
-    private SerializerInterface $serializer;
-
     public function __construct(
         EntityManagerInterface $em,
         UserNotificationRepository $userNotificationRepository,
-        MailerInterface $mailer,
-        SerializerInterface $serializer
+        MailerInterface $mailer
     ) {
         $this->em = $em;
         $this->userNotificationRepository =  $userNotificationRepository;
         $this->mailer = $mailer;
-        $this->serializer =$serializer;
     }
 
     public function createNotification(
