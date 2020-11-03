@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
@@ -193,6 +194,12 @@ class User extends BaseUser implements
      * @var string
      */
     protected $coinifyOfflineToken;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction")
+     * @var ArrayCollection
+     */
+    protected $airdropActions;
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
@@ -524,5 +531,17 @@ class User extends BaseUser implements
         $this->coinifyOfflineToken = $coinifyOfflineToken;
 
         return $this;
+    }
+
+    public function addAirdropAction(AirdropAction $action): self
+    {
+        $this->airdropActions->add($action);
+
+        return $this;
+    }
+
+    public function getAirdropActions(): ArrayCollection
+    {
+        return $this->airdropActions;
     }
 }

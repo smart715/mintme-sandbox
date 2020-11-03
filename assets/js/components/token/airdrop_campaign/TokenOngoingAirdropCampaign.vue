@@ -40,14 +40,142 @@
                     </span>
                     <confirm-modal
                         :visible="showModal"
+                        :button-disabled="loggedIn && !isOwner && !userAlreadyClaimed && !actionsCompleted"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
                         :show-image="false"
                         @confirm="modalOnConfirm"
                         @cancel="modalOnCancel"
-                        @close="showModal = false">
-                        <p class="text-white modal-title pt-2 pb-4">
-                            {{ confirmModalMessage }}
-                        </p>
+                        @close="showModal = false"
+                    >
+                        <div class="d-flex flex-column align-items-center">
+                            <p class="text-white modal-title pt-2 pb-4">
+                                {{ confirmModalMessage }}
+                            </p>
+                            <div class="w-75" v-if="loggedIn && !isOwner && actionsLength > 0 && !alreadyClaimed && loaded">
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.twitterMessage">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'twitter']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2 c-pointer" @click.prevent="claimTwitterMessage">
+                                        {{ $t('airdrop.actions.twitter_message') }}
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.twitterMessage.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.twitterRetweet">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'twitter']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2 c-pointer" @click.prevent="claimTwitterRetweet">
+                                        {{ $t('airdrop.actions.twitter_retweet') }}
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.twitterRetweet.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.facebookMessage">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2 c-pointer" @click.prevent="openFacebookMessage">
+                                        {{ $t('airdrop.actions.facebook_message') }}
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.facebookMessage.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.facebookPage">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2">
+                                        <a class="text-decoration-none text-white"
+                                            :href="airdropCampaign.actionsData.facebookPage"
+                                            target="_blank"
+                                            @click="claimAction(airdropCampaign.actions.facebookPage)"
+                                        >
+                                            {{ $t('airdrop.actions.facebook_page') }}
+                                        </a>
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.facebookPage.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.facebookPost">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'facebook-f']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2">
+                                        <a class="text-decoration-none text-white"
+                                            :href="airdropCampaign.actionsData.facebookPost"
+                                            target="_blank"
+                                            @click="claimAction(airdropCampaign.actions.facebookPost)"
+                                        >
+                                            {{ $t('airdrop.actions.facebook_post') }}
+                                        </a>
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.facebookPost.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.linkedinMessage">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'linkedin-in']" transform="right-3 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2 c-pointer" @click.prevent="claimLinkedin">
+                                        {{ $t('airdrop.actions.linkedin_message') }}
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.linkedinMessage.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.youtubeSubscribe">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon :icon="['fab', 'youtube']" transform="right-2 down-1 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <span class="ml-4 pl-2 c-pointer" @click.prevent="claimYoutube">
+                                        {{ $t('airdrop.actions.youtube_subscribe') }}
+                                    </span>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.youtubeSubscribe.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.postLink">
+                                    <font-awesome-layers class="mt-1">
+                                        <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
+                                        <font-awesome-icon icon="globe" transform="right-3 shrink-1"/>
+                                    </font-awesome-layers>
+                                    <div class="ml-4 pl-2 d-flex flex-column align-items-start w-75">
+                                        <span>{{ $t('airdrop.actions.post_link') }}</span>
+                                        <a :href="tokenUrl" class="truncate-name w-100">{{ tokenUrl }}</a>
+                                    </div>
+                                    <span class="ml-auto">
+                                        {{ airdropCampaign.actions.postLink.done ? '1' : '0' }}/1
+                                    </span>
+                                </div>
+                                <div class="d-flex my-3" v-if="airdropCampaign.actions.postLink">
+                                    <input class="form-control font-size-12"
+                                        type="text"
+                                        v-model="postLinkUrl"
+                                        :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                    >
+                                    <button class="btn btn-primary text-nowrap ml-1"
+                                        :disabled="$v.postLinkUrl.$invalid"
+                                        @click="claimPostLink"
+                                    >
+                                        {{ $t('ongoing_airdrop.submit_url') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
                         <template v-if="!loggedIn || isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
@@ -66,13 +194,22 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin, FiltersMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney} from '../../../utils';
+import gapi from 'gapi';
+import {required, url} from 'vuelidate/lib/validators';
+
+const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
+const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 
 export default {
     name: 'TokenOngoingAirdropCampaign',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [
+        NotificationMixin,
+        LoggerMixin,
+        FiltersMixin,
+    ],
     components: {
         ConfirmModal,
     },
@@ -83,6 +220,7 @@ export default {
         userAlreadyClaimed: Boolean,
         loginUrl: String,
         signupUrl: String,
+        youtubeClientId: String,
     },
     data() {
         return {
@@ -93,12 +231,16 @@ export default {
             alreadyClaimed: this.userAlreadyClaimed,
             timeElapsed: false,
             showDuration: true,
+            postLinkUrl: '',
         };
     },
     mounted: function() {
         this.getAirdropCampaign();
     },
     computed: {
+        actionsLength() {
+            return Object.keys((this.airdropCampaign || {}).actions || {}).length;
+        },
         actualParticipants: function() {
             return this.airdropCampaign.actualParticipants || 0;
         },
@@ -164,10 +306,44 @@ export default {
               return this.$t('ongoing_airdrop.ended');
             }
 
+            if (this.actionsLength > 0) {
+                return this.$t('ongoing_airdrop.actions_message', {
+                    airdropReward: this.airdropReward,
+                    tokenName: this.truncateFunc(this.tokenName, 30),
+                    tasksAmount: this.actionsLength,
+                });
+            }
+
             return this.$t('ongoing_airdrop.confirm_message', {
                 airdropReward: this.airdropReward,
                 tokenName: this.tokenName,
             });
+        },
+        actionMessage() {
+            return this.$t('ongoing_airdrop.actions.message', {
+                tokenName: this.tokenName,
+                tokenUrl: this.tokenUrl,
+            });
+        },
+        tokenUrl() {
+            return this.$routing.generate('token_show', {name: this.tokenName}, true);
+        },
+        twitterMessageLink() {
+            return 'https://twitter.com/intent/tweet?text=' + decodeURI(this.actionMessage);
+        },
+        twitterRetweetLink() {
+            return 'https://twitter.com/intent/retweet?tweet_id=' + this.airdropCampaign.actionsData.twitterRetweet;
+        },
+        linkedinLink() {
+            return 'https://www.linkedin.com/sharing/share-offsite?url=' + this.tokenUrl;
+        },
+        youtubeLink() {
+            return 'https://www.youtube.com/channel/' + this.airdropCampaign.actionsData.youtubeSubscribe + '?sub_confirmation=1';
+        },
+        actionsCompleted() {
+            return this.actionsLength > 0
+                ? Object.keys(this.airdropCampaign.actions).every((key) => this.airdropCampaign.actions[key].done)
+                : true;
         },
     },
     methods: {
@@ -200,7 +376,7 @@ export default {
                 return;
             }
 
-            if (this.isOwner || this.timeElapsed) {
+            if (this.isOwner || this.timeElapsed || !this.actionsCompleted) {
                 return;
             }
 
@@ -234,6 +410,116 @@ export default {
                 window.location.replace(this.signupUrl);
             }
         },
+        openPopup(link, callback = null) {
+            let popup = window.open(link, 'popup', 'width=600,height=600');
+
+            // this is for giving the points after the popup is closed, but it doesn't work with twitter
+            if (callback) {
+                let interval = setInterval(() => {
+                    if (popup.closed) {
+                        clearInterval(interval);
+                        callback();
+                    }
+                }, 1000);
+            }
+        },
+        claimAction(action) {
+            if (action.done) {
+                return;
+            }
+
+            return this.$axios.single.post(this.$routing.generate('claim_airdrop_action', {
+                tokenName: this.tokenName,
+                id: action.id,
+            })).then(() => {
+                action.done = true;
+            }).catch((err) => {
+                this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                this.sendLogs('error', 'Error claiming action', err);
+            });
+        },
+        claimTwitterMessage() {
+            this.openPopup(this.twitterMessageLink);
+            this.claimAction(this.airdropCampaign.actions.twitterMessage);
+        },
+        claimTwitterRetweet() {
+            this.openPopup(this.twitterRetweetLink);
+            this.claimAction(this.airdropCampaign.actions.twitterRetweet);
+        },
+        openFacebookMessage() {
+            FB.ui({
+                method: 'share',
+                href: this.tokenUrl,
+            }, () => this.claimAction(this.airdropCampaign.actions.facebookMessage));
+        },
+        claimLinkedin() {
+            this.openPopup(this.linkedinLink, () => this.claimAction(this.airdropCampaign.actions.linkedinMessage));
+        },
+        claimYoutube() {
+            this.openPopup(this.youtubeLink, () => {
+                this.signInYoutube()
+                .then(this.checkIfSubscribed, () => Promise.reject(new Error(this.$t('ongoing_airdrop.youtube_authentication_required'))))
+                .then(() => this.claimAction(this.airdropCampaign.actions.youtubeSubscribe), (err) => this.notifyError(err.message));
+            });
+        },
+        claimPostLink() {
+            this.$axios.single.post(this.$routing.generate('verify_post_link_action', {tokenName: this.tokenName}), {
+                url: this.postLinkUrl,
+            }).then((res) => {
+                if (!res.data.verified) {
+                    throw new Error();
+                }
+
+                return this.claimAction(this.airdropCampaign.actions.postLink);
+            }).catch((err) => {
+                this.notifyError(this.$t('ongoing_airdrop.verification_failed'));
+            });
+        },
+        loadYoutubeClient: function() {
+            gapi.load('client:auth2', this.initYoutubeClient);
+        },
+        initYoutubeClient: function() {
+            gapi.client.init({
+                discoveryDocs: DISCOVERY_DOCS,
+                clientId: this.youtubeClientId,
+                scope: SCOPES,
+            });
+        },
+        signInYoutube: function() {
+            let options = new gapi.auth2.SigninOptionsBuilder();
+
+            options.setPrompt('select_account');
+
+            return gapi.auth2.getAuthInstance().signIn(options);
+        },
+        checkIfSubscribed: function() {
+            return new Promise((resolve, reject) => {
+                gapi.client.youtube.subscriptions.list({
+                    part: 'id',
+                    mine: true,
+                    forChannelId: this.airdropCampaign.actionsData.youtubeSubscribe,
+                })
+                .then((response) => {
+                    if (response.items.length > 0) {
+                        resolve();
+                    }
+                    reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
+                }).catch((err) => {
+                    reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
+                });
+            });
+        },
+    },
+    created() {
+        this.loadYoutubeClient();
+    },
+    validations() {
+        return {
+            postLinkUrl: {
+                required: (val) => required(val.trim()),
+                url,
+            },
+        };
     },
 };
 </script>

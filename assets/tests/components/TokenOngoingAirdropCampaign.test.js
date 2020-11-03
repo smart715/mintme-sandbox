@@ -3,6 +3,7 @@ import TokenOngoingAirdropCampaign from '../../js/components/token/airdrop_campa
 import moxios from 'moxios';
 import axios from 'axios';
 import moment from 'moment';
+import Vuelidate from 'vuelidate';
 
 /**
  * @return {Wrapper<Vue>}
@@ -17,6 +18,7 @@ function mockVue() {
             Vue.prototype.$t = (val) => val;
         },
     });
+    localVue.use(Vuelidate);
 
     return localVue;
 }
@@ -43,6 +45,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.actualParticipants).toBe(11);
@@ -61,6 +66,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                         'participants': 150,
                     },
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
@@ -81,6 +89,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.endsDate).toBe(moment(dateNow).format('Do MMMM YYYY'));
@@ -94,6 +105,9 @@ describe('TokenOngoingAirdropCampaign', () => {
             propsData: {
                 loggedIn: false,
                 isOwner: false,
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
         expect(wrapper.vm.confirmButtonText).toBe('log_in');
@@ -122,6 +136,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.logged_in');
@@ -144,6 +161,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.showEndDate).toBe(true);
@@ -162,6 +182,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                 return {
                     airdropCampaign: null,
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
@@ -200,6 +223,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                         'id': 5,
                     },
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
