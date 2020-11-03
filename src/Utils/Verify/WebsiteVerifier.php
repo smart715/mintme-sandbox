@@ -3,7 +3,6 @@
 namespace App\Utils\Verify;
 
 use App\Communications\Factory\HttpClientFactoryInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -81,6 +80,45 @@ class WebsiteVerifier implements WebsiteVerifierInterface
         $this->selectError($response->getStatusCode());
 
         return false;
+    }
+
+    public function verifyAirdropPostLinkAction(string $url, string $message): bool
+    {
+        $client = $this->clientFactory->createClient([
+            'timeout' => $this->timeoutSeconds,
+            'request.options' => ['proxy' => $this->proxy],
+        ]);
+
+        try {
+            $response = $client->request('GET', $url);
+        } catch (\Throwable $e) {
+            $this->selectError($e->getCode());
+            $this->logger->error($e->getMessage());
+
+            return false;
+        }
+
+        if (Response::HTTP_OK !== $response->getStatusCode()) {
+            return false;
+        }
+
+        $fileContent = $response->getBody()->getContents();
+
+        if (empty($fileContent)) {
+            $this->selectError(Response::HTTP_NO_CONTENT);
+
+            return false;
+        }
+
+        $expectedPattern = '#('.preg_quote($message).')#';
+
+        if (!preg_match($expectedPattern, $fileContent)) {
+            $this->selectError(self::INVALID_VERIFICATION_CODE);
+
+            return false;
+        }
+
+        return true;
     }
 
     private function selectError(int $code): void
