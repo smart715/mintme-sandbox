@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
 use App\Manager\UserNotificationManagerInterface;
+use App\Utils\NotificationsType;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -61,6 +62,18 @@ class UserNotificationsController extends AbstractFOSRestController implements T
         $this->userNotificationManager->updateNotifications($user);
 
         return new Response(Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\Get("/notifications_type", name="notifications_type", options={"expose"=true})
+     * @Rest\View()
+     * @return View
+     */
+    public function getNotificationsType(): View
+    {
+        return $this->view([
+            NotificationsType::getAll(),
+        ], Response::HTTP_ACCEPTED);
     }
 
 

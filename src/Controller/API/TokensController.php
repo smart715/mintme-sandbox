@@ -7,7 +7,6 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
@@ -31,6 +30,7 @@ use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Utils\NotificationType;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -474,7 +474,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->eventDispatcher->dispatch(
             new UserNotificationEvent(
                 $user,
-                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+                NotificationType::TOKEN_DEPLOYED
             ),
             UserNotificationEvent::NAME
         );

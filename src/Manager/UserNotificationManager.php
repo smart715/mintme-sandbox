@@ -8,6 +8,7 @@ use App\Entity\UserToken;
 use App\Exception\ApiBadRequestException;
 use App\Mailer\MailerInterface;
 use App\Repository\UserNotificationRepository;
+use App\Utils\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserNotificationManager implements UserNotificationManagerInterface
@@ -36,8 +37,8 @@ class UserNotificationManager implements UserNotificationManagerInterface
         String $notificationType,
         array $extraData
     ): void {
-        if ((UserNotification::TOKEN_NEW_POST_NOTIFICATION === $notificationType ||
-            UserNotification::TOKEN_DEPLOYED_NOTIFICATION === $notificationType)
+        if ((NotificationType::TOKEN_NEW_POST === $notificationType ||
+            NotificationType::TOKEN_DEPLOYED === $notificationType)
         ) {
             foreach ($this->getUsersHaveTokenIds($user) as $userHaveToken) {
                 $token = $user->getProfile()->getToken();
@@ -49,7 +50,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
                 ], JSON_THROW_ON_ERROR);
 
                 $this->newUserNotification($notificationType, $userWithToken, $jsonData);
-                UserNotification::TOKEN_NEW_POST_NOTIFICATION === $notificationType ?
+                NotificationType::TOKEN_NEW_POST === $notificationType ?
                     $this->mailer->sendNewPostMail($userWithToken, $tokenName) :
                     $this->mailer->sendTokenDeployedMail($userWithToken, $tokenName);
             }
@@ -58,8 +59,8 @@ class UserNotificationManager implements UserNotificationManagerInterface
         } else {
             $jsonData = null;
 
-            if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType ||
-                UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType
+            if (NotificationType::ORDER_CANCELLED === $notificationType ||
+                NotificationType::ORDER_FILLED === $notificationType
             ) {
                 $tokenName = $user->getProfile()->getToken()->getName();
                 $jsonData = (array)json_encode([
@@ -68,7 +69,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
                 $this->mailer->sendNoOrdersMail($user, $tokenName);
             }
 
-            if (UserNotification::NEW_INVESTOR_NOTIFICATION === $notificationType) {
+            if (NotificationType::NEW_INVESTOR === $notificationType) {
                 $jsonData = (array)json_encode(
                     $extraData,
                     JSON_THROW_ON_ERROR

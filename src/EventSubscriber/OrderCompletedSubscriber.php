@@ -3,12 +3,12 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Token\Token;
-use App\Entity\UserNotification;
 use App\Events\OrderCompletedEvent;
 use App\Events\UserNotificationEvent;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\ScheduledNotificationManagerInterface;
+use App\Utils\NotificationType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -73,7 +73,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $this->eventDispatcher->dispatch(
                     new UserNotificationEvent(
                         $userTokenCreator,
-                        UserNotification::NEW_INVESTOR_NOTIFICATION,
+                        NotificationType::NEW_INVESTOR,
                         $extraData
                     ),
                     UserNotificationEvent::NAME
@@ -83,7 +83,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
             if (Order::BUY_SIDE === $orderType &&
                 !$this->marketHandler->getSellOrdersSummaryByUser($userTokenCreator, $market)
             ) {
-                $notificationType = UserNotification::ORDER_FILLED_NOTIFICATION;
+                $notificationType = NotificationType::ORDER_FILLED;
                 $this->scheduledNotificationManager->createScheduledNotification(
                     $notificationType,
                     $userTokenCreator
@@ -105,7 +105,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
 
                 if (!$userSellOrdersSummary) {
-                    $notificationType = UserNotification::ORDER_CANCELLED_NOTIFICATION;
+                    $notificationType = NotificationType::ORDER_CANCELLED;
                     $this->scheduledNotificationManager->createScheduledNotification(
                         $notificationType,
                         $currentUser

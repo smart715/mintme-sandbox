@@ -6,7 +6,6 @@ use App\Consumers\Helpers\DBConnection;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\DepositCompletedEvent;
 use App\Events\UserNotificationEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -18,6 +17,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\ClockInterface;
+use App\Utils\NotificationType;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -182,7 +182,7 @@ class DepositConsumer implements ConsumerInterface
             $this->eventDispatcher->dispatch(
                 new UserNotificationEvent(
                     $user,
-                    UserNotification::DEPOSIT_NOTIFICATION
+                    NotificationType::DEPOSIT
                 ),
                 UserNotificationEvent::NAME
             );

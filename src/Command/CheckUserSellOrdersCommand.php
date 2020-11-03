@@ -4,12 +4,12 @@ namespace App\Command;
 
 use App\Entity\ScheduledNotification;
 use App\Entity\Token\Token;
-use App\Entity\UserNotification;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Utils\NotificationType;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -102,13 +102,13 @@ class CheckUserSellOrdersCommand extends Command
 
     private function isLastNotificationSent(String $notificationType, String $timeInterval): bool
     {
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType &&
+        if (NotificationType::ORDER_CANCELLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval
         ) {
             return true;
         }
 
-        return UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType &&
+        return NotificationType::ORDER_FILLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval;
     }
 
@@ -120,11 +120,11 @@ class CheckUserSellOrdersCommand extends Command
     ): void {
         $newTimeInterval = '0';
 
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType) {
+        if (NotificationType::ORDER_CANCELLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[2];
         }
 
-        if (UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType) {
+        if (NotificationType::ORDER_FILLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[0] === $timeInterval ?
                 (string)$this->timeIntervals[1] :
                 (string)$this->timeIntervals[2];

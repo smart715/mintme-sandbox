@@ -5,13 +5,13 @@ namespace App\Controller\API;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\UserNotificationEvent;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -241,7 +241,7 @@ class PostsController extends AbstractFOSRestController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
+        $notificationType = NotificationType::TOKEN_NEW_POST;
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(

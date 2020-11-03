@@ -49,8 +49,19 @@ export default {
             ],
         };
     },
+    mounted() {
+        this.fetchNotificationsTypes();
+    },
     methods: {
-        // todo fetch all notification type
+        fetchNotificationsTypes: function() {
+            this.$axios.retry.get(this.$routing.generate('notifications_type'))
+                .then((res) => {
+                    console.log(res);
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Error loading Notifications type', err);
+                });
+        },
         closeModal: function() {
             this.visible = false;
         },
