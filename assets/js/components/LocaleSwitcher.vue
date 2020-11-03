@@ -11,7 +11,7 @@
             :aria-expanded="showLangMenu"
             @click="showLangMenu = true"
         >
-            <span :class="currentLocaleClass"></span>
+            <span :class="currentLocaleClass"></span> {{ currentLocaleLabel }}
         </button>
         <div
             class="dropdown-menu lang-menu"
@@ -46,9 +46,6 @@ export default {
         };
     },
     computed: {
-        currentLocaleClass: function() {
-            return 'flag-icon flag-icon-' + this.flagNames[this.currentLocale].flag;
-        },
         flagNames: function() {
           return JSON.parse(this.flags);
         },
@@ -62,6 +59,12 @@ export default {
                   label: this.flagNames[loc].label,
                 };
             });
+        },
+        currentLocaleClass: function() {
+            return 'flag-icon flag-icon-' + this.flagNames[this.currentLocale].flag;
+        },
+        currentLocaleLabel: function() {
+            return this.flagNames[this.currentLocale].label;
         },
     },
     methods: {
