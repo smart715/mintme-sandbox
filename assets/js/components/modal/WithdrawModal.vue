@@ -214,7 +214,7 @@ export default {
             })
             .then((response) => {
                 if (this.code === null) {
-                    this.notifySuccess('Withdrawal request successfully confirmed and added to queue.');
+                    this.notifySuccess(this.$t('toasted.success.withdrawal.queued'));
                 } else {
                     this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
                 }

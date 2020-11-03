@@ -1054,6 +1054,7 @@ toasted.error.can_not_update_supply: 'Can not update MINTME circulation supply. 
 toasted.error.connection_problem: 'Connection problem. Try again later.'
 toasted.error.fetching_exchange_rates: 'Error fetching exchange rates for cryptos. Selecting USD as currency might not work'
 toasted.success.email_sent: 'Confirmation email has been sent to your email. It will expire in %hours% hours.'
+toasted.success.withdrawal.queued: 'Withdrawal request successfully confirmed and added to queue.'
 toasted.success.facebook.added: 'Facebook page saved as %address%'
 toasted.success.facebook.deleted: 'Facebook page deleted'
 toasted.success.youtube.added: 'Youtube channel saved as %address%'

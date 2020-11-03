@@ -12,7 +12,6 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Manager\TwoFactorManagerInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapper;
@@ -75,7 +74,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Post("/withdraw", name="withdraw")
+     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="optional"})
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(
@@ -88,7 +87,6 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     public function withdraw(
         ParamFetcherInterface $request,
         CryptoManagerInterface $cryptoManager,
-        TwoFactorManagerInterface $twoFactorManager,
         TokenManagerInterface $tokenManager,
         MoneyWrapperInterface $moneyWrapper,
         WalletInterface $wallet,
@@ -127,14 +125,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
             ], Response::HTTP_BAD_GATEWAY);
         }
-        
-        $code = $request->get('code');
 
         if ($user->isGoogleAuthenticatorEnabled()) {
-            if (empty($code) || !$twoFactorManager->checkCode($user, strval($code))) {
-                throw new ApiUnauthorizedException('Unauthorized, Invalid two factor authentication code');
-            }
-
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
             } catch (Throwable $exception) {
