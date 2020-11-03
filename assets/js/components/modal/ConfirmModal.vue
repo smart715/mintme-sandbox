@@ -16,7 +16,9 @@
                     <button
                         class="btn btn-primary"
                         :tabindex="9"
-                        @click="onConfirm">
+                        @click="onConfirm"
+                        :disabled="buttonDisabled"
+                    >
                         <slot name="confirm">{{ $t('confirm_modal.confirm') }}</slot>
                     </button>
                     <button
@@ -49,6 +51,10 @@ export default {
         showImage: {
             type: Boolean,
             default: true,
+        },
+        buttonDisabled: {
+            type: Boolean,
+            default: false,
         },
     },
     methods: {
