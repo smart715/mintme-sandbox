@@ -42,9 +42,10 @@ class UserNotificationsController extends AbstractFOSRestController implements T
         /** @var User $user */
         $user = $this->getUser();
 
-        return $this->view([
+        return $this->view(
             $this->userNotificationManager->getNotifications($user, self::NOTIFICATION_LIMIT),
-        ], Response::HTTP_ACCEPTED);
+            Response::HTTP_ACCEPTED
+        );
     }
 
     /**

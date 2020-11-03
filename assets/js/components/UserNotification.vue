@@ -130,7 +130,7 @@ export default {
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
                 .then((res) => {
-                    this.userNotifications = res.data[0];
+                    this.userNotifications = res.data;
                     this.loadNotifications();
                 })
                 .catch((err) => {

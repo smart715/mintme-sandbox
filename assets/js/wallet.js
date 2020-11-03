@@ -27,13 +27,9 @@ new Vue({
     };
   },
   mounted: function() {
-    let urlPath = window.location;
-    let parser = document.createElement('a');
-    parser.href = urlPath;
-    if (parser.pathname === this.$routing.generate('wallet', {tab: 'dw-history'})) {
-      this.goToDepositWithdrawalHistoryTab();
-      window.history.replaceState({}, '', this.$routing.generate('wallet'));
-    }
+    let segmentArray = window.location.pathname.split( '/' );
+    let lastSegmentPath = segmentArray.pop();
+    this.changeTab(lastSegmentPath);
     this.depositMore = this.$refs.depositMore.getAttribute('value');
   },
   computed: {
@@ -54,8 +50,17 @@ new Vue({
     tabUpdated: function() {
       this.depositMore = '';
     },
-    goToDepositWithdrawalHistoryTab() {
-      this.tabIndex = 2;
+    changeTab(tab) {
+      if ('dw-history' === tab) {
+        this.tabIndex = 2;
+      }
+      if ('trad-history' === tab) {
+        this.tabIndex = 1;
+      }
+      if ('active-orders' === tab) {
+        this.tabIndex = 3;
+      }
+      window.history.replaceState({}, '', this.$routing.generate('wallet'));
     },
   },
   store,
