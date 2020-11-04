@@ -297,7 +297,6 @@ export default {
         }));
 
         this.addMessageHandler((result) => {
-            this.sendLogsIfWsError(result, 'Websocket error while mounting TokenIntroductionStatistics.vue.');
             if ('kline.update' === result.method) {
                 this.donationVolume = result.params[0][8] || 0;
             }

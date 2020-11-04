@@ -243,7 +243,6 @@ export default {
             }));
 
             this.addMessageHandler((response) => {
-                this.sendLogsIfWsError(response, 'Websocket error while mounting TradeTradeHistory.vue.');
                 if ('deals.update' === response.method) {
                     const orders = response.params[1];
 

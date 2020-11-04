@@ -515,7 +515,6 @@ export default {
                     this.loading = false;
 
                     this.addMessageHandler((result) => {
-                        this.sendLogsIfWsError(result, 'Websocket error while mounting Trading.vue.');
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
                             this.requestMonthInfo(result.params[0]);

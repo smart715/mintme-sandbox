@@ -170,7 +170,6 @@ export default {
             }));
 
             this.addMessageHandler((response) => {
-                this.sendLogsIfWsError(response, 'Websocket error while mounting Trade.vue.');
                 if ('order.update' === response.method) {
                     this.processOrders(response.params[1], response.params[0]);
                 }

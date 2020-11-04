@@ -87,7 +87,10 @@ export default {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
-                handler,
+                handler: (result) => {
+                    this.sendLogsIfWsError(result);
+                    handler(result);
+                }
             });
         },
         addOnOpenHandler: function(handler) {
@@ -104,10 +107,10 @@ export default {
                 });
             });
         },
-        sendLogsIfWsError: function(response, message) {
-            if (response.error !== null ||
-                (response.result !== null && response.result.status !== 'success')) {
-                this.sendLogs('error', message, JSON.stringify(response.error));
+        sendLogsIfWsError: function(result, message='') {
+            if (result.error !== null ||
+                (result.result !== null && result.result.status !== 'success')) {
+                this.sendLogs('error', message, JSON.stringify(result.error));
             }
         },
     },
