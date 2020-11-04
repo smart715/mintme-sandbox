@@ -398,15 +398,6 @@ export default {
     },
     mounted: function() {
         this.setTakerFee(this.takerFee);
-        this.addMessageHandler((response) => {
-            this.sendLogsIfWsError(response, 'Websocket error while mounting TradeBuyOrder.vue.');
-            if (
-                'asset.update' === response.method &&
-                response.params[0].hasOwnProperty(this.market.base.identifier)
-            ) {
-                this.immutableBalance = response.params[0][this.market.base.identifier].available;
-            }
-        }, 'trade-buy-order-asset');
     },
 };
 </script>
