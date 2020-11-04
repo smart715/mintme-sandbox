@@ -19,8 +19,12 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.idekey=Docker" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_host=$(ip route show | awk '/default/ {print $3}')" >> /usr/local/etc/php/conf.d/xdebug.ini
 
+RUN yes | pecl install apcu
+
 RUN touch /usr/local/etc/php/php.ini
-RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
+
+RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini \
+    && echo 'extension=apcu.so' >> /usr/local/etc/php/php.ini
 
 # NodeJs
 RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.x | bash -
