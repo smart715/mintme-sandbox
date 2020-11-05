@@ -50,7 +50,7 @@
                                 />
                                 <div v-if="newDescription.length > 0 && !$v.newDescription.minLength"
                                      class="text-sm text-danger">
-                                    {{ $t('token.intro.description.min_length') }}
+                                    {{ $t('token.intro.description.min_length', translationsContext) }}
                                 </div>
                                 <div v-if="!$v.newDescription.maxLength" class="text-sm text-danger">
                                     {{ $t('token.intro.description.max_length', translationsContext) }}
@@ -93,6 +93,7 @@ import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import BbcodeView from '../../bbcode/BbcodeView';
 import LimitedTextarea from '../../LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
+import {descriptionLength} from '../../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
 import he from 'he';
 
@@ -118,8 +119,6 @@ export default {
         return {
             editingDescription: false,
             newDescription: this.description || '',
-            maxDescriptionLength: 10000,
-            minDescriptionLength: 200,
             readyToSave: false,
         };
     },
@@ -132,7 +131,8 @@ export default {
         },
         translationsContext: function() {
             return {
-                maxDescriptionLength: this.maxDescriptionLength,
+                minDescriptionLength: descriptionLength.min,
+                maxDescriptionLength: descriptionLength.max,
                 name: this.name,
             };
         },
@@ -187,8 +187,8 @@ export default {
         return {
             newDescription: {
                 required,
-                minLength: minLength(this.minDescriptionLength),
-                maxLength: maxLength(this.maxDescriptionLength),
+                minLength: minLength(descriptionLength.min),
+                maxLength: maxLength(descriptionLength.max),
             },
         };
     },
