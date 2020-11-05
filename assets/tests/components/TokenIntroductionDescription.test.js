@@ -18,13 +18,14 @@ function mockVue() {
             Vue.prototype.$axios = {single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$toasted = {show: (val) => val};
         },
     });
     return localVue;
 }
 
 let propsForTestCorrectlyRenders = {
-    description: 'Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit',
+    description: 'a'.repeat(200),
     editable: true,
     name: 'fooName',
  };
@@ -46,9 +47,9 @@ describe('TokenIntroductionDescription', () => {
             },
             mocks: {$t: (val) => propsForTestCorrectlyRenders.name + val},
         });
-        expect(wrapper.vm.newDescription).toBe('Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit');
+        expect(wrapper.vm.newDescription).toBe('a'.repeat(200));
         expect(wrapper.html()).toContain('token.intro.description.plan.header');
-        expect(wrapper.html()).toContain('Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit');
+        expect(wrapper.html()).toContain('a'.repeat(200));
         expect(wrapper.html()).toContain('fooName');
     });
 
@@ -154,19 +155,19 @@ describe('TokenIntroductionDescription', () => {
             mocks: {$t: (val) => val},
         });
         wrapper.vm.editingDescription = true;
-        wrapper.vm.minDescriptionLength = 2;
         wrapper.vm.icon = 'foo';
+        wrapper.vm.newDescription = 'a'.repeat(201);
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
             status: 202,
-            response: {newDescription: 'foo'},
+            response: {newDescription: 'a'.repeat(202)},
         });
 
         moxios.wait(() => {
             expect(wrapper.emitted('updated').length).toBe(1);
             expect(wrapper.vm.editingDescription).toBe(false);
-            expect(wrapper.vm.newDescription).toBe('foo');
+            expect(wrapper.vm.newDescription).toBe('a'.repeat(202));
             expect(wrapper.vm.icon).toBe('edit');
             done();
         });
