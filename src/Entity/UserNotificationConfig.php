@@ -2,17 +2,17 @@
 
 namespace App\Entity;
 
-use App\Entity\Token\Token;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserNotificationChannelRepository")
- * @ORM\Table(name="user_notifications_channel")
+ * @ORM\Entity(repositoryClass="App\Repository\UserNotificationConfigRepository")
+ * @ORM\Table(name="user_notifications_config")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class UserNotificationChannel
+class UserNotificationConfig
 {
     /**
      * @ORM\Id()
@@ -36,11 +36,20 @@ class UserNotificationChannel
     private string $channel;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     * @var String
+     */
+    private string $type;
+
+    /**
      * @ORM\Column(type="datetime_immutable")
      * @var DateTimeImmutable
      */
     private DateTimeImmutable $created;
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -51,9 +60,20 @@ class UserNotificationChannel
         return $this->user;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getChannel(): string
     {
         return $this->channel;
+    }
+
+    /**
+     * @Groups({"default", "API"})
+     */
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     public function getCreated(): DateTimeImmutable
@@ -71,6 +91,13 @@ class UserNotificationChannel
     public function setChannel(string $channel): self
     {
         $this->channel = $channel;
+
+        return $this;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

@@ -2,7 +2,7 @@
 
 namespace App\Utils;
 
-interface NotificationsTypeInterface
+interface NotificationChannelsInterface
 {
     public static function getAll(): array;
 }

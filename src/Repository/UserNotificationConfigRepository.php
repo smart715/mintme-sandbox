@@ -3,22 +3,23 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use App\Entity\UserNotificationChannel;
+use App\Entity\UserNotificationConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class UserNotificationChannelRepository extends ServiceEntityRepository
+class UserNotificationConfigRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserNotificationChannel::class);
+        parent::__construct($registry, UserNotificationConfig::class);
     }
 
-    public function getUserNotificationsChannel(User $user): ?array
+    public function getUserNotificationsConfig(User $user): ?array
     {
         return $this->createQueryBuilder('unc')
             ->where('unc.user = :user')
             ->setParameter('user', $user)
-            ->getQuery()->getResult();
+            ->getQuery()
+            ->getResult();
     }
 }

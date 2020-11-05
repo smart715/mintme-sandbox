@@ -2,9 +2,7 @@
 
 namespace App\Utils;
 
-use ReflectionClass;
-
-class NotificationsType implements NotificationsTypeInterface
+class NotificationTypes implements NotificationTypesInterface
 {
     public const DEPOSIT = 'deposit';
     public const WITHDRAWAL = 'withdrawal';
@@ -16,8 +14,14 @@ class NotificationsType implements NotificationsTypeInterface
 
     public static function getAll(): array
     {
-        $typeClasses = new ReflectionClass(self::class);
-
-        return $typeClasses->getConstants();
+        return [
+            self::DEPOSIT,
+            self::WITHDRAWAL,
+            self::NEW_INVESTOR,
+            self::TOKEN_NEW_POST,
+            self::TOKEN_DEPLOYED,
+            self::ORDER_FILLED,
+            self::ORDER_CANCELLED,
+        ];
     }
 }

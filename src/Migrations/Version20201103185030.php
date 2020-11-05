@@ -23,10 +23,11 @@ final class Version20201103185030 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
         $this->addSql(
             'CREATE TABLE 
-                    user_notifications_channel (
+                    user_notifications_config (
                         id INT AUTO_INCREMENT NOT NULL,
                         user_id INT NOT NULL,                  
                         channel VARCHAR(255) NOT NULL,
+                        type VARCHAR(255) NOT NULL,
                         created DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\',                         
                         PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
         );

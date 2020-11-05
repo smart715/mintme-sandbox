@@ -6,7 +6,9 @@
         </button>
 
         <notifications-management-modal
-            :notifications-type="notificationsType"
+            :notification-types="notificationTypes"
+            :notification-channels="notificationChannels"
+            :user-notifications-config="userNotificationsConfig"
             :visible="visible"
             :noClose="noClose"
             @close="closeModal"
@@ -27,36 +29,39 @@ export default {
         return {
             visible: false,
             noClose: false,
-            notificationsType: [
-                {
-                    id: 1,
-                    type: 'deployed',
-                    email: true,
-                    website: true,
-                },
-                {
-                    id: 2,
-                    type: 'withdrawal',
-                    email: true,
-                    website: false,
-                },
-                {
-                    id: 3,
-                    type: 'deposit',
-                    email: false,
-                    website: true,
-                },
-            ],
+            notificationTypes: [],
+            notificationChannels: [],
+            userNotificationsConfig: [],
         };
     },
-    mounted() {
-        this.fetchNotificationsTypes();
+    created() {
+        this.fetchUserNotificationsConfig();
+        this.fetchNotificationTypes();
+        this.fetchNotificationChannels();
     },
     methods: {
-        fetchNotificationsTypes: function() {
-            this.$axios.retry.get(this.$routing.generate('notifications_type'))
+        fetchUserNotificationsConfig: function() {
+            this.$axios.retry.get(this.$routing.generate('user_notifications_config'))
                 .then((res) => {
-                    console.log(res);
+                    this.userNotificationsConfig = res.data;
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Error loading User Notifications channels', err);
+                });
+        },
+        fetchNotificationChannels: function() {
+            this.$axios.retry.get(this.$routing.generate('notification_channels'))
+                .then((res) => {
+                    this.notificationChannels = res.data;
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'Error loading Notifications type', err);
+                });
+        },
+        fetchNotificationTypes: function() {
+            this.$axios.retry.get(this.$routing.generate('notification_types'))
+                .then((res) => {
+                    this.notificationTypes = res.data;
                 })
                 .catch((err) => {
                     this.sendLogs('error', 'Error loading Notifications type', err);

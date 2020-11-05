@@ -4,8 +4,10 @@ namespace App\Controller\API;
 
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
+use App\Manager\UserNotificationConfigManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
-use App\Utils\NotificationsType;
+use App\Utils\NotificationChannels;
+use App\Utils\NotificationTypes;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -26,12 +28,17 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     /** @var UserNotificationManagerInterface */
     private $userNotificationManager;
 
+    /** @var UserNotificationConfigManagerInterface */
+    private $userNotificationsConfig;
+
     public function __construct(
         UserManagerInterface $userManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        UserNotificationConfigManagerInterface $userNotificationsConfig
     ) {
         $this->userManager = $userManager;
         $this->userNotificationManager = $userNotificationManager;
+        $this->userNotificationsConfig = $userNotificationsConfig;
     }
 
     /**
@@ -65,15 +72,45 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/notifications_type", name="notifications_type", options={"expose"=true})
+     * @Rest\Get("/user-notifications-config", name="user_notifications_config", options={"expose"=true})
+     * @Rest\View()
+     * @return View
+     */
+    public function getUserNotificationsConfig(): View
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->view(
+            $this->userNotificationsConfig->getUserNotificationsConfig($user),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * @Rest\Get("/notification-types", name="notification_types", options={"expose"=true})
      * @Rest\View()
      * @return View
      */
     public function getNotificationsType(): View
     {
-        return $this->view([
-            NotificationsType::getAll(),
-        ], Response::HTTP_ACCEPTED);
+        return $this->view(
+            NotificationTypes::getAll(),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * @Rest\Get("/notification-channels", name="notification_channels", options={"expose"=true})
+     * @Rest\View()
+     * @return View
+     */
+    public function getNotificationsChannel(): View
+    {
+        return $this->view(
+            NotificationChannels::getAll(),
+            Response::HTTP_OK
+        );
     }
 
 

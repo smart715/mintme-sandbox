@@ -4,9 +4,8 @@ namespace App\Manager;
 
 use App\Entity\ScheduledNotification;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Repository\ScheduledNotificationRepository;
-use App\Utils\NotificationType;
+use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -45,7 +44,7 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
             ->setUser($user)
             ->setDateToBeSend($this->dateToBeSendFactory($notificationType));
 
-        if (NotificationType::ORDER_CANCELLED === $notificationType) {
+        if (NotificationTypes::ORDER_CANCELLED === $notificationType) {
             $scheduledNotification->setTimeInterval((string)$this->timeIntervals[1]); // 24 hrs
         } else {
             $scheduledNotification->setTimeInterval((string)$this->timeIntervals[0]); // 10min
@@ -76,7 +75,7 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
     {
         $actualDate = new DateTimeImmutable();
 
-        return NotificationType::ORDER_CANCELLED === $orderExecutionType ?
+        return NotificationTypes::ORDER_CANCELLED === $orderExecutionType ?
              $actualDate->modify('+'.$this->timeIntervals[1].' minutes') :  // one day
              $actualDate->modify('+'.$this->timeIntervals[0].' minutes');  // 10 min
     }
