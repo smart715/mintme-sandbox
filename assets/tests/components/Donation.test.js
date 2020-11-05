@@ -15,6 +15,7 @@ function mockVue() {
     localVue.component('b-dropdown-item', {});
     localVue.use({
         install(Vue, options) {
+            Vue.prototype.$sanitize = (val) => val;
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
@@ -56,6 +57,7 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
+                    quote: {name: 'foo'},
                     identifier: 'bar',
                 },
                 websocketUrl: '',
@@ -94,7 +96,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -128,7 +132,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -150,7 +156,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -169,7 +177,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -195,7 +205,7 @@ describe('Donation', () => {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                     base: {
                         subunit: 4,
                     },
@@ -228,7 +238,9 @@ describe('Donation', () => {
                     minBtcAmount: 0.000001,
                     minMintmeAmount: 0.0001,
                 },
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -268,7 +280,7 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: false,
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                     base: {
                         subunit: 4,
                     },
@@ -311,7 +323,9 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
             },
         });
@@ -338,7 +352,7 @@ describe('Donation', () => {
                     fee: .01,
                 },
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                 },
                 websocketUrl: '',
             },
@@ -371,6 +385,7 @@ describe('Donation', () => {
                         symbol: webSymbol,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK00011122233',
                     },
                 },
@@ -414,6 +429,7 @@ describe('Donation', () => {
                         symbol: webSymbol,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK00011122233',
                     },
                 },
@@ -457,6 +473,7 @@ describe('Donation', () => {
                         subunit: 4,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK3333322221111',
                     },
                 },
@@ -490,7 +507,7 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                 },
                 websocketUrl: '',
             },
