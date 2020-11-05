@@ -131,3 +131,9 @@ export const notificationTypes = {
     newPost: 'new_post',
     newInvestor: 'new_investor',
 };
+
+
+export const descriptionLength = {
+    min: 200,
+    max: 10000,
+};

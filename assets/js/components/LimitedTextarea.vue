@@ -1,10 +1,20 @@
 <template>
+    <div>
     <textarea
+        :name="name"
+        class="form-control"
         @keydown="onKeyDown"
         :title="tooltipMessage"
         v-tippy="tooltipOptions"
+        @mousemove="hideTooltip"
         v-model="internalValue">
     </textarea>
+        <div
+            class="text-right small"
+        >
+            {{ internalValue.length }}/{{ limit }}
+        </div>
+    </div>
 </template>
 
 <script>
@@ -12,9 +22,17 @@
 export default {
     name: 'LimitedTextarea',
     props: {
+        name: {
+            type: String,
+            default: '',
+        },
         value: {
             type: String,
             default: '',
+        },
+        limit: {
+            type: String,
+            default: '0',
         },
         max: {
             type: String,
@@ -43,6 +61,11 @@ export default {
             return (parseInt(this.max) - this.internalValue.length);
         },
     },
+    watch: {
+        internalValue: function(val) {
+            this.$emit('input', val);
+        },
+    },
     methods: {
         onKeyDown(e) {
             if (this.internalValue.length >= parseInt(this.max)) {
@@ -58,6 +81,11 @@ export default {
         showTooltip(e) {
             if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
                 e.target._tippy.show();
+            }
+        },
+        hideTooltip(e) {
+            if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
+                e.target._tippy.hide();
             }
         },
     },

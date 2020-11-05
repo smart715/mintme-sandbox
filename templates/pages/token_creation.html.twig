@@ -59,62 +59,47 @@
                                         'class' : 'form-control',
                                     }}) }}
                                 </div>
+                                <div class="col-12">
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.contain{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="tokenName.length > 0 && (!$v.tokenName.validFirstChars || !$v.tokenName.validLastChars || !$v.tokenName.noSpaceBetweenDashes)" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.space{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.min{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.max{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.hasNotBlockedWords" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.blocked{% endtrans %}
+                                    </div>
+                                </div>
                                 <div class="col-12 text-left">
                                     <div class="clearfix">
                                         <div class="float-left">
                                             {{ form_label(form.description, null, {'label_attr': {'class': 'mb-1'}}) }}
                                         </div>
-                                        <div class="float-right">
-                                        </div>
-                                        <div class="float-right">
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="description">
-                                        <bbcode-editor
-                                            rows="2"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': newDescription.length > 0 && !$v.newDescription.minLength}"
-                                            :value="newDescriptionHtmlDecode"
-                                            @change="onDescriptionChange"
-                                            @input="onDescriptionChange"
-                                        />
+                                        {{ form_widget(form.description, {'attr': {
+                                            'v-model': '$v.description.$model',
+                                        }}) }}
                                     </div>
-                                    {{ form_widget(form.description, {'attr': {
-                                        'v-model': '$v.newDescription.$model',
-                                    }}) }}
+                                </div>
+                                <div class="col-12">
+                                    <div
+                                        v-cloak="$v.description"
+                                        v-if="!$v.description.maxLength"
+                                        class="text-danger text-center"
+                                    >
+                                        ${ $t('token.intro.description.max_length', translationsContext) }
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div
-                            v-cloak="$v.newDescription"
-                            v-if="newDescription.length > 0 && !$v.newDescription.minLength"
-                            class="text-danger text-center"
-                        >
-                            Token Description must be more than 200 character
-                        </div>
-                        <div
-                            v-cloak="$v.newDescription"
-                            v-if="!$v.newDescription.maxLength"
-                            class="text-danger text-center"
-                        >
-                            Token Description must be less than 10000 characters
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
-                            {% trans %}page.token_creation.error.contain{% endtrans %}
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="tokenName.length > 0 && (!$v.tokenName.validFirstChars || !$v.tokenName.validLastChars || !$v.tokenName.noSpaceBetweenDashes)" class="text-danger text-center">
-                            {% trans %}page.token_creation.error.space{% endtrans %}
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
-                            {% trans %}page.token_creation.error.min{% endtrans %}
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
-                            {% trans %}page.token_creation.error.max{% endtrans %}
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.hasNotBlockedWords" class="text-danger text-center">
-                            {% trans %}page.token_creation.error.blocked{% endtrans %}
                         </div>
                         <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
