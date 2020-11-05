@@ -622,10 +622,6 @@ services:
     old_sound_rabbit_mq.consumer_command:
         class: App\Command\ConsumerCommand
 
-    App\Controller\Dev\API\V1\User\WalletController:
-        arguments:
-            $withdrawExpirationTime: '%withdraw_expiration_time%'
-
     App\Manager\MarketStatusManager:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
