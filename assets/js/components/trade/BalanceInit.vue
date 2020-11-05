@@ -30,6 +30,7 @@ export default {
         ...mapGetters('tradeBalance', [
             'getBalances',
             'getQuoteBalance',
+            'getBaseBalance',
         ]),
         balances: {
             get: function() {
@@ -47,11 +48,20 @@ export default {
                 this.setQuoteBalance(val);
             },
         },
+        baseBalance: {
+            get() {
+                return this.getBaseBalance;
+            },
+            set(val) {
+                return this.setBaseBalance(val);
+            },
+        },
     },
     methods: {
         ...mapMutations('tradeBalance', [
             'setBalances',
             'setQuoteBalance',
+            'setBaseBalance',
         ]),
         updateAssets: function() {
             if (!this.loggedIn) {
@@ -109,6 +119,10 @@ export default {
                             this.sendLogs('error', 'Can not get immutable balance', err);
                         });
                 }
+
+                if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.base.identifier)) {
+                    this.baseBalance = response.params[0][this.market.base.identifier].available;
+                }
             }, 'trade-sell-order-asset');
         },
     },
@@ -116,6 +130,10 @@ export default {
         balances: function() {
             this.quoteBalance = this.balances && this.balances[this.market.quote.symbol]
                 ? this.balances[this.market.quote.symbol].available
+                : false;
+
+            this.baseBalance = this.balances && this.balances[this.market.base.symbol]
+                ? this.balances[this.market.base.symbol].available
                 : false;
         },
     },
