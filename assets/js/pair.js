@@ -23,7 +23,7 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'trade', 'donate', 'posts'],
+      tabs: ['intro', 'buy', 'posts', 'trade'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
@@ -83,12 +83,12 @@ new Vue({
       document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
         introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
-        let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
-        let donateLink = document.querySelectorAll('a.token-donate-tab-link')[0];
-        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        let donateLink = document.querySelectorAll('a.token-buy-tab-link')[0];
+        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
       });
     }
   },
@@ -177,7 +177,7 @@ new Vue({
       });
     },
     goToPosts: function() {
-      this.tabIndex = 3;
+      this.tabIndex = 2;
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
@@ -186,7 +186,7 @@ new Vue({
       return null !== a ? a : b;
     },
     goToTrade: function(amount) {
-      this.tabIndex= 1;
+      this.tabIndex= 3;
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
