@@ -1,9 +1,8 @@
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import BbcodeEditor from './components/bbcode/BbcodeEditor';
+import LimitedTextarea from './components/LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
 import i18n from './utils/i18n/i18n';
-import he from 'he';
 import {
     HTTP_OK,
     tokenNameValidChars,
@@ -12,11 +11,13 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_ACCEPTED,
+    descriptionLength,
 } from './utils/constants';
 new Vue({
     el: '#token',
     i18n,
     mixins: [NotificationMixin],
+    delimiters: ['${', '}'],
     data() {
         return {
             domLoaded: false,
@@ -25,11 +26,11 @@ new Vue({
             tokenNameProcessing: false,
             tokenNameTimeout: null,
             tokenNameInBlacklist: false,
-            newDescription: '',
+            description: '',
         };
     },
     components: {
-        BbcodeEditor,
+        LimitedTextarea,
         FontAwesomeIcon,
     },
     computed: {
@@ -37,8 +38,10 @@ new Vue({
             return this.$v.$anyError || !this.tokenName ||
                 this.tokenNameExists || this.tokenNameProcessing;
         },
-        newDescriptionHtmlDecode: function() {
-            return he.decode(this.newDescription);
+        translationsContext: function() {
+            return {
+                maxDescriptionLength: descriptionLength.max,
+            };
         },
     },
     watch: {
@@ -98,10 +101,6 @@ new Vue({
                     }
                 }, (err) => this.notifyError(err.response.data.message));
         },
-        onDescriptionChange: function(val) {
-            this.newDescription = he.encode(val);
-        },
-
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
@@ -120,10 +119,10 @@ new Vue({
             minLength: minLength(4),
             maxLength: maxLength(60),
         },
-        newDescription: {
+        description: {
             required: (val) => required(val.trim()),
-            minLength: minLength(200),
-            maxLength: maxLength(10000),
+            minLength: minLength(descriptionLength.min),
+            maxLength: maxLength(descriptionLength.max),
         },
     },
 });
