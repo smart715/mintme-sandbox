@@ -97,7 +97,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts","modal" = "settings"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -112,6 +112,13 @@ class TokenController extends Controller
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        if ('donate' === $tab) {
+            return $this->redirectToRoute('token_show', [
+                'name' => $name,
+                'tab' => 'buy',
+            ]);
         }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
