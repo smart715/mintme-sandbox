@@ -12,7 +12,7 @@
                             <div v-if="loggedIn" class="h-100">
                                 <div>
                                     <div>
-                                        <p class="info">{{ $t('donation.nonrefund') }}</p>
+                                        <p class="info" v-html="$sanitize(nonrefundHtml)"></p>
                                     </div>
                                     <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
                                         <div class="col">
@@ -118,7 +118,7 @@
                                                 @click="showConfirmationModal"
                                                 class="btn btn-primary btn-donate"
                                             >
-                                              {{ $t('donation.donate') }} {{ donationCurrency }}
+                                              {{ $t('donation.buy') }}
                                             </button>
                                             <confirm-modal
                                                 :visible="showModal"
@@ -273,6 +273,14 @@ export default {
                 || this.donationInProgress
                 || this.insufficientFundsError;
         },
+        nonrefundHtml: function() {
+            return this.$t('donation.nonrefund', {
+                path: this.$routing.generate('token_show', {
+                    name: this.market.quote.name,
+                    tab: 'trade',
+                }),
+            });
+        },
     },
     mounted() {
         if (this.loggedIn) {
@@ -357,8 +365,9 @@ export default {
             })
                 .then((response) => {
                     this.notifySuccess(
-                        'Congratulations! Donation has been successfully made. '
-                        + 'You have received ' + this.amountToReceive + ' tokens.'
+                        this.$t('donation.successfully_made', {
+                            amount: this.amountToReceive,
+                        })
                     );
 
                     this.resetAmount();
@@ -393,7 +402,7 @@ export default {
         },
         showConfirmationModal: function() {
             if (this.tokensAvailabilityChanged) {
-                this.notifyError('Tokens availability changed. Please adjust donation amount.');
+                this.notifyError(this.$t('donation.tokens_availability_changed'));
                 this.tokensAvailabilityChanged = false;
                 location.reload();
                 return;
