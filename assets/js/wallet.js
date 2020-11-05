@@ -54,7 +54,7 @@ new Vue({
       if ('dw-history' === tab) {
         this.tabIndex = 2;
       }
-      if ('trad-history' === tab) {
+      if ('trade-history' === tab) {
         this.tabIndex = 1;
       }
       if ('active-orders' === tab) {
