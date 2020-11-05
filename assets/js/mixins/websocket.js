@@ -88,7 +88,7 @@ export default {
                 url: this.websocketUrl,
                 id,
                 handler: (result) => {
-                    this.sendLogsIfWsError(result).bind(this);
+                    this.sendLogsIfWsError(result);
                     handler(result);
                 },
             });
