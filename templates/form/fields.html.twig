@@ -103,7 +103,12 @@
 
 {%- block textarea_widget -%}
 {%- if  (attr.max is defined) -%}
-    <limited-textarea {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} rows="5" cols="30" class="form-control form-control-md"></limited-textarea>
+    <limited-textarea
+            {{ block('widget_attributes') }}
+            value="{{ value }}"
+            rows="5"
+            cols="30"
+    ></limited-textarea>
 {%- else -%}
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}

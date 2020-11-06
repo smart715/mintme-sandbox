@@ -39,6 +39,8 @@ class Token implements TradebleInterface, ImagineInterface
     public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
+    public const DESC_MIN_LENGTH = 200;
+    public const DESC_MAX_LENGTH = 10000;
     public const NOT_DEPLOYED = 'not-deployed';
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
@@ -133,8 +135,8 @@ class Token implements TradebleInterface, ImagineInterface
 
     /**
      * @Assert\NotBlank()
-     * @ORM\Column(type="text", length=10000, nullable=true)
-     * @Assert\Length(min=200)
+     * @ORM\Column(type="text", length=Token::DESC_MAX_LENGTH, nullable=true)
+     * @Assert\Length(min=Token::DESC_MIN_LENGTH, max=Token::DESC_MAX_LENGTH)
      * @Groups({"API_TOK"})
      * @var string|null
      */
