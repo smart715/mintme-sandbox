@@ -84,7 +84,7 @@ export default {
          * @param {*} message - message from vue component
          * @return {*}
          */
-        addMessageHandler: function(handler, id = null, message='') {
+        addMessageHandler: function(handler, id = null, message = '') {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
@@ -108,7 +108,7 @@ export default {
                 });
             });
         },
-        sendLogsIfWsError: function(result, message='') {
+        sendLogsIfWsError: function(result, message = '') {
             if (result.error !== null ||
                 (result.result !== null && result.result.status !== 'success')) {
                 this.sendLogs('error', message, result.error);
