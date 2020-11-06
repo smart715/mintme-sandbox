@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,8 +38,12 @@ class TokenCreateType extends AbstractType
                     'title' => $this->translator->trans('form.token.name.invalid'),
                 ],
             ])
-            ->add('description', HiddenType::class, [
-                'label' => 'Description:',
+            ->add('description', TextareaType::class, [
+                'label' => $this->translator->trans('form.token.description'),
+                'attr' => [
+                    'limit' => Token::DESC_MIN_LENGTH,
+                    'max' => Token::DESC_MAX_LENGTH,
+                ],
                 'required' => true,
             ]);
 
