@@ -214,7 +214,8 @@ export default {
             })
             .then((response) => {
                 if (this.code === null) {
-                    this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                    this.notifySuccess(
+                        this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
                 } else {
                     this.notifySuccess(this.$t('toasted.success.withdrawal.queued'));
                 }
