@@ -97,6 +97,7 @@ export default {
                 WEB: null,
                 BTC: null,
             },
+            interval: null,
         };
     },
     mounted() {
@@ -107,7 +108,7 @@ export default {
 
         if (this.username) {
             this.fetchBalance();
-            setInterval(this.fetchBalance, 10000);
+            this.interval = setInterval(this.fetchBalance, 10000);
         }
     },
     computed: {
@@ -129,9 +130,12 @@ export default {
                 });
         },
         close: function() {
-            this.$axios.retry.get(this.$routing.generate('hacker-toggle-info-bar'));
-            let panel = document.getElementById('info-panel');
-            panel.style.display = 'none';
+            this.$axios.retry.get(this.$routing.generate('hacker-toggle-info-bar')).catch(() => {});
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
+            this.$el.parentElement.removeChild(this.$el);
+            this.$destroy();
         },
     },
 };
