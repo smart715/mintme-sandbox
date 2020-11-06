@@ -393,10 +393,7 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            if (!this.twofa) {
-                this.notifyInfo(this.$t('toasted.info.enable_2fa_before'));
-                return;
-            }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;

@@ -6,14 +6,14 @@ use App\Entity\User;
 use App\EventSubscriber\KernelSubscriber;
 use App\Manager\ProfileManagerInterface;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Throwable;
 
 class KernelSubscriberTest extends TestCase
 {
@@ -40,10 +40,10 @@ class KernelSubscriberTest extends TestCase
             $this->mockCsrfTokenManager(true)
         );
 
-        $this->expectException(Throwable::class);
-        $sub->onRequest(
-            $this->mockEvent(null, '/foo/bar', true, true)
-        );
+        $event = $this->mockEvent(null, '/foo/bar', true, true);
+        $event->expects($this->once())->method('setResponse');
+
+        $sub->onRequest($event);
     }
 
     public function testOnRequestTokIsNotValidWithApi(): void
@@ -55,12 +55,13 @@ class KernelSubscriberTest extends TestCase
             $this->mockCsrfTokenManager(false)
         );
 
-        $this->expectException(Throwable::class);
-        $sub->onRequest(
-            $this->mockEvent('foo', '/api/bar', true, true)
-        );
+        $event = $this->mockEvent('foo', '/api/bar', true, true);
+        $event->expects($this->once())->method('setResponse');
+
+        $sub->onRequest($event);
     }
 
+    /** @return TokenInterface|MockObject */
     private function mockToken(User $user): TokenInterface
     {
         $tok = $this->createMock(TokenInterface::class);
@@ -69,9 +70,10 @@ class KernelSubscriberTest extends TestCase
         return $tok;
     }
 
-    private function mockEvent(?string $csrf, string $path, bool $isXml, bool $isImgFilter): GetResponseEvent
+    /** @return RequestEvent|MockObject */
+    private function mockEvent(?string $csrf, string $path, bool $isXml, bool $isImgFilter): RequestEvent
     {
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $req = $this->createMock(Request::class);
 
         $hb = $this->createMock(HeaderBag::class);
@@ -87,6 +89,7 @@ class KernelSubscriberTest extends TestCase
         return $event;
     }
 
+    /** @return ProfileManagerInterface|MockObject */
     private function mockProfileManager(Invocation $invocation): ProfileManagerInterface
     {
         $pm = $this->createMock(ProfileManagerInterface::class);
@@ -95,6 +98,7 @@ class KernelSubscriberTest extends TestCase
         return $pm;
     }
 
+    /** @return TokenStorageInterface|MockObject */
     private function mockTokenStorage(?TokenInterface $token = null): TokenStorageInterface
     {
         $ts = $this->createMock(TokenStorageInterface::class);
@@ -103,6 +107,7 @@ class KernelSubscriberTest extends TestCase
         return $ts;
     }
 
+    /** @return CsrfTokenManagerInterface|MockObject */
     private function mockCsrfTokenManager(bool $isValid): CsrfTokenManagerInterface
     {
         $ctm = $this->createMock(CsrfTokenManagerInterface::class);
