@@ -137,11 +137,13 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         } else {
             $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
-            $this->userActionLogger->info('Sent withdrawal email for'. " " .$tradable->getSymbol(),
+            $this->userActionLogger->info(
+                'Sent withdrawal email for'. " " .$tradable->getSymbol(),
                 [
                     'address' => $pendingWithdraw->getAddress()->getAddress(),
                     'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
-                ]);
+                ]
+            );
         }
 
         return $this->view();
