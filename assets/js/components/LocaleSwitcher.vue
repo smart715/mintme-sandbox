@@ -1,11 +1,11 @@
 <template>
     <div
-        class="dropdown dropup lang-dropdown"
+        class="dropup language-switcher d-inline-block"
         :class="{ 'show': showLangMenu }"
         v-on-clickaway="hideLangMenu"
     >
         <button
-            class="btn btn-lang-menu dropdown-toggle"
+            class="btn dropdown-toggle"
             type="button"
             aria-haspopup="true"
             :aria-expanded="showLangMenu"
