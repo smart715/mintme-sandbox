@@ -91,6 +91,8 @@
             'first-name' : '{{ app.user.getProfile().getFirstName()|default('') }}',
             'last-name' : '{{ app.user.getProfile().getLastName()|default('') }}'
         }, function(error){});
+        let tawkIframe = document.getElementsByTagName('iframe')[1];
+        tawkIframe.style.cssText = tawkIframe.style.cssText.replace('margin: 0px !important', 'margin:0 0 20px 0 !important');
     }
 </script>
 <!--End of Tawk.to Script-->
