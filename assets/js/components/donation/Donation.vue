@@ -294,7 +294,7 @@ export default {
                 if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }
-            });
+            }, null, 'Donation');
         }
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },

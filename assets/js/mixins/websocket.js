@@ -81,14 +81,15 @@ export default {
          * Add additional handler for a websocket stream.
          * @param {function} handler
          * @param {*} id - uniq identifier for a handler to overwrite duplicated handler
+         * @param {*} message - message from vue component 
          * @return {*}
          */
-        addMessageHandler: function(handler, id = null) {
+        addMessageHandler: function(handler, id = null, message='') {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
                 handler: (result) => {
-                    this.sendLogsIfWsError(result);
+                    this.sendLogsIfWsError(result, message);
                     handler(result);
                 },
             });
