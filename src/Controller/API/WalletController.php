@@ -129,6 +129,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         if ($user->isGoogleAuthenticatorEnabled()) {
             try {
                 $wallet->withdrawCommit($pendingWithdraw);
+
+                $this->userActionLogger->info(
+                    'Withdrawal request sent to queue for'. " " .$pendingWithdraw->getSymbol(),
+                    [
+                        'address' => $pendingWithdraw->getAddress()->getAddress(),
+                        'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+                    ]
+                );
             } catch (Throwable $exception) {
                 return $this->view([
                     'error' => $this->translations->trans('api.wallet.withdrawal_went_wrong'),
