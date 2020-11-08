@@ -147,7 +147,7 @@ export default {
     },
     data() {
         return {
-            code: '',
+            code: null,
             amount: 0,
             address: '',
             withdrawing: true,
@@ -189,7 +189,7 @@ export default {
             this.$v.$reset();
             this.amount = 0;
             this.address = '';
-            this.code = '';
+            this.code = null;
             this.$emit('close');
         },
         onWithdraw: function() {
@@ -210,10 +210,15 @@ export default {
                 'crypto': this.currency,
                 'amount': this.amount,
                 'address': this.address,
-                'code': this.code || null,
+                'code': this.code,
             })
             .then((response) => {
-                this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                if (this.code === null) {
+                    this.notifySuccess(
+                        this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                } else {
+                    this.notifySuccess(this.$t('toasted.success.withdrawal.queued'));
+                }
                 this.closeModal();
             })
             .catch((error) => {
@@ -263,7 +268,6 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
-                required,
                 twoFACode,
             },
         };
