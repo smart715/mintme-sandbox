@@ -6,6 +6,7 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -73,7 +74,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="required"})
+     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="optional"})
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(
@@ -81,7 +82,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      *      allowBlank=false,
      *      requirements="^[a-zA-Z0-9]+$"
      *     )
-     * @Rest\RequestParam(name="code", allowBlank=false)
+     * @Rest\RequestParam(name="code", allowBlank=true)
      */
     public function withdraw(
         ParamFetcherInterface $request,
@@ -125,20 +126,37 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            try {
+                $wallet->withdrawCommit($pendingWithdraw);
 
-        $this->userActionLogger->info($this->translations->trans(
-            'api.wallet.went_withdrawal_email',
-            ['%symbol%' => $tradable->getSymbol()]
-        ), [
-            'address' => $pendingWithdraw->getAddress()->getAddress(),
-            'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
-        ]);
+                $this->userActionLogger->info(
+                    'Withdrawal request sent to queue for'. " " .$pendingWithdraw->getSymbol(),
+                    [
+                        'address' => $pendingWithdraw->getAddress()->getAddress(),
+                        'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+                    ]
+                );
+            } catch (Throwable $exception) {
+                return $this->view([
+                    'error' => $this->translations->trans('api.wallet.withdrawal_went_wrong'),
+                ], Response::HTTP_BAD_GATEWAY);
+            }
+        } else {
+            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+
+            $this->userActionLogger->info(
+                'Sent withdrawal email for'. " " .$tradable->getSymbol(),
+                [
+                    'address' => $pendingWithdraw->getAddress()->getAddress(),
+                    'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+                ]
+            );
+        }
 
         return $this->view();
     }
-
-
+    
     /**
      * @Rest\View()
      * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
