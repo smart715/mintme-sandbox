@@ -8,6 +8,8 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +18,7 @@ use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DeployConsumer implements ConsumerInterface
 {
@@ -34,18 +37,23 @@ class DeployConsumer implements ConsumerInterface
     /** @var DeployCostFetcherInterface */
     private $deployCostFetcher;
 
+    /** @var EventDispatcherInterface */
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
-        DeployCostFetcherInterface $deployCostFetcher
+        DeployCostFetcherInterface $deployCostFetcher,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -126,6 +134,15 @@ class DeployConsumer implements ConsumerInterface
             $this->em->persist($lockIn);
             $this->em->persist($token);
             $this->em->flush();
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new UserNotificationEvent(
+                    $user,
+                    UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+                ),
+                UserNotificationEvent::NAME
+            );
         } catch (\Throwable $exception) {
             $this->logger->error(
                 '[deploy-consumer] Failed to update token address. Retry operation.'
