@@ -91,10 +91,6 @@
             'first-name' : '{{ app.user.getProfile().getFirstName()|default('') }}',
             'last-name' : '{{ app.user.getProfile().getLastName()|default('') }}'
         }, function(error){});
-        let iframes = document.querySelectorAll('iframe[title="chat widget"]');
-        for (let i = 0; i <= 1; i++) {
-            iframes[i].style.cssText = iframes[i].style.cssText.replace('margin: 0px !important', 'margin:0 0 20px 0 !important');
-        }
     }
 </script>
 <!--End of Tawk.to Script-->
