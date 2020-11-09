@@ -80,6 +80,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var TranslatorInterface */
     private $translator;
 
+    /** @var EventDispatcherInterface */
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -87,6 +90,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -98,6 +102,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
         $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -682,6 +687,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent(
+                $user,
+                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+            ),
+            UserNotificationEvent::NAME
+        );
 
         return $this->view();
     }
