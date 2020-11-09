@@ -27,9 +27,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
     public function getUserNotificationsConfig(User $user): ?array
     {
-        return $this->configNormalizer(
-            $this->userNotificationConfigRepository->getUserNotificationsConfig($user)
-        );
+        return $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
     }
 
     public function updateUserNotificationsConfig(
@@ -38,39 +36,5 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         NotificationChannels $notificationsChannel
     ): void {
         // todo update the table
-    }
-
-    private function configNormalizer(?array $userNotificationsConfig): ?array
-    {
-        $notificationsTypes = NotificationTypes::getAll();
-        $notificationsChannels = NotificationChannels::getAll();
-
-        $result = [];
-        /*foreach ($userNotificationsConfig as $unConfig) {
-            $result[] = [
-                $unConfig->getType
-            ]
-        }*/
-       // dd($userNotificationsConfig);
-        foreach ($notificationsTypes as $key => $nType) {
-            foreach ($notificationsChannels as $nChannel) {
-               // dd($userNotificationsConfig);
-                //dd(in_array('website', $userNotificationsConfig));
-                $result[$nType][$nChannel] =
-                /*$result[$nType][$nChannel] = *///in_array($nChannel, $userNotificationsConfig, true) && in_array($nType, $userNotificationsConfig, true);
-                /*$result[$nType][$nChannel][] =  array_walk($userNotificationsConfig, static function (object $data) use (&$nType, &$nChannel): bool {
-                            return $data->getType() === $nType && $data->getChannel() === $nChannel;
-                });*/
-            }
-
-            /*$result[$nType][] = [
-                $nChannel => array_walk(
-                    $userNotificationsConfig, function ($ntype, $nChannel)
-                )
-            ];*/
-        }
-
-         dd($result);
-        //dd($userNotificationsConfig->geTtype());
     }
 }
