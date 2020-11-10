@@ -4,6 +4,7 @@ namespace App\Exchange;
 
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Entity\User;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class Market
