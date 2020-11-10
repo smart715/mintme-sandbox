@@ -84,7 +84,6 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
-        LocaleSwitcher,
         Avatar,
         UserNotification,
     },
@@ -118,5 +117,6 @@ new Vue({
     components: {
         FontAwesomeIcon,
         FontAwesomeLayers,
+        LocaleSwitcher,
     },
 });
