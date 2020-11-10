@@ -81,7 +81,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     private $translator;
 
     /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -473,18 +473,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        /** @var User */
-        $user = $this->getUser();
-
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent(
-                $user,
-                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
-            ),
-            UserNotificationEvent::NAME
-        );
-
         return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
     }
 
@@ -699,6 +687,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent(
+                $user,
+                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+            ),
+            UserNotificationEvent::NAME
+        );
 
         return $this->view();
     }
