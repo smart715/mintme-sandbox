@@ -45,7 +45,6 @@ class OrdersController extends AbstractFOSRestController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,

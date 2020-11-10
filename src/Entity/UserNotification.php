@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Entity\Token\Token;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserNotificationRepository")
@@ -20,16 +20,18 @@ class UserNotification
      * @ORM\Column(type="integer")
      * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @ORM\JoinColumn(nullable=false)
      * @var String
      */
-    private $type;
+    private string $type;
 
-    /** @ORM\Column(type="json", nullable=true) */
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
     private ?array $json_data;
 
     /**
@@ -37,25 +39,31 @@ class UserNotification
      * @ORM\JoinColumn(nullable=false)
      * @var User
      */
-    protected $user;
+    protected User $user;
 
     /**
      * @ORM\Column(type="boolean")
      * @var Bool
      */
-    private $viewed;
+    private bool $viewed;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @var DateTimeImmutable
      */
-    private $date;
+    private DateTimeImmutable $date;
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getType(): ?string
     {
         return $this->type;
@@ -68,6 +76,9 @@ class UserNotification
         return $this;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getJsonData(): ?array
     {
         return $this->json_data;
@@ -92,6 +103,9 @@ class UserNotification
         return $this;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getViewed(): ?bool
     {
         return $this->viewed;

@@ -84,31 +84,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
 
     public function getNotifications(User $user, ?int $notificationLimit): ?array
     {
-        $notifications = $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
-
-        return $this->userNotificationsFactory($notifications);
-    }
-
-    private function userNotificationsFactory(?array $notifications): array
-    {
-        if (!$notifications) {
-            return [];
-        }
-
-        $result =[];
-
-        foreach ($notifications as $key => $notification) {
-            $jsonExtraData = $notification->getJsonData();
-            $notificationType = $notification->getType();
-            $result[$key]['id'] = $notification->getId();
-            $result[$key]['type'] = $notificationType;
-            $result[$key]['viewed'] = $notification->getViewed();
-            $result[$key]['extraData'] = $jsonExtraData ?
-                json_decode($jsonExtraData[0], true, 512, JSON_THROW_ON_ERROR) :
-                $jsonExtraData;
-        }
-
-        return $result;
+        return $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
     }
 
     public function updateNotifications(User $user): void
