@@ -25,30 +25,62 @@ class NotificationConfigNormalizer implements NormalizerInterface
         /**
          * @var array $userNotificationConfig
          */
-        $userNotificationConfig = $this->normalizer->normalize($object, $format, $context);
+
+        $userNotificationConfig = $this->normalizer->normalize($object, 'array', $context);
+        //dd($userNotificationConfig);
         $result = [];
+
         /*if ( $object->getType()  ) {
 
         }*/
         $notificationTypes = NotificationTypes::getAll();
         $notificationChannels = NotificationChannels::getAll();
 
+            //dd($notificationTypes[]);
         foreach ($notificationTypes as $nType) {
-            foreach ($notificationChannels as $item) {
-                // todo normalize the object
-                
+            $userNotificationConfig[$nType] = true;
+            /*$keyExist = array_key_exists($nType, $result);
+
+            if ($keyExist) {
+                continue;
             }
 
-        }
-        $result['type'] = $object->getType();
-        $result[$object->getChannel()] = [
-            'text' => $object->getChannel(),
-            'value' => true,
-        ];
+            $result[$nType] = [];*/
 
 
 
-        return $result;
+          /*  foreach ($notificationChannels as $nChannel) {
+                $keyExist = array_key_exists($nType, $result);
+                if (!$keyExist) {
+                    $result[$nType] = [
+                        $nChannel => $nChannel === $object->getChannel()
+                    ];
+                    //dd($result);
+                }*/
+
+
+           /// }
+
+
+
+
+
+    //        foreach ($notificationChannels as $nChannel) {
+                /*r$esult[$nType] = [
+
+                ]*/
+               // $result[$nType][$nChannel] = true;
+                /*if ($object->getType() === $nType) {
+                    $result['type'] = $object->getType();
+                    $result[$object->getChannel()] = [
+                        'text' => $object->getChannel(),
+                        'value' => true,
+                    ];
+                }*/
+           }
+       // }
+
+        return $userNotificationConfig;
     }
 
     /** {@inheritdoc} */

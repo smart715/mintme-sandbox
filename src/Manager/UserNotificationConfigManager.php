@@ -27,7 +27,31 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
     public function getUserNotificationsConfig(User $user): ?array
     {
-        return $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
+      //  return $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
+
+        $notificationTypes = NotificationTypes::getAll();
+        $notificationChannels = NotificationChannels::getAll();
+
+        $userNotificationConfig = $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
+        $defaultConfig = [];
+
+        foreach ($notificationTypes as $nType) {
+            $defaultConfig[$nType]['text'] = NotificationTypes::getText()[$nType];
+
+            foreach ($notificationChannels as $nChannel) {
+                $defaultConfig[$nType][$nChannel]['text'] = ucfirst($nChannel);
+                $defaultConfig[$nType][$nChannel]['value'] = false;
+
+                foreach ($userNotificationConfig as $unc) {
+                    $type = $unc->getType();
+                    $channel = $unc->getChannel();
+                    $defaultConfig[$type][$channel]['text'] = ucfirst($channel);
+                    $defaultConfig[$type][$channel]['value'] = true;
+                }
+            }
+        }
+
+        return $defaultConfig;
     }
 
     public function updateUserNotificationsConfig(

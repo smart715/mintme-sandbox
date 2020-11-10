@@ -11,25 +11,47 @@
             <template slot="body">
                 <div class="token-edit p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
-                        <template v-for="nType in notificationTypes">
+                        <template v-for="config in userNotificationsConfig">
                             <faq-item>
-                                <template slot="title"> {{ nType}} </template>
-                                <template slot="body">
-                                    <template v-for="nChannel in notificationChannels">
+                                <template slot="title"> {{ config.text }} </template>
+                                    <template slot="body">
                                         <div class="mb-2">
-                                            <span> {{ nChannel }} </span>
+                                            <span> {{ config.email.text }} </span>
                                             <b-form-checkbox
-                                                v-model="selected"
+                                                v-model=" config.email.value"
                                                 class="float-right"
                                                 size="lg"
                                                 name="check-button"
                                                 switch>
                                             </b-form-checkbox>
                                         </div>
-                                    </template>
+                                        <div class="mb-2">
+                                            <span> {{ config.website.text }} </span>
+                                            <b-form-checkbox
+                                                v-model="config.website.value"
+                                                class="float-right"
+                                                size="lg"
+                                                name="check-button"
+                                                switch>
+                                            </b-form-checkbox>
+                                        </div>
                                 </template>
                             </faq-item>
                         </template>
+                        <div class="col-12 pt-2 px-0 clearfix">
+                            <button
+                                class="btn btn-primary float-left"
+
+                            >
+                                {{ $t('save') }}
+                            </button>
+                            <button
+                                class="btn btn-primary float-left"
+
+                            >
+                                {{ $t('cancel') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -40,8 +62,6 @@
 <script>
 import Modal from './Modal';
 import FaqItem from '../FaqItem';
-import {toMoney} from "../../utils";
-import Decimal from "decimal.js";
 
 export default {
     name: 'NotificationManagementModal',
@@ -54,7 +74,7 @@ export default {
         noClose: Boolean,
         notificationTypes: Array,
         notificationChannels: Array,
-        userNotificationsConfig: Array,
+        userNotificationsConfig: Object,
     },
     data() {
         return {

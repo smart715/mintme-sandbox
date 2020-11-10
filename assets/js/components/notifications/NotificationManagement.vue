@@ -31,7 +31,7 @@ export default {
             noClose: false,
             notificationTypes: [],
             notificationChannels: [],
-            userNotificationsConfig: [],
+            userNotificationsConfig: {},
         };
     },
     created() {

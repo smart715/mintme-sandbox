@@ -11,7 +11,7 @@ use App\Form\CommentType;
 use App\Form\PostType;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Utils\NotificationType;
+use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -241,7 +241,7 @@ class PostsController extends AbstractFOSRestController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $notificationType = NotificationType::TOKEN_NEW_POST;
+        $notificationType = NotificationTypes::TOKEN_NEW_POST;
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(

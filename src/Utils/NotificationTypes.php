@@ -24,4 +24,16 @@ class NotificationTypes implements NotificationTypesInterface
             self::ORDER_CANCELLED,
         ];
     }
+    public static function getText(): array
+    {
+        return [
+            self::DEPOSIT => 'Deposits',
+            self::WITHDRAWAL => 'Withdrawals',
+            self::NEW_INVESTOR => 'New Investors',
+            self::TOKEN_NEW_POST => 'Posts related to token you own',
+            self::TOKEN_DEPLOYED => 'Deployments related to token you own',
+            self::ORDER_FILLED => 'Orders filled',
+            self::ORDER_CANCELLED => 'Orders Cancelled',
+        ];
+    }
 }

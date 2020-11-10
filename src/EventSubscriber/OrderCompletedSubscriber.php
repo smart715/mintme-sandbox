@@ -8,7 +8,7 @@ use App\Events\UserNotificationEvent;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\ScheduledNotificationManagerInterface;
-use App\Utils\NotificationType;
+use App\Utils\NotificationTypes;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -73,7 +73,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $this->eventDispatcher->dispatch(
                     new UserNotificationEvent(
                         $userTokenCreator,
-                        NotificationType::NEW_INVESTOR,
+                        NotificationTypes::NEW_INVESTOR,
                         $extraData
                     ),
                     UserNotificationEvent::NAME
@@ -83,7 +83,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
             if (Order::BUY_SIDE === $orderType &&
                 !$this->marketHandler->getSellOrdersSummaryByUser($userTokenCreator, $market)
             ) {
-                $notificationType = NotificationType::ORDER_FILLED;
+                $notificationType = NotificationTypes::ORDER_FILLED;
                 $this->scheduledNotificationManager->createScheduledNotification(
                     $notificationType,
                     $userTokenCreator
