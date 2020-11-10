@@ -10,10 +10,9 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @Rest\Route("/api/userNotifications")
+ * @Rest\Route("/api/notifications")
  */
 class UserNotificationsController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
@@ -34,39 +33,33 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/user-notifications", name="user-notifications", options={"expose"=true})
+     * @Rest\Get("/user-notifications", name="user_notifications", options={"expose"=true})
      * @Rest\View()
      * @return View
      */
     public function getUserNotifications(): View
     {
-        /** @var User|null $user */
+        /** @var User $user */
         $user = $this->getUser();
 
-        return $this->view([
-            'data' => $this->userNotificationManager->getNotifications($user, self::NOTIFICATION_LIMIT),
-        ], Response::HTTP_ACCEPTED);
+        return $this->view(
+            $this->userNotificationManager->getNotifications($user, self::NOTIFICATION_LIMIT),
+            Response::HTTP_ACCEPTED
+        );
     }
 
     /**
-     * @Rest\Get("/update-read-notifications", name="update-read-notifications", options={"expose"=true})
+     * @Rest\Get("/update-read-notifications", name="update_read_notifications", options={"expose"=true})
      * @Rest\View()
      * @return Response
      */
     public function updateUserNotification(): Response
     {
-        /** @var User|null $user */
+        /** @var User $user */
         $user = $this->getUser();
 
         $this->userNotificationManager->updateNotifications($user);
 
         return new Response(Response::HTTP_ACCEPTED);
-    }
-    /**
-     * @return UserInterface|object|null
-     */
-    protected function getUser()
-    {
-        return parent::getUser();
     }
 }
