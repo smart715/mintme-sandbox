@@ -7,61 +7,75 @@
         >
             <template v-slot:body>
                 <p>
-                    Congratulations on creating your own token {{ tokenName }}. Next step is to message all people you know with
+                    {{ $t('token.intro.created_modal.paragraph_1.part_1', {tokenName}) }}
                     <a :href="tokenLink" target="_blank">
-                        link to your token
+                        {{ $t('token.intro.created_modal.paragraph_1.part_2') }}
                     </a>
                     <copy-link :content-to-copy="tokenLink" class="c-pointer mx-1">
                         <font-awesome-icon :icon="['far', 'copy']"/>
                     </copy-link>
-                    asking for support. You might also use airdrop feature and give away your coins in small amounts in exchange for advertising it. Consider messaging people you don't know but be prepared to have strong arguments about why they should buy your token.
+                    {{ $t('token.intro.created_modal.paragraph_1.part_3') }}
                 </p>
                 <p>
-                    Users buying tokens through
+                    {{ $t('token.intro.created_modal.paragraph_2.part_1') }}
                     <a :href="buyLink" target="_blank">
-                        this link
+                        {{ $t('token.intro.created_modal.paragraph_2.part_2') }}
                     </a>
                     <copy-link :content-to-copy="buyLink" class="c-pointer mx-1">
                         <font-awesome-icon :icon="['far', 'copy']"/>
                     </copy-link>
-                    purchase it only from you, contrary to trade option. Remember that marketing your token is up to you so start sharing link to your token now and good luck!
+                    {{ $t('token.intro.created_modal.paragraph_2.part_3') }}
                 </p>
                 <p>
-                    Also, check our articles with marketing tips:
+                    {{ $t('token.intro.created_modal.paragraph_3') }}
                     <ul>
                         <li>
-                            Time for token sales, how can I make a difference?
+                            <a href="https://www.mintme.com/kb/Time-for-token-sales-how-can-I-make-a-difference" target="_blank">
+                                {{ $t('token.intro.created_modal.list_1.item_1') }}
+                            </a>
                         </li>
                         <li>
-                            Aiming at a strong token?
+                            <a href="https://www.mintme.com/kb/Aiming-at-a-strong-token" target="_blank">
+                                {{ $t('token.intro.created_modal.list_1.item_2') }}
+                            </a>
                         </li>
                         <li>
-                            Ideas to promote and sell your token
+                            <a href="https://www.mintme.com/kb/Ideas-to-promote-and-sell-your-token" target="_blank">
+                                {{ $t('token.intro.created_modal.list_1.item_3') }}
+                            </a>
                         </li>
                         <li>
-                            Stuck not knowing what to do next?
+                            <a href="https://www.mintme.com/kb/Stuck-not-knowing-what-to-do-next" target="_blank">
+                                {{ $t('token.intro.created_modal.list_1.item_4') }}
+                            </a>
                         </li>
                         <li>
-                            Talking to your followers about MintMe? We got some ideas!
+                            <a href="https://www.mintme.com/kb/Talking-to-your-followers-about-MintMe-we-got-some-ideas" target="_blank">
+                                {{ $t('token.intro.created_modal.list_1.item_5') }}
+                            </a>
                         </li>
                     </ul>
                 </p>
                 <p>
-                    For better results, you need to constantly educate people when bringing them in so don't forget about this!
+                    {{ $t('token.intro.created_modal.paragraph_4') }}
                 </p>
                 <p>
-                    Please consider deploying your token for which you will get following benefits:
+                    {{ $t('token.intro.created_modal.paragraph_5') }}
                 </p>
                 <ol>
                     <li>
-                        It can be withdrawn and deposited
+                        {{ $t('token.intro.created_modal.list_2.item_1') }}
                     </li>
                     <li>
-                        Better position on the trading page
+                        {{ $t('token.intro.created_modal.list_2.item_2') }}
                     </li>
                 </ol>
                 <p>
-                    Read How to deploy my token to the blockchain? article to learn about details.
+                    {{ $t('token.intro.created_modal.paragraph_6.part_1') }}
+                    <a href="https://www.mintme.com/kb/How-to-deploy-my-token-to-the-blockchain" target="_blank">
+                        {{ $t('token.intro.created_modal.paragraph_6.part_2') }}
+                    </a>
+                    {{ $t('token.intro.created_modal.paragraph_6.part_3') }}
                 </p>
             </template>
         </modal>
