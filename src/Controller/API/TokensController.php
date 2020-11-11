@@ -659,6 +659,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         string $name,
         DeploymentFacadeInterface $deployment
     ): View {
+        $this->denyAccessUnlessGranted('deploy');
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
@@ -794,6 +796,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         return $this->view(['exists' => null !== $token], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/tokens-creation", name="check_token_creation", options={"expose"=true})
+     * @return View
+     */
+    public function isTokenCreationEnabled(): View
+    {
+        return $this->view([
+            'tokenCreation' => $this->isGranted('new-trades') && $this->isGranted('trading'),
+        ]);
     }
 
     /**

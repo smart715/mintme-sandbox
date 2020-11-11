@@ -8,6 +8,7 @@ use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,12 +29,16 @@ class CoinController extends Controller
     /** @var MarketStatusManagerInterface */
     private $marketStatusManager;
 
+    /** @var DisabledServicesConfig */
+    private $disabledServicesConfig;
+
     public function __construct(
         NormalizerInterface $normalizer,
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketFactory,
         RebrandingConverterInterface $rebrandingConverter,
-        MarketStatusManagerInterface $marketStatusManager
+        MarketStatusManagerInterface $marketStatusManager,
+        DisabledServicesConfig $disabledServicesConfig
     ) {
         parent::__construct($normalizer);
 
@@ -41,6 +46,7 @@ class CoinController extends Controller
         $this->marketFactory = $marketFactory;
         $this->rebrandingConverter = $rebrandingConverter;
         $this->marketStatusManager = $marketStatusManager;
+        $this->disabledServicesConfig = $disabledServicesConfig;
     }
 
     /** @Route("/coin/{quote}/{base}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
@@ -90,6 +96,7 @@ class CoinController extends Controller
             'precision' => $quoteCrypto->getShowSubunit(),
             'isTokenPage' => false,
             'tab' => 'trade',
+            'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
         ]);
     }
 

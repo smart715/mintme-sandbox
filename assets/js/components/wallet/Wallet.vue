@@ -32,9 +32,9 @@
                     <div class="row pl-2">
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
+                            :class="cryptoActionsClass('depositDisabled', data)"
                             @click="openDeposit(data.item.name, data.item.subunit)">
-                            <div class="text-white hover-icon">
+                            <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
@@ -46,14 +46,14 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': isUserBlocked || isDisabledCrypto(data.item.name)}"
+                            :class="cryptoActionsClass('withdrawalsDisabled', data)"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
                                         data.item.subunit)"
                         >
-                            <div class="text-white hover-icon">
+                            <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
@@ -80,7 +80,11 @@
         <div v-if="hasTokens" class="table-responsive">
             <b-table hover :items="items" :fields="tokenFields">
                 <template v-slot:cell(name)="data">
-                    <div v-if="data.item.name.length > 17" v-b-tooltip="{title: data.item.name, boundary:'viewport'}" class="first-field">
+                    <div
+                        v-if="data.item.name.length > 17"
+                        v-b-tooltip="{title: data.item.name, boundary:'viewport'}"
+                        class="first-field"
+                    >
                         <span v-if="data.item.blocked">
                             <span class="text-muted">
                                 {{ data.item.name | truncate(14) }}
@@ -120,10 +124,12 @@
                     >
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': data.item.blocked}"
+                            :class="(data.item.blocked
+                                || disabledServices.depositDisabled
+                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
                             @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)"
                         >
-                            <div class="text-white hover-icon">
+                            <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'deposit']"
@@ -135,7 +141,9 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="{'text-muted': data.item.blocked}"
+                            :class="(data.item.blocked
+                                || disabledServices.withdrawalsDisabled
+                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -145,12 +153,14 @@
                                         data.item.blocked)"
                         >
                             <div>
-                                <div class="text-white hover-icon">
+                                <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
                                     :icon="['fac', 'withdraw']"
                                 />
-                                <span class="pl-2 text-xs align-middle wallet-action-txt">Withdraw</span>
+                                <span class="pl-2 text-xs align-middle wallet-action-txt">
+                                  {{ $t('wallet.withdraw') }}
+                                </span>
                                 </div>
                             </div>
                         </button>
@@ -171,7 +181,10 @@
                     <tr>
                         <td class="first-field">
                             <div class="truncate-name">
-                              {{ $t('wallet.create_token_1') }} <a :href="createTokenUrl">{{ $t('wallet.create_token_2') }}</a>
+                              {{ $t('wallet.create_token_1') }}
+                              <a :href="createTokenUrl">
+                                {{ $t('wallet.create_token_2') }}
+                              </a>
                             </div>
                         </td>
                         <td class="field-table">&nbsp;</td>
@@ -259,6 +272,7 @@ export default {
         twofa: String,
         expirationTime: Number,
         disabledCrypto: String,
+        disabledServicesConfig: String,
         isUserBlocked: Boolean,
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
@@ -329,6 +343,9 @@ export default {
         showLoadingIcon: function() {
             return (this.tokens === null);
         },
+        disabledServices: function() {
+            return JSON.parse(this.disabledServicesConfig);
+        },
     },
     mounted: function() {
         Promise.all([
@@ -381,12 +398,30 @@ export default {
         });
     },
     methods: {
+        /**
+         * @param {string} action
+         * @param {object} data
+         * @return {string}
+         */
+        cryptoActionsClass: function(action, data) {
+            let {name} = data;
+
+            return this.isUserBlocked
+            || this.isDisabledCrypto(name)
+            || this.disabledServices[action]
+            || this.disabledServices.allServicesDisabled
+              ? 'text-muted'
+              : 'text-white';
+        },
         isDisabledCrypto: function(name) {
-          return JSON.parse(this.disabledCrypto).includes(name);
+            return JSON.parse(this.disabledCrypto).includes(name);
         },
         openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
-            if (this.isDisabledCrypto(currency)) {
-              this.notifyError('Withdrawals for this crypto was disabled. Please try again later');
+            if (this.isDisabledCrypto(currency)
+                || this.disabledServices.withdrawalsDisabled
+                || this.disabledServices.allServicesDisabled
+            ) {
+              this.notifyError('Withdrawals are disabled. Please try again later');
 
               return;
             }
@@ -413,8 +448,11 @@ export default {
             this.showModal = false;
         },
         openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
-            if (this.isDisabledCrypto(currency)) {
-              this.notifyError('Deposit for this crypto was disabled. Please try again later');
+            if (this.isDisabledCrypto(currency)
+                || this.disabledServices.depositDisabled
+                || this.disabledServices.allServicesDisabled
+            ) {
+              this.notifyError('Deposits are disabled. Please try again later');
 
               return;
             }
