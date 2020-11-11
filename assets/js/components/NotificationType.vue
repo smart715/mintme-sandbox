@@ -28,10 +28,10 @@ export default {
         translationsContext: function(notification) {
             if (this.notificationType.withdrawal !== notification.type && this.notificationType.deposit !== notification.type) {
                 return {
-                    urlProfile: this.$routing.generate('profile-view', {nickname: notification.extraData.profile}),
-                    profile: notification.extraData.profile,
-                    tokenName: notification.extraData.tokenName,
-                    urlToken: this.$routing.generate('token_show', {name: notification.extraData.tokenName}),
+                    urlProfile: this.$routing.generate('profile-view', {nickname: JSON.parse(notification.jsonData).profile}),
+                    profile: JSON.parse(notification.jsonData).profile,
+                    tokenName: JSON.parse(notification.jsonData).tokenName,
+                    urlToken: this.$routing.generate('token_show', {name: JSON.parse(notification.jsonData).tokenName}),
                 };
             }
             return {

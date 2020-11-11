@@ -22,7 +22,6 @@ import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
 
-
 window.Vue = Vue;
 Vue.use(VueBootstrap);
 Vue.use(Routing);
@@ -85,7 +84,6 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
-        LocaleSwitcher,
         Avatar,
         UserNotification,
     },
@@ -119,5 +117,6 @@ new Vue({
     components: {
         FontAwesomeIcon,
         FontAwesomeLayers,
+        LocaleSwitcher,
     },
 });
