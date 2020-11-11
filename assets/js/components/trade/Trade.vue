@@ -173,7 +173,7 @@ export default {
                 if ('order.update' === response.method) {
                     this.processOrders(response.params[1], response.params[0]);
                 }
-            }, 'trade-update-orders');
+            }, 'trade-update-orders', 'Trade');
         });
 
         if (!this.requestingRates) {

@@ -262,7 +262,7 @@ export default {
                         this.sendLogs('error', 'Can not get executed order details', err);
                     });
                 }
-            }, 'trade-tableData-update-deals');
+            }, 'trade-tableData-update-deals', 'TradeTradeHistory');
         }).catch((err) => {
             this.sendLogs('error', 'Can not update table data', err);
         });

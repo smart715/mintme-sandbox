@@ -176,7 +176,7 @@ export default {
                 ) {
                     this.balance = response.params[0][webSymbol].available;
                 }
-            }, 'trade-buy-order-asset');
+            }, 'trade-buy-order-asset', 'TokenDeploy');
         } else {
             this.webCost = 0;
             this.balance = 0;
