@@ -3,10 +3,12 @@
 namespace App\Manager;
 
 use App\Entity\User;
+use App\Entity\UserNotificationConfig;
 use App\Repository\UserNotificationConfigRepository;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserNotificationConfigManager implements UserNotificationConfigManagerInterface
 {
@@ -37,7 +39,6 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
         foreach ($notificationTypes as $nType) {
             $defaultConfig[$nType]['text'] = NotificationTypes::getText()[$nType];
-
             foreach ($notificationChannels as $nChannel) {
                 $defaultConfig[$nType][$nChannel]['text'] = ucfirst($nChannel);
                 $defaultConfig[$nType][$nChannel]['value'] = false;
@@ -56,9 +57,26 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
     public function updateUserNotificationsConfig(
         User $user,
-        NotificationTypes $notificationTypes,
-        NotificationChannels $notificationsChannel
+        Request $request
     ): void {
-        // todo update the table
+        $newConfig = $request->request->all();
+        $userConfigStored = $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
+
+        // todo foreach new config...
+//dd($newConfig);
+        // Delete old Config
+        /*foreach ($userConfigStored as $userConfig) {
+            $this->userNotificationConfigRepository->deleteUserNotificationsConfig($userConfig->getId());
+        }*/
+        // Insert new Config
+        $notificationChannels = NotificationChannels::getAll();
+        foreach ($newConfig as $index=> $nConfig) {
+           //dd($index); //type
+            /*if ($index === 'text') {
+                continue;
+            }*/
+          //  dd(array_keys($nConfig[$notificationChannels[$index]]));
+            //$this->createUserNotificationConfig($type, $channel , $user);
+        }
     }
 }

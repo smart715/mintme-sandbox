@@ -22,4 +22,14 @@ class UserNotificationConfigRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function deleteUserNotificationsConfig(int $userNotificationConfigId): int
+    {
+        return $this->createQueryBuilder('unc')
+            ->delete()
+            ->where('unc.id = :id')
+            ->setParameter('id', $userNotificationConfigId)
+            ->getQuery()
+            ->execute();
+    }
 }

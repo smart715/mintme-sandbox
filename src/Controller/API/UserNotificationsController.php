@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -88,28 +89,18 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/notification-types", name="notification_types", options={"expose"=true})
+     * @Rest\Post("/update-notifications-config", name="update_notifications_config", options={"expose"=true})
      * @Rest\View()
-     * @return View
+     * @param Request $request
+     * @return Reponse
      */
-    public function getNotificationsType(): View
+    public function updateUserNotificationsConfig(Request $request): Response
     {
-        return $this->view(
-            NotificationTypes::getAll(),
-            Response::HTTP_OK
-        );
-    }
+        /** @var User $user */
+        $user = $this->getUser();
 
-    /**
-     * @Rest\Get("/notification-channels", name="notification_channels", options={"expose"=true})
-     * @Rest\View()
-     * @return View
-     */
-    public function getNotificationsChannel(): View
-    {
-        return $this->view(
-            NotificationChannels::getAll(),
-            Response::HTTP_OK
-        );
+        $this->userNotificationsConfig->updateUserNotificationsConfig($user, $request);
+
+        return new Response(Response::HTTP_OK);
     }
 }
