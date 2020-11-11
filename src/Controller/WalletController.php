@@ -11,6 +11,7 @@ use App\Events\UserNotificationEvent;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -57,12 +58,14 @@ class WalletController extends Controller
      * )
      * @param Request $request
      * @param DisabledBlockchainConfig $disabledBlockchainConfig
+     * @param DisabledServicesConfig $disabledServicesConfig
      * @param string|null $tab
      * @return Response
      */
     public function wallet(
         Request $request,
         DisabledBlockchainConfig $disabledBlockchainConfig,
+        DisabledServicesConfig $disabledServicesConfig,
         ?string $tab
     ): Response {
         $depositMore = $request->get('depositMore') ?? '';
@@ -74,6 +77,7 @@ class WalletController extends Controller
             'hash' => $user->getHash(),
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
+            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
         ]);
     }
 
@@ -86,6 +90,13 @@ class WalletController extends Controller
      */
     public function withdrawConfirm(string $hash, WalletInterface $wallet): Response
     {
+        if (!$this->isGranted('withdraw')) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdrawing is not possible. Please try again later'
+            );
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
 
         /** @var PendingWithdrawRepository $withdrawRepo */

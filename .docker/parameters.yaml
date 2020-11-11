@@ -91,16 +91,50 @@ parameters:
         - BTC
         - ETH
     blockchain_disabled: null
+    disable_deposits: false
+    disable_withdrawals: false
+    disable_deploy_tokens: false
+    disable_new_trades: false
+    disable_trading: false
+    disable_all: false
     translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
-    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_locales:
+        - en
+        - ru
+        - ua
+        - es
+        - ar
+        - pt
+        - fr
+        - pl
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
     translation_flags:
-        en: gb
-        ru: ru
-        ua: ua
-        es: es
-        ar: ae
-        pt: pt
-        fr: fr
-        pl: pl
+        en:
+            label: English
+            flag: gb
+        es:
+            label: Español
+            flag: es
+        ru:
+            label: Русский
+            flag: ru
+        ua:
+            label: Українська
+            flag: ua
+        pl:
+            label: Polski
+            flag: pl
+        ar:
+            label: العربية
+            flag: ae
+        pt:
+            label: Portugues
+            flag: pt
+        fr:
+            label: Française
+            flag: fr
+    time_intervals:
+        - 10
+        - 1440
+        - 43200
     dm_min_amount: 1
