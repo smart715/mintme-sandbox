@@ -1,5 +1,8 @@
 <template>
-    <div class="container-fluid px-0">
+    <div
+        v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled"
+        class="container-fluid px-0"
+    >
         <div class="row justify-content-center">
             <div class="width-100 col-9 col-sm-10 col-md-9 col-lg-7 col-xl-6 mt-3">
                 <div class="card h-100">
@@ -118,7 +121,9 @@
                                                 @click="showConfirmationModal"
                                                 class="btn btn-primary btn-donate"
                                             >
-                                              {{ $t('donation.buy') }}
+                                                <span :class="{'text-muted': disabledServices.newTradesDisabled}">
+                                                    {{ $t('donation.buy') }}
+                                                </span>
                                             </button>
                                             <confirm-modal
                                                 :visible="showModal"
@@ -144,6 +149,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div v-else>
+        <div class="h1 text-center pt-5 mt-5">
+          {{ $t('donate.page.disabled') }}
         </div>
     </div>
 </template>
@@ -187,6 +197,7 @@ export default {
         loggedIn: Boolean,
         googleRecaptchaSiteKey: String,
         donationParams: Object,
+        disabledServicesConfig: String,
     },
     data() {
         return {
@@ -280,6 +291,9 @@ export default {
                     tab: 'trade',
                 }),
             });
+        },
+        disabledServices: function() {
+            return JSON.parse(this.disabledServicesConfig);
         },
     },
     mounted() {
@@ -401,6 +415,15 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
+            if (
+                this.disabledServices.allServicesDisabled ||
+                this.disabledServices.newTradesDisabled ||
+                this.disabledServices.tradingDisabled
+            ) {
+                this.notifyError(this.$t('donate.disabled'));
+                return;
+            }
+
             if (this.tokensAvailabilityChanged) {
                 this.notifyError(this.$t('donation.tokens_availability_changed'));
                 this.tokensAvailabilityChanged = false;

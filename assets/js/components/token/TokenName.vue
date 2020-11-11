@@ -24,6 +24,7 @@
                 :youtube-client-id="youtubeClientId"
                 :youtube-channel-id="youtubeChannelId"
                 :airdrop-params="airdropParams"
+                :disabled-services-config="disabledServicesConfig"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
@@ -84,6 +85,7 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         showTokenEditModalProp: Boolean,
+        disabledServicesConfig: String,
     },
     components: {
         FontAwesomeIcon,

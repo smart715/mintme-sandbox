@@ -1,3 +1,4 @@
+{% if is_granted('trading') %}
 <div class="container-fluid px-0">
     <div class="container-fluid px-0">
         <div class="row justify-content-center">
@@ -90,3 +91,8 @@
         </div>
     </div>
 </div>
+{% else %}
+<div class="h1 text-center pt-5 mt-5">
+    {% trans %}trade.page.disabled{% endtrans %}
+</div>
+{% endif %}

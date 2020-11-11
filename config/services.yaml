@@ -201,6 +201,15 @@ services:
         arguments:
             $disabledCrypto: '%blockchain_disabled%'
 
+    App\Security\Config\DisabledServicesConfig:
+        arguments:
+            $depositDisabled: '%disable_deposits%'
+            $withdrawalsDisabled: '%disable_withdrawals%'
+            $deployDisabled: '%disable_deploy_tokens%'
+            $newTradesDisabled: '%disable_new_trades%'
+            $tradingDisabled: '%disable_trading%'
+            $allServicesDisabled: '%disable_all%'
+
     # SonataAdminBundle Registered Admin Classes
     # =======================================
     admin.user:
