@@ -96,7 +96,8 @@ new Vue({
                     if (res.status === HTTP_ACCEPTED) {
                         frm.action = this.$routing.generate('token_show', {
                             name: this.tokenName,
-                            tab: 'created',
+                            tab: 'intro',
+                            modal: 'created',
                         });
                         frm.submit();
                     }
