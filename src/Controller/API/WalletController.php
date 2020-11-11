@@ -105,6 +105,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         $user = $this->getUser();
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
+        $this->denyAccessUnlessGranted('withdraw');
 
         if ($tradable instanceof Crypto) {
             $this->denyAccessUnlessGranted('not-disabled', $tradable);
@@ -165,6 +166,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
+        $this->denyAccessUnlessGranted('deposit');
+
         /** @var User $user*/
         $user = $this->getUser();
 
@@ -187,6 +190,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         WalletInterface $depositCommunicator,
         CryptoManagerInterface $cryptoManager
     ): View {
+        $this->denyAccessUnlessGranted('deposit');
+
         $crypto = $cryptoManager->findBySymbol($crypto);
 
         if (!$crypto) {

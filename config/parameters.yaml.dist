@@ -181,6 +181,26 @@ parameters:
     #     - BTC
     blockchain_disabled: null
 
+    # Disables processing deposits and deposit buttons in wallet. Remember to restart deposit consumer after changing this
+    disable_deposits: false
+
+    # Disables processing withdrawals and withdraw buttons in wallet
+    disable_withdrawals: false
+
+    # Disables deploying tokens to blockchain
+    disable_deploy_tokens: false
+
+    # Disables creating trades and creating new tokens
+    disable_new_trades: false
+
+    # Disables trade page completely and disables creating new tokens
+    disable_trading: false
+
+    # Disables all main functionality:
+    #     processing deposits and deposit buttons in wallet, withdrawals and btns, deploying tokens to blockchain,
+    #     creating trades and creating new tokens, trade page completely and disables creating new tokens
+    disable_all: false
+
     # Prefixes for security access_control.
     # For add additional language just add slash + lang
     # (for ex.: if you want to add USA(us) you need to add /us| . Should be like '/us|/ru|/uk|/es|/ar|/pt|/fr|/pl|\s*'

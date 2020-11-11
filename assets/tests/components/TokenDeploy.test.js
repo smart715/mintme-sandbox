@@ -58,6 +58,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
             precision: 4,
             statusProp: status,
             websocketUrl: '',
+            disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
         },
     });
 
