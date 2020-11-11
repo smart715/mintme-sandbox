@@ -61,6 +61,7 @@ describe('Donation', () => {
                     identifier: 'bar',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -79,6 +80,7 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: false,
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -100,6 +102,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -136,6 +139,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -160,6 +164,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -181,6 +186,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -211,6 +217,7 @@ describe('Donation', () => {
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -242,6 +249,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -290,6 +298,7 @@ describe('Donation', () => {
                     minMintmeAmount: 0.0001,
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -327,6 +336,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -355,6 +365,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -394,6 +405,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -434,6 +446,7 @@ describe('Donation', () => {
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -482,6 +495,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -510,6 +524,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 

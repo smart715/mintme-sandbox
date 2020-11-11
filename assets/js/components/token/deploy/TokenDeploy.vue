@@ -28,7 +28,9 @@
                             :disabled="btnDisabled"
                             @click="deploy"
                         >
-                            {{ $t('token.deploy.deploy_to_blockchain') }}
+                            <span :class="{'text-muted': isDeploymentDisabled}">
+                                {{ $t('token.deploy.deploy_to_blockchain') }}
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -93,6 +95,7 @@ export default {
         name: String,
         precision: Number,
         statusProp: String,
+        disabledServicesConfig: String,
     },
     data() {
         return {
@@ -103,6 +106,11 @@ export default {
         };
     },
     computed: {
+        isDeploymentDisabled: function() {
+            let services = JSON.parse(this.disabledServicesConfig);
+
+            return services.allServicesDisabled || services.deployDisabled;
+        },
         notDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.status;
         },
@@ -138,6 +146,12 @@ export default {
             });
         },
         deploy: function() {
+            if (this.isDeploymentDisabled) {
+              this.notifyError(this.$t('toasted.error.deployment_disabled'));
+
+              return;
+            }
+
             if (this.deploying) {
                 return;
             }
