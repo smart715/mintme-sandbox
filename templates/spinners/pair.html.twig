@@ -187,6 +187,7 @@
                     </li>
                 </ul>
             </div>
+            {% if is_granted('trading') %}
             <div class="tab-content" id="__BVID__33__BV_tab_container_">
                 <div
                     role="tabpanel"
@@ -242,6 +243,13 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div>
+                <div class="h1 text-center pt-5 mt-5">
+                    {% trans %}trade.page.disabled{% endtrans %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}

@@ -119,6 +119,9 @@ class DonationController extends AbstractFOSRestController
      */
     public function makeDonation(Market $market, ParamFetcherInterface $request): View
     {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         try {
             $user = $this->getCurrentUser();
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);

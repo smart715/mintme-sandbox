@@ -27,6 +27,7 @@ new Vue({
             tokenNameTimeout: null,
             tokenNameInBlacklist: false,
             description: '',
+            tokenCreation: true,
         };
     },
     components: {
@@ -89,6 +90,12 @@ new Vue({
         },
         createToken: function(e) {
             e.preventDefault();
+
+            if (!this.tokenCreation) {
+                this.notifyError(this.$t('token.creation.disabled'));
+                return;
+            }
+
             let frm = document.querySelector('form[name="token_create"]');
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
@@ -104,6 +111,12 @@ new Vue({
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
+        this.$axios.single.get(this.$routing.generate('check_token_creation'))
+            .then((result) => {
+                if (result.data) {
+                    this.tokenCreation = result.data.tokenCreation;
+                }
+            });
     },
     validations: {
         tokenName: {

@@ -128,6 +128,15 @@ class DepositConsumer implements ConsumerInterface
             return true;
         }
 
+        $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
+        $this->container->get('security.token_storage')->setToken($token);
+
+        if (!$this->security->isGranted('deposit')) {
+            $this->logger->info('[deposit-consumer] Deposits are disabled. Canceled.');
+
+            return true;
+        }
+
         /** @var User|null $user */
         $user = $this->userManager->find($clbResult->getUserId());
 
@@ -141,7 +150,7 @@ class DepositConsumer implements ConsumerInterface
         }
 
         try {
-            $tradable =$this->cryptoManager->findBySymbol($clbResult->getCrypto())
+            $tradable = $this->cryptoManager->findBySymbol($clbResult->getCrypto())
                 ?? $this->tokenManager->findByName($clbResult->getCrypto());
 
             if (!$tradable) {
@@ -151,9 +160,6 @@ class DepositConsumer implements ConsumerInterface
             }
 
             if ($tradable instanceof Crypto) {
-                $token = new AnonymousToken('deposit', 'deposit', ['IS_AUTHENTICATED_ANONYMOUSLY']);
-                $this->container->get('security.token_storage')->setToken($token);
-
                 if (!$this->security->isGranted('not-disabled', $tradable)) {
                     $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');
 
