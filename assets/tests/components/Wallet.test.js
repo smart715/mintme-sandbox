@@ -56,6 +56,7 @@ let propsForTestCorrectlyRenders = {
     twofa: 'twofa',
     websocketUrl: '',
     disabledCrypto: '["CRYPTO"]',
+    disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
 const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};

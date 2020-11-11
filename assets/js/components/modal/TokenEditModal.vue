@@ -73,6 +73,7 @@
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
                                     :key="tokenDeployKey"
+                                    :disabled-services-config="disabledServicesConfig"
                                 />
                             </template>
                         </faq-item>
@@ -201,6 +202,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
+        disabledServicesConfig: String,
     },
     data() {
         return {

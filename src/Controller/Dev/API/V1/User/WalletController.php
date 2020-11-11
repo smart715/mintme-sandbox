@@ -93,6 +93,8 @@ class WalletController extends DevApiController
      */
     public function getDepositAddresses(WalletInterface $depositCommunicator): array
     {
+        $this->denyAccessUnlessGranted('deposit');
+
         /** @var User $user */
         $user = $this->getUser();
 
@@ -199,6 +201,8 @@ class WalletController extends DevApiController
         MoneyWrapperInterface $moneyWrapper,
         MailerInterface $mailer
     ): View {
+        $this->denyAccessUnlessGranted('withdraw');
+
         $currency = $request->get('currency');
         $amount = $request->get('amount');
         $address = $request->get('address');

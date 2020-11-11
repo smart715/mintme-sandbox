@@ -63,6 +63,7 @@ describe('TradeBuyOrder', () => {
             marketPrice: 2,
             isOwner: false,
             websocketUrl: '',
+            tradeDisabled: false,
         },
     });
     it('hide buy order  contents and show loading instead', () => {

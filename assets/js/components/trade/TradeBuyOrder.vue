@@ -153,7 +153,9 @@
                             :disabled="!buttonValid"
                             tabindex="5"
                         >
-                          {{ $t('trade.buy_order.submit') }}
+                            <span :class="{'text-muted': tradeDisabled}">
+                                {{ $t('trade.buy_order.submit') }}
+                            </span>
                         </button>
                         <template v-else>
                             <a :href="loginUrl" class="btn btn-primary">{{ $t('log_in') }}</a>
@@ -215,6 +217,7 @@ export default {
         balance: [String, Boolean],
         balanceLoaded: [String, Boolean],
         takerFee: Number,
+        tradeDisabled: Boolean,
     },
     data() {
         return {
@@ -236,6 +239,11 @@ export default {
             this.$emit('check-input', this.market.quote.subunit);
         },
         placeOrder: function() {
+            if (this.tradeDisabled) {
+                this.notifyError(this.$t('trade.orders.disabled'));
+                return;
+            }
+
             if (this.buyPrice && this.buyAmount) {
                 if ((new Decimal(this.buyPrice)).times(this.buyAmount).lessThan(this.minTotalPrice)) {
                     this.showNotification({

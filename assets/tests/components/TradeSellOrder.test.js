@@ -71,6 +71,7 @@ function mockVm(balance = 1) {
             marketPrice: 2,
             isOwner: false,
             websocketUrl: '',
+            tradeDisabled: false,
         },
     });
 }

@@ -67,6 +67,9 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
@@ -120,6 +123,9 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         /** @var User $currentUser */
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
