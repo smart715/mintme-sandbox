@@ -60,7 +60,9 @@ class DonationController extends AbstractFOSRestController
         string $amount
     ): View {
         try {
-            $user = $this->getCurrentUser();
+            /** @var User|null $user */
+            $user = $this->getUser();
+
             $checkDonationResult = $this->donationHandler->checkDonation(
                 $market,
                 $currency,

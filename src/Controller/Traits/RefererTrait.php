@@ -7,12 +7,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 trait RefererTrait
 {
+    private array $refererPathData;
+
+    public function getRefererPathData(): array
+    {
+        return $this->refererPathData;
+    }
+
     public function isRefererValid(string $pathInfo): bool
     {
         $refererRequest = Request::create($pathInfo);
         $router = $this->get('router');
-        $pathData = $router->match($refererRequest->getPathInfo());
-        $routeName = $pathData['_route'] ?? null;
+        $this->refererPathData = $router->match($refererRequest->getPathInfo());
+        $routeName = $this->refererPathData['_route'] ?? null;
 
         return in_array($routeName, $this->validRefererRoutes());
     }
