@@ -25,6 +25,7 @@ Encore
     .addEntry('edit_post', './assets/js/edit_post.js')
     .addEntry('show_post', './assets/js/show_post.js')
     .addEntry('chat', './assets/js/chat.js')
+    .addEntry('home', './assets/js/home.js')
 
     .enablePostCssLoader()
 
