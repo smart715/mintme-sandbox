@@ -275,7 +275,7 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.setProps({depositMore: webSymbol});
+            wrapper.setData({depositMore: webSymbol});
             wrapper.vm.predefinedTokens = {};
             wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
             wrapper.vm.depositAddresses = {};

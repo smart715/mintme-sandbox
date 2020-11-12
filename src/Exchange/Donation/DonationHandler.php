@@ -71,7 +71,7 @@ class DonationHandler implements DonationHandlerInterface
         Market $market,
         string $currency,
         string $amount,
-        User $donorUser
+        ?User $donorUser
     ): CheckDonationResult {
         $amountObj = $this->moneyWrapper->parse($amount, $currency);
         /** @var Token $token */
@@ -353,29 +353,31 @@ class DonationHandler implements DonationHandlerInterface
         return $amount->multiply($this->donationConfig->getFee());
     }
 
-    private function checkAmount(User $user, Money $amount, string $currency): void
+    private function checkAmount(?User $user, Money $amount, string $currency): void
     {
-        $balance = $this->balanceHandler->balance(
-            $user,
-            Token::getFromSymbol($currency)
-        )->getAvailable();
+        $balance = $user
+            ? $this->balanceHandler->balance(
+                $user,
+                Token::getFromSymbol($currency)
+            )->getAvailable()
+            : null;
 
         if (Token::BTC_SYMBOL === $currency) {
             $minBtcAmount = $this->donationConfig->getMinBtcAmount();
 
-            if ($amount->lessThan($minBtcAmount) || $amount->greaterThan($balance)) {
+            if ($amount->lessThan($minBtcAmount) || ($user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } elseif (Token::WEB_SYMBOL === $currency) {
             $minMintmeAmount = $this->donationConfig->getMinMintmeAmount();
 
-            if ($amount->lessThan($minMintmeAmount) || $amount->greaterThan($balance)) {
+            if ($amount->lessThan($minMintmeAmount) || ($user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } else {
             $minEthAmount = $this->donationConfig->getMinEthAmount();
 
-            if ($amount->lessThan($minEthAmount) || $amount->greaterThan($balance)) {
+            if ($amount->lessThan($minEthAmount) || ($user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }
