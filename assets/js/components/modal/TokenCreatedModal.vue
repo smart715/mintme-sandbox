@@ -30,27 +30,42 @@
                     {{ $t('token.intro.created_modal.paragraph_3') }}
                     <ul>
                         <li>
-                            <a href="https://www.mintme.com/kb/Time-for-token-sales-how-can-I-make-a-difference" target="_blank">
+                            <a
+                                href="https://www.mintme.com/kb/Time-for-token-sales-how-can-I-make-a-difference"
+                                target="_blank"
+                            >
                                 {{ $t('token.intro.created_modal.list_1.item_1') }}
                             </a>
                         </li>
                         <li>
-                            <a href="https://www.mintme.com/kb/Aiming-at-a-strong-token" target="_blank">
+                            <a
+                                href="https://www.mintme.com/kb/Aiming-at-a-strong-token"
+                                target="_blank"
+                            >
                                 {{ $t('token.intro.created_modal.list_1.item_2') }}
                             </a>
                         </li>
                         <li>
-                            <a href="https://www.mintme.com/kb/Ideas-to-promote-and-sell-your-token" target="_blank">
+                            <a
+                                href="https://www.mintme.com/kb/Ideas-to-promote-and-sell-your-token"
+                                target="_blank"
+                            >
                                 {{ $t('token.intro.created_modal.list_1.item_3') }}
                             </a>
                         </li>
                         <li>
-                            <a href="https://www.mintme.com/kb/Stuck-not-knowing-what-to-do-next" target="_blank">
+                            <a
+                                href="https://www.mintme.com/kb/Stuck-not-knowing-what-to-do-next"
+                                target="_blank"
+                            >
                                 {{ $t('token.intro.created_modal.list_1.item_4') }}
                             </a>
                         </li>
                         <li>
-                            <a href="https://www.mintme.com/kb/Talking-to-your-followers-about-MintMe-we-got-some-ideas" target="_blank">
+                            <a
+                                href="https://www.mintme.com/kb/Talking-to-your-followers-about-MintMe-we-got-some-ideas"
+                                target="_blank"
+                            >
                                 {{ $t('token.intro.created_modal.list_1.item_5') }}
                             </a>
                         </li>
@@ -72,7 +87,10 @@
                 </ol>
                 <p>
                     {{ $t('token.intro.created_modal.paragraph_6.part_1') }}
-                    <a href="https://www.mintme.com/kb/How-to-deploy-my-token-to-the-blockchain" target="_blank">
+                    <a
+                        href="https://www.mintme.com/kb/How-to-deploy-my-token-to-the-blockchain"
+                        target="_blank"
+                    >
                         {{ $t('token.intro.created_modal.paragraph_6.part_2') }}
                     </a>
                     {{ $t('token.intro.created_modal.paragraph_6.part_3') }}
