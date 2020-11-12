@@ -301,7 +301,7 @@
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
         {% endif %}
     </div>
-    {% if showCreatedModal and isOwner %}
+    {% if showCreatedModal and isOwner is same as('true') %}
         <token-created-modal
             :visible="showCreatedModal"
             token-name="{{ market.quote.name }}"
