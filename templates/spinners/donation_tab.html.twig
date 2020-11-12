@@ -7,11 +7,7 @@
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
                             <span>
-                                {% if app.user %}
-                                    {% trans %}donation.header.logged{% endtrans %}
-                                {% else %}
-                                    {% trans %}donation.header.not_logged{% endtrans %}
-                                {% endif %}
+                                {% trans %}donation.header.logged{% endtrans %}
                             </span>
                         </div>
                         <div class="card-body donation-body">

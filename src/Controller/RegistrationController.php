@@ -134,6 +134,12 @@ class RegistrationController extends FOSRegistrationController
             return $response;
         }
 
+        if ($request->get('formContentOnly', false)) {
+            return $this->render("@FOSUser/Registration/register_content_body.html.twig", [
+                'form' => $form->createView(),
+            ]);
+        }
+
         return $this->render('@FOSUser/Registration/register.html.twig', [
             'form' => $form->createView(),
         ]);
@@ -256,6 +262,12 @@ class RegistrationController extends FOSRegistrationController
 
         if ($referer && $this->isRefererValid($referer)) {
             $session->remove('register_referer');
+
+            $path = $this->getRefererPathData();
+
+            if ('token_show' === $path['_route'] && 'buy' === $path['tab'] && 'signup' === $path['modal']) {
+                return $this->redirectToRoute('wallet');
+            }
 
             return $this->redirect($referer);
         }
