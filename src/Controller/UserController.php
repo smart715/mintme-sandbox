@@ -259,13 +259,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $backupCodes;
     }
 
-    /** @Route("/settings/2fa/backupcodes/generate",
-        name="generate_backup_codes",
-        options={"2fa"="required"},
-        defaults={"needToCheckCode" = false}
-    )*/
+    /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
     public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
     {
+
+        if (!$this->getUser()->isGoogleAuthenticatorEnabled()) {
+            $this->addFlash('danger', 'an error occurred please try again!');
+        }
+
         $this->getBackupCodes($twoFactorManager);
         $this->addFlash('success', 'Downloading backup codes...');
         $this->userActionLogger->info('Downloaded Two-Factor backup codes');
