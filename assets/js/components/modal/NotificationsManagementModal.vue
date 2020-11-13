@@ -23,9 +23,9 @@
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
                                         <div class="mb-2">
-                                            <span> {{ config.email.text }} </span>
+                                            <span> {{ config.channels.email.text }} </span>
                                             <b-form-checkbox
-                                                v-model="config.email.value"
+                                                v-model="config.channels.email.value"
                                                 class="float-right"
                                                 size="lg"
                                                 name="check-button"
@@ -33,9 +33,9 @@
                                             </b-form-checkbox>
                                         </div>
                                         <div class="mb-2">
-                                            <span> {{ config.website.text }} </span>
+                                            <span> {{ config.channels.website.text }} </span>
                                             <b-form-checkbox
-                                                v-model="config.website.value"
+                                                v-model="config.channels.website.value"
                                                 class="float-right"
                                                 size="lg"
                                                 name="check-button"
@@ -101,8 +101,9 @@ export default {
         saveConfig: function() {
             let data = this.configModel;
             this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
-                .then((res) => {
-                    console.log(res);
+                .then(() => {
+                   /* this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}))*/
+                    this.$t('toasted.success.email_sent');
                 })
                 .catch((err) => {
                     this.sendLogs('error', 'Error loading User Notifications channels', err);

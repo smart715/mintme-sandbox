@@ -29,8 +29,6 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
     public function getUserNotificationsConfig(User $user): ?array
     {
-      //  return $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
-
         $notificationTypes = NotificationTypes::getAll();
         $notificationChannels = NotificationChannels::getAll();
 
@@ -39,15 +37,16 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
         foreach ($notificationTypes as $nType) {
             $defaultConfig[$nType]['text'] = NotificationTypes::getText()[$nType];
+
             foreach ($notificationChannels as $nChannel) {
-                $defaultConfig[$nType][$nChannel]['text'] = ucfirst($nChannel);
-                $defaultConfig[$nType][$nChannel]['value'] = false;
+                $defaultConfig[$nType]['channels'][$nChannel]['text'] = ucfirst($nChannel);
+                $defaultConfig[$nType]['channels'][$nChannel]['value'] = false;
 
                 foreach ($userNotificationConfig as $unc) {
                     $type = $unc->getType();
                     $channel = $unc->getChannel();
-                    $defaultConfig[$type][$channel]['text'] = ucfirst($channel);
-                    $defaultConfig[$type][$channel]['value'] = true;
+                    $defaultConfig[$type]['channels'][$channel]['text'] = ucfirst($channel);
+                    $defaultConfig[$type]['channels'][$channel]['value'] = true;
                 }
             }
         }
@@ -62,21 +61,29 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         $newConfig = $request->request->all();
         $userConfigStored = $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
 
-        // todo foreach new config...
-//dd($newConfig);
-        // Delete old Config
-        /*foreach ($userConfigStored as $userConfig) {
-            $this->userNotificationConfigRepository->deleteUserNotificationsConfig($userConfig->getId());
-        }*/
-        // Insert new Config
-        $notificationChannels = NotificationChannels::getAll();
-        foreach ($newConfig as $index=> $nConfig) {
-           //dd($index); //type
-            /*if ($index === 'text') {
-                continue;
-            }*/
-          //  dd(array_keys($nConfig[$notificationChannels[$index]]));
-            //$this->createUserNotificationConfig($type, $channel , $user);
+        if ($userConfigStored) {
+            foreach ($userConfigStored as $userConfig) {
+                $this->userNotificationConfigRepository->deleteUserNotificationsConfig($userConfig->getId());
+            }
         }
+
+        foreach ($newConfig as $type => $nConfig) {
+            foreach ($nConfig['channels'] as $channel => $channelConfig) {
+                if ($channelConfig['value']) {
+                    $this->createUserNotificationConfig($type, $channel, $user);
+                }
+            }
+        }
+    }
+
+    private function createUserNotificationConfig(String $type, String $channel, User $user): void
+    {
+
+        $newConfig= (new UserNotificationConfig())
+            ->setType($type)
+            ->setChannel($channel)
+            ->setUser($user);
+        $this->em->persist($newConfig);
+        $this->em->flush();
     }
 }
