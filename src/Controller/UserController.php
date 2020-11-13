@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -264,7 +265,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
 
         if (!$this->getUser()->isGoogleAuthenticatorEnabled()) {
-            $this->addFlash('danger', 'an error occurred please try again!');
+            throw new BadRequestHttpException();
         }
 
         $this->getBackupCodes($twoFactorManager);
