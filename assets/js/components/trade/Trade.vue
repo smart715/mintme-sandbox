@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid px-0">
+    <div v-if="!disabledServices.tradingDisabled && !disabledServices.allServicesDisabled" class="container-fluid px-0">
         <div class="row">
             <trade-chart
                 :is-token="isToken"
@@ -24,6 +24,7 @@
                     :balance="baseBalance"
                     :balance-loaded="balanceLoaded"
                     :taker-fee="takerFee"
+                    :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                 />
             </div>
@@ -39,6 +40,7 @@
                     :balance="quoteBalance"
                     :balance-loaded="balanceLoaded"
                     :is-owner="isOwner"
+                    :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                 />
             </div>
@@ -61,6 +63,11 @@
                 :websocket-url="websocketUrl"
                 :market="market"
             />
+        </div>
+    </div>
+    <div v-else>
+        <div class="h1 text-center pt-5 mt-5">
+            {{ $t('trade.page.disabled') }}
         </div>
     </div>
 </template>
@@ -113,6 +120,7 @@ export default {
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
         isToken: Boolean,
+        disabledServicesConfig: String,
         takerFee: Number,
     },
     data() {
@@ -159,6 +167,18 @@ export default {
             set(val) {
                 this.setRequesting(val);
             },
+        },
+        /**
+         * @return {object}
+         */
+        disabledServices: function() {
+            return JSON.parse(this.disabledServicesConfig);
+        },
+        /**
+         * @return {boolean}
+         */
+        tradeDisabled: function() {
+            return this.disabledServices.newTradesDisabled || this.disabledServices.allServicesDisabled;
         },
     },
     mounted() {

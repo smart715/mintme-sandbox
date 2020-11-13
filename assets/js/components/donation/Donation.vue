@@ -1,15 +1,17 @@
 <template>
-    <div class="container-fluid px-0">
+    <div
+        v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled"
+        class="container-fluid px-0"
+    >
         <div class="row justify-content-center">
             <div class="width-100 col-9 col-sm-10 col-md-9 col-lg-7 col-xl-6 mt-3">
                 <div class="card h-100">
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
-                            <span v-if="loggedIn">{{ $t('donation.header.logged') }}</span>
-                            <span v-else>{{ $t('donation.header.not_logged') }}</span>
+                            <span>{{ $t('donation.header.logged') }}</span>
                         </div>
                         <div class="card-body donation-body">
-                            <div v-if="loggedIn" class="h-100">
+                            <div v-show="!showForms" class="h-100">
                                 <div>
                                     <div>
                                         <p class="info" v-html="$sanitize(nonrefundHtml)"></p>
@@ -33,8 +35,9 @@
                                             </b-dropdown>
                                         </div>
                                         <div
-                                            v-if="isCurrencySelected"
+                                            v-if="isCurrencySelected && loggedIn"
                                             class="col"
+                                            id="show-balance"
                                         >
                                             <p class="mb-2">{{ $t('donation.balance') }}</p>
                                             <span v-if="balanceLoaded" class="d-block">
@@ -75,7 +78,7 @@
                                                     :subunit="2"
                                                     symbol="$"
                                                 />
-                                                <div class="input-group-append">
+                                                <div v-if="loggedIn" class="input-group-append">
                                                     <button
                                                         @click="all"
                                                         class="btn btn-primary all-button"
@@ -118,7 +121,9 @@
                                                 @click="showConfirmationModal"
                                                 class="btn btn-primary btn-donate"
                                             >
-                                              {{ $t('donation.buy') }}
+                                                <span :class="{'text-muted': disabledServices.newTradesDisabled}">
+                                                    {{ $t('donation.buy') }}
+                                                </span>
                                             </button>
                                             <confirm-modal
                                                 :visible="showModal"
@@ -137,13 +142,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <Register v-if="!loggedIn"
-                            :google-recaptcha-site-key="googleRecaptchaSiteKey"
-                            ></Register>
+                            <div v-if="!loggedIn">
+                                <login-signup-switcher v-show="showForms" :google-recaptcha-site-key="googleRecaptchaSiteKey" @login="onLogin" @signup="onSignup"/>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div v-else>
+        <div class="h1 text-center pt-5 mt-5">
+          {{ $t('donate.page.disabled') }}
         </div>
     </div>
 </template>
@@ -160,7 +170,7 @@ import {
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
-import Register from '../Register';
+import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
@@ -180,13 +190,14 @@ export default {
         PriceConverterInput,
         Guide,
         ConfirmModal,
-        Register,
+        LoginSignupSwitcher,
     },
     props: {
         market: Object,
         loggedIn: Boolean,
         googleRecaptchaSiteKey: String,
         donationParams: Object,
+        disabledServicesConfig: String,
     },
     data() {
         return {
@@ -195,7 +206,7 @@ export default {
                 btcSymbol,
                 ethSymbol,
             },
-            selectedCurrency: null,
+            selectedCurrency: webSymbol,
             amountToDonate: 0,
             amountToReceive: 0,
             tokensWorth: 0,
@@ -207,6 +218,7 @@ export default {
             showModal: false,
             tokensAvailabilityChanged: false,
             USD,
+            showForms: false,
         };
     },
     computed: {
@@ -249,7 +261,7 @@ export default {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
         },
         insufficientFunds: function() {
-            return this.balanceLoaded &&
+            return this.loggedIn && this.balanceLoaded &&
                 (
                     (new Decimal(this.balance)).lessThan(this.minTotalPrice)
                     ||
@@ -257,21 +269,18 @@ export default {
                 );
         },
         insufficientFundsError: function() {
-            return this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
+            return this.loggedIn && this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
         },
         isAmountValid: function() {
             return !!parseFloat(this.amountToDonate)
                 && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return !this.loggedIn
+            return (this.loggedIn && (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
                 || !this.isCurrencySelected
-                || this.insufficientFunds
-                || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
                 || this.donationChecking
-                || this.donationInProgress
-                || this.insufficientFundsError;
+                || this.donationInProgress;
         },
         nonrefundHtml: function() {
             return this.$t('donation.nonrefund', {
@@ -281,8 +290,22 @@ export default {
                 }),
             });
         },
+        disabledServices: function() {
+            return JSON.parse(this.disabledServicesConfig);
+        },
     },
     mounted() {
+        if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
+            this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
+            this.$nextTick(() => {
+                this.amountToDonate = window.localStorage.getItem('mintme_donation_amount');
+                window.localStorage.removeItem('mintme_donation_amount');
+            });
+
+            window.localStorage.removeItem('mintme_loggedin_from_donation');
+            window.localStorage.removeItem('mintme_donation_currency');
+        }
+
         if (this.loggedIn) {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
@@ -401,6 +424,32 @@ export default {
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
+            if (
+                this.disabledServices.allServicesDisabled ||
+                this.disabledServices.newTradesDisabled ||
+                this.disabledServices.tradingDisabled
+            ) {
+                this.notifyError(this.$t('donate.disabled'));
+
+                return;
+            }
+
+            if (!this.loggedIn) {
+                if (window.history.replaceState) {
+                    // prevents browser from storing history with each change:
+                    window.history.replaceState(
+                        {}, document.title, this.$routing.generate('token_show', {
+                            name: this.market.quote.symbol,
+                            tab: 'buy',
+                            modal: 'signup',
+                        })
+                    );
+                }
+                this.showForms = true;
+
+                return;
+            }
+
             if (this.tokensAvailabilityChanged) {
                 this.notifyError(this.$t('donation.tokens_availability_changed'));
                 this.tokensAvailabilityChanged = false;
@@ -417,6 +466,15 @@ export default {
         cancelDonation: function() {
             this.showModal = false;
             this.resetAmount();
+        },
+        onLogin() {
+            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_donation_amount', this.amountToDonate);
+            window.localStorage.setItem('mintme_loggedin_from_donation', true);
+        },
+        onSignup() {
+            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_signedup_from_donation', true);
         },
     },
     watch: {

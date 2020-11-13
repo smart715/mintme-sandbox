@@ -107,7 +107,8 @@
                                     type="submit"
                                     :disabled="saveBtnDisabled"
                                     @click="createToken"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary submit-creation"
+                                    :class="{'input-disabled': !tokenCreation}"
                                     value="{% trans %}page.token_creation.create{% endtrans %}"
                                 />
                                 <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>

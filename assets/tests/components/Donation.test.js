@@ -1,9 +1,10 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
+import '../vueI18nfix.js';
 import Donation from '../../js/components/donation/Donation';
 import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
-import {webSymbol, btcSymbol, tokSymbol, MINTME} from '../../js/utils/constants';
+import {webSymbol, btcSymbol, tokSymbol, MINTME, ethSymbol} from '../../js/utils/constants';
 
 /**
  * @return {Wrapper<Vue>}
@@ -56,16 +57,21 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
                 market: {
                     quote: {name: 'foo'},
                     identifier: 'bar',
+                    quote: {
+                        name: 'bar',
+                    },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
-        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
-        expect(wrapper.vm.isCurrencySelected).toBe(false);
+        expect(wrapper.vm.dropdownText).toBe(MINTME.symbol);
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
@@ -78,15 +84,23 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: false,
+                donationParams: {fee: .01},
+                market: {
+                    identifier: 'bar',
+                    quote: {
+                        name: 'bar',
+                    },
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
-        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.not_logged');
-        expect(wrapper.find('b-dropdown-stub').exists()).toBe(false);
+        expect(wrapper.vm.dropdownText).toBe(MINTME.symbol);
+        expect(wrapper.find('.all-button').exists()).toBe(false);
+        expect(wrapper.find('#show-balance').exists()).toBe(false);
     });
 
     it('should renders correctly for logged in user and load balance for selected currency', () => {
@@ -100,22 +114,23 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
-        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
-        expect(wrapper.vm.isCurrencySelected).toBe(false);
+        expect(wrapper.vm.dropdownText).toBe('MINTME');
+        expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
-        // Select WEB
-        wrapper.vm.onSelect(webSymbol);
+        // Select ETH
+        wrapper.vm.onSelect(ethSymbol);
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.balanceLoaded).toBe(false);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+        expect(wrapper.vm.selectedCurrency).toBe(ethSymbol);
 
         // Select BTC
         wrapper.vm.onSelect(btcSymbol);
@@ -136,6 +151,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -160,6 +176,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -181,6 +198,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -211,6 +229,7 @@ describe('Donation', () => {
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -242,6 +261,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -290,6 +310,7 @@ describe('Donation', () => {
                     minMintmeAmount: 0.0001,
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -327,12 +348,13 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
         wrapper.vm.balanceLoaded = true;
-        wrapper.vm.onSelect(webSymbol);
-        expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
+        wrapper.vm.onSelect(ethSymbol);
+        expect(wrapper.vm.selectedCurrency).toBe(ethSymbol);
         expect(wrapper.vm.balanceLoaded).toBe(false);
 
         wrapper.vm.balanceLoaded = true;
@@ -355,6 +377,7 @@ describe('Donation', () => {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -394,6 +417,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -434,6 +458,7 @@ describe('Donation', () => {
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -482,6 +507,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -506,10 +532,12 @@ describe('Donation', () => {
             localVue,
             propsData: {
                 loggedIn: true,
+                donationParams: {fee: .01},
                 market: {
                     quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 

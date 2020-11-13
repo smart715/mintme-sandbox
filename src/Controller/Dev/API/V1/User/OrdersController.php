@@ -226,6 +226,9 @@ class OrdersController extends DevApiController
         ExchangerInterface $exchanger,
         bool $reverseBaseQuote = false
     ): View {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         $base = $request->get('base');
         $quote = $request->get('quote');
 
@@ -285,6 +288,9 @@ class OrdersController extends DevApiController
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id, bool $reverseBaseQuote = false): View
     {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         $base = $request->get('base');
         $quote = $request->get('quote');
 

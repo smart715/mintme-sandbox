@@ -75,6 +75,7 @@ let propsForTestCorrectlyRenders = {
         precision: 0,
         mintmeSupplyUrl: 'testMintmeSupplyUrl',
         minimumVolumeForMarketcap: 11,
+        disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
 describe('Trade', () => {

@@ -21,6 +21,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -97,7 +98,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -108,7 +109,8 @@ class TokenController extends Controller
         ?string $modal,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
-        LimitOrderConfig $orderConfig
+        LimitOrderConfig $orderConfig,
+        DisabledServicesConfig $disabledServicesConfig
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
@@ -194,6 +196,7 @@ class TokenController extends Controller
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
             'showTokenEditModal' => 'settings' === $modal,
+            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
         ]);
     }
 
@@ -230,6 +233,9 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('new-trades');
+            $this->denyAccessUnlessGranted('trading');
+
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
                     ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],

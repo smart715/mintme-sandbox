@@ -38,10 +38,11 @@
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
-                            :deposit-more="depositMoreCurrency"
+                            :deposit-more-prop="depositMoreCurrency"
                             twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
                             :expiration-time="{{ withdraw_expiration_time }}"
                             disabled-crypto="{{ disabledBlockchain | json_encode }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                             {% if app.user.isBlocked %}
                             is-user-blocked
                             {% endif %}

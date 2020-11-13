@@ -56,6 +56,7 @@ let propsForTestCorrectlyRenders = {
     twofa: 'twofa',
     websocketUrl: '',
     disabledCrypto: '["CRYPTO"]',
+    disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
 const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};
@@ -274,7 +275,7 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.setProps({depositMore: webSymbol});
+            wrapper.setData({depositMore: webSymbol});
             wrapper.vm.predefinedTokens = {};
             wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
             wrapper.vm.depositAddresses = {};
