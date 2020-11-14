@@ -2,7 +2,7 @@
     <div>
         <div class="card h-100">
             <div class="card-header">
-                {{ $t('token.intro.description.header') }}
+               {{ $t('token.intro.description.header') }}
                 <guide class="float-right">
                     <template  slot="header">
                         {{ $t('token.intro.description.guide_header') }}
@@ -24,7 +24,10 @@
                                 @click="editingDescription = true"
                             />
                         </span>
-                        <bbcode-view v-if="!editingDescription" :value="description" />
+                        <div v-bind:class="{'show-hide-text': showMore}">
+                            <bbcode-view v-if="!editingDescription" :value="description"/>
+                            <a id="show" class="show" href="#0" @click="show">{{showMessage}}</a>
+                        </div>
                         <template v-if="editable">
                             <div v-show="editingDescription">
                                 <div class="pb-1">
@@ -120,6 +123,8 @@ export default {
             editingDescription: false,
             newDescription: this.description || '',
             readyToSave: false,
+            showMore: true,
+            showMessage: 'show More',
         };
     },
     computed: {
@@ -141,6 +146,15 @@ export default {
         onDescriptionChange: function(val) {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
+        },
+        show: function(){
+            if(this.showMore){
+                this.showMore = false;
+                this.showMessage = 'show Less';
+            } else {
+                this.showMore = true;
+                this.showMessage = 'show More';
+            }
         },
         editDescription: function() {
             this.$v.$touch();
