@@ -147,8 +147,8 @@ export default {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
         },
-        show: function(){
-            if(this.showMore){
+        show: function() {
+            if (this.showMore) {
                 this.showMore = false;
                 this.showMessage = 'show Less';
             } else {
