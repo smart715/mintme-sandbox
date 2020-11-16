@@ -9,22 +9,22 @@
                 <p>
                     {{ $t('token.intro.created_modal.paragraph_1.part_1', {tokenName}) }}
                     <a :href="tokenLink" target="_blank">
-                        {{ $t('token.intro.created_modal.paragraph_1.part_2') }}
+                        {{ tokenLink }}
                     </a>
                     <copy-link :content-to-copy="tokenLink" class="c-pointer mx-1">
                         <font-awesome-icon :icon="['far', 'copy']"/>
                     </copy-link>
-                    {{ $t('token.intro.created_modal.paragraph_1.part_3') }}
+                    {{ $t('token.intro.created_modal.paragraph_1.part_2') }}
                 </p>
                 <p>
                     {{ $t('token.intro.created_modal.paragraph_2.part_1') }}
                     <a :href="buyLink" target="_blank">
-                        {{ $t('token.intro.created_modal.paragraph_2.part_2') }}
+                        {{ buyLink }}
                     </a>
                     <copy-link :content-to-copy="buyLink" class="c-pointer mx-1">
                         <font-awesome-icon :icon="['far', 'copy']"/>
                     </copy-link>
-                    {{ $t('token.intro.created_modal.paragraph_2.part_3') }}
+                    {{ $t('token.intro.created_modal.paragraph_2.part_2') }}
                 </p>
                 <p>
                     {{ $t('token.intro.created_modal.paragraph_3') }}
