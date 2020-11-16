@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -259,13 +260,16 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $backupCodes;
     }
 
-    /** @Route("/settings/2fa/backupcodes/generate",
-        name="generate_backup_codes",
-        options={"2fa"="required"},
-        defaults={"needToCheckCode" = false}
-    )*/
+    /** @Route("/settings/2fa/backupcodes/generate", name="generate_backup_codes")*/
     public function generateBackupCodes(TwoFactorManagerInterface $twoFactorManager): Response
     {
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        if (!$user->isGoogleAuthenticatorEnabled()) {
+            throw new BadRequestHttpException();
+        }
+
         $this->getBackupCodes($twoFactorManager);
         $this->addFlash('success', 'Downloading backup codes...');
         $this->userActionLogger->info('Downloaded Two-Factor backup codes');
