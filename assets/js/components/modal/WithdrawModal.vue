@@ -17,7 +17,7 @@
                         @change="setFirstTimeOpen"
                         :class="{ 'is-invalid': $v.address.$error }"
                         class="form-control">
-                    <div v-if="$v.address.$error" class="invalid-feedback">
+                    <div v-if="$v.address.$error" class="invalid-message">
                         {{ ('WEB' === currency || true === isToken ? $t('withdraw_modal.length') : $t('withdraw_modal.invalid_addr'))}}
                     </div>
                 </div>
@@ -46,13 +46,16 @@
                             {{ $t('withdraw_modal.all') }}
                         </button>
                     </div>
-                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-feedback text-center">
+                        <div v-if="!$v.amount.maxValue && $v.amount.decimal" class="invalid-message text-center">
                             {{ $t('withdraw_modal.do_not_have', translationsContext) }}
                         </div>
-                        <div v-if="!$v.amount.minValue && $v.amount.decimal" class="invalid-feedback text-center">
+                        <div
+                            v-if="!$v.amount.minValue && $v.amount.decimal && typeof $v.amount.$model === 'string'"
+                            class="invalid-message text-center"
+                        >
                             {{ $t('withdraw_modal.min_withdraw', translationsContext) }}
                         </div>
-                        <div v-if="!$v.amount.decimal" class="invalid-feedback text-center">
+                        <div v-if="!$v.amount.decimal" class="invalid-message text-center">
                             {{ $t('withdraw_modal.invalid_amount') }}
                         </div>
                 </div>
@@ -179,7 +182,7 @@ export default {
         },
         translationsContext: function() {
             return {
-                currency: this.currency,
+                currency: this.rebrandingFunc(this.currency),
                 minAmount: this.minAmount,
             };
         },
