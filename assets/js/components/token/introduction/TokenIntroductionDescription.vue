@@ -124,7 +124,7 @@ export default {
             newDescription: this.description || '',
             readyToSave: false,
             showMore: true,
-            showMessage: 'show More',
+            showMessage: this.$t('read_more'),
         };
     },
     computed: {
@@ -150,10 +150,10 @@ export default {
         show: function() {
             if (this.showMore) {
                 this.showMore = false;
-                this.showMessage = 'show Less';
+                this.showMessage = this.$t('read_less');
             } else {
                 this.showMore = true;
-                this.showMessage = 'show More';
+                this.showMessage = this.$t('read_more');
             }
         },
         editDescription: function() {
