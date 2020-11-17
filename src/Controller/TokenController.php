@@ -98,7 +98,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup|created"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -112,7 +112,7 @@ class TokenController extends Controller
         LimitOrderConfig $orderConfig,
         DisabledServicesConfig $disabledServicesConfig
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
+        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
@@ -197,6 +197,7 @@ class TokenController extends Controller
             'taker_fee' => $orderConfig->getTakerFeeRate(),
             'showTokenEditModal' => 'settings' === $modal,
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
+            'showCreatedModal' => 'created' === $modal,
         ]);
     }
 
