@@ -40,6 +40,7 @@ tests_php:
       - node_modules/
       - vendor/
   tags:
+    - mintme.abchosting.org
     - mintme-tests
 
 tests_assets:
@@ -55,6 +56,7 @@ tests_assets:
       - node_modules/
       - vendor/
   tags:
+    - mintme.abchosting.org
     - mintme-tests
 
 phpfunctional_tests:
