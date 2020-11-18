@@ -34,7 +34,7 @@ export default {
     },
     methods: {
         changeContact: function(e) {
-            this.$emit('change-contact', e.target.value);
+            this.$emit('change-contact', parseInt(e.target.value));
         },
     },
 };
