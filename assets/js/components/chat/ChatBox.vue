@@ -30,10 +30,14 @@
                         </template>
                     </b-table>
                     <div v-else-if="messagesLoaded">
-                        <p class="text-center p-5">{{ $t('chat.chat_box.no_messages_yet') }}</p>
+                        <p class="text-center p-5">
+                            {{ $t('chat.chat_box.no_messages_yet') }}
+                        </p>
                     </div>
                     <div v-else>
-                        <unread-messages-count/>
+                        <p class="text-center p-5">
+                            {{ $t('chat.chat_box.please_chose_contact') }}
+                        </p>
                     </div>
                 </template>
                 <template v-else>
@@ -44,7 +48,7 @@
             </div>
         </div>
         <div v-if="messagesLoaded" class="card-footer border-0 py-2 px-0">
-            <form @submit.prevent="sendMessage" class="d-flex">
+            <form @submit.prevent="addMessageToQueue" class="d-flex">
                 <input
                     v-model="messageBody"
                     type="text"
@@ -55,7 +59,6 @@
                 >
                 <button
                     type="submit"
-                    @click="sendMessage"
                     class="btn btn-primary ml-2"
                 >
                     {{ $t('chat.form.send') }}
@@ -67,25 +70,22 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
-import UnreadMessagesCount from './UnreadMessagesCount';
+import {LoggerMixin} from '../../mixins';
 const updateMessagesMS = 1000;
 
 export default {
     name: 'ChatBox',
-    mixin: {
+    mixins: [
         LoggerMixin,
-        NotificationMixin,
-    },
-    components: {
-        UnreadMessagesCount,
-    },
+    ],
     data() {
         return {
             messagesPage: 1,
             loading: false,
             messageBody: '',
             messages: null,
+            messagesQueue: [],
+            isQueueRunning: false,
             fields: [
                 {
                     key: 'trader',
@@ -139,21 +139,39 @@ export default {
         },
     },
     methods: {
-        sendMessage: function() {
+        addMessageToQueue: function() {
             if (!this.messageBody) {
                 return;
             }
 
+            this.messagesQueue.push(this.messageBody);
+            this.messageBody = '';
+            this.runQueue();
+        },
+        runQueue: function() {
+            if (this.isQueueRunning) {
+                return;
+            }
+
+            this.isQueueRunning = true;
+            this.sendNextMessage();
+        },
+        sendNextMessage: function() {
+            if (0 === this.messagesQueue.length) {
+                this.isQueueRunning = false;
+                return;
+            }
+            this.sendMessage(this.messagesQueue.splice(0, 1)[0]);
+        },
+        sendMessage: function(body) {
             this.$axios.single.post(this.$routing.generate('send_dm_message', {
                 threadId: this.threadId,
-            }), {
-                body: this.messageBody,
-            }).catch((error) => {
-                this.notifyError(this.$('toasted.error.didnt_send_message'));
+            }), {body})
+            .then(() => this.sendNextMessage())
+            .catch((error) => {
+                this.sendMessage(body);
                 this.sendLogs('error', 'send message error', error);
             });
-
-            this.messageBody = '';
         },
         getMessages: function() {
             this.messages = null;
