@@ -112,7 +112,7 @@ export default {
         sendLogsIfWsError: function(result, message = '') {
             if (result.error !== null ||
                 (result.result !== null && result.result.status !== 'success')) {
-                debounce(this.sendLogs('error', message, result.error).bind(this), 500);
+                this.sendLogs('error', message, result.error);
             }
         },
     },
