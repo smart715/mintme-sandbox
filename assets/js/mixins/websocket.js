@@ -1,4 +1,3 @@
-import debounce from 'lodash/debounce';
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
 import LoggerMixin from './logger';
@@ -90,7 +89,7 @@ export default {
                 url: this.websocketUrl,
                 id,
                 handler: (result) => {
-                    debounce(this.sendLogsIfWsError(result, message), 500);
+                    this.sendLogsIfWsError(result, message);
                     handler(result);
                 },
             });
