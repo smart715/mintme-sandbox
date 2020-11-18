@@ -1,3 +1,4 @@
+import debounce from 'lodash/debounce';
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
 import LoggerMixin from './logger';
@@ -111,7 +112,7 @@ export default {
         sendLogsIfWsError: function(result, message = '') {
             if (result.error !== null ||
                 (result.result !== null && result.result.status !== 'success')) {
-                this.sendLogs('error', message, result.error);
+                debounce(this.sendLogs('error', message, result.error, 30000));
             }
         },
     },
