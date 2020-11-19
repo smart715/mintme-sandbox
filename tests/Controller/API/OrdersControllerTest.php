@@ -139,7 +139,6 @@ class OrdersControllerTest extends WebTestCase
     public function testPendingUserOrders(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -156,7 +155,6 @@ class OrdersControllerTest extends WebTestCase
     public function testPendingOrderDetails(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [

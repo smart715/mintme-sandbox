@@ -25,23 +25,4 @@ class TradesControllerTest extends WebTestCase
             $this->assertTrue($this->client->getResponse()->isSuccessful());
         }
     }
-
-    public function testRebrandingRedirect(): void
-    {
-        $redirects = [
-            [
-                'from' => Token::WEB_SYMBOL . '_' . Token::BTC_SYMBOL,
-                'to' => Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL,
-            ],
-            [
-                'from' => Token::WEB_SYMBOL . '_' . Token::ETH_SYMBOL,
-                'to' => Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL,
-            ],
-        ];
-
-        foreach ($redirects as $redirect) {
-            $this->client->request('GET', self::URL . '/' . $redirect['from']);
-            $this->assertTrue($this->client->getResponse()->isRedirect(self::URL . '/' . $redirect['to']));
-        }
-    }
 }

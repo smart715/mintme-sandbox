@@ -9,7 +9,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 
-class WalletControllerTest extends WebTestCase
+class WalletControllerFix extends WebTestCase
 {
     public function testWithdrawConfirmCrypto(): void
     {
@@ -34,7 +34,14 @@ class WalletControllerTest extends WebTestCase
 
         $this->assertNotNull($pendingWithdraw);
 
-        $this->client->request('GET', '/wallet/withdraw/' . $pendingWithdraw->getHash());
+        $this->client->request(
+            'GET',
+            '/wallet/withdraw/' . $pendingWithdraw->getHash(),
+            [],
+            [],
+            ['HTTPS' => true]
+        );
+
         $this->client->followRedirect();
 
         /** @var PendingWithdraw|null $pendingWithdraw */
@@ -77,7 +84,14 @@ class WalletControllerTest extends WebTestCase
 
         $this->assertNotNull($pendingWithdraw);
 
-        $this->client->request('GET', '/wallet/withdraw/' . $pendingWithdraw->getHash());
+        $this->client->request(
+            'GET',
+            '/wallet/withdraw/' . $pendingWithdraw->getHash(),
+            [],
+            [],
+            ['HTTPS' => true]
+        );
+
         $this->client->followRedirect();
 
         /** @var PendingTokenWithdraw|null $pendingWithdraw */
