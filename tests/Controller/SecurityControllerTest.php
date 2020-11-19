@@ -14,7 +14,7 @@ class SecurityControllerTest extends WebTestCase
 
         $this->client->request('GET', '/login');
         $this->client->submitForm(
-            'Log In',
+            '_submit',
             [
                 '_username' => $fooEmail,
                 '_password' => self::DEFAULT_USER_PASS,
@@ -36,17 +36,16 @@ class SecurityControllerTest extends WebTestCase
         $fooEmail = $this->register($this->client);
         $tokName = $this->createToken($this->client);
 
-        $this->client->request('GET', '/logout');
-        $this->client->followRedirect();
+        $fooClient = self::createClient();
 
-        $this->client->request('GET', '/token/' . $tokName . '/donate');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->request('GET', '/token/' . $tokName . '/buy');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
-        $this->client->request('GET', '/login?formContentOnly=true');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->request('GET', '/login?formContentOnly=true');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
-        $this->client->submitForm(
-            'Log In',
+        $fooClient->submitForm(
+            '_submit',
             [
                 '_username' => $fooEmail,
                 '_password' => self::DEFAULT_USER_PASS,
@@ -57,8 +56,8 @@ class SecurityControllerTest extends WebTestCase
             ]
         );
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('/login_check'));
-        $this->client->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isRedirect('/login_check'));
+        $fooClient->followRedirect();
     }
 
     public function testLoginFails(): void
@@ -71,7 +70,7 @@ class SecurityControllerTest extends WebTestCase
 
         $this->client->request('GET', '/login');
         $this->client->submitForm(
-            'Log In',
+            '_submit',
             [
                 '_username' => $fooEmail,
                 '_password' => 'WrongPath123',
@@ -93,17 +92,16 @@ class SecurityControllerTest extends WebTestCase
         $userEmail = $this->register($this->client);
         $tokName = $this->createToken($this->client);
 
-        $this->client->request('GET', '/logout');
-        $this->client->followRedirect();
+        $fooClient = self::createClient();
 
-        $this->client->request('GET', '/token/' . $tokName . '/trade');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->request('GET', '/token/' . $tokName . '/trade');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
-        $this->client->clickLink('Log In');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->clickLink('Log In');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
-        $this->client->submitForm(
-            'Log In',
+        $fooClient->submitForm(
+            '_submit',
             [
                 '_username' => $userEmail,
                 '_password' => self::DEFAULT_USER_PASS,
@@ -114,14 +112,14 @@ class SecurityControllerTest extends WebTestCase
             ]
         );
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('/login_check'));
-        $this->client->followRedirect();
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login_success'));
-        $this->client->followRedirect();
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/token/' . $tokName . '/trade'));
-        $this->assertTrue($this->client->getResponse()->isRedirection());
-        $this->client->followRedirect();
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-        $this->assertContains($tokName, $this->client->getResponse()->getContent());
+        $this->assertTrue($fooClient->getResponse()->isRedirect('/login_check'));
+        $fooClient->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isRedirect('http://localhost/login_success'));
+        $fooClient->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isRedirect('http://localhost/token/' . $tokName . '/trade'));
+        $this->assertTrue($fooClient->getResponse()->isRedirection());
+        $fooClient->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
+        $this->assertStringContainsString($tokName, (string)$fooClient->getResponse()->getContent());
     }
 }

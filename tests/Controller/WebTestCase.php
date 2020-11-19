@@ -9,6 +9,7 @@ use Money\Currency;
 use Money\Money;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 class WebTestCase extends BaseWebTestCase
 {
@@ -50,26 +51,6 @@ class WebTestCase extends BaseWebTestCase
         return $email;
     }
 
-    protected function createProfile(
-        Client $client,
-        string $fName = 'foo',
-        string $lName = 'bar'
-    ): void {
-        $client->request('GET', '/profile');
-
-        $client->submitForm(
-            'Save',
-            [
-                'profile[firstName]' => $fName,
-                'profile[lastName]' => $lName,
-            ],
-            'POST',
-            [
-                '_with_csrf' => false,
-            ]
-        );
-    }
-
     protected function sendWeb(string $email, string $amount = '100000000000000000000'): void
     {
         $this->deposit(
@@ -100,20 +81,27 @@ class WebTestCase extends BaseWebTestCase
 
     protected function createToken(Client $client): string
     {
-        $name = $this->generateString();
+        $name = $this->generateString(25);
 
         $client->request('GET', '/token');
 
-        $client->submitForm(
-            'Create token',
-            [
-                'token_create[name]' => $name,
-            ],
-            'POST',
-            [
-                '_with_csrf' => false,
-            ]
-        );
+        $csrfToken = $client->getContainer()->get('security.csrf.token_manager')->getToken('token_create');
+
+        $formHtml = '
+            <form method="post">
+                <input type="text" name="token_create[name]">
+                <input type="text" name="token_create[description]">
+                <input type="text" name="token_create[_token]">
+                <input type="submit" name="Create token" />
+            </form>
+        ';
+        $dom = new Crawler($formHtml, 'http://localhost/token');
+        $form = $dom->selectButton('Create token')->form([
+            'token_create[name]' => $name,
+            'token_create[description]' => str_repeat('a', 200),
+            'token_create[_token]' => $csrfToken,
+        ]);
+        $client->submit($form);
 
         return $name;
     }

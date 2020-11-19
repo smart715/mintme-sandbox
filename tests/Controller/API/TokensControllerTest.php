@@ -15,20 +15,18 @@ class TokensControllerTest extends WebTestCase
         $tokName = $this->createToken($this->client);
 
         $this->client->request('PATCH', '/api/tokens/' . $tokName, [
-            'name' => $tokName . '-foo',
-            'description' => 'description for token',
+            'description' => str_repeat('a', 205),
             'facebookUrl' => 'www.facebook.com/foo',
-            'telegramUrl' => 'www.telegram.com',
-            'discordUrl' => 'www.discord.com',
+            'telegramUrl' => 'https://t.me/joinchat/test',
+            'discordUrl' => 'https://discordapp.com/invite/test',
             'youtubeChannelId' => 'foo-youtube-id',
         ]);
 
         /** @var Token $token */
-        $token = $this->getToken($tokName . '-foo');
+        $token = $this->getToken($tokName);
 
         $this->assertEquals(
             [
-                $token->getName(),
                 $token->getDescription(),
                 $token->getFacebookUrl(),
                 $token->getTelegramUrl(),
@@ -36,11 +34,10 @@ class TokensControllerTest extends WebTestCase
                 $token->getYoutubeChannelId(),
             ],
             [
-                $tokName . '-foo',
-                'description for token',
+                str_repeat('a', 205),
                 'www.facebook.com/foo',
-                'http://www.telegram.com',
-                'http://www.discord.com',
+                'https://t.me/joinchat/test',
+                'https://discordapp.com/invite/test',
                 'foo-youtube-id',
             ]
         );
@@ -131,10 +128,11 @@ class TokensControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res['common']);
-        $this->assertCount(2, $res['predefined']);
+        $this->assertCount(3, $res['predefined']);
         $this->assertArrayHasKey($tokName, $res['common']);
         $this->assertArrayHasKey('WEB', $res['predefined']);
         $this->assertArrayHasKey('BTC', $res['predefined']);
+        $this->assertArrayHasKey('ETH', $res['predefined']);
     }
 
     public function testGetTokenExchange(): void
@@ -176,7 +174,6 @@ class TokensControllerTest extends WebTestCase
     public function testIsTokenExchanged(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-exchanged');
@@ -201,7 +198,6 @@ class TokensControllerTest extends WebTestCase
     public function testIsTokenNotDeployed(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
@@ -227,7 +223,6 @@ class TokensControllerTest extends WebTestCase
     public function testDelete(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var Token $token */
@@ -254,7 +249,6 @@ class TokensControllerTest extends WebTestCase
     public function testSendCode(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var Token $token */
@@ -273,17 +267,14 @@ class TokensControllerTest extends WebTestCase
     public function testGetTopHolders(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $fooClient = static::createClient();
         $fooEmail = $this->register($fooClient);
-        $this->createProfile($fooClient);
         $this->sendWeb($fooEmail);
 
         $barClient = static::createClient();
         $barEmail = $this->register($barClient);
-        $this->createProfile($barClient);
         $this->sendWeb($barEmail);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -316,12 +307,10 @@ class TokensControllerTest extends WebTestCase
     public function testSoldOnMarket(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $fooClient = static::createClient();
         $fooEmail = $this->register($fooClient);
-        $this->createProfile($fooClient);
         $this->sendWeb($fooEmail);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
@@ -411,7 +400,7 @@ class TokensControllerTest extends WebTestCase
 
         $fooClient->request('POST', '/api/tokens/' . $tokName . '/deploy');
 
-        $this->assertEquals($this->client->getResponse()->getStatusCode(), 302);
+        $this->assertEquals($fooClient->getResponse()->getStatusCode(), 400);
     }
 
     public function testDeploy(): void
@@ -438,7 +427,6 @@ class TokensControllerTest extends WebTestCase
     public function testContractUpdateIfCantEdit(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $fooClient = self::createClient();
@@ -446,13 +434,12 @@ class TokensControllerTest extends WebTestCase
 
         $fooClient->request('POST', '/api/tokens/' . $tokName . '/contract/update');
 
-        $this->assertEquals($this->client->getResponse()->getStatusCode(), 302);
+        $this->assertEquals($fooClient->getResponse()->getStatusCode(), 401);
     }
 
     public function testContractUpdateIfNotDeployed(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/tokens/' . $tokName . '/contract/update', [
@@ -465,7 +452,6 @@ class TokensControllerTest extends WebTestCase
     public function testContractUpdate(): void
     {
         $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         /** @var Token $token */
@@ -475,7 +461,7 @@ class TokensControllerTest extends WebTestCase
         $this->em->flush();
 
         $this->client->request('POST', '/api/tokens/' . $tokName . '/contract/update', [
-            'address' => '0x00',
+            'address' => '0x42e07422fa1bce2090912ddbc0717fa44654ef00',
         ]);
 
         $this->em->clear();
