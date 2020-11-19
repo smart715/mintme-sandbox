@@ -47,7 +47,7 @@ class TokenCreateType extends AbstractType
                 ],
                 'required' => true,
             ])
-            ->add('initial_orders', CheckboxType::class,[
+            ->add('initial_orders', CheckboxType::class, [
                 'label' => $this->translator->trans('form.token.initial_order'),
                 'attr' => ['checked' => true],
                 'mapped' => false,

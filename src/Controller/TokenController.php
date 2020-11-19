@@ -9,6 +9,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Factory\OrdersFactoryInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
@@ -210,7 +211,8 @@ class TokenController extends Controller
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         MarketStatusManagerInterface $marketStatusManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        OrdersFactoryInterface $ordersFactory
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
@@ -244,6 +246,9 @@ class TokenController extends Controller
                 );
             }
 
+            /** @var bool $initOrders */
+            $initOrders = $form->get('initial_orders')->getData();
+
             $this->em->beginTransaction();
 
             /** @var User $user */
@@ -270,6 +275,10 @@ class TokenController extends Controller
                     )
                 );
                 $market = $this->marketManager->createUserRelated($user);
+
+                if ($initOrders) {
+                    $ordersFactory->createInitOrders($user, $token);
+                }
 
                 $marketStatusManager->createMarketStatus($market);
 
