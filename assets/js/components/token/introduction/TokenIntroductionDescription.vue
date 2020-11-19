@@ -24,9 +24,9 @@
                                 @click="editingDescription = true"
                             />
                         </span>
-                        <div v-bind:class="{'show-hide-text': showMore}">
+                        <div :class="{'show-hide-text': showMore}">
                             <bbcode-view v-if="!editingDescription" :value="description"/>
-                            <a id="show" class="show" href="#0" @click="show">{{showMessage}}</a>
+                            <a id="show" class="show" href="#0" @click="toggleDescription">{{showMessage}}</a>
                         </div>
                         <template v-if="editable">
                             <div v-show="editingDescription">
@@ -124,12 +124,15 @@ export default {
             newDescription: this.description || '',
             readyToSave: false,
             showMore: true,
-            showMessage: this.$t('read_more'),
+            readMore: this.$t('read_more'),
         };
     },
     computed: {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
+        },
+        showMessage() {
+            return this.showMore ? this.$t('read_more') : this.$t('read_less');
         },
         newDescriptionHtmlDecode: function() {
             return he.decode(this.newDescription);
@@ -147,14 +150,8 @@ export default {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
         },
-        show: function() {
-            if (this.showMore) {
-                this.showMore = false;
-                this.showMessage = this.$t('read_less');
-            } else {
-                this.showMore = true;
-                this.showMessage = this.$t('read_more');
-            }
+        toggleDescription: function() {
+            this.showMore = !this.showMore;
         },
         editDescription: function() {
             this.$v.$touch();
