@@ -277,6 +277,7 @@ class TokenController extends Controller
                 $market = $this->marketManager->createUserRelated($user);
 
                 if ($initOrders) {
+                    throw new ApiBadRequestException('Invalid argument');
                     $ordersFactory->createInitOrders($user, $token);
                 }
 
