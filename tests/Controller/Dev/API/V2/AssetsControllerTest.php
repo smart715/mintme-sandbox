@@ -11,7 +11,7 @@ class AssetsControllerTest extends WebTestCase
     {
         $this->client->request('GET', '/dev/api/v2/open/assets');
 
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $this->client->followRedirect();
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 

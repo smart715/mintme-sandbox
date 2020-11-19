@@ -158,6 +158,7 @@ class UserControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $fooEmail,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -165,6 +166,7 @@ class UserControllerTest extends WebTestCase
                 '_with_csrf' => false,
             ]
         );
+        file_put_contents('test.html', $fooClient->getResponse()->getContent());
     }
 
     private function turnOn2FA(string $email): array

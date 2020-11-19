@@ -45,14 +45,14 @@ class CurrenciesControllerTest extends WebTestCase
         $this->em->persist($keys);
         $this->em->flush();
 
-        $this->client->request('GET', '/dev/api/v1/currencies/WEB', [], [], [
+        $this->client->request('GET', '/dev/api/v1/currencies/MINTME', [], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertEquals(
-            'WEB',
+            'MINTME',
             json_decode((string)$this->client->getResponse()->getContent(), true)['symbol']
         );
     }
