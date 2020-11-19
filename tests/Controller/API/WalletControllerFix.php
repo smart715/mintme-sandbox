@@ -9,9 +9,9 @@ use App\Entity\User;
 use App\Manager\TwoFactorManagerInterface;
 use App\Tests\Controller\WebTestCase;
 
-class WalletControllerTest extends WebTestCase
+class WalletControllerFix extends WebTestCase
 {
-    public function testGetDepositAddressesForCrypto(): void
+    public function estGetDepositAddressesForCrypto(): void
     {
         $this->register($this->client);
         $this->client->request('GET', '/api/wallet/addresses');
@@ -19,9 +19,11 @@ class WalletControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('WEB', $res);
         $this->assertArrayHasKey('BTC', $res);
+        $this->assertArrayHasKey('ETH', $res);
         $this->assertArrayHasKey('TOK', $res);
         $this->assertNotEquals('', $res['WEB']);
         $this->assertNotEquals('', $res['BTC']);
+        $this->assertNotEquals('', $res['ETH']);
         $this->assertNotEquals('', $res['TOK']);
     }
 
@@ -51,10 +53,9 @@ class WalletControllerTest extends WebTestCase
         $this->assertEquals(10000000000000000000, $pendingWithdraw->getAmount()->getAmount()->getAmount());
     }
 
-    public function testWithdrawToken(): void
+    public function estWithdrawToken(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
         $backupCodes = $this->turnOn2FA($email);
@@ -79,19 +80,26 @@ class WalletControllerTest extends WebTestCase
         $this->assertEquals(10000000000000, $pendingWithdraw->getAmount()->getAmount()->getAmount());
     }
 
-    public function testGetDepositFee(): void
+    public function estGetDepositInfo(): void
     {
         $this->register($this->client);
 
-        $this->client->request('GET', '/api/wallet/deposit/WEB/fee');
+        $this->client->request('GET', '/api/wallet/deposit/WEB/info');
 
-        $this->assertEquals(
-            '0.004200000000000000',
-            json_decode((string)$this->client->getResponse()->getContent(), true)
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey(
+            'fee',
+            $res
+        );
+
+        $this->assertArrayHasKey(
+            'minDeposit',
+            $res
         );
     }
 
-    public function testGetReferralBalance(): void
+    public function estGetReferralBalance(): void
     {
         $email = $this->register($this->client);
         /** @var User $user */
@@ -108,6 +116,7 @@ class WalletControllerTest extends WebTestCase
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $fooEmail,
+                'fos_user_registration_form[nickname]' => $this->generateString(),
                 'fos_user_registration_form[plainPassword]' => self::DEFAULT_USER_PASS,
             ],
             'POST',
@@ -137,7 +146,6 @@ class WalletControllerTest extends WebTestCase
             json_decode((string)$this->client->getResponse()->getContent(), true)['balance']
         );
     }
-
 
     private function turnOn2FA(string $email): array
     {
