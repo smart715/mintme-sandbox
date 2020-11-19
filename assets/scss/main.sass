@@ -577,7 +577,6 @@ a
     padding-top: 0.35rem
     padding-bottom: 0.35rem
     vertical-align: middle
-    padding-left: calc(0.75rem + 0.65em)
 
     &:first-child
       padding-left: 1.5rem
@@ -596,6 +595,10 @@ a
 
     img
       height: 22px
+
+  .trading-body
+    td
+      padding-left: calc(0.75rem + 0.65em) !important
 
   .table-orders
     td
@@ -1356,3 +1359,13 @@ li.trade-tab
 
 .input-disabled
   color: #6c757d !important
+
+.nav-envelope-badge
+  border-radius: 50%
+  min-width: 12px
+  height: 12px
+  bottom: 4px
+  left: 12px
+  padding: 1px
+  background-color: red
+  font-size: 8px

@@ -109,6 +109,7 @@
                     <div class="trading-table table-responsive text-nowrap">
                         <b-table
                                 thead-class="trading-head"
+                                tbody-class="trading-body"
                                 :items="tokens"
                                 :fields="fieldsArray"
                                 :sort-compare="sortCompare"

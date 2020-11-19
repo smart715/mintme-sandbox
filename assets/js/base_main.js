@@ -21,6 +21,7 @@ import LocaleSwitcher from './components/LocaleSwitcher';
 import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
+import NavEnvelope from './components/chat/NavEnvelope';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
@@ -86,6 +87,7 @@ new Vue({
         AdminMenu,
         Avatar,
         UserNotification,
+        NavEnvelope,
     },
     methods: {
         toggleNavbarMenu: function() {
