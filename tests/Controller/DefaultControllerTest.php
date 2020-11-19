@@ -51,7 +51,7 @@ class DefaultControllerTest extends WebTestCase
             ['/kb'],
             ['/register/'],
             ['/login'],
-            ['/dev/documentation/v1/'],
+            ['/dev/documentation/v1'],
             ['/privacy-policy'],
             ['/terms-of-service'],
         ];
