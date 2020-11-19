@@ -1,5 +1,6 @@
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import LimitedTextarea from './components/LimitedTextarea';
+import Guide from './components/Guide';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
 import i18n from './utils/i18n/i18n';
@@ -33,6 +34,7 @@ new Vue({
     components: {
         LimitedTextarea,
         FontAwesomeIcon,
+        Guide,
     },
     computed: {
         saveBtnDisabled: function() {
