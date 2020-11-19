@@ -66,7 +66,7 @@ phpfunctional_tests:
     - mintme-docker.abchosting.org
   only:
     # this job only will be executed for branches
-    - update-functional-tests
+    - functional-test
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
 
 build_mintme_sites:
@@ -80,7 +80,7 @@ build_mintme_sites:
   only:
     # this job only will be executed for branches
     - branches
-    
+
 staging_release:
   stage: build-sites
   script:
