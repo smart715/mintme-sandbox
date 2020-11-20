@@ -40,6 +40,8 @@ class OrdersFactory implements OrdersFactoryInterface
 
     private TokenManagerInterface $tokenManager;
 
+    private Money $currentStep;
+
     public function __construct(
         TraderInterface $trader,
         MarketFactoryInterface $marketFactory,
@@ -56,6 +58,7 @@ class OrdersFactory implements OrdersFactoryInterface
         $this->userLogger = $userLogger;
         $this->moneyWrapper = $moneyWrapper;
         $this->tokenManager = $tokenManager;
+        $this->currentStep = $this->moneyWrapper->parse((string)self::INIT_TOKEN_PRICE, MoneyWrapper::TOK_SYMBOL);
     }
 
     public function createInitOrders(User $user): void
@@ -99,14 +102,14 @@ class OrdersFactory implements OrdersFactoryInterface
         );
 
         $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+
         if ($currentPrice) {
-            $priceMultipliedOnStep = $currentPrice->multiply(self::STEP);
-            $substractedPrice = $price->subtract($priceMultipliedOnStep);
+            $this->currentStep = $price->subtract($price->multiply($this->moneyWrapper->format($this->currentStep)));
+            return $currentPrice->add($currentPrice->multiply($this->moneyWrapper->format($this->currentStep)));
+        } else {
+            return $price;
         }
 
-        return $currentPrice
-            ? $substractedPrice
-            : $price;
     }
 
     private function getStepAmount(Token $token): Money
