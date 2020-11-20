@@ -84,7 +84,7 @@ class OrdersFactory implements OrdersFactoryInterface
                 $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
             );
 
-            $this->trader->placeOrder($order);
+            $this->trader->placeOrder($order, false);
         }
 
     }
