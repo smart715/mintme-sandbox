@@ -24,6 +24,7 @@ class OrdersFactory implements OrdersFactoryInterface
     public const INIT_TOKENS_AMOUNT = 1500000;
     public const INIT_TOKENS_STEP_AMOUNT = 15000;
     public const INIT_TOKEN_PRICE = 0.1;
+    public const STEP = 0.01738;
 
     private TraderInterface $trader;
 
@@ -64,10 +65,10 @@ class OrdersFactory implements OrdersFactoryInterface
         $amount = $this->getStepAmount($token);
         $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);
 
-        /* @TODO Check if token has enough amount */
+        $price = null;
 
         for ($i = 0; $i < self::INIT_TOKENS_AMOUNT; $i = $i + self::INIT_TOKENS_STEP_AMOUNT) {
-            $price = $this->getStepPrice(1);
+            $price = $this->getStepPrice($price);
 
             $order = new Order(
                 null,
@@ -89,15 +90,23 @@ class OrdersFactory implements OrdersFactoryInterface
 
     }
 
-    private function getStepPrice($currentPrice): Money
+    private function getStepPrice(?Money $currentPrice): Money
     {
-        $amount = (string) BigDecimal::of(1)->dividedBy(
+        $amount = (string) BigDecimal::of(self::INIT_TOKEN_PRICE)->dividedBy(
             '1',
             4,
             RoundingMode::HALF_DOWN
         );
 
-        return $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+        $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+        if ($currentPrice) {
+            $priceMultipliedOnStep = $currentPrice->multiply(self::STEP);
+            $substractedPrice = $price->subtract($priceMultipliedOnStep);
+        }
+
+        return $currentPrice
+            ? $substractedPrice
+            : $price;
     }
 
     private function getStepAmount(Token $token): Money
