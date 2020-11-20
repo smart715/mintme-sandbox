@@ -10,6 +10,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
@@ -36,13 +37,16 @@ class OrdersFactory implements OrdersFactoryInterface
 
     private MoneyWrapperInterface $moneyWrapper;
 
+    private TokenManagerInterface $tokenManager;
+
     public function __construct(
         TraderInterface $trader,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
         ParameterBagInterface $bag,
         UserActionLogger $userLogger,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        TokenManagerInterface $tokenManager
     ) {
         $this->trader = $trader;
         $this->marketFactory = $marketFactory;
@@ -50,13 +54,15 @@ class OrdersFactory implements OrdersFactoryInterface
         $this->bag = $bag;
         $this->userLogger = $userLogger;
         $this->moneyWrapper = $moneyWrapper;
+        $this->tokenManager = $tokenManager;
     }
 
-    public function createInitOrders(User $user, Token $token): void
+    public function createInitOrders(User $user): void
     {
+        $token = $this->tokenManager->getOwnToken();
         $market = $this->getMintmeMarketForToken($token);
         $amount = $this->getStepAmount($token);
-        $fee = $this->moneyWrapper->parse($this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);
+        $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);
 
         /* @TODO Check if token has enough amount */
 
