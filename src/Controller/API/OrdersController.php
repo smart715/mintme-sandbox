@@ -191,7 +191,6 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        dd($market->getBase());
         return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
     }
 
