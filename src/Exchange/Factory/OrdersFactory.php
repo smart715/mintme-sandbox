@@ -70,7 +70,7 @@ class OrdersFactory implements OrdersFactoryInterface
 
         $price = null;
 
-        for ($i = 0; $i < self::INIT_TOKENS_AMOUNT; $i = $i + self::INIT_TOKENS_STEP_AMOUNT) {
+        for ($i = 0; $i < self::INIT_TOKENS_AMOUNT; $i += self::INIT_TOKENS_STEP_AMOUNT) {
             $price = $this->getStepPrice($price);
 
             $order = new Order(
@@ -90,7 +90,6 @@ class OrdersFactory implements OrdersFactoryInterface
 
             $this->trader->placeOrder($order, false);
         }
-
     }
 
     private function getStepPrice(?Money $currentPrice): Money
@@ -104,12 +103,12 @@ class OrdersFactory implements OrdersFactoryInterface
         $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
 
         if ($currentPrice) {
-            $this->currentStep = $price->subtract($price->multiply($this->moneyWrapper->format($this->currentStep)));
-            return $currentPrice->add($currentPrice->multiply($this->moneyWrapper->format($this->currentStep)));
+            $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
+
+            return $currentPrice->add($this->currentStep);
         } else {
             return $price;
         }
-
     }
 
     private function getStepAmount(Token $token): Money
