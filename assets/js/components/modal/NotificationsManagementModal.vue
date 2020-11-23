@@ -18,7 +18,7 @@
                                 </b-card-text>
                             </b-card>
                         </div>
-                        <template v-for="config in configModel">
+                        <template v-if="!loading" v-for="config in userConfig">
                             <faq-item>
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
@@ -45,11 +45,15 @@
                                 </template>
                             </faq-item>
                         </template>
+                        <div v-if="loading" class="text-center w-100">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </div>
                         <div>
                             <b-card>
                                 <button
                                     class="btn btn-primary float-left"
                                     @click="saveConfig"
+                                    :disabled="loading"
                                 >
                                     {{ $t('save') }}
                                 </button>
@@ -71,8 +75,10 @@
 <script>
 import Modal from './Modal';
 import FaqItem from '../FaqItem';
+import {NotificationMixin, LoggerMixin} from '../../mixins/';
 
 export default {
+    mixins: [NotificationMixin, LoggerMixin],
     name: 'NotificationManagementModal',
     components: {
     Modal,
@@ -81,46 +87,33 @@ export default {
     props: {
         visible: Boolean,
         noClose: Boolean,
+        userConfig: Object,
+        loading: Boolean,
     },
     data() {
         return {
-            userNotificationsConfig: {},
             email: false,
             website: false,
-            configModel: {},
             options: [
                 {text: '', value: 'email'}, // set translation tag
                 {text: '', value: 'website'}, // set translation tag
             ],
         };
     },
-    created() {
-        this.fetchUserNotificationsConfig();
-    },
     methods: {
         saveConfig: function() {
-            let data = this.configModel;
+            let data = this.userConfig;
             this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
                 .then(() => {
-                   /* this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}))*/
-                    this.$t('toasted.success.email_sent');
+                    this.notifySuccess('Configuration updated successfully');
+                    this.$emit('close');
                 })
                 .catch((err) => {
                     this.sendLogs('error', 'Error loading User Notifications channels', err);
-                });
-        },
-        fetchUserNotificationsConfig: function() {
-            this.$axios.retry.get(this.$routing.generate('user_notifications_config'))
-                .then((res) => {
-                    this.userNotificationsConfig = res.data;
-                    this.configModel = res.data;
-                })
-                .catch((err) => {
-                    this.sendLogs('error', 'Error loading User Notifications channels', err);
+                    this.notifyError('Error tag');
                 });
         },
         closeModal: function() {
-            this.configModel = this.userNotificationsConfig;
             this.$emit('close');
         },
     },

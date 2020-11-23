@@ -5,4 +5,5 @@ namespace App\Utils;
 interface NotificationTypesInterface
 {
     public static function getAll(): array;
+    public static function getConfigurable(): array;
 }
