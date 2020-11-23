@@ -8,7 +8,7 @@
                 <div class="contacts-box p-0 px-1 px-lg-0 col-lg-3">
                     <contacts-box
                         :nickname="nickname"
-                        :threads="threads"
+                        :threads-prop="threads"
                         :thread-id-prop="threadId"
                     />
                 </div>

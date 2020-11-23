@@ -2,7 +2,7 @@ const storage = {
     namespaced: true,
     state: {
         contactName: null,
-        currentThreadId: null,
+        currentThreadId: 0,
     },
     getters: {
         getContactName: function(state) {

@@ -31,11 +31,12 @@ export default {
     props: {
         nickname: String,
         threadIdProp: Number,
-        threads: Array,
+        threadsProp: Array,
     },
     data() {
         return {
             showContactsListWidget: false,
+            threads: {},
         };
     },
     components: {
@@ -57,7 +58,7 @@ export default {
         participants: function() {
             let participants = {};
 
-            this.threads.forEach((thread) => {
+            Object.values(this.threads).forEach((thread) => {
                 thread.metadata.forEach((metadata) => {
                     if (metadata.participant.profile.nickname === this.nickname) {
                         return;
@@ -67,6 +68,7 @@ export default {
                         ...metadata.participant,
                         threadId: thread.id,
                         lastMessageTimestamp: thread.lastMessageTimestamp,
+                        hasUnreadMessages: thread.hasUnreadMessages,
                     };
                 });
             });
@@ -83,6 +85,7 @@ export default {
                         avatar: participant.profile.image.avatar_middle,
                         threadId: participant.threadId,
                         lastMessageTimestamp: participant.lastMessageTimestamp,
+                        hasUnreadMessages: participant.hasUnreadMessages,
                     };
                 });
 
@@ -98,6 +101,11 @@ export default {
             'setContactName',
             'setCurrentThreadId',
         ]),
+        initThreads: function() {
+            this.threadsProp.forEach((thread) => {
+                this.$set(this.threads, thread.id, thread);
+            });
+        },
         changeChat: function(threadId, updateUrl = true) {
             if (this.threadId === threadId) {
                 return;
@@ -110,6 +118,7 @@ export default {
             }
 
             if (threadId > 0) {
+                this.$set(this.threads[threadId], 'hasUnreadMessages', false);
                 this.setContactName(this.contacts[threadId].nickname);
             }
 
@@ -133,6 +142,8 @@ export default {
         },
     },
     mounted() {
+        this.initThreads();
+
         if (this.threadIdProp > 0) {
             this.changeChat(this.threadIdProp, false);
         }

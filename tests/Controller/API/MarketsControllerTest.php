@@ -15,7 +15,7 @@ class MarketsControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(2, $res);
+        $this->assertCount(3, $res);
         $this->assertEquals(
             [
                 $res[0]['base']['symbol'],
@@ -23,11 +23,17 @@ class MarketsControllerTest extends WebTestCase
                 $res[0]['identifier'],
                 $res[1]['base']['symbol'],
                 $res[1]['quote']['symbol'],
+                $res[1]['identifier'],
+                $res[2]['base']['symbol'],
+                $res[2]['quote']['symbol'],
             ],
             [
                 'BTC',
                 'WEB',
                 'WEBBTC',
+                'ETH',
+                'WEB',
+                'WEBETH',
                 'WEB',
                 $tokName,
             ]

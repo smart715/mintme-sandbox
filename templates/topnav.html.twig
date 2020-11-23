@@ -28,7 +28,10 @@
         </a>
         <div>
             {% if show_links %}
-                <user-notification class="d-lg-none float-left small-bell"></user-notification>
+                <div class="d-lg-none float-left d-flex align-items-center">
+                    <user-notification class="small-bell mx-xs-1 mx-sm-2"></user-notification>
+                    <nav-envelope class="mx-xs-1 mx-sm-2" href="{{ path('chat') }}"></nav-envelope>
+                </div>
             {% endif %}
             <button
                     class="navbar-toggler"
@@ -110,6 +113,9 @@
                     <li class="align-self-center c-pointer desktop-notification-bell">
                         <user-notification></user-notification>
                     </li>
+                    <li class="align-self-center c-pointer d-none d-lg-flex">
+                        <nav-envelope href="{{ path('chat') }}"></nav-envelope>
+                    </li>
                 {% endif %}
                 {% if not app.user %}
                     <li class="nav-item align-self-center {{ route == 'fos_user_security_login' ? 'active' : '' }}">
@@ -143,11 +149,6 @@
                         <li class="nav-item align-self-center d-lg-none {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}">
                             <a href="{{ path('settings') }}" class="nav-link">
                                 <span>{% trans %}navbar.settings{% endtrans %}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item align-self-center d-lg-none {{ route == 'chat' ? 'active' : '' }}">
-                            <a href="{{ path('chat') }}" class="nav-link">
-                                <span>{% trans %}navbar.direct_messages{% endtrans %}</span>
                             </a>
                         </li>
                         {% if app.user.profile.token %}
@@ -207,10 +208,6 @@
                                     <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
                                         <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
                                         {% trans %}navbar.settings{% endtrans %}
-                                    </a>
-                                    <a class="dropdown-item {{ route == 'chat' ? 'active' : '' }}" href="{{ path('chat') }}">
-                                        <span class="icon-chat fa fa-envelope float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        {% trans %}navbar.direct_messages{% endtrans %}
                                     </a>
                                     {% if app.user.profile.token %}
                                         <a class="dropdown-item" href="{{ path('token_show_modal') }}">
