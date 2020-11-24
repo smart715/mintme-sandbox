@@ -9,6 +9,10 @@ export default class CustomFormatter {
      * @return {string} String with interpolated translation
      */
     interpolate(translation, context) {
+        if ('string' !== typeof translation) {
+            return String(translation);
+        }
+
         let result = translation
             .replaceAll('&#039;', '\'')
             .replaceAll('&quot;', '"')
