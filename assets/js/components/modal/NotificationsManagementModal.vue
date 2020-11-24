@@ -2,22 +2,22 @@
     <div>
         <modal
             :visible="visible"
+            :noClose="noClose"
             :without-padding="true"
-            @close="fetchUserNotificationsConfig"
+            @close="closeModal"
         >
-            <template slot="header"> Notifications Settings</template>
-            <template slot="close"></template>
+            <template slot="header"> {{ $t('userNotification.config.settings') }} </template>
             <template slot="body">
                 <div class="p-0">
                     <div class="row faq-block mx-0 border-bottom border-top">
                         <div>
                             <b-card>
                                 <b-card-text>
-                                    Receive notifications about:
+                                    {{ $t('userNotification.config.receive_not_about') }}
                                 </b-card-text>
                             </b-card>
                         </div>
-                        <template v-if="!loading" v-for="config in userConfig">
+                        <template v-if="!loading" v-for="config in userConfigModel">
                             <faq-item>
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
@@ -58,7 +58,7 @@
                                 </button>
                                 <button
                                     class="btn btn-primary float-left ml-2"
-                                    @click="closeModal"
+                                    @click="$emit('close')"
                                 >
                                     {{ $t('cancel') }}
                                 </button>
@@ -98,6 +98,7 @@ export default {
             loading: false,
             saving: false,
             userConfig: {},
+            userConfigModel: {},
         };
     },
     mounted() {
@@ -109,6 +110,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('user_notifications_config'))
                 .then((res) => {
                     this.userConfig = res.data;
+                    this.userConfigModel = JSON.parse(JSON.stringify(this.userConfig));
                     this.loading = false;
                 })
                 .catch((err) => {
@@ -118,9 +120,10 @@ export default {
         },
         saveConfig: function() {
             this.saving = true;
-            let data = this.userConfig;
+            let data = this.userConfigModel;
             this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
                 .then(() => {
+                    this.fetchUserNotificationsConfig();
                     this.saving = false;
                     this.notifySuccess('Configuration updated successfully');
                     this.$emit('close');
@@ -132,7 +135,8 @@ export default {
                 });
         },
         closeModal: function() {
-            this.visible = false;
+            this.$emit('close');
+            this.userConfigModel = JSON.parse(JSON.stringify(this.userConfig));
         },
     },
 };

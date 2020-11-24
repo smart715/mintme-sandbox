@@ -59,16 +59,16 @@
                     </div>
                 </div>
                 <div class="card card-featured mt-3">
-                    <div class="card-header">{% trans %}userNotification.title{% endtrans %}</div>
+                    <div class="card-header">{% trans %}userNotification.config.title{% endtrans %}</div>
                     <div class="card-body m-0">
                         <notifications-management-modal
                             :visible="visible"
-                            :noClose="false"
+                            :noClose="true"
                             @close="visible = false"
                         >
                         </notifications-management-modal>
                         <button @click="notificationModalToggle()" class="btn btn-primary btn-block">
-                            {% trans %}userNotification.manage{% endtrans %}
+                            {% trans %}userNotification.config.manage{% endtrans %}
                         </button>
                     </div>
                 </div>
