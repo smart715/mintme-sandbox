@@ -478,7 +478,7 @@ new_post.msg: '%tokenName% created new post. Read it <a href="%urlToken%/posts">
 deployed.msg: '%tokenName% has been deployed to the blockchain! Visit <a href="%urlToken%">token page</a>.'
 no_orders.msg: 'There are no sell orders on the market of your token %tokenName%. <a href="%urlToken%/trade">Please add them</a>.'
 userNotification.title: 'Notifications'
-userNotification.any_notifications_yet: 'Any notifications yet.'
+userNotification.no_notifications_yet: 'No notifications yet.'
 userNotification.config.settings: 'Notifications Settings'
 userNotification.config.receive_not_about: 'Receive notifications about:'
 userNotification.config.title: 'Notifications'
