@@ -2,9 +2,8 @@
     <div>
         <modal
             :visible="visible"
-            :no-close="noClose"
             :without-padding="true"
-            @close="closeModal"
+            @close="fetchUserNotificationsConfig"
         >
             <template slot="header"> Notifications Settings</template>
             <template slot="close"></template>
@@ -53,7 +52,7 @@
                                 <button
                                     class="btn btn-primary float-left"
                                     @click="saveConfig"
-                                    :disabled="loading"
+                                    :disabled="saving"
                                 >
                                     {{ $t('save') }}
                                 </button>
@@ -87,8 +86,6 @@ export default {
     props: {
         visible: Boolean,
         noClose: Boolean,
-        userConfig: Object,
-        loading: Boolean,
     },
     data() {
         return {
@@ -98,23 +95,44 @@ export default {
                 {text: '', value: 'email'}, // set translation tag
                 {text: '', value: 'website'}, // set translation tag
             ],
+            loading: false,
+            saving: false,
+            userConfig: {},
         };
     },
+    mounted() {
+        this.fetchUserNotificationsConfig();
+    },
     methods: {
+        fetchUserNotificationsConfig: function() {
+            this.loading = true;
+            this.$axios.retry.get(this.$routing.generate('user_notifications_config'))
+                .then((res) => {
+                    this.userConfig = res.data;
+                    this.loading = false;
+                })
+                .catch((err) => {
+                    this.loading = false;
+                    this.sendLogs('error', 'Error loading User Notifications channels', err);
+                });
+        },
         saveConfig: function() {
+            this.saving = true;
             let data = this.userConfig;
             this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
                 .then(() => {
+                    this.saving = false;
                     this.notifySuccess('Configuration updated successfully');
                     this.$emit('close');
                 })
                 .catch((err) => {
+                    this.saving = false;
                     this.sendLogs('error', 'Error loading User Notifications channels', err);
                     this.notifyError('Error tag');
                 });
         },
         closeModal: function() {
-            this.$emit('close');
+            this.visible = false;
         },
     },
 };

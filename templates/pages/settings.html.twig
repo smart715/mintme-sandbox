@@ -61,10 +61,15 @@
                 <div class="card card-featured mt-3">
                     <div class="card-header">{% trans %}userNotification.title{% endtrans %}</div>
                     <div class="card-body m-0">
-                        <notification-management></notification-management>
-                       {# <span @click="notificationModalToggle()" class="btn btn-primary btn-block">
+                        <notifications-management-modal
+                            :visible="visible"
+                            :noClose="false"
+                            @close="visible = false"
+                        >
+                        </notifications-management-modal>
+                        <button @click="notificationModalToggle()" class="btn btn-primary btn-block">
                             {% trans %}userNotification.manage{% endtrans %}
-                        </span>#}
+                        </button>
                     </div>
                 </div>
             </div>
