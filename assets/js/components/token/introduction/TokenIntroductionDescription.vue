@@ -140,9 +140,6 @@ export default {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
         },
-        showReadButton: function(){
-            return this.$refs['hide-text'].offsetHeight >=400 ? true : false;
-        },
         showMessage() {
             return this.showMore ? this.$t('read_more') : this.$t('read_less');
         },
