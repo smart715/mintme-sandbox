@@ -189,7 +189,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         }
 
         return $this->forward(
-            'twoFactorAuth',
+            'App\Controller\UserController::twoFactorAuth',
             ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }
