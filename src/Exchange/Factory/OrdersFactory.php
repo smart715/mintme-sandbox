@@ -103,9 +103,6 @@ class OrdersFactory implements OrdersFactoryInterface
         $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
 
         if ($currentPrice) {
-            $curdentStep = $this->moneyWrapper->format($this->currentStep);
-            $curdentStepMULTIPLYonPercent = $this->moneyWrapper->format($this->currentStep->multiply(self::STEP));
-            $result = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
             $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
 
             return $currentPrice->add($this->currentStep);
