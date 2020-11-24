@@ -175,7 +175,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             $parameters['backupCodes'] = $request->get('backupCodes');
             $parameters['formHeader'] = 'Two-Factor authentication backup codes';
 
-            return $this->render('security/2fa_manager.html.twig', $parameters);
+            return $this->addDownloadCodesToResponse($this->render('security/2fa_manager.html.twig', $parameters));
         }
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -188,8 +188,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return $this->redirectToRoute('settings');
         }
 
-        return $this->redirectToRoute(
-            'two_factor_auth',
+        return $this->forward(
+            'twoFactorAuth',
             ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }
