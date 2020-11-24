@@ -24,9 +24,11 @@
                                 @click="editingDescription = true"
                             />
                         </span>
-                        <div :class="{'show-hide-text': showMore}">
-                            <bbcode-view v-if="!editingDescription" :value="description"/>
-                            <a id="show" class="show" href="#0" @click="toggleDescription">{{showMessage}}</a>
+                        <div id="description-text">                
+                            <div :class="{'show-hide-text': showMore}" ref="hide-text">
+                                <bbcode-view v-if="!editingDescription" :value="description" />
+                                <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
+                            </div>
                         </div>
                         <template v-if="editable">
                             <div v-show="editingDescription">
@@ -125,11 +127,21 @@ export default {
             readyToSave: false,
             showMore: true,
             readMore: this.$t('read_more'),
+            show: '',
+            height: null,
         };
+    },
+    mounted: function () {
+        this.$nextTick(function () {
+           this.height = this.$refs['hide-text'].offsetHeight;
+        })
     },
     computed: {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
+        },
+        showReadButton: function(){
+            return this.$refs['hide-text'].offsetHeight >=400 ? true : false;
         },
         showMessage() {
             return this.showMore ? this.$t('read_more') : this.$t('read_less');
