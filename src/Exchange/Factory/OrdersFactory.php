@@ -65,12 +65,12 @@ class OrdersFactory implements OrdersFactoryInterface
     {
         $token = $this->tokenManager->getOwnToken();
         $market = $this->getMintmeMarketForToken($token);
-        $amount = $this->getStepAmount($token);
+        $amount = $this->getStepAmount();
         $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);
 
         $price = null;
 
-        for ($i = 0; $i < self::INIT_TOKENS_AMOUNT; $i += self::INIT_TOKENS_STEP_AMOUNT) {
+        for ($i = 0; $i <= self::INIT_TOKENS_AMOUNT; $i += self::INIT_TOKENS_STEP_AMOUNT) {
             $price = $this->getStepPrice($price);
 
             $order = new Order(
@@ -103,6 +103,9 @@ class OrdersFactory implements OrdersFactoryInterface
         $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
 
         if ($currentPrice) {
+            $curdentStep = $this->moneyWrapper->format($this->currentStep);
+            $curdentStepMULTIPLYonPercent = $this->moneyWrapper->format($this->currentStep->multiply(self::STEP));
+            $result = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
             $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
 
             return $currentPrice->add($this->currentStep);
@@ -111,7 +114,7 @@ class OrdersFactory implements OrdersFactoryInterface
         }
     }
 
-    private function getStepAmount(Token $token): Money
+    private function getStepAmount(): Money
     {
         $amount = (string) BigDecimal::of(self::INIT_TOKENS_STEP_AMOUNT)->dividedBy(
             '1',
