@@ -61,9 +61,14 @@ class OrdersFactory implements OrdersFactoryInterface
         $this->currentStep = $this->moneyWrapper->parse((string)self::INIT_TOKEN_PRICE, MoneyWrapper::TOK_SYMBOL);
     }
 
-    public function createInitOrders(User $user): void
+    public function createInitOrders(Token $token): void
     {
-        $token = $this->tokenManager->getOwnToken();
+        $user = $token->getOwner();
+
+        if (!$user) {
+            throw new \LogicException();
+        }
+
         $market = $this->getMintmeMarketForToken($token);
         $amount = $this->getStepAmount();
         $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);

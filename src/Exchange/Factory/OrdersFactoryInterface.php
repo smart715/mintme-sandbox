@@ -7,5 +7,5 @@ use App\Entity\User;
 
 interface OrdersFactoryInterface
 {
-    public function createInitOrders(User $user): void;
+    public function createInitOrders(Token $token): void;
 }

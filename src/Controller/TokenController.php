@@ -277,7 +277,7 @@ class TokenController extends Controller
                 $market = $this->marketManager->createUserRelated($user);
 
                 if ($initOrders) {
-                    $ordersFactory->createInitOrders($user);
+                    $ordersFactory->createInitOrders($token);
                 }
 
                 $marketStatusManager->createMarketStatus($market);
