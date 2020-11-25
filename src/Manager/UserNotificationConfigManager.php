@@ -7,6 +7,7 @@ use App\Entity\UserNotificationConfig;
 use App\Repository\UserNotificationConfigRepository;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
+use App\Utils\NotificationTypesInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,13 +19,18 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
     /** @var UserNotificationConfigRepository */
     private UserNotificationConfigRepository $userNotificationConfigRepository;
 
+    /** @var NotificationTypesInterface */
+    private NotificationTypesInterface $notificationTypes;
+
 
     public function __construct(
         EntityManagerInterface $em,
-        UserNotificationConfigRepository $userNotificationConfigRepository
+        UserNotificationConfigRepository $userNotificationConfigRepository,
+        NotificationTypesInterface $notificationTypes
     ) {
         $this->em = $em;
         $this->userNotificationConfigRepository = $userNotificationConfigRepository;
+        $this->notificationTypes = $notificationTypes;
     }
 
     public function getUserNotificationsConfig(User $user): ?array
@@ -36,7 +42,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         $defaultConfig = [];
 
         foreach ($notificationTypes as $nType) {
-            $defaultConfig[$nType]['text'] = NotificationTypes::getText()[$nType];
+            $defaultConfig[$nType]['text'] = $this->notificationTypes->getText()[$nType];
 
             foreach ($notificationChannels as $nChannel) {
                 $defaultConfig[$nType]['channels'][$nChannel]['text'] = ucfirst($nChannel);

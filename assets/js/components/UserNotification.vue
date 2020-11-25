@@ -42,7 +42,7 @@
                           <NotificationType :notification="notification"/>
                       </div>
                       <div v-if="!hasNotifications" class="text-center notification-body">
-                          {{ $t('userNotification.any_notifications_yet') }}
+                          {{ $t('userNotification.no_notifications_yet') }}
                       </div>
                   </template>
                   <template v-else>

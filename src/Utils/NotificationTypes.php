@@ -2,8 +2,18 @@
 
 namespace App\Utils;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 class NotificationTypes implements NotificationTypesInterface
 {
+    /** @var TranslatorInterface */
+    private TranslatorInterface $translations;
+
+    public function __construct(TranslatorInterface $translations)
+    {
+        $this->translations = $translations;
+    }
+
     public const DEPOSIT = 'deposit';
     public const WITHDRAWAL = 'withdrawal';
     public const NEW_INVESTOR = 'new_investor';
@@ -34,16 +44,16 @@ class NotificationTypes implements NotificationTypesInterface
             self::TOKEN_DEPLOYED,
         ];
     }
-    public static function getText(): array
+    public function getText(): array
     {
         return [
-            self::DEPOSIT => 'Deposits',
-            self::WITHDRAWAL => 'Withdrawals',
-            self::NEW_INVESTOR => 'New Investors',
-            self::TOKEN_NEW_POST => 'Posts related to token you own',
-            self::TOKEN_DEPLOYED => 'Deployments related to token you own',
-            self::ORDER_FILLED => 'Orders filled',
-            self::ORDER_CANCELLED => 'Orders Cancelled',
+            self::DEPOSIT => $this->translations->trans('userNotification.type.deposits'),
+            self::WITHDRAWAL => $this->translations->trans('userNotification.type.withdrawals'),
+            self::NEW_INVESTOR => $this->translations->trans('userNotification.type.new_investors'),
+            self::TOKEN_NEW_POST => $this->translations->trans('userNotification.type.token_new_post'),
+            self::TOKEN_DEPLOYED => $this->translations->trans('userNotification.type.token_deployment'),
+            self::ORDER_FILLED => $this->translations->trans('userNotification.type.order_filled'),
+            self::ORDER_CANCELLED => $this->translations->trans('userNotification.type.order_cancelled'),
         ];
     }
 }
