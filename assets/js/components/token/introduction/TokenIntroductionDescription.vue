@@ -24,7 +24,7 @@
                                 @click="editingDescription = true"
                             />
                         </span>
-                        <div id="description-text">                
+                        <div id="description-text">
                             <div :class="{'show-hide-text': showMore}" ref="hide-text">
                                 <bbcode-view v-if="!editingDescription" :value="description" />
                                 <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
@@ -131,10 +131,10 @@ export default {
             height: null,
         };
     },
-    mounted: function () {
-        this.$nextTick(function () {
+    mounted: function() {
+        this.$nextTick(function() {
            this.height = this.$refs['hide-text'].offsetHeight;
-        })
+        });
     },
     computed: {
         showEditIcon: function() {
