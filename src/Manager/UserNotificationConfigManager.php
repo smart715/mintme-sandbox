@@ -76,20 +76,30 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         foreach ($newConfig as $type => $nConfig) {
             foreach ($nConfig['channels'] as $channel => $channelConfig) {
                 if ($channelConfig['value']) {
-                    $this->createUserNotificationConfig($type, $channel, $user);
+                    $newConfig = (new UserNotificationConfig())
+                        ->setType($type)
+                        ->setChannel($channel)
+                        ->setUser($user);
+                    $this->em->persist($newConfig);
+                    $this->em->flush();
                 }
             }
         }
     }
 
-    private function createUserNotificationConfig(String $type, String $channel, User $user): void
+    public function initializeUserNotificationConfig(User $user): void
     {
-
-        $newConfig= (new UserNotificationConfig())
-            ->setType($type)
-            ->setChannel($channel)
-            ->setUser($user);
-        $this->em->persist($newConfig);
-        $this->em->flush();
+        $notificationTypes = NotificationTypes::getConfigurable();
+        $notificationChannels = NotificationChannels::getAll();
+        foreach($notificationTypes as $nType) {
+            foreach ($notificationChannels as $nChannel) {
+                $newConfig = (new UserNotificationConfig())
+                    ->setType($nType)
+                    ->setChannel($nChannel)
+                    ->setUser($user);
+                $this->em->persist($newConfig);
+                $this->em->flush();
+            }
+        }
     }
 }

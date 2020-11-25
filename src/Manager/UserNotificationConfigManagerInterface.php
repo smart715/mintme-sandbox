@@ -14,4 +14,5 @@ interface UserNotificationConfigManagerInterface
         User $user,
         Request $request
     ): void;
+    public function initializeUserNotificationConfig(User $user): void;
 }

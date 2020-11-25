@@ -139,4 +139,8 @@ class UserNotificationManager implements UserNotificationManagerInterface
         $userNotification->setViewed(false);
         $this->em->persist($userNotification);
     }
+
+    private function isNotifcationAvailable(User $user, String $type) {
+
+    }
 }
