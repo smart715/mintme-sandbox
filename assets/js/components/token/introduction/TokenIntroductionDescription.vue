@@ -170,7 +170,7 @@ export default {
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.type === 'attributes') {
-                        let {height}  = box.style;
+                        let {height} = box.style;
                         vm.height = height;
                     }
                 });
@@ -239,9 +239,6 @@ export default {
         description: function(val) {
             this.newDescription = val;
         },
-        height: function(){
-            this.height = this.$refs['hide-text'].clientHeight;
-        }
     },
 };
 </script>
