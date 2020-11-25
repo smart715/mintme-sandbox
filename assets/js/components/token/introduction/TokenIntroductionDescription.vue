@@ -25,7 +25,7 @@
                             />
                         </span>
                         <div id="description-text">
-                            <div :class="{'show-hide-text': showMore}" ref="hide-text">
+                            <div :class="{'show-hide-text': showMore}" ref="hide-text" >
                                 <bbcode-view v-if="!editingDescription" :value="description" />
                                 <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
                             </div>
@@ -129,11 +129,16 @@ export default {
             readMore: this.$t('read_more'),
             show: '',
             height: null,
+            observer: null,
         };
     },
     mounted: function() {
-        this.$nextTick(function() {
-           this.height = this.$refs['hide-text'].offsetHeight;
+    this.$nextTick()
+        .then(() => {
+            const box = this.$refs['hide-text'],
+            boxSize = box.getBoundingClientRect();
+            this.height = Math.trunc(boxSize.height) + "px";
+            this.initObserver();
         });
     },
     computed: {
@@ -154,7 +159,28 @@ export default {
             };
         },
     },
+    beforeDestroy() {
+        if (this.observer) this.observer.disconnect();
+     },
     methods: {
+        initObserver() {
+            const box = this.$refs['hide-text'],
+                vm = this,
+                config = {
+                attributes: true
+                };
+
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.type === "attributes") {
+                        let  {height}  = box.style;
+                        vm.height = height;
+                    }
+                });
+            });
+            observer.observe(box, config);
+            this.observer = observer;
+         },
         onDescriptionChange: function(val) {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
@@ -216,6 +242,9 @@ export default {
         description: function(val) {
             this.newDescription = val;
         },
+        height: function(){
+            this.height = this.$refs['hide-text'].clientHeight;
+        }
     },
 };
 </script>
