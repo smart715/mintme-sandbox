@@ -164,7 +164,7 @@ export default {
      },
     methods: {
         initObserver() {
-            const box = this.$refs['hide-text'],
+            const box = this.$refs['hide-text'];
             const vm = this;
             const config = {attributes: true};
             const observer = new MutationObserver(function(mutations) {
