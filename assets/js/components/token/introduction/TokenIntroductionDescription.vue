@@ -135,9 +135,9 @@ export default {
     mounted: function() {
     this.$nextTick()
         .then(() => {
-            const box = this.$refs['hide-text'],
-            boxSize = box.getBoundingClientRect();
-            this.height = Math.trunc(boxSize.height) + "px";
+            const box = this.$refs['hide-text'];
+            const boxSize = box.getBoundingClientRect();
+            this.height = Math.trunc(boxSize.height) + 'px';
             this.initObserver();
         });
     },
@@ -165,15 +165,12 @@ export default {
     methods: {
         initObserver() {
             const box = this.$refs['hide-text'],
-                vm = this,
-                config = {
-                attributes: true
-                };
-
-            const observer = new MutationObserver(function (mutations) {
-                mutations.forEach(function (mutation) {
-                    if (mutation.type === "attributes") {
-                        let  {height}  = box.style;
+            const vm = this;
+            const config = {attributes: true};
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes') {
+                        let {height}  = box.style;
                         vm.height = height;
                     }
                 });
