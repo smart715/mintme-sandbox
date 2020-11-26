@@ -129,6 +129,7 @@ export default {
             readMore: this.$t('read_more'),
             show: '',
             height: 0,
+            resizeObserver: null,
         };
     },
     mounted: function() {
