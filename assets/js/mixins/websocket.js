@@ -109,7 +109,7 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            this.sendLogs('errorTEST', message, result.error);
+            this.sendLogs('errorTEST', message, 'result.error');
         },
     },
 };
