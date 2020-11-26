@@ -12,7 +12,7 @@ use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
-use App\Utils\NotificationType;
+use App\Utils\NotificationTypes;
 use App\Wallet\WalletInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -159,7 +159,7 @@ class WalletController extends Controller
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, NotificationType::WITHDRAWAL),
+            new UserNotificationEvent($user, NotificationTypes::WITHDRAWAL),
             UserNotificationEvent::NAME
         );
 

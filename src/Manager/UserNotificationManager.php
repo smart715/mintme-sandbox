@@ -8,28 +8,34 @@ use App\Entity\UserToken;
 use App\Exception\ApiBadRequestException;
 use App\Mailer\MailerInterface;
 use App\Repository\UserNotificationRepository;
+use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserNotificationManager implements UserNotificationManagerInterface
 {
     /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
     /** @var UserNotificationRepository */
-    private $userNotificationRepository;
+    private UserNotificationRepository $userNotificationRepository;
 
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    /** @var UserNotificationConfigManagerInterface */
+    private UserNotificationConfigManagerInterface $notificationConfigManager;
+
     public function __construct(
         EntityManagerInterface $em,
         UserNotificationRepository $userNotificationRepository,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        UserNotificationConfigManagerInterface $notificationConfigManager
     ) {
         $this->em = $em;
         $this->userNotificationRepository =  $userNotificationRepository;
         $this->mailer = $mailer;
+        $this->notificationConfigManager = $notificationConfigManager;
     }
 
     public function createNotification(
@@ -49,10 +55,15 @@ class UserNotificationManager implements UserNotificationManagerInterface
                     'tokenName' => $tokenName,
                 ], JSON_THROW_ON_ERROR);
 
-                $this->newUserNotification($notificationType, $userWithToken, $jsonData);
-                NotificationTypes::TOKEN_NEW_POST === $notificationType ?
-                    $this->mailer->sendNewPostMail($userWithToken, $tokenName) :
-                    $this->mailer->sendTokenDeployedMail($userWithToken, $tokenName);
+                if ($this->isNotificationAvailable($user, $notificationType, NotificationChannels::EMAIL)) {
+                    $this->newUserNotification($notificationType, $userWithToken, $jsonData);
+                }
+
+                if ($this->isNotificationAvailable($user, $notificationType, NotificationChannels::WEBSITE)) {
+                    NotificationTypes::TOKEN_NEW_POST === $notificationType ?
+                        $this->mailer->sendNewPostMail($userWithToken, $tokenName) :
+                        $this->mailer->sendTokenDeployedMail($userWithToken, $tokenName);
+                }
             }
 
             $this->em->flush();
@@ -74,10 +85,16 @@ class UserNotificationManager implements UserNotificationManagerInterface
                     $extraData,
                     JSON_THROW_ON_ERROR
                 );
-                $this->mailer->sendNewInvestorMail($user, $extraData['profile']);
+
+                if ($this->isNotificationAvailable($user, $notificationType, NotificationChannels::EMAIL)) {
+                    $this->mailer->sendNewInvestorMail($user, $extraData['profile']);
+                }
             }
 
-            $this->newUserNotification($notificationType, $user, $jsonData);
+            if ($this->isNotificationAvailable($user, $notificationType, NotificationChannels::WEBSITE)) {
+                $this->newUserNotification($notificationType, $user, $jsonData);
+            }
+
             $this->em->flush();
         }
     }
@@ -140,7 +157,25 @@ class UserNotificationManager implements UserNotificationManagerInterface
         $this->em->persist($userNotification);
     }
 
-    private function isNotifcationAvailable(User $user, String $type) {
+    public function isNotificationAvailable(User $user, String $type, String $channel): Bool
+    {
+        $userConfig = $this->notificationConfigManager->getUserNotificationsConfig($user);
+        $isAvailable = false;
 
+        foreach ($userConfig as $index => $uConfig) {
+            $isAvailable = false;
+
+            if (NotificationTypes::ORDER_FILLED === $type || NotificationTypes::ORDER_CANCELLED === $type) {
+                $isAvailable = true;
+            }
+
+            if ($index === $type && true === $uConfig['channels'][$channel]['value']) {
+                $isAvailable = true;
+
+                break;
+            }
+        }
+
+        return $isAvailable;
     }
 }

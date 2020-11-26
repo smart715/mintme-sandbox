@@ -92,7 +92,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
      * @Rest\Post("/update-notifications-config", name="update_notifications_config", options={"expose"=true})
      * @Rest\View()
      * @param Request $request
-     * @return Reponse
+     * @return Response
      */
     public function updateUserNotificationsConfig(Request $request): Response
     {

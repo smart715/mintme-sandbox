@@ -694,7 +694,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->eventDispatcher->dispatch(
             new UserNotificationEvent(
                 $user,
-                NotificationTypes::TOKEN_DEPLOYED_NOTIFICATION
+                NotificationTypes::TOKEN_DEPLOYED
             ),
             UserNotificationEvent::NAME
         );

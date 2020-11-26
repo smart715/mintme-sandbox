@@ -5,7 +5,6 @@ namespace App\Controller\Dev\API\V1\User;
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
@@ -14,6 +13,7 @@ use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\NotificationTypes;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -265,7 +265,7 @@ class WalletController extends DevApiController
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
+            new UserNotificationEvent($user, NotificationTypes::WITHDRAWAL),
             UserNotificationEvent::NAME
         );
 

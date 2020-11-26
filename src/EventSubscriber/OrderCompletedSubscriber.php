@@ -105,7 +105,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
 
                 if (!$userSellOrdersSummary) {
-                    $notificationType = NotificationType::ORDER_CANCELLED;
+                    $notificationType = NotificationTypes::ORDER_CANCELLED;
                     $this->scheduledNotificationManager->createScheduledNotification(
                         $notificationType,
                         $currentUser

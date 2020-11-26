@@ -18,7 +18,7 @@
                             </b-card>
                         </div>
                         <template v-if="!loading" v-for="config in userConfigModel">
-                            <faq-item>
+                            <faq-item v-if="config.show" :key="config">
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
                                         <div class="mb-2">
@@ -89,12 +89,6 @@ export default {
     },
     data() {
         return {
-            email: false,
-            website: false,
-            options: [
-                {text: '', value: 'email'}, // set translation tag
-                {text: '', value: 'website'}, // set translation tag
-            ],
             loading: false,
             saving: false,
             userConfig: {},

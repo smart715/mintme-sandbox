@@ -43,6 +43,11 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
         foreach ($notificationTypes as $nType) {
             $defaultConfig[$nType]['text'] = $this->notificationTypes->getText()[$nType];
+            $defaultConfig[$nType]['show'] = true;
+
+            if (NotificationTypes::NEW_INVESTOR === $nType && null === $user->getProfile()->getToken()) {
+                $defaultConfig[$nType]['show'] = false;
+            }
 
             foreach ($notificationChannels as $nChannel) {
                 $defaultConfig[$nType]['channels'][$nChannel]['text'] = ucfirst($nChannel);
@@ -91,15 +96,17 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
     {
         $notificationTypes = NotificationTypes::getConfigurable();
         $notificationChannels = NotificationChannels::getAll();
-        foreach($notificationTypes as $nType) {
+
+        foreach ($notificationTypes as $nType) {
             foreach ($notificationChannels as $nChannel) {
                 $newConfig = (new UserNotificationConfig())
                     ->setType($nType)
                     ->setChannel($nChannel)
                     ->setUser($user);
                 $this->em->persist($newConfig);
-                $this->em->flush();
             }
         }
+
+        $this->em->flush();
     }
 }
