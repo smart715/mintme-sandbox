@@ -25,7 +25,7 @@
                             />
                         </span>
                         <div id="description-text">
-                            <div :class="{'show-hide-text': showMore}" ref="hide-text" >
+                            <div :class="{'show-hide-text': showMore}" ref="hide" >
                                 <bbcode-view v-if="!editingDescription" :value="description" />
                                 <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
                             </div>
@@ -128,18 +128,18 @@ export default {
             showMore: true,
             readMore: this.$t('read_more'),
             show: '',
-            height: null,
-            observer: null,
+            height: 0,
         };
     },
     mounted: function() {
     this.$nextTick()
         .then(() => {
-            const box = this.$refs['hide-text'];
-            const boxSize = box.getBoundingClientRect();
-            this.height = Math.trunc(boxSize.height) + 'px';
-            this.initObserver();
+            this.resizeObserver = new ResizeObserver(this.updateHeight.bind(this));
+            this.resizeObserver.observe(this.$refs.hide);
         });
+    },
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
     },
     computed: {
         showEditIcon: function() {
@@ -159,28 +159,17 @@ export default {
             };
         },
     },
-    beforeDestroy() {
-        if (this.observer) this.observer.disconnect();
-     },
     methods: {
-        initObserver() {
-            const box = this.$refs['hide-text'];
-            const vm = this;
-            const config = {attributes: true};
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'attributes') {
-                        let {height} = box.style;
-                        vm.height = height;
-                    }
-                });
-            });
-            observer.observe(box, config);
-            this.observer = observer;
-         },
         onDescriptionChange: function(val) {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
+        },
+        updateHeight() {
+            let styles = window.getComputedStyle(this.$refs.hide, null);
+            let height = parseFloat(styles.getPropertyValue('height'));
+            let topPadding = parseFloat(styles.getPropertyValue('padding-top'));
+            let bottomPadding = parseFloat(styles.getPropertyValue('padding-bottom'));
+            this.height = height - topPadding - bottomPadding;
         },
         toggleDescription: function() {
             this.showMore = !this.showMore;
