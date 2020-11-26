@@ -83,7 +83,7 @@ class TransactionSubscriber implements EventSubscriberInterface
             );
 
             if ($isAvailableEmailNotification) {
-                $this->mailer->sendTransactionCompletedMail($user, $notificationType);
+                $this->mailer->sendTransactionCompletedMail($user, $event::TYPE);
                 $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
             }
         } catch (\Throwable $e) {
