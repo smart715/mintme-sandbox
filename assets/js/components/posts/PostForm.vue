@@ -100,7 +100,7 @@ export default {
             content: this.post.content,
             amount: toMoney(this.post.amount),
             minContentLength: 2,
-            maxContentLength: 1000,
+            maxContentLength: 500,
             maxDecimals: 4,
             maxAmount: 999999.9999,
             contentError: false,
