@@ -106,8 +106,8 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            if (result.error !== null ||
-                (result.result !== null && result.result.status !== 'success')) {
+            if (null != result.error ||
+                (null != result.result  && null != result.result.status  && 'success' !== result.result.status)) {
                     let errorStatus = result.error || result.result.status;
                     this.sendLogs('error', message, errorStatus);
             }
