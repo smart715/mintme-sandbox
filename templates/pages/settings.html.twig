@@ -62,12 +62,12 @@
                     <div class="card-header">{% trans %}userNotification.config.title{% endtrans %}</div>
                     <div class="card-body m-0">
                         <notifications-management-modal
-                            :visible="visible"
-                            :noClose="true"
-                            @close="visible = false"
+                            :notification-config-modal-visible="notificationConfigModalVisible"
+                            :no-close="true"
+                            @close="notificationConfigModalVisible = false"
                         >
                         </notifications-management-modal>
-                        <button @click="notificationModalToggle()" class="btn btn-primary btn-block">
+                        <button @click="notificationConfigModalToggle()" class="btn btn-primary btn-block">
                             {% trans %}userNotification.config.manage{% endtrans %}
                         </button>
                     </div>

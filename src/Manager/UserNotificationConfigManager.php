@@ -9,7 +9,6 @@ use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use App\Utils\NotificationTypesInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class UserNotificationConfigManager implements UserNotificationConfigManagerInterface
 {
@@ -52,14 +51,14 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
             foreach ($notificationChannels as $nChannel) {
                 $defaultConfig[$nType]['channels'][$nChannel]['text'] = ucfirst($nChannel);
                 $defaultConfig[$nType]['channels'][$nChannel]['value'] = false;
-
-                foreach ($userNotificationConfig as $unc) {
-                    $type = $unc->getType();
-                    $channel = $unc->getChannel();
-                    $defaultConfig[$type]['channels'][$channel]['text'] = ucfirst($channel);
-                    $defaultConfig[$type]['channels'][$channel]['value'] = true;
-                }
             }
+        }
+
+        foreach ($userNotificationConfig as $unc) {
+            $type = $unc->getType();
+            $channel = $unc->getChannel();
+            $defaultConfig[$type]['channels'][$channel]['text'] = ucfirst($channel);
+            $defaultConfig[$type]['channels'][$channel]['value'] = true;
         }
 
         return $defaultConfig;
@@ -67,9 +66,9 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
 
     public function updateUserNotificationsConfig(
         User $user,
-        Request $request
+        array $configToStore
     ): void {
-        $newConfig = $request->request->all();
+
         $userConfigStored = $this->userNotificationConfigRepository->getUserNotificationsConfig($user);
 
         if ($userConfigStored) {
@@ -78,7 +77,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
             }
         }
 
-        foreach ($newConfig as $type => $nConfig) {
+        foreach ($configToStore as $type => $nConfig) {
             foreach ($nConfig['channels'] as $channel => $channelConfig) {
                 if ($channelConfig['value']) {
                     $newConfig = (new UserNotificationConfig())
@@ -86,10 +85,11 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
                         ->setChannel($channel)
                         ->setUser($user);
                     $this->em->persist($newConfig);
-                    $this->em->flush();
                 }
             }
         }
+
+        $this->em->flush();
     }
 
     public function initializeUserNotificationConfig(User $user): void
@@ -108,5 +108,10 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         }
 
         $this->em->flush();
+    }
+
+    public function getOneUserNotificationConfig(User $user, string $type, string $channel): ?array
+    {
+        return $this->userNotificationConfigRepository->getOneUserNotificationsConfig($user, $type, $channel);
     }
 }

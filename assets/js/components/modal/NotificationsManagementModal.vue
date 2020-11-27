@@ -1,7 +1,7 @@
 <template>
     <div>
         <modal
-            :visible="visible"
+            :visible="notificationConfigModalVisible"
             :noClose="noClose"
             :without-padding="true"
             @close="closeModal"
@@ -17,8 +17,8 @@
                                 </b-card-text>
                             </b-card>
                         </div>
-                        <template v-if="!loading" v-for="config in userConfigModel">
-                            <faq-item v-if="config.show" :key="config">
+                        <template v-if="!loading && config.show" v-for="config in userConfigModel">
+                            <faq-item :key="config">
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
                                         <div class="mb-2">
@@ -28,7 +28,8 @@
                                                 class="float-right"
                                                 size="lg"
                                                 name="check-button"
-                                                switch>
+                                                switch
+                                            >
                                             </b-form-checkbox>
                                         </div>
                                         <div class="mb-2">
@@ -38,7 +39,8 @@
                                                 class="float-right"
                                                 size="lg"
                                                 name="check-button"
-                                                switch>
+                                                switch
+                                            >
                                             </b-form-checkbox>
                                         </div>
                                 </template>
@@ -80,11 +82,11 @@ export default {
     mixins: [NotificationMixin, LoggerMixin],
     name: 'NotificationManagementModal',
     components: {
-    Modal,
-    FaqItem,
+        Modal,
+        FaqItem,
     },
     props: {
-        visible: Boolean,
+        notificationConfigModalVisible: Boolean,
         noClose: Boolean,
     },
     data() {

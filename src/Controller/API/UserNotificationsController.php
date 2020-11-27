@@ -23,22 +23,22 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     private const NOTIFICATION_LIMIT = 90;
 
     /** @var UserManagerInterface */
-    protected $userManager;
+    protected UserManagerInterface $userManager;
 
     /** @var UserNotificationManagerInterface */
-    private $userNotificationManager;
+    private UserNotificationManagerInterface $userNotificationManager;
 
     /** @var UserNotificationConfigManagerInterface */
-    private $userNotificationsConfig;
+    private UserNotificationConfigManagerInterface $userNotificationsConfigManager;
 
     public function __construct(
         UserManagerInterface $userManager,
         UserNotificationManagerInterface $userNotificationManager,
-        UserNotificationConfigManagerInterface $userNotificationsConfig
+        UserNotificationConfigManagerInterface $userNotificationsConfigManager
     ) {
         $this->userManager = $userManager;
         $this->userNotificationManager = $userNotificationManager;
-        $this->userNotificationsConfig = $userNotificationsConfig;
+        $this->userNotificationsConfigManager = $userNotificationsConfigManager;
     }
 
     /**
@@ -73,7 +73,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     }
 
     /**
-     * @Rest\Get("/user-notifications-config", name="user_notifications_config", options={"expose"=true})
+     * @Rest\Get("/config", name="user_notifications_config", options={"expose"=true})
      * @Rest\View()
      * @return View
      */
@@ -83,13 +83,13 @@ class UserNotificationsController extends AbstractFOSRestController implements T
         $user = $this->getUser();
 
         return $this->view(
-            $this->userNotificationsConfig->getUserNotificationsConfig($user),
+            $this->userNotificationsConfigManager->getUserNotificationsConfig($user),
             Response::HTTP_OK
         );
     }
 
     /**
-     * @Rest\Post("/update-notifications-config", name="update_notifications_config", options={"expose"=true})
+     * @Rest\Post("/config/update", name="update_notifications_config", options={"expose"=true})
      * @Rest\View()
      * @param Request $request
      * @return Response
@@ -99,7 +99,9 @@ class UserNotificationsController extends AbstractFOSRestController implements T
         /** @var User $user */
         $user = $this->getUser();
 
-        $this->userNotificationsConfig->updateUserNotificationsConfig($user, $request);
+        $configToStore = $request->request->all();
+
+        $this->userNotificationsConfigManager->updateUserNotificationsConfig($user, $configToStore);
 
         return new Response(Response::HTTP_OK);
     }

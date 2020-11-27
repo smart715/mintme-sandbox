@@ -159,23 +159,12 @@ class UserNotificationManager implements UserNotificationManagerInterface
 
     public function isNotificationAvailable(User $user, String $type, String $channel): Bool
     {
-        $userConfig = $this->notificationConfigManager->getUserNotificationsConfig($user);
-        $isAvailable = false;
-
-        foreach ($userConfig as $index => $uConfig) {
-            $isAvailable = false;
-
-            if (NotificationTypes::ORDER_FILLED === $type || NotificationTypes::ORDER_CANCELLED === $type) {
-                $isAvailable = true;
-            }
-
-            if ($index === $type && true === $uConfig['channels'][$channel]['value']) {
-                $isAvailable = true;
-
-                break;
-            }
+        if (NotificationTypes::ORDER_FILLED === $type || NotificationTypes::ORDER_CANCELLED === $type) {
+            return true;
         }
 
-        return $isAvailable;
+        $userConfig = $this->notificationConfigManager->getOneUserNotificationConfig($user, $type, $channel);
+
+        return null !== $userConfig;
     }
 }

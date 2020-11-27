@@ -22,18 +22,15 @@ new Vue({
         twoFaVisible: false,
         code: '',
         showErrorMessage: false,
-        visible: false,
+        notificationConfigModalVisible: false,
     },
     mounted() {
         this.passwordInput = document.getElementById('app_user_change_password_plainPassword');
         this.eyeIcon = document.querySelector('.show-password');
     },
     methods: {
-        closeModal: function() {
-            this.visible = false;
-        },
-        notificationModalToggle: function() {
-            this.visible = !this.visible;
+        notificationConfigModalToggle: function() {
+            this.notificationConfigModalVisible = !this.notificationConfigModalVisible;
         },
         submit2FA: function() {
             this.doCheckStoredUserPassword();

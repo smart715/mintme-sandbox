@@ -22,6 +22,18 @@ class UserNotificationConfigRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function getOneUserNotificationsConfig(User $user, string $type, string $channel): ?array
+    {
+        return $this->createQueryBuilder('unc')
+            ->where('unc.user = :user')
+            ->andWhere('unc.type = :type')
+            ->andWhere('unc.channel = :channel')
+            ->setParameter('user', $user)
+            ->setParameter('type', $type)
+            ->setParameter('channel', $channel)
+            ->getQuery()
+            ->getResult();
+    }
 
     public function deleteUserNotificationsConfig(int $userNotificationConfigId): int
     {
