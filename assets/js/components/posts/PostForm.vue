@@ -32,6 +32,7 @@
                     :value="content"
                     @change="onContentChange"
                     @input="onContentChange"
+                    ref="input"
                 />
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
@@ -202,6 +203,9 @@ export default {
         reset() {
             this.content = '';
             this.amount = '0';
+            this.$nextTick(() => {
+                this.$refs.input.$el.dispatchEvent(new Event('input'));
+            });
         },
         cancel() {
             this.$emit('cancel');
