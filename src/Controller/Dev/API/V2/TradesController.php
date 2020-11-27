@@ -2,12 +2,12 @@
 
 namespace App\Controller\Dev\API\V2;
 
-use App\Controller\Traits\BaseQuoteOrderTrait;
 use App\Exception\ApiNotFoundException;
 use App\Exchange\Market\MarketFinderInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -20,9 +20,6 @@ use Swagger\Annotations as SWG;
  */
 class TradesController extends AbstractFOSRestController
 {
-
-    use BaseQuoteOrderTrait;
-
     private MarketHandlerInterface $marketHandler;
     private MarketFinderInterface $marketFinder;
     private RebrandingConverterInterface $rebrandingConverter;
@@ -55,7 +52,6 @@ class TradesController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
      * @Security(name="")
-     * @return mixed[]
      */
     public function getTrades(string $market_pair): array
     {
@@ -73,7 +69,7 @@ class TradesController extends AbstractFOSRestController
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $market = $this->reverseBaseQuote($market);
+        $market = BaseQuote::reverseMarket($market);
 
         return array_map(function ($order) {
             $rebrandedOrder = $this->rebrandingConverter->convertOrder($order);

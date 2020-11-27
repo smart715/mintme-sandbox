@@ -4,12 +4,12 @@
             <div class="text-center">
                 <div class="text-left">
                     <div class="text-left d-inline-block ml-api">
-                        Your public key:<br />
+                        {{ $t('api_keys.public_key') }}<br />
                             <span class="text-danger word-break">{{ keys.publicKey }}</span>
                             <copy-link class="code-copy c-pointer ml-2" id="pub-copy-btn" :content-to-copy="keys.publicKey">
                                 <font-awesome-icon :icon="['far', 'copy']"></font-awesome-icon>
                             </copy-link><br />
-                        Your private key:<br />
+                            {{ $t('api_keys.private_key') }}<br />
                             <div v-if="keys.plainPrivateKey">
                                 <template>
                                     <span class="text-danger word-break">{{ keys.plainPrivateKey }}</span>
@@ -23,36 +23,35 @@
                             </div>
                             <div v-else>
                                 <template>
-                                    <span class="text-white-50">** hidden **</span>
+                                    <span class="text-white-50">{{ $t('api_clients.hidden') }}</span>
                                 </template>
                             </div>
                     </div>
                 </div>
                <span v-show="keys.plainPrivateKey" class="small">
-                    (Copy this key, you will not able to see it again after reload)
-                </span>
+                 {{ $t('api_keys.private_key_note') }}
+               </span>
             </div>
-            <p>Invalidate your API keys:</p>
+            <p>{{ $t('api_keys.invalidate.label') }}</p>
             <button
                 class="btn btn-primary c-pointer"
                 @click="toggleInvalidateModal(true)"
             >
-                Invalidate
+                {{ $t('api_keys.invalidate') }}
             </button>
         </template>
         <template v-else>
-            <p>Generate your API keys:</p>
+            <p>{{ $t('api_keys.generate.label') }}</p>
             <button
                 class="btn btn-primary c-pointer"
                 @click="generate"
             >
-                Generate
+                {{ $t('api_keys.generate.submit') }}
             </button>
         </template>
         <confirm-modal :visible="invalidateModal" @confirm="invalidate" @close="toggleInvalidateModal(false)">
             <p class="text-white modal-title pt-2">
-                Are you sure you want to invalidate your API keys.
-                Currently running applications will not work. Continue?
+              <span v-html="this.$t('api_keys.invalidate.note')"></span>
             </p>
         </confirm-modal>
     </div>
@@ -86,7 +85,7 @@
                 return this.$axios.single.post(this.$routing.generate('post_keys'))
                     .then((res) => this.keys = res.data)
                     .catch((err) => {
-                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.notifyError(this.$t('toasted.error.try_reload'));
                         this.sendLogs('error', 'Can not generate API Keys', err);
                     });
             },
@@ -97,7 +96,7 @@
                         this.toggleInvalidateModal(false);
                     })
                     .catch((err) => {
-                        this.notifyError('Something went wrong. Try to reload the page.');
+                        this.notifyError(this.$t('toasted.error.try_reload'));
                         this.sendLogs('error', 'Can not invalidate API Keys', err);
                     });
             },

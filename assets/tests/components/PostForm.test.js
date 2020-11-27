@@ -8,6 +8,11 @@ import Vuelidate from 'vuelidate';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuelidate);
+    localVue.use({
+        install(Vue, options) {
+            Vue.prototype.$t = (val) => val;
+        },
+    });
     return localVue;
 }
 

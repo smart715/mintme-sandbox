@@ -1,3 +1,4 @@
+{% if is_granted('trading') %}
 <div class="container-fluid px-0">
     <div class="container-fluid px-0">
         <div class="row justify-content-center">
@@ -7,9 +8,9 @@
                         <div class="donation-header text-left">
                             <span>
                                 {% if app.user %}
-                                    Donate
+                                    {% trans %}donation.header.logged{% endtrans %}
                                 {% else %}
-                                    To make a donation you have to be logged in
+                                    {% trans %}donation.header.not_logged{% endtrans %}
                                 {% endif %}
                             </span>
                         </div>
@@ -19,39 +20,39 @@
                                     <div>
                                         <div>
                                             <p class="info">
-                                                Donation is non-refundable
+                                                {% trans %}donation.nonrefund{% endtrans %}
                                             </p>
                                         </div>
                                         <div class="row">
                                             <div class="col">
                                                 <p class="mb-2">
-                                                    Currency
+                                                    {% trans %}donation.currency{% endtrans %}
                                                 </p>
                                                 <div id="donation_currency" class="dropdown btn-group b-dropdown">
                                                     <button type="button" class="btn dropdown-toggle btn-primary">
-                                                        Select currency
+                                                        {% trans %}donation.currency.select{% endtrans %}
                                                     </button>
                                                     <ul role="menu" tabindex="-1" class="dropdown-menu">
                                                         <li role="presentation">
                                                             <a
-                                                                value="WEB"
+                                                                value="{% trans %}mintme{% endtrans %}"
                                                                 role="menuitem"
                                                                 target="_self"
                                                                 href="#"
                                                                 class="dropdown-item"
                                                             >
-                                                                MINTME
+                                                                {% trans %}mintme{% endtrans %}
                                                             </a>
                                                         </li>
                                                         <li role="presentation">
                                                             <a
-                                                                value="BTC"
+                                                                value="{% trans %}btc{% endtrans %}"
                                                                 role="menuitem"
                                                                 target="_self"
                                                                 href="#"
                                                                 class="dropdown-item"
                                                             >
-                                                                BTC
+                                                                {% trans %}btc{% endtrans %}
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -90,3 +91,8 @@
         </div>
     </div>
 </div>
+{% else %}
+<div class="h1 text-center pt-5 mt-5">
+    {% trans %}trade.page.disabled{% endtrans %}
+</div>
+{% endif %}

@@ -14,6 +14,7 @@ function mockVue() {
         install(Vue) {
             Vue.prototype.$axios = {single: axios};
             Vue.prototype.$routing = $routing;
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -51,13 +52,14 @@ describe('TokenYoutubeAddress', () => {
             stubs: ['b-tooltip'],
             mocks: {
                 $routing,
+                $t: (val)=> val,
             },
             propsData: propsForTestCorrectlyRenders,
         });
         expect(wrapper.vm.computedChannel).toBe('https://www.youtube.com/channel/testChannelId');
 
         wrapper.vm.currentChannelId = false;
-        expect(wrapper.vm.computedChannel).toBe('Add Youtube channel');
+        expect(wrapper.vm.computedChannel).toBe('token.youtube.empty_address');
     });
 
     it('should set youtube url correctly when the function buildYoutubeUrl() is called', () => {

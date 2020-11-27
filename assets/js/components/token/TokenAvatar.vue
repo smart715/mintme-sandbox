@@ -35,6 +35,8 @@
                 @updated-youtube="$emit('updated-youtube')"
                 @updated-discord="$emit('updated-discord')"
                 @updated-telegram="$emit('updated-telegram')"
+                :show-token-edit-modal-prop="showTokenEditModal"
+                :disabled-services-config="disabledServicesConfig"
             />
             <token-deploy-icon
                 class="ml-2 token-deploy-icon"
@@ -91,6 +93,8 @@ export default {
         tokenWebsite: String,
         telegramUrl: String,
         discordUrl: String,
+        showTokenEditModal: Boolean,
+        disabledServicesConfig: String,
     },
     components: {
         Avatar,

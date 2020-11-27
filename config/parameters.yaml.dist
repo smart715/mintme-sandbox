@@ -164,6 +164,15 @@ parameters:
     telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
     facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
 
+    # coinify parameters
+    coinify_api_url: 'https://app-api.sandbox.coinify.com'
+    coinify_ui_url: 'https://trade-ui.sandbox.coinify.com'
+    coinify_api_timeout: 0.1
+    coinify_partner_id: 135
+    coinify_crypto_currencies:
+        - BTC
+        - ETH
+
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
     # Example for ETH and BTC:
@@ -171,3 +180,50 @@ parameters:
     #     - ETH
     #     - BTC
     blockchain_disabled: null
+
+    # Disables processing deposits and deposit buttons in wallet. Remember to restart deposit consumer after changing this
+    disable_deposits: false
+
+    # Disables processing withdrawals and withdraw buttons in wallet
+    disable_withdrawals: false
+
+    # Disables deploying tokens to blockchain
+    disable_deploy_tokens: false
+
+    # Disables creating trades and creating new tokens
+    disable_new_trades: false
+
+    # Disables trade page completely and disables creating new tokens
+    disable_trading: false
+
+    # Disables all main functionality:
+    #     processing deposits and deposit buttons in wallet, withdrawals and btns, deploying tokens to blockchain,
+    #     creating trades and creating new tokens, trade page completely and disables creating new tokens
+    disable_all: false
+
+    # Prefixes for security access_control.
+    # For add additional language just add slash + lang
+    # (for ex.: if you want to add USA(us) you need to add /us| . Should be like '/us|/ru|/uk|/es|/ar|/pt|/fr|/pl|\s*'
+    # if you want to remove lang, just remove /{language_prefix}|
+    translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
+    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # Flag value should be in ISO 3166-1-alpha-2 code of a country.
+    # Check this https://www.iso.org/obp/ui/#search/code/
+    # To disable language selector menu you need to remove all languages except en or just set this var to ~
+    translation_flags:
+        en: {label: English, flag: gb}
+        es: {label: Español, flag: es}
+        ru: {label: Русский, flag: ru}
+        ua: {label: Українська, flag: ua}
+        pl: {label: Polski, flag: pl}
+        ar: {label: العربية, flag: ae}
+        pt: {label: Portugues, flag: pt}
+        fr: {label: Française, flag: fr}
+
+    #time Interval for scheduled notifications
+    time_intervals: [10, 1440, 43200]
+
+    # min amount of a specific tokens to start DM the owner
+    dm_min_amount: 100
+

@@ -5,7 +5,6 @@ import axios from 'axios';
 import Vuex from 'vuex';
 import {webSymbol, btcSymbol, tokSymbol, MINTME} from '../../js/utils/constants';
 
-
 /**
  * @return {Wrapper<Vue>}
  */
@@ -16,9 +15,11 @@ function mockVue() {
     localVue.component('b-dropdown-item', {});
     localVue.use({
         install(Vue, options) {
+            Vue.prototype.$sanitize = (val) => val;
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -56,17 +57,19 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
+                    quote: {name: 'foo'},
                     identifier: 'bar',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
-        expect(wrapper.vm.dropdownText).toBe('Select currency');
+        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
         expect(wrapper.vm.isCurrencySelected).toBe(false);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('Donations');
+        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
     });
 
@@ -77,13 +80,14 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: false,
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.vm.dropdownText).toBe('Select currency');
-        expect(wrapper.find('.donation-header span').text()).toBe('To make a donation, you have to sign up or log in');
+        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
+        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.not_logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(false);
     });
 
@@ -94,16 +98,19 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
-        expect(wrapper.vm.dropdownText).toBe('Select currency');
+        expect(wrapper.vm.dropdownText).toBe('donation.currency.select');
         expect(wrapper.vm.isCurrencySelected).toBe(false);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('Donations');
+        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
         // Select WEB
@@ -128,8 +135,11 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -150,8 +160,11 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -169,8 +182,11 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -195,12 +211,13 @@ describe('Donation', () => {
                 loggedIn: true,
                 donationParams: {fee: .01},
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                     base: {
                         subunit: 4,
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -228,8 +245,11 @@ describe('Donation', () => {
                     minBtcAmount: 0.000001,
                     minMintmeAmount: 0.0001,
                 },
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -268,7 +288,7 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: false,
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                     base: {
                         subunit: 4,
                     },
@@ -278,6 +298,7 @@ describe('Donation', () => {
                     minMintmeAmount: 0.0001,
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -311,8 +332,11 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 donationParams: {fee: .01},
-                market: {quote: 'tok1'},
+                market: {
+                    quote: {name: 'foo'},
+                },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -338,9 +362,10 @@ describe('Donation', () => {
                     fee: .01,
                 },
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -371,6 +396,7 @@ describe('Donation', () => {
                         symbol: webSymbol,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK00011122233',
                     },
                 },
@@ -379,6 +405,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -414,10 +441,12 @@ describe('Donation', () => {
                         symbol: webSymbol,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK00011122233',
                     },
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -457,6 +486,7 @@ describe('Donation', () => {
                         subunit: 4,
                     },
                     quote: {
+                        name: 'foo',
                         symbol: 'TOK3333322221111',
                     },
                 },
@@ -465,6 +495,7 @@ describe('Donation', () => {
                     minMintmeAmount: '0.0001',
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 
@@ -490,9 +521,10 @@ describe('Donation', () => {
             propsData: {
                 loggedIn: true,
                 market: {
-                    quote: 'tok1',
+                    quote: {name: 'foo'},
                 },
                 websocketUrl: '',
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
             },
         });
 

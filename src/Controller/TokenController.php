@@ -13,6 +13,7 @@ use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
+use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
@@ -20,6 +21,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
@@ -92,11 +94,11 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/{tab}",
+     * @Route("/{name}/{tab}/{modal}",
      *     name="token_show",
-     *     defaults={"tab" = "intro"},
+     *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|posts"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -104,12 +106,21 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
+        ?string $modal,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
-        LimitOrderConfig $orderConfig
+        LimitOrderConfig $orderConfig,
+        DisabledServicesConfig $disabledServicesConfig
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo())) {
+        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        if ('donate' === $tab) {
+            return $this->redirectToRoute('token_show', [
+                'name' => $name,
+                'tab' => 'buy',
+            ]);
         }
 
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
@@ -178,11 +189,14 @@ class TokenController extends Controller
                 '',
             'precision' => $this->getParameter('token_precision'),
             'isTokenPage' => true,
+            'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
             'userAlreadyClaimed' => $airdropCampaignManager
                 ->checkIfUserClaimed($user, $token),
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
+            'showTokenEditModal' => 'settings' === $modal,
+            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
         ]);
     }
 
@@ -194,7 +208,8 @@ class TokenController extends Controller
         Request $request,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
-        MarketStatusManagerInterface $marketStatusManager
+        MarketStatusManagerInterface $marketStatusManager,
+        MailerInterface $mailer
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
@@ -218,6 +233,9 @@ class TokenController extends Controller
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('new-trades');
+            $this->denyAccessUnlessGranted('trading');
+
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
                     ['blacklisted' => true, 'message' => 'Forbidden token name, please try another'],
@@ -235,6 +253,8 @@ class TokenController extends Controller
             );
             $this->em->persist($token);
             $this->em->flush();
+
+            $mailer->sendKnowledgeBaseMail($user, $token);
 
             try {
                 /** @var User $user*/
@@ -313,7 +333,15 @@ class TokenController extends Controller
         return $response;
     }
 
-    private function redirectToOwnToken(?string $showtab = 'trade'): RedirectResponse
+    /**
+     * @Route("/show/settings", name="token_show_modal", options={"expose"=true})
+     */
+    public function showModal(): Response
+    {
+        return $this->redirectToOwnToken('intro', 'settings');
+    }
+
+    private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
         $token = $this->tokenManager->getOwnToken();
 
@@ -326,6 +354,7 @@ class TokenController extends Controller
         return $this->redirectToRoute('token_show', [
             'name' => $tokenDashed,
             'tab' => $showtab,
+            'modal' => $showTokenEditModal,
         ]);
     }
 

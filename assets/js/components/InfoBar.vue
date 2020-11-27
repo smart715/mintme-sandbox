@@ -2,59 +2,59 @@
     <div id="info-panel" class="position-relative">
         <div class="p-2">
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Username login/email">
-                <b>Login:</b>  {{ username || 'guest' }}
+                <b>{{ $t('info_bar.login.title') }}</b>  {{ username || 'guest' }}
             </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Token name">
-                <b>Token:</b> {{ infoData.tokenName || '-' }}
+                <b>{{ $t('info_bar.token.title') }}</b> {{ infoData.tokenName || '-' }}
             </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="MintMe balance">
-                <b>MINTME:</b> {{ mintmeBalance }}
+                <b>{{ $t('info_bar.mintme.title') }}</b> {{ mintmeBalance }}
             </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Etherium balance">
-                <b>ETH:</b> {{ ethBalance }}
+                <b>{{ $t('info_bar.eth.title') }}</b> {{ ethBalance }}
             </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
-                <b>BTC:</b> {{ btcBalance }}
+                <b>{{ $t('info_bar.btc.title') }}</b> {{ btcBalance }}
             </span>
             <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
-                <b>Code:</b> {{ authCode }}
+                <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
-            <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">Toggle</b-button>
+            <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
             <div class="close-btn p-sm-2" @click="close">
                 <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
             </div>
         </div>
         <b-collapse visible id="collapse-3">
             <div class="p-2">
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of panel">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.panel')">
                     <b>Pg:</b> {{ infoData.panelBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of deposit gateway">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.deposit')">
                     <b>Dg:</b> {{ infoData.depositBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of contract gateway">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.contract')">
                     <b>Cg:</b> {{ infoData.contractBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Branch of withdraw gateway">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.branch.withdraw')">
                     <b>Wg:</b> {{ infoData.withdrawBranch }}
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of token-contract-gateway">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.contract')">
                     <b>Tcg:</b>
                     <span :class="[infoData.isTokenContractActive ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of deposit consumer">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.deposit')">
                     <b>Dcg:</b>
                     <span :class="[infoData.consumersInfo.deposit ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of withdraw consumer">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.withdraw')">
                     <b>Wcg:</b>
                     <span :class="[infoData.consumersInfo.payment ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of market consumer">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.market')">
                     <b>Mcg:</b>
                     <span :class="[infoData.consumersInfo.market ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of deploy token consumer">
+                <span class="pr-2 pr-sm-5" v-b-tooltip.hover :title="this.$t('info_bar.status.deploy')">
                     <b>Dtcg:</b>
                     <span :class="[infoData.consumersInfo.deploy ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
@@ -97,6 +97,7 @@ export default {
                 WEB: null,
                 BTC: null,
             },
+            interval: null,
         };
     },
     mounted() {
@@ -107,7 +108,7 @@ export default {
 
         if (this.username) {
             this.fetchBalance();
-            setInterval(this.fetchBalance, 10000);
+            this.interval = setInterval(this.fetchBalance, 10000);
         }
     },
     computed: {
@@ -129,9 +130,12 @@ export default {
                 });
         },
         close: function() {
-            this.$axios.retry.get(this.$routing.generate('hacker-toggle-info-bar'));
-            let panel = document.getElementById('info-panel');
-            panel.style.display = 'none';
+            this.$axios.retry.get(this.$routing.generate('hacker-toggle-info-bar')).catch(() => {});
+            if (this.interval) {
+                clearInterval(this.interval);
+            }
+            this.$el.parentElement.removeChild(this.$el);
+            this.$destroy();
         },
     },
 };

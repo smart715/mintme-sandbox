@@ -17,13 +17,15 @@ function mockVue() {
         install(Vue) {
             Vue.prototype.$axios = {single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
+            Vue.prototype.$toasted = {show: (val) => val};
         },
     });
     return localVue;
 }
 
 let propsForTestCorrectlyRenders = {
-    description: 'fooDescription',
+    description: 'a'.repeat(200),
     editable: true,
     name: 'fooName',
  };
@@ -43,16 +45,18 @@ describe('TokenIntroductionDescription', () => {
             stubs: {
                 Guide: {template: '<div><slot name="body"></slot></div>'},
             },
+            mocks: {$t: (val) => propsForTestCorrectlyRenders.name + val},
         });
-        expect(wrapper.vm.newDescription).toBe('fooDescription');
-        expect(wrapper.html()).toContain('About your plan:');
-        expect(wrapper.html()).toContain('fooDescription');
+        expect(wrapper.vm.newDescription).toBe('a'.repeat(200));
+        expect(wrapper.html()).toContain('token.intro.description.plan.header');
+        expect(wrapper.html()).toContain('a'.repeat(200));
         expect(wrapper.html()).toContain('fooName');
     });
 
     it('should compute showEditIcon correctly', () => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         wrapper.setProps({editable: true});
         expect(wrapper.vm.showEditIcon).toBe(true);
@@ -65,6 +69,7 @@ describe('TokenIntroductionDescription', () => {
         propsForTestCorrectlyRenders.description = '&lt;&gt;';
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         propsForTestCorrectlyRenders.description = 'fooDescription';
         expect(wrapper.vm.newDescriptionHtmlDecode).toBe('<>');
@@ -73,6 +78,7 @@ describe('TokenIntroductionDescription', () => {
     it('should watch for description prop', (done) => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         wrapper.setProps({description: 'foo'});
         Vue.nextTick(() => {
@@ -84,6 +90,7 @@ describe('TokenIntroductionDescription', () => {
     it('should set newDescription and readyToSave correctly when the function onDescriptionChange() is called', () => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         wrapper.vm.readyToSave = false;
         wrapper.vm.onDescriptionChange('foo');
@@ -94,6 +101,7 @@ describe('TokenIntroductionDescription', () => {
     it('should be false when newDescription data is incorrect', () => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         wrapper.vm.newDescription = '';
         wrapper.vm.$v.$touch();
@@ -112,8 +120,9 @@ describe('TokenIntroductionDescription', () => {
     it('should be true when newDescription data is correct', () => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
-        wrapper.vm.newDescription = 'foobar';
+        wrapper.vm.newDescription = 'Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit';
         wrapper.vm.$v.$touch();
         expect(!wrapper.vm.$v.newDescription.$error).toBe(true);
     });
@@ -126,8 +135,9 @@ describe('TokenIntroductionDescription', () => {
                     this.$emit('errormessage');
                 },
             },
+            mocks: {$t: (val) => val},
         });
-        wrapper.vm.newDescription = 'f';
+        wrapper.vm.newDescription = 'foobar';
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
@@ -142,20 +152,22 @@ describe('TokenIntroductionDescription', () => {
         const wrapper = shallowMount(TokenIntroductionDescription, {
             localVue,
             propsData: propsForTestCorrectlyRenders,
+            mocks: {$t: (val) => val},
         });
         wrapper.vm.editingDescription = true;
         wrapper.vm.icon = 'foo';
+        wrapper.vm.newDescription = 'a'.repeat(201);
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
             status: 202,
-            response: {newDescription: 'foo'},
+            response: {newDescription: 'a'.repeat(202)},
         });
 
         moxios.wait(() => {
             expect(wrapper.emitted('updated').length).toBe(1);
             expect(wrapper.vm.editingDescription).toBe(false);
-            expect(wrapper.vm.newDescription).toBe('foo');
+            expect(wrapper.vm.newDescription).toBe('a'.repeat(202));
             expect(wrapper.vm.icon).toBe('edit');
             done();
         });

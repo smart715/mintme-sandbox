@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
@@ -45,7 +46,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     protected $id;
 
@@ -176,6 +177,30 @@ class User extends BaseUser implements
      */
     protected $isBlocked = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
+     */
+    protected $comments;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @var ArrayCollection
+     */
+    protected $likes;
+
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @var string
+     */
+    protected $coinifyOfflineToken;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction")
+     * @var ArrayCollection
+     */
+    protected $airdropActions;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -228,7 +253,7 @@ class User extends BaseUser implements
 
     /**
      * @codeCoverageIgnore
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     public function getProfile(): Profile
     {
@@ -482,5 +507,41 @@ class User extends BaseUser implements
         $this->isBlocked = $isBlocked;
 
         return $this;
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments->toArray();
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        $this->comments->add($comment);
+
+        return $this;
+    }
+
+    public function getCoinifyOfflineToken(): ?string
+    {
+        return $this->coinifyOfflineToken;
+    }
+
+    public function setCoinifyOfflineToken(string $coinifyOfflineToken): self
+    {
+        $this->coinifyOfflineToken = $coinifyOfflineToken;
+
+        return $this;
+    }
+
+    public function addAirdropAction(AirdropAction $action): self
+    {
+        $this->airdropActions->add($action);
+
+        return $this;
+    }
+
+    public function getAirdropActions(): ArrayCollection
+    {
+        return $this->airdropActions;
     }
 }

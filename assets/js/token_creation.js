@@ -1,5 +1,8 @@
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import LimitedTextarea from './components/LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
+import i18n from './utils/i18n/i18n';
 import {
     HTTP_OK,
     tokenNameValidChars,
@@ -8,10 +11,13 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_ACCEPTED,
+    descriptionLength,
 } from './utils/constants';
 new Vue({
     el: '#token',
+    i18n,
     mixins: [NotificationMixin],
+    delimiters: ['${', '}'],
     data() {
         return {
             domLoaded: false,
@@ -20,12 +26,23 @@ new Vue({
             tokenNameProcessing: false,
             tokenNameTimeout: null,
             tokenNameInBlacklist: false,
+            description: '',
+            tokenCreation: true,
         };
+    },
+    components: {
+        LimitedTextarea,
+        FontAwesomeIcon,
     },
     computed: {
         saveBtnDisabled: function() {
             return this.$v.$anyError || !this.tokenName ||
                 this.tokenNameExists || this.tokenNameProcessing;
+        },
+        translationsContext: function() {
+            return {
+                maxDescriptionLength: descriptionLength.max,
+            };
         },
     },
     watch: {
@@ -53,7 +70,7 @@ new Vue({
                                                 this.tokenNameExists = response.data.exists;
                                             }
                                         }, (error) => {
-                                            this.notifyError('An error has occurred, please try again later');
+                                            this.notifyError(this.$t('toasted.error.try_later'));
                                         })
                                         .then(() => {
                                             this.tokenNameProcessing = false;
@@ -61,7 +78,7 @@ new Vue({
                                 }
                             }
                         }, (error) => {
-                            this.notifyError('An error has occurred, please try again later');
+                            this.notifyError(this.$t('toasted.error.try_later'));
                         });
                     }, 2000);
             }
@@ -73,6 +90,12 @@ new Vue({
         },
         createToken: function(e) {
             e.preventDefault();
+
+            if (!this.tokenCreation) {
+                this.notifyError(this.$t('token.creation.disabled'));
+                return;
+            }
+
             let frm = document.querySelector('form[name="token_create"]');
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
@@ -88,6 +111,12 @@ new Vue({
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
+        this.$axios.single.get(this.$routing.generate('check_token_creation'))
+            .then((result) => {
+                if (result.data) {
+                    this.tokenCreation = result.data.tokenCreation;
+                }
+            });
     },
     validations: {
         tokenName: {
@@ -102,6 +131,11 @@ new Vue({
             validChars: tokenNameValidChars,
             minLength: minLength(4),
             maxLength: maxLength(60),
+        },
+        description: {
+            required: (val) => required(val.trim()),
+            minLength: minLength(descriptionLength.min),
+            maxLength: maxLength(descriptionLength.max),
         },
     },
 });

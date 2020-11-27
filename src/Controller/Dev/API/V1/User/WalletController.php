@@ -5,6 +5,8 @@ namespace App\Controller\Dev\API\V1\User;
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Logger\UserActionLogger;
@@ -23,17 +25,16 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
+use Throwable;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/wallet")
  */
 class WalletController extends DevApiController
 {
-    /** @var float */
-    private $withdrawExpirationTime;
-
     /** @var WalletInterface */
     private $wallet;
 
@@ -52,22 +53,25 @@ class WalletController extends DevApiController
     /** @var ValidatorFactoryInterface */
     private $vf;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
-        float $withdrawExpirationTime,
         WalletInterface $wallet,
         UserActionLogger $userActionLogger,
         RebrandingConverterInterface $rebrandingConverter,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        ValidatorFactoryInterface $validatorFactory
+        ValidatorFactoryInterface $validatorFactory,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->withdrawExpirationTime = floor($withdrawExpirationTime / 3600);
         $this->wallet = $wallet;
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->vf = $validatorFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -89,7 +93,9 @@ class WalletController extends DevApiController
      */
     public function getDepositAddresses(WalletInterface $depositCommunicator): array
     {
-        /** @var  User $user*/
+        $this->denyAccessUnlessGranted('deposit');
+
+        /** @var User $user */
         $user = $this->getUser();
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
@@ -147,7 +153,7 @@ class WalletController extends DevApiController
      */
     public function getDepositWithdrawHistory(ParamFetcherInterface $request): array
     {
-        /** @var  User $user*/
+        /** @var User $user */
         $user = $this->getUser();
 
         return $this->wallet->getWithdrawDepositHistory(
@@ -167,7 +173,7 @@ class WalletController extends DevApiController
      *     name="amount",
      *     allowBlank=false
      * )
-     * * @Rest\RequestParam(
+     * @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
      *     requirements="^[a-zA-Z0-9]+$"
@@ -195,6 +201,8 @@ class WalletController extends DevApiController
         MoneyWrapperInterface $moneyWrapper,
         MailerInterface $mailer
     ): View {
+        $this->denyAccessUnlessGranted('withdraw');
+
         $currency = $request->get('currency');
         $amount = $request->get('amount');
         $address = $request->get('address');
@@ -247,19 +255,27 @@ class WalletController extends DevApiController
                 )),
                 $tradable
             );
-        } catch (\Throwable $exception) {
+
+            $this->denyAccessUnlessGranted('edit', $pendingWithdraw);
+
+            $this->wallet->withdrawCommit($pendingWithdraw);
+        } catch (Throwable $exception) {
             throw new ApiBadRequestException('Withdrawal failed');
         }
 
-        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
+            UserNotificationEvent::NAME
+        );
 
-        $this->userActionLogger->info("Sent withdrawal email for {$tradable->getSymbol()}", [
+        $this->userActionLogger->info("Withdraw funds from API for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
 
         return $this->view([
-            'message' => "Confirmation email has been sent to your email. It will expire in {$this->withdrawExpirationTime} hours.",
+            'message' => "Your transaction has been successfully processed and queued to be sent.",
         ], Response::HTTP_ACCEPTED);
     }
 }

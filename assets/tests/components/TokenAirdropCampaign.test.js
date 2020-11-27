@@ -4,6 +4,7 @@ import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
 import tokenStatistics from '../../js/storage/modules/token_statistics';
+import Vuelidate from 'vuelidate';
 
 delete window.location;
 window.location = {
@@ -20,11 +21,13 @@ function mockVue() {
     localVue.component('font-awesome-icon', {});
     localVue.component('b-collapse', {});
     localVue.use(Vuex);
+    localVue.use(Vuelidate);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -67,6 +70,16 @@ describe('TokenAirdropCampaign', () => {
             data() {
                 return {
                     airdropCampaignId: null,
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
                 };
             },
             methods: {
@@ -87,6 +100,20 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
             },
             methods: {
                 loadAirdropCampaign: () => {},
@@ -122,6 +149,20 @@ describe('TokenAirdropCampaign', () => {
             propsData: {
                 airdropParams: airdropParams,
             },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
+            },
             methods: {
                 loadAirdropCampaign: () => {},
                 loadTokenBalance: () => {},
@@ -145,6 +186,20 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
             },
             methods: {
                 loadAirdropCampaign: () => {},
@@ -170,6 +225,20 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 airdropParams: airdropParams,
+            },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
             },
             methods: {
                 loadAirdropCampaign: () => {},
@@ -200,6 +269,20 @@ describe('TokenAirdropCampaign', () => {
             propsData: {
                 airdropParams: airdropParams,
             },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
+            },
             methods: {
                 loadAirdropCampaign: () => {},
                 loadTokenBalance: () => {},
@@ -229,6 +312,20 @@ describe('TokenAirdropCampaign', () => {
                 tokenName: 'test2',
                 airdropParams: airdropParams,
             },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
+            },
             methods: {
                 loadAirdropCampaign: () => {},
             },
@@ -255,6 +352,20 @@ describe('TokenAirdropCampaign', () => {
             propsData: {
                 tokenName: 'test2',
                 airdropParams: airdropParams,
+            },
+            data() {
+                return {
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
+                };
             },
             methods: {
                 loadTokenBalance: () => {},
@@ -294,6 +405,16 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '100',
                     participantsAmount: 100,
                     showEndDate: false,
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
                 };
             },
             methods: {
@@ -334,6 +455,16 @@ describe('TokenAirdropCampaign', () => {
                     tokensAmount: '0.015',
                     participantsAmount: 196,
                     showEndDate: false,
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
                 };
             },
             methods: {
@@ -347,8 +478,7 @@ describe('TokenAirdropCampaign', () => {
 
         expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.vm.isRewardValid).toBe(false);
-        expect(wrapper.vm.errorMessage).toBe('Reward can\'t be lower than 0.0001 test5. ' +
-            'Set higher amount of tokens for airdrop or lower amount of participants.');
+        expect(wrapper.vm.errorMessage).toBe('airdrop.error_message');
     });
 
     it('can delete ongoing airdrop campaign', (done) => {
@@ -359,6 +489,16 @@ describe('TokenAirdropCampaign', () => {
             data() {
                 return {
                     airdropCampaignId: 3,
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
                 };
             },
             methods: {
@@ -392,6 +532,16 @@ describe('TokenAirdropCampaign', () => {
                 return {
                     tokensAmount: 500,
                     participantsAmount: 170,
+                    actions: {
+                        twitterMessage: false,
+                        twitterRetweet: false,
+                        facebookMessage: false,
+                        facebookPage: false,
+                        facebookPost: false,
+                        linkedinMessage: false,
+                        youtubeSubscribe: false,
+                        postLink: false,
+                    },
                 };
             },
             methods: {

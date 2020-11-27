@@ -3,6 +3,7 @@ import TokenOngoingAirdropCampaign from '../../js/components/token/airdrop_campa
 import moxios from 'moxios';
 import axios from 'axios';
 import moment from 'moment';
+import Vuelidate from 'vuelidate';
 
 /**
  * @return {Wrapper<Vue>}
@@ -14,8 +15,10 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
+    localVue.use(Vuelidate);
 
     return localVue;
 }
@@ -42,6 +45,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.actualParticipants).toBe(11);
@@ -60,6 +66,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                         'participants': 150,
                     },
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
@@ -80,6 +89,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         expect(wrapper.vm.endsDate).toBe(moment(dateNow).format('Do MMMM YYYY'));
@@ -94,20 +106,14 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loggedIn: false,
                 isOwner: false,
             },
-            data() {
-                return {
-                    alreadyClaimed: false,
-                };
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
-
-        expect(wrapper.vm.confirmButtonText).toBe('Log In');
+        expect(wrapper.vm.confirmButtonText).toBe('log_in');
         wrapper.setProps({loggedIn: true});
         expect(wrapper.vm.confirmButtonText).toBe('');
         wrapper.setProps({isOwner: true});
-        expect(wrapper.vm.confirmButtonText).toBe('OK');
-        wrapper.setProps({isOwner: false});
-        wrapper.vm.alreadyClaimed = true;
         expect(wrapper.vm.confirmButtonText).toBe('OK');
     });
 
@@ -130,18 +136,18 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
-        expect(wrapper.vm.confirmModalMessage).toBe('You have to be logged in to claim 3 test77.');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.logged_in');
         wrapper.setProps({loggedIn: true});
         wrapper.setProps({isOwner: true});
-        expect(wrapper.vm.confirmModalMessage).toBe('Sorry, you can\'t participate in your own airdrop.');
-        wrapper.setProps({isOwner: false});
-        wrapper.vm.alreadyClaimed = true;
-        expect(wrapper.vm.confirmModalMessage).toBe('You already claimed tokens from this airdrop.');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.cant_participate');
         wrapper.setProps({isOwner: false});
         wrapper.vm.alreadyClaimed = false;
-        expect(wrapper.vm.confirmModalMessage).toBe('Are you sure you want to claim 3 test77?');
+        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message');
     });
 
     it('should check airdrop end date', () => {
@@ -154,6 +160,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                         'endDate': new Date(),
                     },
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
@@ -173,6 +182,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                 return {
                     airdropCampaign: null,
                 };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
             },
         });
 
@@ -212,6 +224,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     },
                 };
             },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
         });
 
         moxios.stubRequest('claim_airdrop_campaign', {
@@ -225,12 +240,9 @@ describe('TokenOngoingAirdropCampaign', () => {
         };
 
         wrapper.vm.modalOnConfirm();
-        expect(wrapper.vm.btnDisabled).toBe(true);
-
         moxios.wait(() => {
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(14);
             expect(wrapper.vm.alreadyClaimed).toBe(true);
-            expect(wrapper.vm.btnDisabled).toBe(false);
             done();
         });
     });

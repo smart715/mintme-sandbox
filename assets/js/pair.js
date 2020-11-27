@@ -1,3 +1,4 @@
+import BalanceInit from './components/trade/BalanceInit';
 import CreatePost from './components/posts/CreatePost';
 import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
@@ -13,14 +14,16 @@ import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
+import i18n from './utils/i18n/i18n';
 
 new Vue({
   el: '#token',
   mixins: [NotificationMixin],
+  i18n,
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'trade', 'donate', 'posts'],
+      tabs: ['intro', 'buy', 'posts', 'trade'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
@@ -40,6 +43,7 @@ new Vue({
     };
   },
   components: {
+    BalanceInit,
     CreatePost,
     Donation,
     Posts,
@@ -70,7 +74,7 @@ new Vue({
 
     let aux = this.$refs['tokenAvatar'];
     if (aux && aux.$attrs['showsuccess']) {
-        this.notifySuccess('Token has been created successfully');
+        this.notifySuccess(this.$t('page.pair.token_created'));
     }
 
     let tokenName = this.tokenName;
@@ -79,17 +83,17 @@ new Vue({
       document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
         introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
-        let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
-        let donateLink = document.querySelectorAll('a.token-donate-tab-link')[0];
-        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        let donateLink = document.querySelectorAll('a.token-buy-tab-link')[0];
+        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
       });
     }
   },
   methods: {
-    ...mapMutations('makeOrder', [
+    ...mapMutations('tradeBalance', [
       'setUseBuyMarketPrice',
       'setBuyAmountInput',
       'setSubtractQuoteBalanceFromBuyAmount',
@@ -101,7 +105,7 @@ new Vue({
             this.tokenAddress = response.data.address;
           }
         }, (error) => {
-            this.notifyError('An error has occurred, please try again later');
+            this.notifyError(this.$t('toasted.error.try_later'));
         });
     },
     checkTokenDeployment: function() {
@@ -117,14 +121,14 @@ new Vue({
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
-                this.notifyError('The token could not be deployed, please try again later');
+                this.notifyError(this.$t('toasted.error.can_not_be_deployed'));
                 this.tokenPending = false;
                 this.tokenDeployed = false;
                 clearInterval(this.deployInterval);
             }
           })
           .catch((error) => {
-            this.notifyError('An error has occured, please try again later');
+            this.notifyError(this.$t('toasted.error.try_later'));
           });
       }, 60000);
     },
@@ -173,7 +177,7 @@ new Vue({
       });
     },
     goToPosts: function() {
-      this.tabIndex = 3;
+      this.tabIndex = 2;
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
@@ -182,14 +186,14 @@ new Vue({
       return null !== a ? a : b;
     },
     goToTrade: function(amount) {
-      this.tabIndex= 1;
+      this.tabIndex= 3;
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
     },
   },
   computed: {
-    ...mapGetters('makeOrder', [
+    ...mapGetters('tradeBalance', [
       'getQuoteBalance',
     ]),
   },

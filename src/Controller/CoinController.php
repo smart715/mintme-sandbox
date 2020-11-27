@@ -7,9 +7,12 @@ use App\Entity\User;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
+use App\Security\Config\DisabledServicesConfig;
+use App\Utils\BaseQuote;
+use App\Utils\Converter\RebrandingConverterInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class CoinController extends Controller
@@ -20,47 +23,69 @@ class CoinController extends Controller
     /** @var MarketFactoryInterface */
     private $marketFactory;
 
+    /** @var RebrandingConverterInterface */
+    private $rebrandingConverter;
+
+    /** @var MarketStatusManagerInterface */
+    private $marketStatusManager;
+
+    /** @var DisabledServicesConfig */
+    private $disabledServicesConfig;
+
     public function __construct(
         NormalizerInterface $normalizer,
         CryptoManagerInterface $cryptoManager,
-        MarketFactoryInterface $marketFactory
+        MarketFactoryInterface $marketFactory,
+        RebrandingConverterInterface $rebrandingConverter,
+        MarketStatusManagerInterface $marketStatusManager,
+        DisabledServicesConfig $disabledServicesConfig
     ) {
         parent::__construct($normalizer);
 
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->marketStatusManager = $marketStatusManager;
+        $this->disabledServicesConfig = $disabledServicesConfig;
     }
 
-    /** @Route("/coin/{base}/{quote}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
+    /** @Route("/coin/{quote}/{base}", name="coin", defaults={"quote"="mintme"}, options={"expose"=true,"2fa_progress"=false}) */
     public function pair(string $base, string $quote): Response
     {
-        // rebranding
-        if (Token::WEB_SYMBOL === mb_strtoupper($quote)) {
-            return $this->redirectToRoute('coin', [
-                'base' => mb_strtoupper($base),
-                'quote' => Token::MINTME_SYMBOL,
-            ]);
+        $convertedOldUrl = $this->convertOldUrl($base, $quote);
+
+        if ($convertedOldUrl) {
+            $base = $convertedOldUrl['base'];
+            $quote = $convertedOldUrl['quote'];
         }
 
-        $base = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($base));
-        $quote = str_replace(Token::MINTME_SYMBOL, Token::WEB_SYMBOL, mb_strtoupper($quote));
+        $base = $this->rebrandingConverter->reverseConvert($base);
+        $quote = $this->rebrandingConverter->reverseConvert($quote);
 
-        $base = $this->cryptoManager->findBySymbol($base);
-        $quote = $this->cryptoManager->findBySymbol(strtoupper($quote));
+        $baseCrypto = $this->cryptoManager->findBySymbol($base);
+        $quoteCrypto = $this->cryptoManager->findBySymbol($quote);
 
-        if (null === $base          ||
-            null === $quote         ||
-            $base === $quote        ||
-            !$base->isTradable()    ||
-            !$quote->isExchangeble()
-        ) {
+        if (null === $baseCrypto || null === $quoteCrypto) {
             throw new NotFoundPairException();
         }
 
-        $market = $this->marketFactory->create($base, $quote);
+        $market =  $this->marketFactory->create($baseCrypto, $quoteCrypto);
+
+        if (!$this->marketStatusManager->isValid($market, true)) {
+            throw new NotFoundPairException();
+        }
+
+        if ($convertedOldUrl) {
+            return $this->redirectToRoute('coin', [
+                'base' => $convertedOldUrl['base'],
+                'quote' => $convertedOldUrl['quote'],
+            ], 301);
+        }
 
         /** @var  User|null $user */
         $user = $this->getUser();
+
+        $market = BaseQuote::reverseMarket($market);
 
         return $this->render('pages/pair.html.twig', [
             'market' => $this->normalize($market),
@@ -68,9 +93,42 @@ class CoinController extends Controller
             'showTrade' => true,
             'showDonation' => false,
             'hash' => $user ? $user->getHash() : '',
-            'precision' => $quote->getShowSubunit(),
+            'precision' => $quoteCrypto->getShowSubunit(),
             'isTokenPage' => false,
             'tab' => 'trade',
+            'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
         ]);
+    }
+
+    private function convertOldUrl(string $base, string $quote): ?array
+    {
+        $upperCaseBase = mb_strtoupper($base);
+        $upperCaseQuote = mb_strtoupper($quote);
+
+        // if reversed base/quote order and web instead of mintme
+        if (Token::WEB_SYMBOL === $upperCaseBase) {
+            return [
+                'base' => $upperCaseQuote,
+                'quote' => $this->rebrandingConverter->convert($upperCaseBase),
+            ];
+        }
+
+        // if right base/quote order and web instead of mintme
+        if (Token::WEB_SYMBOL === $upperCaseQuote) {
+            return [
+                'base' => $upperCaseBase,
+                'quote' => $this->rebrandingConverter->convert($upperCaseQuote),
+            ];
+        }
+
+        // if reversed base/quote order but no web instead of mintme
+        if (Token::MINTME_SYMBOL === $upperCaseBase) {
+            return [
+                'base' => $upperCaseQuote,
+                'quote' => $upperCaseBase,
+            ];
+        }
+
+        return null;
     }
 }

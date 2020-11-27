@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="col text-truncate">
-            Facebook:
+            {{ $t('token.facebook.view_label') }}
             <a
                 :href="currentAddress"
                 target="_blank"
@@ -29,11 +29,10 @@
         <div class="col-auto social-help">
             <guide>
                 <template slot="header">
-                    Facebook
+                  {{ $t('token.facebook.guide_header') }}
                 </template>
                 <template slot="body">
-                    Link to token creator’s Facebook.
-                    Before adding it, we confirmed ownership.
+                  <span v-html="this.$t('token.facebook.guide_body')"></span>
                 </template>
             </guide>
         </div>

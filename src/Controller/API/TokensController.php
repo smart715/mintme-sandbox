@@ -7,6 +7,8 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
@@ -39,11 +41,13 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -73,12 +77,20 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var BlacklistManagerInterface */
     protected $blacklistManager;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var EventDispatcherInterface */
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
         CryptoManagerInterface $cryptoManager,
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -89,20 +101,17 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->topHolders = $topHolders;
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
+        $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @Rest\View()
-     * @Rest\Patch("/{name}", name="token_update", options={"2fa"="optional", "expose"=true})
-     * @Rest\RequestParam(name="name", nullable=true)
-     * @Rest\RequestParam(name="description", nullable=true)
-     * @Rest\RequestParam(name="facebookUrl", nullable=true)
-     * @Rest\RequestParam(name="telegramUrl", nullable=true)
-     * @Rest\RequestParam(name="discordUrl", nullable=true)
-     * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
-     * @Rest\RequestParam(name="code", nullable=true)
+     * @Rest\Patch("/update/{name}", name="token_update_name", options={"2fa"="optional", "expose"=true})
+     * @Rest\RequestParam(name="name", nullable=false)
+     * @Rest\RequestParam(name="code", nullable=false)
      */
-    public function update(
+    public function updateName(
         ParamFetcherInterface $request,
         BalanceHandlerInterface $balanceHandler,
         string $name
@@ -112,46 +121,57 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
 
-        if ($request->get('name')) {
-            if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-                throw new ApiBadRequestException('You need all your tokens to change token\'s name');
-            }
-
-            if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-                throw new ApiBadRequestException('Token is deploying or deployed.');
-            }
-
-            if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
-                throw new ApiBadRequestException('Forbidden token name, please try another');
-            }
+        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.you_need_all_tokens_to_change_name'));
         }
 
-        $form = $this->createForm(TokenType::class, $token, [
-            'csrf_protection' => false,
-            'allow_extra_fields' => true,
-        ]);
-
-        $form->submit(array_filter($request->all(), function ($value) {
-            return null !== $value;
-        }), false);
-
-        if (!$form->isValid()) {
-            foreach ($form->all() as $childForm) {
-                /** @var FormError[] $fieldErrors */
-                $fieldErrors = $form->get($childForm->getName())->getErrors();
-
-                if (count($fieldErrors) > 0) {
-                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
-                }
-            }
-
-            throw new ApiBadRequestException('Invalid argument');
+        if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.deploying'));
         }
+
+        if ($this->blacklistManager->isBlacklistedToken($request->get('name'))) {
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.forbidden_name'));
+        }
+
+        $this->handleUpdateForm($token, $request);
+
+        $this->em->persist($token);
+        $this->em->flush();
+
+        $this->userActionLogger->info('Change token info', $request->all());
+
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/{name}", name="token_update", options={"expose"=true})
+     * @Rest\RequestParam(name="description", nullable=true)
+     * @Rest\RequestParam(name="facebookUrl", nullable=true)
+     * @Rest\RequestParam(name="telegramUrl", nullable=true)
+     * @Rest\RequestParam(name="discordUrl", nullable=true)
+     * @Rest\RequestParam(name="youtubeChannelId", nullable=true)
+     */
+    public function update(
+        ParamFetcherInterface $request,
+        string $name
+    ): View {
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        $this->handleUpdateForm($token, $request);
 
         if (null === $token->getDescription() || '' == $token->getDescription()) {
             $token->setNumberOfReminder(0);
@@ -186,7 +206,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         $this->denyAccessUnlessGranted('edit', $token);
@@ -194,7 +214,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if (null === $token->getWebsiteConfirmationToken()) {
             return $this->view([
                 'verified' => false,
-                'errors' => ['File not downloaded yet'],
+                'errors' => [$this->translator->trans('api.tokens.file_not_downloaded')],
             ], Response::HTTP_ACCEPTED);
         }
 
@@ -216,9 +236,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
-            $message = 'Website confirmed';
+            $message = $this->translator->trans('api.tokens.website_confirmed');
         } else {
-            $message = 'Website deleted';
+            $message = $this->translator->trans('api.tokens.website_deleted');
         }
 
         if ($isVerified) {
@@ -242,7 +262,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Post("/{name}/lock-in", name="lock_in", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
-     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[1-9][0-9]?$|^100$")
+     * @Rest\RequestParam(name="released", allowBlank=false, requirements="^[2-9][0-9]$|^100$")
      * @Rest\RequestParam(name="releasePeriod", allowBlank=false)
      */
     public function setTokenReleasePeriod(
@@ -254,7 +274,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
@@ -286,7 +306,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $balance = $balanceHandler->balance($user, $token);
 
             if ($balance->isFailed()) {
-                return $this->view('Service unavailable now. Try later', Response::HTTP_BAD_REQUEST);
+                return $this->view(
+                    $this->translator->trans('toasted.error.service_unavailable'),
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
@@ -314,7 +337,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         return $this->view($token->getLockIn());
@@ -380,7 +403,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         $balance = $balanceHandler->exchangeBalance(
@@ -413,7 +436,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         return $this->view(
@@ -430,7 +453,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         return $this->view(
@@ -486,7 +509,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         $this->denyAccessUnlessGranted('delete', $token);
@@ -516,13 +539,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->em->remove($token);
         $this->em->flush();
 
-        $this->addFlash('success', "Token {$token->getName()} was successfully deleted.");
+        $this->addFlash('success', $this->translator->trans('api.tokens.deleted', ['%tokeName%' => $token->getName()]));
 
         $mailer->sendTokenDeletedMail($token);
 
         $this->userActionLogger->info('Delete token', $request->all());
 
-        return $this->view(['message' => 'Token successfully deleted'], Response::HTTP_ACCEPTED);
+        return $this->view(
+            ['message' => $this->translator->trans('api.tokens.delete_successfull')],
+            Response::HTTP_ACCEPTED
+        );
     }
 
     /**
@@ -539,7 +565,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         /** @var User $user*/
@@ -549,11 +575,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if (!$user->isGoogleAuthenticatorEnabled()) {
             $emailAuthManager->generateCode($user, $this->expirationTime);
             $mailer->sendAuthCodeToMail(
-                'Confirm token deletion',
-                'Your code to confirm token deletion:',
+                $this->translator->trans('api.tokens.confirm_email_header'),
+                $this->translator->trans('api.tokens.confirm_email_body'),
                 $user
             );
-            $message = "Code to confirm token deletion was sent to your email.";
+            $message = $this->translator->trans('api.tokens.confirm_email_sent');
         }
 
         return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
@@ -571,7 +597,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $this->tokenManager->findByName($name);
 
         if (null == $tradable) {
-            throw $this->createNotFoundException('Not Found');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.not_found'));
         }
 
         $topTraders = $balanceHandler->topHolders(
@@ -597,7 +623,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         try {
@@ -633,10 +659,12 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         string $name,
         DeploymentFacadeInterface $deployment
     ): View {
+        $this->denyAccessUnlessGranted('deploy');
+
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
@@ -644,11 +672,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         if (!$token->getLockIn()) {
-            throw new ApiBadRequestException('Token not has released period');
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.has_not_releaded_period'));
         }
 
         if (!$this->isGranted('edit', $token)) {
-            throw new ApiUnauthorizedException('Unauthorized');
+            throw new ApiUnauthorizedException($this->translator->trans('api.tokens.unathorized'));
         }
 
         try {
@@ -657,10 +685,19 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
             $deployment->execute($user, $token);
         } catch (Throwable $ex) {
-            throw new ApiBadRequestException('Internal error, Please try again later');
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.internal_error'));
         }
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent(
+                $user,
+                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
+            ),
+            UserNotificationEvent::NAME
+        );
 
         return $this->view();
     }
@@ -686,11 +723,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
-            throw new ApiNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         if (!$this->isGranted('edit', $token)) {
-            throw new ApiUnauthorizedException('Unauthorized');
+            throw new ApiUnauthorizedException($this->translator->trans('api.tokens.unathorized'));
         }
 
         try {
@@ -707,7 +744,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             if ($ex instanceof  InvalidAddressException) {
                 throw new ApiBadRequestException('Invalid Address');
             } else {
-                throw new ApiBadRequestException('Internal error, Please try again later');
+                throw new ApiBadRequestException($this->translator->trans('api.tokens.internal_error'));
             }
         }
 
@@ -763,6 +800,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
+     * @Rest\Get("/tokens-creation", name="check_token_creation", options={"expose"=true})
+     * @return View
+     */
+    public function isTokenCreationEnabled(): View
+    {
+        return $this->view([
+            'tokenCreation' => $this->isGranted('new-trades') && $this->isGranted('trading'),
+        ]);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Get("/{name}/token-name-blacklist-check", name="token_name_blacklist_check", options={"expose"=true})
      * @param string $name
      * @return View
@@ -778,5 +827,30 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     private function validateEthereumAddress(string $address): bool
     {
         return 0 === strpos($address, '0x') && (42 === strlen($address));
+    }
+
+    private function handleUpdateForm(Token $token, ParamFetcherInterface $request): void
+    {
+        $form = $this->createForm(TokenType::class, $token, [
+            'csrf_protection' => false,
+            'allow_extra_fields' => true,
+        ]);
+
+        $form->submit(array_filter($request->all(), function ($value) {
+            return null !== $value;
+        }), false);
+
+        if (!$form->isValid()) {
+            foreach ($form->all() as $childForm) {
+                /** @var FormError[] $fieldErrors */
+                $fieldErrors = $form->get($childForm->getName())->getErrors();
+
+                if (count($fieldErrors) > 0) {
+                    throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+            }
+
+            throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
+        }
     }
 }

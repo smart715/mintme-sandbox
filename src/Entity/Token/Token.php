@@ -6,6 +6,8 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
+use App\Entity\Message\Thread;
+use App\Entity\Message\ThreadMetadata;
 use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
@@ -37,6 +39,8 @@ class Token implements TradebleInterface, ImagineInterface
     public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
+    public const DESC_MIN_LENGTH = 200;
+    public const DESC_MAX_LENGTH = 10000;
     public const NOT_DEPLOYED = 'not-deployed';
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
@@ -130,7 +134,9 @@ class Token implements TradebleInterface, ImagineInterface
     protected $discordUrl;
 
     /**
-     * @ORM\Column(type="text", length=60000, nullable=true)
+     * @Assert\NotBlank()
+     * @ORM\Column(type="text", length=Token::DESC_MAX_LENGTH, nullable=true)
+     * @Assert\Length(min=Token::DESC_MIN_LENGTH, max=Token::DESC_MAX_LENGTH)
      * @Groups({"API_TOK"})
      * @var string|null
      */
@@ -243,6 +249,12 @@ class Token implements TradebleInterface, ImagineInterface
      * @var \DateTime
      */
     private $nextReminderDate;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Message\Thread", mappedBy="token", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     */
+    private $threads;
 
     public function __construct()
     {
@@ -645,5 +657,17 @@ class Token implements TradebleInterface, ImagineInterface
         $this->nextReminderDate = $nextReminderDate;
 
         return $this;
+    }
+
+    public function addThread(Thread $thread): self
+    {
+        $this->threads[] = $thread;
+
+        return $this;
+    }
+
+    public function getThreads(): array
+    {
+        return $this->threads->toArray();
     }
 }

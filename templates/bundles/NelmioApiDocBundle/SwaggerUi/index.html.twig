@@ -13,7 +13,7 @@
 {% endif %}
 
 {% block title %}
-    API Documentation | mintMe
+    {% trans %}api.page.title{% endtrans %} | mintMe
 {% endblock %}
 
 {% block stylesheets %}
@@ -42,7 +42,7 @@
           transition: all .3s ease;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('build/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/base_main.css') }}">
 {% endblock stylesheets %}
 
 {% block javascripts %}
@@ -50,7 +50,7 @@
         replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
         raw
     %}
-    {% include 'scripts.html.twig' %}
+    {% include 'base_scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
     <script src="{{ asset('build/api.js') }}"></script>
@@ -111,49 +111,57 @@
                         <div class="card card-fixed-large mx-auto">
                             <div class="card-header py-3 px-4">
                                 <div class="row justify-content-md-center align-items-center">
-                                    <div class="col"><h2 class="m-0">API Documentation</h2></div>
-                                    <!--
+                                    <div class="col"><h2 class="m-0">{% trans %}api.page.title{% endtrans %}</h2></div>
                                     <div id="api-version" class="col-auto mr-auto">
                                         <api-version
                                             url-version={{ version }}
                                         >
                                         </api-version>
                                     </div>
-                                    -->
                                 </div>
                             </div>
                             <div class="card-body py-2 px-0">
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
                                     {% if version != 'v1' %}
                                     <p>
-                                        All Open API requests don't require authorization. All non-open API requests
-                                        must be provided with unique API keys or OAuth token, which you can generate
-                                        in <a href="{{ path('settings') }}">settings</a>.
+                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.v2.body.2{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.v2.body.3{% endtrans %}
+                                    </p>
+                                    {% else %}
+                                    <p>
+                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.body.2{% endtrans %}
                                     </p>
                                     {% endif %}
                                     <p>
-                                        All requests must be provided with unique API keys or OAuth token, which you can generate in dashboard.<br />
-                                        You have to pass API keys with each request in headers as <span class="text-danger">X-API-ID</span> (public)
-                                        and <span class="text-danger">X-API-KEY</span> (private) parameters.<br />
-                                        Or you have to pass OAuth token with each request in headers as <span class="text-danger">Authorization: Bearer {token}</span> parameter.<br />
-                                        You can get OAuth token by sending the request to address: <span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span><br />
-                                        Token will expire after some time. You should get token again after expiration.
-                                        Our data is delivered to you on-demand using well-documented and simple HTTP RESTful API in JSON format.
+                                        {% trans %}api.page.body.3{% endtrans %}
+                                        <span class="text-danger">X-API-ID</span>
+                                        {% trans %}api.page.body.4{% endtrans %}
+                                        <span class="text-danger">X-API-KEY</span>
+                                        {% trans %}api.page.body.5{% endtrans %}
+                                        <span class="text-danger">Authorization: Bearer {token}</span>
+                                        {% trans %}api.page.body.6{% endtrans %}
                                     </p>
                                     <p>
-                                        Requests to API are limited to 5 per second with bursts not exceeding 10 requests.
-                                        All requests above this limit won't be processed and API will return 503 HTTP code.
-                                        To avoid exceeding the limit, it's recommended to implement a caching mechanism in your application.
+                                        {% trans %}api.page.body.7{% endtrans %}
+                                        <span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span>.
+                                        {% trans %}api.page.body.8{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.body.9{% endtrans %}
                                     </p>
                                     <p>
                                         {% if app.user is not null %}
-                                            Go to <a href="{{ path('settings') }}">settings</a> to generate your own API keys or OAuth Client ID and Secret.
+                                            {% trans %}api.page.body.10{% endtrans %}
+                                            <a href="{{ path('settings') }}">settings</a>
+                                            {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
                                         {% else %}
-                                            <a href="{{ path('login') }}">Log in</a> to generate your own API keys or OAuth Client ID and Secret.
+                                            {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}
                                         {% endif %}
                                     </p>
                                     <p>
-                                        You can test our API here. Authorize your generated keys or token and click on specific methods to see how they work live.
+                                        {% trans %}api.page.body.13{% endtrans %}
                                     </p>
                                 </div>
                                 {{ parent() }}

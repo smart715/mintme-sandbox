@@ -7,7 +7,7 @@
         <div class="col-12 pb-3 px-0">
             <div class="clearfix">
                 <label for="tokenName" class="float-left">
-                    Edit your token name:
+                    {{ $t('token.change_name.edit_token') }}
                 </label>
                 <div class="float-right">
                     <div
@@ -15,7 +15,7 @@
                         class="alert alert-danger alert-token-name-exists"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                        Token name is already taken
+                        {{ $t('page.token_creation.error.taken') }}
                     </div>
                 </div>
                 <div class="float-right">
@@ -24,7 +24,7 @@
                         class="alert alert-danger alert-token-name-exists"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                        Forbidden token name.
+                        {{ $t('page.token_creation.error.forbidden') }}
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
             >
             <div class="col-12 pt-2 px-0 clearfix">
                 <div v-if="!this.$v.newName.validChars" class="text-danger text-center small">
-                    Token name can contain only alphabets, numbers and spaces
+                    {{ $t('page.token_creation.error.contain') }}
                 </div>
                 <div
                     v-if="this.newName.length > 0
@@ -46,16 +46,16 @@
                     || !this.$v.newName.validLastChars
                     || !this.$v.newName.noSpaceBetweenDashes)"
                     class="text-danger text-center small">
-                    Token name can't start or end with a space
+                    {{ $t('page.token_creation.error.space') }}
                 </div>
                 <div v-if="!this.$v.newName.minLength" class="text-danger text-center small">
-                    Token name should have at least 4 symbols
+                    {{ $t('page.token_creation.error.min') }}
                 </div>
                 <div v-if="!this.$v.newName.maxLength" class="text-danger text-center small">
-                    Token name can't be longer than 60 characters
+                    {{ $t('page.token_creation.error.max') }}
                 </div>
                 <div v-if="!this.$v.newName.hasNotBlockedWords" class="text-danger text-center small">
-                    Token name can't contain "token" or "coin" words
+                    {{ $t('page.token_creation.error.blocked') }}
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@
                 :disabled="btnDisabled"
                 @click="editName"
             >
-                Save
+                {{ $t('save') }}
             </button>
         </div>
         <two-factor-modal
@@ -126,9 +126,9 @@ export default {
             let message = '';
 
             if (!this.isTokenNotDeployed) {
-                message = 'The name of a deployed token can\'t be changed';
+                message = this.$t('token.change_name.cant_be_changed');
             } else if (this.isTokenExchanged) {
-                message = 'You must own all your tokens in order to change the token\'s name';
+                message = this.$t('token.change_name.must_own_all');
             }
 
             return message;
@@ -166,7 +166,7 @@ export default {
                                             this.tokenNameExists = response.data.exists;
                                         }
                                     }, () => {
-                                        this.notifyError('An error has occurred, please try again later');
+                                        this.notifyError(this.$t('toasted.error.try_later'));
                                     })
                                     .then(() => {
                                         this.tokenNameProcessing = false;
@@ -174,7 +174,7 @@ export default {
                             }
                         }
                     }, () => {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                     });
             });
         },
@@ -211,7 +211,7 @@ export default {
             }
 
             this.submitting = true;
-            this.$axios.single.patch(this.$routing.generate('token_update', {
+            this.$axios.single.patch(this.$routing.generate('token_update_name', {
                 name: this.currentName,
             }), {
                 name: this.newName,
@@ -220,7 +220,7 @@ export default {
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                         this.currentName = response.data['tokenName'];
-                        this.notifySuccess('Token\'s name changed successfully');
+                        this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 
                         this.showTwoFactorModal = false;
                         this.closeModal();
@@ -231,13 +231,13 @@ export default {
                     }
                 }, (error) => {
                     if (!error.response) {
-                        this.notifyError('Network error');
+                        this.notifyError(this.$t('toasted.error.network'));
                         this.sendLogs('error', 'Edit name network error', error);
                     } else if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
                         this.sendLogs('error', 'Can not edit name', error);
                     } else {
-                        this.notifyError('An error has occurred, please try again later');
+                        this.notifyError(this.$t('toasted.error.try_later'));
                         this.sendLogs('error', 'An error has occurred, please try again later', error);
                     }
                 })

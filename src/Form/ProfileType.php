@@ -14,10 +14,14 @@ use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore  */
 class ProfileType extends AbstractType
 {
+    /** @var TranslatorInterface */
+    private $translator;
+
     /** @var NameTransformer  */
     private $nameTransformer;
 
@@ -31,11 +35,13 @@ class ProfileType extends AbstractType
     private $showFullDataInProfile;
 
     public function __construct(
+        TranslatorInterface $translator,
         NameTransformer $nameTransformer,
         XSSProtectionTransformer $xssProtectionTransformer,
         ZipCodeTransformer $zipCodeTransformer,
         bool $showFullDataInProfile
     ) {
+        $this->translator = $translator;
         $this->nameTransformer = $nameTransformer;
         $this->xssProtectionTransformer = $xssProtectionTransformer;
         $this->zipCodeTransformer = $zipCodeTransformer;
@@ -47,33 +53,32 @@ class ProfileType extends AbstractType
         $builder
             ->add('nickname', NicknameType::class)
             ->add('firstName', TextType::class, [
-                'label' => 'First name:',
-                'required' => false,
+                'label' => $this->translator->trans('page.profile.form.first_name'),
                 'attr' => [
                     'maxlength' => 30,
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Last name:',
+                'label' => $this->translator->trans('page.profile.form.last_name'),
                 'required' => false,
                 'attr' => [
                     'maxlength' => 30,
                 ],
             ])
             ->add('country', CountryType::class, [
-                'label' => 'Country:',
+                'label' => $this->translator->trans('page.profile.form.country'),
                 'required' => false,
-                'placeholder' => 'Select the country',
+                'placeholder' => $this->translator->trans('page.profile.form.country_placeholder'),
             ])
             ->add('description', BbcodeEditorType::class, [
-                'label' => 'Description:',
+                'label' => $this->translator->trans('page.profile.form.description'),
                 'required' => false,
                 'attr' => [
                     'maxlength' => 500,
                 ],
             ])
             ->add('anonymous', CheckboxType::class, [
-                'label' => 'Hide my personal data',
+                'label' => $this->translator->trans('page.profile.form.trade_anonymously'),
                 'required' => false,
                 'attr' => [
                   'class' => 'custom-control-input',
@@ -84,7 +89,7 @@ class ProfileType extends AbstractType
         if ($this->showFullDataInProfile) {
             $builder
                 ->add('city', TextType::class, [
-                    'label' => 'City:',
+                    'label' => $this->translator->trans('page.profile.form.city'),
                     'required' => false,
                     'attr' => [
                         'minlength' => 2,
@@ -92,7 +97,7 @@ class ProfileType extends AbstractType
                     ],
                 ])
                 ->add('zipCode', TextType::class, [
-                    'label' => 'ZIP code:',
+                    'label' => $this->translator->trans('page.profile.form.zip_code'),
                     'required' => false,
                 ]);
         }

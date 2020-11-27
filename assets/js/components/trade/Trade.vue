@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid px-0">
+    <div v-if="!disabledServices.tradingDisabled && !disabledServices.allServicesDisabled" class="container-fluid px-0">
         <div class="row">
             <trade-chart
                 :is-token="isToken"
@@ -24,6 +24,7 @@
                     :balance="baseBalance"
                     :balance-loaded="balanceLoaded"
                     :taker-fee="takerFee"
+                    :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                 />
             </div>
@@ -39,6 +40,7 @@
                     :balance="quoteBalance"
                     :balance-loaded="balanceLoaded"
                     :is-owner="isOwner"
+                    :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                 />
             </div>
@@ -59,7 +61,13 @@
                 class="col"
                 :hash="hash"
                 :websocket-url="websocketUrl"
-                :market="market" />
+                :market="market"
+            />
+        </div>
+    </div>
+    <div v-else>
+        <div class="h1 text-center pt-5 mt-5">
+            {{ $t('trade.page.disabled') }}
         </div>
     </div>
 </template>
@@ -71,13 +79,13 @@ import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
 import OrderModal from '../modal/OrderModal';
-import {isRetryableError} from 'axios-retry';
 import {
     CheckInputMixin,
     LoggerMixin,
     NotificationMixin,
     WebSocketMixin,
 } from '../../mixins';
+import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
 
 const WSAPI = Constants.WSAPI;
@@ -112,13 +120,13 @@ export default {
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
         isToken: Boolean,
+        disabledServicesConfig: String,
         takerFee: Number,
     },
     data() {
         return {
             buyOrders: null,
             sellOrders: null,
-            balances: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
@@ -126,6 +134,12 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRequesting',
+        ]),
+        ...mapGetters('tradeBalance', {
+            balances: 'getBalances',
+        }),
         baseBalance: function() {
             return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
                 : false;
@@ -146,6 +160,26 @@ export default {
         marketPriceBuy: function() {
             return this.sellOrders && this.sellOrders[0] ? this.sellOrders.reduce((min, order) => Math.min(parseFloat(order.price), min), Infinity) : 0;
         },
+        requestingRates: {
+            get() {
+                return this.getRequesting;
+            },
+            set(val) {
+                this.setRequesting(val);
+            },
+        },
+        /**
+         * @return {object}
+         */
+        disabledServices: function() {
+            return JSON.parse(this.disabledServicesConfig);
+        },
+        /**
+         * @return {boolean}
+         */
+        tradeDisabled: function() {
+            return this.disabledServices.newTradesDisabled || this.disabledServices.allServicesDisabled;
+        },
     },
     mounted() {
         this.updateOrders().then(() => {
@@ -162,17 +196,25 @@ export default {
             }, 'trade-update-orders');
         });
 
-        this.addOnOpenHandler(() => {
-            this.sendMessage(JSON.stringify({
-                method: 'deals.subscribe',
-                params: [this.market.identifier],
-                id: parseInt(Math.random().toString().replace('0.', '')),
-            }));
-
-            this.updateAssets();
-        });
+        if (!this.requestingRates) {
+            this.requestingRates = true;
+            this.$axios.retry.get(this.$routing.generate('exchange_rates'))
+            .then((res) => {
+                this.setRates(res.data);
+            })
+            .catch((err) => {
+                this.sendLogs('error', 'Can\'t load conversion rates', err);
+            })
+            .finally(() => {
+                this.requestingRates = false;
+            });
+        }
     },
     methods: {
+        ...mapMutations('rates', [
+            'setRates',
+            'setRequesting',
+        ]),
         /**
          * @param {undefined|{type, isAssigned, resolve}} context
          * @return {Promise}
@@ -224,44 +266,6 @@ export default {
                 }
             });
         },
-        updateAssets: function() {
-            if (!this.loggedIn) {
-                this.balances = false;
-                return;
-            }
-
-            this.$axios.retry.get(this.$routing.generate('tokens'))
-                .then((res) => {
-                    this.balances = {...res.data.common, ...res.data.predefined};
-
-                    if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
-                        this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
-                    }
-
-                    this.authorize()
-                        .then(() => {
-                            this.sendMessage(JSON.stringify({
-                                method: 'asset.subscribe',
-                                params: [this.market.base.identifier, this.market.quote.identifier],
-                                id: parseInt(Math.random().toString().replace('0.', '')),
-                            }));
-                        })
-                        .catch((err) => {
-                            this.notifyError(
-                                'Can not connect to internal services'
-                            );
-                            this.sendLogs('error', 'Can not connect to internal services', err);
-                        });
-                })
-                .catch((err) => {
-                    if (!isRetryableError(err)) {
-                        this.balances = false;
-                    } else {
-                        this.notifyError('Can not load current balance. Try again later.');
-                        this.sendLogs('error', 'Can not load current balance', err);
-                    }
-                });
-        },
         processOrders: function(data, type) {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
@@ -280,7 +284,7 @@ export default {
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
-                        this.notifyError('Something went wrong. Can not update orders.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_orders'));
                         this.sendLogs('error', 'Can not update orders', err);
                     });
                     break;

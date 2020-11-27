@@ -26,7 +26,6 @@ nelmio_security:
                 - 'https://*.tawk.to'
             connect-src:
                 - 'self'
-                - 'wss://self'
                 - 'wss://api.mintme.com/'
                 - 'wss://api.mintme.abchosting.org/'
                 - 'https://*.facebook.net'
@@ -53,6 +52,9 @@ nelmio_security:
                 - 'https://va.tawk.to'
                 - 'https://www.youtube.com'
                 - 'https://www.google.com'
+                - 'https://*.coinify.com'
+                - 'https://platform.twitter.com'
+                - 'https://content-youtube.googleapis.com'
             base-uri:
                 - 'self'
             worker-src:

@@ -1,6 +1,13 @@
+import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import TradeBuyOrders from '../../js/components/trade/TradeBuyOrders';
 import {toMoney} from '../../js/utils';
+
+Vue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
 
 describe('TradeBuyOrders', () => {
     const wrapper = shallowMount(TradeBuyOrders, {
@@ -43,10 +50,10 @@ describe('TradeBuyOrders', () => {
 
     it('hide the table and show message if no orders yet', () => {
         expect(wrapper.find('b-table').exists()).toBe(false);
-        expect(wrapper.html().includes('No order was added yet')).toBe(true);
+        expect(wrapper.html().includes('trade.buy_orders.no_orders')).toBe(true);
         wrapper.setProps({ordersList: Array(2).fill(order)});
         expect(wrapper.find('b-table').exists()).toBe(true);
-        expect(wrapper.html().includes('No order was added yet')).toBe(false);
+        expect(wrapper.html().includes('trade.sell_orders.no_orders')).toBe(false);
     });
 
     it('show total amount correctly', () => {

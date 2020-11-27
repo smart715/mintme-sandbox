@@ -37,11 +37,12 @@
                 @confirm="removeOrder"
         >
                 <span class="text-white">
-                    You want to delete these orders:<br>
+                    {{ $t('trade.orders.confirm.body_1') }}<br>
                     <span v-for="order in this.removeOrders" :key="order.id">
-                        Price {{ order.price }} Amount {{ order.amount }}<br>
-                    </span>
-                    Are you sure?
+                    {{ $t('trade.orders.price') }} {{ order.price }}
+                    {{ $t('trade.orders.amount') }} {{ order.amount }}<br>
+                </span>
+                {{ $t('trade.orders.confirm.body_2') }}
                 </span>
         </confirm-modal>
     </div>
@@ -58,7 +59,11 @@ import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixin
 
 export default {
     name: 'TokenTradeOrders',
-    mixins: [RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {
         TradeBuyOrders,
         TradeSellOrders,
@@ -83,22 +88,22 @@ export default {
             fields: [
                 {
                     key: 'price',
-                    label: 'Price',
+                    label: this.$t('trade.orders.price'),
                     formatter: formatMoney,
                 },
                 {
                     key: 'amount',
-                    label: 'Amount',
+                    label: this.$t('trade.orders.amount'),
                     formatter: formatMoney,
                 },
                 {
                     key: 'sum',
-                    label: 'Sum ' + this.rebrandingFunc(this.market.base.symbol),
+                    label: this.$t('trade.orders.sum'),
                     formatter: formatMoney,
                 },
                 {
                     key: 'trader',
-                    label: 'Trader',
+                    label: this.$t('trade.orders.trader'),
                 },
             ],
         };
@@ -195,7 +200,7 @@ export default {
             });
             this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
                 .catch((err) => {
-                    this.notifyError('Service unavailable, try again later');
+                    this.notifyError(this.$t('toasted.error.service_unavailable'));
                     this.sendLogs('error', 'Remove order service unavailable', err);
                 });
         },

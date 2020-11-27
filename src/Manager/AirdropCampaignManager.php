@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\AirdropCampaign\Airdrop;
+use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -208,6 +209,30 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         if ($airdropAmount->equals($airdropActualAmount)) {
             throw new ApiBadRequestException('Insufficient funds.');
         }
+    }
+
+    public function createAction(string $action, ?string $actionData, Airdrop $airdrop): void
+    {
+        $action = (new AirdropAction())
+            ->setType(AirdropAction::TYPE_MAP[$action])
+            ->setAirdrop($airdrop)
+            ->setData($actionData);
+
+        $this->em->persist($action);
+        $this->em->flush();
+    }
+
+    public function claimAirdropAction(AirdropAction $action, User $user): void
+    {
+        $action->addUser($user);
+
+        $this->em->persist($action);
+        $this->em->flush();
+    }
+
+    public function checkIfUserCompletedActions(Airdrop $airdrop, User $user): bool
+    {
+        return $airdrop->getActions()->forAll(fn (int $key, AirdropAction $action) => $action->getUsers()->contains($user));
     }
 
     private function createNewParticipant(User $user, Airdrop $airdrop): AirdropParticipant

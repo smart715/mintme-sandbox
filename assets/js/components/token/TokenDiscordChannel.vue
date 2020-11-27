@@ -4,7 +4,7 @@
             v-if="editing"
             class="form-group col-12"
         >
-            <label for="discord-err">Discord address:</label>
+            <label for="discord-err">{{ $t('token.discord.label') }}</label>
             <input
                 id="discord-err"
                 v-model="newDiscord"
@@ -17,20 +17,20 @@
                 v-if="showDiscordError"
                 class="invalid-feedback"
             >
-                Please provide a valid URL.
+                {{ $t('token.discord.invalid_url') }}
             </div>
             <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editDiscord"
                 >
-                    Save
+                    {{ $t('token.discord.submit') }}
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
                     @click="toggleEdit"
                 >
-                    Cancel
+                    {{ $t('token.discord.cancel') }}
                 </span>
             </div>
         </div>
@@ -80,10 +80,9 @@ import {faDiscord} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
+import {HTTP_ACCEPTED} from '../../utils/constants';
 
 library.add(faDiscord, faTimes);
-
-const HTTP_ACCEPTED = 202;
 
 export default {
     name: 'TokenDiscordChannel',
@@ -115,7 +114,7 @@ export default {
     },
     computed: {
         computedDiscordUrl: function() {
-            return this.currentDiscord || 'Add Discord invitation link';
+            return this.currentDiscord || this.$t('token.discord.empty_address');
         },
     },
     methods: {
@@ -144,14 +143,13 @@ export default {
             this.submitting = true;
             this.$axios.single.patch(this.updateUrl, {
                 discordUrl: this.newDiscord,
-                needToCheckCode: false,
             })
                 .then((response) => {
                     if (response.status === HTTP_ACCEPTED) {
                        let state = this.newDiscord ? 'added' : 'removed';
                        this.$emit('saveDiscord', this.newDiscord);
                        this.newDiscord = this.newDiscord || 'https://discord.gg/';
-                       this.notifySuccess(`Discord invitation link ${state} successfully`);
+                       this.notifySuccess(this.$t('toasted.success.discord.' + state));
                        this.editing = false;
                     }
                     this.submitting = false;

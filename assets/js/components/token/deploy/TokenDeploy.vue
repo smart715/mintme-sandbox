@@ -7,21 +7,20 @@
                     class="text-left"
                 >
                     <p>
-                        This is final step for token creation. After you pay for deploying token to blockchain
-                        you and others will be able to withdraw tokens from mintme to your MintMe Coin wallet.
+                        {{ $t('token.deploy.final_step') }}
                     </p>
                     <p class="bg-info px-2">
-                        MINTME spent here will be inaccessible to anyone (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.
+                        {{ $t('token.deploy.frozen') }}
                     </p>
                     <p class="bg-info px-2">
-                        This process is irreversible, once you confirm payment there is no going back.
+                        {{ $t('token.deploy.irreversible') }}
                     </p>
                     <p class="mt-5">
-                        Your current balance: {{ balance | toMoney(precision) | formatMoney }} MINTME <br>
+                      {{ $t('token.deploy.current_balance') }} {{ balance | toMoney(precision) | formatMoney }} {{ $t('mintme') }} <br>
                         <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
                     </p>
                     <p>
-                        Cost of deploying token to blockchain: {{ webCost | toMoney(precision) | formatMoney }} MINTME
+                        {{ $t('token.deploy.cost') }} {{ webCost | toMoney(precision) | formatMoney }} {{ $t('mintme') }}
                     </p>
                     <div class="pt-3">
                         <button
@@ -29,7 +28,9 @@
                             :disabled="btnDisabled"
                             @click="deploy"
                         >
-                            Deploy to blockchain
+                            <span :class="{'text-muted': isDeploymentDisabled}">
+                                {{ $t('token.deploy.deploy_to_blockchain') }}
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
                         class="loading-spinner"
                         fixed-width
                     />
-                    Deployment is pending. It may take a few moments.
+                    {{ $t('token.deploy.pending') }}
                 </p>
             </div>
             <div
@@ -64,7 +65,7 @@
                 class="text-left"
             >
                 <p class="bg-info m-0 py-1 px-3">
-                    Token is already deployed.
+                    {{ $t('token.deploy.deployed') }}
                 </p>
             </div>
         </template>
@@ -73,7 +74,7 @@
             class="text-left"
         >
             <p class="bg-info m-0 py-1 px-3">
-                Please edit token release period before deploying.
+                {{ $t('token.deploy.edit_release_period') }}
             </p>
         </div>
     </div>
@@ -94,6 +95,7 @@ export default {
         name: String,
         precision: Number,
         statusProp: String,
+        disabledServicesConfig: String,
     },
     data() {
         return {
@@ -104,6 +106,11 @@ export default {
         };
     },
     computed: {
+        isDeploymentDisabled: function() {
+            let services = JSON.parse(this.disabledServicesConfig);
+
+            return services.allServicesDisabled || services.deployDisabled;
+        },
         notDeployed: function() {
             return tokenDeploymentStatus.notDeployed === this.status;
         },
@@ -139,6 +146,12 @@ export default {
             });
         },
         deploy: function() {
+            if (this.isDeploymentDisabled) {
+              this.notifyError(this.$t('toasted.error.deployment_disabled'));
+
+              return;
+            }
+
             if (this.deploying) {
                 return;
             }
@@ -154,13 +167,13 @@ export default {
             })
             .catch(({response}) => {
                 if (!response) {
-                    this.notifyError('Network error');
+                    this.notifyError(this.$t('toasted.error.network'));
                     this.sendLogs('error', 'Token deploy network error', response);
                 } else if (response.data.message) {
                     this.notifyError(response.data.message);
                     this.sendLogs('error', 'Error of deploying token', response);
                 } else {
-                    this.notifyError('An error has occurred, please try again later');
+                    this.notifyError(this.$t('toasted.error.try_later'));
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             })

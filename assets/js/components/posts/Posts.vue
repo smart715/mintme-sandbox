@@ -1,30 +1,36 @@
 <template>
-    <div class="card h-100">
+    <div class="card h-100 posts-container">
         <div class="card-header">
-            <slot name="title">Posts</slot>
+            <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
-        <div class="card-body posts">
-            <template v-if="posts.length > 0">
-                <post v-for="(n, i) in postsCount"
-                    :post="posts[i]"
-                    :key="i"
-                    :index="i"
-                    @delete-post="$emit('delete-post', $event)"
-                    :show-edit="showEdit"
-                    @go-to-trade="$emit('go-to-trade', $event)"
-                    :logged-in="loggedIn"
-                />
-            </template>
-            <div v-else>
-                The token creator has not added any posts yet.
+        <div
+            class="card-body posts overflow-hidden position-relative"
+        >
+            <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
+                <template v-if="posts.length > 0">
+                    <post v-for="(n, i) in postsCount"
+                          :post="posts[i]"
+                          :key="i"
+                          :index="i"
+                          @delete-post="$emit('delete-post', $event)"
+                          :show-edit="showEdit"
+                          @go-to-trade="$emit('go-to-trade', $event)"
+                          :logged-in="loggedIn"
+                    />
+                </template>
+                <div v-else :class="{ 'position-absolute top-50': tokenPage }">
+                    {{ $t('post.not_any_post') }}
+                </div>
             </div>
-            <a v-if="showReadMore"
-                class="align-self-center"
-                :href="readMoreUrl"
-                @click.prevent="goToPosts"
-            >
-                All Posts
-            </a>
+            <div v-if="showReadMore" class="read-more">
+                <a
+                    class="align-self-center all-posts-link"
+                    :href="readMoreUrl"
+                    @click.prevent="goToPosts"
+                >
+                    {{ $t('posts.all') }}
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -58,14 +64,20 @@ export default {
     data() {
         return {
             readMoreUrl: this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'}),
+            readMore: false,
+            resizeObserver: null,
         };
+    },
+    mounted() {
+        this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
+        this.resizeObserver.observe(this.$refs.postsContainer);
     },
     computed: {
         postsCount() {
             return Math.min(this.posts.length, this.max || Infinity);
         },
         showReadMore() {
-            return !!(this.max && this.posts.length > this.max);
+            return !!(this.max && this.posts.length > this.max) || this.readMore;
         },
     },
     methods: {
@@ -76,6 +88,14 @@ export default {
                 location.href = this.readMoreUrl;
             }
         },
+        updateReadMore() {
+            let posts = document.querySelector('.posts');
+            let postsContainer = document.querySelector('#posts-container');
+            this.readMore = postsContainer.clientHeight > posts.clientHeight;
+        },
+    },
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
     },
 };
 </script>

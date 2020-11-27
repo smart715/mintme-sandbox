@@ -45,7 +45,7 @@
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
         </div>
         <div v-else-if="noHistory">
-            <p class="text-center p-5">No transactions were added yet</p>
+            <p class="text-center p-5">{{ $t('wallet.history.no_transactions') }}</p>
         </div>
         </template>
         <template v-else>
@@ -71,51 +71,57 @@ import {GENERAL} from '../../utils/constants';
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin, FiltersMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        LazyScrollTableMixin,
+        FiltersMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     components: {CopyLink},
     data() {
         return {
             fields: {
                 date: {
                     key: 'date',
-                    label: 'Date',
+                    label: this.$t('wallet.history.date'),
                     sortable: true,
                     type: 'date',
                 },
                 type: {
                     key: 'type',
-                    label: 'Type',
+                    label: this.$t('wallet.history.type'),
                     sortable: true,
                     type: 'string',
                 },
                 symbol: {
                     key: 'symbol',
-                    label: 'Name',
+                    label: this.$t('wallet.history.symbol'),
                     sortable: true,
                     type: 'string',
                 },
                 toAddress: {
                     key: 'toAddress',
-                    label: 'Address',
+                    label: this.$t('wallet.history.to_address'),
                     sortable: true,
                     type: 'string',
                 },
                 amount: {
                     key: 'amount',
-                    label: 'Amount',
+                    label: this.$t('wallet.history.amount'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
                 },
                 status: {
                     key: 'status',
-                    label: 'Status',
+                    label: this.$t('wallet.history.status'),
                     sortable: true,
                     type: 'string',
                 },
                 fee: {
                     key: 'fee',
-                    label: 'Fee',
+                    label: this.$t('wallet.history.fee'),
                     sortable: true,
                     formatter: formatMoney,
                     type: 'numeric',
@@ -164,7 +170,7 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError('Can not update payment history. Try again later.');
+                        this.notifyError(this.$t('toasted.error.can_not_update_payment_history'));
                         this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });

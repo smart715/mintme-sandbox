@@ -11,6 +11,7 @@ use App\Exchange\Market\Model\LineStat;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\UserManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -25,17 +26,10 @@ class MarketHandler implements MarketHandlerInterface
 
     private const MONTH_PERIOD = 2592000;
 
-    /** @var MarketFetcherInterface */
-    private $marketFetcher;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var UserManagerInterface */
-    private $userManager;
-
-    /** @var MarketNameConverterInterface */
-    private $marketNameConverter;
+    private MarketFetcherInterface $marketFetcher;
+    private MoneyWrapperInterface $moneyWrapper;
+    private UserManagerInterface $userManager;
+    private MarketNameConverterInterface $marketNameConverter;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
@@ -49,6 +43,7 @@ class MarketHandler implements MarketHandlerInterface
         $this->marketNameConverter = $marketNameConverter;
     }
 
+    /** {@inheritdoc} */
     public function getExecutedOrder(Market $market, int $id, int $limit = 100): Order
     {
         $orders = $this->getExecutedOrders($market, 0, $limit);
@@ -73,8 +68,12 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getPendingSellOrders(Market $market, int $offset = 0, int $limit = 100): array
-    {
+    public function getPendingSellOrders(
+        Market $market,
+        int $offset = 0,
+        int $limit = 100,
+        bool $reverseBaseQuote = false
+    ): array {
         return $this->parsePendingOrders(
             $this->marketFetcher->getPendingOrders(
                 $this->marketNameConverter->convert($market),
@@ -82,13 +81,18 @@ class MarketHandler implements MarketHandlerInterface
                 $limit,
                 self::SELL
             ),
-            $market
+            $market,
+            $reverseBaseQuote
         );
     }
 
     /** {@inheritdoc} */
-    public function getPendingBuyOrders(Market $market, int $offset = 0, int $limit = 100): array
-    {
+    public function getPendingBuyOrders(
+        Market $market,
+        int $offset = 0,
+        int $limit = 100,
+        bool $reverseBaseQuote = false
+    ): array {
         return $this->parsePendingOrders(
             $this->marketFetcher->getPendingOrders(
                 $this->marketNameConverter->convert($market),
@@ -96,27 +100,38 @@ class MarketHandler implements MarketHandlerInterface
                 $limit,
                 self::BUY
             ),
-            $market
+            $market,
+            $reverseBaseQuote
         );
     }
 
     /** {@inheritdoc} */
-    public function getExecutedOrders(Market $market, int $lastId = 0, int $limit = 100): array
-    {
+    public function getExecutedOrders(
+        Market $market,
+        int $lastId = 0,
+        int $limit = 100,
+        bool $reverseBaseQuote = false
+    ): array {
         return $this->parseExecutedOrders(
             $this->marketFetcher->getExecutedOrders(
                 $this->marketNameConverter->convert($market),
                 $lastId,
                 $limit
             ),
-            $market
+            $market,
+            $reverseBaseQuote
         );
     }
 
     /** {@inheritdoc} */
-    public function getUserExecutedHistory(User $user, array $markets, int $offset = 0, int $limit = 100): array
-    {
-        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit) {
+    public function getUserExecutedHistory(
+        User $user,
+        array $markets,
+        int $offset = 0,
+        int $limit = 100,
+        bool $reverseBaseQuote = false
+    ): array {
+        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
             return $this->parseDeals(
                 $this->marketFetcher->getUserExecutedHistory(
                     $user->getId(),
@@ -124,13 +139,14 @@ class MarketHandler implements MarketHandlerInterface
                     $offset,
                     $limit
                 ),
-                $market
+                $market,
+                $reverseBaseQuote
             );
         }, $markets);
 
         $deals = $marketDeals ? array_merge(...$marketDeals) : [];
 
-        uasort($deals, function (Deal $lDeal, Deal $rDeal) {
+        uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
             return $lDeal->getTimestamp() > $rDeal->getTimestamp();
         });
 
@@ -138,9 +154,14 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getPendingOrdersByUser(User $user, array $markets, int $offset = 0, int $limit = 100): array
-    {
-        $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit) {
+    public function getPendingOrdersByUser(
+        User $user,
+        array $markets,
+        int $offset = 0,
+        int $limit = 100,
+        bool $reverseBaseQuote = false
+    ): array {
+        $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
             return $this->parsePendingOrders(
                 $this->marketFetcher->getPendingOrdersByUser(
                     $user->getId(),
@@ -148,13 +169,14 @@ class MarketHandler implements MarketHandlerInterface
                     $offset,
                     $limit
                 ),
-                $market
+                $market,
+                $reverseBaseQuote
             );
         }, $markets);
 
         $orders = $marketOrders ? array_merge(...$marketOrders) : [];
 
-        uasort($orders, function (Order $lOrder, Order $rOrder) {
+        uasort($orders, static function (Order $lOrder, Order $rOrder) {
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
         });
 
@@ -194,14 +216,23 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
-    /** @return Order[] */
-    private function parsePendingOrders(array $result, Market $market): array
+    /**
+     * @param array $result
+     * @param Market $market
+     * @param bool $reverseBaseQuote
+     * @return Order[]
+     */
+    private function parsePendingOrders(array $result, Market $market, bool $reverseBaseQuote = false): array
     {
         $orders = array_key_exists('orders', $result)
             ? $result['orders']
             : $result;
 
         $filtered = [];
+
+        if ($reverseBaseQuote) {
+            $market = BaseQuote::reverseMarket($market);
+        }
 
         array_walk($orders, function (array $orderData) use ($market, &$filtered): void {
             $user = $this->userManager->find($orderData['user']);
@@ -237,11 +268,20 @@ class MarketHandler implements MarketHandlerInterface
         return $filtered;
     }
 
-    /** @return Order[] */
-    private function parseExecutedOrders(array $result, Market $market): array
+    /**
+     * @param array $result
+     * @param Market $market
+     * @param bool $reverseBaseQuote
+     * @return Order[]
+     */
+    private function parseExecutedOrders(array $result, Market $market, bool $reverseBaseQuote = false): array
     {
         /** @var Order[] */
         $orders = [];
+
+        if ($reverseBaseQuote) {
+            $market = BaseQuote::reverseMarket($market);
+        }
 
         foreach ($result as $orderData) {
             $user = array_key_exists('maker_id', $orderData)
@@ -280,9 +320,18 @@ class MarketHandler implements MarketHandlerInterface
         return $orders;
     }
 
-    /** @return Deal[] */
-    private function parseDeals(array $result, Market $market): array
+    /**
+     * @param array $result
+     * @param Market $market
+     * @param bool $reverseBaseQuote
+     * @return Deal[]
+     */
+    private function parseDeals(array $result, Market $market, bool $reverseBaseQuote = false): array
     {
+        if ($reverseBaseQuote) {
+            $market = BaseQuote::reverseMarket($market);
+        }
+
         return array_map(function (array $dealData) use ($market) {
             return new Deal(
                 $dealData['id'],
@@ -312,6 +361,7 @@ class MarketHandler implements MarketHandlerInterface
         }, $result);
     }
 
+    /** {@inheritdoc} */
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo
     {
         $result = $this->marketFetcher->getMarketInfo(
@@ -385,19 +435,14 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
-    private function getSymbol(TradebleInterface $tradeble): string
+    private function getSymbol(TradebleInterface $tradable): string
     {
-        return $tradeble instanceof Token
+        return $tradable instanceof Token
             ? MoneyWrapper::TOK_SYMBOL
-            : $tradeble->getSymbol();
+            : $tradable->getSymbol();
     }
 
-    /**
-     * Get market buy depth
-     *
-     * @param Market $market
-     * @return string
-     */
+    /** {@inheritdoc} */
     public function getBuyDepth(Market $market): string
     {
         $offset = 0;
@@ -427,6 +472,7 @@ class MarketHandler implements MarketHandlerInterface
         return $this->moneyWrapper->format($depthAmount);
     }
 
+    /** {@inheritdoc} */
     public function getSellOrdersSummary(Market $market): string
     {
         $offset = 0;
@@ -451,5 +497,16 @@ class MarketHandler implements MarketHandlerInterface
         }, $zeroDepth);
 
         return $this->moneyWrapper->format($sellOrdersSum);
+    }
+
+    public function getSellOrdersSummaryByUser(User $user, Market $market): array
+    {
+        $offset = 0;
+
+        return $this->marketFetcher->getPendingOrdersByUser(
+            $user->getId(),
+            $this->marketNameConverter->convert($market),
+            $offset,
+        );
     }
 }

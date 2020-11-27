@@ -20,7 +20,7 @@
                     <div class="row faq-block mx-0 border-bottom border-top">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
-                                Add social media
+                                {{ $t('token_edit_modal.add_social_media') }}
                             </template>
                             <template slot="body">
                                 <token-social-media-edit
@@ -45,7 +45,7 @@
                     <div class="row faq-block mx-0 border-bottom">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
-                                Token release period
+                              {{ $t('token_edit_modal.period') }}
                             </template>
                             <template slot="body">
                                 <token-release-period
@@ -61,7 +61,7 @@
                     <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
-                                Deploy token to blockchain
+                                {{ $t('token_edit_modal.deploy') }}
                             </template>
                             <template slot="body">
                                 <token-deploy
@@ -73,6 +73,7 @@
                                     :websocket-url="websocketUrl"
                                     @pending="$emit('token-deploy-pending')"
                                     :key="tokenDeployKey"
+                                    :disabled-services-config="disabledServicesConfig"
                                 />
                             </template>
                         </faq-item>
@@ -82,12 +83,17 @@
                         class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
-                                Airdrop campaign
+                                {{ $t('token_edit_modal.airdrop') }}
                             </template>
                             <template slot="body">
                                 <token-airdrop-campaign
                                     :token-name="currentName"
                                     :airdrop-params="airdropParams"
+                                    :facebook-url="facebookUrl"
+                                    :youtube-client-id="youtubeClientId"
+                                    :youtube-channel-id="youtubeChannelId"
+                                    @updated-facebook="$emit('updated-facebook', $event)"
+                                    @updated-youtube="$emit('updated-youtube', $event)"
                                     @close="$emit('close')"
                                 />
                             </template>
@@ -96,7 +102,7 @@
                     <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
-                                Change token name
+                                {{ $t('token_edit_modal.change_name') }}
                             </template>
                             <template slot="body">
                                 <token-change-name
@@ -111,7 +117,7 @@
                     <div class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
-                                Modify token release address
+                                {{ $t('token_edit_modal.release_addr') }}
                             </template>
                             <template slot="body">
                                 <token-release-address
@@ -127,7 +133,7 @@
                     <div class="row faq-block mx-0">
                         <faq-item>
                             <template slot="title">
-                                Delete token
+                                {{ $t('token_edit_modal.delete') }}
                             </template>
                             <template slot="body">
                                 <token-delete
@@ -196,6 +202,7 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
+        disabledServicesConfig: String,
     },
     data() {
         return {
@@ -207,7 +214,7 @@ export default {
     beforeUpdate: function() {
         if (this.isTokenDeployed) {
             this.tokenDeployKey++;
-        };
+        }
     },
     computed: {
         shouldTruncate: function() {

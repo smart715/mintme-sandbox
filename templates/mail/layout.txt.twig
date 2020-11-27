@@ -1,3 +1,3 @@
  {{ absolute_url('/') }}
 {% block content %}{% endblock %}
-  2018 - {{ "now"|date("Y") }} mintMe. All rights reserved
+  {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}

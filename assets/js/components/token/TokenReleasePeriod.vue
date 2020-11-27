@@ -3,25 +3,24 @@
         <b-row>
             <b-col cols="12" class="statistic-description mb-2">
                 <div>
-                    Token release period:
+                    {{ $t('token.release_period.header') }}
                 </div>
                 <div class="text-xs">
-                    Period it will take for the full release of all your tokens not released during creation. Tokens are slowly released over selected time to make sure you won't flood the market.
-                    If you choose to release 100% of your tokens immediately this feature will be off and all 10 millions will be accessible by you right now.
+                    {{ $t('token.release_period.body') }}
                 </div>
             </b-col>
             <b-col cols="12">
-                <div>Amount released during creation: {{ released }}%</div>
+                <div>{{ $t('token.release_period.amount', {released: released}) }}</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
-                        <b>0%</b>
+                        <b>20%</b>
                     </b-col>
                     <b-col class="p-0">
                         <vue-slider
                             ref="released-slider"
                             :disabled="releasedDisabled"
                             v-model="released"
-                            :min="1" :max="100"
+                            :min="20" :max="100"
                             :interval="1"
                             :tooltip="false"
                             width="100%"
@@ -33,7 +32,7 @@
                 </b-row>
             </b-col>
             <b-col v-bind:class="{invisible: !showAreaUnlockedTokens}" cols="12">
-                <div>Release period for the rest: {{ releasePeriod }} year(s)</div>
+                <div>{{ $t('token.release_period.for_rest_years', {releasePeriod: releasePeriod}) }}</div>
                 <b-row class="mx-1 my-2">
                     <b-col cols="2" class="text-center px-0">
                         <font-awesome-icon icon="unlock-alt" class="ml-1 mb-1" />
@@ -63,7 +62,7 @@
                         :disabled="releasePeriodDisabled || loading"
                         @click="saveReleasePeriod"
                     >
-                        Save
+                        {{ $t('save') }}
                     </b-button>
                     <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
                 </div>
@@ -91,7 +90,7 @@ export default {
     data() {
         return {
             loading: true,
-            released: 1,
+            released: 20,
             releasePeriod: 0,
             hasLockin: false,
         };
@@ -125,13 +124,13 @@ export default {
                     this.released = percent.toNumber();
                 } else if (HTTP_NO_CONTENT === res.status) {
                     this.releasePeriod = 10;
-                    this.released = 10;
+                    this.released = 20;
                 }
 
                 this.loading = false;
             })
             .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
@@ -146,7 +145,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
             .then((res) => this.setTokenExchangeAmount(res.data))
             .catch((err) => {
-                this.notifyError('Can not load statistic data. Try again later');
+                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
         },
@@ -159,16 +158,16 @@ export default {
             }).then((response) => {
                 this.$emit('update', response);
                 this.updateTokenStatistics(response.data);
-                this.notifySuccess('Release period updated.');
+                this.notifySuccess(this.$t('toasted.success.release_period_updated'));
             }).catch(({response}) => {
                 if (!response) {
-                    this.notifyError('Network error');
+                    this.notifyError(this.$t('toasted.error.network'));
                     this.sendLogs('error', 'Save release period network error', response);
                 } else if (response.data.message) {
                     this.notifyError(response.data.message);
                     this.sendLogs('error', 'Can not save release period', response);
                 } else {
-                    this.notifyError('An error has occurred, please try again later');
+                    this.notifyError(this.$t('toasted.error.try_later'));
                     this.sendLogs('error', 'An error has occurred, please try again later', response);
                 }
             });

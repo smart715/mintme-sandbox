@@ -5,8 +5,8 @@
   padding: 10px
 
 .post
-  background-color: #00334e
-  border-color: #0e3b59
+  background-color: $post-background-color
+  border-color: $post-border-color
   border-style: solid
   border-width: 1px
   margin: 5px auto
@@ -17,5 +17,27 @@
   button:focus
     outline: 1px dotted
 
-  .post-date
-    color:  $grey
+.single-post-page .post
+  background-color: transparent
+  border-color: transparent
+  border-style: none
+  border-width: 0
+
+.post .post-date, .comment .comment-date
+  color:  $grey
+
+.comments
+  width: 100%
+
+  textarea
+    min-height: 50px
+
+.comment
+  background-color: #183251
+  border-color: #0e3956
+  border-style: solid
+  border-width: 1px
+  margin: 5px auto
+  padding: 7px
+  padding-bottom: 0
+  width: 100%

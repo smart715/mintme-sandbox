@@ -8,6 +8,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -90,12 +91,19 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="side", in="query", type="string", description="Order side (sell|buy)")
      * @SWG\Tag(name="Orders")
      */
-    public function getActiveOrders(ParamFetcherInterface $request): array
+    public function getActiveOrders(ParamFetcherInterface $request, bool $reverseBaseQuote = false): array
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
+        $base = $request->get('base');
+        $quote = $request->get('quote');
 
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
+        $this->checkForDisallowedValues($base, $quote);
+
+        $base = $this->rebrandingConverter->reverseConvert($base);
+        $quote = $this->rebrandingConverter->reverseConvert($quote);
+
+        if ($reverseBaseQuote) {
+            [$base, $quote] = BaseQuote::reverse($base, $quote);
+        }
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
@@ -114,7 +122,8 @@ class OrdersController extends DevApiController
         }, $this->marketHandler->$method(
             $market,
             (int)$request->get('offset'),
-            (int)$request->get('limit')
+            (int)$request->get('limit'),
+            $reverseBaseQuote
         ));
     }
 
@@ -149,12 +158,19 @@ class OrdersController extends DevApiController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-500]")
      * @SWG\Tag(name="Orders")
      */
-    public function getFinishedOrders(ParamFetcherInterface $request): array
+    public function getFinishedOrders(ParamFetcherInterface $request, bool $reverseBaseQuote = false): array
     {
-        $this->checkForDisallowedValues($request->get('base'), $request->get('quote'));
+        $base = $request->get('base');
+        $quote = $request->get('quote');
 
-        $base = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('base')));
-        $quote = $this->rebrandingConverter->reverseConvert(mb_strtolower($request->get('quote')));
+        $this->checkForDisallowedValues($base, $quote);
+
+        $base = $this->rebrandingConverter->reverseConvert($base);
+        $quote = $this->rebrandingConverter->reverseConvert($quote);
+
+        if ($reverseBaseQuote) {
+            [$base, $quote] = BaseQuote::reverse($base, $quote);
+        }
 
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
@@ -168,7 +184,8 @@ class OrdersController extends DevApiController
         }, $this->marketHandler->getExecutedOrders(
             new Market($base, $quote),
             (int)$request->get('lastId'),
-            (int)$request->get('limit')
+            (int)$request->get('limit'),
+            $reverseBaseQuote
         ));
     }
 }

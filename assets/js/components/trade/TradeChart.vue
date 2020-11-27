@@ -3,78 +3,78 @@
         <div class="card-body p-2">
             <div class="mx-2 d-flex flex-column flex-lg-row justify-content-between">
                 <div class="my-1 text-center text-lg-left">
-                    <span>Last price: </span>
+                  <span>{{ $t('trade.chart.last_price.header') }}</span>
                     <guide>
                         <template slot="header">
-                            Last price
+                            {{ $t('trade.chart.last_price.guide_header') }}
                         </template>
                         <template slot="body">
-                            Price per one {{ market.quote|rebranding }} for last transaction.
+                            {{ $t('trade.chart.last_price.guide_body', translationsContext) }}
                         </template>
                     </guide>
                     <br>
                     {{ marketStatus.last | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
                 <div class="my-1 text-center">
-                    <span>24h/30d change: </span>
+                  <span>{{ $t('trade.chart.change.header') }}</span>
                     <guide>
                         <template slot="header">
-                            24h/30d change
+                            {{ $t('trade.chart.change.guide_header') }}
                         </template>
                         <template slot="body">
-                            Price change in last 24 hours and last 30 days.
+                            {{ $t('trade.chart.change.guide_body') }}
                         </template>
                     </guide>
                     <br>
                     {{ marketStatus.change }}%/{{ marketStatus.monthChange }}%
                 </div>
                 <div class="my-1 text-center">
-                    <span>24h/30d volume: </span>
+                    <span>{{ $t('trade.chart.volume_token.header') }}</span>
                     <guide>
                         <template slot="header">
-                            24h/30d volume
+                            {{ $t('trade.chart.volume_token.guide_header') }}
                         </template>
                         <template slot="body">
-                            The amount of {{ market.quote |rebranding }} that has been traded in the last 24 hours and the last 30 days.
+                            {{ $t('trade.chart.volume_token.guide_body', translationsContext) }}
                         </template>
                     </guide>
                     <br>
                     {{ marketStatus.volume | formatMoney }}/{{ marketStatus.monthVolume | formatMoney }} {{ volumeSymbol }}
                 </div>
                 <div class="my-1 text-center">
-                    <span>24h/30d volume: </span>
+                    <span>{{ $t('trade.chart.volume_crypto.header') }}</span>
                     <guide>
                         <template slot="header">
-                            24h/30d volume
+                            {{ $t('trade.chart.volume_crypto.guide_header') }}
                         </template>
                         <template slot="body">
-                            The amount of {{ market.base.symbol|rebranding }} that has been traded in the last 24 hours and the last 30 days.
+                            {{ $t('trade.chart.volume_crypto.guide_body', translationsContext) }}
                         </template>
                     </guide>
                     <br>
                     {{ marketStatus.amount | formatMoney }}/{{ marketStatus.monthAmount | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
                 <div class="my-1 text-center" v-if="isToken">
-                    <span>Buy Depth: </span>
+                    <span>{{ $t('trade.chart.buy_depth') }} </span>
                     <guide>
                         <template slot="header">
-                            Buy Depth
+                            {{ $t('trade.chart.buy_depth_guide') }}
                         </template>
                         <template slot="body">
-                            Buy depth is amount of buy orders in MINTME on each market. This might better represent token market size than marketcap.
+                            {{ $t('trade.chart.buy_depth_guide_body') }}
                         </template>
                     </guide>
                     <br>
                     {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
                 <div class="my-1 text-center text-lg-right">
-                    <span>Market Cap: </span>
+                    <span>{{ $t('trade.chart.market_cap') }} </span>
                     <guide>
                         <template slot="header">
-                            Market Cap
+                            {{ $t('trade.chart.market_cap.body') }}
                         </template>
                         <template slot="body">
-                            Market cap of {{ market.quote|rebranding }} based on 10 million tokens created. To make it simple to compare them between each other, we consider not yet released tokens as already created. Marketcap is not shown if 30d volume is lower than {{ minimumVolumeForMarketcap | formatMoney }} MINTME.
+                            {{ $t('trade.chart.market_cap.info', translationsContext) }}
                         </template>
                     </guide>
                     <br>
@@ -115,7 +115,13 @@ import {WEB, webBtcSymbol} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
-    mixins: [WebSocketMixin, MoneyFilterMixin, RebrandingFilterMixin, NotificationMixin, LoggerMixin],
+    mixins: [
+        WebSocketMixin,
+        MoneyFilterMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         websocketUrl: String,
         market: Object,
@@ -130,7 +136,7 @@ export default {
             chartTheme: VeLineTheme,
             chartSettings: {
                 labelMap: {
-                    '日K': 'Indexes',
+                    '日K': this.$t('trade.chart.indexes'),
                 },
                 showMA: false,
                 showDataZoom: true,
@@ -193,6 +199,13 @@ export default {
         };
     },
     computed: {
+        translationsContext: function() {
+            return {
+                quoteSymbol: this.rebrandingFunc(this.market.quote),
+                baseSymbol: this.rebrandingFunc(this.market.base.symbol),
+                minimumVolumeForMarketcap: this.minimumVolumeForMarketcap,
+            };
+        },
         isKlineEmpty: function() {
             return this.chartRows.length === 0;
         },
@@ -214,7 +227,14 @@ export default {
         },
         chartData: function() {
             return {
-                columns: ['date', 'open', 'close', 'highest', 'lowest', 'vol'],
+                columns: [
+                    this.$t('trade.chart.date'),
+                    this.$t('trade.chart.open'),
+                    this.$t('trade.chart.close'),
+                    this.$t('trade.chart.highest'),
+                    this.$t('trade.chart.lowest'),
+                    this.$t('trade.chart.vol'),
+                ],
                 rows: this.chartRows,
             };
         },
@@ -260,7 +280,7 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch((err) => {
-            this.notifyError('Service unavailable now. Can not load the chart data');
+            this.notifyError(this.$t('toasted.error.can_not_load_chart_data'));
             this.sendLogs('error', 'Can not load the chart data', err);
         });
     },
@@ -307,7 +327,7 @@ export default {
             let marketCap;
 
             if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
-                this.notifyError('Can not update the market cap for BTC / MINTME');
+                this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
                 marketCap = 0;
             } else {
                 marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
@@ -352,7 +372,7 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error('Can not update WEB circulation supply. Market Cap might not be accurate.');
+                        this.$toasted.error(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });

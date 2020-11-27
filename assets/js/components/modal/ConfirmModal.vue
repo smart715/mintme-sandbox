@@ -9,22 +9,24 @@
                 </div>
                 <slot>
                     <p class="text-white modal-title pt-2 text-uppercase">
-                        ARE YOU SURE?
+                        {{ $t('confirm_modal.body') }}
                     </p>
                 </slot>
                 <div class="pt-2">
                     <button
                         class="btn btn-primary"
                         :tabindex="9"
-                        @click="onConfirm">
-                        <slot name="confirm">Confirm</slot>
+                        @click="onConfirm"
+                        :disabled="buttonDisabled"
+                    >
+                        <slot name="confirm">{{ $t('confirm_modal.confirm') }}</slot>
                     </button>
                     <button
                         v-if="showCancelButton"
                         class="btn-cancel pl-3 bg-transparent"
                         :tabindex="10"
                         @click="onCancel">
-                        <slot name="cancel">Cancel</slot>
+                        <slot name="cancel">{{ $t('confirm_modal.cancel') }}</slot>
                     </button>
                 </div>
             </div>
@@ -34,6 +36,7 @@
 
 <script>
 import Modal from './Modal.vue';
+
 export default {
     name: 'ConfirmModal',
     components: {
@@ -48,6 +51,10 @@ export default {
         showImage: {
             type: Boolean,
             default: true,
+        },
+        buttonDisabled: {
+            type: Boolean,
+            default: false,
         },
     },
     methods: {

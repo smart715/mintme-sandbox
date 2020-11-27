@@ -1,5 +1,13 @@
+import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import ConfirmModal from '../../js/components/modal/ConfirmModal';
+
+Vue.use({
+    install(Vue, options) {
+        Vue.prototype.$t = (val) => val;
+    },
+});
+
 
 describe('ConfirmModal', () => {
     it('should be visible when visible props is true', () => {

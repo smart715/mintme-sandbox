@@ -75,7 +75,7 @@
         <button type="button"
         class="btn btn-primary ml-3"
         close>
-            Cancel
+            {% trans %}cancel{% endtrans %}
         </button>
     {%- endif -%}
     </div>
@@ -103,7 +103,12 @@
 
 {%- block textarea_widget -%}
 {%- if  (attr.max is defined) -%}
-    <limited-textarea {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} rows="5" cols="30" class="form-control form-control-md"></limited-textarea>
+    <limited-textarea
+            {{ block('widget_attributes') }}
+            value="{{ value }}"
+            rows="5"
+            cols="30"
+    ></limited-textarea>
 {%- else -%}
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}
@@ -130,7 +135,7 @@
         <div class="custom-control custom-checkbox my-1">
             <input type="checkbox" id="trusted_device" name="_trusted" class="custom-control-input" value="1" checked>
             {% set lifetime_days = trusted_device_cookie_lifetime/(24*60*60) %}
-            <label for="trusted_device" class="custom-control-label">Save device as trusted for {{ lifetime_days }} days</label>
+            <label for="trusted_device" class="custom-control-label">{% trans with {'%days%': lifetime_days} %}2fa.trusted_device{% endtrans %}</label>
         </div>
     {% endif %}
 {% endblock %}

@@ -6,16 +6,19 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
+use App\Entity\UserNotification;
+use App\Events\UserNotificationEvent;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
+use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
@@ -24,6 +27,9 @@ use Throwable;
  */
 class WalletController extends Controller
 {
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /** @var UserActionLogger */
     private $userActionLogger;
 
@@ -33,21 +39,35 @@ class WalletController extends Controller
     public function __construct(
         UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
-        RebrandingConverterInterface $rebrandingConverter
+        RebrandingConverterInterface $rebrandingConverter,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct($normalizer);
     }
 
     /**
+     * @Route("/{tab}",
+     *     name="wallet",
+     *     defaults={"tab"="wallet"},
+     *     requirements={"tab"="(dw-history|trade-history|active-orders)"},
+     *     options={"expose"=true}
+     * )
      * @param Request $request
-     * @Route(name="wallet", options={"expose"=true})
+     * @param DisabledBlockchainConfig $disabledBlockchainConfig
+     * @param DisabledServicesConfig $disabledServicesConfig
+     * @param string|null $tab
      * @return Response
      */
-    public function wallet(Request $request, DisabledBlockchainConfig $disabledBlockchainConfig): Response
-    {
+    public function wallet(
+        Request $request,
+        DisabledBlockchainConfig $disabledBlockchainConfig,
+        DisabledServicesConfig $disabledServicesConfig,
+        ?string $tab
+    ): Response {
         $depositMore = $request->get('depositMore') ?? '';
 
         /** @var  User $user*/
@@ -57,6 +77,7 @@ class WalletController extends Controller
             'hash' => $user->getHash(),
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
+            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
         ]);
     }
 
@@ -69,6 +90,13 @@ class WalletController extends Controller
      */
     public function withdrawConfirm(string $hash, WalletInterface $wallet): Response
     {
+        if (!$this->isGranted('withdraw')) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdrawing is not possible. Please try again later'
+            );
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
 
         /** @var PendingWithdrawRepository $withdrawRepo */
@@ -125,6 +153,15 @@ class WalletController extends Controller
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
+
+        /** @var  User $user*/
+        $user = $this->getUser();
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
+            UserNotificationEvent::NAME
+        );
 
         return $this->createWalletRedirection(
             'success',

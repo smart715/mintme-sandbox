@@ -4,7 +4,7 @@
             v-if="editing"
             class="form-group col-12"
         >
-            <label for="website-err">Website address:</label>
+            <label for="website-err">{{ $t('token.website.label') }}</label>
             <input
                 id="website-err"
                 v-model="newWebsite"
@@ -17,20 +17,20 @@
                 v-if="showWebsiteError"
                 class="invalid-feedback"
             >
-                Please provide a valid URL.
+                {{ $t('token.website.invalid_url') }}
             </div>
             <div class="col-12 text-left mt-3 px-0">
                 <button
                     class="btn btn-primary"
                     @click="editWebsite"
                 >
-                    Save
+                    {{ $t('token.website.save') }}
                 </button>
                 <span
                     class="btn-cancel pl-3 c-pointer"
                     @click="editing = false"
                 >
-                    Cancel
+                    {{ $t('token.website.cancel') }}
                 </span>
             </div>
         </div>
@@ -85,7 +85,7 @@
                             target="_blank"
                             rel="nofollow"
                         >
-                            More information about HTTP status codes.
+                            {{ $t('token.website.more_info') }}
                         </a>
                     </p>
                     <div class="pt-2 text-center">
@@ -93,7 +93,7 @@
                             class="btn btn-primary"
                             @click="closeFileErrorModal"
                         >
-                            OK
+                            {{ $t('token.website.ok') }}
                         </button>
                     </div>
                 </div>
@@ -106,22 +106,24 @@
             @close="showConfirmWebsiteModal = false"
         >
             <template slot="body">
-                <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
+                <h5 class="modal-title text-center mb-2">
+                    {{ $t('token.website.confirmation_title') }}
+                </h5>
                 <div class="row">
                     <div class="col-12">
                         <ol class="pl-3">
                             <li>
-                                Download
+                                {{ $t('token.website.download_1') }}
                                 <a
                                     :href="confirmWebsiteFileUrl"
                                     target="_blank"
                                 >
-                                    this html verification file
+                                    {{ $t('token.website.download_2') }}
                                 </a>
                             </li>
-                            <li>Upload the file to {{ parsedWebsite }}</li>
+                            <li>{{ $t('token.website.upload', translationsContext) }}</li>
                             <li>
-                                Check if file was uploaded successfully by visiting
+                                {{ $t('token.website.check') }}
                                 <a
                                     :href="siteRequestUrl"
                                     target="_blank"
@@ -130,7 +132,7 @@
                                     {{ siteRequestUrl }}
                                 </a>
                             </li>
-                            <li>Click confirm below</li>
+                            <li>{{ $t('token.website.click') }}</li>
                         </ol>
                     </div>
                     <div class="col-12 text-left">
@@ -145,13 +147,13 @@
                                 class="loading-spinner"
                                 fixed-width
                             />
-                            Confirm
+                            {{ $t('token.website.submit') }}
                         </button>
                         <span
                             class="btn-cancel pl-3 c-pointer"
                             @click="showConfirmWebsiteModal = false"
                         >
-                            Cancel
+                            {{ $t('token.website.cancel') }}
                         </span>
                     </div>
                 </div>
@@ -210,7 +212,7 @@ export default {
     },
     computed: {
         computedWebsiteUrl: function() {
-            return this.currentWebsite || 'Add Website';
+            return this.currentWebsite || this.$t('token.website.empty_address');
         },
         fileErrorHttpUrl: function() {
             return !!this.fileError.visibleHttpUrl;
@@ -220,6 +222,11 @@ export default {
         },
         siteRequestUrl: function() {
             return this.parsedWebsite + '/mintme.html';
+        },
+        translationsContext: function() {
+            return {
+                parsedWebsite: this.parsedWebsite,
+            };
         },
     },
     methods: {
@@ -281,7 +288,7 @@ export default {
                     }
                 })
                 .catch(({response}) => {
-                    this.notifyError(!response ? 'Network error' : response.statusText);
+                    this.notifyError(!response ? this.$t('toasted.error.network') : response.statusText);
                     this.sendLogs('error', 'Save website network error', response);
                 })
                 .then(() => this.submitting = false);

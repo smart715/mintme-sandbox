@@ -2,14 +2,14 @@
     <div>
         <div class="card">
             <div class="card-header">
-                Trade History
+                {{ $t('trade.history.header') }}
                 <span class="card-header-icon">
                     <guide>
                         <template slot="header">
-                            Trade History
+                            {{ $t('trade.history.guide_header') }}
                         </template>
                         <template slot="body">
-                            List of last closed orders for {{ market.base.symbol|rebranding }}.
+                            {{ $t('trade.history.guide_body', {baseSymbol: market.base.symbol}) | rebranding }}
                         </template>
                     </guide>
                 </span>
@@ -26,19 +26,19 @@
 
                             <template v-slot:head(pricePerQuote)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    Price per {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
                                 </span>
                                 <span v-else>
-                                    Price per {{ market.quote | rebranding }}
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding }}
                                 </span>
                             </template>
 
                             <template v-slot:head(quoteAmount)="row">
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
-                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} amount
+                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} {{ $t('trade.history.amount') }}
                                 </span>
                                  <span v-else>
-                                    {{ market.quote | rebranding }} amount
+                                    {{ market.quote | rebranding }} {{ $t('trade.history.amount') }}
                                 </span>
                             </template>
 
@@ -48,7 +48,7 @@
                                         <img
                                             :src="row.item.makerAvatar"
                                             class="rounded-circle d-block flex-grow-0 mr-1"
-                                            alt="avatar">
+                                            :alt="$t('avatar')">
                                         <span class="d-inline-block truncate-name flex-grow-1">
                                             <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                                 {{ row.value }}
@@ -79,6 +79,27 @@
                                     </a>
                                 </div>
                             </template>
+                            <template v-slot:cell(pricePerQuote)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span
+                                                v-b-tooltip="{title: currencyConvert(row.value, rate, 2), boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-slot:cell(baseAmount)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
                             <template v-slot:cell(dateTime)="row">
                                 <span class="truncate-name" v-b-tooltip="{title: row.value, boundary:'viewport'}">
                                     {{ row.value | truncate(11) }}
@@ -86,7 +107,7 @@
                             </template>
                         </b-table>
                         <div v-if="!hasOrders">
-                            <p class="text-center p-5">No deal was made yet</p>
+                            <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
                         </div>
                         <div v-if="loading" class="p-1 text-center">
                             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
@@ -106,7 +127,9 @@
 <script>
 import moment from 'moment';
 import Guide from '../Guide';
-import {formatMoney, toMoney} from '../../utils';
+import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
+import {mapGetters} from 'vuex';
+import {USD, usdSign} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {GENERAL} from '../../utils/constants';
 import {
@@ -138,15 +161,15 @@ export default {
             fields: [
                 {
                     key: 'type',
-                    label: 'Type',
+                    label: this.$t('trade.history.type'),
                 },
                 {
                     key: 'orderMaker',
-                    label: 'Order maker',
+                    label: this.$t('trade.history.order_maker'),
                 },
                 {
                     key: 'orderTrader',
-                    label: 'Order taker',
+                    label: this.$t('trade.history.order_taker'),
                 },
                 {
                     key: 'pricePerQuote',
@@ -158,17 +181,20 @@ export default {
                 },
                 {
                     key: 'baseAmount',
-                    label: this.rebrandingFunc(this.market.base.symbol) + ' amount',
+                    label: this.$t('trade.orders.sum'),
                     formatter: formatMoney,
                 },
                 {
                     key: 'dateTime',
-                    label: 'Date & Time',
+                    label: this.$t('trade.history.time'),
                 },
             ],
         };
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRates',
+        ]),
         shouldTruncate: function() {
             return this.market.quote.symbol.length > this.maxLengthToTruncate;
         },
@@ -176,24 +202,25 @@ export default {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.tableData !== false ? this.tableData.map((order) => {
-                return {
-                    dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
-                    orderMaker: order.maker.profile.nickname,
-                    orderTrader: order.taker.profile.nickname,
-                    makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
-                    takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
-                    type: this.getSideByType(order.side),
-                    pricePerQuote: toMoney(order.price, this.market.base.subunit),
-                    quoteAmount: toMoney(order.amount, this.market.quote.subunit),
-                    baseAmount: toMoney(
-                        new Decimal(order.price).mul(order.amount).toString(),
-                        this.market.base.subunit
-                    ),
-                    makerAvatar: order.maker.profile.image.avatar_small,
-                    takerAvatar: order.taker.profile.image.avatar_small,
-                };
-            }) : [];
+            return this.tableData !== false ? this.tableData.filter((order) => order.maker && order.taker)
+                .map((order) => {
+                    return {
+                        dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                        orderMaker: order.maker.profile.nickname,
+                        orderTrader: order.taker.profile.nickname,
+                        makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
+                        takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
+                        type: this.getSideByType(order.side),
+                        pricePerQuote: toMoney(order.price, this.market.base.subunit),
+                        quoteAmount: toMoney(order.amount, this.market.quote.subunit),
+                        baseAmount: toMoney(
+                            new Decimal(order.price).mul(order.amount).toString(),
+                            this.market.base.subunit
+                        ),
+                        makerAvatar: order.maker.profile.image.avatar_small,
+                        takerAvatar: order.taker.profile.image.avatar_small,
+                    };
+                }) : [];
         },
         loaded: function() {
             return this.tableData !== null;
@@ -202,6 +229,9 @@ export default {
             return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
                 this.tableData[0].id :
                 0;
+        },
+        rate: function() {
+            return (this.getRates[this.market.base.symbol] || [])[USD.symbol] || 1;
         },
     },
     mounted: function() {
@@ -265,6 +295,14 @@ export default {
                     resolve(result.data);
                 }).catch(reject);
             });
+        },
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+        },
+    },
+    filters: {
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
         },
     },
 };

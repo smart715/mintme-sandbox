@@ -1,7 +1,6 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-Hello
+{% trans %}hello{% endtrans %}
 {{username}}
-Your withdraw of {{ amount }} {{ tradable.symbol|rebranding }} was sent to address that you specified.
-You should see it soon in your wallet.
+{% trans with {'%urlWallet%':urlWallet}%}withdrawal.msg{% endtrans %}
 {% endblock %}

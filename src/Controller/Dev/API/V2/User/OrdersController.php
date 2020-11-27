@@ -53,7 +53,10 @@ class OrdersController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::getActiveOrders',
-            ['request' => $request,],
+            [
+                'request' => $request,
+                'reverseBaseQuote' => true,
+            ],
             [
                 'offset' => (int)$request->get('offset'),
                 'limit' => (int)$request->get('limit'),
@@ -98,7 +101,10 @@ class OrdersController extends AbstractFOSRestController
     {
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::getFinishedOrders',
-            ['request' => $request,],
+            [
+                'request' => $request,
+                'reverseBaseQuote' => true,
+            ],
             [
                 'offset' => (int)$request->get('offset'),
                 'limit' => (int)$request->get('limit'),
@@ -155,14 +161,15 @@ class OrdersController extends AbstractFOSRestController
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
+                'reverseBaseQuote' => true,
             ],
             [
-                'base' => (int)$request->get('base'),
-                'quote' => (int)$request->get('quote'),
-                'priceInput' => (int)$request->get('priceInput'),
-                'amountInput' => (int)$request->get('amountInput'),
-                'marketPrice' => (int)$request->get('marketPrice'),
-                'action' => (int)$request->get('action'),
+                'base' => $request->get('base'),
+                'quote' => $request->get('quote'),
+                'priceInput' => $request->get('priceInput'),
+                'amountInput' => $request->get('amountInput'),
+                'marketPrice' => $request->get('marketPrice'),
+                'action' => $request->get('action'),
             ]
         );
     }
@@ -189,10 +196,11 @@ class OrdersController extends AbstractFOSRestController
             [
                 'request' => $request,
                 'id' => $id,
+                'reverseBaseQuote' => true,
             ],
             [
-                'base' => (int)$request->get('base'),
-                'quote' => (int)$request->get('quote'),
+                'base' => $request->get('base'),
+                'quote' => $request->get('quote'),
             ]
         );
     }

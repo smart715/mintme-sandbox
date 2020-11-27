@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
+use App\Events\OrderCompletedEvent;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -19,6 +20,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -40,14 +42,19 @@ class OrdersController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -60,6 +67,9 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
         }
@@ -83,6 +93,17 @@ class OrdersController extends AbstractFOSRestController
 
             $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
+
+            $quote = $market->getQuote();
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new OrderCompletedEvent(
+                    $order,
+                    $quote
+                ),
+                OrderCompletedEvent::CANCELLED
+            );
         }
 
         return $this->view(Response::HTTP_OK);
@@ -102,6 +123,9 @@ class OrdersController extends AbstractFOSRestController
         ParamFetcherInterface $request,
         ExchangerInterface $exchanger
     ): View {
+        $this->denyAccessUnlessGranted('new-trades');
+        $this->denyAccessUnlessGranted('trading');
+
         /** @var User $currentUser */
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);

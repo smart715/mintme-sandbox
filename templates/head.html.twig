@@ -32,10 +32,7 @@
 <meta property="og:site_name" content="Mintme">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ app.request.uri }}">
-<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) }}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) | absolute_url }}">
 <meta
     property="og:image:alt"
     content="{{ metaImageAlt | default('Mintme logo. Create your own token, monetize yourself!') }}"
@@ -46,6 +43,11 @@
 <meta name="twitter:creator" content="Mintme">
 
 <style>
+    @font-face {
+        font-family: 'ConcordBold';
+        src: url({{ asset('build/fonts/Concord-Bold.ttf') }}) format('truetype');
+    }
+
     body {
         background-color: #0c1a29;
     }
@@ -56,6 +58,7 @@
 
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_tracking_id }}"></script>
+
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

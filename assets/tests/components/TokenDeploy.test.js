@@ -2,7 +2,7 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenDeploy from '../../js/components/token/deploy/TokenDeploy';
 import moxios from 'moxios';
 import Vuex from 'vuex';
-import makeOrder from '../../js/storage/modules/make_order';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 import Axios from '../../js/axios';
 import axios from 'axios';
 
@@ -19,6 +19,7 @@ function mockVue() {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {info: (val) => val};
             Vue.prototype.$toasted = {show: () => {}};
+            Vue.prototype.$t = (val) => val;
         },
     });
 
@@ -38,7 +39,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
     localVue.component('font-awesome-icon', {});
     const store = new Vuex.Store({
         modules: {
-            makeOrder,
+            tradeBalance,
             websocket: {
                 namespaced: true,
                 actions: {
@@ -57,6 +58,7 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
             precision: 4,
             statusProp: status,
             websocketUrl: '',
+            disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
         },
     });
 
@@ -94,7 +96,7 @@ describe('TokenDeploy', () => {
         const wrapper = mockTokenDeploy(true);
         const message = wrapper.find('.bg-info');
         expect(message.exists()).toBe(true);
-        expect(message.text()).toBe('Please edit token release period before deploying.');
+        expect(message.text()).toBe('token.deploy.edit_release_period');
     });
 
     it('should disabled button if the cost is higher than the balance or is deploying', () => {
