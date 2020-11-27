@@ -108,7 +108,7 @@ export default {
         sendLogsIfWsError: function(result, message = '') {
             if (null != result.error ||
                 (null != result.result && null != result.result.status && 'success' !== result.result.status)) {
-                    let context = null != result.error 
+                    let context = null != result.error
                         ? JSON.stringify(result.error)
                         : result.result.status;
                     this.sendLogs('error', message, new Error( 'test context ' + context));
