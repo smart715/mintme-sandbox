@@ -106,10 +106,11 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
+            this.sendLogs('error', message, 'test context');
             if (null != result.error ||
                 (null != result.result && null != result.result.status && 'success' !== result.result.status)) {
-                    let errorStatus = result.error || result.result.status;
-                    this.sendLogs('error', message, errorStatus);
+                    let context = result.error;
+                    this.sendLogs('error', message, context);
             }
         },
     },
