@@ -106,11 +106,12 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            this.sendLogs('error', message, new Error( 'test context ' + JSON.stringify(result.error)));
             if (null != result.error ||
                 (null != result.result && null != result.result.status && 'success' !== result.result.status)) {
-                    let context = result.error;
-                    this.sendLogs('error', message, context);
+                    let context = null != result.error 
+                        ? JSON.stringify(result.error)
+                        : result.result.status;
+                    this.sendLogs('error', message, new Error( 'test context ' + context));
             }
         },
     },
