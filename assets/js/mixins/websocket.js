@@ -88,7 +88,10 @@ export default {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
-                handler,
+                handler: (result) => {
+                    this.sendLogsIfWsError(result, message);
+                    handler(result);
+                },
             });
         },
         addOnOpenHandler: function(handler) {
@@ -106,6 +109,7 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
+            this.sendLogs('error', message, new Error( 'test context ' + JSON.stringify(result.error)));
             if (null != result.error ||
                 (null != result.result && null != result.result.status && 'success' !== result.result.status)) {
                     let context = null != result.error

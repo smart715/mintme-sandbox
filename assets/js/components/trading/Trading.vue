@@ -516,14 +516,13 @@ export default {
                     this.loading = false;
 
                     this.addMessageHandler((result) => {
-                        this.sendLogsIfWsError(result, 'Trading Vue');
                         if ('state.update' === result.method) {
                             this.sanitizeMarket(result);
                             this.requestMonthInfo(result.params[0]);
                         } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
                             this.updateMonthVolume(result.id, result.result);
                         }
-                    }, null, 'Trading');
+                    }, null, 'Trading WS');
                 });
         },
         sortCompare: function(a, b, key) {
