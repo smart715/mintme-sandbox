@@ -280,7 +280,7 @@ export default {
     },
     data() {
         return {
-            depositMore: this.depositMoreProp,
+            depositMore: null,
             tokens: null,
             predefinedTokens: null,
             depositAddresses: {},
@@ -398,6 +398,9 @@ export default {
                 }),
         ])
         .then(() => {
+            if (this.depositMore === null) {
+                this.depositMore = this.depositMoreProp;
+            }
             this.openDepositMore();
         })
         .catch((err) => {
