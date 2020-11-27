@@ -127,18 +127,17 @@ export default {
             readyToSave: false,
             showMore: true,
             readMore: this.$t('read_more'),
-            show: '',
             height: 0,
             resizeObserver: null,
         };
     },
     mounted: function() {
-    this.$nextTick()
-        .then(() => {
-            this.resizeObserver = new ResizeObserver(this.updateHeight.bind(this));
-            this.resizeObserver.observe(this.$refs.hide);
-        });
-    },
+        this.$nextTick()
+            .then(() => {
+                this.resizeObserver = new ResizeObserver(this.updateHeight.bind(this));
+                this.resizeObserver.observe(this.$refs.hide);
+            });
+        },
     beforeDestroy() {
         this.resizeObserver.disconnect();
     },
