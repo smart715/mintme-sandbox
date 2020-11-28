@@ -268,7 +268,7 @@ export default {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
-        depositMore: String,
+        depositMoreProp: String,
         twofa: String,
         expirationTime: Number,
         disabledCrypto: String,
@@ -280,6 +280,7 @@ export default {
     },
     data() {
         return {
+            depositMore: null,
             tokens: null,
             predefinedTokens: null,
             depositAddresses: {},
@@ -348,6 +349,13 @@ export default {
         },
     },
     mounted: function() {
+        if (window.localStorage.getItem('mintme_signedup_from_donation') !== null) {
+            this.depositMore = window.localStorage.getItem('mintme_donation_currency');
+
+            window.localStorage.removeItem('mintme_signedup_from_donation');
+            window.localStorage.removeItem('mintme_donation_currency');
+        }
+
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -390,6 +398,9 @@ export default {
                 }),
         ])
         .then(() => {
+            if (this.depositMore === null) {
+                this.depositMore = this.depositMoreProp;
+            }
             this.openDepositMore();
         })
         .catch((err) => {
@@ -428,10 +439,7 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            if (!this.twofa) {
-                this.notifyInfo(this.$t('toasted.info.enable_2fa_before'));
-                return;
-            }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
