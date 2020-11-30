@@ -4,6 +4,7 @@ import Toasted from 'vue-toasted';
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenIntroductionDescription from '../../js/components/token/introduction/TokenIntroductionDescription';
 import moxios from 'moxios';
+import '../__mocks__/ResizeObserver';
 import axios from 'axios';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
