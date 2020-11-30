@@ -56,4 +56,17 @@ class NotificationTypes implements NotificationTypesInterface
             self::ORDER_CANCELLED => $this->translations->trans('userNotification.type.order_cancelled'),
         ];
     }
+
+    public static function getStrategyText(): array
+    {
+        return [
+            self::DEPOSIT => 'Deposit',
+            self::WITHDRAWAL => 'Withdrawal',
+            self::NEW_INVESTOR => 'newInvestor',
+            self::TOKEN_NEW_POST => 'TokenPost',
+            self::TOKEN_DEPLOYED => 'TokenDeployed',
+            self::ORDER_FILLED => 'OrderFilled',
+            self::ORDER_CANCELLED => 'OrderCancelled',
+        ];
+    }
 }

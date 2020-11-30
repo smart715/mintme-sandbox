@@ -9,8 +9,12 @@ use App\Events\UserNotificationEvent;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TokenPostStrategy;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -35,19 +39,29 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
+
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
         PostManagerInterface $postManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -238,16 +252,27 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        /** @var User|null $user */
+        /** @var User $user */
         $user = $this->getUser();
 
         $notificationType = NotificationTypes::TOKEN_NEW_POST;
 
         /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
+        /*$this->eventDispatcher->dispatch(
             new UserNotificationEvent($user, $notificationType),
             UserNotificationEvent::NAME,
+        );*/
+
+        $strategy = new TokenPostStrategy(
+            $this->userNotificationManager,
+            $this->mailer,
+            $this->entityManager,
+            $notificationType
         );
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
+        //dd($notificationContext);
+       // $this->userNotificationManager->createNotification($user, $notificationType, $extraData);
 
         return $this->view(["message" => $message], Response::HTTP_OK);
     }

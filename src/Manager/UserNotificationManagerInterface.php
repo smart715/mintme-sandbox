@@ -9,7 +9,7 @@ interface UserNotificationManagerInterface
     public function createNotification(
         User $user,
         String $notificationType,
-        array $extraData
+        ?array $extraData
     ): void;
     public function updateNotifications(User $user): void;
     public function getNotifications(User $user, ?int $notificationLimit): ?array;

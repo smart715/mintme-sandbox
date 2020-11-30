@@ -4,11 +4,8 @@ namespace App\Manager;
 
 use App\Entity\User;
 use App\Entity\UserNotification;
-use App\Entity\UserToken;
 use App\Exception\ApiBadRequestException;
-use App\Mailer\MailerInterface;
 use App\Repository\UserNotificationRepository;
-use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -20,30 +17,37 @@ class UserNotificationManager implements UserNotificationManagerInterface
     /** @var UserNotificationRepository */
     private UserNotificationRepository $userNotificationRepository;
 
-    /** @var MailerInterface */
-    private MailerInterface $mailer;
-
     /** @var UserNotificationConfigManagerInterface */
     private UserNotificationConfigManagerInterface $notificationConfigManager;
 
     public function __construct(
         EntityManagerInterface $em,
         UserNotificationRepository $userNotificationRepository,
-        MailerInterface $mailer,
         UserNotificationConfigManagerInterface $notificationConfigManager
     ) {
         $this->em = $em;
         $this->userNotificationRepository =  $userNotificationRepository;
-        $this->mailer = $mailer;
         $this->notificationConfigManager = $notificationConfigManager;
     }
 
     public function createNotification(
         User $user,
         String $notificationType,
-        array $extraData
+        ?array $extraData
     ): void {
-        if ((NotificationTypes::TOKEN_NEW_POST === $notificationType ||
+        $userNotification = (new UserNotification())
+            ->setType($notificationType)
+            ->setUser($user);
+
+        if ($extraData) {
+            $userNotification->setJsonData($extraData);
+        }
+
+        $userNotification->setViewed(false);
+        $this->em->persist($userNotification);
+        $this->em->flush();
+
+        /*if ((NotificationTypes::TOKEN_NEW_POST === $notificationType ||
             NotificationTypes::TOKEN_DEPLOYED === $notificationType)
         ) {
             foreach ($this->getUsersHaveTokenIds($user) as $userHaveToken) {
@@ -96,7 +100,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
             }
 
             $this->em->flush();
-        }
+        }*/
     }
 
     public function getNotifications(User $user, ?int $notificationLimit): ?array
@@ -120,7 +124,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
         $this->em->flush();
     }
 
-    private function getUsersHaveTokenIds(User $user): array
+    /*private function getUsersHaveTokenIds(User $user): array
     {
         $result = [];
         $usersTokens = $this->em->getRepository(UserToken::class)->findAll();
@@ -141,9 +145,9 @@ class UserNotificationManager implements UserNotificationManagerInterface
         }
 
         return $result;
-    }
+    }*/
 
-    private function newUserNotification(String $type, User $user, ?array $jsonData): void
+    /*private function newUserNotification(String $type, User $user, ?array $jsonData): void
     {
         $userNotification = (new UserNotification())
             ->setType($type)
@@ -155,7 +159,7 @@ class UserNotificationManager implements UserNotificationManagerInterface
 
         $userNotification->setViewed(false);
         $this->em->persist($userNotification);
-    }
+    }*/
 
     public function isNotificationAvailable(User $user, String $type, String $channel): Bool
     {
