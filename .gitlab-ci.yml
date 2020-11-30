@@ -41,6 +41,8 @@ tests_php:
       - vendor/
   tags:
     - mintme-tests
+  except:
+    - translations
 
 tests_assets:
   stage: tests
@@ -56,6 +58,8 @@ tests_assets:
       - vendor/
   tags:
     - mintme-tests
+  except:
+    - translations
 
 phpfunctional_tests:
   stage: tests
