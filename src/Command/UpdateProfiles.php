@@ -104,7 +104,7 @@ class UpdateProfiles extends Command
             return $this->getNickname($profile, ++$sequence);
         }
 
-        return $nickname;
+        return mb_convert_encoding($nickname, "UTF-8");
     }
 
     private function nicknameHasProfile(string $nickname): bool
