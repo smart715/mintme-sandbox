@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\OrdersFactory;
@@ -84,7 +85,7 @@ class InitialSellOrdersCommand extends Command
             if (!$token->isDeployed() &&
                 !$token->isBlocked() &&
                 $this->tokenHasEnoughAmount($token) &&
-                $this->noActiveSellOrder($token)
+                $this->noUserActiveSellOrder($token->getProfile()->getUser(), $token)
             ) {
                 $this->ordersFactory->createInitOrders($token);
                 $initOrdersFactoryCount++;
@@ -110,11 +111,11 @@ class InitialSellOrdersCommand extends Command
             );
     }
 
-    private function noActiveSellOrder(Token $token): bool
+    private function noUserActiveSellOrder(User $user, Token $token): bool
     {
         $market = $this->marketFactory->create($this->cryptoManager->findBySymbol(Token::WEB_SYMBOL), $token);
 
-        $sellOrders = $this->marketHandler->getPendingSellOrders($market);
+        $sellOrders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
 
         return 0 === count($sellOrders);
     }
