@@ -4,18 +4,18 @@ namespace App\EventSubscriber;
 
 use App\Entity\Token\Token;
 use App\Events\OrderCompletedEvent;
-use App\Events\UserNotificationEvent;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Mailer\MailerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NewInvestorStrategy;
+use App\Notifications\Strategy\NotificationContext;
 use App\Utils\NotificationTypes;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderCompletedSubscriber implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
 
     /** @var MarketHandlerInterface */
     private $marketHandler;
@@ -23,14 +23,22 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
     /** @var ScheduledNotificationManagerInterface */
     private $scheduledNotificationManager;
 
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
+
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
         MarketHandlerInterface $marketHandler,
-        ScheduledNotificationManagerInterface $scheduledNotificationManager
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
-        $this->eventDispatcher = $eventDispatcher;
         $this->marketHandler = $marketHandler;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     public static function getSubscribedEvents(): array
@@ -69,15 +77,15 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                     'profile' => $userProfile,
                     'tokenName' => $tokenName,
                 ];
-                /** @psalm-suppress TooManyArguments */
-                $this->eventDispatcher->dispatch(
-                    new UserNotificationEvent(
-                        $userTokenCreator,
-                        NotificationTypes::NEW_INVESTOR,
-                        $extraData
-                    ),
-                    UserNotificationEvent::NAME
+                $notificationType = NotificationTypes::NEW_INVESTOR;
+                $strategy = new NewInvestorStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer,
+                    $notificationType,
+                    $extraData
                 );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($userTokenCreator);
             }
 
             if (Order::BUY_SIDE === $orderType &&

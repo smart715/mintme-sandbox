@@ -5,13 +5,15 @@ namespace App\Controller\Dev\API\V1\User;
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\WithdrawalStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Utils\ValidatorFactoryInterface;
@@ -53,8 +55,8 @@ class WalletController extends DevApiController
     /** @var ValidatorFactoryInterface */
     private $vf;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
 
     public function __construct(
         WalletInterface $wallet,
@@ -63,7 +65,7 @@ class WalletController extends DevApiController
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        EventDispatcherInterface $eventDispatcher
+        UserNotificationManagerInterface $userNotificationManager
     ) {
         $this->wallet = $wallet;
         $this->userActionLogger = $userActionLogger;
@@ -71,7 +73,7 @@ class WalletController extends DevApiController
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->vf = $validatorFactory;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
     }
 
     /**
@@ -263,11 +265,13 @@ class WalletController extends DevApiController
             throw new ApiBadRequestException('Withdrawal failed');
         }
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, NotificationTypes::WITHDRAWAL),
-            UserNotificationEvent::NAME
+        $notificationType = NotificationTypes::WITHDRAWAL;
+        $strategy = new WithdrawalStrategy(
+            $this->userNotificationManager,
+            $notificationType
         );
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
 
         $this->userActionLogger->info("Withdraw funds from API for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),

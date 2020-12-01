@@ -3,7 +3,6 @@
 namespace App\Notifications\Strategy;
 
 use App\Entity\User;
-use App\Manager\UserNotificationManager;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 

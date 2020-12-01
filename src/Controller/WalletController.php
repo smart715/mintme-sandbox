@@ -6,7 +6,6 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
-use App\Events\UserNotificationEvent;
 use App\Logger\UserActionLogger;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
@@ -17,7 +16,6 @@ use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Wallet\WalletInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,9 +28,6 @@ use Throwable;
  */
 class WalletController extends Controller
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var UserActionLogger */
     private $userActionLogger;
 
@@ -47,12 +42,10 @@ class WalletController extends Controller
         UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
         RebrandingConverterInterface $rebrandingConverter,
-        EventDispatcherInterface $eventDispatcher,
         UserNotificationManagerInterface $userNotificationManager
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->eventDispatcher = $eventDispatcher;
         $this->userNotificationManager = $userNotificationManager;
 
         parent::__construct($normalizer);
@@ -166,13 +159,7 @@ class WalletController extends Controller
         /** @var  User $user*/
         $user = $this->getUser();
 
-        /** @psalm-suppress TooManyArguments */
-        /*$this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, NotificationTypes::WITHDRAWAL),
-            UserNotificationEvent::NAME
-        );*/
         $notificationType = NotificationTypes::WITHDRAWAL;
-
         $strategy = new WithdrawalStrategy(
             $this->userNotificationManager,
             $notificationType

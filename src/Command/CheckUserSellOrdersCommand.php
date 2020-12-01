@@ -6,9 +6,12 @@ use App\Entity\ScheduledNotification;
 use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\OrderStrategy;
 use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
@@ -35,16 +38,21 @@ class CheckUserSellOrdersCommand extends Command
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
+
     public function __construct(
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
         MarketHandlerInterface $marketHandler,
         CryptoManagerInterface $cryptoManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
@@ -76,11 +84,13 @@ class CheckUserSellOrdersCommand extends Command
             $actual_date = new DateTimeImmutable();
 
             if (!$userSellOrders && $dateToBeSend <= $actual_date) {
-                $this->userNotificationManager->createNotification(
-                    $user,
-                    $notificationType,
-                    []
+                $strategy = new OrderStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer,
+                    $notificationType
                 );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
 
                 $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
 
