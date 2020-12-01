@@ -56,20 +56,12 @@ class Order extends AbstractOrder
     /** @Groups({"Default", "API"}) */
     public function getMaker(): User
     {
-        if ($this->maker->getProfile()->isAnonymous()) {
-            $this->maker->setProfile(null)->setNickname("Anonymous");
-        }
-
         return $this->maker;
     }
 
     /** @Groups({"Default", "API"}) */
     public function getTaker(): ?User
     {
-        if ($this->maker->getProfile()->isAnonymous()) {
-            $this->maker->setProfile(null)->setNickname("Anonymous");
-        }
-
         return $this->taker;
     }
 
