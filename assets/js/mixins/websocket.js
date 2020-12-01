@@ -109,10 +109,9 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            if ((null !== result.error && '' !== result.error && undefined !== result.error) ||
-                (null !== result.result
-                    && undefined !== result.result
+            if (null !== result.error || (null !== result.result
                     && null !== result.result.status
+                    && 'undefined' !== result.result.status
                     && 'success' !== result.result.status)
                 ) {
                     let context = null !== result.error
