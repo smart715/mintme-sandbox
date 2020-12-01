@@ -116,8 +116,8 @@ export default {
                     && 'success' !== result.result.status)
                 ) {
                     let context = null !== result.error
-                        ? JSON.stringify(result.error)
-                        : result.result.status;
+                        ? 'context ' + JSON.stringify(result.error)
+                        : 'status ' + JSON.stringify(result.result.status);
                     this.sendLogs('error', message, new Error(context));
             }
         },
