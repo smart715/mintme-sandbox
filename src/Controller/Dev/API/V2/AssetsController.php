@@ -38,7 +38,7 @@ class AssetsController extends AbstractFOSRestController
      * @Rest\View(serializerGroups={"dev"})
      * @SWG\Response(
      *     response="200",
-     *     description="Returns detailed summary for each currency available on the exchange."
+     *     description="Returns detailed summary for each crypto or deployed token available on the exchange."
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
