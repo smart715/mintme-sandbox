@@ -109,18 +109,8 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            if (null !== result.error || (null !== result.result
-                    && undefined !== result.result
-                    && 'undefined' !== result.result
-                    && null !== result.result.status
-                    && undefined !== result.result.status
-                    && 'undefined' !== result.result.status
-                    && 'success' !== result.result.status)
-                ) {
-                    let context = null !== result.error
-                        ? 'context ' + JSON.stringify(result.error)
-                        : 'status ' + JSON.stringify(result.result);
-                    this.sendLogs('error', message, new Error(context));
+            if (null !== result.error) {
+                this.sendLogs('error', message, new Error(result.error));
             }
         },
     },
