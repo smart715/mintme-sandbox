@@ -109,7 +109,7 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            if (null !== result.error ||
+            if ((null !== result.error && '' !== result.error && undefined !== result.error) ||
                 (null !== result.result && null !== result.result.status && 'success' !== result.result.status)) {
                     let context = null !== result.error
                         ? JSON.stringify(result.error)
