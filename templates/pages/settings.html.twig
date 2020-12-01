@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">{% trans %}page.settings.account.header{% endtrans %}</div>
                     <div class="card-body m-0">
-                        <div id="settings">
+                        <div id="settings" class="account-settings">
                         {% if twoFactorAuth %}
                             {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'submit2FA'}} ) }}
                             <two-factor-modal
