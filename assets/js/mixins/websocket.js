@@ -110,6 +110,8 @@ export default {
         },
         sendLogsIfWsError: function(result, message = '') {
             if (null !== result.error || (null !== result.result
+                    && undefined !== result.result
+                    && 'undefined' !== result.result
                     && null !== result.result.status
                     && undefined !== result.result.status
                     && 'undefined' !== result.result.status
