@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
 class MarketStatusRepository extends EntityRepository
@@ -58,6 +59,17 @@ class MarketStatusRepository extends EntityRepository
         return $this->createQueryBuilder('ms')
             ->where('ms.expires is not null and ms.expires < :now')
             ->setParameter('now', new \DateTimeImmutable())
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getCryptoAndDeployedTokenMarketStatuses(): array
+    {
+        return $this->createQueryBuilder('ms')
+            ->leftJoin('ms.quoteToken', 'qt')
+            ->where('ms.quoteToken IS NULL')
+            ->orWhere('qt.deployed IS NOT NULL')
+            ->orderBy('ms.lastPrice', Criteria::DESC)
             ->getQuery()
             ->getResult();
     }
