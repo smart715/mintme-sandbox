@@ -110,7 +110,7 @@ export default {
         },
         sendLogsIfWsError: function(result, message = '') {
             if (null !== result.error) {
-                this.sendLogs('error', message, new Error(result.error));
+                this.sendLogs('error', message, new Error(JSON.stringify(result.error)));
             }
         },
     },
