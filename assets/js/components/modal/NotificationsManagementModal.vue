@@ -8,17 +8,17 @@
         >
             <template slot="header"> {{ $t('userNotification.config.settings') }} </template>
             <template slot="body">
-                <div class="p-0">
-                    <div class="row faq-block mx-0 border-bottom border-top">
-                        <div>
-                            <b-card>
-                                <b-card-text>
-                                    {{ $t('userNotification.config.receive_not_about') }}
-                                </b-card-text>
-                            </b-card>
-                        </div>
-                        <template v-if="!loading && config.show" v-for="config in userConfigModel">
-                            <faq-item :key="config">
+                <div class="notification-config p-0">
+                    <div>
+                        <b-card>
+                            <b-card-text>
+                                {{ $t('userNotification.config.receive_not_about') }}
+                            </b-card-text>
+                        </b-card>
+                    </div>
+                    <template v-if="!loading && config.show" v-for="config in userConfigModel">
+                        <div class="row faq-block mx-0 border-bottom border-top" :key="config.text">
+                            <faq-item>
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
                                         <div class="mb-2">
@@ -45,27 +45,24 @@
                                         </div>
                                 </template>
                             </faq-item>
-                        </template>
-                        <div v-if="loading" class="text-center w-100">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                         </div>
-                        <div>
-                            <b-card>
-                                <button
-                                    class="btn btn-primary float-left"
-                                    @click="saveConfig"
-                                    :disabled="saving"
-                                >
-                                    {{ $t('save') }}
-                                </button>
-                                <button
-                                    class="btn btn-primary float-left ml-2"
-                                    @click="$emit('close')"
-                                >
-                                    {{ $t('cancel') }}
-                                </button>
-                            </b-card>
-                        </div>
+                    </template>
+                    <div v-if="loading" class="text-center w-100">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                    <div>
+                        <b-card>
+                            <button
+                                class="btn btn-primary float-left"
+                                @click="saveConfig"
+                                :disabled="saving"
+                            >
+                                {{ $t('save') }}
+                            </button>
+                            <div class="mt-1">
+                                <b-link class="ml-3" @click="$emit('close')" >{{ $t('cancel') }}</b-link>
+                            </div>
+                        </b-card>
                     </div>
                 </div>
             </template>

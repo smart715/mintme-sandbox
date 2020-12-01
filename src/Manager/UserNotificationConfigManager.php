@@ -7,8 +7,8 @@ use App\Entity\UserNotificationConfig;
 use App\Repository\UserNotificationConfigRepository;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
-use App\Utils\NotificationTypesInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserNotificationConfigManager implements UserNotificationConfigManagerInterface
 {
@@ -18,18 +18,17 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
     /** @var UserNotificationConfigRepository */
     private UserNotificationConfigRepository $userNotificationConfigRepository;
 
-    /** @var NotificationTypesInterface */
-    private NotificationTypesInterface $notificationTypes;
-
+    /** @var TranslatorInterface */
+    private TranslatorInterface $translator;
 
     public function __construct(
         EntityManagerInterface $em,
         UserNotificationConfigRepository $userNotificationConfigRepository,
-        NotificationTypesInterface $notificationTypes
+        TranslatorInterface $translator
     ) {
         $this->em = $em;
         $this->userNotificationConfigRepository = $userNotificationConfigRepository;
-        $this->notificationTypes = $notificationTypes;
+        $this->translator = $translator;
     }
 
     public function getUserNotificationsConfig(User $user): ?array
@@ -41,7 +40,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         $defaultConfig = [];
 
         foreach ($notificationTypes as $nType) {
-            $defaultConfig[$nType]['text'] = $this->notificationTypes->getText()[$nType];
+            $defaultConfig[$nType]['text'] = $this->translator->trans('userNotification.type.'.$nType);
             $defaultConfig[$nType]['show'] = true;
 
             if (NotificationTypes::NEW_INVESTOR === $nType && null === $user->getProfile()->getToken()) {
