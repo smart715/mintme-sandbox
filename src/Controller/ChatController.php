@@ -59,6 +59,9 @@ class ChatController extends Controller
         return $this->render('pages/chat.html.twig', [
             'threads' => $this->normalize($threads),
             'threadId' => $threadId,
+            'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
+            'precision' => $this->getParameter('token_precision'),
+            'hash' => $user->getHash(),
         ]);
     }
 
