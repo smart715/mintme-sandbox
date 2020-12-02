@@ -24,7 +24,6 @@ export default {
         loggedIn: Boolean,
         isOwner: Boolean,
         precision: Number,
-        isToken: Boolean,
     },
     computed: {
         ...mapGetters('tradeBalance', [

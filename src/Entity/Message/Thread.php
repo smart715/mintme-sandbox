@@ -79,6 +79,9 @@ class Thread
         return $this;
     }
 
+    /**
+     * @Groups({"Default"})
+     */
     public function getToken(): Token
     {
         return $this->token;
