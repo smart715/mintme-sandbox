@@ -70,14 +70,14 @@ class AssetsController extends AbstractFOSRestController
         foreach ($tokens as $token) {
             $deployed = $token->isDeployed();
 
-            if ($token->isBlocked()) {
+            if ($token->isBlocked() || !$deployed) {
                 continue;
             }
 
             $assets[$this->rebrandingConverter->convert($token->getSymbol())] = [
                 'name' => strtolower($this->rebrandingConverter->convert($token->getName())),
-                'can_withdraw' => $deployed,
-                'can_deposit' => $deployed,
+                'can_withdraw' => true,
+                'can_deposit' => true,
                 'min_withdraw' => $tokenMinWithdraw,
                 'max_withdraw' => $this->getParameter('token_quantity'),
                 'maker_fee' => $makerFee,
