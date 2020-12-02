@@ -47,7 +47,7 @@
                 </template>
             </div>
         </div>
-        <div v-if="messagesLoaded" class="card-footer border-0 py-2 px-0">
+        <div v-if="showInput" class="card-footer border-0 py-2 px-0">
             <form @submit.prevent="addMessageToQueue" class="d-flex">
                 <input
                     v-model="messageBody"
@@ -70,14 +70,21 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import {LoggerMixin} from '../../mixins';
+import {LoggerMixin, NotificationMixin} from '../../mixins';
 const updateMessagesMS = 1000;
 
 export default {
     name: 'ChatBox',
     mixins: [
         LoggerMixin,
+        NotificationMixin,
     ],
+    props: {
+        chatReady: {
+            type: Boolean,
+            default: true,
+        },
+    },
     data() {
         return {
             messagesPage: 1,
@@ -97,13 +104,22 @@ export default {
     computed: {
         ...mapGetters('chat', {
             getContactName: 'getContactName',
+            tokenName: 'getTokenName',
+            userTokenName: 'getUserTokenName',
             threadId: 'getCurrentThreadId',
+            dMMinAmount: 'getDMMinAmount',
+        }),
+        ...mapGetters('tradeBalance', {
+            quoteBalance: 'getQuoteBalance',
         }),
         hasMessages: function() {
             return this.messagesList.length > 0;
         },
         messagesLoaded: function() {
             return this.messages !== null;
+        },
+        showInput: function() {
+            return this.messagesLoaded && this.chatReady;
         },
         contactName: function() {
             return this.messagesLoaded
@@ -137,10 +153,25 @@ export default {
                 ? lastMessage.id
                 : 0;
         },
+        translationContext: function() {
+            return {
+                amount: this.dMMinAmount,
+                currency: this.tokenName,
+            };
+        },
     },
     methods: {
         addMessageToQueue: function() {
             if (!this.messageBody) {
+                return;
+            }
+
+            if (this.tokenName !== this.userTokenName && this.quoteBalance < this.dMMinAmount) {
+                this.notifyInfo(this.$t(
+                    'chat.chat_box.min_amount_required_info',
+                    this.translationContext
+                ));
+                this.messageBody = '';
                 return;
             }
 
