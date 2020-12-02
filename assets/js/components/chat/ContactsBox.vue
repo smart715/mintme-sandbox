@@ -67,6 +67,7 @@ export default {
                     participants[metadata.participant.id] = {
                         ...metadata.participant,
                         threadId: thread.id,
+                        tokenName: thread.token.name,
                         lastMessageTimestamp: thread.lastMessageTimestamp,
                         hasUnreadMessages: thread.hasUnreadMessages,
                     };
@@ -84,6 +85,7 @@ export default {
                         nickname: participant.profile.nickname,
                         avatar: participant.profile.image.avatar_middle,
                         threadId: participant.threadId,
+                        tokenName: participant.tokenName,
                         lastMessageTimestamp: participant.lastMessageTimestamp,
                         hasUnreadMessages: participant.hasUnreadMessages,
                     };
@@ -99,6 +101,7 @@ export default {
     methods: {
         ...mapMutations('chat', [
             'setContactName',
+            'setTokenName',
             'setCurrentThreadId',
         ]),
         initThreads: function() {
@@ -119,6 +122,7 @@ export default {
 
             if (threadId > 0) {
                 this.$set(this.threads[threadId], 'hasUnreadMessages', false);
+                this.setTokenName(this.contacts[threadId].tokenName);
                 this.setContactName(this.contacts[threadId].nickname);
             }
 
