@@ -68,7 +68,7 @@ class MarketStatusRepository extends EntityRepository
         return $this->createQueryBuilder('ms')
             ->leftJoin('ms.quoteToken', 'qt')
             ->where('ms.quoteToken IS NULL')
-            ->orWhere('qt.address IS NOT NULL AND qt.address != :pending')
+            ->orWhere('qt.address IS NOT NULL AND qt.address != :pending AND qt.isBlocked = false')
             ->setParameter('pending', Token::PENDING_ADDR)
             ->orderBy('ms.lastPrice', Criteria::DESC)
             ->getQuery()
