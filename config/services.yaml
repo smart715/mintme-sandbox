@@ -655,3 +655,7 @@ services:
     App\Manager\ScheduledNotificationManager:
         properties:
             timeIntervals: '%time_intervals%'
+
+    App\Controller\API\WalletController:
+        arguments:
+            $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'

@@ -6,6 +6,7 @@
             :coinify-partner-id="coinifyPartnerId"
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
+            :addresses-signature="addressesSignature"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -283,6 +284,7 @@ export default {
             tokens: null,
             predefinedTokens: null,
             depositAddresses: {},
+            addressesSignature: {},
             showModal: false,
             selectedCurrency: null,
             isTokenModal: false,
@@ -382,8 +384,11 @@ export default {
                     this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
-            this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
-                .then((res) => this.depositAddresses = res.data)
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses_signature'))
+                .then((res) => {
+                    this.depositAddresses = res.data.addresses;
+                    this.addressesSignature = res.data.signatures;
+                })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.can_not_update_deposit_data'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
