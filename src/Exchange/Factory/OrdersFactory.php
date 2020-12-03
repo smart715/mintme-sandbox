@@ -105,15 +105,13 @@ class OrdersFactory implements OrdersFactoryInterface
             RoundingMode::HALF_DOWN
         );
 
-        $price = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
-
-        if ($currentPrice) {
-            $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
-
-            return $currentPrice->add($this->currentStep);
-        } else {
-            return $price;
+        if (!$currentPrice) {
+            return $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
         }
+
+        $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
+        
+        return $currentPrice->add($this->currentStep);
     }
 
     private function getStepAmount(): Money
