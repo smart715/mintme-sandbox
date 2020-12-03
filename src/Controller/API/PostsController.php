@@ -80,7 +80,7 @@ class PostsController extends AbstractFOSRestController
         $post = new Post();
         $post->setToken($token);
 
-        return $this->handlePostForm($post, $request, 'Post created.');
+        return $this->handlePostForm($post, $request, 'Post created.', true);
     }
 
     /**
@@ -232,8 +232,12 @@ class PostsController extends AbstractFOSRestController
         return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
     }
 
-    private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
-    {
+    private function handlePostForm(
+        Post $post,
+        ParamFetcherInterface $request,
+        string $message,
+        bool $newPost = false
+    ): View {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
 
         $form->submit($request->all());
@@ -245,18 +249,21 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        /** @var User $user */
-        $user = $this->getUser();
+        if ($newPost) {
+            /** @var User $user */
+            $user = $this->getUser();
 
-        $notificationType = NotificationTypes::TOKEN_NEW_POST;
-        $strategy = new TokenPostStrategy(
-            $this->userNotificationManager,
-            $this->mailer,
-            $this->entityManager,
-            $notificationType
-        );
-        $notificationContext = new NotificationContext($strategy);
-        $notificationContext->sendNotification($user);
+            $notificationType = NotificationTypes::TOKEN_NEW_POST;
+            $strategy = new TokenPostStrategy(
+                $this->userNotificationManager,
+                $this->mailer,
+                $this->entityManager,
+                $notificationType
+            );
+
+            $notificationContext = new NotificationContext($strategy);
+            $notificationContext->sendNotification($user);
+        }
 
         return $this->view(["message" => $message], Response::HTTP_OK);
     }
