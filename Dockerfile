@@ -31,9 +31,9 @@ RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.
 
 RUN apt-get install -y nodejs
 RUN apt-get install -y build-essential
-
+RUN npm install npm@6.9.0 -g
 # Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=1.9.3
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql zip bcmath pcntl sockets gd
 
