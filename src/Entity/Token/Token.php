@@ -45,6 +45,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
+    public const PENDING_ADDR = '0x';
 
     /**
      * @ORM\Id()
@@ -447,7 +448,7 @@ class Token implements TradebleInterface, ImagineInterface
     {
         return !$this->address
             ? self::NOT_DEPLOYED
-            : ('0x' === $this->address
+            : (self::PENDING_ADDR === $this->address
                 ? self::PENDING
                 : self::DEPLOYED);
     }

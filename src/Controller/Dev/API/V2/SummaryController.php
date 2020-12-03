@@ -41,7 +41,7 @@ class SummaryController extends AbstractFOSRestController
      * @Rest\View(serializerGroups={"dev"})
      * @SWG\Response(
      *     response="200",
-     *     description="Returns data for all tickers and all markets."
+     *     description="Returns data for all tickers and all markets with crypto or deployed tokens."
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
@@ -49,7 +49,7 @@ class SummaryController extends AbstractFOSRestController
      */
     public function getSummary(): array
     {
-        $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
+        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo();
 
         return array_map(
             function ($marketStatus) {

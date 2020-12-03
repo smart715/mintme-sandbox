@@ -167,11 +167,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getAllMarketsInfo(): array
+    public function getCryptoAndDeployedMarketsInfo(): array
     {
-        return $this->parseMarketStatuses(
-            $this->repository->findBy([], ['lastPrice' => Criteria::DESC])
-        );
+        return $this->repository->getCryptoAndDeployedTokenMarketStatuses();
     }
 
     /** {@inheritDoc} */
