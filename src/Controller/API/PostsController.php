@@ -73,7 +73,7 @@ class PostsController extends AbstractFOSRestController
         $post = new Post();
         $post->setToken($token);
 
-        return $this->handlePostForm($post, $request, 'Post created.');
+        return $this->handlePostForm($post, $request, 'Post created.', true);
     }
 
     /**
@@ -225,8 +225,12 @@ class PostsController extends AbstractFOSRestController
         return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
     }
 
-    private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
-    {
+    private function handlePostForm(
+        Post $post,
+        ParamFetcherInterface $request,
+        string $message,
+        bool $newPost = false
+    ): View {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
 
         $form->submit($request->all());
@@ -238,16 +242,18 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        /** @var User|null $user */
-        $user = $this->getUser();
+        if ($newPost) {
+            /** @var User|null $user */
+            $user = $this->getUser();
 
-        $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
+            $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, $notificationType),
-            UserNotificationEvent::NAME,
-        );
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new UserNotificationEvent($user, $notificationType),
+                UserNotificationEvent::NAME,
+            );
+        }
 
         return $this->view(["message" => $message], Response::HTTP_OK);
     }
