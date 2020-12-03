@@ -72,6 +72,13 @@ class CheckUserSellOrdersCommand extends Command
             $dateToBeSend = $scheduledNotification->getDateToBeSend();
             $user = $scheduledNotification->getUser();
             $quoteToken = $user->getProfile()->getToken();
+
+            if (!$quoteToken) {
+                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+
+                continue;
+            }
+
             $baseCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
             $UserMarket = new Market($baseCrypto, $quoteToken);
 

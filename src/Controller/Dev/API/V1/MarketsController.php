@@ -43,7 +43,7 @@ class MarketsController extends DevApiController
     }
 
     /**
-     * List markets with a day volume information
+     * List crypto or deployed token markets with a day volume information
      *
      * @Rest\View(serializerGroups={"dev"})
      * @Rest\Get()
@@ -85,7 +85,7 @@ class MarketsController extends DevApiController
                     $limit,
                     'monthVolume',
                     'DESC',
-                    1,
+                    2,
                     null
                 )
             )),
