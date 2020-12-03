@@ -75,8 +75,6 @@ class UserNotificationManager implements UserNotificationManagerInterface
             return true;
         }
 
-        $userConfig = $this->notificationConfigManager->getOneUserNotificationConfig($user, $type, $channel);
-
-        return null !== $userConfig;
+        return !empty($this->notificationConfigManager->getOneUserNotificationConfig($user, $type, $channel));
     }
 }

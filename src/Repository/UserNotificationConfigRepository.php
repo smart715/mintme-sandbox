@@ -22,7 +22,7 @@ class UserNotificationConfigRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function getOneUserNotificationsConfig(User $user, string $type, string $channel): ?array
+    public function getOneUserNotificationsConfig(User $user, string $type, string $channel): array
     {
         return $this->createQueryBuilder('unc')
             ->where('unc.user = :user')

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 interface UserNotificationConfigManagerInterface
 {
     public function getUserNotificationsConfig(User $user): ?array;
-    public function getOneUserNotificationConfig(User $user, string $type, string $channel): ?array;
+    public function getOneUserNotificationConfig(User $user, string $type, string $channel): array;
     public function updateUserNotificationsConfig(
         User $user,
         array $newConfig

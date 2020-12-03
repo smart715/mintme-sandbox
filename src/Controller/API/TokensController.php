@@ -27,6 +27,7 @@ use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TokenDeployedStrategy;
 use App\Notifications\Strategy\TokenPostStrategy;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
@@ -697,7 +698,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
 
         $notificationType = NotificationTypes::TOKEN_DEPLOYED;
-        $strategy = new TokenPostStrategy(
+        $strategy = new TokenDeployedStrategy(
             $this->userNotificationManager,
             $this->mailer,
             $this->em,

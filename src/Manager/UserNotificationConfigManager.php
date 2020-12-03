@@ -109,7 +109,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
         $this->em->flush();
     }
 
-    public function getOneUserNotificationConfig(User $user, string $type, string $channel): ?array
+    public function getOneUserNotificationConfig(User $user, string $type, string $channel): array
     {
         return $this->userNotificationConfigRepository->getOneUserNotificationsConfig($user, $type, $channel);
     }
