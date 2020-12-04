@@ -108,7 +108,7 @@ export default {
                 })
                 .catch((err) => {
                     this.loading = false;
-                    this.sendLogs('error', 'Error loading User Notifications channels', err);
+                    this.sendLogs('error', 'Error loading User Notifications config', err);
                 });
         },
         saveConfig: function() {
@@ -118,13 +118,13 @@ export default {
                 .then(() => {
                     this.fetchUserNotificationsConfig();
                     this.saving = false;
-                    this.notifySuccess('Configuration updated successfully');
+                    this.notifySuccess(this.$t('userNotification.config.updated'));
                     this.$emit('close');
                 })
                 .catch((err) => {
                     this.saving = false;
-                    this.sendLogs('error', 'Error loading User Notifications channels', err);
-                    this.notifyError('Error tag');
+                    this.sendLogs('error', 'Error updating User Notifications config', err);
+                    this.notifyError(this.$t('toasted.error.try_later'));
                 });
         },
         closeModal: function() {
