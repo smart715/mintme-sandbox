@@ -6,7 +6,12 @@
             class="pt-4"
             nickname="{{ app.user.profile.nickname }}"
             :threads="{{ threads | json_encode }}"
-            :thread-id="{{ threadId }}"
+            :thread-id-prop="{{ threadId }}"
+            :d-m-min-amount="{{ dMMinAmount }}"
+            user-token-name="{{ app.user.profile.token ? app.user.profile.token.name : '' }}"
+            :token-precision="{{ precision }}"
+            websocket-url="{{ global_websocket_url }}"
+            user-hash="{{ hash }}"
         />
     </div>
 {% endblock %}

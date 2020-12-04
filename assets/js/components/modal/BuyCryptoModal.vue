@@ -11,6 +11,7 @@
             <template slot="body">
                 <iframe
                     v-if="paramsLoaded"
+                    ref="coinifyIframe"
                     :src="frameSrc"
                     width="100%"
                     height="450px"
@@ -35,6 +36,9 @@ import FaqItem from '../FaqItem';
 import Modal from './Modal';
 import {primaryColor} from '../../utils/constants';
 
+const ADDRESS_CHANGED_EVENT = 'trade.receive-account-changed';
+const RECEIVED_ACCOUNT_CONFIRMED_EVENT = 'trade.receive-account-confirmed';
+
 export default {
     name: 'TokenEditModal',
     components: {
@@ -48,12 +52,18 @@ export default {
         cryptoCurrencies: Array,
         refreshToken: String,
         addresses: Object,
+        addressesSignature: Object,
     },
     computed: {
         coinifyAddress: function() {
             return Object.keys(this.addresses)
                 .filter((key) => this.cryptoCurrencies.includes(key))
                 .map((key) => key + ':' + this.addresses[key]).join(',');
+        },
+        coinifyAddressSignature: function() {
+            return Object.keys(this.addresses)
+                .filter((key) => this.cryptoCurrencies.includes(key))
+                .map((key) => key + ':' + this.addressesSignature[key]).join(',');
         },
         frameSrcParams: function() {
             return {
@@ -62,7 +72,9 @@ export default {
                 primaryColor: primaryColor,
                 fontColor: 'gray',
                 address: this.coinifyAddress,
+                addressSignature: this.coinifyAddressSignature,
                 refreshToken: encodeURIComponent(this.refreshToken),
+                addressConfirmation: true,
             };
         },
         frameSrcQueryStr: function() {
@@ -72,8 +84,35 @@ export default {
             return `${this.uiUrl}/widget?${this.frameSrcQueryStr}`;
         },
         paramsLoaded: function() {
-            return Object.keys(this.addresses).length > 0 && this.refreshToken;
+            return Object.keys(this.addresses).length > 0
+                && Object.keys(this.addressesSignature).length > 0
+                && this.refreshToken;
         },
+    },
+    methods: {
+        listenForEvents: function() {
+            window.addEventListener('message', (event) => {
+                if (event.origin === this.uiUrl && ADDRESS_CHANGED_EVENT === event.data.event) {
+                    this.handleAccountAddressChanged(event.data.context);
+                }
+            }, false);
+        },
+        handleAccountAddressChanged: function(context) {
+            if (this.addresses[context.currency] === context.address) {
+                const iframe = this.$refs.coinifyIframe;
+                iframe.contentWindow.postMessage({
+                    type: 'event',
+                    event: RECEIVED_ACCOUNT_CONFIRMED_EVENT,
+                    context: {
+                        address: context.address,
+                        status: 'accepted',
+                    },
+                }, '*');
+            }
+        },
+    },
+    mounted: function() {
+        this.listenForEvents();
     },
 };
 </script>

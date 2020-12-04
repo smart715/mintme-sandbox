@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
+use DateTimeImmutable;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
@@ -93,7 +94,7 @@ class Profile implements ImagineInterface
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
-     * @var \DateTimeImmutable|null
+     * @var DateTimeImmutable|null
      */
     protected $nameChangedDate;
 
@@ -139,6 +140,12 @@ class Profile implements ImagineInterface
      * @var \DateTime
      */
     private $nextReminderDate;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var DateTimeImmutable
+     */
+    private ?DateTimeImmutable $created;
 
     public function __construct(User $user)
     {
@@ -358,5 +365,20 @@ class Profile implements ImagineInterface
         $this->nextReminderDate = $nextReminderDate;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreated(): self
+    {
+        $this->created = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getCreated(): ?DateTimeImmutable
+    {
+        return $this->created;
     }
 }
