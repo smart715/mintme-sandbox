@@ -60,7 +60,7 @@ class TokenDeployedNotificationStrategy implements NotificationStrategyInterface
                 NotificationChannels::EMAIL
             )
             ) {
-                $this->mailer->sendNewPostMail($userWithToken, $tokenName);
+                $this->mailer->sendTokenDeployedMail($userWithToken, $tokenName);
             }
         }
     }
