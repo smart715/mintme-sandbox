@@ -23,7 +23,7 @@ class OrdersFactory implements OrdersFactoryInterface
     public const INIT_TOKENS_AMOUNT = 1500000;
     public const INIT_TOKENS_STEP_AMOUNT = 15000;
     public const INIT_TOKEN_PRICE = 0.1;
-    public const STEP = 0.016915;
+    public const STEP = 0.01691495;
 
     private TraderInterface $trader;
 
