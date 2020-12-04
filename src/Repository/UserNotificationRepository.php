@@ -26,7 +26,7 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('customDate', $customDate)
             ->setParameter('actualDate', $actualDate)
-            ->orderBy('user_notification.type', 'DESC');
+            ->orderBy('user_notification.date', 'DESC');
 
         if (null !== $notificationLimit) {
             $query->setMaxResults($notificationLimit);
