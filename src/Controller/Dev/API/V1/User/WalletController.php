@@ -13,7 +13,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
-use App\Notifications\Strategy\WithdrawalStrategy;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Utils\ValidatorFactoryInterface;
@@ -265,7 +265,7 @@ class WalletController extends DevApiController
         }
 
         $notificationType = NotificationTypes::WITHDRAWAL;
-        $strategy = new WithdrawalStrategy(
+        $strategy = new WithdrawalNotificationStrategy(
             $this->userNotificationManager,
             $notificationType
         );

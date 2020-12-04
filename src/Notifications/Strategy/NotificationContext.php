@@ -16,6 +16,6 @@ class NotificationContext
 
     public function sendNotification(User $user): void
     {
-        $this->strategy->notification($user);
+        $this->strategy->sendNotification($user);
     }
 }
