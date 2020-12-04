@@ -29,6 +29,7 @@
             :partner-id="coinifyPartnerId"
             :crypto-currencies="coinifyCryptoCurrencies"
             :addresses="addresses"
+            :addresses-signature="addressesSignature"
             :refresh-token="refreshToken"
             @close="modalVisible = false"
         />
@@ -50,6 +51,7 @@ export default {
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
         addresses: Object,
+        addressesSignature: Object,
     },
     data() {
         return {
