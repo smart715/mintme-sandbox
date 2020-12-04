@@ -7,7 +7,7 @@ use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 
-class NewInvestorStrategy implements NotificationStrategyInterface
+class OrderNotificationStrategy implements NotificationStrategyInterface
 {
     /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
@@ -17,32 +17,29 @@ class NewInvestorStrategy implements NotificationStrategyInterface
 
     private string $type;
 
-    private array $extraData;
-
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
-        string $type,
-        array $extraData
+        string $type
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
         $this->type = $type;
-        $this->extraData = $extraData;
     }
 
-    public function notification(User $user): void
+    public function sendNotification(User $user): void
     {
+        $tokenName = $user->getProfile()->getToken()->getName();
+        $jsonData = (array)json_encode([
+            'tokenName' => $tokenName,
+        ], JSON_THROW_ON_ERROR);
+
         if ($this->userNotificationManager->isNotificationAvailable(
             $user,
             $this->type,
             NotificationChannels::WEBSITE
         )
         ) {
-            $jsonData = (array)json_encode(
-                $this->extraData,
-                JSON_THROW_ON_ERROR
-            );
             $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
@@ -52,7 +49,7 @@ class NewInvestorStrategy implements NotificationStrategyInterface
             NotificationChannels::EMAIL
         )
         ) {
-            $this->mailer->sendNewInvestorMail($user, $this->extraData['profile']);
+            $this->mailer->sendNoOrdersMail($user, $tokenName);
         }
     }
 }

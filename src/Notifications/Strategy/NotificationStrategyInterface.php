@@ -6,5 +6,5 @@ use App\Entity\User;
 
 interface NotificationStrategyInterface
 {
-    public function notification(User $user): void;
+    public function sendNotification(User $user): void;
 }

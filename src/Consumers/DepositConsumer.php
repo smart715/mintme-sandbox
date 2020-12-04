@@ -16,7 +16,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
-use App\Notifications\Strategy\DepositStrategy;
+use App\Notifications\Strategy\DepositNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
 use App\Utils\ClockInterface;
 use App\Utils\NotificationTypes;
@@ -191,7 +191,7 @@ class DepositConsumer implements ConsumerInterface
             );
 
             $notificationType = NotificationTypes::DEPOSIT;
-            $strategy = new DepositStrategy(
+            $strategy = new DepositNotificationStrategy(
                 $this->userNotificationManager,
                 $notificationType
             );

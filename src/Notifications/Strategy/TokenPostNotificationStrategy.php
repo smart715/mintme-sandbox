@@ -9,7 +9,7 @@ use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 use Doctrine\ORM\EntityManagerInterface;
 
-class TokenDeployedStrategy implements NotificationStrategyInterface
+class TokenPostNotificationStrategy implements NotificationStrategyInterface
 {
     /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
@@ -34,7 +34,7 @@ class TokenDeployedStrategy implements NotificationStrategyInterface
         $this->type = $type;
     }
 
-    public function notification(User $user): void
+    public function sendNotification(User $user): void
     {
         foreach ($this->getUsersHaveTokenIds($user) as $userHaveToken) {
             $token = $user->getProfile()->getToken();
@@ -60,7 +60,7 @@ class TokenDeployedStrategy implements NotificationStrategyInterface
                 NotificationChannels::EMAIL
             )
             ) {
-                $this->mailer->sendNewPostMail($userWithToken, $tokenName);
+                    $this->mailer->sendNewPostMail($userWithToken, $tokenName);
             }
         }
     }

@@ -104,12 +104,11 @@ export default {
                 .then((res) => {
                     this.userConfig = res.data;
                     this.userConfigModel = JSON.parse(JSON.stringify(this.userConfig));
-                    this.loading = false;
                 })
                 .catch((err) => {
-                    this.loading = false;
                     this.sendLogs('error', 'Error loading User Notifications config', err);
-                });
+                })
+                .then(() => this.loading = false);
         },
         saveConfig: function() {
             this.saving = true;
@@ -117,15 +116,14 @@ export default {
             this.$axios.retry.post(this.$routing.generate('update_notifications_config'), data)
                 .then(() => {
                     this.fetchUserNotificationsConfig();
-                    this.saving = false;
                     this.notifySuccess(this.$t('userNotification.config.updated'));
                     this.$emit('close');
                 })
                 .catch((err) => {
-                    this.saving = false;
                     this.sendLogs('error', 'Error updating User Notifications config', err);
                     this.notifyError(this.$t('toasted.error.try_later'));
-                });
+                })
+                .then(() => this.saving = false);
         },
         closeModal: function() {
             this.$emit('close');

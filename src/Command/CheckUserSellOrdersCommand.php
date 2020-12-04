@@ -11,7 +11,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
-use App\Notifications\Strategy\OrderStrategy;
+use App\Notifications\Strategy\OrderNotificationStrategy;
 use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
@@ -91,7 +91,7 @@ class CheckUserSellOrdersCommand extends Command
             $actual_date = new DateTimeImmutable();
 
             if (!$userSellOrders && $dateToBeSend <= $actual_date) {
-                $strategy = new OrderStrategy(
+                $strategy = new OrderNotificationStrategy(
                     $this->userNotificationManager,
                     $this->mailer,
                     $notificationType

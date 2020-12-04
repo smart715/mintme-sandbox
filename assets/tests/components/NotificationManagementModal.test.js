@@ -122,6 +122,7 @@ describe('User Notifications Configuration', () => {
             status: 200,
             response: userNotificationConfig,
         });
+        expect(wrapper.find('font-awesome-icon').exists()).toBe(false);
         moxios.wait(() => {
             expect(wrapper.find('font-awesome-icon').exists()).toBe(true);
             done();

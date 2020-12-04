@@ -9,7 +9,7 @@ use App\Exchange\Order;
 use App\Mailer\MailerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
-use App\Notifications\Strategy\NewInvestorStrategy;
+use App\Notifications\Strategy\NewInvestorNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
 use App\Utils\NotificationTypes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -78,7 +78,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                     'tokenName' => $tokenName,
                 ];
                 $notificationType = NotificationTypes::NEW_INVESTOR;
-                $strategy = new NewInvestorStrategy(
+                $strategy = new NewInvestorNotificationStrategy(
                     $this->userNotificationManager,
                     $this->mailer,
                     $notificationType,

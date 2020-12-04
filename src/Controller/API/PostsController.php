@@ -13,7 +13,7 @@ use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
-use App\Notifications\Strategy\TokenPostStrategy;
+use App\Notifications\Strategy\TokenPostNotificationStrategy;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -254,7 +254,7 @@ class PostsController extends AbstractFOSRestController
             $user = $this->getUser();
 
             $notificationType = NotificationTypes::TOKEN_NEW_POST;
-            $strategy = new TokenPostStrategy(
+            $strategy = new TokenPostNotificationStrategy(
                 $this->userNotificationManager,
                 $this->mailer,
                 $this->entityManager,

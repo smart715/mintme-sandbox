@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Logger\UserActionLogger;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
-use App\Notifications\Strategy\WithdrawalStrategy;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
@@ -160,7 +160,7 @@ class WalletController extends Controller
         $user = $this->getUser();
 
         $notificationType = NotificationTypes::WITHDRAWAL;
-        $strategy = new WithdrawalStrategy(
+        $strategy = new WithdrawalNotificationStrategy(
             $this->userNotificationManager,
             $notificationType
         );

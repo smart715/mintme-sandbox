@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 
-class DepositStrategy implements NotificationStrategyInterface
+class DepositNotificationStrategy implements NotificationStrategyInterface
 {
     /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
@@ -21,7 +21,7 @@ class DepositStrategy implements NotificationStrategyInterface
         $this->type = $type;
     }
 
-    public function notification(User $user): void
+    public function sendNotification(User $user): void
     {
         if ($this->userNotificationManager->isNotificationAvailable(
             $user,
