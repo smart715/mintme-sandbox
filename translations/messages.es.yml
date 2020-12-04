@@ -38,7 +38,7 @@ form.token.name: 'Nombre del token:'
 form.token.name.invalid: 'Nombre de token inválido.'
 form.token.description: 'Description:'
 form.token.initial_order: 'Set initial sell orders'
-form.token.initial_order.guide: '15% of your tokens will be set for sale in prices from 0.1 to 5 MINTME. If you uncheck this, please make sure you add sell orders manually in Trade section of your token'
+form.token.initial_order.guide: '15% of your tokens will be set for sale in prices from 0.1 to 10 MINTME. If you uncheck this, please make sure you add sell orders manually in Trade section of your token'
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar

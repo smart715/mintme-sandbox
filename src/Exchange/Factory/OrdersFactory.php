@@ -4,7 +4,6 @@ namespace App\Exchange\Factory;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\TraderInterface;
@@ -15,16 +14,16 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
+use LogicException;
 use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Throwable;
 
 class OrdersFactory implements OrdersFactoryInterface
 {
     public const INIT_TOKENS_AMOUNT = 1500000;
     public const INIT_TOKENS_STEP_AMOUNT = 15000;
     public const INIT_TOKEN_PRICE = 0.1;
-    public const STEP = 0.01738;
+    public const STEP = 0.016915;
 
     private TraderInterface $trader;
 
@@ -66,7 +65,7 @@ class OrdersFactory implements OrdersFactoryInterface
         $user = $token->getOwner();
 
         if (!$user) {
-            throw new \LogicException();
+            throw new LogicException();
         }
 
         $market = $this->getMintmeMarketForToken($token);
@@ -110,8 +109,8 @@ class OrdersFactory implements OrdersFactoryInterface
         }
 
         $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
-        
-        return $currentPrice->add($this->currentStep);
+
+        return $currentPrice->add($currentPrice->multiply($this->moneyWrapper->format($this->currentStep)));
     }
 
     private function getStepAmount(): Money
