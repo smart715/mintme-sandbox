@@ -2,8 +2,8 @@
 
 namespace App\Serializer;
 
-use App\Exchange\Order;
 use App\Entity\Image;
+use App\Exchange\Order;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -24,13 +24,31 @@ class OrderNormalizer implements NormalizerInterface
     public function normalize($order, $format = null, array $context = [])
     {
         $normalized = $this->normalizer->normalize($order, $format, $context);
-        
-        if ($normalized["maker"]["profile"]) {
-            foreach ($normalized["maker"]["profile"] as $key => $val) {
+
+        if ($order->getMaker()->getProfile()->isAnonymous()) {
+            foreach ($normalized["maker"]["profile"] as $key) {
                 $normalized["maker"]["profile"][$key] = "";
+                $normalized["maker"]["profile"]["nickname"]= "Anonymous";
+                $normalized["maker"]["profile"]["image"] = [];
+                $normalized["maker"]["profile"]["image"]["url"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["maker"]["profile"]["image"]["avatar_small"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["maker"]["profile"]["image"]["avatar_medium"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["maker"]["profile"]["image"]["avatar_large"] = Image::DEFAULT_PROFILE_IMAGE_URL;
             }
         }
-        $normalized["maker"]["profile"]["nickname"]= "Anonymous";
+
+        if ($order->getTaker()->getProfile()->isAnonymous()) {
+            foreach ($normalized["maker"]["profile"] as $key) {
+                $normalized["taker"]["profile"][$key] = "";
+                $normalized["taker"]["profile"]["nickname"]= "Anonymous";
+                $normalized["taker"]["profile"]["image"] = [];
+                $normalized["taker"]["profile"]["image"]["url"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["taker"]["profile"]["image"]["avatar_small"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["taker"]["profile"]["image"]["avatar_medium"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+                $normalized["taker"]["profile"]["image"]["avatar_large"] = Image::DEFAULT_PROFILE_IMAGE_URL;
+            }
+        }
+
         return $normalized;
     }
 

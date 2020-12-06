@@ -30,6 +30,7 @@ class MarketNormalizer implements NormalizerInterface
     {
         /** @var array $normalized */
         $normalized = $this->normalizer->normalize($market, $format, $context);
+        
         return $normalized;
     }
 
