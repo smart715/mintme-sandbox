@@ -501,10 +501,9 @@ export default {
                 })
                 .then((response) => {
                     if (response.items.length > 0) {
-                        resolve();
-                    } else {
-                        reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
+                        return resolve();
                     }
+                        reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
                 }).catch((err) => {
                     reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
                 });
