@@ -106,8 +106,9 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/list/{tokenName}", name="list_posts", options={"expose"=true})
      */
-    public function list(string $tokenName = null): View
+    public function list(?string $tokenName = null): View
     {
+
         if (null === $tokenName) {
             return $this->view(false);
         }
