@@ -503,7 +503,7 @@ export default {
                     if (response.items.length > 0) {
                         return resolve();
                     }
-                        reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
+                    reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
                 }).catch((err) => {
                     reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
                 });
