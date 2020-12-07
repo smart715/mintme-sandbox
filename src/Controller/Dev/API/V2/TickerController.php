@@ -44,7 +44,7 @@ class TickerController extends AbstractFOSRestController
      * @Rest\View(serializerGroups={"dev"})
      * @SWG\Response(
      *     response="200",
-     *     description="Returns 24-hour pricing and volume summary for each market pair available on the exchange."
+     *     description="Returns 24-hour pricing and volume summary for each market pair with crypto and deployed tokens available on the exchange."
      * )
      * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="Open")
@@ -53,7 +53,7 @@ class TickerController extends AbstractFOSRestController
     public function getTicker(): array
     {
         $assets = [];
-        $marketStatuses = $this->marketStatusManager->getAllMarketsInfo();
+        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo();
 
         return array_map(
             function ($marketStatus) use ($assets) {

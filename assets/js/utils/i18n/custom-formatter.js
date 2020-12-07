@@ -9,16 +9,12 @@ export default class CustomFormatter {
      * @return {string} String with interpolated translation
      */
     interpolate(translation, context) {
-        if ('string' === typeof translation) {
-            return String(translation);
-        }
-
         let result = translation
-            .replaceAll('&#039;', '\'')
-            .replaceAll('&quot;', '"')
-            .replaceAll('&amp;', '&')
-            .replaceAll('&lt;', '<')
-            .replaceAll('&gt;', '>');
+            .replace(/&#039;/g, '\'')
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
 
         if (typeof context === 'object') {
             const matches = result.match(/(%([^%]|%%)*%)/g);

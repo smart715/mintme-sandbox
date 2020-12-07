@@ -32,18 +32,18 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
 
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var TranslatorInterface */
-    private $translations;
+    private UserActionLogger $userActionLogger;
+    private TranslatorInterface $translations;
+    private string $coinifySharedSecret;
 
     public function __construct(
         TranslatorInterface $translations,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        string $coinifySharedSecret
     ) {
         $this->translations = $translations;
         $this->userActionLogger = $userActionLogger;
+        $this->coinifySharedSecret = $coinifySharedSecret;
     }
 
     /**
@@ -161,6 +161,47 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
 
         return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/addresses/signature", name="deposit_addresses_signature", options={"expose"=true})
+     */
+    public function getDepositAddressesSignature(
+        WalletInterface $depositCommunicator,
+        CryptoManagerInterface $cryptoManager
+    ): View {
+        $this->denyAccessUnlessGranted('deposit');
+
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
+            $user,
+            $cryptoManager->findAll()
+        ) : [];
+
+        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
+
+        $addresses = array_merge($cryptoDepositAddresses, $tokenDepositAddresses);
+        $signatures = [];
+
+        /**
+         * @var string $symbol
+         * @var Address $address
+         */
+        foreach ($addresses as $symbol => $address) {
+            $signatures[$symbol] = hash_hmac(
+                'sha256',
+                $address->getAddress(),
+                $this->coinifySharedSecret
+            );
+        }
+
+        return $this->view([
+            'addresses' => $addresses,
+            'signatures' => $signatures,
+        ]);
     }
 
     /**
