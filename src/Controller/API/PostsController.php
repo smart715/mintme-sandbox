@@ -108,10 +108,10 @@ class PostsController extends AbstractFOSRestController
      */
     public function list(?string $tokenName = null): View
     {
-
         if (null === $tokenName) {
             return $this->view(false);
         }
+
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token) {
