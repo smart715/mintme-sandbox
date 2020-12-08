@@ -44,8 +44,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -72,8 +71,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -100,8 +98,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -128,8 +125,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -155,8 +151,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -184,8 +179,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertTrue(
@@ -218,8 +212,7 @@ class DepositConsumerTest extends TestCase
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
             $this->mockContainer(),
-            $this->mockSecurity(),
-            $this->mockUserNotificationManager()
+            $this->mockSecurity()
         );
 
         $this->assertFalse(
@@ -338,10 +331,5 @@ class DepositConsumerTest extends TestCase
     private function mockSecurity(): Security
     {
         return $this->createMock(Security::class);
-    }
-
-    private function mockUserNotificationManager(): UserNotificationManagerInterface
-    {
-        return $this->createMock(UserNotificationManagerInterface::class);
     }
 }

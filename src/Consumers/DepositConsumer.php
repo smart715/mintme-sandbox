@@ -15,11 +15,7 @@ use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Manager\UserNotificationManagerInterface;
-use App\Notifications\Strategy\DepositNotificationStrategy;
-use App\Notifications\Strategy\NotificationContext;
 use App\Utils\ClockInterface;
-use App\Utils\NotificationTypes;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -70,9 +66,6 @@ class DepositConsumer implements ConsumerInterface
     /** @var ContainerInterface */
     private $container;
 
-    /** @var UserNotificationManagerInterface */
-    private UserNotificationManagerInterface $userNotificationManager;
-
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -85,8 +78,7 @@ class DepositConsumer implements ConsumerInterface
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher,
         ContainerInterface $container,
-        Security $security,
-        UserNotificationManagerInterface $userNotificationManagerManager
+        Security $security
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -100,7 +92,6 @@ class DepositConsumer implements ConsumerInterface
         $this->eventDispatcher = $eventDispatcher;
         $this->security = $security;
         $this->container = $container;
-        $this->userNotificationManager = $userNotificationManagerManager;
     }
 
     /** {@inheritdoc} */
@@ -189,14 +180,6 @@ class DepositConsumer implements ConsumerInterface
                 new DepositCompletedEvent($tradable, $user, $clbResult->getAmount()),
                 DepositCompletedEvent::NAME
             );
-
-            $notificationType = NotificationTypes::DEPOSIT;
-            $strategy = new DepositNotificationStrategy(
-                $this->userNotificationManager,
-                $notificationType
-            );
-            $notificationContext = new NotificationContext($strategy);
-            $notificationContext->sendNotification($user);
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {

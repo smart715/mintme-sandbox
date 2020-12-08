@@ -9,6 +9,9 @@ use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\DepositNotificationStrategy;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use App\Wallet\Money\MoneyWrapper;
@@ -17,7 +20,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TransactionSubscriber implements EventSubscriberInterface
@@ -72,9 +74,23 @@ class TransactionSubscriber implements EventSubscriberInterface
         try {
             $this->mailer->checkConnection();
 
-            $notificationType = $event instanceof DepositCompletedEvent
-                ? NotificationTypes::DEPOSIT
-                : NotificationTypes::WITHDRAWAL;
+            if ($event instanceof WithdrawCompletedEvent) {
+                $notificationType = NotificationTypes::WITHDRAWAL;
+                $strategy = new WithdrawalNotificationStrategy(
+                    $this->userNotificationManager,
+                    $notificationType
+                );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
+            } else {
+                $notificationType = NotificationTypes::DEPOSIT;
+                $strategy = new DepositNotificationStrategy(
+                    $this->userNotificationManager,
+                    $notificationType
+                );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
+            }
 
             $isAvailableEmailNotification = $this->userNotificationManager->isNotificationAvailable(
                 $user,

@@ -7,14 +7,10 @@ use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
 use App\Logger\UserActionLogger;
-use App\Manager\UserNotificationManagerInterface;
-use App\Notifications\Strategy\NotificationContext;
-use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
-use App\Utils\NotificationTypes;
 use App\Wallet\WalletInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,19 +30,13 @@ class WalletController extends Controller
     /** @var RebrandingConverterInterface */
     private $rebrandingConverter;
 
-    /** @var UserNotificationManagerInterface */
-    private $userNotificationManager;
-
-
     public function __construct(
         UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
-        RebrandingConverterInterface $rebrandingConverter,
-        UserNotificationManagerInterface $userNotificationManager
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->userNotificationManager = $userNotificationManager;
 
         parent::__construct($normalizer);
     }
@@ -155,17 +145,6 @@ class WalletController extends Controller
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
-
-        /** @var  User $user*/
-        $user = $this->getUser();
-
-        $notificationType = NotificationTypes::WITHDRAWAL;
-        $strategy = new WithdrawalNotificationStrategy(
-            $this->userNotificationManager,
-            $notificationType
-        );
-        $notificationContext = new NotificationContext($strategy);
-        $notificationContext->sendNotification($user);
 
         return $this->createWalletRedirection(
             'success',
