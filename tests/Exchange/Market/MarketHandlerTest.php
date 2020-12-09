@@ -174,9 +174,7 @@ class MarketHandlerTest extends TestCase
         $fetcher = $this->mockMarketFetcher();
         $fetcher->method('getPendingOrders')
             ->with('convertedmarket', 4, 100)
-            ->willReturn(
-                ['orders' => $this->getPendingOrders()]
-            );
+            ->willReturn($this->getPendingOrders());
 
         $userManager = $this->mockUserManager();
         $userManager->method('find')->willReturnCallback(function (int $id) {
