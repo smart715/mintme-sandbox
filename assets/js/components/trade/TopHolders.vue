@@ -1,7 +1,7 @@
 <template>
     <div class="card h-100 top-holders">
         <div class="card-header">
-            Top Holders
+            {{ $t('trade.top_holders.header') }}
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
