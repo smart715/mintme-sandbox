@@ -85,7 +85,7 @@ class MessageController extends AbstractFOSRestController
             "send a message user: {$user->getUsername()}, token: {$thread->getToken()->getName()}, message: {$messageBody}"
         );
 
-        return $this->view([], Response::HTTP_ACCEPTED);
+        return $this->view([], Response::HTTP_OK);
     }
 
     /**

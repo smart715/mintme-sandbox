@@ -145,7 +145,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->userActionLogger->info('Change token info', $request->all());
 
-        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_OK);
     }
 
     /**
@@ -186,11 +186,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         if ($request->get('description')) {
             return $this->view(
                 ['tokenName' => $token->getName(), 'newDescription' => $token->getDescription()],
-                Response::HTTP_ACCEPTED
+                Response::HTTP_OK
             );
         }
 
-        return $this->view(['tokenName' => $token->getName()], Response::HTTP_ACCEPTED);
+        return $this->view(['tokenName' => $token->getName()], Response::HTTP_OK);
     }
 
     /**
@@ -215,7 +215,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             return $this->view([
                 'verified' => false,
                 'errors' => [$this->translator->trans('api.tokens.file_not_downloaded')],
-            ], Response::HTTP_ACCEPTED);
+            ], Response::HTTP_OK);
         }
 
         $url = $request->get('url');
@@ -232,7 +232,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
                     'errors' => array_map(static function ($violation) {
                         return $violation->getMessage();
                     }, iterator_to_array($urlViolations)),
-                ], Response::HTTP_ACCEPTED);
+                ], Response::HTTP_OK);
             }
 
             $isVerified = $websiteVerifier->verify($url, $token->getWebsiteConfirmationToken());
@@ -255,7 +255,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             'verified' => $isVerified,
             'errors' => ['fileError' => $websiteVerifier->getError()],
             'message' => $message.' successfully',
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -547,7 +547,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         return $this->view(
             ['message' => $this->translator->trans('api.tokens.delete_successfull')],
-            Response::HTTP_ACCEPTED
+            Response::HTTP_OK
         );
     }
 
@@ -582,7 +582,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $message = $this->translator->trans('api.tokens.confirm_email_sent');
         }
 
-        return $this->view(['message' => $message], Response::HTTP_ACCEPTED);
+        return $this->view(['message' => $message], Response::HTTP_OK);
     }
 
     /**
@@ -641,7 +641,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException();
         }
 
-        return $this->view($balances, Response::HTTP_ACCEPTED);
+        return $this->view($balances, Response::HTTP_OK);
     }
 
     /**

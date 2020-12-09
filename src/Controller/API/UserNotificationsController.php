@@ -44,7 +44,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
 
         return $this->view(
             $this->userNotificationManager->getNotifications($user, self::NOTIFICATION_LIMIT),
-            Response::HTTP_ACCEPTED
+            Response::HTTP_OK
         );
     }
 
@@ -60,6 +60,6 @@ class UserNotificationsController extends AbstractFOSRestController implements T
 
         $this->userNotificationManager->updateNotifications($user);
 
-        return new Response(Response::HTTP_ACCEPTED);
+        return new Response(Response::HTTP_OK);
     }
 }

@@ -10,7 +10,6 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
-    HTTP_ACCEPTED,
     descriptionLength,
 } from './utils/constants';
 new Vue({
@@ -100,7 +99,7 @@ new Vue({
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
                 .then((res) => {
-                    if (res.status === HTTP_ACCEPTED) {
+                    if (res.status === HTTP_OK) {
                         frm.action = this.$routing.generate('token_show', {
                             name: this.tokenName,
                             tab: 'intro',

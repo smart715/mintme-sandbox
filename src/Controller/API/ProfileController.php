@@ -55,6 +55,6 @@ class ProfileController extends AbstractFOSRestController
             }
         }
 
-        return $this->view(['hasPattern' => $hasPattern, 'pattern' => $finalPattern], Response::HTTP_ACCEPTED);
+        return $this->view(['hasPattern' => $hasPattern, 'pattern' => $finalPattern], Response::HTTP_OK);
     }
 }
