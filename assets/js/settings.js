@@ -5,11 +5,12 @@ import TwoFactorModal from './components/modal/TwoFactorModal';
 import {NotificationMixin} from './mixins/';
 import {HTTP_UNAUTHORIZED} from './utils/constants';
 import i18n from './utils/i18n/i18n';
+import NotificationsManagementModal from './components/modal/NotificationsManagementModal';
 
 new Vue({
     el: '#settings',
     i18n,
-    components: {Passwordmeter, ApiKeys, ApiClients, TwoFactorModal},
+    components: {Passwordmeter, ApiKeys, ApiClients, TwoFactorModal, NotificationsManagementModal},
     mixins: [NotificationMixin],
     data: {
         password: '',
@@ -21,12 +22,16 @@ new Vue({
         twoFaVisible: false,
         code: '',
         showErrorMessage: false,
+        notificationConfigModalVisible: false,
     },
     mounted() {
         this.passwordInput = document.getElementById('app_user_change_password_plainPassword');
         this.eyeIcon = document.querySelector('.show-password');
     },
     methods: {
+        notificationConfigModalToggle: function() {
+            this.notificationConfigModalVisible = !this.notificationConfigModalVisible;
+        },
         submit2FA: function() {
             this.doCheckStoredUserPassword();
         },
