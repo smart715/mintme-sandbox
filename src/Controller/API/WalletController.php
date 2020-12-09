@@ -6,7 +6,6 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -32,6 +31,7 @@ use Throwable;
 class WalletController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
+
     private UserActionLogger $userActionLogger;
     private TranslatorInterface $translations;
     private string $coinifySharedSecret;
