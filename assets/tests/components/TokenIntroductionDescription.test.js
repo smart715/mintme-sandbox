@@ -142,7 +142,7 @@ describe('TokenIntroductionDescription', () => {
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
-            status: 202, responseText: {data: {newDescription: 'f'}},
+            status: 200, responseText: {data: {newDescription: 'f'}},
         });
 
         expect(wrapper.emitted('errormessage').length).toBe(1);
@@ -161,7 +161,7 @@ describe('TokenIntroductionDescription', () => {
         wrapper.vm.editDescription();
 
         moxios.stubRequest('token_update', {
-            status: 202,
+            status: 200,
             response: {newDescription: 'a'.repeat(202)},
         });
 

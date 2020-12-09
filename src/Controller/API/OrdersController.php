@@ -137,7 +137,7 @@ class OrdersController extends AbstractFOSRestController
             return $this->view([
                 'result' => TradeResult::FAILED,
                 'message' => 'Invalid price quantity',
-            ], Response::HTTP_ACCEPTED);
+            ], Response::HTTP_OK);
         }
 
         $tradeResult = $exchanger->placeOrder(
@@ -152,7 +152,7 @@ class OrdersController extends AbstractFOSRestController
         return $this->view([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**

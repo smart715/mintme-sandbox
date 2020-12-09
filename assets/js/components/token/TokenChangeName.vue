@@ -87,7 +87,6 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_OK,
-    HTTP_ACCEPTED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
@@ -218,7 +217,7 @@ export default {
                 code: code,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         this.currentName = response.data['tokenName'];
                         this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 
