@@ -267,7 +267,7 @@ export default {
             this.stats = res.data;
             this.chartSettings.start = this.getStartTradingPeriod();
 
-            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state');
+            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state', 'TradeChart');
 
             this.sendMessage(JSON.stringify({
                 method: 'state.subscribe',
