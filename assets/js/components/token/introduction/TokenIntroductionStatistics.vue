@@ -300,7 +300,7 @@ export default {
             if ('kline.update' === result.method) {
                 this.donationVolume = result.params[0][8] || 0;
             }
-        });
+        }, null, 'TokenIntroductionStatistics');
     },
     methods: {
         ...mapMutations('tokenStatistics', [
