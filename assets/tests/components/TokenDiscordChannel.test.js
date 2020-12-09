@@ -47,7 +47,7 @@ describe('TokenDiscordChannel', () => {
         wrapper.vm.editDiscord();
 
         moxios.stubRequest('token_update', {
-            status: 202,
+            status: 200,
         });
 
         moxios.wait(() => {

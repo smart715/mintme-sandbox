@@ -44,10 +44,10 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
 import Guide from '../../Guide';
+import {HTTP_OK} from '../../../utils/constants';
 
 library.add(faTimes, faYoutubeSquare);
 
-const HTTP_ACCEPTED = 202;
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 
@@ -127,7 +127,7 @@ export default {
                 needToCheckCode: false,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         this.currentChannelId = channelId;
                         this.notifySuccess(
                             this.$t(

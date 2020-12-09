@@ -104,7 +104,7 @@ describe('TokenFacebookAddress', () => {
         wrapper.vm.saveFacebookAddress();
 
         moxios.stubRequest('token_update', {
-            status: 202,
+            status: 200,
         });
 
         moxios.wait(() => {
