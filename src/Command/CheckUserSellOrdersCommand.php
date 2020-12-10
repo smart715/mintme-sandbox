@@ -4,12 +4,15 @@ namespace App\Command;
 
 use App\Entity\ScheduledNotification;
 use App\Entity\Token\Token;
-use App\Entity\UserNotification;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\OrderNotificationStrategy;
+use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,16 +38,21 @@ class CheckUserSellOrdersCommand extends Command
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
+
     public function __construct(
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
         MarketHandlerInterface $marketHandler,
         CryptoManagerInterface $cryptoManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
@@ -83,11 +91,13 @@ class CheckUserSellOrdersCommand extends Command
             $actual_date = new DateTimeImmutable();
 
             if (!$userSellOrders && $dateToBeSend <= $actual_date) {
-                $this->userNotificationManager->createNotification(
-                    $user,
-                    $notificationType,
-                    []
+                $strategy = new OrderNotificationStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer,
+                    $notificationType
                 );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
 
                 $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
 
@@ -109,13 +119,13 @@ class CheckUserSellOrdersCommand extends Command
 
     private function isLastNotificationSent(String $notificationType, String $timeInterval): bool
     {
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType &&
+        if (NotificationTypes::ORDER_CANCELLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval
         ) {
             return true;
         }
 
-        return UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType &&
+        return NotificationTypes::ORDER_FILLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval;
     }
 
@@ -127,11 +137,11 @@ class CheckUserSellOrdersCommand extends Command
     ): void {
         $newTimeInterval = '0';
 
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType) {
+        if (NotificationTypes::ORDER_CANCELLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[2];
         }
 
-        if (UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType) {
+        if (NotificationTypes::ORDER_FILLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[0] === $timeInterval ?
                 (string)$this->timeIntervals[1] :
                 (string)$this->timeIntervals[2];
