@@ -495,7 +495,7 @@ export default {
         checkIfSubscribed: function() {
             return new Promise((resolve, reject) => {
                 gapi.client.youtube.subscriptions.list({
-                    part: 'id',
+                    part: 'snippet',
                     mine: true,
                     forChannelId: this.airdropCampaign.actionsData.youtubeSubscribe,
                 })
@@ -505,6 +505,7 @@ export default {
                     }
                     reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
                 }).catch((err) => {
+                    this.sendLogs('error', 'Can not check the subscription youtube channel.', err);
                     reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
                 });
             });
