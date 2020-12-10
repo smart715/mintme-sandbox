@@ -264,7 +264,9 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_participants_amount'));
         }
 
-        if ($endDateTimestamp && $endDateTimestamp < time()) {
+        $timeAfterOneHour = time() + 60 * 60;
+        
+        if ($endDateTimestamp && $endDateTimestamp < $timeAfterOneHour) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_end_date'));
         }
     }

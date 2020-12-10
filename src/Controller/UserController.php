@@ -188,8 +188,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return $this->redirectToRoute('settings');
         }
 
-        return $this->redirectToRoute(
-            'two_factor_auth',
+        return $this->forward(
+            'App\Controller\UserController::twoFactorAuth',
             ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }

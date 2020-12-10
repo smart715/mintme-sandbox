@@ -6,6 +6,7 @@
             :coinify-partner-id="coinifyPartnerId"
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
+            :addresses-signature="addressesSignature"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -268,7 +269,7 @@ export default {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
-        depositMore: String,
+        depositMoreProp: String,
         twofa: String,
         expirationTime: Number,
         disabledCrypto: String,
@@ -280,9 +281,11 @@ export default {
     },
     data() {
         return {
+            depositMore: null,
             tokens: null,
             predefinedTokens: null,
             depositAddresses: {},
+            addressesSignature: {},
             showModal: false,
             selectedCurrency: null,
             isTokenModal: false,
@@ -348,6 +351,13 @@ export default {
         },
     },
     mounted: function() {
+        if (window.localStorage.getItem('mintme_signedup_from_donation') !== null) {
+            this.depositMore = window.localStorage.getItem('mintme_donation_currency');
+
+            window.localStorage.removeItem('mintme_signedup_from_donation');
+            window.localStorage.removeItem('mintme_donation_currency');
+        }
+
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -362,7 +372,7 @@ export default {
                                 if ('asset.update' === response.method) {
                                     this.updateBalances(response.params[0]);
                                 }
-                            }, 'wallet-asset-update');
+                            }, 'wallet-asset-update', 'Wallet');
 
                             this.sendMessage(JSON.stringify({
                                 method: 'asset.subscribe',
@@ -382,14 +392,20 @@ export default {
                     this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
-            this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
-                .then((res) => this.depositAddresses = res.data)
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses_signature'))
+                .then((res) => {
+                    this.depositAddresses = res.data.addresses;
+                    this.addressesSignature = res.data.signatures;
+                })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.can_not_update_deposit_data'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
                 }),
         ])
         .then(() => {
+            if (this.depositMore === null) {
+                this.depositMore = this.depositMoreProp;
+            }
             this.openDepositMore();
         })
         .catch((err) => {
@@ -428,10 +444,7 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            if (!this.twofa) {
-                this.notifyInfo(this.$t('toasted.info.enable_2fa_before'));
-                return;
-            }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;

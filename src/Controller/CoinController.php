@@ -97,6 +97,7 @@ class CoinController extends Controller
             'isTokenPage' => false,
             'tab' => 'trade',
             'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
+            'showCreatedModal' => false,
         ]);
     }
 

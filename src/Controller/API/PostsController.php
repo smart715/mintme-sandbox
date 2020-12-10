@@ -5,19 +5,21 @@ namespace App\Controller\API;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TokenPostNotificationStrategy;
+use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -35,19 +37,24 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
         PostManagerInterface $postManager,
-        EventDispatcherInterface $eventDispatcher
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -73,7 +80,7 @@ class PostsController extends AbstractFOSRestController
         $post = new Post();
         $post->setToken($token);
 
-        return $this->handlePostForm($post, $request, 'Post created.');
+        return $this->handlePostForm($post, $request, 'Post created.', true);
     }
 
     /**
@@ -225,8 +232,12 @@ class PostsController extends AbstractFOSRestController
         return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
     }
 
-    private function handlePostForm(Post $post, ParamFetcherInterface $request, string $message): View
-    {
+    private function handlePostForm(
+        Post $post,
+        ParamFetcherInterface $request,
+        string $message,
+        bool $newPost = false
+    ): View {
         $form = $this->createForm(PostType::class, $post, ['csrf_protection' => false]);
 
         $form->submit($request->all());
@@ -238,16 +249,21 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        /** @var User|null $user */
-        $user = $this->getUser();
+        if ($newPost) {
+            /** @var User $user */
+            $user = $this->getUser();
 
-        $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
+            $notificationType = NotificationTypes::TOKEN_NEW_POST;
+            $strategy = new TokenPostNotificationStrategy(
+                $this->userNotificationManager,
+                $this->mailer,
+                $this->entityManager,
+                $notificationType
+            );
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, $notificationType),
-            UserNotificationEvent::NAME,
-        );
+            $notificationContext = new NotificationContext($strategy);
+            $notificationContext->sendNotification($user);
+        }
 
         return $this->view(["message" => $message], Response::HTTP_OK);
     }

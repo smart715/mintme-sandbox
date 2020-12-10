@@ -1,11 +1,10 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import Register from '../../js/components/Register';
+import '../vueI18nfix.js';
+import LoginSignupSwitcher from '../../js/components/LoginSignupSwitcher';
 import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
-import Vue from 'vue';
 import Vuelidate from 'vuelidate';
-Vue.use(Vuelidate);
 
 /**
  * @return {Wrapper<Vue>}
@@ -20,10 +19,12 @@ function mockVue() {
             Vue.prototype.$toasted = {show: () => {}};
         },
     });
+    localVue.use(Vuelidate);
+    localVue.use(Vuex);
     return localVue;
 }
 
-describe('Register', () => {
+describe('LoginSignupSwitcher', () => {
     beforeEach(() => {
         moxios.install();
     });
@@ -33,7 +34,6 @@ describe('Register', () => {
     });
 
     const localVue = mockVue();
-    localVue.use(Vuex);
 
     const store = new Vuex.Store({
         modules: {
@@ -47,17 +47,32 @@ describe('Register', () => {
         },
     });
 
-    it('should render register and login form correctly', () => {
-        const wrapper = shallowMount(Register, {
+    it('should render register and login form correctly', (done) => {
+        // @TODO find out how to make Vue.extend work on jest so that we can assert the mounting onf the register component
+        const wrapper = shallowMount(LoginSignupSwitcher, {
             store,
             localVue,
             propsData: {
                 googleRecaptchaSiteKey: 'any_fake_key_data',
             },
+            mocks: {
+                $t: () => {},
+            },
         });
-        expect(wrapper.find('#login').exists()).toBe(true);
-        expect(wrapper.find('#register').exists()).toBe(true);
-        expect(wrapper.vm.loginFormLoaded).toBe(true);
-        expect(wrapper.vm.loginForm).toBe(false);
+
+        moxios.stubRequest('login', {
+            status: 200,
+            response: 'login',
+        });
+
+        moxios.stubRequest('register', {
+            status: 200,
+            response: 'register',
+        });
+
+        moxios.wait(() => {
+            expect(wrapper.find('#login-form-container').html()).toContain('login');
+            done();
+        });
     });
 });
