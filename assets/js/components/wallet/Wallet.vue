@@ -372,7 +372,7 @@ export default {
                                 if ('asset.update' === response.method) {
                                     this.updateBalances(response.params[0]);
                                 }
-                            }, 'wallet-asset-update');
+                            }, 'wallet-asset-update', 'Wallet');
 
                             this.sendMessage(JSON.stringify({
                                 method: 'asset.subscribe',
