@@ -500,7 +500,7 @@ export default {
                     forChannelId: this.airdropCampaign.actionsData.youtubeSubscribe,
                 })
                 .then((response) => {
-                    if (response.items.length > 0) {
+                    if (response.result.items.length > 0) {
                         resolve();
                     }
                     reject(new Error(this.$t('ongoing_airdrop.not_subscribed')));
