@@ -141,13 +141,10 @@ class TokenController extends Controller
         }
 
         if ($this->tokenManager->isPredefined($token)) {
-            return $this->redirectToRoute(
-                'coin',
-                [
+            return $this->redirectToRoute('coin', [
                     'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
-                    'quote'=> Token::WEB_SYMBOL,
-                ]
-            );
+                    'quote'=> Token::MINTME_SYMBOL,
+                ], 301);
         }
 
         $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
