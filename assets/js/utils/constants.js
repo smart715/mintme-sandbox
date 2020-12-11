@@ -137,3 +137,14 @@ export const descriptionLength = {
     min: 200,
     max: 10000,
 };
+
+export const currencyModes = {
+    usd: {
+        value: 'usd',
+        text: 'USD',
+    },
+    crypto: {
+        value: 'crypto',
+        text: 'Crypto',
+    },
+};

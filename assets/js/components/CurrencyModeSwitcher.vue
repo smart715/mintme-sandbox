@@ -1,0 +1,68 @@
+<template>
+    <b-dropdown
+        id="currency"
+        variant="primary"
+        class="d-inline"
+        :lazy="true"
+    >
+        <template slot="button-content">
+            <span
+                v-html="selectedCurrency ? selectedCurrency : this.$t('trading.currency.' + currencyMode)">
+            >
+            </span>
+        </template>
+        <template>
+            <b-dropdown-item @click="changeCurrencyMode(currencyModes.crypto.value)">
+                {{ $t('trading.currency.crypto') }}
+            </b-dropdown-item>
+            <b-dropdown-item class="usdOption" @click="changeCurrencyMode(currencyModes.usd.value)">
+                {{ $t('trading.currency.usd') }}
+            </b-dropdown-item>
+        </template>
+    </b-dropdown>
+</template>
+
+<script>
+import {HTTP_ACCEPTED, currencyModes} from '../utils/constants';
+
+export default {
+    name: 'CurrencyModeSwitcher',
+    props: {
+        currentCurrencyMode: String,
+    },
+    data() {
+        return {
+            selectedCurrency: '',
+            currencyModes: Object.freeze(currencyModes),
+        };
+    },
+    mounted() {
+    },
+    methods: {
+        changeCurrencyMode: function(mode) {
+            this.toggleCurrency(mode);
+            this.$axios.single.post(this.$routing.generate('change_currency_mode', {
+                mode,
+            }))
+                .then((response) => {
+                    if (response.status === HTTP_ACCEPTED) {
+                        location.reload();
+                    } else {
+                        this.$toasted.error(this.$t('toasted.error.try_later'));
+                    }
+                }, (error) => {
+                    this.$toasted.error(this.$t('toasted.error.try_later'));
+                });
+        },
+        toggleCurrency: function(mode) {
+            console.log(mode);
+            this.selectedCurrency = currencyModes[mode].text;
+        },
+    },
+    computed: {
+        currencyMode: function() {
+            return this.currentCurrencyMode;
+        },
+    },
+};
+</script>

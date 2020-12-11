@@ -22,7 +22,7 @@ import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
 import NavEnvelope from './components/chat/NavEnvelope';
-import CurrencySwitcher from "./components/CurrencySwitcher";
+import CurrencyModeSwitcher from './components/CurrencyModeSwitcher';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
@@ -121,6 +121,6 @@ new Vue({
         FontAwesomeIcon,
         FontAwesomeLayers,
         LocaleSwitcher,
-        CurrencySwitcher,
+        CurrencyModeSwitcher,
     },
 });

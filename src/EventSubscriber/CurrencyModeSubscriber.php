@@ -3,29 +3,34 @@
 namespace App\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Twig\Environment;
 
 /** @codeCoverageIgnore */
 class CurrencyModeSubscriber implements EventSubscriberInterface
 {
-    /** @var Environment */
-    private Environment $defaultCurrencyMode;
+    /** @var String */
+    private String $default_currency_mode;
 
-    public function __construct(Environment $defaultCurrencyMode)
+    /** @var SessionInterface */
+    private SessionInterface $session;
+
+    public function __construct(String $default_currency_mode, SessionInterface $session)
     {
-        $this->defaultCurrencyMode = $defaultCurrencyMode;
+        $this->default_currency_mode = $default_currency_mode;
+        $this->session = $session;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::EXCEPTION => 'onException',
+            KernelEvents::REQUEST => 'onKernelRequest',
+            KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }
 
-    public function onException(ExceptionEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -33,10 +38,16 @@ class CurrencyModeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($currencyMode = $request->attributes->get('_currencyMode')) {
-            $request->getSession()->set('_currencyMode', $currencyMode);
-        } else {
-            $request->setLocale($request->getSession()->get('_currencyMode', $this->defaultCurrencyMode));
+        if ($currencyMode = $request->attributes->get('mode')) {
+            $request->getSession()->set('_currency_mode', $currencyMode);
+        }
+    }
+
+    public function onKernelResponse(): void
+    {
+        if (null === $this->session->get('_currency_mode')) {
+            $this->session->set('_currency_mode', $this->default_currency_mode);
+
         }
     }
 }
