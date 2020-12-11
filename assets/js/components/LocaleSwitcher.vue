@@ -1,6 +1,6 @@
 <template>
     <div
-        class="dropup language-switcher d-inline-block"
+        class="dropup language-switcher d-inline"
         :class="{ 'show': showLangMenu }"
         v-on-clickaway="hideLangMenu"
     >
