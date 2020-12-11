@@ -141,7 +141,7 @@ export default {
             ) {
                 this.checkIfTokenExchanged();
             }
-        }, 'token-name-asset-update');
+        }, 'token-name-asset-update', 'TokenName');
 
         if (this.showTokenEditModalProp) {
             window.history.replaceState(

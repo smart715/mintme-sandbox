@@ -6,9 +6,7 @@ use App\Consumers\Helpers\DBConnection;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\DepositCompletedEvent;
-use App\Events\UserNotificationEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Strategy\BalanceContext;
@@ -67,7 +65,6 @@ class DepositConsumer implements ConsumerInterface
 
     /** @var ContainerInterface */
     private $container;
-
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
@@ -182,15 +179,6 @@ class DepositConsumer implements ConsumerInterface
             $this->eventDispatcher->dispatch(
                 new DepositCompletedEvent($tradable, $user, $clbResult->getAmount()),
                 DepositCompletedEvent::NAME
-            );
-
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new UserNotificationEvent(
-                    $user,
-                    UserNotification::DEPOSIT_NOTIFICATION
-                ),
-                UserNotificationEvent::NAME
             );
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');

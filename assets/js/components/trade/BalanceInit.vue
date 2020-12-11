@@ -122,7 +122,7 @@ export default {
                 if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.base.identifier)) {
                     this.baseBalance = response.params[0][this.market.base.identifier].available;
                 }
-            }, 'trade-sell-order-asset');
+            }, 'trade-sell-order-asset', 'BalanceInit');
         },
     },
     watch: {

@@ -497,7 +497,7 @@ export default {
                         } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
                             this.updateMonthVolume(result.id, result.result);
                         }
-                    });
+                    }, null, 'Trading');
                 });
         },
         sortCompare: function(a, b, key) {
