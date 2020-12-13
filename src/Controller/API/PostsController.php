@@ -112,16 +112,12 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/list/{tokenName}", name="list_posts", options={"expose"=true})
      * @Rest\RequestParam(name="tokenName", nullable=True)
-     * @param string|null $tokenName
+     * @param string $tokenName
      * @return View
      * @throws ApiNotFoundException
      */
-    public function list(?string $tokenName = null): View
+    public function list(string $tokenName): View
     {
-        if (null === $tokenName) {
-            return $this->view(false);
-        }
-
         $token = $this->tokenManager->findByName($tokenName);
 
         if (!$token) {
