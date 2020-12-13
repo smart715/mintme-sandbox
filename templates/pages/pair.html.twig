@@ -253,23 +253,27 @@
                         <li class="nav-item ml-auto small-profile-link">
                             <div class="d-flex align-items-center h-100">
                                 <a
-                                    v-if="getQuoteBalance >= {{ dMMinAmount }} || {{ isOwner }}"
                                     href="{{ isOwner == 'true' ? path('chat') : path('new_dm_message', {'tokenName': token.name}) }}"
-                                    class="chat-envelope d-block text-white pl-2 pr-2">
-                                    <font-awesome-icon icon="envelope" size="lg" />
+                                    class="chat-envelope d-block text-white pl-2 pr-2"
+                                >
+                                    <envelope
+                                        :is-owner="{{ isOwner }}"
+                                        :dm-min-amount="{{ dMMinAmount }}"
+                                        :get-quote-balance="getQuoteBalance"
+                                    ></envelope>
                                 </a>
                                 <div class="div-container-avatar">
-                                <a
-                                    href="{{ path('profile') }}/{{ profile.nickname }}"
-                                >
-                                    <avatar
-                                        class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
-                                        size="small"
-                                        type="profile"
-                                        image="{{ profile.image.url | imagine_filter('avatar_small') }}"
-                                    ></avatar>
-                                </a>
-                            </div>
+                                    <a
+                                        href="{{ path('profile') }}/{{ profile.nickname }}"
+                                    >
+                                        <avatar
+                                            class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
+                                            size="small"
+                                            type="profile"
+                                            image="{{ profile.image.url | imagine_filter('avatar_small') }}"
+                                        ></avatar>
+                                    </a>
+                                </div>
                             </div>
                         </li>
                     {% endif %}
