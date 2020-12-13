@@ -44,7 +44,7 @@
                                 tabindex="8"
                                 :from="market.base.symbol"
                                 :to="USD.symbol"
-                                :subunit="2"
+                                :subunit="4"
                                 symbol="$"
                             />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
