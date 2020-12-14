@@ -84,7 +84,7 @@ export default {
          * @param {*} message - message from vue component
          * @return {*}
          */
-        addMessageHandler: function(handler, id = null, message = '') {
+        addMessageHandler: function(handler, id = null, message = 'WebSocket') {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
