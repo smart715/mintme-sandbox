@@ -269,9 +269,9 @@ export default {
         duration: {
             get: function() {
                 let now = moment();
-                return moment.duration(moment(this.endsDateTime).diff(moment(now))).asMilliseconds() <= 0
+                return moment.duration(moment(this.endsDateTime, 'D MMMM YYYY HH:mm:ss').diff(moment(now, 'D MMMM YYYY HH:mm:ss'))).asMilliseconds() <= 0
                     ? moment.duration(0)
-                    : moment.duration(moment(this.endsDateTime).diff(moment(now)));
+                    : moment.duration(moment(this.endsDateTime, 'D MMMM YYYY HH:mm:ss').diff(moment(now, 'D MMMM YYYY HH:mm:ss')));
             },
             set: function(newDuration) {
                 return newDuration;

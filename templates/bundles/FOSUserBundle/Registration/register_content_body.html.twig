@@ -19,9 +19,9 @@
     {{ form_row(form.recaptcha, { 'inline': false }) }}
 </div>
 <div class="text-left">
-    <input type="submit" :disabled="disabled" class="btn btn-primary" value="Sign Up">
-    <span class="px-3">or</span>
-    <a class="btn-cancel px-0" id="login-button" href="{{ path('fos_user_security_login') }}">Log In</a>
+    <input type="submit" :disabled="disabled" class="btn btn-primary" value="{% trans from 'FOSUserBundle' %}form.signup.submit{% endtrans %}">
+    <span class="px-3">{% trans %}or{% endtrans %}</span>
+    <a class="btn-cancel px-0" id="login-button" href="{{ path('fos_user_security_login') }}">{% trans from 'FOSUserBundle' %}form.login.submit{% endtrans %}</a>
 </div>
 <p class="text-left pt-3">
     {% trans from 'FOSUserBundle' %}register.accepting{% endtrans %} <br><a target="_blank" href="{{ path('terms_of_service') }}">{% trans from 'messages' %}terms_of_service{% endtrans %}</a> {% trans from 'messages' %}and{% endtrans %} <a target="_blank" href="{{ path('privacy_policy') }}">{% trans from 'messages' %}privacy_policy{% endtrans %}</a>

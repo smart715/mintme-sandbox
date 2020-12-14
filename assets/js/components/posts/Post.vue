@@ -51,7 +51,7 @@
                 icon="comment"
                 transform="grow-1.5"
             />
-          <span class="social-link ml-1">{{ post.commentsCount }} Comments</span>
+          <span class="social-link ml-1">{{ post.commentsCount }} {{ $t('post.comments') }}</span>
         </a>
         <confirm-modal
             :visible="isModalVisible"
@@ -126,7 +126,7 @@ export default {
             this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
             .then((res) => {
                this.$emit('delete-post', this.index);
-               this.notifySuccess(res.data.message);
+               this.notifySuccess(this.$t('post.deleted'));
             })
             .catch(() => {
                 this.notifyError('Error deleting post.');

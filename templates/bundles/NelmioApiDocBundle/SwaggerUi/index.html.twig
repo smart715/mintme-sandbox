@@ -124,14 +124,14 @@
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
                                     {% if version != 'v1' %}
                                     <p>
-                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.v2.body.2{% endtrans %}
+                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.v2.body.2{% endtrans %}
                                     </p>
                                     <p>
                                         {% trans %}api.page.v2.body.3{% endtrans %}
                                     </p>
                                     {% else %}
                                     <p>
-                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.body.2{% endtrans %}
+                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.body.2{% endtrans %}
                                     </p>
                                     {% endif %}
                                     <p>
@@ -154,7 +154,7 @@
                                     <p>
                                         {% if app.user is not null %}
                                             {% trans %}api.page.body.10{% endtrans %}
-                                            <a href="{{ path('settings') }}">settings</a>
+                                            <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a>
                                             {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
                                         {% else %}
                                             {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}

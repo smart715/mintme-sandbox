@@ -31,6 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserController extends AbstractController implements TwoFactorAuthenticatedInterface
 {
@@ -52,13 +53,16 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     /** @var TokenManager */
     private $tokenManager;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         UserManagerInterface $userManager,
         ProfileManagerInterface $profileManager,
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
         NormalizerInterface $normalizer,
-        TokenManager $tokenManager
+        TokenManager $tokenManager,
+        TranslatorInterface $translator
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
@@ -66,6 +70,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $this->eventDispatcher = $eventDispatcher;
         $this->normalizer = $normalizer;
         $this->tokenManager = $tokenManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -326,8 +331,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $this->getBackupCodes($twoFactorManager);
-        $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
-        $this->addFlash('success', 'Downloading backup codes...');
+        $this->addFlash('success', $this->translator->trans('2fa.notification.enabled'));
+        $this->addFlash('success', $this->translator->trans('2fa.notification.download_backup_code'));
         $this->userActionLogger->info('Enable Two-Factor Authentication');
 
         return $backupCodes;
@@ -342,7 +347,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $entityManager->remove($googleAuth);
         $entityManager->flush();
         $this->container->get('session')->remove('googleSecreteCode');
-        $this->addFlash('success', 'You have disabled two-factor authentication!');
+        $this->addFlash('success', $this->translator->trans('2fa.notification.disabled'));
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
 
