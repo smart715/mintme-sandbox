@@ -1,6 +1,6 @@
 <template>
     <a
-        href="getDirectMessageLink"
+        :href="getDirectMessageLink"
         class="chat-envelope d-block text-white pl-2 pr-2"
     >
         <font-awesome-icon icon="envelope" size="lg" @click="checkDirectMessage" />
@@ -11,7 +11,7 @@
 
 import {NotificationMixin} from '../mixins';
 
-    export default {
+export default {
     name: 'Envelope',
     mixins: [NotificationMixin],
     props: {
