@@ -221,6 +221,7 @@ export default {
         loginUrl: String,
         signupUrl: String,
         youtubeClientId: String,
+        currentLocale: String,
     },
     data() {
         return {
@@ -236,6 +237,10 @@ export default {
     },
     mounted: function() {
         this.getAirdropCampaign();
+
+        if (null !== this.currentLocale) {
+            moment.locale(this.currentLocale);
+        }
     },
     computed: {
         actionsLength() {
@@ -269,9 +274,10 @@ export default {
         duration: {
             get: function() {
                 let now = moment();
-                return moment.duration(moment(this.endsDateTime, 'D MMMM YYYY HH:mm:ss').diff(moment(now, 'D MMMM YYYY HH:mm:ss'))).asMilliseconds() <= 0
+                let format = 'D MMMM YYYY HH:mm:ss';
+                return moment.duration(moment(this.endsDateTime, format).diff(moment(now, format))).asMilliseconds() <= 0
                     ? moment.duration(0)
-                    : moment.duration(moment(this.endsDateTime, 'D MMMM YYYY HH:mm:ss').diff(moment(now, 'D MMMM YYYY HH:mm:ss')));
+                    : moment.duration(moment(this.endsDateTime, format).diff(moment(now, format)));
             },
             set: function(newDuration) {
                 return newDuration;

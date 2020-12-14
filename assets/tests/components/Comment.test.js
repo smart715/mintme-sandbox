@@ -12,6 +12,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -162,6 +163,7 @@ describe('Comments', () => {
             install(Vue, options) {
                 Vue.prototype.$routing = {generate: (val) => val};
                 Vue.prototype.$axios = {retry: mockAxios, single: mockAxios};
+                Vue.prototype.$t = (val) => val;
             },
         });
 

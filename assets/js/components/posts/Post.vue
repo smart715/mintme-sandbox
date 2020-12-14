@@ -129,7 +129,7 @@ export default {
                this.notifySuccess(this.$t('post.deleted'));
             })
             .catch(() => {
-                this.notifyError('Error deleting post.');
+                this.notifyError(this.$t('post.error.deleted'));
             })
             .finally(() => {
                 this.deleteDisabled = false;
