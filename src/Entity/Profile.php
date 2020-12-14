@@ -318,10 +318,6 @@ class Profile implements ImagineInterface
 
     public function getImage(): Image
     {
-        if ($this->isAnonymous()) {
-            return Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
-        }
-
         return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }
 
