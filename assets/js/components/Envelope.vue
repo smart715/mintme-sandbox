@@ -8,6 +8,7 @@ import {NotificationMixin} from '../../mixins';
 
     export default {
     name: 'Envelope',
+    mixins: [NotificationMixin],
     props: {
         isOwner: Boolean,
         dmMinAmount: String,
