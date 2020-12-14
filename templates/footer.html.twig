@@ -12,12 +12,11 @@
                     flags="{{ global_translation_flags | json_encode(constant('JSON_UNESCAPED_UNICODE')) }}"
                 ></locale-switcher>
             {% endif %}
-            {{ dump(app.session) }}
             <currency-mode-switcher
                 current-currency-mode="{{ app.session.get('_currency_mode') }}"
             ></currency-mode-switcher>
         </div>
-        <div class="col-auto text-center mr-5">
+        <div class="col-auto text-center mr-5 pl-0">
             <a
                 href="{{ twitter_footer_link }}"
                 rel="noopener"
