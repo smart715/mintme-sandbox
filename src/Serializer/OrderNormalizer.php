@@ -16,6 +16,7 @@ class OrderNormalizer implements NormalizerInterface
     {
         $this->normalizer = $normalizer;
     }
+    
     /**
      * {@inheritDoc}
      *
