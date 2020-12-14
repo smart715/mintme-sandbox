@@ -252,16 +252,12 @@
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto small-profile-link">
                             <div class="d-flex align-items-center h-100">
-                                <a
-                                    href="{{ isOwner == 'true' ? path('chat') : path('new_dm_message', {'tokenName': token.name}) }}"
-                                    class="chat-envelope d-block text-white pl-2 pr-2"
-                                >
-                                    <envelope
-                                        :is-owner="{{ isOwner }}"
-                                        :dm-min-amount="{{ dMMinAmount }}"
-                                        :get-quote-balance="getQuoteBalance"
-                                    ></envelope>
-                                </a>
+                                <envelope
+                                    :is-owner="{{ isOwner }}"
+                                    :dm-min-amount="{{ dMMinAmount }}"
+                                    :get-quote-balance="getQuoteBalance"
+                                    :token-name="{{ token.name }}"
+                                ></envelope>
                                 <div class="div-container-avatar">
                                     <a
                                         href="{{ path('profile') }}/{{ profile.nickname }}"
