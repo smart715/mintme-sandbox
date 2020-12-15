@@ -2,7 +2,7 @@
     <b-dropdown
         id="currency"
         variant="primary"
-        class="d-inline"
+        class="dropup d-inline"
         :lazy="true"
     >
         <template slot="button-content">
@@ -38,8 +38,9 @@ export default {
         };
     },
     mounted() {
+            console.log(Document.);
         //this.globalCurrencyMode(this.currentCurrencyMode);
-      //  console.log(this.globalCurrencyMode);
+        //console.log(this.globalCurrencyMode);
       //  this.updateCurrencyMode(this.currentCurrencyMode);
     },
     methods: {
