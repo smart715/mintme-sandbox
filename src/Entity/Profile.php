@@ -93,12 +93,8 @@ class Profile implements ImagineInterface
      */
     protected $anonymous = false;
 
-    /**
-     * @ORM\Column(type="boolean")
-     * @Groups({"Default", "API"})
-     * @var bool
-     */
-    public bool $disabledAnonymous = false;
+    /** @var bool */
+    public bool $disabledAnonymous = false;  // phpcs:ignore
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
@@ -132,8 +128,7 @@ class Profile implements ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     * @Groups({"Default", "API"})
-     * @var Image
+     * @var Image|null
      */
     protected $image;
 
@@ -253,9 +248,9 @@ class Profile implements ImagineInterface
         return $this;
     }
 
-    public function setDisabledAnonymous(bool $anonymous): self
+    public function setDisabledAnonymous(bool $disabledAnonymous): self
     {
-        $this->disabledAnonymous = $anonymous;
+        $this->disabledAnonymous = $disabledAnonymous;
 
         return $this;
     }
@@ -354,7 +349,7 @@ class Profile implements ImagineInterface
      */
     public function getImage(): Image
     {
-        return $this->image && $this->returnDefault()
+        return $this->image && !$this->returnDefault()
             ? $this->image
             : Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }

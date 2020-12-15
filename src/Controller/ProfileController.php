@@ -39,7 +39,7 @@ class ProfileController extends Controller
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
 
-        if (null !== $this->getUser() && $profile->getUser()->getId() === $this->getUser()->getId()) {
+        if (null !== $this->getUser() && $profile->getUser() === $this->getUser()) {
             $profile->setDisabledAnonymous(true);
         }
 
