@@ -46,6 +46,7 @@ parameters:
         minBtcAmount: 0.000001
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
+        minUsdcAmount: 0.1
         minTokensAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-22'
@@ -172,6 +173,7 @@ parameters:
     coinify_crypto_currencies:
         - BTC
         - ETH
+        - USDC
 
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB

@@ -13,6 +13,9 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Etherium balance">
                 <b>{{ $t('info_bar.eth.title') }}</b> {{ ethBalance }}
             </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="USD Coin balance">
+                <b>{{ $t('info_bar.usdc.title') }}</b> {{ usdcBalance }}
+            </span>
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
                 <b>{{ $t('info_bar.btc.title') }}</b> {{ btcBalance }}
             </span>
@@ -96,6 +99,8 @@ export default {
             balance: {
                 WEB: null,
                 BTC: null,
+                ETH: null,
+                USDC: null,
             },
             interval: null,
         };
@@ -120,6 +125,9 @@ export default {
         },
         btcBalance: function() {
             return this.balance.BTC ? new Decimal(this.balance.BTC.available).toFixed(this.balance.BTC.subunit) : '-';
+        },
+        usdcBalance: function() {
+          return this.balance.USDC ? new Decimal(this.balance.USDC.available).toFixed(this.balance.USDC.subunit) : '-';
         },
     },
     methods: {

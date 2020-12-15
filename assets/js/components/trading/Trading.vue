@@ -9,36 +9,35 @@
                     <div class="row coin-markets">
                         <div v-for="(market, index) in this.sanitizedMarketsOnTop"
                              :key="market.pair"
-                             class="col-12 col-lg-6 my-2 pl-3"
+                             class="col-12 col-lg-4 my-2 px-1"
                              v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
                         >
                             <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block px-md-3 py-2">
+                                <div class="d-inline-block pl-md-3 pr-md-2 py-2">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
                                 <div class="crypto-pair d-inline-block align-middle">
-                                    <span>{{ market.pair|rebranding }}</span>
-                                    <br>
-                                    <span>{{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}</span>
-                                </div>
-                                <div class="d-inline-block text-center mx-md-1 market-change">
-                                    <span v-if="parseFloat(market.change) > 0" class="market-up">
+                                    <div class="text-center">{{ market.pair|rebranding }}</div>
+                                    <div v-if="parseFloat(market.change) > 0" class="market-up text-center">
                                         &#9650;+{{ market.change }}
-                                    </span>
-                                    <span v-else-if="parseFloat(market.change) < 0" class="market-down">
+                                    </div>
+                                    <div v-else-if="parseFloat(market.change) < 0" class="market-down text-center">
                                         &#9660;{{ market.change }}
-                                    </span>
-                                    <span v-else>
+                                    </div>
+                                    <div class="text-center" v-else>
                                         {{ market.change }}
-                                    </span>
+                                    </div>
+                                    <div class="text-center">
+                                        {{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}
+                                    </div>
                                 </div>
                             </a>
-                            <div class="d-inline-block align-middle market-data">
+                            <div class="d-inline-block pl-2 pt-2 pt-lg-0 align-middle market-data float-right float-lg-none">
                                 <span>{{ $t('trading.table.volume_30d') }}</span>
-                                <span class="float-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right pl-1 pl-sm-4 pl-lg-0">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
                                 <span>{{ $t('trading.table.volume_24h') }}</span>
-                                <span class="float-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right pl-1 pl-sm-4 pl-lg-0">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>
@@ -273,7 +272,7 @@ import {
   LoggerMixin,
 } from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD, WEB, BTC, MINTME, ETH} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
 
@@ -319,6 +318,7 @@ export default {
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
+                {currency: USDC.symbol, token: WEB.symbol},
             ],
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
@@ -557,7 +557,8 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length === 2 // there are only WEBBTC and WEBETH markets
+                            // there are only WEBBTC,WEBETH and WEBUSDC markets
+                            Object.keys(res.data.markets).length === 3
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
@@ -681,7 +682,9 @@ export default {
                 : Decimal.mul(lastPrice, supply);
 
             return {
-                pair: BTC.symbol === currency || ETH.symbol === currency ? `${token}/${currency}` : `${token}`,
+                pair: BTC.symbol === currency
+                  || ETH.symbol === currency
+                  || USDC.symbol === currency ? `${token}/${currency}` : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,

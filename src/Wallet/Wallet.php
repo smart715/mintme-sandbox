@@ -152,11 +152,9 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        if ($tradable instanceof Crypto && !$this->validateAmount($crypto, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($crypto, $amount, $user)) {
             throw new NotEnoughAmountException();
-        }
-
-        if ($tradable instanceof Token && !$this->validateTokenFee($user, $crypto)) {
+        } elseif (!$this->validateTokenFee($user, $crypto)) {
             throw new NotEnoughAmountException();
         }
 
@@ -183,14 +181,14 @@ class Wallet implements WalletInterface
         $amount = $pendingWithdraw->getAmount();
         $address = $pendingWithdraw->getAddress();
 
-        if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
         $this->em->beginTransaction();
 
         try {
-            if ($tradable instanceof Crypto) {
+            if ($tradable instanceof Crypto && !$tradable->isToken()) {
                 $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
             } else {
                 $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
@@ -203,7 +201,7 @@ class Wallet implements WalletInterface
 
             $this->logger->error(
                 "Failed to pay '{$user->getEmail()}' amount {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}.
-                Withdraw-gateway failed with the next errror: {$exception->getMessage()}. Payment has been rollbacked"
+                Withdraw-gateway failed with the next error: {$exception->getMessage()}. Payment has been rollbacked"
             );
 
             throw new Exception();
@@ -225,9 +223,13 @@ class Wallet implements WalletInterface
     /** {@inheritDoc} */
     public function getTokenDepositCredentials(User $user): array
     {
-        return [
-            MoneyWrapper::TOK_SYMBOL => new Address($this->contractHandler->getDepositCredentials($user)),
-        ];
+        $addresses = $this->contractHandler->getDepositCredentials($user);
+
+        foreach ($addresses as $symbol => $address) {
+            $addresses[$symbol] = new Address($address);
+        }
+
+        return $addresses;
     }
 
     /** {@inheritDoc} */
