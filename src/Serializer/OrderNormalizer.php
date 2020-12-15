@@ -2,7 +2,6 @@
 
 namespace App\Serializer;
 
-use App\Entity\Image;
 use App\Exchange\Order;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -10,7 +9,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class OrderNormalizer implements NormalizerInterface
 {
     /** @var ObjectNormalizer */
-    private $normalizer;
+    private ObjectNormalizer $normalizer;
 
     public function __construct(ObjectNormalizer $normalizer)
     {
@@ -22,13 +21,13 @@ class OrderNormalizer implements NormalizerInterface
      *
      * @param Order $order
      */
-    public function normalize($order, $format = null, array $context = [])
+    public function normalize($order, $format = null, array $context = []): array
     {
         return $this->normalizer->normalize($order, $format, $context);
     }
 
     /** {@inheritDoc} */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof Order;
     }

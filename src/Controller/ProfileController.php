@@ -38,8 +38,8 @@ class ProfileController extends Controller
         string $nickname
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
-
-        if (null !== $this->getUser() && $profile->getUser() === $this->getUser()) {
+        $user = $this->getUser();
+        if (null !== $user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
         }
 
