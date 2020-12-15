@@ -82,6 +82,12 @@ class MarketStatus
     private $buyDepth = '0';
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     * @var string|null
+     */
+    private ?string $marketCap = null; // phpcs:ignore
+
+    /**
      * @ORM\Column(type="datetime_immutable")
      * @var \DateTimeImmutable|null
      */
@@ -148,6 +154,16 @@ class MarketStatus
         return new Money($this->monthVolume, new Currency($this->crypto->getSymbol()));
     }
 
+    /**
+     * @Groups({"API", "dev"})
+     */
+    public function getMarketCap(): ?Money
+    {
+        return $this->marketCap
+            ? new Money($this->marketCap, new Currency($this->crypto->getSymbol()))
+            : null;
+    }
+
     public function setQuote(?TradebleInterface $quote): self
     {
         if ($quote instanceof Crypto) {
@@ -169,7 +185,7 @@ class MarketStatus
         return $this->quoteCrypto ?? $this->quoteToken;
     }
 
-    public function updateStats(MarketInfo $marketInfo): self
+    public function updateStats(MarketInfo $marketInfo, ?Money $marketCap): self
     {
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
@@ -177,6 +193,9 @@ class MarketStatus
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
         $this->expires = $marketInfo->getExpires();
+        $this->marketCap = $marketCap
+            ? $marketCap->getAmount()
+            : null;
 
         return $this;
     }
