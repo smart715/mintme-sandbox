@@ -6,15 +6,19 @@ use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
@@ -58,12 +62,21 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** @var int */
     public $minVolumeForMarketcap;
 
+    private BalanceHandlerInterface $balanceHandler;
+
+    private ParameterBagInterface $bag;
+
+    private MoneyWrapperInterface $moneyWrapper;
+
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketFactory,
-        MarketHandlerInterface $marketHandler
+        MarketHandlerInterface $marketHandler,
+        BalanceHandlerInterface $balanceHandler,
+        ParameterBagInterface $bag,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         /** @var  MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
@@ -73,6 +86,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
         $this->em = $em;
+        $this->balanceHandler = $balanceHandler;
+        $this->bag = $bag;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /** {@inheritDoc} */
@@ -214,7 +230,27 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $marketInfo = $this->marketHandler->getMarketInfo($market);
 
-        $marketStatus->updateStats($marketInfo);
+        /** @var Token|null $quote */
+        $quote = $market->getQuote();
+
+        $marketCap = null;
+
+        if ($quote instanceof Token) {
+            $ownerPendingOrders = $this->marketHandler->getPendingOrdersByUser(
+                $quote->getProfile()->getUser(),
+                [$market]
+            );
+
+            $soldOnMarket = $this->balanceHandler->soldOnMarket(
+                $quote,
+                $this->bag->get('token_quantity'),
+                $ownerPendingOrders
+            );
+
+            $marketCap = $marketInfo->getLast()->multiply($this->moneyWrapper->format($soldOnMarket));
+        }
+
+        $marketStatus->updateStats($marketInfo, $marketCap);
 
         $this->em->merge($marketStatus);
         $this->em->flush();

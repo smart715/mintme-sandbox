@@ -324,23 +324,37 @@ export default {
             const marketAmount = parseFloat(marketData.deal);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            let marketCap;
-
-            if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
-                this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
-                marketCap = 0;
-            } else {
-                marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
-                    ? '-'
-                    : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
-            }
-
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: marketCap,
             };
+
+            if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
+                this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
+                monthInfo.marketCap = 0;
+            } else {
+              if (WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap) {
+                  monthInfo.marketCap = '-';
+              } else {
+                  this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
+                    name: this.market.quote.symbol,
+                  }))
+                      .then((res) => {
+                          monthInfo.marketCap = toMoney(
+                              parseFloat(this.marketStatus.last) * res.data, this.market.base.subunit
+                          ) + ' ' + this.market.base.symbol;
+                      })
+                      .catch((err) => {
+                          monthInfo.marketCap = '-';
+                          this.notifyError(this.$t('toasted.error.can_not_load_sold_on_market'));
+                          this.sendLogs('error', 'Can not load soldOnMarket value', err);
+                      })
+                      .finally(() => {
+                          this.marketStatus = {...this.marketStatus, ...monthInfo};
+                      });
+              }
+            }
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
         },
