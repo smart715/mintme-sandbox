@@ -346,7 +346,7 @@ export default {
         translationsContext: function() {
             return {
                 baseSymbol: this.rebrandingFunc(this.market.base.symbol),
-                quoteSymbol: this.market.quote.symbol,
+                quoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 rebrandedQuoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 minTotalPrice: this.minTotalPrice,
             };

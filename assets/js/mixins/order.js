@@ -1,4 +1,4 @@
-import {webSymbol, btcSymbol, ethSymbol, WSAPI} from '../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, usdcSymbol, WSAPI} from '../utils/constants';
 
 export default {
     props: {
@@ -36,7 +36,7 @@ export default {
             return '';
         },
         isCryptoMarket: function() {
-            return [webSymbol, btcSymbol, ethSymbol].includes(this.marketIdentifier);
+            return [webSymbol, btcSymbol, ethSymbol, usdcSymbol].includes(this.marketIdentifier);
         },
     },
     methods: {

@@ -27,11 +27,11 @@ class CryptoRatesFetcher implements CryptoRatesFetcherInterface
         $cryptos = $this->cryptoManager->findAllIndexed('name');
 
         $names = implode(',', array_map(function ($crypto) {
-            return $crypto->getName();
+            return str_replace(' ', '-', $crypto->getName());
         }, $cryptos));
 
         $symbols = implode(',', array_map(function ($crypto) {
-            return $crypto->getSymbol();
+            return str_replace(' ', '-', $crypto->getSymbol());
         }, $cryptos));
 
         $symbols .= ','.MoneyWrapper::USD_SYMBOL;
@@ -41,7 +41,9 @@ class CryptoRatesFetcher implements CryptoRatesFetcherInterface
         $response = json_decode($response, true);
 
         $keys = array_map(function ($key) use ($cryptos) {
-            return $cryptos[ucfirst((string)$key)]->getSymbol();
+            return 'usd-coin' === $key
+                ? $cryptos['USD Coin']->getSymbol()
+                : $cryptos[ucfirst((string)$key)]->getSymbol();
         }, array_keys($response));
 
         $values = array_map(function ($value) {
