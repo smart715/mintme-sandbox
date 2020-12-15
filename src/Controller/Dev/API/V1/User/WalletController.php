@@ -3,6 +3,7 @@
 namespace App\Controller\Dev\API\V1\User;
 
 use App\Controller\Dev\API\V1\DevApiController;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
@@ -101,7 +102,7 @@ class WalletController extends DevApiController
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
-            $this->cryptoManager->findAll()
+            $crypto = array_filter($this->cryptoManager->findAll(), fn(Crypto $crypto) => !$crypto->isToken())
         ) : [];
 
         $isBlockedToken = $user->getProfile()->getToken()

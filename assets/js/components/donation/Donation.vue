@@ -173,7 +173,7 @@ import Guide from '../Guide';
 import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD, digitsLimits} from '../../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, usdcSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD, digitsLimits} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -205,6 +205,7 @@ export default {
                 webSymbol,
                 btcSymbol,
                 ethSymbol,
+                usdcSymbol,
             },
             selectedCurrency: webSymbol,
             amountToDonate: 0,
@@ -251,11 +252,16 @@ export default {
                 : MINTME.subunit;
         },
         currencyMinAmount: function() {
-            return btcSymbol === this.selectedCurrency
-                ? this.donationParams.minBtcAmount
-                : (ethSymbol === this.selectedCurrency
-                    ? this.donationParams.minEthAmount
-                    : this.donationParams.minMintmeAmount);
+            switch (this.selectedCurrency) {
+              case btcSymbol:
+                return this.donationParams.minBtcAmount;
+              case ethSymbol:
+                return this.donationParams.minEthAmount;
+              case usdcSymbol:
+                return this.donationParams.minUsdcAmount;
+              default:
+                return this.donationParams.minMintmeAmount;
+            }
         },
         minTotalPrice: function() {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);

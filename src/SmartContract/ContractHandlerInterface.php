@@ -3,6 +3,7 @@
 namespace App\SmartContract;
 
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\SmartContract\Model\TokenDeployResult;
 use App\Wallet\WalletInterface;
@@ -19,9 +20,9 @@ interface ContractHandlerInterface
 
     public function updateMintDestination(Token $token, string $address): void;
 
-    public function getDepositCredentials(User $user): string;
+    public function getDepositCredentials(User $user): array;
 
-    public function withdraw(User $user, Money $balance, string $address, Token $token): void;
+    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void;
 
     public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
 

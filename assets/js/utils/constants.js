@@ -39,6 +39,8 @@ export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
+export const usdcSymbol = 'USDC';
+export const tokEthSymbol = 'TOKETH';
 export const webBtcSymbol = 'WEBBTC';
 export const usdSign = '$';
 
@@ -104,6 +106,11 @@ export const ETH = {
     symbol: 'ETH',
     subunit: 8,
     digits: 4,
+};
+
+export const USDC = {
+    symbol: 'USDC',
+    subunit: 18,
 };
 
 export const MINTME = {
