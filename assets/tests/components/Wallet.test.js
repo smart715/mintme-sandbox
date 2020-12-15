@@ -166,9 +166,6 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.showModal = false;
-        wrapper.setProps({twofa: ''});
-        wrapper.vm.openWithdraw('currency', 'fee', 'amount', 'subunit');
-        expect(wrapper.vm.showModal).toBe(false);
         wrapper.setProps({twofa: 'foo'});
         wrapper.vm.predefinedTokens = {};
         wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
@@ -278,7 +275,7 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.setProps({depositMore: webSymbol});
+            wrapper.setData({depositMore: webSymbol});
             wrapper.vm.predefinedTokens = {};
             wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
             wrapper.vm.depositAddresses = {};

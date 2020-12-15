@@ -301,6 +301,13 @@
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
         {% endif %}
     </div>
+    {% if showCreatedModal and isOwner is same as('true') %}
+        <token-created-modal
+            :visible="showCreatedModal"
+            token-name="{{ market.quote.name }}"
+            @close="showCreatedModal = false"
+        ></token-created-modal>
+    {% endif %}
 </div>
 
 <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">

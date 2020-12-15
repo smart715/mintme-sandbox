@@ -6,34 +6,5 @@
 {% set featured = true %}
 
 {% block formBody %}
-    {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
-    {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required', 'autofocus': 'autofocus'} }) }}
-    {% include 'form/nickname_field.html.twig' %}
-    <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
-        {% trans from 'messages' %}page.profile.error.nickname.min{% endtrans %}
-    </div>
-    <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
-        {% trans from 'messages' %}page.profile.error.nickname.letters_numbers{% endtrans %}
-    </div>
-    <div id="register-form-password-container">
-            <passwordmeter :password="password" @toggle-error="toggleError">
-                <span @click="togglePassword()" class="show-password">
-                    <i class="far fa-eye"></i>
-                </span>
-                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
-            </passwordmeter>
-        </div>
-        <div id="register-form-captcha-container" class="py-2">
-            {{ form_row(form.recaptcha, { 'inline': false }) }}
-        </div>
-        <div class="text-left">
-            <input type="submit" :disabled="disabled" class="btn btn-primary" value="Sign Up">
-            <span class="px-3">or</span>
-            <a class="btn-cancel px-0" href="{{ path('fos_user_security_login') }}">Log In</a>
-        </div>
-        <p class="text-left pt-3">
-            {% trans %}register.accepting{% endtrans %} <br><a target="_blank" href="{{ path('terms_of_service') }}">{% trans from 'messages' %}terms_of_service{% endtrans %}</a> {% trans from 'messages' %}and{% endtrans %} <a target="_blank" href="{{ path('privacy_policy') }}">{% trans from 'messages' %}privacy_policy{% endtrans %}</a>
-        </p>
-    {{ form_end(form) }}
-    {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
+    {{ include("@FOSUser/Registration/register_content_body.html.twig") }}
 {% endblock %}

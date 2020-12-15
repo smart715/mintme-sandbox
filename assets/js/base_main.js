@@ -21,6 +21,7 @@ import LocaleSwitcher from './components/LocaleSwitcher';
 import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
+import NavEnvelope from './components/chat/NavEnvelope';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
@@ -84,9 +85,9 @@ new Vue({
     components: {
         TokenSearcher,
         AdminMenu,
-        LocaleSwitcher,
         Avatar,
         UserNotification,
+        NavEnvelope,
     },
     methods: {
         toggleNavbarMenu: function() {
@@ -118,5 +119,6 @@ new Vue({
     components: {
         FontAwesomeIcon,
         FontAwesomeLayers,
+        LocaleSwitcher,
     },
 });

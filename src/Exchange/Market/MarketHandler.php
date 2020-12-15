@@ -75,12 +75,7 @@ class MarketHandler implements MarketHandlerInterface
         bool $reverseBaseQuote = false
     ): array {
         return $this->parsePendingOrders(
-            $this->marketFetcher->getPendingOrders(
-                $this->marketNameConverter->convert($market),
-                $offset,
-                $limit,
-                self::SELL
-            ),
+            $this->getPendingOrders($market, $offset, $limit, self::SELL),
             $market,
             $reverseBaseQuote
         );
@@ -94,12 +89,7 @@ class MarketHandler implements MarketHandlerInterface
         bool $reverseBaseQuote = false
     ): array {
         return $this->parsePendingOrders(
-            $this->marketFetcher->getPendingOrders(
-                $this->marketNameConverter->convert($market),
-                $offset,
-                $limit,
-                self::BUY
-            ),
+            $this->getPendingOrders($market, $offset, $limit, self::BUY),
             $market,
             $reverseBaseQuote
         );
@@ -507,6 +497,51 @@ class MarketHandler implements MarketHandlerInterface
             $user->getId(),
             $this->marketNameConverter->convert($market),
             $offset,
+        );
+    }
+
+    private function getPendingOrders(
+        Market $market,
+        int $offset,
+        int $limit,
+        int $side,
+        array $pendingOrdersSliced = [],
+        array $pricesKeys = []
+    ): array {
+        $pendingOrders = $this->marketFetcher->getPendingOrders(
+            $this->marketNameConverter->convert($market),
+            $offset,
+            $limit,
+            $side
+        );
+
+        $ordersGroupedCount = count($pricesKeys);
+
+        foreach ($pendingOrders as $pendingOrder) {
+            $orderPrice = $pendingOrder['price'];
+            $pendingOrdersSliced[] = $pendingOrder;
+
+            if (!isset($pricesKeys[$orderPrice])) {
+                $pricesKeys[$orderPrice] = true;
+                $ordersGroupedCount++;
+            }
+
+            if ($ordersGroupedCount === $limit) {
+                break;
+            }
+        }
+
+        if ($ordersGroupedCount === $limit || count($pendingOrders) < $limit) {
+            return $pendingOrdersSliced;
+        }
+
+        return $this->getPendingOrders(
+            $market,
+            $offset +  $limit,
+            $limit,
+            $side,
+            $pendingOrdersSliced,
+            $pricesKeys
         );
     }
 }

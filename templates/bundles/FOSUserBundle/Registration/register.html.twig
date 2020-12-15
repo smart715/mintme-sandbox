@@ -7,6 +7,7 @@
 {% endblock fos_user_content %}
 
 {% block pagescripts %}
+    {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
     <script src="{{ asset('build/register.js') }}"></script>
     <script>
         window.onload = function() {

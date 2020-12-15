@@ -31,11 +31,12 @@ export default {
     props: {
         nickname: String,
         threadIdProp: Number,
-        threads: Array,
+        threadsProp: Array,
     },
     data() {
         return {
             showContactsListWidget: false,
+            threads: {},
         };
     },
     components: {
@@ -57,7 +58,7 @@ export default {
         participants: function() {
             let participants = {};
 
-            this.threads.forEach((thread) => {
+            Object.values(this.threads).forEach((thread) => {
                 thread.metadata.forEach((metadata) => {
                     if (metadata.participant.profile.nickname === this.nickname) {
                         return;
@@ -66,7 +67,9 @@ export default {
                     participants[metadata.participant.id] = {
                         ...metadata.participant,
                         threadId: thread.id,
+                        tokenName: thread.token.name,
                         lastMessageTimestamp: thread.lastMessageTimestamp,
+                        hasUnreadMessages: thread.hasUnreadMessages,
                     };
                 });
             });
@@ -82,7 +85,9 @@ export default {
                         nickname: participant.profile.nickname,
                         avatar: participant.profile.image.avatar_middle,
                         threadId: participant.threadId,
+                        tokenName: participant.tokenName,
                         lastMessageTimestamp: participant.lastMessageTimestamp,
+                        hasUnreadMessages: participant.hasUnreadMessages,
                     };
                 });
 
@@ -96,8 +101,14 @@ export default {
     methods: {
         ...mapMutations('chat', [
             'setContactName',
+            'setTokenName',
             'setCurrentThreadId',
         ]),
+        initThreads: function() {
+            this.threadsProp.forEach((thread) => {
+                this.$set(this.threads, thread.id, thread);
+            });
+        },
         changeChat: function(threadId, updateUrl = true) {
             if (this.threadId === threadId) {
                 return;
@@ -110,6 +121,8 @@ export default {
             }
 
             if (threadId > 0) {
+                this.$set(this.threads[threadId], 'hasUnreadMessages', false);
+                this.setTokenName(this.contacts[threadId].tokenName);
                 this.setContactName(this.contacts[threadId].nickname);
             }
 
@@ -133,6 +146,8 @@ export default {
         },
     },
     mounted() {
+        this.initThreads();
+
         if (this.threadIdProp > 0) {
             this.changeChat(this.threadIdProp, false);
         }

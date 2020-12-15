@@ -7,8 +7,6 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\ApiUnauthorizedException;
@@ -27,10 +25,14 @@ use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TokenDeployedNotificationStrategy;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Utils\NotificationTypes;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -41,7 +43,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -80,8 +81,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var TranslatorInterface */
     private $translator;
 
-    /** @var EventDispatcherInterface */
-    private EventDispatcherInterface $eventDispatcher;
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -90,7 +94,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher,
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -102,7 +107,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->expirationTime = $expirationTime;
         $this->blacklistManager = $blacklistManager;
         $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -690,14 +696,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $this->userActionLogger->info('Deploy Token', ['name' => $name]);
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent(
-                $user,
-                UserNotification::TOKEN_DEPLOYED_NOTIFICATION
-            ),
-            UserNotificationEvent::NAME
+        $notificationType = NotificationTypes::TOKEN_DEPLOYED;
+        $strategy = new TokenDeployedNotificationStrategy(
+            $this->userNotificationManager,
+            $this->mailer,
+            $this->em,
+            $notificationType
         );
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
 
         return $this->view();
     }

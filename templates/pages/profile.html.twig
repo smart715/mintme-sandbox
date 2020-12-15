@@ -36,7 +36,7 @@
                         <span>{{ savedNickname }} </span>
                     </div>
                     <div class="card-body position-relative">
-                        {%- if (canEdit == true) -%}
+                        {% if (canEdit == true) %}
                             <a  @click="showEditForm = true"
                                 @keyup.enter="showEditForm = true"
                                 class="edit-icon"
@@ -48,6 +48,11 @@
                         {% if (profile.anonymous == true) %}
                             <div v-if="!showEditForm">
                                 {% trans %}page.profile.is_private{% endtrans %}
+                            </div>
+                            <div class="pb-1">
+                                {% if profile.created is not null %}
+                                    {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                                {% endif %}
                             </div>
                         {% else %}
                             <div v-if="!showEditForm" class="row mr-1">
@@ -92,6 +97,11 @@
                             <div class="col-12 pt-3">
                                 <bbcode-view value="{{ profile.description }}"></bbcode-view>
                             </div>
+                                <div class="col-12 pt-3">
+                                    {% if profile.created is not null %}
+                                        {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                                    {% endif %}
+                                </div>
                         </div>
                         {% endif %}
 

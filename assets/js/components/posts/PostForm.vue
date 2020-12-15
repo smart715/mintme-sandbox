@@ -32,6 +32,7 @@
                     :value="content"
                     @change="onContentChange"
                     @input="onContentChange"
+                    ref="input"
                 />
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
@@ -100,7 +101,7 @@ export default {
             content: this.post.content,
             amount: toMoney(this.post.amount),
             minContentLength: 2,
-            maxContentLength: 1000,
+            maxContentLength: 500,
             maxDecimals: 4,
             maxAmount: 999999.9999,
             contentError: false,
@@ -202,6 +203,9 @@ export default {
         reset() {
             this.content = '';
             this.amount = '0';
+            this.$nextTick(() => {
+                this.$refs.input.$el.dispatchEvent(new Event('input'));
+            });
         },
         cancel() {
             this.$emit('cancel');
