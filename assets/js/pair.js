@@ -174,7 +174,7 @@ new Vue({
       this.tokenTelegram = val;
     },
     updatePosts: function() {
-      if (null !== this.tokenName) {
+      if (this.tokenName) {
         this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
             .then((res) => {
               this.posts = res.data;
