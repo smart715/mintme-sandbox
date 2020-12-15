@@ -303,11 +303,14 @@ class ContractHandlerTest extends TestCase
                 ],
             ]));
 
+        $cryptoManager = $this->createMock(CryptoManagerInterface::class);
+        $cryptoManager->method('findBySymbol')->willReturn($this->mockTokenCrypto());
+
         $handler = new ContractHandler(
             $rpc,
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
-            $this->mockCryptoManager(),
+            $cryptoManager,
             $this->mockTokenManager()
         );
 
@@ -467,6 +470,16 @@ class ContractHandlerTest extends TestCase
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+
+        return $crypto;
+    }
+
+    private function mockTokenCrypto(): Crypto
+    {
+        $crypto = $this->createMock(Crypto::class);
+        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Token::USDC_SYMBOL)));
+        $crypto->method('getSymbol')->willReturn('USDC');
+        $crypto->method('getSubunit')->willReturn(6);
 
         return $crypto;
     }

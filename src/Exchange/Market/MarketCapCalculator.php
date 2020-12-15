@@ -68,8 +68,12 @@ class MarketCapCalculator
         if (MoneyWrapper::USD_SYMBOL === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
             $calculatingUSD = Token::BTC_SYMBOL;
-        } elseif (Token::BTC_SYMBOL !== $base && Token::WEB_SYMBOL !== $base && Token::ETH_SYMBOL !== $base) {
-            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH or USD');
+        } elseif (Token::BTC_SYMBOL !== $base &&
+            Token::WEB_SYMBOL !== $base &&
+            Token::ETH_SYMBOL !== $base &&
+            Token::USDC_SYMBOL !== $base
+        ) {
+            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH, USDC or USD');
         }
 
         # Calculate MarketCap for WEB/token markets

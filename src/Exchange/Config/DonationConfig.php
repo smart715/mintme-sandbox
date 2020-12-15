@@ -52,6 +52,14 @@ class DonationConfig
         );
     }
 
+    public function getMinUsdcAmount(): Money
+    {
+        return $this->moneyWrapper->parse(
+            (string)($this->donationParams['minUsdcAmount'] ?? 0),
+            Token::USDC_SYMBOL
+        );
+    }
+
     public function getMinTokensAmount(): Money
     {
         return $this->moneyWrapper->parse(
