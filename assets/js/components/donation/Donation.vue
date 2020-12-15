@@ -1,4 +1,4 @@
-<template>
+f<template>
     <div
         v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled"
         class="container-fluid px-0"
@@ -54,7 +54,9 @@
                                                     {{ $t('donation.insufficient_funds') }}
                                                 </span>
                                                 <span class="d-block">
-                                                    {{ $t('donation.make') }} <a :href="getDepositLink">{{ $t('donation.deposit') }}</a> {{ $t('donation.first') }}
+                                                    {{ $t('donation.make') }}
+                                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
+                                                    {{ $t('donation.first') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -89,7 +91,12 @@
                                             <div
                                                 v-if="insufficientFundsError"
                                                 class="w-100 mt-1 text-danger">
-                                                {{ $t('donation.min_amount', {donationCurrency:donationCurrency, currencyMinAmount:currencyMinAmount}) }}
+                                                {{
+                                                    $t('donation.min_amount', {
+                                                      donationCurrency:donationCurrency,
+                                                      currencyMinAmount:currencyMinAmount
+                                                    })
+                                                }}
                                             </div>
                                             <p class="mt-2 mb-4 text-nowrap">
                                                 {{ $t('donation.receive') }}
@@ -143,7 +150,12 @@
                                 </div>
                             </div>
                             <div v-if="!loggedIn">
-                                <login-signup-switcher v-show="showForms" :google-recaptcha-site-key="googleRecaptchaSiteKey" @login="onLogin" @signup="onSignup"/>
+                                <login-signup-switcher
+                                    v-show="showForms"
+                                    :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                                    @login="onLogin"
+                                    @signup="onSignup"
+                                />
                             </div>
                         </div>
                     </div>
@@ -173,7 +185,17 @@ import Guide from '../Guide';
 import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, usdcSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD, digitsLimits} from '../../utils/constants';
+import {
+    webSymbol,
+    btcSymbol,
+    ethSymbol,
+    usdcSymbol,
+    HTTP_BAD_REQUEST,
+    BTC,
+    MINTME,
+    USD,
+    digitsLimits,
+} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -207,7 +229,7 @@ export default {
                 ethSymbol,
                 usdcSymbol,
             },
-            selectedCurrency: webSymbol,
+            selectedCurrency: null,
             amountToDonate: 0,
             amountToReceive: 0,
             tokensWorth: 0,
@@ -282,7 +304,8 @@ export default {
                 && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return (this.loggedIn && (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
+            return (this.loggedIn &&
+                (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
                 || !this.isCurrencySelected
                 || !parseFloat(this.amountToDonate)
                 || this.donationChecking
@@ -325,6 +348,8 @@ export default {
                 }
             }, null, 'Donation');
         }
+
+        this.selectedCurrency = webSymbol;
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
@@ -407,7 +432,9 @@ export default {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
                         this.notifyError(error.response.data.message);
 
-                        if ('Tokens availability changed. Please adjust donation amount.' === error.response.data.message) {
+                        if ('Tokens availability changed. Please adjust donation amount.' ===
+                            error.response.data.message
+                        ) {
                             location.reload();
                         }
                     } else if (error.response.data.message) {
