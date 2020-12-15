@@ -1,4 +1,4 @@
-f<template>
+<template>
     <div
         v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled"
         class="container-fluid px-0"
