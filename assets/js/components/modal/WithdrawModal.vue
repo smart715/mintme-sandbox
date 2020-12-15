@@ -33,7 +33,7 @@
                             :show-converter="!isToken"
                             :from="currency"
                             :to="USD.symbol"
-                            :subunit="2"
+                            :subunit="4"
                             symbol="$"
                             @change="setFirstTimeOpen"
                             @keypress="checkInput(subunit, 8)"
