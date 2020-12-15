@@ -86,6 +86,7 @@ export const USD = {
 export const WEB = {
     symbol: 'WEB',
     subunit: 4,
+    digits: 8,
 };
 
 export const TOK = {
@@ -96,11 +97,13 @@ export const TOK = {
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
+    digits: 4,
 };
 
 export const ETH = {
     symbol: 'ETH',
-    subunit: 18,
+    subunit: 8,
+    digits: 4,
 };
 
 export const MINTME = {
@@ -136,4 +139,10 @@ export const notificationTypes = {
 export const descriptionLength = {
     min: 200,
     max: 10000,
+};
+
+export const digitsLimits = {
+    WEB: WEB.digits,
+    BTC: BTC.digits,
+    ETH: ETH.digits,
 };
