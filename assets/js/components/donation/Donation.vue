@@ -173,7 +173,7 @@ import Guide from '../Guide';
 import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD, digitsLimits} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -340,7 +340,7 @@ export default {
                 });
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit, this.currencySubunit);
+            return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
         },
         onKeyup: function() {
             this.debouncedCheck();
