@@ -75,7 +75,7 @@
                                                     @keyup="onKeyup"
                                                     :from="selectedCurrency"
                                                     :to="USD.symbol"
-                                                    :subunit="2"
+                                                    :subunit="4"
                                                     symbol="$"
                                                 />
                                                 <div v-if="loggedIn" class="input-group-append">
