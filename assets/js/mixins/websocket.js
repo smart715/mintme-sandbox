@@ -109,8 +109,8 @@ export default {
             });
         },
         sendLogsIfWsError: function(result, message = '') {
-            if (null !== result.error) {
-                this.sendLogs('error', message, new Error(JSON.stringify(result.error)));
+            if (null !== result.error && 'object' === typeof result.error) {
+                this.sendLogs('error', message, result.error);
             }
         },
     },

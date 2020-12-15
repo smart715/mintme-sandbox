@@ -626,6 +626,11 @@ export default {
             const supply = market.supply;
             const monthVolume = market.monthVolume;
             const buyDepth = market.buyDepth;
+            const marketCap = !market.marketCap ||
+                WEB.symbol === marketCurrency &&
+                parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+                    ? 0
+                    : market.marketCap;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
@@ -646,7 +651,8 @@ export default {
                 tokenized,
                 buyDepth,
                 baseImage,
-                quoteImage
+                quoteImage,
+                marketCap
             );
 
             if (marketOnTopIndex > -1) {
@@ -674,12 +680,10 @@ export default {
             tokenized,
             buyDepth,
             baseImage,
-            quoteImage
+            quoteImage,
+            marketCap = 0
         ) {
             let hiddenName = this.findHiddenName(token);
-            let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
-                ? 0
-                : Decimal.mul(lastPrice, supply);
 
             return {
                 pair: BTC.symbol === currency
@@ -720,6 +724,7 @@ export default {
         },
         updateSanitizedMarkets: function() {
             this.sanitizedMarkets = {};
+
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].base.symbol;
@@ -756,7 +761,8 @@ export default {
                         tokenized,
                         parseFloat(this.markets[market].buyDepth),
                         this.markets[market].base.image.avatar_small,
-                        this.markets[market].quote.image.avatar_small
+                        this.markets[market].quote.image.avatar_small,
+                        this.markets[market].marketCap || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -815,7 +821,8 @@ export default {
                 tokenized,
                 market.buyDepth,
                 market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.quote.image.avatar_small,
+                this.markets[marketName].marketCap || 0
                 );
 
             if (marketOnTopIndex > -1) {
