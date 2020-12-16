@@ -472,9 +472,6 @@ export default {
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },
-        /*toggleUsd: function(show) {
-            this.showUsd = show;
-        },*/
         disableUsd: function() {
             this.showUsd = false;
             this.enableUsd = false;
