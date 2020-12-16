@@ -56,7 +56,8 @@
                 :sell-orders="sellOrders"
                 :market="market"
                 :user-id="userId"
-                :logged-in="loggedIn"/>
+                :logged-in="loggedIn"
+                :currency-mode="currencyMode"/>
         </div>
         <div class="row mt-3">
             <trade-trade-history
@@ -64,6 +65,7 @@
                 :hash="hash"
                 :websocket-url="websocketUrl"
                 :market="market"
+                :currency-mode="currencyMode"
             />
         </div>
     </div>

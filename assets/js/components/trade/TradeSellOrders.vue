@@ -47,8 +47,11 @@
                             <template v-slot:cell(sum)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="currencyMode === currencyModes.usd.value ?
+                                                currencyConvert(row.value, rate, 2) :
+                                                row.value">
                                         </span>
                                     </div>
                                 </div>
@@ -105,7 +108,7 @@
 import Guide from '../Guide';
 import {toMoney, removeSpaces, currencyConversion} from '../../utils';
 import {mapGetters} from 'vuex';
-import {USD, usdSign} from '../../utils/constants.js';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
@@ -140,10 +143,12 @@ export default {
             type: Boolean,
             default: false,
         },
+        currencyMode: String,
     },
     data() {
         return {
             tableData: this.ordersList,
+            currencyModes
         };
     },
     components: {
