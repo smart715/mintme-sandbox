@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         getDirectMessageLink: function() {
-            if (isOwner) {
+            if (this.isOwner) {
                 return this.$routing.generate('chat');
             } else if (parseFloat(this.getQuoteBalance) >= parseFloat(this.dmMinAmount)) {
                 return this.$routing.generate('chat', {tokenName: this.tokenName});
