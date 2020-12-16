@@ -40,7 +40,7 @@ class ProfileController extends Controller
         $profile = $profileManager->getProfileByNickname($nickname);
         $user = $this->getUser();
 
-        if (null !== $user && $profile->getUser() === $user) {
+        if ($user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
         }
 
@@ -132,7 +132,7 @@ class ProfileController extends Controller
         /** @var User $user*/
         $user = $this->getUser();
 
-        if (null !== $user && $profile->getUser() === $user) {
+        if ($profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
         }
 

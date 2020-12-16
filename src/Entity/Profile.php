@@ -89,7 +89,6 @@ class Profile implements ImagineInterface
      */
     protected $anonymous = false;
 
-    /** @var bool */
     public bool $disabledAnonymous = false;  // phpcs:ignore
 
     /**
@@ -209,7 +208,7 @@ class Profile implements ImagineInterface
 
     /**
      * @Groups({"API", "Default"})
-     * @return string|null
+     * @return string
      */
     public function getFirstName(): ?string
     {
@@ -217,7 +216,7 @@ class Profile implements ImagineInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      * @Groups({"API", "Default"})
      */
     public function getLastName(): ?string
@@ -226,7 +225,7 @@ class Profile implements ImagineInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      * @Groups({"API", "Default"})
      */
     public function getDescription(): ?string
@@ -284,7 +283,7 @@ class Profile implements ImagineInterface
     }
 
     /**
-     * @return string|null
+     * @return string
      * @Groups({"API", "Default"})
      */
     public function getCountry(): ?string
