@@ -127,6 +127,7 @@ class Profile implements ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+     * @Groups({"API", "Default"})
      * @var Image|null
      */
     protected $image;
@@ -191,7 +192,7 @@ class Profile implements ImagineInterface
         return $this->isAnonymous() || !$this->disabledAnonymous;
     }
 
-    public function filterAnonymous(string $property): string
+    private function filterAnonymous(string $property): string
     {
         return  $property && $this->returnDefault()
             ? $property
@@ -208,9 +209,6 @@ class Profile implements ImagineInterface
         return $this->nickname ?? '';
     }
 
-    /**
-     * @Groups({"API", "Default"})
-     */
     public function getFirstName(): ?string
     {
         return $this->filterAnonymous($this->firstName);
@@ -342,10 +340,7 @@ class Profile implements ImagineInterface
         $this->image = $image;
     }
 
-    /**
-     * @return Image
-     * @Groups({"API", "Default"})
-     */
+
     public function getImage(): Image
     {
         return $this->image && !$this->returnDefault()
