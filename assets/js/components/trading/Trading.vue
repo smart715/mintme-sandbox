@@ -274,7 +274,8 @@ import {
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus, currencyModes} from '../../utils/constants';
+import {mapMutations, mapGetters} from 'vuex';
 
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
@@ -315,7 +316,7 @@ export default {
             loading: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
-            showUsd: false,
+            currencyModes,
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
@@ -380,6 +381,20 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('currencyMode', [
+            'getCurrencyMode',
+        ]),
+        currencyMode: {
+            get() {
+                return this.getCurrencyMode;
+            },
+            set(val) {
+                this.setCurrencyMode(val);
+            },
+        },
+        showUsd: function() {
+            return this.currencyMode === currencyModes.usd.value;
+        },
         marketsHiddenNames: function() {
             return undefined === typeof this.markets ? {} : Object.keys(this.markets);
         },
@@ -454,8 +469,12 @@ export default {
     },
     mounted() {
         this.initialLoad();
+        this.currencyMode = localStorage.getItem('_currency_mode');
     },
     methods: {
+        ...mapMutations('currencyMode', [
+            'setCurrencyMode',
+        ]),
         showFullPair: function(pair) {
             return pair.indexOf('/') !== -1;
         },
@@ -473,10 +492,6 @@ export default {
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },
-        /*disableUsd: function() {
-            this.showUsd = false;
-            this.enableUsd = false;
-        },*/
         initialLoad: function() {
             this.loading = true;
             this.fetchGlobalMarketCap();
