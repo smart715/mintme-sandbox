@@ -148,7 +148,7 @@ export default {
     data() {
         return {
             tableData: this.ordersList,
-            currencyModes
+            currencyModes,
         };
     },
     components: {

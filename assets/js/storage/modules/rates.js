@@ -1,8 +1,8 @@
 export default {
     namespaced: true,
-        state: {
-            requesting: false,
-            rates: {},
+    state: {
+        requesting: false,
+        rates: {},
     },
     getters: {
         getRequesting(state) {

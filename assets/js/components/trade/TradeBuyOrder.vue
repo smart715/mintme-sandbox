@@ -227,7 +227,7 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
-            currencyModes
+            currencyModes,
         };
     },
     methods: {
