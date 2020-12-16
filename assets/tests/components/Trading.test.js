@@ -3,8 +3,8 @@ import Vuex from 'vuex';
 import Trading from '../../js/components/trading/Trading';
 import moxios from 'moxios';
 import axios from 'axios';
-import {status} from "../../js/storage/modules/websocket";
-import tradeBalance from "../../js/storage/modules/trade_balance";
+import {status} from '../../js/storage/modules/websocket';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 
 // TODO: Improve tests and add more tests
 
