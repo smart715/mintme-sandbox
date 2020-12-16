@@ -24,7 +24,7 @@
 
 <script>
 import {HTTP_ACCEPTED, currencyModes} from '../utils/constants';
-import {mapMutations, mapGetters} from 'vuex';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'CurrencyModeSwitcher',
@@ -37,18 +37,11 @@ export default {
             currencyModes: Object.freeze(currencyModes),
         };
     },
-    mounted() {
-            console.log(Document.);
-        //this.globalCurrencyMode(this.currentCurrencyMode);
-        //console.log(this.globalCurrencyMode);
-      //  this.updateCurrencyMode(this.currentCurrencyMode);
+    created() {
+        this.setCurrencyMode(this.currentCurrencyMode);
     },
     methods: {
-/*        updateCurrencyMode: function(mode) {
-            this.globalCurrencyMode(mode);
-        },*/
         changeCurrencyMode: function(mode) {
-           // console.log(this.globalCurrencyMode);
             this.toggleCurrency(mode);
             this.$axios.single.post(this.$routing.generate('change_currency_mode', {
                 mode,
@@ -66,24 +59,13 @@ export default {
         toggleCurrency: function(mode) {
             this.selectedCurrency = currencyModes[mode].text;
         },
-        ...mapMutations('rates', [
-            'setGlobalCurrencyMode',
+        ...mapMutations('currencyMode', [
+            'setCurrencyMode',
         ]),
     },
     computed: {
         currencyMode: function() {
             return this.currentCurrencyMode;
-        },
-        ...mapGetters('rates', [
-            'getGlobalCurrencyMode',
-        ]),
-        globalCurrencyMode: {
-            get() {
-                return this.getGlobalCurrencyMode;
-            },
-            set(val) {
-                this.setGlobalCurrencyMode(val);
-            },
         },
     },
 };

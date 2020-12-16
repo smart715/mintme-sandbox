@@ -17,12 +17,13 @@ import InfoBar from './components/InfoBar';
 import Routing from './routing';
 import Axios from './axios';
 import Avatar from './components/Avatar';
-import LocaleSwitcher from './components/LocaleSwitcher';
+// import LocaleSwitcher from './components/LocaleSwitcher';
 import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
 import NavEnvelope from './components/chat/NavEnvelope';
-import CurrencyModeSwitcher from './components/CurrencyModeSwitcher';
+//import CurrencyModeSwitcher from './components/CurrencyModeSwitcher';
+// import store from './storage';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
@@ -114,6 +115,7 @@ if (document.getElementById('description')) {
     });
 }
 
+/*
 new Vue({
     el: '#footer',
     i18n,
@@ -123,4 +125,6 @@ new Vue({
         LocaleSwitcher,
         CurrencyModeSwitcher,
     },
+    store,
 });
+*/

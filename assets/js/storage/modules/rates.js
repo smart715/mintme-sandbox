@@ -3,12 +3,8 @@ export default {
         state: {
             requesting: false,
             rates: {},
-            globalCurrencyMode: null,
     },
     getters: {
-        getGlobalCurrencyMode(state) {
-            return state.globalCurrencyMode;
-        },
         getRequesting(state) {
             return state.requesting;
         },
@@ -17,9 +13,6 @@ export default {
         },
     },
     mutations: {
-        setGlobalCurrencyMode(state, n) {
-            state.globalCurrencyMode = n;
-        },
         setRequesting(state, n) {
             state.requesting = n;
         },
