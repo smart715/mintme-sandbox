@@ -132,6 +132,10 @@ class ProfileController extends Controller
         /** @var User $user*/
         $user = $this->getUser();
 
+        if (null !== $user && $profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
+
         $profileDescription = $profile->getDescription() ?? '';
         $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);
         $profileDescription = preg_replace(

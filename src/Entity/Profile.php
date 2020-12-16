@@ -41,7 +41,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
-     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $firstName;
@@ -52,7 +51,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
-     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $lastName;
@@ -72,7 +70,6 @@ class Profile implements ImagineInterface
      * @Assert\Country()
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $country;
@@ -127,7 +124,6 @@ class Profile implements ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     * @Groups({"API", "Default"})
      * @var Image|null
      */
     protected $image;
@@ -189,14 +185,16 @@ class Profile implements ImagineInterface
 
     private function returnDefault(): bool
     {
-        return $this->isAnonymous() || !$this->disabledAnonymous;
+        return !$this->isAnonymous() || $this->disabledAnonymous;
     }
 
     private function filterAnonymous(?string $property): string
     {
-        return  $property && $this->returnDefault()
+        return  is_null($property)
+            ? ''
+            : ($property && $this->returnDefault()
             ? $property
-            : 'Anonymous';
+            : 'Anonymous');
     }
 
     public function getId(): int
@@ -209,16 +207,28 @@ class Profile implements ImagineInterface
         return $this->nickname ?? '';
     }
 
+    /**
+     * @Groups({"API", "Default"})
+     * @return string|null
+     */
     public function getFirstName(): ?string
     {
         return $this->filterAnonymous($this->firstName);
     }
 
+    /**
+     * @return string|null
+     * @Groups({"API", "Default"})
+     */
     public function getLastName(): ?string
     {
         return $this->filterAnonymous($this->lastName);
     }
 
+    /**
+     * @return string|null
+     * @Groups({"API", "Default"})
+     */
     public function getDescription(): ?string
     {
         return $this->description && $this->returnDefault()
@@ -273,6 +283,10 @@ class Profile implements ImagineInterface
         return null;
     }
 
+    /**
+     * @return string|null
+     * @Groups({"API", "Default"})
+     */
     public function getCountry(): ?string
     {
         return $this->filterAnonymous($this->country);
@@ -341,9 +355,13 @@ class Profile implements ImagineInterface
     }
 
 
+    /**
+     * @return Image
+     * @Groups({"API", "Default"})
+     */
     public function getImage(): Image
     {
-        return $this->image && !$this->returnDefault()
+        return $this->image && $this->returnDefault()
             ? $this->image
             : Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }
