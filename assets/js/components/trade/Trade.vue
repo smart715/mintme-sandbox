@@ -26,6 +26,7 @@
                     :taker-fee="takerFee"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
+                    :currency-mode="currencyMode"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -42,6 +43,7 @@
                     :is-owner="isOwner"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
+                    :currency-mode="currencyMode"
                 />
             </div>
         </div>
@@ -140,6 +142,17 @@ export default {
         ...mapGetters('tradeBalance', {
             balances: 'getBalances',
         }),
+        ...mapGetters('currencyMode', [
+            'getCurrencyMode',
+        ]),
+        currencyMode: {
+            get() {
+                return this.getCurrencyMode;
+            },
+            set(val) {
+                this.setCurrencyMode(val);
+            },
+        },
         baseBalance: function() {
             return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
                 : false;
@@ -182,6 +195,7 @@ export default {
         },
     },
     mounted() {
+        this.currencyMode = localStorage.getItem('_currency_mode');
         this.updateOrders().then(() => {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
@@ -214,6 +228,9 @@ export default {
         ...mapMutations('rates', [
             'setRates',
             'setRequesting',
+        ]),
+        ...mapMutations('currencyMode', [
+            'setCurrencyMode',
         ]),
         /**
          * @param {undefined|{type, isAssigned, resolve}} context

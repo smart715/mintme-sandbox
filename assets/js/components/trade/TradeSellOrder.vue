@@ -46,7 +46,7 @@
                                 :to="USD.symbol"
                                 :subunit="4"
                                 symbol="$"
-                                :show-converter="globalCurrencyMode === currencyModes.usd"
+                                :show-converter="currencyMode === currencyModes.usd.value"
                             />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.sell_order.your.header') }}
@@ -225,6 +225,7 @@ export default {
         isOwner: Boolean,
         balanceLoaded: Boolean,
         tradeDisabled: Boolean,
+        currencyMode: String,
     },
     data() {
         return {
@@ -234,9 +235,6 @@ export default {
             USD,
             currencyModes,
         };
-    },
-    mounted() {
-        this.currencyMode = localStorage.getItem('_currency_mode');
     },
     methods: {
         setBalanceManuallyEdited: function(val = true) {
@@ -324,9 +322,6 @@ export default {
             'setSellAmountInput',
             'setUseSellMarketPrice',
         ]),
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
-        ]),
     },
     computed: {
         tokenSymbol: function() {
@@ -363,23 +358,12 @@ export default {
                 tokenSymbol: this.tokenSymbol,
             };
         },
-        ...mapGetters('currencyMode', [
-            'getCurrencyMode',
-        ]),
         ...mapGetters('tradeBalance', [
             'getSellPriceInput',
             'getSellAmountInput',
             'getQuoteBalance',
             'getUseSellMarketPrice',
         ]),
-        currencyMode: {
-            get() {
-                return this.getCurrencyMode;
-            },
-            set(val) {
-                this.setCurrencyMode(val);
-            },
-        },
         sellPrice: {
             get() {
                 return this.getSellPriceInput;
