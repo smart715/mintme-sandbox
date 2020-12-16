@@ -79,6 +79,7 @@
                                                     :to="USD.symbol"
                                                     :subunit="4"
                                                     symbol="$"
+                                                    :show-converter="currencyMode === currencyModes.usd.value"
                                                 />
                                                 <div v-if="loggedIn" class="input-group-append">
                                                     <button
@@ -195,8 +196,10 @@ import {
     MINTME,
     USD,
     digitsLimits,
+    currencyModes,
 } from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'Donation',
@@ -229,6 +232,7 @@ export default {
                 ethSymbol,
                 usdcSymbol,
             },
+            currencyModes,
             selectedCurrency: null,
             amountToDonate: 0,
             amountToReceive: 0,
@@ -245,6 +249,17 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('currencyMode', [
+            'getCurrencyMode',
+        ]),
+        currencyMode: {
+            get() {
+                return this.getCurrencyMode;
+            },
+            set(val) {
+                this.setCurrencyMode(val);
+            },
+        },
         translationsContext: function() {
           return {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
@@ -324,6 +339,7 @@ export default {
         },
     },
     mounted() {
+        this.currencyMode = localStorage.getItem('_currency_mode');
         if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
             this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
             this.$nextTick(() => {
@@ -353,6 +369,9 @@ export default {
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
+        ...mapMutations('currencyMode', [
+            'setCurrencyMode',
+        ]),
         onSelect: function(newCurrency) {
             if (this.selectedCurrency !== newCurrency) {
                 this.balanceLoaded = false;
