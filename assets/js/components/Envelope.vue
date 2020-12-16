@@ -3,7 +3,7 @@
         :href="getDirectMessageLink()"
         class="chat-envelope d-block text-white pl-2 pr-2"
     >
-        <font-awesome-icon icon="envelope" size="lg" @click="checkDirectMessage" />
+        <font-awesome-icon icon="envelope" size="lg" />
     </a>
 </template>
 
@@ -21,11 +21,15 @@ export default {
         tokenName: String,
     },
     methods: {
-        checkDirectMessage: function() {
-            this.notifyError('To send direct message you need to have 100 SuperCoins tokens');
-        },
         getDirectMessageLink: function() {
-            return this.$routing.generate('chat');
+            if (isOwner) {
+                return this.$routing.generate('chat');
+            } else if (parseFloat(this.getQuoteBalance) >= parseFloat(this.dmMinAmount)) {
+                return this.$routing.generate('chat', {tokenName: this.tokenName});
+            } else {
+                this.notifyError('To send direct message you need to have 100 SuperCoins tokens');
+                return '';
+            }
         },
     },
 };
