@@ -221,7 +221,12 @@ export default {
                 : this.rebrandingFunc(history.market.base.symbol));
         },
         calculateTotalCost: function(history) {
-            return (new Decimal(history.price).times(history.amount)).toString();
+            return toMoney(
+                (new Decimal(history.price).times(history.amount))
+                    .add(history.fee)
+                    .toString(),
+                history.market.base.subunit
+            );
         },
         producePrecision(history) {
             if (history.market.identifier !== webBtcSymbol) {
