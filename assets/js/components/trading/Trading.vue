@@ -315,6 +315,7 @@ export default {
             loading: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
+            showUsd: false,
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
@@ -472,10 +473,10 @@ export default {
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },
-        disableUsd: function() {
+        /*disableUsd: function() {
             this.showUsd = false;
             this.enableUsd = false;
-        },
+        },*/
         initialLoad: function() {
             this.loading = true;
             this.fetchGlobalMarketCap();

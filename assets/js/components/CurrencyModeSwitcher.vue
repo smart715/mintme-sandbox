@@ -39,6 +39,7 @@ export default {
     },
     created() {
         this.setCurrencyMode(this.currentCurrencyMode);
+        localStorage.setItem('_currency_mode', this.currentCurrencyMode);
     },
     methods: {
         changeCurrencyMode: function(mode) {

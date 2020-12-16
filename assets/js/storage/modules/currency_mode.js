@@ -5,12 +5,13 @@ export default {
     },
     getters: {
         getCurrencyMode(state) {
-            return state.currencyMode;
+            return localStorage.getItem('_currency_mode');
+            // return state.currencyMode;
         },
     },
     mutations: {
         setCurrencyMode(state, n) {
-            state.currencyMode = n;
+            state.currencyMode = n
         },
     },
 };

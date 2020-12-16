@@ -235,6 +235,9 @@ export default {
             currencyModes,
         };
     },
+    mounted() {
+        this.currencyMode = localStorage.getItem('_currency_mode');
+    },
     methods: {
         setBalanceManuallyEdited: function(val = true) {
             this.balanceManuallyEdited = val;
@@ -321,6 +324,9 @@ export default {
             'setSellAmountInput',
             'setUseSellMarketPrice',
         ]),
+        ...mapMutations('currencyMode', [
+            'setCurrencyMode',
+        ]),
     },
     computed: {
         tokenSymbol: function() {
@@ -369,6 +375,9 @@ export default {
         currencyMode: {
             get() {
                 return this.getCurrencyMode;
+            },
+            set(val) {
+                this.setCurrencyMode(val);
             },
         },
         sellPrice: {
