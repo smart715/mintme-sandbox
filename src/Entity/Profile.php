@@ -192,7 +192,7 @@ class Profile implements ImagineInterface
         return $this->isAnonymous() || !$this->disabledAnonymous;
     }
 
-    private function filterAnonymous(string $property): string
+    private function filterAnonymous(?string $property): ?string
     {
         return  $property && $this->returnDefault()
             ? $property
