@@ -253,6 +253,7 @@
                         <li class="nav-item ml-auto small-profile-link">
                             <div class="d-flex align-items-center h-100">
                                 <envelope
+                                    :logged-in="{{ loggedIn }}"
                                     :is-owner="{{ isOwner }}"
                                     :dm-min-amount="{{ dMMinAmount }}"
                                     :get-quote-balance="getQuoteBalance"

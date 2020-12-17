@@ -1,5 +1,5 @@
 <template>
-    <a
+    <a v-if="showEnvelope"
         :href="getDirectMessageLink()"
         class="chat-envelope d-block text-white pl-2 pr-2"
     >
@@ -15,10 +15,16 @@ export default {
     name: 'Envelope',
     mixins: [NotificationMixin],
     props: {
+        loggedIn: Boolean,
         isOwner: Boolean,
         dmMinAmount: String,
         getQuoteBalance: Boolean,
         tokenName: String,
+    },
+    computed: {
+        showEnvelope: function() {
+            return this.loggedIn;
+        },
     },
     methods: {
         getDirectMessageLink: function() {
