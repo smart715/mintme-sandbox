@@ -2,7 +2,7 @@
     <a v-if="showEnvelope"
         :href="getDirectMessageLink"
         class="chat-envelope d-block text-white pl-2 pr-2"
-        @click="checkDirectMessage()"
+        @click="checkDirectMessage"
     >
         <font-awesome-icon icon="envelope" size="lg" />
     </a>
