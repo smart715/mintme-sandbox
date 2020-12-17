@@ -31,4 +31,19 @@ describe('Envelope', () => {
 
         expect(wrapper.find('a').exists()).toBe(false);
     });
+
+    it('show envelope icon', () => {
+        const wrapper = shallowMount(Envelope, {
+            localVue: mockVue(),
+            propsData: {
+                loggedIn: true,
+                isOwner: true,
+                dmMinAmount: '100',
+                getQuoteBalance: '0',
+                tokenName: 'Foo',
+            },
+        });
+
+        expect(wrapper.find('font-awesome-icon').attributes('icon')).toBe('envelope');
+    });
 });
