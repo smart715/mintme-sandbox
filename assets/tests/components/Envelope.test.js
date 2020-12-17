@@ -82,7 +82,7 @@ describe('Envelope', () => {
             localVue: mockVue(),
             propsData: {
                 loggedIn: true,
-                isOwner: true,
+                isOwner: false,
                 dmMinAmount: '100',
                 getQuoteBalance: '101',
                 tokenName: 'Foo',
@@ -90,5 +90,20 @@ describe('Envelope', () => {
         });
 
         expect(wrapper.vm.getDirectMessageLink).toBe('chatFoo');
+    });
+
+    it('should compute getDirectMessageLink correctly for non-owner if there are not enough tokens', () => {
+        const wrapper = shallowMount(Envelope, {
+            localVue: mockVue(),
+            propsData: {
+                loggedIn: true,
+                isOwner: false,
+                dmMinAmount: '100',
+                getQuoteBalance: '99',
+                tokenName: 'Foo',
+            },
+        });
+
+        expect(wrapper.vm.getDirectMessageLink).toBe(null);
     });
 });
