@@ -29,6 +29,6 @@ describe('Envelope', () => {
             },
         });
 
-        expect(wrapper.find('a')).toBe(false);
+        expect(wrapper.find('a').exists()).toBe(false);
     });
 });
