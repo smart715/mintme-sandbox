@@ -224,10 +224,9 @@ class Profile implements ImagineInterface
     }
 
     /**
-     * @return string
      * @Groups({"API", "Default"})
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description && $this->returnDefault()
             ? $this->description
