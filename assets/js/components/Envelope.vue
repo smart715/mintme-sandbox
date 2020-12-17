@@ -19,7 +19,7 @@ export default {
         loggedIn: Boolean,
         isOwner: Boolean,
         dmMinAmount: String,
-        getQuoteBalance: Boolean,
+        getQuoteBalance: String,
         tokenName: String,
     },
     computed: {
