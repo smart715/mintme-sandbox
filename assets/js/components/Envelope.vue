@@ -40,7 +40,13 @@ export default {
         checkDirectMessage: function(e) {
             if (null === this.getDirectMessageLink) {
                 e.preventDefault();
-                this.notifyError('To send direct message you need to have 100 SuperCoins tokens');
+                this.notifyError(
+                    'To send direct message you need to have '
+                    + this.dmMinAmount
+                    + ' '
+                    + this.tokenName
+                    +' tokens'
+                );
             }
         },
     },
