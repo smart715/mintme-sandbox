@@ -2,7 +2,7 @@
     <b-dropdown
         id="currency"
         variant="primary"
-        class="dropup d-inline"
+        class="dropup d-inline currency-mode-switcher"
         :lazy="true"
     >
         <template slot="button-content">
