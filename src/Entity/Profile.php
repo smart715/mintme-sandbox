@@ -263,7 +263,7 @@ class Profile implements ImagineInterface
 
     public function getCity(): ?string
     {
-        return $this->city;
+        return $this->filterAnonymous($this->city);
     }
 
     public function setCity(?string $city): self
