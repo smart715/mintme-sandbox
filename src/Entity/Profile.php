@@ -60,7 +60,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $city;
@@ -261,6 +260,10 @@ class Profile implements ImagineInterface
         return $this;
     }
 
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
     public function getCity(): ?string
     {
         return $this->filterAnonymous($this->city);
