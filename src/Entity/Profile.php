@@ -209,7 +209,7 @@ class Profile implements ImagineInterface
      * @Groups({"API", "Default"})
      * @return string
      */
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->filterAnonymous($this->firstName);
     }
@@ -218,7 +218,7 @@ class Profile implements ImagineInterface
      * @return string
      * @Groups({"API", "Default"})
      */
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->filterAnonymous($this->lastName);
     }
@@ -227,7 +227,7 @@ class Profile implements ImagineInterface
      * @return string
      * @Groups({"API", "Default"})
      */
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description && $this->returnDefault()
             ? $this->description
@@ -264,7 +264,7 @@ class Profile implements ImagineInterface
      * @return string
      * @Groups({"API", "Default"})
      */
-    public function getCity(): ?string
+    public function getCity(): string
     {
         return $this->filterAnonymous($this->city);
     }
@@ -289,7 +289,7 @@ class Profile implements ImagineInterface
      * @return string
      * @Groups({"API", "Default"})
      */
-    public function getCountry(): ?string
+    public function getCountry(): string
     {
         return $this->filterAnonymous($this->country);
     }
