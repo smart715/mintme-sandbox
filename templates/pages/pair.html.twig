@@ -251,7 +251,7 @@
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto my-2 my-lg-0">
-                            <div class="d-flex align-items-center h-100">
+                            <div class="d-flex align-items-center h-100 mr-3">
                                 <a
                                     v-if="getQuoteBalance >= {{ dMMinAmount }} || {{ isOwner }}"
                                     href="{{ isOwner == 'true' ? path('chat') : path('new_dm_message', {'tokenName': token.name}) }}"
