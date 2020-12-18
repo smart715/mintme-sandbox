@@ -38,6 +38,11 @@ class ProfileController extends Controller
         string $nickname
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
+        $user = $this->getUser();
+
+        if ($user && $profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
 
         if (null === $profile) {
             throw new NotFoundProfileException();
@@ -126,6 +131,10 @@ class ProfileController extends Controller
     ): Response {
         /** @var User $user*/
         $user = $this->getUser();
+
+        if ($profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
 
         $profileDescription = $profile->getDescription() ?? '';
         $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);
