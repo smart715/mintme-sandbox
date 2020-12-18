@@ -18,8 +18,8 @@ export default {
     props: {
         loggedIn: Boolean,
         isOwner: Boolean,
-        dmMinAmount: String,
-        getQuoteBalance: String,
+        dmMinAmount: Number,
+        getQuoteBalance: Number,
         tokenName: String,
     },
     computed: {
@@ -29,7 +29,7 @@ export default {
         getDirectMessageLink: function() {
             if (this.isOwner) {
                 return this.$routing.generate('chat');
-            } else if (parseFloat(this.getQuoteBalance) >= parseFloat(this.dmMinAmount)) {
+            } else if (this.getQuoteBalance >= this.dmMinAmount) {
                 return this.$routing.generate('chat', {tokenName: this.tokenName});
             } else {
                 return null;

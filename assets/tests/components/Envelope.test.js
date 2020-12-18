@@ -23,8 +23,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: false,
                 isOwner: false,
-                dmMinAmount: '100',
-                getQuoteBalance: '0',
+                dmMinAmount: 100,
+                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -38,8 +38,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: true,
                 isOwner: true,
-                dmMinAmount: '100',
-                getQuoteBalance: '0',
+                dmMinAmount: 100,
+                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -53,8 +53,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: true,
                 isOwner: false,
-                dmMinAmount: '100',
-                getQuoteBalance: '0',
+                dmMinAmount: 100,
+                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -68,8 +68,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: true,
                 isOwner: true,
-                dmMinAmount: '100',
-                getQuoteBalance: '0',
+                dmMinAmount: 100,
+                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -83,8 +83,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: true,
                 isOwner: false,
-                dmMinAmount: '100',
-                getQuoteBalance: '101',
+                dmMinAmount: 100,
+                getQuoteBalance: 101,
                 tokenName: 'Foo',
             },
         });
@@ -98,8 +98,8 @@ describe('Envelope', () => {
             propsData: {
                 loggedIn: true,
                 isOwner: false,
-                dmMinAmount: '100',
-                getQuoteBalance: '99',
+                dmMinAmount: 100,
+                getQuoteBalance: 99,
                 tokenName: 'Foo',
             },
         });
