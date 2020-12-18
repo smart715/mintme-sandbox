@@ -24,50 +24,35 @@
 </template>
 
 <script>
-import {HTTP_ACCEPTED, currencyModes} from '../utils/constants';
-import {mapMutations} from 'vuex';
+
+import {currencyModes} from '../utils/constants';
 
 export default {
     name: 'CurrencyModeSwitcher',
-    props: {
-        currentCurrencyMode: String,
-    },
     data() {
         return {
             selectedCurrency: '',
-            currencyModes: Object.freeze(currencyModes),
+            currencyModes,
         };
     },
     created() {
-        this.setCurrencyMode(this.currentCurrencyMode);
-        localStorage.setItem('_currency_mode', this.currentCurrencyMode);
+        if (null === localStorage.getItem('_currency_mode')) {
+            localStorage.setItem('_currency_mode', this.currencyModes.crypto.value);
+        }
     },
     methods: {
         changeCurrencyMode: function(mode) {
             this.toggleCurrency(mode);
-            this.$axios.single.post(this.$routing.generate('change_currency_mode', {
-                mode,
-            }))
-                .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        location.reload();
-                    } else {
-                        this.$toasted.error(this.$t('toasted.error.try_later'));
-                    }
-                }, (error) => {
-                    this.$toasted.error(this.$t('toasted.error.try_later'));
-                });
+            localStorage.setItem('_currency_mode', this.currencyModes[mode].value);
+            location.reload();
         },
         toggleCurrency: function(mode) {
             this.selectedCurrency = currencyModes[mode].text;
         },
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
-        ]),
     },
     computed: {
         currencyMode: function() {
-            return this.currentCurrencyMode;
+            return localStorage.getItem('_currency_mode');
         },
     },
 };

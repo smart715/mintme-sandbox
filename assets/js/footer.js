@@ -1,4 +1,3 @@
-import store from './storage';
 import i18n from './utils/i18n/i18n';
 import LocaleSwitcher from './components/LocaleSwitcher';
 import CurrencyModeSwitcher from './components/CurrencyModeSwitcher';
@@ -13,6 +12,5 @@ new Vue({
         LocaleSwitcher,
         CurrencyModeSwitcher,
     },
-    store,
 });
 

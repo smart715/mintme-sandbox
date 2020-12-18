@@ -247,7 +247,6 @@ import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} fr
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
 import BuyCrypto from './BuyCrypto';
-import {mapMutations, mapGetters} from 'vuex';
 
 library.add(depositIcon);
 library.add(withdrawIcon);
@@ -325,16 +324,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('currencyMode', [
-            'getCurrencyMode',
-        ]),
-        currencyMode: {
-            get() {
-                return this.getCurrencyMode;
-            },
-            set(val) {
-                this.setCurrencyMode(val);
-            },
+        currencyMode: function() {
+             return localStorage.getItem('_currency_mode');
         },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
@@ -364,7 +355,6 @@ export default {
         },
     },
     mounted: function() {
-        this.currencyMode = localStorage.getItem('_currency_mode');
         if (window.localStorage.getItem('mintme_signedup_from_donation') !== null) {
             this.depositMore = window.localStorage.getItem('mintme_donation_currency');
 
@@ -428,9 +418,6 @@ export default {
         });
     },
     methods: {
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
-        ]),
         /**
          * @param {string} action
          * @param {object} data

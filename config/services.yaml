@@ -659,7 +659,3 @@ services:
     App\Controller\API\WalletController:
         arguments:
             $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
-
-    App\EventSubscriber\CurrencyModeSubscriber:
-        arguments:
-            $default_currency_mode: '%default_currency_mode%'

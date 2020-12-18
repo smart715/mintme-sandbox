@@ -229,6 +229,3 @@ parameters:
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
 
-    #default currency mode
-    default_currency_mode: 'crypto'
-

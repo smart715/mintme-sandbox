@@ -12,9 +12,7 @@
                     flags="{{ global_translation_flags | json_encode(constant('JSON_UNESCAPED_UNICODE')) }}"
                 ></locale-switcher>
             {% endif %}
-            <currency-mode-switcher
-                current-currency-mode="{{ app.session.get('_currency_mode') }}"
-            ></currency-mode-switcher>
+            <currency-mode-switcher></currency-mode-switcher>
         </div>
         <div class="col-auto text-center mr-5 pl-0">
             <a
@@ -80,5 +78,3 @@
         </div>
     </div>
 </footer>
-
-

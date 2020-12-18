@@ -275,7 +275,6 @@ import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, currencyModes} from '../../utils/constants';
-import {mapMutations, mapGetters} from 'vuex';
 
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
@@ -381,16 +380,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('currencyMode', [
-            'getCurrencyMode',
-        ]),
-        currencyMode: {
-            get() {
-                return this.getCurrencyMode;
-            },
-            set(val) {
-                this.setCurrencyMode(val);
-            },
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
         },
         showUsd: function() {
             return this.currencyMode === currencyModes.usd.value;
@@ -469,12 +460,8 @@ export default {
     },
     mounted() {
         this.initialLoad();
-        this.currencyMode = localStorage.getItem('_currency_mode');
     },
     methods: {
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
-        ]),
         showFullPair: function(pair) {
             return pair.indexOf('/') !== -1;
         },

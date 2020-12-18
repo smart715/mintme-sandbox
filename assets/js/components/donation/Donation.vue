@@ -199,7 +199,6 @@ import {
     currencyModes,
 } from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
-import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'Donation',
@@ -249,16 +248,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('currencyMode', [
-            'getCurrencyMode',
-        ]),
-        currencyMode: {
-            get() {
-                return this.getCurrencyMode;
-            },
-            set(val) {
-                this.setCurrencyMode(val);
-            },
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
         },
         translationsContext: function() {
           return {
@@ -339,7 +330,6 @@ export default {
         },
     },
     mounted() {
-        this.currencyMode = localStorage.getItem('_currency_mode');
         if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
             this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
             this.$nextTick(() => {
@@ -369,9 +359,6 @@ export default {
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
-        ]),
         onSelect: function(newCurrency) {
             if (this.selectedCurrency !== newCurrency) {
                 this.balanceLoaded = false;

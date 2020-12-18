@@ -144,16 +144,8 @@ export default {
         ...mapGetters('tradeBalance', {
             balances: 'getBalances',
         }),
-        ...mapGetters('currencyMode', [
-            'getCurrencyMode',
-        ]),
-        currencyMode: {
-            get() {
-                return this.getCurrencyMode;
-            },
-            set(val) {
-                this.setCurrencyMode(val);
-            },
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
         },
         baseBalance: function() {
             return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
@@ -197,7 +189,6 @@ export default {
         },
     },
     mounted() {
-        this.currencyMode = localStorage.getItem('_currency_mode');
         this.updateOrders().then(() => {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
@@ -230,9 +221,6 @@ export default {
         ...mapMutations('rates', [
             'setRates',
             'setRequesting',
-        ]),
-        ...mapMutations('currencyMode', [
-            'setCurrencyMode',
         ]),
         /**
          * @param {undefined|{type, isAssigned, resolve}} context

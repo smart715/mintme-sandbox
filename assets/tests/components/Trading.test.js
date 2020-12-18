@@ -1,10 +1,7 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import Vuex from 'vuex';
 import Trading from '../../js/components/trading/Trading';
 import moxios from 'moxios';
 import axios from 'axios';
-import {status} from '../../js/storage/modules/websocket';
-import tradeBalance from '../../js/storage/modules/trade_balance';
 
 // TODO: Improve tests and add more tests
 
@@ -13,30 +10,12 @@ import tradeBalance from '../../js/storage/modules/trade_balance';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val, params) => {
                     return val + Object.entries(params).reduce((acc, param) => acc + `?${param[0]}=${param[1]}`, '');
                 }};
-            Vue.prototype.$store = new Vuex.Store({
-                modules: {
-                    status,
-                    tradeBalance,
-                    websocket: {
-                        namespaced: true,
-                        actions: {
-                            addOnOpenHandler: jest.fn(),
-                            addMessageHandler: jest.fn(),
-                            init: jest.fn(),
-                        },
-                        getters: {
-                            getClient: jest.fn(),
-                        },
-                    },
-                },
-            });
             Vue.prototype.$toasted = {show: () => false};
             Vue.prototype.$t = (val) => val;
         },

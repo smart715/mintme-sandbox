@@ -8,7 +8,6 @@ import interval from '../utils/interval';
 import tokenStatistics from './modules/token_statistics';
 import chat from './modules/chat';
 import rates from './modules/rates';
-import currencyMode from './modules/currency_mode';
 
 Vue.use(Vuex);
 
@@ -25,6 +24,5 @@ export default new Vuex.Store({
         newsImages,
         chat,
         rates,
-        currencyMode,
     },
 });
