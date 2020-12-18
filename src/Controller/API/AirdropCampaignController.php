@@ -148,7 +148,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         return $this->view([
             'id' => $airdrop->getId(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -213,7 +213,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         );
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
@@ -232,7 +232,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $this->airdropCampaignManager->claimAirdropAction($action, $user);
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**

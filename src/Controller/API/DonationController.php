@@ -137,7 +137,7 @@ class DonationController extends AbstractFOSRestController
                 $sellOrdersSummary
             );
 
-            return $this->view(null, Response::HTTP_ACCEPTED);
+            return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
             return $this->view([
                 'message' => $ex->getMessage(),
