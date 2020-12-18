@@ -35,18 +35,18 @@ export default {
                 return null;
             }
         },
+        translationsContext: function() {
+            return {
+                currency: this.tokenName,
+                amount: this.dmMinAmount,
+            };
+        },
     },
     methods: {
         checkDirectMessage: function(e) {
             if (null === this.getDirectMessageLink) {
                 e.preventDefault();
-                this.notifyError(
-                    'To send direct message you need to have '
-                    + this.dmMinAmount
-                    + ' '
-                    + this.tokenName
-                    +' tokens'
-                );
+                this.notifyError(this.$t('chat.chat_box.min_amount_required_info', translationsContext));
             }
         },
     },
