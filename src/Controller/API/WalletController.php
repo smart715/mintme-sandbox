@@ -6,7 +6,6 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -32,6 +31,7 @@ use Throwable;
 class WalletController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
     private const DEPOSIT_WITHDRAW_HISTORY_LIMIT = 100;
+
     private UserActionLogger $userActionLogger;
     private TranslatorInterface $translations;
     private string $coinifySharedSecret;
@@ -159,29 +159,6 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
-     */
-    public function getDepositAddresses(
-        WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager
-    ): View {
-        $this->denyAccessUnlessGranted('deposit');
-
-        /** @var User $user*/
-        $user = $this->getUser();
-
-        $depositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
-            $user,
-            $cryptoManager->findAll()
-        ) : [];
-
-        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
-
-        return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
-    }
-
-    /**
-     * @Rest\View()
      * @Rest\Get("/addresses/signature", name="deposit_addresses_signature", options={"expose"=true})
      */
     public function getDepositAddressesSignature(
@@ -193,9 +170,12 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         /** @var User $user*/
         $user = $this->getUser();
 
+        $allCrypto = $cryptoManager->findAll();
+        $crypto = array_filter($allCrypto, fn(Crypto $crypto) => !$crypto->isToken());
+
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
-            $cryptoManager->findAll()
+            $crypto
         ) : [];
 
         $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);

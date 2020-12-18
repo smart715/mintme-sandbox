@@ -169,11 +169,13 @@ class OrdersController extends AbstractFOSRestController
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
         $pendingSellOrders = $this->marketHandler->getPendingSellOrders(
             $market,
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [

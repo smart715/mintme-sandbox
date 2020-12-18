@@ -242,7 +242,7 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
+import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
 import BuyCrypto from './BuyCrypto';
@@ -372,7 +372,7 @@ export default {
                                 if ('asset.update' === response.method) {
                                     this.updateBalances(response.params[0]);
                                 }
-                            }, 'wallet-asset-update');
+                            }, 'wallet-asset-update', 'Wallet');
 
                             this.sendMessage(JSON.stringify({
                                 method: 'asset.subscribe',
@@ -473,8 +473,11 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
-                || this.$t('wallet.loading');
+
+            this.depositAddress = (isToken
+                ? this.depositAddresses[tokSymbol]
+                : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
+                ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
