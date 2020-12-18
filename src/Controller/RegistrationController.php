@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Manager\UserNotificationConfigManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -58,6 +59,9 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var UserNotificationConfigManagerInterface */
+    private UserNotificationConfigManagerInterface $userNotificationConfigManager;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
@@ -67,7 +71,8 @@ class RegistrationController extends FOSRegistrationController
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserNotificationConfigManagerInterface $userNotificationConfigManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -77,6 +82,7 @@ class RegistrationController extends FOSRegistrationController
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->em = $entityManager;
+        $this->userNotificationConfigManager = $userNotificationConfigManager;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -228,6 +234,7 @@ class RegistrationController extends FOSRegistrationController
         }
 
         $bonus = $user->getBonus();
+        $this->userNotificationConfigManager->initializeUserNotificationConfig($user);
 
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&

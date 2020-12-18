@@ -6,15 +6,12 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Wallet\WalletInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,9 +24,6 @@ use Throwable;
  */
 class WalletController extends Controller
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var UserActionLogger */
     private $userActionLogger;
 
@@ -39,12 +33,10 @@ class WalletController extends Controller
     public function __construct(
         UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
-        RebrandingConverterInterface $rebrandingConverter,
-        EventDispatcherInterface $eventDispatcher
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct($normalizer);
     }
@@ -153,15 +145,6 @@ class WalletController extends Controller
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
-
-        /** @var  User $user*/
-        $user = $this->getUser();
-
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
-            UserNotificationEvent::NAME
-        );
 
         return $this->createWalletRedirection(
             'success',

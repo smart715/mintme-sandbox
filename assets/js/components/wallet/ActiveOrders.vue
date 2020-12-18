@@ -247,7 +247,7 @@ export default {
                             this.$refs.btable.refresh();
                         }
                     }
-                }, 'active-tableData-update');
+                }, 'active-tableData-update', 'ActiveOrders');
             })
             .catch((err) => {
                 this.notifyError(this.$t('toasted.error.can_not_update_order_list'));

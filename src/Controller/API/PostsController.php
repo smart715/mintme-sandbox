@@ -5,19 +5,21 @@ namespace App\Controller\API;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiNotFoundException;
 use App\Form\CommentType;
 use App\Form\PostType;
+use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\TokenPostNotificationStrategy;
+use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -35,19 +37,24 @@ class PostsController extends AbstractFOSRestController
     /** @var PostManagerInterface */
     private $postManager;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
         PostManagerInterface $postManager,
-        EventDispatcherInterface $eventDispatcher
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -104,6 +111,9 @@ class PostsController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Get("/list/{tokenName}", name="list_posts", options={"expose"=true})
+     * @param string $tokenName
+     * @return View
+     * @throws ApiNotFoundException
      */
     public function list(string $tokenName): View
     {
@@ -243,16 +253,19 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->flush();
 
         if ($newPost) {
-            /** @var User|null $user */
+            /** @var User $user */
             $user = $this->getUser();
 
-            $notificationType = UserNotification::TOKEN_NEW_POST_NOTIFICATION;
-
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new UserNotificationEvent($user, $notificationType),
-                UserNotificationEvent::NAME,
+            $notificationType = NotificationTypes::TOKEN_NEW_POST;
+            $strategy = new TokenPostNotificationStrategy(
+                $this->userNotificationManager,
+                $this->mailer,
+                $this->entityManager,
+                $notificationType
             );
+
+            $notificationContext = new NotificationContext($strategy);
+            $notificationContext->sendNotification($user);
         }
 
         return $this->view(["message" => $message], Response::HTTP_OK);

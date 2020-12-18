@@ -5,6 +5,7 @@ namespace App\SmartContract;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -111,7 +112,7 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function getDepositCredentials(User $user): string
+    public function getDepositCredentials(User $user): array
     {
         $response = $this->rpc->send(
             self::DEPOSIT_CREDENTIAL,
@@ -120,14 +121,16 @@ class ContractHandler implements ContractHandlerInterface
             ]
         );
 
-        return $response->hasError() || !isset($response->getResult()['address'])
-            ? 'Address unavailable.'
-            : $response->getResult()['address'];
+        if ($response->hasError()) {
+            throw new \Exception((string)json_encode($response->getError()));
+        }
+
+        return $response->getResult();
     }
 
-    public function withdraw(User $user, Money $balance, string $address, Token $token): void
+    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void
     {
-        if (Token::DEPLOYED !== $token->getDeploymentStatus()) {
+        if ($token instanceof Token && Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
                 "Failed to Update mintDestination for '{$token->getName()}' because it is not deployed"
             );
@@ -139,7 +142,7 @@ class ContractHandler implements ContractHandlerInterface
             self::TRANSFER,
             [
                 'userId' => $user->getId(),
-                'tokenName' => $token->getName(),
+                'tokenName' => $token instanceof Token ? $token->getName() : $token->getSymbol(),
                 'to' => $address,
                 'value' => $balance->getAmount(),
             ]
@@ -173,14 +176,17 @@ class ContractHandler implements ContractHandlerInterface
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
     {
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $depositFee = $this->moneyWrapper->format(
+        $webDepositFee = $this->moneyWrapper->format(
             $wallet->getDepositInfo($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getFee()
         );
-        $withdrawFee = $crypto
+
+        $webWithdrawFee = $crypto
             ? $this->moneyWrapper->format($crypto->getFee())
             : '0';
 
-        return array_map(function (array $transaction) use ($withdrawFee, $depositFee) {
+        return array_map(function (array $transaction) use ($webWithdrawFee, $webDepositFee) {
+            $cryptoToken = $this->cryptoManager->findBySymbol($transaction['token']);
+
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 (string)$transaction['hash'],
@@ -188,15 +194,17 @@ class ContractHandler implements ContractHandlerInterface
                 $transaction['to'],
                 new Money(
                     $transaction['amount'],
-                    new Currency(MoneyWrapper::TOK_SYMBOL)
+                    new Currency($cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL)
                 ),
                 $this->moneyWrapper->parse(
                     'withdraw' == $transaction['type']
-                            ? $withdrawFee
-                            : $depositFee,
-                    MoneyWrapper::TOK_SYMBOL
+                            ? ($cryptoToken ? $this->moneyWrapper->format($cryptoToken->getFee()) : $webWithdrawFee)
+                            : ($cryptoToken ? '0' : $webDepositFee),
+                    $cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL
                 ),
-                $this->tokenManager->findByName($transaction['token']),
+                $cryptoToken
+                    ? $this->cryptoManager->findBySymbol($transaction['token'])
+                    : $this->tokenManager->findByName($transaction['token']),
                 Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])
             );

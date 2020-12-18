@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">{% trans %}page.settings.account.header{% endtrans %}</div>
                     <div class="card-body m-0">
-                        <div id="settings">
+                        <div id="settings" class="account-settings">
                         {% if twoFactorAuth %}
                             {{ form_start(passwordForm, {'attr': {'v-on:submit.prevent': 'submit2FA'}} ) }}
                             <two-factor-modal
@@ -56,6 +56,20 @@
                                 {% trans %}page.settings.2fa.enable{% endtrans %}
                             </a>
                         {% endif %}
+                    </div>
+                </div>
+                <div class="card card-featured mt-3">
+                    <div class="card-header">{% trans %}userNotification.config.title{% endtrans %}</div>
+                    <div class="card-body m-0">
+                        <notifications-management-modal
+                            :notification-config-modal-visible="notificationConfigModalVisible"
+                            :no-close="true"
+                            @close="notificationConfigModalVisible = false"
+                        >
+                        </notifications-management-modal>
+                        <button @click="notificationConfigModalToggle()" class="btn btn-primary btn-block">
+                            {% trans %}userNotification.config.manage{% endtrans %}
+                        </button>
                     </div>
                 </div>
             </div>

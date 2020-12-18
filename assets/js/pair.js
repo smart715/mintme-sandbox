@@ -176,10 +176,13 @@ new Vue({
       this.tokenTelegram = val;
     },
     updatePosts: function() {
+      if (!this.tokenName) {
+        return;
+      }
       this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
-      .then((res) => {
-        this.posts = res.data;
-      });
+          .then((res) => {
+            this.posts = res.data;
+          });
     },
     goToPosts: function() {
       this.tabIndex = 2;
