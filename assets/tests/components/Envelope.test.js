@@ -156,7 +156,7 @@ describe('Envelope', () => {
             },
         });
 
-        expect(wrapper.vm.getDirectMessageLink).toBe('chatFoo');
+        expect(wrapper.vm.getDirectMessageLink).toBe(null);
     });
 
     it('should compute getDirectMessageLink correctly for non-owner if there are not enough tokens', () => {
