@@ -11,6 +11,7 @@
 <script>
 
 import {NotificationMixin} from '../../mixins';
+import {mapMutations, mapGetters} from 'vuex';
 
 export default {
     name: 'Envelope',
@@ -19,10 +20,12 @@ export default {
         loggedIn: Boolean,
         isOwner: Boolean,
         dmMinAmount: Number,
-        getQuoteBalance: Number,
         tokenName: String,
     },
     computed: {
+        ...mapGetters('tradeBalance', [
+            'getQuoteBalance',
+        ]),
         showEnvelope: function() {
             return this.loggedIn;
         },

@@ -1,4 +1,6 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
+import Vuex from 'vuex';
+import tradeBalance from '../../js/storage/modules/trade_balance';
 import Envelope from '../../js/components/chat/Envelope';
 
 const $routing = {generate: (val, params) => val + (params ? params.tokenName : '')};
@@ -8,6 +10,7 @@ const $routing = {generate: (val, params) => val + (params ? params.tokenName : 
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.use(Vuex);
     localVue.use({
         install(Vue) {
             Vue.prototype.$routing = $routing;
@@ -24,7 +27,6 @@ describe('Envelope', () => {
                 loggedIn: false,
                 isOwner: false,
                 dmMinAmount: 100,
-                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -39,7 +41,6 @@ describe('Envelope', () => {
                 loggedIn: true,
                 isOwner: true,
                 dmMinAmount: 100,
-                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -65,11 +66,24 @@ describe('Envelope', () => {
     it('should compute getDirectMessageLink for owner correctly', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 0,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: true,
                 isOwner: true,
                 dmMinAmount: 100,
-                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
@@ -80,11 +94,24 @@ describe('Envelope', () => {
     it('should compute getDirectMessageLink correctly for non-owner with enough tokens', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 101,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: true,
                 isOwner: false,
                 dmMinAmount: 100,
-                getQuoteBalance: 101,
                 tokenName: 'Foo',
             },
         });
@@ -95,11 +122,24 @@ describe('Envelope', () => {
     it('should compute getDirectMessageLink correctly for non-owner if there are not enough tokens', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 99,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: true,
                 isOwner: false,
                 dmMinAmount: 100,
-                getQuoteBalance: 99,
                 tokenName: 'Foo',
             },
         });
