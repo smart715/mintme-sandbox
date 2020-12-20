@@ -1,6 +1,5 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import Vuex from 'vuex';
-import tradeBalance from '../../js/storage/modules/trade_balance';
 import Envelope from '../../js/components/chat/Envelope';
 
 const $routing = {generate: (val, params) => val + (params ? params.tokenName : '')};

@@ -11,7 +11,7 @@
 <script>
 
 import {NotificationMixin} from '../../mixins';
-import {mapMutations, mapGetters} from 'vuex';
+import {mapGetters} from 'vuex';
 
 export default {
     name: 'Envelope',
