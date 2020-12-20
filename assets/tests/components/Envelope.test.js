@@ -1,5 +1,5 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
-import Envelope from '../../js/components/Envelope';
+import Envelope from '../../js/components/chat/Envelope';
 
 const $routing = {generate: (val, params) => val + (params ? params.tokenName : '')};
 

@@ -10,7 +10,7 @@
 
 <script>
 
-import {NotificationMixin} from '../mixins';
+import {NotificationMixin} from '../../mixins';
 
 export default {
     name: 'Envelope',
