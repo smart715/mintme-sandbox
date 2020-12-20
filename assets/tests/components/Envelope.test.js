@@ -22,6 +22,20 @@ describe('Envelope', () => {
     it('dont show envelope icon', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 0,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: false,
                 isOwner: false,
@@ -36,6 +50,20 @@ describe('Envelope', () => {
     it('show envelope icon', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 0,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: true,
                 isOwner: true,
@@ -50,11 +78,24 @@ describe('Envelope', () => {
     it('should compute showEnvelope correctly', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
+            store: new Vuex.Store({
+                modules: {
+                    tradeBalance: {
+                        state: {
+                            quoteBalance: 0,
+                        },
+                        getters: {
+                            getQuoteBalance: function(state) {
+                                return state.quoteBalance;
+                            },
+                        },
+                    },
+                },
+            }),
             propsData: {
                 loggedIn: true,
                 isOwner: false,
                 dmMinAmount: 100,
-                getQuoteBalance: 0,
                 tokenName: 'Foo',
             },
         });
