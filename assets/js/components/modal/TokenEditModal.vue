@@ -42,7 +42,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                               {{ $t('token_edit_modal.period') }}
@@ -58,7 +58,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.deploy') }}
@@ -99,7 +99,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.change_name') }}
@@ -114,7 +114,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.release_addr') }}
@@ -130,7 +130,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0">
+                    <div v-if="isMintmeToken" class="row faq-block mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.delete') }}
@@ -185,6 +185,7 @@ export default {
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenCreated: Boolean,
+        isMintmeToken: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
         precision: Number,

@@ -136,6 +136,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
+            ->leftJoin('qt.crypto', 'c')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
             ->setFirstResult($offset)
@@ -149,9 +150,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
         if (self::DEPLOYED_FIRST === $filter) {
             $queryBuilder->addSelect(
                 "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
-            )->orderBy('deployed', 'DESC');
+            )
+            ->orderBy('deployed', 'DESC')
+            ->orderBy('qt.crypto', 'ASC');
         } elseif (self::DEPLOYED_ONLY === $filter) {
-            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+            $queryBuilder->andWhere(
+                "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
+            )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
         } elseif (self::AIRDROP_ONLY === $filter) {
             $queryBuilder->innerJoin('qt.airdrops', 'a')
                 ->andWhere('a.status = :active')
@@ -235,7 +240,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $marketCap = null;
 
-        if ($quote instanceof Token) {
+        if ($quote instanceof Token && $quote->isMintmeToken()) {
             $ownerPendingOrders = $this->marketHandler->getPendingOrdersByUser(
                 $quote->getProfile()->getUser(),
                 [$market]

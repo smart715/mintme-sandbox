@@ -43,7 +43,7 @@ class UserNotificationConfigManager implements UserNotificationConfigManagerInte
             $defaultConfig[$nType]['text'] = $this->translator->trans('userNotification.type.'.$nType);
             $defaultConfig[$nType]['show'] = true;
 
-            if (NotificationTypes::NEW_INVESTOR === $nType && null === $user->getProfile()->getToken()) {
+            if (NotificationTypes::NEW_INVESTOR === $nType && !$user->getProfile()->hasTokens()) {
                 $defaultConfig[$nType]['show'] = false;
             }
 

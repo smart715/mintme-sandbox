@@ -174,8 +174,8 @@ describe('Wallet', () => {
         expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
         expect(wrapper.vm.isTokenModal).toBe(false);
         expect(wrapper.vm.withdraw.fee).toBe('0.5');
-        expect(wrapper.vm.withdraw.webFee).toBe('0.5');
-        expect(wrapper.vm.withdraw.availableWeb).toBe('.01');
+        expect(wrapper.vm.withdraw.baseFee).toBe('0');
+        expect(wrapper.vm.withdraw.availableBase).toBe('.01');
         expect(wrapper.vm.withdraw.amount).toBe('0.8');
         expect(wrapper.vm.withdraw.subunit).toBe(8);
     });

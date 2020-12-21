@@ -58,7 +58,10 @@ class TokenRepository extends EntityRepository
     public function getDeployedTokens(): array
     {
         return $this->createQueryBuilder('token')
+            ->join('token.crypto', 'crypto')
             ->where('token.deployed IS NOT NULL')
+            ->orWhere('crypto.symbol = :ethSymbol')
+            ->setParameter('ethSymbol', Token::ETH_SYMBOL)
             ->getQuery()
             ->execute();
     }

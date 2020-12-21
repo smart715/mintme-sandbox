@@ -285,6 +285,7 @@ class PaymentConsumerTest extends TestCase
     {
         $token = $this->createMock(Token::class);
         $token->method('getSymbol')->willReturn($name);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
 
         return $token;
     }

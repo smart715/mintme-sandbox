@@ -122,6 +122,7 @@ export default {
         isToken: Boolean,
         disabledServicesConfig: String,
         takerFee: Number,
+        isMintmeToken: Boolean,
     },
     data() {
         return {
