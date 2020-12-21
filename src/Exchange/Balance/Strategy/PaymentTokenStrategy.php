@@ -35,7 +35,7 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
     /** @param Token $tradeble */
     public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
     {
-        $this->withdrawWebFee($user);
+        $this->withdrawBaseFee($user, $tradeble);
         $this->depositTokens($user, $tradeble, $amount);
     }
 
@@ -48,9 +48,9 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
         );
     }
 
-    private function withdrawWebFee(User $user): void
+    private function withdrawBaseFee(User $user, Token $token): void
     {
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $crypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
 
         if (!$crypto) {
             throw new NotFoundTokenException();

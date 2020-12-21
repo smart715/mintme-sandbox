@@ -23,30 +23,13 @@ class DeploymentFacadeTest extends TestCase
         $process = new DeploymentFacade(
             $this->createMock(EntityManager::class),
             $this->mockCostFetcher('2000000000000000000'),
-            $this->mockBalanceHandler($this->once(), '2000000000000000000'),
+            $this->mockBalanceHandler($this->never(), '2000000000000000000'),
             $this->mockContractHandler($this->once())
         );
 
         $process->execute(
             $this->createMock(User::class),
             $this->mockToken($this->once(), $this->once())
-        );
-    }
-
-    public function testExecuteWithLowBalance(): void
-    {
-        $process = new DeploymentFacade(
-            $this->createMock(EntityManager::class),
-            $this->mockCostFetcher('2000000000000000000'),
-            $this->mockBalanceHandler($this->never(), '1000000000000000000'),
-            $this->mockContractHandler($this->never())
-        );
-
-        $this->expectException(BalanceException::class);
-
-        $process->execute(
-            $this->createMock(User::class),
-            $this->mockToken($this->never(), $this->never())
         );
     }
 

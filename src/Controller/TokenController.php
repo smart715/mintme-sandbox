@@ -147,9 +147,10 @@ class TokenController extends Controller
                 ], 301);
         }
 
-        $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $market = $webCrypto
-            ? $this->marketManager->create($webCrypto, $token)
+        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
+        $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
+        $market = $exchangeCrypto
+            ? $this->marketManager->create($exchangeCrypto, $token)
             : null;
         $tokenDescription = $token->getDescription() ?: '';
         $defaultDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
@@ -169,13 +170,14 @@ class TokenController extends Controller
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
+            'tokenCrypto' => $this->normalize($tokenCrypto),
             'tokenDescription' => $metaDescription,
             'metaTokenDescription' => substr($metaDescription, 0, 200),
-            'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
+            'showDescription' => $token->isOwner($this->tokenManager->getOwnTokens()) || !$defaultActivated,
             'currency' => Token::WEB_SYMBOL,
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
-            'isOwner' => $token === $this->tokenManager->getOwnToken(),
+            'isOwner' => $token->isOwner($this->tokenManager->getOwnTokens()),
             'isTokenCreated' => $this->isTokenCreated(),
             'tab' => $tab,
             'showTrade' => true,
@@ -305,7 +307,7 @@ class TokenController extends Controller
      */
     public function getWebsiteConfirmationFile(string $name): Response
     {
-        $token = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByNameMintme($name);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
@@ -341,7 +343,9 @@ class TokenController extends Controller
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
-        $token = $this->tokenManager->getOwnToken();
+        $ownTokens = $this->tokenManager->getOwnTokens();
+        $token = $this->tokenManager->getOwnMintmeToken()
+            ?? array_pop($ownTokens);
 
         if (null === $token) {
             throw $this->createNotFoundException('User doesn\'t have a token created.');
@@ -358,6 +362,6 @@ class TokenController extends Controller
 
     private function isTokenCreated(): bool
     {
-        return null !== $this->tokenManager->getOwnToken();
+        return count($this->tokenManager->getOwnTokens()) > 0;
     }
 }

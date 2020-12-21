@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Strategy;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
@@ -15,6 +16,8 @@ class NewInvestorNotificationStrategy implements NotificationStrategyInterface
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    private Token $token;
+
     private string $type;
 
     private array $extraData;
@@ -22,11 +25,13 @@ class NewInvestorNotificationStrategy implements NotificationStrategyInterface
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
+        Token $token,
         string $type,
         array $extraData
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
+        $this->token = $token;
         $this->type = $type;
         $this->extraData = $extraData;
     }
@@ -52,7 +57,7 @@ class NewInvestorNotificationStrategy implements NotificationStrategyInterface
             NotificationChannels::EMAIL
         )
         ) {
-            $this->mailer->sendNewInvestorMail($user, $this->extraData['profile']);
+            $this->mailer->sendNewInvestorMail($this->token, $this->extraData['profile']);
         }
     }
 }

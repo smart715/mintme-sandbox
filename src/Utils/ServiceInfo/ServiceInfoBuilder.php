@@ -48,9 +48,9 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
         $this->serviceInfo = new ServiceInfo();
     }
 
-    public function addTokenInfo(): void
+    public function addMintmeTokenInfo(): void
     {
-        $token = $this->tokenManager->getOwnToken();
+        $token = $this->tokenManager->getOwnMintmeToken();
 
         $this->serviceInfo->setTokenName(
             $token ? $token->getName() : null

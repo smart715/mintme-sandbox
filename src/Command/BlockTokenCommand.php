@@ -101,7 +101,7 @@ class BlockTokenCommand extends Command
             /** @var User $user */
             $user = $entityToBlock;
             /** @var Token|null $token */
-            $token = $user->getProfile()->getToken();
+            $token = $user->getProfile()->getMintmeToken();
         } else {
             /** @var Token $token */
             $token = $entityToBlock;

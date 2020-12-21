@@ -60,14 +60,9 @@ class TokenVoter extends Voter
                 return !$cryptoToken->isBlocked();
             case self::EDIT:
             case self::DELETE:
-                return $this->ownToken($cryptoToken) && !$cryptoToken->isBlocked();
+                return $cryptoToken->isOwner($this->tokenManager->getOwnTokens()) && !$cryptoToken->isBlocked();
         }
 
         return false;
-    }
-
-    private function ownToken(Token $token): bool
-    {
-        return $this->tokenManager->getOwnToken() === $token;
     }
 }

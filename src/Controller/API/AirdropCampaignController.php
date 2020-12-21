@@ -114,7 +114,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $actions = $request->get('actions');
         $actionsData = $request->get('actionsData');
-        
+
         if (!is_array($actions)) {
             $actions = null;
         }
@@ -123,7 +123,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $actionsData = [];
         }
 
-        $actionsValidator = new AirdropCampaignActionsValidator($actions, $actionsData, $user);
+        $actionsValidator = new AirdropCampaignActionsValidator($actions, $actionsData, $token);
 
         if (!$actionsValidator->validate()) {
             throw new ApiBadRequestException($this->translator->trans($actionsValidator->getMessage()));
@@ -287,7 +287,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         $timeAfterOneHour = time() + 60 * 60;
-        
+
         if ($endDateTimestamp && $endDateTimestamp < $timeAfterOneHour) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_end_date'));
         }
@@ -309,7 +309,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $this->denyAccessUnlessGranted('edit', $token);
         }
 
-        if ($checkIfParticipant && $token === $this->tokenManager->getOwnToken()) {
+        if ($checkIfParticipant && $token === $this->tokenManager->getOwnMintmeToken()) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.own_airdrop'));
         }
 
