@@ -42,9 +42,7 @@
                                     <div class="col-11 pl-0 ml-0">
                                          <span
                                              class="d-inline-block truncate-name flex-grow-1"
-                                             v-text="currencyMode === currencyModes.usd.value ?
-                                                currencyConvert(row.value, rate, 2) :
-                                                row.value">
+                                             v-text="sum(row.value, rate)">
                                          </span>
                                     </div>
                                 </div>
@@ -145,6 +143,11 @@ export default {
         this.startScrollListeningOnce(this.ordersList);
     },
     computed: {
+        sum: function(value, rate) {
+            return this.currencyMode === this.currencyModes.usd.value ?
+                this.currencyConvert(value, rate, 2) :
+                value;
+        },
         ...mapGetters('rates', [
             'getRates',
         ]),
