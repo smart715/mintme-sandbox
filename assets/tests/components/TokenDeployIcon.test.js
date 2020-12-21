@@ -73,6 +73,9 @@ describe('TokenDeployIcon', () => {
             localVue: mockVue(),
             propsData: {
                 statusProp: 'deployed',
+                tokenCrypto: {
+                    symbol: 'WEB',
+                },
             },
         });
         expect(wrapper.find('.deployed-icon').exists()).toBe(true);

@@ -2,7 +2,7 @@
 
 namespace App\Utils\Validator;
 
-use App\Entity\User;
+use App\Entity\Token\Token;
 use App\Utils\AirdropCampaignActions;
 
 class AirdropCampaignActionsValidator implements ValidatorInterface
@@ -13,13 +13,13 @@ class AirdropCampaignActionsValidator implements ValidatorInterface
 
     private string $message;
 
-    private User $user;
+    private Token $token;
 
-    public function __construct(?array $actions, array &$actionsData, User $user)
+    public function __construct(?array $actions, array &$actionsData, Token $token)
     {
         $this->actions = $actions;
         $this->actionsData = $actionsData;
-        $this->user = $user;
+        $this->token = $token;
         $this->message = 'airdrop_backend.invalid_actions';
     }
 
@@ -87,7 +87,7 @@ class AirdropCampaignActionsValidator implements ValidatorInterface
 
                 break;
             case AirdropCampaignActions::FACEBOOK_PAGE:
-                $actionData = $this->user->getProfile()->getToken()->getFacebookUrl();
+                $actionData = $this->token->getFacebookUrl();
 
                 if (null === $actionData) {
                     $this->message = 'airdrop_backend.invalid_facebook_page';
@@ -96,7 +96,7 @@ class AirdropCampaignActionsValidator implements ValidatorInterface
 
                 break;
             case AirdropCampaignActions::YOUTUBE_SUBSCRIBE:
-                $actionData = $this->user->getProfile()->getToken()->getYoutubeChannelId();
+                $actionData = $this->token->getYoutubeChannelId();
 
                 if (null === $actionData) {
                     $this->message = 'airdrop_backend.invalid_youtube_channel';

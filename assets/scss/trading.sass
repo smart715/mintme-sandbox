@@ -89,7 +89,8 @@
   .token-avatar
     z-index: 1
     min-width: 0
-    margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
+    &.show-avatar
+      margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
     @media(max-width: 1199px)
       margin-left: calc(111px + 20px) !important

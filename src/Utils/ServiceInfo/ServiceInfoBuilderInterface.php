@@ -6,7 +6,7 @@ use App\Utils\ServiceInfo\Model\ServiceInfo;
 
 interface ServiceInfoBuilderInterface
 {
-    public function addTokenInfo(): void;
+    public function addMintmeTokenInfo(): void;
 
     public function addGitInfo(): void;
 

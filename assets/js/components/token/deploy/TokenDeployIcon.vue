@@ -3,10 +3,10 @@
         <div v-if="deployed" class="deployed-icon">
             <guide>
                 <template slot="icon">
-                    <img class="h-100" src="../../../../img/mintmecoin_W.png" :alt="this.$t('token.deploy_icon.img_alt.deployed')">
+                    <img class="h-100" :src="deployedImg" :alt="this.$t('token.deploy_icon.img_alt.deployed')">
                 </template>
                 <template slot="body">
-                    {{ $t('token.deploy_icon.body') }}
+                    {{ deployedBodyText }}
                 </template>
             </guide>
         </div>
@@ -36,6 +36,8 @@ export default {
         Guide,
     },
     props: {
+        isMintme: Boolean,
+        tokenCrypto: Object,
         isOwner: Boolean,
         statusProp: String,
     },
@@ -48,6 +50,18 @@ export default {
         },
         showPending: function() {
             return this.isOwner && tokenDeploymentStatus.pending === this.statusProp;
+        },
+        deployedImg: function() {
+            return this.isMintme
+                ? require('../../../../img/mintmecoin_W.png')
+                : require('../../../../img/' + this.tokenCrypto.symbol + '.png');
+        },
+        deployedBodyText: function() {
+            return this.isMintme
+                ? this.$t('token.deploy_icon.body')
+                : this.$t('token.deploy_icon.body_not_mintme', {
+                    baseName: this.tokenCrypto.name,
+                });
         },
     },
 };
