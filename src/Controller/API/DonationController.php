@@ -45,7 +45,7 @@ class DonationController extends AbstractFOSRestController
      *     "/{base}/{quote}/check/{currency}/{amount}",
      *     name="check_donation",
      *     options={"expose"=true},
-     *     requirements={"currency"="^(WEB|BTC|ETH)$"}
+     *     requirements={"currency"="^(WEB|BTC|ETH|USDC)$"}
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
@@ -109,7 +109,7 @@ class DonationController extends AbstractFOSRestController
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC|ETH)",
+     *     requirements="(WEB|BTC|ETH|USDC)",
      *     description="Selected currency to donate."
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
@@ -137,7 +137,7 @@ class DonationController extends AbstractFOSRestController
                 $sellOrdersSummary
             );
 
-            return $this->view(null, Response::HTTP_ACCEPTED);
+            return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
             return $this->view([
                 'message' => $ex->getMessage(),

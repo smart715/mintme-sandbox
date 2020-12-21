@@ -66,9 +66,11 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $amount = self::BTC_SYMBOL === $crypto->getSymbol()
+        $symbol = $crypto->getSymbol();
+
+        $amount = self::BTC_SYMBOL === $symbol
             ? '0.001'
-            : (Token::ETH_SYMBOL === $crypto->getSymbol() ? '0.05' : '100');
+            : (Token::ETH_SYMBOL === $symbol ? '0.05' :  (Token::USDC_SYMBOL === $symbol ? '10' : '100'));
 
         /** @var User $user*/
         $user = $this->getUser();
@@ -76,7 +78,7 @@ class HackerController extends AbstractController
         $balanceHandler->deposit(
             $user,
             Token::getFromCrypto($crypto),
-            $moneyWrapper->parse($amount, $crypto->getSymbol())
+            $moneyWrapper->parse($amount, $symbol)
         );
 
         return $this->redirect($referer);

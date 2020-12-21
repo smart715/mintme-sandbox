@@ -262,7 +262,7 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function setProfile(Profile $profile): self
+    public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
 

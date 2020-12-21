@@ -6,12 +6,14 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Enum\AirdropCampaignActions;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -86,6 +88,14 @@ class AirdropCampaignController extends AbstractFOSRestController
         BalanceHandlerInterface $balanceHandler,
         Request $request
     ): View {
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new ApiUnauthorizedException();
+        }
+
         $token = $this->fetchToken($tokenName, true);
 
         if ($token->getActiveAirdrop()) {
@@ -104,8 +114,20 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $actions = $request->get('actions');
         $actionsData = $request->get('actionsData');
+        
+        if (!is_array($actions)) {
+            $actions = null;
+        }
 
-        $actionsData = $this->checkActions($actions, $actionsData);
+        if (!is_array($actionsData)) {
+            $actionsData = [];
+        }
+
+        $actionsValidator = new AirdropCampaignActionsValidator($actions, $actionsData, $user);
+
+        if (!$actionsValidator->validate()) {
+            throw new ApiBadRequestException($this->translator->trans($actionsValidator->getMessage()));
+        }
 
         $endDate = $endDateTimestamp
             ? (new \DateTimeImmutable())->setTimestamp($endDateTimestamp)
@@ -126,7 +148,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         return $this->view([
             'id' => $airdrop->getId(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -191,7 +213,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         );
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
@@ -210,7 +232,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $this->airdropCampaignManager->claimAirdropAction($action, $user);
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
@@ -292,63 +314,5 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         return $token;
-    }
-
-    private function checkActions(array $actions, array $actionsData): array
-    {
-        foreach ($actions as $action => $active) {
-            if ($active) {
-                $actionsData[$action] = $this->checkAction($action, $actionsData[$action] ?? null);
-            }
-        }
-
-        return $actionsData;
-    }
-
-    private function checkAction(string $action, ?string $actionData): ?string
-    {
-        /** @var  User $user */
-        $user = $this->getUser();
-
-        $matches = [];
-
-        switch ($action) {
-            case 'twitterRetweet':
-                if (!preg_match('/^(?:https?:\/\/)?(?:www\.)?twitter\.com\/[\S]+\/status\/([\d]+)$/', $actionData, $matches)) {
-                    throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_twitter_url'));
-                }
-
-                $actionData = $matches[1];
-
-                break;
-            case 'facebookPost':
-                if (!preg_match('/^(https?:\/\/)?(www\.)?facebook\.com\/[\S]+\/posts\/[\d]+$/', $actionData, $matches)) {
-                    throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_facebook_url'));
-                }
-
-                $url = parse_url($actionData);
-                // @phpstan-ignore-next-line
-                $actionData = 'http://' . ($url['host'] ?? '') . ($url['path'] ?? '');
-
-                break;
-            case 'facebookPage':
-                $actionData = $user->getProfile()->getToken()->getFacebookUrl();
-
-                if (null === $actionData) {
-                    throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_facebook_page'));
-                }
-
-                break;
-            case 'youtubeSubscribe':
-                $actionData = $user->getProfile()->getToken()->getYoutubeChannelId();
-
-                if (null === $actionData) {
-                    throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_youtube_channel'));
-                }
-
-                break;
-        }
-
-        return $actionData;
     }
 }

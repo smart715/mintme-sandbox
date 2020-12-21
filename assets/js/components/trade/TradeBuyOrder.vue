@@ -44,7 +44,7 @@
                                 tabindex="8"
                                 :from="market.base.symbol"
                                 :to="USD.symbol"
-                                :subunit="2"
+                                :subunit="4"
                                 symbol="$"
                             />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
@@ -346,7 +346,7 @@ export default {
         translationsContext: function() {
             return {
                 baseSymbol: this.rebrandingFunc(this.market.base.symbol),
-                quoteSymbol: this.market.quote.symbol,
+                quoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 rebrandedQuoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 minTotalPrice: this.minTotalPrice,
             };

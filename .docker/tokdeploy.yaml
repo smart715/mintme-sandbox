@@ -12,3 +12,9 @@ tokenimpladdress: '0x4462181c372ba51c217f568545b7b622c7c0eb4e'
 mintme_account:   '0x9139413fe7247da35ae0797f9270271ba758d248'
 mintme_address:   '0x9139413fe7247da35ae0797f9270271ba758d248'
 gas_limit: 90000
+
+# ethereum rpc server url
+ethereum_daemon_host: 'http://212.32.255.99:8547'
+# ethereum main wallet addres (send Tether from this address)
+eth_account: '0x42e07422fa1bce2090912ddbc0717fa44654ef00'
+ethereum_cli_timeout: 3000
