@@ -11,17 +11,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DeploymentFacade implements DeploymentFacadeInterface
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var DeployCostFetcherInterface */
-    private $costFetcher;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var ContractHandlerInterface */
-    private $contractHandler;
+    private EntityManagerInterface $em;
+    private DeployCostFetcherInterface $costFetcher;
+    private BalanceHandlerInterface $balanceHandler;
+    private ContractHandlerInterface $contractHandler;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -37,25 +30,18 @@ class DeploymentFacade implements DeploymentFacadeInterface
 
     public function execute(User $user, Token $token): void
     {
-        $cost = $this->costFetcher->getDeployWebCost();
-        $balance = $this->balanceHandler
-            ->balance($user, Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable();
-
-        if ($cost->greaterThan($balance)) {
-            throw new BalanceException('Low balance');
-        }
-
-        $this->contractHandler->deploy($token);
-
-        $this->balanceHandler->withdraw(
-            $user,
-            Token::getFromSymbol(Token::WEB_SYMBOL),
-            $cost
+        $deploymentContext = new DeploymentContext(
+            $token->isMintmeToken()
+                ? new MintmeDeploymentStrategy(
+                    $token,
+                    $this->contractHandler,
+                    $this->em,
+                    $this->balanceHandler,
+                    $this->costFetcher->getDeployWebCost()
+                )
+                : new EthDeploymentStrategy($token, $this->contractHandler, $this->em)
         );
 
-        $token->setPendingDeployment();
-        $token->setDeployCost($cost->getAmount());
-        $this->em->persist($token);
-        $this->em->flush();
+        $deploymentContext->deploy();
     }
 }

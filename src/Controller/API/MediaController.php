@@ -76,7 +76,7 @@ class MediaController extends AbstractFOSRestController
 
                 break;
             case 'token':
-                $entity = $profile->getToken();
+                $entity = $profile->getMintmeToken();
 
                 if (!$entity) {
                     throw new NotFoundTokenException();

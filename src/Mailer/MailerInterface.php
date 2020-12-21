@@ -20,8 +20,8 @@ interface MailerInterface
     public function sendPasswordResetMail(User $user, bool $resetting): void;
     public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userLoginInfo): void;
     public function sendProfileFillingReminderMail(User $user): void;
-    public function sendTokenDescriptionReminderMail(User $user): void;
-    public function sendNewInvestorMail(User $user, string $newInvestor): void;
+    public function sendTokenDescriptionReminderMail(Token $token): void;
+    public function sendNewInvestorMail(Token $token, string $newInvestor): void;
     public function sendNewPostMail(User $user, String $tokenName): void;
     public function sendTokenDeployedMail(User $user, String $tokenName): void;
     public function sendNoOrdersMail(User $user, String $tokenName): void;

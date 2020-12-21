@@ -72,7 +72,7 @@ class TokenDescriptionReminderCommand extends Command
 
             $t->setNumberOfReminder($t->getNumberOfReminder() + 1);
             $this->em->persist($t);
-            $this->mailer->sendTokenDescriptionReminderMail($t->getProfile()->getUser());
+            $this->mailer->sendTokenDescriptionReminderMail($t);
         }
 
         $this->em->flush();

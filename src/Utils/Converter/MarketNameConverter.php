@@ -18,8 +18,10 @@ class MarketNameConverter implements MarketNameConverterInterface
 
     public function convert(Market $market, bool $baseFirst = false): string
     {
-        $base = $this->convertTradable($market->getBase());
         $quote = $this->convertTradable($market->getQuote());
+        $base = $market->getQuote() instanceof Token
+            ? Token::WEB_SYMBOL
+            : $this->convertTradable($market->getBase());
 
         return strtoupper($baseFirst ? $base . $quote : $quote . $base);
     }

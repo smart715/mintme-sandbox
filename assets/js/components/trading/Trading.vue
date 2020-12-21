@@ -170,11 +170,11 @@
                                             {{ row.item.base }}/
                                         </span>
                                         <avatar
-                                                :image="row.item.quoteImage"
-                                                type="token"
-                                                size="small"
-                                                class="d-inline"
-                                                :key="row.item.quoteImage"
+                                            :image="row.item.quoteImage"
+                                            type="token"
+                                            size="small"
+                                            class="d-inline"
+                                            :key="row.item.quoteImage"
                                         />
                                         {{ row.item.quote }}
                                     </a>
@@ -182,30 +182,31 @@
                                        v-b-tooltip="{title: row.value, boundary:'window', customClass: 'tooltip-custom'}">
                                         <span v-if="showFullPair(row.value)">
                                             <avatar
-                                                    :image="row.item.baseImage"
-                                                    type="token"
-                                                    size="small"
-                                                    :symbol="row.item.base"
-                                                    class="d-inline"
-                                                    :key="row.item.baseImage"
+                                                :image="row.item.baseImage"
+                                                type="token"
+                                                size="small"
+                                                :symbol="row.item.base"
+                                                class="d-inline"
+                                                :key="row.item.baseImage"
                                             />
                                             {{ row.item.base }}/
                                         </span>
                                         <avatar
-                                                :image="row.item.quoteImage"
-                                                type="token"
-                                                size="small"
-                                                class="d-inline"
-                                                :key="row.item.quoteImage"
+                                            v-if="row.item.quoteImage"
+                                            :image="row.item.quoteImage"
+                                            type="token"
+                                            size="small"
+                                            class="d-inline"
+                                            :key="row.item.quoteImage"
                                         />
                                         <span class="token-link">
                                             {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
                                         </span>
                                     </a>
                                     <guide
-                                            placement="top"
-                                            max-width="150px"
-                                            v-if="row.item.tokenized">
+                                        v-if="row.item.tokenized && row.item.quoteImage"
+                                        placement="top"
+                                        max-width="150px">
                                         <template slot="icon">
                                             <img :src="row.item.baseImage" alt="deployed">
                                         </template>
@@ -274,7 +275,7 @@ import {
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {cryptoSymbols, tokenDeploymentStatus, currencyModes} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
@@ -393,6 +394,12 @@ export default {
             let tokens = Object.values(this.sanitizedMarkets);
             if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
+                    if (first.tokenized && webSymbol === first.cryptoSymbol && webSymbol !== second.cryptoSymbol) {
+                        return -1;
+                    }
+                    if (second.tokenized && webSymbol === second.cryptoSymbol && webSymbol !== first.cryptoSymbol) {
+                        return 1;
+                    }
                     if (first.tokenized !== second.tokenized) {
                         return first.tokenized ? -1 : 1;
                     }
@@ -637,7 +644,7 @@ export default {
             const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
             const baseImage = market.base.image.avatar_small;
-            const quoteImage = market.quote.image.avatar_small;
+            const quoteImage = market.quote.image ? market.quote.image.avatar_small : '';
 
             const sanitizedMarket = this.getSanitizedMarket(
                 marketCurrency,
@@ -652,6 +659,7 @@ export default {
                 buyDepth,
                 baseImage,
                 quoteImage,
+                market.quote.cryptoSymbol,
                 marketCap
             );
 
@@ -681,14 +689,15 @@ export default {
             buyDepth,
             baseImage,
             quoteImage,
+            cryptoSymbol,
             marketCap = 0
         ) {
             let hiddenName = this.findHiddenName(token);
 
             return {
-                pair: BTC.symbol === currency
-                  || ETH.symbol === currency
-                  || USDC.symbol === currency ? `${token}/${currency}` : `${token}`,
+                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol].includes(token)
+                    ? `${token}/${currency}`
+                    : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
@@ -708,6 +717,7 @@ export default {
                 quote: token,
                 baseImage,
                 quoteImage,
+                cryptoSymbol,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -746,23 +756,26 @@ export default {
                         this.markets[market].supply = 1e7;
                     }
 
+                    const selectedMarket = this.markets[market];
+
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
                         this.getPercentage(
-                            parseFloat(this.markets[market].lastPrice),
-                            parseFloat(this.markets[market].openPrice)
+                            parseFloat(selectedMarket.lastPrice),
+                            parseFloat(selectedMarket.openPrice)
                         ),
-                        parseFloat(this.markets[market].lastPrice),
-                        parseFloat(this.markets[market].dayVolume),
-                        parseFloat(this.markets[market].monthVolume),
-                        this.markets[market].supply,
-                        this.markets[market].base.subunit,
+                        parseFloat(selectedMarket.lastPrice),
+                        parseFloat(selectedMarket.dayVolume),
+                        parseFloat(selectedMarket.monthVolume),
+                        selectedMarket.supply,
+                        selectedMarket.base.subunit,
                         tokenized,
                         parseFloat(this.markets[market].buyDepth),
-                        this.markets[market].base.image.avatar_small,
-                        this.markets[market].quote.image.avatar_small,
-                        this.markets[market].marketCap || 0
+                        selectedMarket.base.image.avatar_small,
+                        selectedMarket.quote.image? selectedMarket.quote.image.avatar_small: '',
+                        selectedMarket.quote.cryptoSymbol,
+                        selectedMarket.marketCap || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -821,8 +834,9 @@ export default {
                 tokenized,
                 market.buyDepth,
                 market.base.image.avatar_small,
-                market.quote.image.avatar_small,
-                this.markets[marketName].marketCap || 0
+                market.quote.image ? market.quote.image.avatar_small: '',
+                market.quote.cryptoSymbol,
+                market.marketCap || 0
                 );
 
             if (marketOnTopIndex > -1) {
@@ -909,7 +923,8 @@ export default {
                 false,
                 market.buyDepth,
                 market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.quote.image.avatar_small,
+                market.quote.cryptoSymbol
             );
             this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
@@ -937,7 +952,8 @@ export default {
             return toMoney(val, precision);
         },
         marketCapFormatter: function(value, key, item) {
-            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
+            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap ||
+                ETH.symbol === item.cryptoSymbol
                 ? '-'
                 : value;
         },

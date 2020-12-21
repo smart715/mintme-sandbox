@@ -90,6 +90,20 @@ class TokenManager implements TokenManagerInterface
         );
     }
 
+    public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token
+    {
+        $token = $this->findByName($name);
+
+        return $token->getCryptoSymbol() === $cryptoSymbol
+            ? $token
+            : null;
+    }
+
+    public function findByNameMintme(string $name): ?Token
+    {
+        return $this->findByNameCrypto($name, Token::WEB_SYMBOL);
+    }
+
     public function findByAddress(string $address): ?Token
     {
         return $this->repository->findByAddress($address);
@@ -131,16 +145,35 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->findBy([], null, $limit, $offset);
     }
 
-    public function getOwnToken(): ?Token
+    public function getOwnMintmeToken(): ?Token
     {
         return $this->getProfile()
-            ? $this->getProfile()->getToken()
+            ? $this->getProfile()->getMintmeToken()
             : null;
+    }
+
+    public function getOwnTokenByName(string $name): ?Token
+    {
+        /** @var Token $ownToken */
+        foreach ($this->getOwnTokens() as $ownToken) {
+            if ($name === $ownToken->getName()) {
+                return $ownToken;
+            }
+        }
+
+        return null;
+    }
+
+    public function getOwnTokens(): array
+    {
+        return $this->getProfile()
+            ? $this->getProfile()->getTokens()
+            : [];
     }
 
     public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
     {
-        if ($token !== $this->getOwnToken() ||
+        if (!$token->isOwner($this->getOwnTokens()) ||
             $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
             return $balanceResult;
         }
