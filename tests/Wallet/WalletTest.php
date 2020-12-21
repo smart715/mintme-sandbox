@@ -523,7 +523,10 @@ class WalletTest extends TestCase
 
     private function mockToken(): Token
     {
-        return $this->createMock(Token::class);
+        $token = $this->createMock(Token::class);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
+
+        return $token;
     }
 
     private function mockDateTime(int $timestamp): DateTime

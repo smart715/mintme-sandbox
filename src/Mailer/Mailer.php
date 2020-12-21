@@ -231,44 +231,44 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendTokenDescriptionReminderMail(User $user): void
+    public function sendTokenDescriptionReminderMail(Token $token): void
     {
         $body = $this->twigEngine->render('mail/token_description_reminder.html.twig', [
-            'username' => $user->getUsername(),
-            'token_name' => $user->getProfile()->getToken()->getName(),
+            'username' => $token->getOwner()->getUsername(),
+            'token_name' => $token->getName(),
         ]);
 
         $textBody = $this->twigEngine->render('mail/token_description_reminder.txt.twig', [
-            'username' => $user->getUsername(),
-            'token_name' => $user->getProfile()->getToken()->getName(),
+            'username' => $token->getOwner()->getUsername(),
+            'token_name' => $token->getName(),
         ]);
 
         $subjectMsg = 'Mintme Reminder';
         $msg = (new Swift_Message($subjectMsg))
             ->setFrom([$this->mail => 'Mintme'])
-            ->setTo($user->getEmail())
+            ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
             ->addPart($textBody, 'text/plain');
         $this->mailer->send($msg);
     }
 
-    public function sendNewInvestorMail(User $user, string $newInvestor): void
+    public function sendNewInvestorMail(Token $token, string $newInvestor): void
     {
         $body = $this->twigEngine->render("mail/new_investor.html.twig", [
-            'username' => $user->getUsername(),
+            'username' => $token->getOwner()->getUsername(),
             'investorProfile' => $newInvestor,
-            'userTokenName' => $user->getProfile()->getToken()->getName(),
+            'userTokenName' => $token->getName(),
         ]);
 
         $textBody = $this->twigEngine->render("mail/new_investor.txt.twig", [
-            'username' => $user->getUsername(),
+            'username' => $token->getOwner()->getUsername(),
             'investorProfile' => $newInvestor,
-            'userTokenName' => $user->getProfile()->getToken()->getName(),
+            'userTokenName' => $token->getName(),
         ]);
 
         $msg = (new Swift_Message('New Investor'))
             ->setFrom([$this->mail => 'Mintme'])
-            ->setTo($user->getEmail())
+            ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
             ->addPart($textBody, 'text/plain');
 

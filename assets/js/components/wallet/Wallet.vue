@@ -52,7 +52,8 @@
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
-                                        data.item.subunit)"
+                                        data.item.subunit
+                                        )"
                         >
                             <div class="hover-icon">
                                 <font-awesome-icon
@@ -128,7 +129,13 @@
                             :class="(data.item.blocked
                                 || disabledServices.depositDisabled
                                 || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
-                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)"
+                            @click="openDeposit(
+                                data.item.name,
+                                data.item.subunit,
+                                true,
+                                data.item.blocked,
+                                data.item.cryptoSymbol
+                               )"
                         >
                             <div class="hover-icon">
                                 <font-awesome-icon
@@ -151,7 +158,9 @@
                                         data.item.available,
                                         data.item.subunit,
                                         true,
-                                        data.item.blocked)"
+                                        data.item.blocked,
+                                        data.item.cryptoSymbol
+                                        )"
                         >
                             <div>
                                 <div class="hover-icon">
@@ -205,8 +214,9 @@
             :currency="selectedCurrency"
             :is-token="isTokenModal"
             :fee="withdraw.fee"
-            :web-fee="withdraw.webFee"
-            :available-web="withdraw.availableWeb"
+            :base-fee="withdraw.baseFee"
+            :base-symbol="withdraw.baseSymbol"
+            :available-base="withdraw.availableBase"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
             :twofa="twofa"
@@ -311,10 +321,10 @@ export default {
             ],
             withdraw: {
                 fee: '0',
-                webFee: '0',
+                baseFee: '0',
                 amount: '0',
                 subunit: 4,
-                availableWeb: '0',
+                availableBase: '0',
             },
             deposit: {
                 fee: undefined,
@@ -432,7 +442,7 @@ export default {
         isDisabledCrypto: function(name) {
             return JSON.parse(this.disabledCrypto).includes(name);
         },
-        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false, crypto = '') {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.withdrawalsDisabled
                 || this.disabledServices.allServicesDisabled
@@ -449,18 +459,19 @@ export default {
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
             this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
-            this.withdraw.webFee = toMoney(
-                isToken || webSymbol === currency ? this.predefinedTokens[webSymbol].fee : 0,
+            this.withdraw.baseSymbol = crypto;
+            this.withdraw.baseFee = toMoney(
+                isToken ? this.predefinedTokens[crypto || webSymbol].fee : 0,
                 subunit
             );
-            this.withdraw.availableWeb = this.predefinedTokens[webSymbol].available;
+            this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false, crypto = null) {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.depositDisabled
                 || this.disabledServices.allServicesDisabled
@@ -475,7 +486,7 @@ export default {
             }
 
             this.depositAddress = (isToken
-                ? this.depositAddresses[tokSymbol]
+                ? this.depositAddresses[tokSymbol + crypto]
                 : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
                 ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});

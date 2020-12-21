@@ -6,7 +6,7 @@
 
 {% block content %}
     <div id="wallet" class="container">
-        {% if app.user.profile.token is not empty and app.user.profile.token.isBlocked or app.user.isBlocked %}
+        {% if app.user.profile.hasBlockedTokens or app.user.isBlocked %}
             <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
                 <h1>
                     {% if app.user.isBlocked %}

@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Strategy;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
@@ -15,21 +16,25 @@ class OrderNotificationStrategy implements NotificationStrategyInterface
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    private Token $token;
+
     private string $type;
 
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
+        Token $token,
         string $type
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
+        $this->token = $token;
         $this->type = $type;
     }
 
     public function sendNotification(User $user): void
     {
-        $tokenName = $user->getProfile()->getToken()->getName();
+        $tokenName = $this->token->getName();
         $jsonData = (array)json_encode([
             'tokenName' => $tokenName,
         ], JSON_THROW_ON_ERROR);

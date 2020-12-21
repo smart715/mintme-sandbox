@@ -4,6 +4,7 @@ namespace App\SmartContract;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -23,11 +24,16 @@ use Psr\Log\LoggerInterface;
 class ContractHandler implements ContractHandlerInterface
 {
     private const DEPLOY = 'deploy';
+    private const ADD_TOKEN = 'add_token';
     private const UPDATE_MIN_DESTINATION = 'update_mint_destination';
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
     private const TRANSACTIONS = 'get_transactions';
     private const PING = 'ping';
+    private const WITHDRAW_TYPE = 'withdraw';
+    private const CRYPTO_TOKENS = [
+        'USDC' => 'USDC',
+    ];
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -43,6 +49,9 @@ class ContractHandler implements ContractHandlerInterface
 
     /** @var TokenManagerInterface */
     private $tokenManager;
+
+    /** @var array|Money[] $cryptoFees */
+    private $cryptoFees = [];
 
     public function __construct(
         JsonRpcInterface $rpc,
@@ -75,11 +84,30 @@ class ContractHandler implements ContractHandlerInterface
                 'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
                 'userId' => $token->getProfile()->getUser()->getId(),
+                'crypto' => $token->getCryptoSymbol(),
             ]
         );
 
         if ($response->hasError()) {
             $this->logger->error("Failed to deploy token '{$token->getName()}'");
+
+            throw new Exception($response->getError()['message'] ?? 'get error response');
+        }
+    }
+
+    public function addToken(Token $token): void
+    {
+        $response = $this->rpc->send(
+            self::ADD_TOKEN,
+            [
+                'name' => $token->getName(),
+                'address' => $token->getAddress(),
+                'crypto' => $token->getCryptoSymbol(),
+            ]
+        );
+
+        if ($response->hasError()) {
+            $this->logger->error("Failed to add token '{$token->getName()}'");
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
@@ -145,6 +173,7 @@ class ContractHandler implements ContractHandlerInterface
                 'tokenName' => $token instanceof Token ? $token->getName() : $token->getSymbol(),
                 'to' => $address,
                 'value' => $balance->getAmount(),
+                'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
             ]
         );
 
@@ -173,19 +202,41 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
+    private function getFee(
+        string $cryptoSymbol,
+        string $type,
+        array $indexedCryptos,
+        WalletInterface $wallet
+    ): Money {
+        /** @var Crypto|null $crypto */
+        $crypto = $indexedCryptos[$cryptoSymbol];
+        $key = "{$type}_{$cryptoSymbol}";
+        $isCrypto = $crypto && isset(self::CRYPTO_TOKENS[$crypto->getSymbol()]);
+        $zeroAmount = $this->moneyWrapper->parse('0', MoneyWrapper::TOK_SYMBOL);
+
+        if (!$crypto) {
+            return $zeroAmount;
+        }
+
+        if (!isset($this->cryptoFees[$key])) {
+            $this->cryptoFees[$key] = self::WITHDRAW_TYPE === $type
+                ? $crypto->getFee()
+                : ($isCrypto ? $zeroAmount : $wallet->getDepositInfo($crypto)->getFee())
+            ;
+        }
+
+        return $this->cryptoFees[$key];
+    }
+
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
     {
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $webDepositFee = $this->moneyWrapper->format(
-            $wallet->getDepositInfo($crypto ?? Token::getFromSymbol(Token::WEB_SYMBOL))->getFee()
-        );
+        $indexedCryptos = $this->cryptoManager->findAllIndexed('symbol');
 
-        $webWithdrawFee = $crypto
-            ? $this->moneyWrapper->format($crypto->getFee())
-            : '0';
+        return array_map(function (array $transaction) use ($indexedCryptos, $wallet) {
+            $tokenName = $transaction['token'];
 
-        return array_map(function (array $transaction) use ($webWithdrawFee, $webDepositFee) {
-            $cryptoToken = $this->cryptoManager->findBySymbol($transaction['token']);
+            /** @var Crypto|null $cryptoToken */
+            $cryptoToken = $indexedCryptos[$tokenName] ?? null;
 
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
@@ -196,15 +247,15 @@ class ContractHandler implements ContractHandlerInterface
                     $transaction['amount'],
                     new Currency($cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL)
                 ),
-                $this->moneyWrapper->parse(
-                    'withdraw' == $transaction['type']
-                            ? ($cryptoToken ? $this->moneyWrapper->format($cryptoToken->getFee()) : $webWithdrawFee)
-                            : ($cryptoToken ? '0' : $webDepositFee),
-                    $cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL
+                $this->getFee(
+                    isset(self::CRYPTO_TOKENS[$tokenName])
+                        ? $tokenName
+                        : $transaction['crypto'],
+                    $transaction['type'],
+                    $indexedCryptos,
+                    $wallet
                 ),
-                $cryptoToken
-                    ? $this->cryptoManager->findBySymbol($transaction['token'])
-                    : $this->tokenManager->findByName($transaction['token']),
+                $cryptoToken ?? $this->tokenManager->findByName($tokenName),
                 Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])
             );

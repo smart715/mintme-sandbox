@@ -20,14 +20,14 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var MailerInterface */
+    private $mailer;
+
     /** @var ScheduledNotificationManagerInterface */
     private $scheduledNotificationManager;
 
     /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
-
-    /** @var MailerInterface */
-    private MailerInterface $mailer;
 
     public function __construct(
         MarketHandlerInterface $marketHandler,
@@ -36,6 +36,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         MailerInterface $mailer
     ) {
         $this->marketHandler = $marketHandler;
+        $this->mailer = $mailer;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
@@ -73,6 +74,8 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
             $tokenName = $quote->getName();
 
             if (Order::BUY_SIDE === $orderType && !in_array($quote, $makerTokens, true)) {
+                $this->mailer->sendNewInvestorMail($quote, $userProfile);
+
                 $extraData = [
                     'profile' => $userProfile,
                     'tokenName' => $tokenName,
@@ -81,6 +84,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $strategy = new NewInvestorNotificationStrategy(
                     $this->userNotificationManager,
                     $this->mailer,
+                    $quote,
                     $notificationType,
                     $extraData
                 );
@@ -94,7 +98,7 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                 $notificationType = NotificationTypes::ORDER_FILLED;
                 $this->scheduledNotificationManager->createScheduledNotification(
                     $notificationType,
-                    $userTokenCreator
+                    $userTokenCreator,
                 );
             }
         }
@@ -107,18 +111,15 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         if ($quote instanceof Token) {
             $market = $event->getOrder()->getMarket();
             $currentUser = $quote->getProfile()->getUser();
-            $userToken = $currentUser->getProfile()->getToken();
 
-            if ($userToken && $quote === $userToken) {
-                $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
+            $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
 
-                if (!$userSellOrdersSummary) {
-                    $notificationType = NotificationTypes::ORDER_CANCELLED;
-                    $this->scheduledNotificationManager->createScheduledNotification(
-                        $notificationType,
-                        $currentUser
-                    );
-                }
+            if (!$userSellOrdersSummary) {
+                $notificationType = NotificationTypes::ORDER_CANCELLED;
+                $this->scheduledNotificationManager->createScheduledNotification(
+                    $notificationType,
+                    $currentUser
+                );
             }
         }
     }

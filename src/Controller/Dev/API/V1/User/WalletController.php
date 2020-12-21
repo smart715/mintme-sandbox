@@ -105,9 +105,7 @@ class WalletController extends DevApiController
             $crypto = array_filter($this->cryptoManager->findAll(), fn(Crypto $crypto) => !$crypto->isToken())
         ) : [];
 
-        $isBlockedToken = $user->getProfile()->getToken()
-            ? $user->getProfile()->getToken()->isBlocked()
-            : false;
+        $isBlockedToken = $user->getProfile()->hasBlockedTokens();
 
         $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
