@@ -49,7 +49,7 @@
                                     <div class="col-11 pl-0 ml-0">
                                         <span
                                             class="d-inline-block truncate-name flex-grow-1"
-                                            v-text="sum(value, rate)">
+                                            v-text="sum(row.value, rate)">
                                         </span>
                                     </div>
                                 </div>
