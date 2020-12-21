@@ -66,55 +66,69 @@ class CheckUserSellOrdersCommand extends Command
     {
         $scheduledNotifications = $this->scheduledNotificationManager->getScheduledNotifications();
 
+        /** @var ScheduledNotification $scheduledNotification */
         foreach ($scheduledNotifications as $scheduledNotification) {
-            $notificationType = $scheduledNotification->getType();
-            $timeInterval = $scheduledNotification->getTimeInterval();
-            $dateToBeSend = $scheduledNotification->getDateToBeSend();
-            $user = $scheduledNotification->getUser();
-            $quoteToken = $user->getProfile()->getToken();
+            $quoteTokens = $scheduledNotification->getUser()->getProfile()->getTokens();
 
-            if (!$quoteToken) {
-                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
-
-                continue;
-            }
-
-            $baseCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-            $UserMarket = new Market($baseCrypto, $quoteToken);
-
-            $userSellOrders = $this->marketHandler->getSellOrdersSummaryByUser($user, $UserMarket);
-
-            if ($userSellOrders) {
-                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
-            }
-
-            $actual_date = new DateTimeImmutable();
-
-            if (!$userSellOrders && $dateToBeSend <= $actual_date) {
-                $strategy = new OrderNotificationStrategy(
-                    $this->userNotificationManager,
-                    $this->mailer,
-                    $notificationType
+            foreach ($quoteTokens as $quoteToken) {
+                $this->scheduleNotificationForToken(
+                    $scheduledNotification,
+                    $quoteToken
                 );
-                $notificationContext = new NotificationContext($strategy);
-                $notificationContext->sendNotification($user);
-
-                $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
-
-                if ($lastSent) {
-                    $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
-                } else {
-                    $this->updateScheduledNotification(
-                        $scheduledNotification,
-                        $notificationType,
-                        $timeInterval,
-                        $dateToBeSend
-                    );
-                }
             }
         }
 
         return 0;
+    }
+
+    private function scheduleNotificationForToken(
+        ScheduledNotification $scheduledNotification,
+        Token $quoteToken
+    ): void {
+        $notificationType = $scheduledNotification->getType();
+        $user = $scheduledNotification->getUser();
+        $timeInterval = $scheduledNotification->getTimeInterval();
+        $dateToBeSend = $scheduledNotification->getDateToBeSend();
+        $baseCrypto = $this->cryptoManager->findBySymbol($quoteToken->getCryptoSymbol());
+        $userMarket = new Market($baseCrypto, $quoteToken);
+
+        $userSellOrders = $this->marketHandler->getSellOrdersSummaryByUser($user, $userMarket);
+
+        if (count($userSellOrders) > 0) {
+            $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+        }
+
+        $actual_date = new DateTimeImmutable();
+
+        if (0 === count($userSellOrders) && $dateToBeSend <= $actual_date) {
+            $this->userNotificationManager->createNotification(
+                $user,
+                $notificationType,
+                []
+            );
+
+            $strategy = new OrderNotificationStrategy(
+                $this->userNotificationManager,
+                $this->mailer,
+                $quoteToken,
+                $notificationType
+            );
+            $notificationContext = new NotificationContext($strategy);
+            $notificationContext->sendNotification($user);
+
+            $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
+
+            if ($lastSent) {
+                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+            } else {
+                $this->updateScheduledNotification(
+                    $scheduledNotification,
+                    $notificationType,
+                    $timeInterval,
+                    $dateToBeSend
+                );
+            }
+        }
     }
 
     private function isLastNotificationSent(String $notificationType, String $timeInterval): bool

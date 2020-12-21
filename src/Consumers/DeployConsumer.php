@@ -97,7 +97,7 @@ class DeployConsumer implements ConsumerInterface
 
                     $this->balanceHandler->deposit(
                         $user,
-                        Token::getFromSymbol(Token::WEB_SYMBOL),
+                        Token::getFromSymbol($token->getCryptoSymbol()),
                         $amount
                     );
 
@@ -120,7 +120,7 @@ class DeployConsumer implements ConsumerInterface
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
 
-                $this->setDeployCostReward($user, $token->getName());
+                $this->setDeployCostReward($user, $token);
             }
 
             $this->em->persist($lockIn);
@@ -140,7 +140,7 @@ class DeployConsumer implements ConsumerInterface
         return true;
     }
 
-    private function setDeployCostReward(User $user, string $tokenName): void
+    private function setDeployCostReward(User $user, Token $token): void
     {
         $referencer = $user->getReferencer();
 
@@ -153,13 +153,13 @@ class DeployConsumer implements ConsumerInterface
 
                 $this->balanceHandler->deposit(
                     $user,
-                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    Token::getFromSymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
                 $this->balanceHandler->deposit(
                     $referencer,
-                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    Token::getFromSymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
@@ -171,7 +171,7 @@ class DeployConsumer implements ConsumerInterface
                     . json_encode([
                         'referredUserId' => $user->getId(),
                         'referrerUserId' => $referencer->getId(),
-                        'tokenName' => $tokenName,
+                        'tokenName' => $token->getName(),
                         'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
                         'rewardAmountInMintme' => $reward->getAmount(),
                     ])

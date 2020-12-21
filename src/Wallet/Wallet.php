@@ -118,7 +118,7 @@ class Wallet implements WalletInterface
             $token = Token::getFromCrypto($tradable);
         } else {
             $fee = new Money('0', new Currency(MoneyWrapper::TOK_SYMBOL));
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
             $token = $tradable;
         }
 
@@ -245,8 +245,6 @@ class Wallet implements WalletInterface
 
     private function validateTokenFee(User $user, ?Crypto $crypto = null): bool
     {
-        $crypto = $crypto ?? $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-
         if (!$crypto) {
             throw new NotFoundTokenException();
         }

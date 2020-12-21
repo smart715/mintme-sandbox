@@ -76,10 +76,7 @@ export default {
         Guide,
     },
     props: {
-        apiUrl: {
-            type: String,
-            required: true,
-        },
+        tokenName: String,
         post: {
             type: Object,
             default: () => ({
@@ -166,7 +163,9 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.apiUrl, {
+            this.$axios.single.post(this.$routing.generate('create_post', {
+                tokenName: this.tokenName,
+            }), {
                 content: this.content,
                 amount: this.amount,
             })

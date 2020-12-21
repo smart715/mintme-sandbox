@@ -111,7 +111,7 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
+import {addressLength, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
 import {
     CheckInputMixin,
     MoneyFilterMixin,
@@ -139,10 +139,11 @@ export default {
         currency: String,
         isToken: Boolean,
         fee: String,
-        webFee: String,
+        baseFee: String,
+        baseSymbol: String,
         withdrawUrl: String,
         maxAmount: String,
-        availableWeb: String,
+        availableBase: String,
         subunit: Number,
         twofa: String,
         noClose: Boolean,
@@ -175,10 +176,10 @@ export default {
             );
         },
         feeAmount: function() {
-            return this.isToken ? this.webFee : this.fee;
+            return this.isToken ? this.baseFee : this.fee;
         },
         feeCurrency: function() {
-            return this.isToken ? webSymbol : this.currency;
+            return this.isToken ? this.baseSymbol : this.currency;
         },
         translationsContext: function() {
             return {
@@ -202,7 +203,7 @@ export default {
                 return;
             }
 
-            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
+            if (this.isToken && new Decimal(this.availableBase).lessThan(this.baseFee)) {
                 this.notifyError(this.$t('toasted.error.do_not_have_enough', {currency: this.rebrandingFunc(this.feeCurrency)}));
                 return;
             }
