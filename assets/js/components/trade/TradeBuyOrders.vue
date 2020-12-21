@@ -143,11 +143,6 @@ export default {
         this.startScrollListeningOnce(this.ordersList);
     },
     computed: {
-        sum: function(value, rate) {
-            return this.currencyMode === this.currencyModes.usd.value ?
-                this.currencyConvert(value, rate, 2) :
-                value;
-        },
         ...mapGetters('rates', [
             'getRates',
         ]),
@@ -169,6 +164,11 @@ export default {
         },
     },
     methods: {
+        sum: function(value, rate) {
+            return this.currencyMode === this.currencyModes.usd.value ?
+                this.currencyConvert(value, rate, 2) :
+                value;
+        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },
