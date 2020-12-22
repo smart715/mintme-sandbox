@@ -154,7 +154,7 @@ class MarketHandler implements MarketHandlerInterface
             return $lDeal->getTimestamp() > $rDeal->getTimestamp();
         });
 
-        return array_merge($deals, $donations);
+        return array_slice(array_merge($deals, $donations), $offset, $limit);
     }
 
     /** {@inheritdoc} */
@@ -381,7 +381,7 @@ class MarketHandler implements MarketHandlerInterface
             (int)$donation->getDonor()->getId(),
             (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
             (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
-            $donation->getAmount(),
+            $donation->getAmount()->subtract($donation->getFeeAmount()),
             $this->moneyWrapper->parse('0', $donation->getCurrency()),
             $this->moneyWrapper->parse('0', $donation->getCurrency()),
             $donation->getFeeAmount(),

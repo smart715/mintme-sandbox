@@ -6,11 +6,14 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Deal;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcherInterface;
 use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\Order;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -44,7 +47,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $order = $mh->getExecutedOrder(
@@ -73,7 +79,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $this->expectException(Throwable::class);
@@ -101,7 +110,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $orders = $mh->getExecutedOrders(
@@ -149,7 +161,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $order = $mh->getPendingOrder(
@@ -185,7 +200,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $buyOrders = $mh->getPendingBuyOrders(
@@ -220,7 +238,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $orders = $mh->getPendingOrdersByUser(
@@ -261,7 +282,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $userManager,
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $deals = $mh->getUserExecutedHistory(
@@ -284,6 +308,7 @@ class MarketHandlerTest extends TestCase
                 'deal' => $deal->getDeal()->getAmount(),
                 'fee' => $deal->getFee()->getAmount(),
                 'deal_order_id' => $deal->getDealOrderId(),
+                'order_id' => $deal->getOrderId(),
             ];
         }, $deals));
     }
@@ -301,7 +326,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $this->mockUserManager(),
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $market = $this->mockMarket('FOO', 'BAR');
@@ -354,7 +382,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $this->mockUserManager(),
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $market = $this->mockMarket('FOO', 'BAR');
@@ -386,7 +417,10 @@ class MarketHandlerTest extends TestCase
             $fetcher,
             $this->mockMoneyWrapper(),
             $this->mockUserManager(),
-            $this->mockMarketNameConverter()
+            $this->mockMarketNameConverter(),
+            $this->mockDonationManager(),
+            $this->mockMarketFactory(),
+            $this->mockCryptoManager()
         );
 
         $market = $this->mockMarket('FOO', 'BAR');
@@ -418,7 +452,7 @@ class MarketHandlerTest extends TestCase
     private function getDeals(): array
     {
         return [
-            ['id' => 1, 'time' => 2, 'user' => 3, 'side' => 0, 'role' => 5, 'amount' => '1', 'price' => '2', 'deal' => '3', 'fee' => '4', 'deal_order_id' => 123],
+            ['id' => 1, 'time' => 2, 'user' => 3, 'side' => 0, 'role' => 5, 'amount' => '1', 'price' => '2', 'deal' => '3', 'fee' => '4', 'deal_order_id' => 123, 'order_id' => 801],
         ];
     }
 
@@ -493,5 +527,20 @@ class MarketHandlerTest extends TestCase
         $converter->method('convert')->willReturn('convertedmarket');
 
         return $converter;
+    }
+
+    private function mockDonationManager(): DonationManagerInterface
+    {
+        return $this->createMock(DonationManagerInterface::class);
+    }
+
+    private function mockMarketFactory(): MarketFactoryInterface
+    {
+        return $this->createMock(MarketFactoryInterface::class);
+    }
+
+    private function mockCryptoManager(): CryptoManagerInterface
+    {
+        return $this->createMock(CryptoManagerInterface::class);
     }
 }
