@@ -27,7 +27,8 @@
 
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
-{% set loggedIn = app.user ? 'true' : 'false' %}{% set loggedIn = app.user ? 'true' : 'false' %}
+{% set loggedIn = app.user ? 'true' : 'false' %}
+{% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
@@ -54,8 +55,9 @@
                 :is-owner="{{ isOwner }}"
                 :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                 :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                identifier="{{ market.quote.identifier }}"
-                name="{{ market.quote.name }}"
+                :is-mintme-token="{{ isMintmeToken }}"
+                :market="{{ market | json_encode }}"
+                :token-crypto="{{ tokenCrypto | json_encode }}"
                 :precision="{{ precision }}"
                 :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                 :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
@@ -73,7 +75,7 @@
                 @updated-youtube="youtubeUpdated"
                 @updated-discord="discordUpdated"
                 @updated-telegram="telegramUpdated"
-                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
+                image="{{token.image is null or token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
                 profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
                 profile-name="{{ profile.firstName }}"
                 profile-lastname="{{ profile.lastname }}"
@@ -127,7 +129,7 @@
                     <b-tab
                         title="{% trans %}page.pair.tab.introduction{% endtrans %}"
                         title-link-class="token-intro-tab-link"
-                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
+                        {% if isTokenPage and token.isMintmeToken %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">
@@ -142,7 +144,8 @@
                             {% endif %}
                         </div>
                         <div class="row token-info-container position-relative">
-                            <posts class="col-12 col-lg-7 pr-lg-1"
+                            <posts class="col-12"
+                                :class="{ 'col-lg-7 pr-lg-1': {{ isMintmeToken }} }"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
                                 :max="3"
                                 token-name="{{ token.name }}"
@@ -156,6 +159,7 @@
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
                             <token-introduction-statistics
+                                v-if="{{ isMintmeToken }}"
                                 class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
@@ -206,6 +210,7 @@
                             {% if is_granted('edit', token) %}
                                 <div class="row justify-content-center">
                                     <create-post class="col-12 col-md-10 col-lg-8"
+                                         token-name="{{ token.name }}"
                                         @update-posts="updatePosts"
                                     />
                                 </div>
@@ -231,6 +236,7 @@
                     >
                         <trade
                                 :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                                :is-mintme-token="{{ isMintmeToken }}"
                                 websocket-url="{{ global_websocket_url }}"
                                 hash="{{ hash }}"
                                 login-url="{{ path('fos_user_security_login') }}"

@@ -20,7 +20,7 @@
                 <div class="tabs-left-margin-container"></div>
                 <ul role="tablist" class="nav nav-tabs spinner-tabs">
                     <li role="presentation"
-                        class="nav-item {% if isTokenPage %} token-avatar-left {% endif %}">
+                        class="nav-item {% if isTokenPage and token.isMintmeToken %} token-avatar-left {% endif %}">
                         <a
                             role="tab"
                             aria-selected="true"
@@ -110,7 +110,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-7 pr-lg-1">
+                        <div class="col-12 {% if isTokenPage and token.isMintmeToken %} col-lg-7 pr-lg-1 {% endif %}">
                             <div class="card h-100">
                                 <div class="card-header">
                                     {% trans %}page.pair.recent_posts{% endtrans %}
@@ -122,6 +122,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% if isTokenPage and token.isMintmeToken %}
                         <div class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
@@ -141,6 +142,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                         <div class="card h-100 col-12 mt-3">
                             <div class="card-header">
                                 {% trans %}trade.top_holders.header{% endtrans %}

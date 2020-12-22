@@ -2,8 +2,8 @@
 
 namespace App\Notifications\Strategy;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserToken;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
@@ -20,70 +20,47 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
     /** @var EntityManagerInterface */
     private EntityManagerInterface $em;
 
+    private Token $token;
+
     private string $type;
 
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
         EntityManagerInterface $em,
+        Token $token,
         string $type
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
         $this->em = $em;
+        $this->token = $token;
         $this->type = $type;
     }
 
     public function sendNotification(User $user): void
     {
-        foreach ($this->getUsersHaveTokenIds($user) as $userHaveToken) {
-            $token = $user->getProfile()->getToken();
-            $userWithToken = $this->em->getRepository(User::class)->find($userHaveToken);
+        $tokenName = $this->token->getName();
+        $jsonData = (array)json_encode([
+            'tokenName' => $tokenName,
+        ], JSON_THROW_ON_ERROR);
 
-            $tokenName = $token->getName();
-            $jsonData = (array)json_encode([
-                'tokenName' => $tokenName,
-            ], JSON_THROW_ON_ERROR);
-
-            if ($this->userNotificationManager->isNotificationAvailable(
-                $userWithToken,
-                $this->type,
-                NotificationChannels::WEBSITE
-            )
-            ) {
-                $this->userNotificationManager->createNotification($userWithToken, $this->type, $jsonData);
-            }
-
-            if ($this->userNotificationManager->isNotificationAvailable(
-                $userWithToken,
-                $this->type,
-                NotificationChannels::EMAIL
-            )
-            ) {
-                    $this->mailer->sendNewPostMail($userWithToken, $tokenName);
-            }
-        }
-    }
-    private function getUsersHaveTokenIds(User $user): array
-    {
-        $result = [];
-        $usersTokens = $this->em->getRepository(UserToken::class)->findAll();
-
-        if (!$usersTokens) {
-            return $result;
+        if ($this->userNotificationManager->isNotificationAvailable(
+            $user,
+            $this->type,
+            NotificationChannels::WEBSITE
+        )
+        ) {
+            $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
-        foreach ($usersTokens as $userToken) {
-            $tokenId = $user->getProfile()->getToken()->getId();
-            $userId = $user->getId();
-            $userWithToken = $userToken->getuser()->getId();
-            $userTokenId = $userToken->getToken()->getId();
-
-            if ($userTokenId === $tokenId && $userWithToken !== $userId) {
-                $result[] = $userWithToken;
-            }
+        if ($this->userNotificationManager->isNotificationAvailable(
+            $user,
+            $this->type,
+            NotificationChannels::EMAIL
+        )
+        ) {
+            $this->mailer->sendNewPostMail($user, $tokenName);
         }
-
-        return $result;
     }
 }

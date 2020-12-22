@@ -11,9 +11,17 @@ interface TokenManagerInterface
 {
     public function findByName(string $name): ?Token;
 
+    public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token;
+
+    public function findByNameMintme(string $name): ?Token;
+
     public function findByAddress(string $address): ?Token;
 
-    public function getOwnToken(): ?Token;
+    public function getOwnMintmeToken(): ?Token;
+
+    public function getOwnTokenByName(string $name): ?Token;
+
+    public function getOwnTokens(): array;
 
     public function findByHiddenName(string $name): ?Token;
 

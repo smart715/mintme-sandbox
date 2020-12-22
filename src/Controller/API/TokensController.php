@@ -126,7 +126,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -279,7 +279,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     ): View {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -514,7 +514,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -639,7 +639,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $balances = [
                 'balance' => $balanceHandler->balance(
                     $user,
-                    Token::getFromSymbol(Token::WEB_SYMBOL)
+                    Token::getFromSymbol($token->getCryptoSymbol())
                 )->getAvailable(),
                 'webCost' => $costFetcher->getDeployWebCost(),
             ];
@@ -669,7 +669,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -701,10 +701,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $this->userNotificationManager,
             $this->mailer,
             $this->em,
+            $token,
             $notificationType
         );
         $notificationContext = new NotificationContext($strategy);
-        $notificationContext->sendNotification($user);
+
+        $tokenUsers = $token->getUsers();
+
+        foreach ($tokenUsers as $tokenUser) {
+            $notificationContext->sendNotification($tokenUser);
+        }
 
         return $this->view();
     }
@@ -729,7 +735,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     ): View {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -854,6 +860,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
                 if (count($fieldErrors) > 0) {
                     throw new ApiBadRequestException($fieldErrors[0]->getMessage());
+                }
+
+                if ('name' === $childForm->getName()) {
+                    throw new ApiBadRequestException('api.tokens.invalid_argument');
                 }
             }
 

@@ -64,11 +64,11 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/create", name="create_post", options={"expose"=true})
+     * @Rest\Post("/create/{tokenName}", name="create_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
      */
-    public function create(ParamFetcherInterface $request): View
+    public function create(string $tokenName, ParamFetcherInterface $request): View
     {
         $user = $this->getUser();
 
@@ -76,7 +76,7 @@ class PostsController extends AbstractFOSRestController
             throw new AccessDeniedHttpException();
         }
 
-        $token = $this->tokenManager->getOwnToken();
+        $token = $this->tokenManager->getOwnTokenByName($tokenName);
 
         if (!$token) {
             throw new ApiNotFoundException('Current user has not created a token');
@@ -262,17 +262,25 @@ class PostsController extends AbstractFOSRestController
         if ($newPost) {
             /** @var User $user */
             $user = $this->getUser();
+            $token = $post->getToken();
+
+            $this->mailer->sendNewPostMail($user, $token->getName());
 
             $notificationType = NotificationTypes::TOKEN_NEW_POST;
             $strategy = new TokenPostNotificationStrategy(
                 $this->userNotificationManager,
                 $this->mailer,
                 $this->entityManager,
+                $token,
                 $notificationType
             );
-
             $notificationContext = new NotificationContext($strategy);
-            $notificationContext->sendNotification($user);
+
+            $tokenUsers = $token->getUsers();
+
+            foreach ($tokenUsers as $tokenUser) {
+                $notificationContext->sendNotification($tokenUser);
+            }
         }
 
         return $this->view(["message" => $message], Response::HTTP_OK);

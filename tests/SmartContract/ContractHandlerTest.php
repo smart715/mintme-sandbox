@@ -39,6 +39,7 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             )
             ->willReturn($this->mockResponse(false, []));
@@ -85,6 +86,7 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -194,6 +196,7 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             );
 
@@ -248,6 +251,7 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             )->willReturn($this->mockResponse(true));
 
@@ -290,6 +294,7 @@ class ContractHandlerTest extends TestCase
                     'token' => 'foo',
                     'status' => 'paid',
                     'type' => 'withdraw',
+                    'crypto' => 'WEB',
                 ],
                 [
                     'hash' => 'hash',
@@ -300,11 +305,15 @@ class ContractHandlerTest extends TestCase
                     'token' => 'bar',
                     'status' => 'paid',
                     'type' => 'deposit',
+                    'crypto' => 'WEB',
                 ],
             ]));
 
         $cryptoManager = $this->createMock(CryptoManagerInterface::class);
         $cryptoManager->method('findBySymbol')->willReturn($this->mockTokenCrypto());
+        $cryptoManager->method('findAllIndexed')->willReturn([
+            'WEB' => $this->mockCrypto(),
+        ]);
 
         $handler = new ContractHandler(
             $rpc,
@@ -510,6 +519,9 @@ class ContractHandlerTest extends TestCase
     {
         $manager = $this->createMock(CryptoManagerInterface::class);
         $manager->method('findBySymbol')->willReturn($this->mockCrypto());
+        $manager->method('findAllIndexed')->willReturn([
+            'WEB' => $this->mockCrypto(),
+        ]);
 
         return $manager;
     }

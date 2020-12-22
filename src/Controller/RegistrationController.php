@@ -282,7 +282,7 @@ class RegistrationController extends FOSRegistrationController
         $refCode = $request->cookies->get('referral-code');
 
         if (!is_null($refCode)) {
-            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getToken();
+            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getMintmeToken();
         }
 
         if (isset($token)) {

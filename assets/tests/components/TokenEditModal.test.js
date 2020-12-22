@@ -12,6 +12,7 @@ let propsForTestCorrectlyRenders = {
     hasReleasePeriodProp: false,
     isOwner: true,
     isTokenExchanged: true,
+    isMintmeToken: true,
     noClose: false,
     precision: 0,
     releaseAddress: '',

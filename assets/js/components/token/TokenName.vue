@@ -7,6 +7,7 @@
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
                 :is-token-created="isTokenCreated"
+                :is-mintme-token="isMintmeToken"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -69,6 +70,7 @@ export default {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
+        isMintmeToken: Boolean,
         identifier: String,
         name: String,
         precision: Number,
