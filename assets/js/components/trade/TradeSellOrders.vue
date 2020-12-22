@@ -47,8 +47,9 @@
                             <template v-slot:cell(sum)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="sum(row.value, rate)">
                                         </span>
                                     </div>
                                 </div>
@@ -105,7 +106,7 @@
 import Guide from '../Guide';
 import {toMoney, removeSpaces, currencyConversion} from '../../utils';
 import {mapGetters} from 'vuex';
-import {USD, usdSign} from '../../utils/constants.js';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
@@ -140,10 +141,12 @@ export default {
             type: Boolean,
             default: false,
         },
+        currencyMode: String,
     },
     data() {
         return {
             tableData: this.ordersList,
+            currencyModes,
         };
     },
     components: {
@@ -177,6 +180,11 @@ export default {
         },
     },
     methods: {
+        sum: function(value, rate) {
+            return this.currencyMode === this.currencyModes.usd.value ?
+                this.currencyConvert(value, rate, 2) :
+                value;
+        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },

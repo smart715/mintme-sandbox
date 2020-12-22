@@ -94,8 +94,11 @@
                             <template v-slot:cell(baseAmount)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="currencyMode === currencyModes.usd.value ?
+                                                currencyConvert(row.value, rate, 2) :
+                                                row.value">
                                         </span>
                                     </div>
                                 </div>
@@ -129,7 +132,7 @@ import moment from 'moment';
 import Guide from '../Guide';
 import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
 import {mapGetters} from 'vuex';
-import {USD, usdSign} from '../../utils/constants.js';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
 import Decimal from 'decimal.js';
 import {GENERAL} from '../../utils/constants';
 import {
@@ -151,6 +154,7 @@ export default {
     ],
     props: {
         market: Object,
+        currencyMode: String,
     },
     components: {
         Guide,
@@ -158,6 +162,7 @@ export default {
     data() {
         return {
             maxLengthToTruncate: 4,
+            currencyModes,
             fields: [
                 {
                     key: 'type',
