@@ -224,6 +224,7 @@
             :no-close="true"
             :expiration-time="expirationTime"
             @close="closeWithdraw"
+            :currency-mode="currencyMode"
         />
         <deposit-modal
             :address="depositAddress"
@@ -333,6 +334,9 @@ export default {
         };
     },
     computed: {
+        currencyMode: function() {
+             return localStorage.getItem('_currency_mode');
+        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },

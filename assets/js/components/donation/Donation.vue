@@ -79,6 +79,7 @@
                                                     :to="USD.symbol"
                                                     :subunit="4"
                                                     symbol="$"
+                                                    :show-converter="currencyMode === currencyModes.usd.value"
                                                 />
                                                 <div v-if="loggedIn" class="input-group-append">
                                                     <button
@@ -195,6 +196,7 @@ import {
     MINTME,
     USD,
     digitsLimits,
+    currencyModes,
 } from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
@@ -229,6 +231,7 @@ export default {
                 ethSymbol,
                 usdcSymbol,
             },
+            currencyModes,
             selectedCurrency: null,
             amountToDonate: 0,
             amountToReceive: 0,
@@ -245,6 +248,9 @@ export default {
         };
     },
     computed: {
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
+        },
         translationsContext: function() {
           return {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,

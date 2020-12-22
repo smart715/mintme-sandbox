@@ -1,6 +1,7 @@
 @import "variables"
 
 .language-switcher
+  margin-left: -9px
 
   .dropdown-menu
     left: unset
@@ -37,3 +38,6 @@
       background-color: transparent
       color: $color-nav-hover
       border: none
+
+  @include media-breakpoint-down(sm)
+    margin-left: 20px !important
