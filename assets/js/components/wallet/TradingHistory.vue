@@ -153,7 +153,7 @@ export default {
         },
         history: function() {
             return this.tableData.map((history) => {
-                let isDonationOrder = 0 === history.id || 0 === history.dealOrderId;
+                let isDonationOrder = 0 === history.orderId || 0 === history.dealOrderId;
 
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),

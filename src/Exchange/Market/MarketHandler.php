@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
@@ -10,6 +11,7 @@ use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -30,17 +32,20 @@ class MarketHandler implements MarketHandlerInterface
     private MoneyWrapperInterface $moneyWrapper;
     private UserManagerInterface $userManager;
     private MarketNameConverterInterface $marketNameConverter;
+    private DonationManagerInterface $donationManager;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
         MoneyWrapperInterface $moneyWrapper,
         UserManagerInterface $userManager,
-        MarketNameConverterInterface $marketNameConverter
+        MarketNameConverterInterface $marketNameConverter,
+        DonationManagerInterface $donationManager
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
         $this->marketNameConverter = $marketNameConverter;
+        $this->donationManager = $donationManager;
     }
 
     /** {@inheritdoc} */
@@ -322,7 +327,7 @@ class MarketHandler implements MarketHandlerInterface
             $market = BaseQuote::reverseMarket($market);
         }
 
-        return array_map(function (array $dealData) use ($market) {
+        $deals = array_map(function (array $dealData) use ($market) {
             return new Deal(
                 $dealData['id'],
                 (int)$dealData['time'],
@@ -346,9 +351,13 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 $dealData['deal_order_id'],
+                $dealData['order_id'],
                 $market
             );
         }, $result);
+
+        // Filter deals and return not donation deals
+        return array_filter($deals, fn(Deal $deal) => 0 !== $deal->getOrderId() && 0 !== $deal->getDealOrderId());
     }
 
     /** {@inheritdoc} */
