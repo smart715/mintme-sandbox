@@ -62,7 +62,7 @@
                 transform="grow-1.5"
                 @click="likeComment"
             />
-            <span class="ml-1">{{ comment.likeCount }} Likes</span>
+            <span class="ml-1">{{ comment.likeCount }} {{ $t('post.likes') }}</span>
         </span>
     </div>
 </template>

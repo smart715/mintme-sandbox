@@ -22,6 +22,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/posts")
@@ -43,18 +44,22 @@ class PostsController extends AbstractFOSRestController
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
         PostManagerInterface $postManager,
         UserNotificationManagerInterface $userNotificationManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        TranslatorInterface $translator
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
+        $this->translator = $translator;
     }
 
     /**
@@ -183,7 +188,9 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->remove($comment);
         $this->entityManager->flush();
 
-        return $this->view(['message' => 'Comment deleted.'], Response::HTTP_OK);
+        $message = $this->translator->trans('post.comment.deleted');
+
+        return $this->view(['message' => $message], Response::HTTP_OK);
     }
 
     /**
