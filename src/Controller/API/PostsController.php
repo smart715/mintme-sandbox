@@ -256,23 +256,21 @@ class PostsController extends AbstractFOSRestController
             /** @var User $user */
             $user = $this->getUser();
             $token = $post->getToken();
-
-            $this->mailer->sendNewPostMail($user, $token->getName());
-
             $notificationType = NotificationTypes::TOKEN_NEW_POST;
+            $tokenUsers = $token->getUsers();
+
             $strategy = new TokenPostNotificationStrategy(
                 $this->userNotificationManager,
                 $this->mailer,
-                $this->entityManager,
                 $token,
                 $notificationType
             );
             $notificationContext = new NotificationContext($strategy);
 
-            $tokenUsers = $token->getUsers();
-
             foreach ($tokenUsers as $tokenUser) {
-                $notificationContext->sendNotification($tokenUser);
+                if ($tokenUser !== $user) {
+                    $notificationContext->sendNotification($tokenUser);
+                }
             }
         }
 
