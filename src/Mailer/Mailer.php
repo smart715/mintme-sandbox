@@ -13,6 +13,7 @@ use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore */
 class Mailer implements MailerInterface, AuthCodeMailerInterface
@@ -29,16 +30,20 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         string $mail,
         Swift_Mailer $mailer,
         EngineInterface $twigEngine,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator
     ) {
         $this->mail = $mail;
         $this->mailer = $mailer;
         $this->twigEngine = $twigEngine;
         $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
     }
 
     public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
@@ -59,7 +64,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'confirmationUrl' => $confirmLink,
         ]);
 
-        $msg = (new Swift_Message('Confirm withdraw'))
+        $subject = $this->translator->trans('email.confirm_withdraw');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -71,8 +77,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     public function sendAuthCode(TwoFactorInterface $user): void
     {
         $this->sendAuthCodeToMail(
-            'Confirm authentication',
-            'You verification code:',
+            $this->translator->trans('email.confirm_authentication'),
+            $this->translator->trans('email.verification_code'),
             $user
         );
     }
@@ -93,7 +99,6 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'email' => $user->getEmailAuthRecipient(),
             'code' => $user->getEmailAuthCode(),
         ]);
-
 
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
@@ -122,7 +127,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'urlWallet' => $confirmLink,
         ]);
 
-        $msg = (new Swift_Message(ucfirst($transactionType)." Completed"))
+        $subject = ucfirst($transactionType).' '.$this->translator->trans('email.completed');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -143,7 +149,13 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'resetting' => $resetting,
         ]);
 
-        $msg = (new Swift_Message("Your password has been ".($resetting ? "reset" : "changed")))
+        $subject = 'email.password_changed';
+
+        if ($resetting) {
+            $subject = 'email.password_rest';
+        }
+
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -176,7 +188,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $token->getName(),
         ]);
 
-        $msg = (new Swift_Message("Token Deleted"))
+        $subject = $this->translator->trans('email.token_deleted');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -187,7 +200,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userDeviceInfo): void
     {
-        $message = 'Our system has detected a new login attempt from a new IP address or device.';
+        $message = $this->translator->trans('new_device.detected.msg');
+
         $body = $this->twigEngine->render('mail/new_device_detected.html.twig', [
             'message' => $message,
             'username' => $user->getUsername(),
@@ -200,8 +214,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'user_device_info' => $userDeviceInfo,
         ]);
 
-        $subjectMsg = 'New login attempt from a new IP address or device';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.new_login_from_new_ip');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -222,8 +236,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'profile_name' => $user->getProfile()->getNickname(),
         ]);
 
-        $subjectMsg = 'Mintme Reminder';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.mintme_reminder');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -243,8 +257,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'token_name' => $token->getName(),
         ]);
 
-        $subjectMsg = 'Mintme Reminder';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.mintme_reminder');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
@@ -266,7 +280,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'userTokenName' => $token->getName(),
         ]);
 
-        $msg = (new Swift_Message('New Investor'))
+        $subject = $this->translator->trans('email.new_investor');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
@@ -287,7 +302,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $tokenName,
         ]);
 
-        $msg = (new Swift_Message('New Post'))
+        $subject = $this->translator->trans('email.new_post');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -308,7 +324,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $tokenName,
         ]);
 
-        $msg = (new Swift_Message('New Token Deployed'))
+        $subject = $this->translator->trans('email.new_token_deployed');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -329,7 +346,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $tokenName,
         ]);
 
-        $msg = (new Swift_Message('Orders'))
+        $subject = $this->translator->trans('email.orders');
+        $msg = (new Swift_Message($subject))
         ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -387,8 +405,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $token->getName(),
         ]);
 
-        $subjectMsg = 'What Now?';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.what_now');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')

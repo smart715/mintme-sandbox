@@ -210,7 +210,7 @@ export default {
                         orderTrader: order.taker.profile.nickname,
                         makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
                         takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
-                        type: this.getSideByType(order.side),
+                        type: this.getSideByType(order.side) === 'Buy' ? this.$t('buy') : this.$t('sell'),
                         pricePerQuote: toMoney(order.price, this.market.base.subunit),
                         quoteAmount: toMoney(order.amount, this.market.quote.subunit),
                         baseAmount: toMoney(
