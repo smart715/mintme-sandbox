@@ -20,7 +20,7 @@
                 />
             </template>
             <div v-else class="text-center w-100">
-                No one commented yet.
+              {{ $t('post.no_one_commented') }}
             </div>
         </div>
     </div>

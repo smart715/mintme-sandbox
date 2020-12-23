@@ -85,7 +85,7 @@
                                                         @click="all"
                                                         class="btn btn-primary all-button"
                                                         type="button"
-                                                    >All</button>
+                                                    >{{ $t('donation.button_all') }}</button>
                                                 </div>
                                             </div>
                                             <div
