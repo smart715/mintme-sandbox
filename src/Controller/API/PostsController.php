@@ -268,7 +268,7 @@ class PostsController extends AbstractFOSRestController
             $notificationContext = new NotificationContext($strategy);
 
             foreach ($tokenUsers as $tokenUser) {
-                if ($tokenUser !== $user) {
+                if ($tokenUser->getId() !== $user->getId()) {
                     $notificationContext->sendNotification($tokenUser);
                 }
             }

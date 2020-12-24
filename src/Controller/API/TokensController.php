@@ -709,7 +709,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $tokenUsers = $token->getUsers();
 
         foreach ($tokenUsers as $tokenUser) {
-            if ($tokenUser !== $user) {
+            if ($tokenUser->getId() !== $user->getId()) {
                 $notificationContext->sendNotification($tokenUser);
             }
         }
