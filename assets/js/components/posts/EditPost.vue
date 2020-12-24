@@ -1,6 +1,5 @@
 <template>
     <post-form
-        :api-url="$routing.generate('edit_post', {id: post.id})"
         :post="post"
         @save-success="redirect"
         @cancel="redirect"
