@@ -25,14 +25,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 0,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 0},
                     },
                 },
             }),
@@ -53,14 +46,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 0,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 0},
                     },
                 },
             }),
@@ -81,14 +67,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 0,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 0},
                     },
                 },
             }),
@@ -109,14 +88,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 0,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 0},
                     },
                 },
             }),
@@ -137,14 +109,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 101,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 101},
                     },
                 },
             }),
@@ -156,7 +121,7 @@ describe('Envelope', () => {
             },
         });
 
-        expect(wrapper.vm.getDirectMessageLink).toBe(null);
+        expect(wrapper.vm.getDirectMessageLink).toBe('chatFoo');
     });
 
     it('should compute getDirectMessageLink correctly for non-owner if there are not enough tokens', () => {
@@ -165,14 +130,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        state: {
-                            quoteBalance: 99,
-                        },
-                        getters: {
-                            getQuoteBalance: function(state) {
-                                return state.quoteBalance;
-                            },
-                        },
+                        getters: {getQuoteBalance: () => 99},
                     },
                 },
             }),
