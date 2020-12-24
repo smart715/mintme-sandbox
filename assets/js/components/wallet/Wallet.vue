@@ -348,7 +348,7 @@ export default {
             return this.tokensToArray(this.predefinedTokens || {});
         },
         items: function() {
-            return this.tokensToArray(this.tokens || {});
+            return this.tokensToArray(this.tokens || {}).filter((token) => token.available >0);
         },
         showLoadingIconP: function() {
             return (this.predefinedTokens === null);
