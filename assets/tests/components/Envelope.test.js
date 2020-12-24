@@ -109,7 +109,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 101},
+                        getters: {getQuoteBalance: jest.fn(101)},
                     },
                 },
             }),
