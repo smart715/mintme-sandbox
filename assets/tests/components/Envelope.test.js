@@ -25,7 +25,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 0},
+                        getters: {getQuoteBalance: () => {}},
                     },
                 },
             }),
@@ -46,7 +46,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 0},
+                        getters: {getQuoteBalance: () => {}},
                     },
                 },
             }),
@@ -67,7 +67,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 0},
+                        getters: {getQuoteBalance: () => {}},
                     },
                 },
             }),
@@ -88,7 +88,7 @@ describe('Envelope', () => {
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 0},
+                        getters: {getQuoteBalance: () => {}},
                     },
                 },
             }),
@@ -103,34 +103,13 @@ describe('Envelope', () => {
         expect(wrapper.vm.getDirectMessageLink).toBe('chat');
     });
 
-    it('should compute getDirectMessageLink correctly for non-owner with enough tokens', () => {
-        const wrapper = shallowMount(Envelope, {
-            localVue: mockVue(),
-            store: new Vuex.Store({
-                modules: {
-                    tradeBalance: {
-                        getters: {getQuoteBalance: jest.fn(() => 101)},
-                    },
-                },
-            }),
-            propsData: {
-                loggedIn: true,
-                isOwner: false,
-                dmMinAmount: 100,
-                tokenName: 'Foo',
-            },
-        });
-
-        expect(wrapper.vm.getDirectMessageLink).toBe('chatFoo');
-    });
-
     it('should compute getDirectMessageLink correctly for non-owner if there are not enough tokens', () => {
         const wrapper = shallowMount(Envelope, {
             localVue: mockVue(),
             store: new Vuex.Store({
                 modules: {
                     tradeBalance: {
-                        getters: {getQuoteBalance: () => 99},
+                        getters: {getQuoteBalance: () => {}},
                     },
                 },
             }),
