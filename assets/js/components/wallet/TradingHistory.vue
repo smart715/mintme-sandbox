@@ -67,7 +67,6 @@ import {
     FiltersMixin,
     LazyScrollTableMixin,
     RebrandingFilterMixin,
-    NotificationMixin,
     LoggerMixin,
     PairNameMixin,
     OrderMixin,
@@ -79,7 +78,6 @@ export default {
         FiltersMixin,
         LazyScrollTableMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
         PairNameMixin,
         OrderMixin,
@@ -196,7 +194,6 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_trading_history'));
                         this.sendLogs('error', 'Service unavailable. Can not update trading history', err);
                         reject([]);
                     });

@@ -402,7 +402,6 @@ export default {
                         });
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_tokens'));
                     this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
@@ -412,7 +411,6 @@ export default {
                     this.addressesSignature = res.data.signatures;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_data'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
                 }),
         ])
@@ -423,7 +421,6 @@ export default {
             this.openDepositMore();
         })
         .catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_wallet_data'));
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
         });
     },
@@ -508,7 +505,6 @@ export default {
                     this.deposit.min = res.data.minDeposit ? toMoney(res.data.minDeposit, subunit) : undefined;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_fee_status'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
