@@ -269,7 +269,6 @@ import {
   WebSocketMixin,
   MoneyFilterMixin,
   RebrandingFilterMixin,
-  NotificationMixin,
   LoggerMixin,
 } from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
@@ -288,7 +287,6 @@ export default {
         FiltersMixin,
         MoneyFilterMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
     ],
     props: {
@@ -604,7 +602,6 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_markets_data'));
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
@@ -872,7 +869,6 @@ export default {
                     })
                     .catch((err) => {
                         this.$emit('disable-usd');
-                        this.notifyError(this.$t('toasted.error.fetching_exchange_rates'));
                         this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                         reject();
                     });
@@ -900,7 +896,6 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });

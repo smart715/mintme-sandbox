@@ -372,7 +372,6 @@ export default {
                     this.balanceLoaded = true;
                 })
                 .catch((error) => {
-                    this.notifyError('Can not load balance. Try again later.');
                     this.sendLogs('error', 'Can not load crypto balance.', error);
                 });
         },
@@ -401,12 +400,6 @@ export default {
                     this.sellOrdersSummary = res.data.sellOrdersSummary;
                 })
                 .catch((error) => {
-                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
-                        this.notifyError(error.response.data.message);
-                    } else {
-                        this.notifyError('Can not to calculate amount of tokens. Try again later.');
-                    }
-
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 })
                 .then(() => this.donationChecking = false);
