@@ -24,20 +24,22 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <span v-if="alreadyClaimed">
-                        <button
+                    <template v-if="!timeElapsed">
+                        <span v-if="alreadyClaimed">
+                            <button
                                 :disabled="true"
                                 class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.claimed') }}
-                        </button>
-                    </span>
-                    <span v-else>
-                        <button
+                                {{ $t('ongoing_airdrop.claimed') }}
+                            </button>
+                        </span>
+                        <span v-else>
+                            <button
                                 @click="showModal = true"
                                 class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.participate') }}
-                        </button>
-                    </span>
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </button>
+                        </span>
+                    </template>
                     <confirm-modal
                         :visible="showModal"
                         :button-disabled="loggedIn && !isOwner && !userAlreadyClaimed && !actionsCompleted"
