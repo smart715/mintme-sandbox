@@ -74,8 +74,6 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
             $tokenName = $quote->getName();
 
             if (Order::BUY_SIDE === $orderType && !in_array($quote, $makerTokens, true)) {
-                $this->mailer->sendNewInvestorMail($quote, $userProfile);
-
                 $extraData = [
                     'profile' => $userProfile,
                     'tokenName' => $tokenName,

@@ -195,7 +195,6 @@ import {mapGetters, mapMutations} from 'vuex';
 import {
   LoggerMixin,
   MoneyFilterMixin,
-  NotificationMixin,
   WebSocketMixin,
 } from '../../../mixins';
 
@@ -205,7 +204,6 @@ export default {
     name: 'TokenIntroductionStatistics',
     mixins: [
         MoneyFilterMixin,
-        NotificationMixin,
         LoggerMixin,
         WebSocketMixin,
     ],
@@ -236,21 +234,18 @@ export default {
         this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_token_data'));
                 this.sendLogs('error', 'Can not load token data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
             .then((res) => this.stats = res.data || this.stats)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
             .then((res) => this.tokenExchangeAmount = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
@@ -259,14 +254,12 @@ export default {
         }))
             .then((res) => this.soldOnMarket = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_sold_on_market'));
                 this.sendLogs('error', 'Can not load soldOnMarket value', err);
             });
 
         this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
             .then((res) => this.tokenWithdrawn = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_withdrawn_data'));
                 this.sendLogs('error', 'Can not load token withdrawn value', err);
             });
 
@@ -276,7 +269,6 @@ export default {
         }))
             .then((res) => this.pendingSellOrders = res.data.sell)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
 
@@ -286,7 +278,6 @@ export default {
         })).then((res) => {
             this.donationVolume = res.data.volumeDonation || 0;
         }).catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_donation_volume'));
             this.sendLogs('error', 'Can not load market status', err);
         });
 
