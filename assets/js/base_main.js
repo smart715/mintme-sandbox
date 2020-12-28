@@ -17,7 +17,6 @@ import InfoBar from './components/InfoBar';
 import Routing from './routing';
 import Axios from './axios';
 import Avatar from './components/Avatar';
-import LocaleSwitcher from './components/LocaleSwitcher';
 import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
@@ -112,13 +111,3 @@ if (document.getElementById('description')) {
         },
     });
 }
-
-new Vue({
-    el: '#footer',
-    i18n,
-    components: {
-        FontAwesomeIcon,
-        FontAwesomeLayers,
-        LocaleSwitcher,
-    },
-});

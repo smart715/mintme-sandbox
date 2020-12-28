@@ -16,11 +16,11 @@
 
 <script>
 import Register from './Register';
-import {NotificationMixin, LoggerMixin} from '../mixins';
+import {LoggerMixin} from '../mixins';
 
 export default {
     name: 'LoginSignupSwitcher',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [LoggerMixin],
     props: {
         googleRecaptchaSiteKey: String,
     },
@@ -73,7 +73,6 @@ export default {
                     });
                 })
                 .catch((error) => {
-                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Donation - can not load register form.', error);
                 });
         },
@@ -106,7 +105,6 @@ export default {
                     });
                 })
                 .catch((error) => {
-                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Donation - can not load login form.', error);
                 });
         },
