@@ -101,6 +101,7 @@
                                         id="volume"
                                         variant="primary"
                                         :lazy="true"
+                                        boundary="window"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
@@ -129,6 +130,7 @@
                                         id="marketCap"
                                         variant="primary"
                                         :lazy="true"
+                                        boundary="window"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
