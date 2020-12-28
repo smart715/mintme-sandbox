@@ -62,14 +62,16 @@ export default {
     methods: {
         buyCrypto: function() {
             this.modalVisible = true;
+            this.getRefreshToken();
         },
         getRefreshToken: function() {
+            if (this.refreshToken) {
+                return;
+            }
+
             this.$axios.retry.get(this.$routing.generate('refresh_token'))
                 .then((res) => this.refreshToken = res.data);
         },
-    },
-    mounted() {
-        this.getRefreshToken();
     },
 };
 </script>
