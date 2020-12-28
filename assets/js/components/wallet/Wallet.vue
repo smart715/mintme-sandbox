@@ -334,7 +334,9 @@ export default {
     },
     computed: {
         hasTokens: function() {
-            return Object.values(this.tokens || {}).length > 0;
+            return Object.values(this.tokens || {}).length > 0 && Object.values(this.tokens).map((token) => {
+              return token.available > 0;
+            });
         },
         allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
