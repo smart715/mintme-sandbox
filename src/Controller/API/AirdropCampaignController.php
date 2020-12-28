@@ -292,11 +292,9 @@ class AirdropCampaignController extends AbstractFOSRestController
     {
         $timeAfterOneHour = time() + 60 * 60;
 
-        if ($endDateTimestamp && $endDateTimestamp < $timeAfterOneHour) {
-            $endDateTimestamp = $timeAfterOneHour;
-        }
-
-        return $endDateTimestamp;
+        return $endDateTimestamp && $endDateTimestamp < $timeAfterOneHour
+            ? $timeAfterOneHour
+            : $endDateTimestamp;
     }
 
     private function fetchToken(
