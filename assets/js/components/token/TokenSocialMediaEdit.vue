@@ -1,5 +1,5 @@
 <template>
-    <div class="pb-1 pt-4 flex-grow-1 mb-2 token-social-media-edit">
+    <div class="pb-1 pt-1 flex-grow-1 mb-2 token-social-media-edit">
         <token-website-address
             :currentWebsite="currentWebsite"
             :editingWebsite="editingWebsite"
