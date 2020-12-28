@@ -16,16 +16,16 @@ class DonationRepository extends ServiceEntityRepository
 
     public function findAllUserRelated(User $user): array
     {
-        $tokenOwner = $user->getProfile()->getMintmeToken()->getOwner();
+        $userOwnToken = $user->getProfile()->getMintmeToken();
 
         $result = $this->createQueryBuilder('donation')
             ->where('donation.donor = :donor')
             ->setParameter('donor', $user);
 
-        if ($tokenOwner) {
+        if ($userOwnToken) {
             $result
                 ->orWhere('donation.tokenCreator = :tokenCreator')
-                ->setParameter('tokenCreator', $tokenOwner);
+                ->setParameter('tokenCreator', $userOwnToken->getOwner());
         }
 
         return $result->getQuery()->getResult();
