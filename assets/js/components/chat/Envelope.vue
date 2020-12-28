@@ -33,7 +33,7 @@ export default {
             if (this.isOwner) {
                 return this.$routing.generate('chat');
             } else if (this.getQuoteBalance >= this.dmMinAmount) {
-                return this.$routing.generate('chat', {tokenName: this.tokenName});
+                return this.$routing.generate('new_dm_message', {tokenName: this.tokenName});
             } else {
                 return null;
             }
