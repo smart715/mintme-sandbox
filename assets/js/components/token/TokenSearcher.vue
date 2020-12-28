@@ -29,13 +29,13 @@
 
 <script>
 import Autocomplete from 'v-autocomplete';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
+import {LoggerMixin} from '../../mixins';
 
 const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
 export default {
     name: 'TokenSearcher',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [LoggerMixin],
     components: {
         Autocomplete,
     },
@@ -63,7 +63,6 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                this.notifyError(this.$t('toasted.error.service_timeout'));
                 this.sendLogs('error', 'Service timeout error', error);
             });
         },
