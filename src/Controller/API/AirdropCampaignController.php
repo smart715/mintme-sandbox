@@ -6,12 +6,13 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Enum\AirdropCampaignActions;
+use App\Exception\ApiBadForbiddenException;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
@@ -248,6 +249,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     public function verifyPostLinkAction(
         string $tokenName,
         ParamFetcherInterface $request,
+        BlacklistManagerInterface $blacklistManager,
         WebsiteVerifierInterface $websiteVerifier
     ): View {
         $this->fetchToken($tokenName, false, true);
@@ -260,6 +262,10 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         if (count($errors) > 0) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_url'));
+        }
+
+        if ($blacklistManager->isBlacklistedAirdropDomain($url)) {
+            throw new ApiBadForbiddenException($this->translator->trans('api.airdrop.forbidden_domain'));
         }
 
         $verified = $websiteVerifier->verifyAirdropPostLinkAction($url, $message);
