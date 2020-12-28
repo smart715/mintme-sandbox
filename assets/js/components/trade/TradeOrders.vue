@@ -13,7 +13,8 @@
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
-                    @modal="removeOrderModal"/>
+                    @modal="removeOrderModal"
+                    :currency-mode="currencyMode"/>
             </div>
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
@@ -27,7 +28,8 @@
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
-                    @modal="removeOrderModal"/>
+                    @modal="removeOrderModal"
+                    :currency-mode="currencyMode"/>
             </div>
         </div>
         <confirm-modal
@@ -80,6 +82,7 @@ export default {
         market: Object,
         userId: Number,
         loggedIn: Boolean,
+        currencyMode: String,
     },
     data() {
         return {

@@ -30,7 +30,7 @@
                             input-id="wamount"
                             v-model="$v.amount.$model"
                             :input-class="{ 'is-invalid': $v.amount.$error }"
-                            :show-converter="!isToken"
+                            :show-converter="!isToken && currencyMode === currencyModes.usd.value"
                             :from="currency"
                             :to="USD.symbol"
                             :subunit="4"
@@ -111,7 +111,14 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {addressLength, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
+import {
+    addressLength,
+    addressContain,
+    addressFirstSymbol,
+    twoFACode,
+    USD,
+    currencyModes,
+} from '../../utils/constants';
 import {
     CheckInputMixin,
     MoneyFilterMixin,
@@ -148,6 +155,7 @@ export default {
         twofa: String,
         noClose: Boolean,
         expirationTime: Number,
+        currencyMode: String,
     },
     data() {
         return {
@@ -157,6 +165,7 @@ export default {
             withdrawing: true,
             flag: true,
             USD,
+            currencyModes,
         };
     },
     computed: {

@@ -280,7 +280,6 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_chart_data'));
             this.sendLogs('error', 'Can not load the chart data', err);
         });
     },
@@ -347,7 +346,6 @@ export default {
                       })
                       .catch((err) => {
                           monthInfo.marketCap = '-';
-                          this.notifyError(this.$t('toasted.error.can_not_load_sold_on_market'));
                           this.sendLogs('error', 'Can not load soldOnMarket value', err);
                       })
                       .finally(() => {
@@ -386,7 +384,6 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });
