@@ -110,7 +110,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         );
 
-        $this->checkAirdropParams($amount, $participants, $endDateTimestamp, $balance);
+        $this->checkAirdropParams($amount, $participants, $balance);
+        $endDateTimestamp = $this->checkAirdropEndDate($endDateTimestamp);
 
         $actions = $request->get('actions');
         $actionsData = $request->get('actionsData');
@@ -148,7 +149,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         return $this->view([
             'id' => $airdrop->getId(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -213,7 +214,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         );
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
@@ -232,7 +233,7 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         $this->airdropCampaignManager->claimAirdropAction($action, $user);
 
-        return $this->view(null, Response::HTTP_ACCEPTED);
+        return $this->view(null, Response::HTTP_OK);
     }
 
     /**
@@ -266,7 +267,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(['verified' => $verified], Response::HTTP_OK);
     }
 
-    private function checkAirdropParams(Money $amount, int $participants, ?int $endDateTimestamp, Money $balance): void
+    private function checkAirdropParams(Money $amount, int $participants, Money $balance): void
     {
         if ($amount->lessThan($this->airdropConfig->getMinTokensAmount()) || $amount->greaterThan($balance)) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_amount'));
@@ -285,12 +286,17 @@ class AirdropCampaignController extends AbstractFOSRestController
         ) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_participants_amount'));
         }
+    }
 
+    private function checkAirdropEndDate(?int $endDateTimestamp): ?int
+    {
         $timeAfterOneHour = time() + 60 * 60;
 
         if ($endDateTimestamp && $endDateTimestamp < $timeAfterOneHour) {
-            throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_end_date'));
+            $endDateTimestamp = $timeAfterOneHour;
         }
+
+        return $endDateTimestamp;
     }
 
     private function fetchToken(
