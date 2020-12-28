@@ -130,7 +130,6 @@ export default {
                 this.loading = false;
             })
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
@@ -145,7 +144,6 @@ export default {
             this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
             .then((res) => this.setTokenExchangeAmount(res.data))
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
         },
