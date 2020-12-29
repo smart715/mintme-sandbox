@@ -179,15 +179,8 @@
             </b-table>
         </div>
         <div class="table-responsive">
-            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
-                <thead>
-                    <tr>
-                        <th class="first-field">{{ $t('wallet.name') }}</th>
-                        <th class="field-table">{{ $t('wallet.amount') }}</th>
-                        <th >&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <table v-if="!showLoadingIcon && items.length <= 0" class="table table-hover no-owned-token">
+              <tbody>
                     <tr>
                         <td class="first-field">
                             <div class="truncate-name">
@@ -338,8 +331,11 @@ export default {
              return localStorage.getItem('_currency_mode');
         },
         hasTokens: function() {
-            return Object.values(this.tokens || {}).length > 0 && Object.values(this.tokens).map((token) => {
-              return token.available > 0;
+            return Object.values(this.tokens || {}).length > 0;
+        },
+        tokenAmountNotZero: function() {
+            return Object.values(this.tokens || {}).forEach((x) => {
+              return x.amount > 0;
             });
         },
         allTokens: function() {
