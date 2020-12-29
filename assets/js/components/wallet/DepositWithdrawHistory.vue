@@ -63,7 +63,6 @@ import {
     LazyScrollTableMixin,
     FiltersMixin,
     RebrandingFilterMixin,
-    NotificationMixin,
     LoggerMixin,
 } from '../../mixins/';
 import CopyLink from '../CopyLink';
@@ -75,7 +74,6 @@ export default {
         LazyScrollTableMixin,
         FiltersMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
     ],
     components: {CopyLink},
@@ -170,7 +168,6 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_payment_history'));
                         this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });

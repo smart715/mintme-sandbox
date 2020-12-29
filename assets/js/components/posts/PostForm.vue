@@ -163,9 +163,11 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.$routing.generate('create_post', {
-                tokenName: this.tokenName,
-            }), {
+            const url = this.post.id
+                ? this.$routing.generate('edit_post', {tokenName: this.tokenName, id: this.post.id})
+                : this.$routing.generate('create_post', {tokenName: this.tokenName});
+
+            this.$axios.single.post(url, {
                 content: this.content,
                 amount: this.amount,
             })

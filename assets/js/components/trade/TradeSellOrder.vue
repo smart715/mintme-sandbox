@@ -46,6 +46,7 @@
                                 :to="USD.symbol"
                                 :subunit="4"
                                 symbol="$"
+                                :show-converter="currencyMode === currencyModes.usd.value"
                             />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.sell_order.your.header') }}
@@ -195,7 +196,7 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {MINTME, USD} from '../../utils/constants';
+import {MINTME, USD, currencyModes} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -224,6 +225,7 @@ export default {
         isOwner: Boolean,
         balanceLoaded: Boolean,
         tradeDisabled: Boolean,
+        currencyMode: String,
     },
     data() {
         return {
@@ -231,6 +233,7 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
+            currencyModes,
         };
     },
     methods: {

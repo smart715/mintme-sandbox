@@ -250,7 +250,6 @@ export default {
                 }, 'active-tableData-update', 'ActiveOrders');
             })
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_update_order_list'));
                 this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
             });
     },
@@ -276,7 +275,6 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_orders_history'));
                         this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });
