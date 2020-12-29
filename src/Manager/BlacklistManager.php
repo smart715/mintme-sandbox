@@ -24,6 +24,15 @@ class BlacklistManager implements BlacklistManagerInterface
         $this->repository = $repository;
     }
 
+    public function isBlacklistedAirdropDomain(string $url, bool $sensitive = false): bool
+    {
+        $domain = parse_url($url, PHP_URL_HOST);
+
+        return $domain
+            ? $this->repository->matchValue($domain, Blacklist::AIRDROP_DOMAIN, $sensitive)
+            : true;
+    }
+
     public function isBlackListedEmail(string $email, bool $sensitive = false): bool
     {
         $domain = substr($email, strrpos($email, '@') + 1);
