@@ -33,7 +33,7 @@
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
 <div id="token" class="container">
-  
+    {{ include('spinners/pair.html.twig') }}
 
     <balance-init
             :is-token="{{ isTokenPage ? 'true' : 'false' }}"
