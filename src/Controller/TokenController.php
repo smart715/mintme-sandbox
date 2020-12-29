@@ -9,6 +9,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Factory\OrdersFactoryInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
@@ -209,7 +210,8 @@ class TokenController extends Controller
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         MarketStatusManagerInterface $marketStatusManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        OrdersFactoryInterface $ordersFactory
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
@@ -243,6 +245,9 @@ class TokenController extends Controller
                 );
             }
 
+            /** @var bool $initOrders */
+            $initOrders = $form->get('initial_orders')->getData();
+
             $this->em->beginTransaction();
 
             /** @var User $user */
@@ -270,12 +275,16 @@ class TokenController extends Controller
                 );
                 $market = $this->marketManager->createUserRelated($user);
 
+                if ($initOrders) {
+                    $ordersFactory->createInitOrders($token);
+                }
+
                 $marketStatusManager->createMarketStatus($market);
 
                 $this->em->commit();
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->json("success", Response::HTTP_ACCEPTED);
+                return $this->json("success", Response::HTTP_OK);
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');

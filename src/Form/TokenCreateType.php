@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Token\Token;
 use App\Form\DataTransformer\NameTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -45,6 +46,11 @@ class TokenCreateType extends AbstractType
                     'max' => Token::DESC_MAX_LENGTH,
                 ],
                 'required' => true,
+            ])
+            ->add('initial_orders', CheckboxType::class, [
+                'label' => $this->translator->trans('form.token.initial_order'),
+                'attr' => ['checked' => true],
+                'mapped' => false,
             ]);
 
         $builder->get('name')

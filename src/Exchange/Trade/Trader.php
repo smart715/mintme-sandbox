@@ -74,7 +74,7 @@ class Trader implements TraderInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function placeOrder(Order $order): TradeResult
+    public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
     {
         $result = $this->fetcher->placeOrder(
             $order->getMaker()->getId(),
@@ -100,10 +100,12 @@ class Trader implements TraderInterface
                 OrderCompletedEvent::CREATED
             );
 
-            if ($quote instanceof Token) {
-                $this->updateUserTokenReferencer($order->getMaker(), $quote);
-            } elseif ($quote instanceof Crypto) {
-                $this->updateUserCrypto($order->getMaker(), $quote);
+            if ($updateTokenOrCrypto) {
+                if ($quote instanceof Token) {
+                    $this->updateUserTokenReferencer($order->getMaker(), $quote);
+                } elseif ($quote instanceof Crypto) {
+                    $this->updateUserCrypto($order->getMaker(), $quote);
+                }
             }
         }
 

@@ -31,6 +31,7 @@
 {% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
+{% set currentLocale = app.session.get('_locale') %}
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -122,6 +123,7 @@
                     login-url="{{ absolute_url(path('fos_user_security_login')) }}"
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
                     youtube-client-id="{{ global_youtube_client_id }}"
+                    current-locale="{{ currentLocale }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab

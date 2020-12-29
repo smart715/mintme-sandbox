@@ -321,7 +321,7 @@ describe('WithdrawModal', () => {
         expect(wrapper.emitted('withdraw').length).toBe(1);
 
         moxios.stubRequest('withdraw_url', {
-            status: 202,
+            status: 200,
         });
 
         moxios.wait(() => {

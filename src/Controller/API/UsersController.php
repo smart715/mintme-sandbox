@@ -206,7 +206,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
 
         $this->userManager->updatePassword($user);
         $this->userManager->updateUser($user);
-        $response = new Response(Response::HTTP_ACCEPTED);
+        $response = new Response(Response::HTTP_OK);
 
         $event = new FilterUserResponseEvent($user, $request, $response);
 
@@ -245,7 +245,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
             throw new ApiBadRequestException($errorOnPasswordForm);
         }
 
-        return new Response(Response::HTTP_ACCEPTED);
+        return new Response(Response::HTTP_OK);
     }
 
     private function checkStoredUserPassword(Request $request, User $user): ?string

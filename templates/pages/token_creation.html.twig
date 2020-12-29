@@ -99,6 +99,19 @@
                                         ${ $t('token.intro.description.max_length', translationsContext) }
                                     </div>
                                 </div>
+                                <div class="col-12">
+                                    {{ form_widget(form.initial_orders, {
+                                        'attr': {
+                                            'class': 'align-middle'
+                                        }
+                                    })}}
+                                    {{ form_label(form.initial_orders, null, {'label_attr': {'class': 'pl-1 pb-0'}}) }}
+                                    <guide>
+                                        <template slot="body">
+                                            {% trans %}form.token.initial_order.guide{% endtrans %}
+                                        </template>
+                                    </guide>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group row mt-3">
