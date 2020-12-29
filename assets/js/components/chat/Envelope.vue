@@ -47,7 +47,7 @@ export default {
     },
     methods: {
         checkDirectMessage: function(e) {
-            if (null === this.getDirectMessageLink) {
+            if (!this.getDirectMessageLink) {
                 e.preventDefault();
                 this.notifyError(this.$t('chat.chat_box.min_amount_required_info', this.translationsContext));
             }
