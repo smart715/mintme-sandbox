@@ -68,9 +68,7 @@ class AssetsController extends AbstractFOSRestController
         }
 
         foreach ($tokens as $token) {
-            $deployed = $token->isDeployed();
-
-            if ($token->isBlocked() || !$deployed) {
+            if ($token->isBlocked() || !$token->isDeployed()) {
                 continue;
             }
 
