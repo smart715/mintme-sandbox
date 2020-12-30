@@ -140,3 +140,4 @@ parameters:
         - 1440
         - 43200
     dm_min_amount: 1
+    token_withdraw_fee: 0.01

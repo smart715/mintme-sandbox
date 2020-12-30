@@ -10,6 +10,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
@@ -20,6 +21,7 @@ use Exception;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ContractHandler implements ContractHandlerInterface
 {
@@ -29,11 +31,9 @@ class ContractHandler implements ContractHandlerInterface
     private const DEPOSIT_CREDENTIAL = 'get_deposit_credential';
     private const TRANSFER = 'transfer';
     private const TRANSACTIONS = 'get_transactions';
+    private const GET_DEPOSIT_INFO = "get_deposit_info";
     private const PING = 'ping';
     private const WITHDRAW_TYPE = 'withdraw';
-    private const CRYPTO_TOKENS = [
-        'USDC' => 'USDC',
-    ];
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -50,21 +50,22 @@ class ContractHandler implements ContractHandlerInterface
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    /** @var array|Money[] $cryptoFees */
-    private $cryptoFees = [];
+    private ParameterBagInterface $parameterBag;
 
     public function __construct(
         JsonRpcInterface $rpc,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        ParameterBagInterface $parameterBag
     ) {
         $this->rpc = $rpc;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->parameterBag = $parameterBag;
     }
 
     public function deploy(Token $token): void
@@ -95,7 +96,7 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function addToken(Token $token): void
+    public function addToken(Token $token, ?string $minDeposit): void
     {
         $response = $this->rpc->send(
             self::ADD_TOKEN,
@@ -103,6 +104,7 @@ class ContractHandler implements ContractHandlerInterface
                 'name' => $token->getName(),
                 'address' => $token->getAddress(),
                 'crypto' => $token->getCryptoSymbol(),
+                'minDeposit' => $minDeposit,
             ]
         );
 
@@ -202,30 +204,22 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(
-        string $cryptoSymbol,
-        string $type,
-        array $indexedCryptos,
-        WalletInterface $wallet
-    ): Money {
-        /** @var Crypto|null $crypto */
-        $crypto = $indexedCryptos[$cryptoSymbol];
-        $key = "{$type}_{$cryptoSymbol}";
-        $isCrypto = $crypto && isset(self::CRYPTO_TOKENS[$crypto->getSymbol()]);
-        $zeroAmount = $this->moneyWrapper->parse('0', MoneyWrapper::TOK_SYMBOL);
-
-        if (!$crypto) {
-            return $zeroAmount;
+    private function getFee(TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
+    {
+        if (self::WITHDRAW_TYPE === $type) {
+            if ($tradeble instanceof Crypto) {
+                return $tradeble->getFee();
+            } else {
+                /** @var Token $tradeble */
+                return Token::ETH_SYMBOL === $tradeble->getCryptoSymbol()
+                    ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
+                        (string)$this->parameterBag->get('token_withdraw_fee'),
+                        Token::ETH_SYMBOL
+                    ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
+            }
+        } else {
+            return $wallet->getDepositInfo($tradeble)->getFee();
         }
-
-        if (!isset($this->cryptoFees[$key])) {
-            $this->cryptoFees[$key] = self::WITHDRAW_TYPE === $type
-                ? $crypto->getFee()
-                : ($isCrypto ? $zeroAmount : $wallet->getDepositInfo($crypto)->getFee())
-            ;
-        }
-
-        return $this->cryptoFees[$key];
     }
 
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
@@ -248,11 +242,8 @@ class ContractHandler implements ContractHandlerInterface
                     new Currency($cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL)
                 ),
                 $this->getFee(
-                    isset(self::CRYPTO_TOKENS[$tokenName])
-                        ? $tokenName
-                        : $transaction['crypto'],
+                    $cryptoToken ?? $this->tokenManager->findByName($tokenName),
                     $transaction['type'],
-                    $indexedCryptos,
                     $wallet
                 ),
                 $cryptoToken ?? $this->tokenManager->findByName($tokenName),
@@ -267,5 +258,26 @@ class ContractHandler implements ContractHandlerInterface
         $response = $this->rpc->send(self::PING, []);
 
         return 'pong' === $response->getResult();
+    }
+
+    public function getDepositInfo(string $symbol): DepositInfo
+    {
+        $response = $this->rpc->send(
+            self::GET_DEPOSIT_INFO,
+            [
+                'tokenName' => $symbol,
+            ]
+        );
+
+        if ($response->hasError()) {
+            throw new FetchException((string)json_encode($response->getError()));
+        }
+
+        $result = $response->getResult();
+
+        return new DepositInfo(
+            new Money($result['fee'], new Currency(MoneyWrapper::TOK_SYMBOL)),
+            new Money($result['minDeposit'], new Currency(MoneyWrapper::TOK_SYMBOL))
+        );
     }
 }

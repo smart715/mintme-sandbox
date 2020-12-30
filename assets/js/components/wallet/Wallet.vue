@@ -285,6 +285,7 @@ export default {
         expirationTime: Number,
         disabledCrypto: String,
         disabledServicesConfig: String,
+        tokenWithdrawFee: Number,
         isUserBlocked: Boolean,
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
@@ -459,10 +460,12 @@ export default {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
-            this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
+            this.withdraw.fee = fee ? toMoney(fee, subunit) : null;
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
-                isToken ? this.predefinedTokens[crypto || webSymbol].fee : 0,
+                isToken
+                    ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
+                    : 0,
                 subunit
             );
             this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
@@ -496,7 +499,7 @@ export default {
             this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_info', {
-                    crypto: isToken ? webSymbol : currency,
+                    crypto: currency,
                 }))
                 .then((res) => {
                     this.deposit.fee = res.data.fee && 0.0 !== parseFloat(res.data.fee)
