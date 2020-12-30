@@ -13,6 +13,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -74,6 +75,11 @@ class Token implements TradebleInterface, ImagineInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="bigint",nullable=true)
+     */
+    protected ?string $fee = null; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -357,6 +363,22 @@ class Token implements TradebleInterface, ImagineInterface
     public function getAddress(): ?string
     {
         return $this->address;
+    }
+
+    public function getFee(): ?Money
+    {
+        return $this->fee ?
+            new Money($this->fee, new Currency(MoneyWrapper::TOK_SYMBOL))
+            : null;
+    }
+
+    public function setFee(?Money $fee): self
+    {
+        $this->fee = $fee
+            ? $fee->getAmount()
+            : null;
+
+        return $this;
     }
 
     public function setPendingDeployment(): self
