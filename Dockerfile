@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libfontconfig \
     netcat \
-    iproute2
+    iproute2 \
+    libicu-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl
 
 RUN yes | pecl install xdebug-2.9.6 \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
