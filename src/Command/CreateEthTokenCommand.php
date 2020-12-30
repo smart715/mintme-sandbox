@@ -151,6 +151,7 @@ class CreateEthTokenCommand extends Command
         $token->setName($name)
             ->setAddress($tokenAddress)
             ->setExchangeCrypto($this->exchangeCrypto)
+            ->setDeployed(new \DateTimeImmutable())
             ->setCrypto($this->crypto)
             ->setProfile($profile);
 
