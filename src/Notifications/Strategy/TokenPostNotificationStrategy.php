@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
-use Doctrine\ORM\EntityManagerInterface;
 
 class TokenPostNotificationStrategy implements NotificationStrategyInterface
 {
@@ -17,9 +16,6 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
-    /** @var EntityManagerInterface */
-    private EntityManagerInterface $em;
-
     private Token $token;
 
     private string $type;
@@ -27,13 +23,11 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
     public function __construct(
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
-        EntityManagerInterface $em,
         Token $token,
         string $type
     ) {
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
-        $this->em = $em;
         $this->token = $token;
         $this->type = $type;
     }

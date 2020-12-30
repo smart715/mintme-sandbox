@@ -6,12 +6,13 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Enum\AirdropCampaignActions;
+use App\Exception\ApiBadForbiddenException;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiUnauthorizedException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
@@ -110,7 +111,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             $token
         );
 
-        $this->checkAirdropParams($amount, $participants, $endDateTimestamp, $balance);
+        $this->checkAirdropParams($amount, $participants, $balance);
+        $endDateTimestamp = $this->checkAirdropEndDate($endDateTimestamp);
 
         $actions = $request->get('actions');
         $actionsData = $request->get('actionsData');
@@ -247,6 +249,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     public function verifyPostLinkAction(
         string $tokenName,
         ParamFetcherInterface $request,
+        BlacklistManagerInterface $blacklistManager,
         WebsiteVerifierInterface $websiteVerifier
     ): View {
         $this->fetchToken($tokenName, false, true);
@@ -261,12 +264,16 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_url'));
         }
 
+        if ($blacklistManager->isBlacklistedAirdropDomain($url)) {
+            throw new ApiBadForbiddenException($this->translator->trans('api.airdrop.forbidden_domain'));
+        }
+
         $verified = $websiteVerifier->verifyAirdropPostLinkAction($url, $message);
 
         return $this->view(['verified' => $verified], Response::HTTP_OK);
     }
 
-    private function checkAirdropParams(Money $amount, int $participants, ?int $endDateTimestamp, Money $balance): void
+    private function checkAirdropParams(Money $amount, int $participants, Money $balance): void
     {
         if ($amount->lessThan($this->airdropConfig->getMinTokensAmount()) || $amount->greaterThan($balance)) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_amount'));
@@ -285,12 +292,15 @@ class AirdropCampaignController extends AbstractFOSRestController
         ) {
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_participants_amount'));
         }
+    }
 
+    private function checkAirdropEndDate(?int $endDateTimestamp): ?int
+    {
         $timeAfterOneHour = time() + 60 * 60;
 
-        if ($endDateTimestamp && $endDateTimestamp < $timeAfterOneHour) {
-            throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_end_date'));
-        }
+        return $endDateTimestamp && $endDateTimestamp < $timeAfterOneHour
+            ? $timeAfterOneHour
+            : $endDateTimestamp;
     }
 
     private function fetchToken(

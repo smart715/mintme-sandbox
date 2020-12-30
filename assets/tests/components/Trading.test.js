@@ -67,11 +67,6 @@ describe('Trading', () => {
         base: 'WEB',
         quote: 'MobCoin',
     };
-
-    it('Show USD in dropdown option if enableUSD is true', () => {
-        const wrapper = mockTrading();
-        expect(wrapper.find('.usdOption').exists()).toBe(true);
-    });
     it('show message if there are not deployed tokens yet', () => {
         const wrapper = mockTrading();
         wrapper.vm.marketFilters.selectedFilter = 'deployed';

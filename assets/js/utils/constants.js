@@ -153,3 +153,14 @@ export const digitsLimits = {
     BTC: BTC.digits,
     ETH: ETH.digits,
 };
+
+export const currencyModes = {
+    usd: {
+        value: 'usd',
+        text: 'USD',
+    },
+    crypto: {
+        value: 'crypto',
+        text: 'Crypto',
+    },
+};

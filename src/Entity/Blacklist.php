@@ -17,6 +17,7 @@ class Blacklist
     public const CRYPTO_SYMBOL = 'crypto-symbol';
     public const TOKEN = 'token';
     public const EMAIL = 'email';
+    public const AIRDROP_DOMAIN = 'airdrop-domain';
 
     /**
      * @ORM\Id()

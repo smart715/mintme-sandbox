@@ -480,6 +480,11 @@ export default {
 
                 return this.claimAction(this.airdropCampaign.actions.postLink);
             }).catch((err) => {
+                if (err.response.data.message) {
+                    this.notifyError(err.response.data.message);
+                    return;
+                }
+
                 this.notifyError(this.$t('ongoing_airdrop.verification_failed'));
             });
         },

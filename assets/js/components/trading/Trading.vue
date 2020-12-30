@@ -55,29 +55,6 @@
                     <span class="px-3 pb-2 mr-auto">{{ $t('trading.tokens') }}</span>
                     <div>
                         <b-dropdown
-                                id="currency"
-                                variant="primary"
-                                class="ml-auto pl-3 pb-2"
-                                :lazy="true"
-                        >
-                            <template slot="button-content">
-                                <span v-if="showUsd">
-                                    {{ $t('trading.currency.usd') }}
-                                </span>
-                                <span v-else>
-                                    {{ $t('trading.currency.crypto') }}
-                                </span>
-                            </template>
-                            <template>
-                                <b-dropdown-item @click="toggleUsd(false)">
-                                    {{ $t('trading.currency.crypto') }}
-                                </b-dropdown-item>
-                                <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                                    {{ $t('trading.currency.usd') }}
-                                </b-dropdown-item>
-                            </template>
-                        </b-dropdown>
-                        <b-dropdown
                                 id="customFilter"
                                 variant="primary"
                                 class="px-3 pb-2"
@@ -124,7 +101,6 @@
                                         id="volume"
                                         variant="primary"
                                         :lazy="true"
-                                        boundary="viewport"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
@@ -153,7 +129,6 @@
                                         id="marketCap"
                                         variant="primary"
                                         :lazy="true"
-                                        boundary="viewport"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
@@ -292,13 +267,12 @@ import {
   WebSocketMixin,
   MoneyFilterMixin,
   RebrandingFilterMixin,
-  NotificationMixin,
   LoggerMixin,
 } from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
 import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {cryptoSymbols, tokenDeploymentStatus, webSymbol} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
@@ -311,7 +285,6 @@ export default {
         FiltersMixin,
         MoneyFilterMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
     ],
     props: {
@@ -339,13 +312,12 @@ export default {
             loading: false,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
+            currencyModes,
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
                 {currency: USDC.symbol, token: WEB.symbol},
             ],
-            showUsd: true,
-            enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             sortBy: this.sort,
@@ -405,6 +377,12 @@ export default {
         };
     },
     computed: {
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
+        },
+        showUsd: function() {
+            return this.currencyMode === currencyModes.usd.value;
+        },
         marketsHiddenNames: function() {
             return undefined === typeof this.markets ? {} : Object.keys(this.markets);
         },
@@ -503,13 +481,6 @@ export default {
             this.sortBy = '';
             this.sortDesc = true;
             this.updateMarkets(page, true);
-        },
-        toggleUsd: function(show) {
-            this.showUsd = show;
-        },
-        disableUsd: function() {
-            this.showUsd = false;
-            this.enableUsd = false;
         },
         initialLoad: function() {
             this.loading = true;
@@ -629,7 +600,6 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_markets_data'));
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
@@ -897,7 +867,6 @@ export default {
                     })
                     .catch((err) => {
                         this.$emit('disable-usd');
-                        this.notifyError(this.$t('toasted.error.fetching_exchange_rates'));
                         this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                         reject();
                     });
@@ -925,7 +894,6 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
