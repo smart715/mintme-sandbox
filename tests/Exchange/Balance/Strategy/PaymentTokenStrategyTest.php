@@ -13,6 +13,7 @@ use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PaymentTokenStrategyTest extends TestCase
 {
@@ -21,7 +22,8 @@ class PaymentTokenStrategyTest extends TestCase
         $strategy = new PaymentTokenStrategy(
             $this->mockBalanceHandler($this->exactly(2)),
             $this->mockCryptoManager(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockParameterBagInterface()
         );
 
         $strategy->deposit(
@@ -57,5 +59,15 @@ class PaymentTokenStrategyTest extends TestCase
         $mw->method("parse")->wilLReturn(new Money("100000000000000", new Currency('TOK')));
 
         return $mw;
+    }
+
+    public function mockParameterBagInterface(): ParameterBagInterface
+    {
+        $pb = $this->createMock(ParameterBagInterface::class);
+        $pb->method('get')
+            ->with('token_withdraw_fee')
+            ->willReturn('0.01');
+
+        return $pb;
     }
 }
