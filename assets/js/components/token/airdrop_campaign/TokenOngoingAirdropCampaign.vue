@@ -238,8 +238,6 @@ export default {
         };
     },
     mounted: function() {
-        this.getAirdropCampaign();
-
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
@@ -525,6 +523,7 @@ export default {
         },
     },
     created() {
+        this.getAirdropCampaign();
         this.loadYoutubeClient();
     },
     validations() {
