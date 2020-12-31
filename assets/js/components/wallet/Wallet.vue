@@ -333,11 +333,6 @@ export default {
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
-        tokenAmountNotZero: function() {
-            return Object.values(this.tokens || {}).forEach((x) => {
-              return x.amount > 0;
-            });
-        },
         allTokens: function() {
             return Object.assign({}, this.tokens || {}, this.predefinedTokens || {});
         },
