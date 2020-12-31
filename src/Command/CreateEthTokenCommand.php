@@ -135,6 +135,11 @@ class CreateEthTokenCommand extends Command
             $io->error('token name/address exists');
         }
 
+        if ($profile->hasTokens()) {
+            $hasErrors = true;
+            $io->error('User with provided email has already created a token');
+        }
+
         if ($hasErrors) {
             return 1;
         }
