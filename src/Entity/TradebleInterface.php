@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 interface TradebleInterface
@@ -14,6 +15,8 @@ interface TradebleInterface
 
     /** @Groups({"Default", "API", "dev"}) */
     public function getSymbol(): string;
+
+    public function getFee(): ?Money;
 
     /**
      * @param string $name

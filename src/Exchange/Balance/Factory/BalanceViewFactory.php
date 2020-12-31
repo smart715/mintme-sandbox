@@ -51,7 +51,10 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 : false;
 
             if ($token->getCrypto()) {
-                $fee = $token->getCrypto()->getFee();
+                // getId returns null if this is instance of Crypto
+                $fee = $token->getId()
+                    ? $token->getFee()
+                    : $token->getCrypto()->getFee();
                 $name = $token->getCrypto()->getName();
                 $subunit = $token->getCrypto()->getShowSubunit();
             }
