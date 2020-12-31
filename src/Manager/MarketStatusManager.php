@@ -151,8 +151,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $queryBuilder->addSelect(
                 "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
             )
-            ->orderBy('deployed', 'DESC')
-            ->orderBy('qt.crypto', 'ASC');
+            ->orderBy('deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $filter) {
             $queryBuilder->andWhere(
                 "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
