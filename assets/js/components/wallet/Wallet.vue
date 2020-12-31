@@ -179,15 +179,8 @@
             </b-table>
         </div>
         <div class="table-responsive">
-            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
-                <thead>
-                    <tr>
-                        <th class="first-field">{{ $t('wallet.name') }}</th>
-                        <th class="field-table">{{ $t('wallet.amount') }}</th>
-                        <th >&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <table v-if="!showLoadingIcon && items.length <= 0" class="table table-hover no-owned-token">
+              <tbody>
                     <tr>
                         <td class="first-field">
                             <div class="truncate-name">
@@ -352,7 +345,7 @@ export default {
             return this.tokensToArray(this.predefinedTokens || {});
         },
         items: function() {
-            return this.tokensToArray(this.tokens || {});
+            return this.tokensToArray(this.tokens || {}).filter((token) => !(!token.deployed && token.available <= 0));
         },
         showLoadingIconP: function() {
             return (this.predefinedTokens === null);
