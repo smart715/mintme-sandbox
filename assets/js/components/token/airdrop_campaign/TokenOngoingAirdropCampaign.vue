@@ -354,12 +354,15 @@ export default {
     },
     methods: {
         showCountdown: function() {
+            this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+            if (this.duration.asMilliseconds() <= 0) {
+                this.timeElapsed = true;
+                this.showDuration = false;
+            }
+        },
+        countdownInterval: function() {
             return setInterval(() => {
-                this.duration = moment.duration(this.duration - 1000, 'milliseconds');
-                if (this.duration.asMilliseconds() <= 0) {
-                    this.timeElapsed = true;
-                    this.showDuration = false;
-                }
+                this.showCountdown;
             }, 1000);
         },
         getAirdropCampaign: function() {
@@ -370,6 +373,7 @@ export default {
                     this.airdropCampaign = result.data;
                     this.loaded = true;
                     this.showCountdown();
+                    this.countdownInterval();
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_reload'));
