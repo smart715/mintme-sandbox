@@ -1,6 +1,7 @@
 <template>
     <post-form
         :token-name="tokenName"
+        :subunit="subunit"
         @save-success="$emit('update-posts')"
         reset-after-action
         reset-cancel
@@ -17,6 +18,7 @@ export default {
     },
     props: {
         tokenName: String,
+        subunit: Number,
     },
 };
 </script>

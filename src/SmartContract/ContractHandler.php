@@ -96,7 +96,7 @@ class ContractHandler implements ContractHandlerInterface
         }
     }
 
-    public function addToken(Token $token, ?string $minDeposit): void
+    public function addToken(Token $token, ?string $minDeposit): Token
     {
         $response = $this->rpc->send(
             self::ADD_TOKEN,
@@ -113,6 +113,8 @@ class ContractHandler implements ContractHandlerInterface
 
             throw new Exception($response->getError()['message'] ?? 'get error response');
         }
+
+        return $token->setDecimals((int)$response->getResult()['decimals']);
     }
 
     public function updateMintDestination(Token $token, string $address): void
