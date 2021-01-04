@@ -67,8 +67,7 @@ services:
             $url: '%d7_networks_url%'
             $timeoutSeconds: '10'
             $headers:
-                Authorization: '%d7_networks_token%'
-                Accept: application/json
+                Authorization: 'Basic %d7_networks_token%'
 
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
@@ -120,7 +119,7 @@ services:
             $rpc: '@coinify.rest_rpc'
             $partnerId: '%coinify_partner_id%'
 
-    App\Communications\D7NetworksCommunicator:
+    App\Communications\SMS\D7NetworksCommunicator:
         arguments:
             $rpc: '@d7_networks.rest_rpc'
 

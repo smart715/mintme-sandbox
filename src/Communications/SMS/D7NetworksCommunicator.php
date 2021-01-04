@@ -1,7 +1,9 @@
 <?php declare(strict_types = 1);
 
-namespace App\Communications;
+namespace App\Communications\SMS;
 
+use App\Communications\RestRpcInterface;
+use App\Communications\SMS\Model\SMS;
 use Symfony\Component\HttpFoundation\Request;
 
 class D7NetworksCommunicator implements D7NetworksCommunicatorInterface
@@ -15,13 +17,18 @@ class D7NetworksCommunicator implements D7NetworksCommunicatorInterface
         $this->rpc = $rpc;
     }
 
-    public function send(string $content): array
+    public function send(SMS $sms): array
     {
         $response = $this->rpc->send(
             self::SEND_SMS_METHOD,
             Request::METHOD_POST,
             [
-                'content' => $content,
+                'json' =>
+                    [
+                        'from' => $sms->getFrom(),
+                        'to' => $sms->getTo(),
+                        'content' => $sms->getContent(),
+                    ],
             ]
         );
 
