@@ -4,8 +4,11 @@ namespace App\Tests\Consumer;
 
 use App\Communications\AMQP\MarketAMQPInterface;
 use App\Consumers\MarketConsumer;
+use App\Entity\Crypto;
 use App\Exchange\Market;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +26,8 @@ class MarketConsumerTest extends TestCase
         $mc = new MarketConsumer(
             $this->mockLogger(),
             $this->mockStatusManager($this->once()),
-            $this->mockMarketNameConverter(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
             $this->mockEM()
         );
@@ -40,7 +44,8 @@ class MarketConsumerTest extends TestCase
         $mc = new MarketConsumer(
             $this->mockLogger(),
             $this->mockStatusManager($this->never()),
-            $this->mockMarketNameConverter(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
             $this->mockEM()
         );
@@ -57,7 +62,8 @@ class MarketConsumerTest extends TestCase
         $mc = new MarketConsumer(
             $this->mockLogger(),
             $this->mockStatusManager($this->never()),
-            $this->mockMarketNameConverter(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
             $this->mockEM()
         );
@@ -77,7 +83,8 @@ class MarketConsumerTest extends TestCase
         $mc = new MarketConsumer(
             $this->mockLogger(),
             $sm,
-            $this->mockMarketNameConverter(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
             $this->mockMarketProducer($this->once()),
             $this->mockEM()
         );
@@ -102,9 +109,20 @@ class MarketConsumerTest extends TestCase
         return $this->createMock(LoggerInterface::class);
     }
 
-    private function mockMarketNameConverter(): MarketNameConverterInterface
+    private function mockCryptoManager(): CryptoManagerInterface
     {
-        return $this->createMock(MarketNameConverterInterface::class);
+        $manager = $this->createMock(CryptoManagerInterface::class);
+        $manager->method('findBySymbol')->willReturn((new Crypto()));
+
+        return $manager;
+    }
+
+    private function mockTokenManager(): TokenManagerInterface
+    {
+        $manager = $this->createMock(TokenManagerInterface::class);
+        $manager->method('findByName')->willReturn((new Crypto()));
+
+        return $manager;
     }
 
     /** @return MarketStatusManagerInterface|MockObject */

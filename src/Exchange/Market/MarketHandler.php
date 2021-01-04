@@ -8,8 +8,10 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
@@ -466,6 +468,27 @@ class MarketHandler implements MarketHandlerInterface
             ),
             $expires
         );
+    }
+
+    public function getSummary(array $market): array
+    {
+        $result = $this->marketFetcher->getSummary(
+            array_map(function (Market $market) {
+                return $this->marketNameConverter->convert($market);
+            }, $market)
+        );
+
+        return (new MarketSummaryFactory(
+            $result,
+            $market,
+            $this->moneyWrapper,
+            $this->marketNameConverter
+        ))->create();
+    }
+
+    public function getOneSummary(Market $market): Summary
+    {
+        return $this->getSummary([$market])[0];
     }
 
     private function getSymbol(TradebleInterface $tradable): string
