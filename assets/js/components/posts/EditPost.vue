@@ -1,6 +1,7 @@
 <template>
     <post-form
         :post="post"
+        :subunit="subunit"
         @save-success="redirect"
         @cancel="redirect"
     >
@@ -21,6 +22,7 @@ export default {
             type: Object,
             required: true,
         },
+        subunit: Number,
     },
     methods: {
         redirect() {

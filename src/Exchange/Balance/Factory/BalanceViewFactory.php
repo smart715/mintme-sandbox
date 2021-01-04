@@ -50,11 +50,8 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 ? $user->getId() === $token->getProfile()->getUser()->getId()
                 : false;
 
-            if ($token->getCrypto()) {
-                // getId returns null if this is instance of Crypto
-                $fee = $token->getId()
-                    ? $token->getFee()
-                    : $token->getCrypto()->getFee();
+            if (!$token->getId() && $token->getCrypto()) {
+                $fee = $token->getCrypto()->getFee();
                 $name = $token->getCrypto()->getName();
                 $subunit = $token->getCrypto()->getShowSubunit();
             }
@@ -68,7 +65,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
                 $fee,
-                $subunit,
+                null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals(),
                 $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
                 $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
                 Token::DEPLOYED === $token->getDeploymentStatus(),

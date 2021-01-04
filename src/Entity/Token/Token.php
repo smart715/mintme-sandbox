@@ -274,6 +274,13 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $threads;
 
+    /**
+     * @ORM\Column(type="integer", options={"default"=12})
+     * @Groups({"Default", "API"})
+     * @var int|null
+     */
+    private $decimals = 12;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -733,6 +740,18 @@ class Token implements TradebleInterface, ImagineInterface
     public function getThreads(): array
     {
         return $this->threads->toArray();
+    }
+
+    public function setDecimals(int $decimals): self
+    {
+        $this->decimals = $decimals;
+
+        return $this;
+    }
+
+    public function getDecimals(): ?int
+    {
+        return $this->decimals;
     }
 
     /*

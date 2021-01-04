@@ -167,6 +167,8 @@ class TokenController extends Controller
         /** @var  User|null $user */
         $user = $this->getUser();
 
+        $tokenDecimals = $token->getDecimals();
+
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
@@ -197,6 +199,9 @@ class TokenController extends Controller
             'showTokenEditModal' => 'settings' === $modal,
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
             'showCreatedModal' => 'created' === $modal,
+            'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
+                ? Token::TOKEN_SUBUNIT
+                : $tokenDecimals,
         ]);
     }
 

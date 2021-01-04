@@ -239,7 +239,12 @@ export default {
             this.setBalanceManuallyEdited(true);
         },
         checkAmountInput() {
-            this.$emit('check-input', this.market.quote.subunit);
+            this.$emit(
+                'check-input',
+                this.market.quote.decimals > this.market.quote.subunit
+                    ? this.market.quote.subunit
+                    : this.market.quote.decimals
+            );
         },
         placeOrder: function() {
             if (this.tradeDisabled) {

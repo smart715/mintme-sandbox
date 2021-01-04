@@ -144,7 +144,12 @@ class CreateEthTokenCommand extends Command
             return 1;
         }
 
-        $this->createEthToken($tokenName, $profile, $tokenAddress, $minDeposit, $withdrawalFee);
+        if (!$this->createEthToken($tokenName, $profile, $tokenAddress, $minDeposit, $withdrawalFee)) {
+            $io->error('Please make sure that the internal services are running then try again!');
+
+            return 1;
+        }
+
         $io->success("{$tokenName} added successfully");
 
         return 0;
@@ -156,25 +161,32 @@ class CreateEthTokenCommand extends Command
         string $tokenAddress,
         ?string $minDeposit,
         ?string $withdrawalFee
-    ): void {
+    ): bool {
         $this->em->beginTransaction();
         $token = $this->storeToken($name, $profile, $tokenAddress, $withdrawalFee);
 
-        $this->balanceHandler->deposit(
-            $profile->getUser(),
-            $token,
-            $this->moneyWrapper->parse(
-                self::INIT_BALANCE,
-                MoneyWrapper::TOK_SYMBOL
-            )
-        );
+        try {
+            $this->balanceHandler->deposit(
+                $profile->getUser(),
+                $token,
+                $this->moneyWrapper->parse(
+                    self::INIT_BALANCE,
+                    MoneyWrapper::TOK_SYMBOL
+                )
+            );
+            $this->contractHandler->addToken($token, $minDeposit);
+        } catch (\Throwable $exception) {
+            $this->logger->error('error while adding ETH token: ' . json_encode($exception));
 
-        $this->contractHandler->addToken($token, $minDeposit);
+            return false;
+        }
 
         $market = $this->marketManager->createUserRelated($profile->getUser());
         $this->marketStatusManager->createMarketStatus($market);
         $this->em->commit();
         $this->logger->info('Create eth token', ['name' => $token->getName(), 'id' => $token->getId()]);
+
+        return true;
     }
 
     private function storeToken(string $name, Profile $profile, string $tokenAddress, ?string $withdrawalFee): Token
