@@ -24,20 +24,22 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <span v-if="alreadyClaimed">
-                        <button
+                    <template v-if="!timeElapsed">
+                        <span v-if="alreadyClaimed">
+                            <button
                                 :disabled="true"
                                 class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.claimed') }}
-                        </button>
-                    </span>
-                    <span v-else>
-                        <button
+                                {{ $t('ongoing_airdrop.claimed') }}
+                            </button>
+                        </span>
+                        <span v-else>
+                            <button
                                 @click="showModal = true"
                                 class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.participate') }}
-                        </button>
-                    </span>
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </button>
+                        </span>
+                    </template>
                     <confirm-modal
                         :visible="showModal"
                         :button-disabled="loggedIn && !isOwner && !userAlreadyClaimed && !actionsCompleted"
@@ -236,8 +238,6 @@ export default {
         };
     },
     mounted: function() {
-        this.getAirdropCampaign();
-
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
@@ -354,12 +354,15 @@ export default {
     },
     methods: {
         showCountdown: function() {
+            this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+            if (this.duration.asMilliseconds() <= 0) {
+                this.timeElapsed = true;
+                this.showDuration = false;
+            }
+        },
+        countdownInterval: function() {
             return setInterval(() => {
-                this.duration = moment.duration(this.duration - 1000, 'milliseconds');
-                if (this.duration.asMilliseconds() <= 0) {
-                    this.timeElapsed = true;
-                    this.showDuration = false;
-                }
+                this.showCountdown;
             }, 1000);
         },
         getAirdropCampaign: function() {
@@ -370,6 +373,7 @@ export default {
                     this.airdropCampaign = result.data;
                     this.loaded = true;
                     this.showCountdown();
+                    this.countdownInterval();
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_reload'));
@@ -523,6 +527,7 @@ export default {
         },
     },
     created() {
+        this.getAirdropCampaign();
         this.loadYoutubeClient();
     },
     validations() {
