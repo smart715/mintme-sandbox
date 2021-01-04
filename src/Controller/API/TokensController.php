@@ -795,7 +795,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         );
 
         return $this->view(
-            $balanceHandler->soldOnMarket($token, $this->getParameter('token_quantity'), $ownerPendingOrders),
+            $balanceHandler->soldOnMarket(
+                $token,
+                $token->isMintmeToken() ? $this->getParameter('token_quantity') : 0,
+                $ownerPendingOrders
+            ),
             Response::HTTP_OK
         );
     }
