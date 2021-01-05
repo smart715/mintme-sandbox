@@ -33,7 +33,7 @@ class ContractHandler implements ContractHandlerInterface
     private const TRANSACTIONS = 'get_transactions';
     private const GET_DEPOSIT_INFO = "get_deposit_info";
     private const PING = 'ping';
-    private const WITHDRAW_TYPE = 'withdraw';
+    private const DEPOSIT_TYPE = 'deposit';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -206,22 +206,26 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
+    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
     {
-        if (self::WITHDRAW_TYPE === $type) {
-            if ($tradeble instanceof Crypto) {
-                return $tradeble->getFee();
-            } else {
-                /** @var Token $tradeble */
-                return Token::ETH_SYMBOL === $tradeble->getCryptoSymbol()
-                    ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
-                        (string)$this->parameterBag->get('token_withdraw_fee'),
-                        Token::ETH_SYMBOL
-                    ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
-            }
-        } else {
+        if (!$tradeble) {
+            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        }
+
+        if (self::DEPOSIT_TYPE === $type) {
             return $wallet->getDepositInfo($tradeble)->getFee();
         }
+
+        if ($tradeble instanceof Crypto) {
+            return $tradeble->getFee();
+        }
+
+        /** @var Token $tradeble */
+        return Token::ETH_SYMBOL === $tradeble->getCryptoSymbol()
+            ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
+                (string)$this->parameterBag->get('token_withdraw_fee'),
+                Token::ETH_SYMBOL
+            ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
     }
 
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
@@ -233,6 +237,11 @@ class ContractHandler implements ContractHandlerInterface
 
             /** @var Crypto|null $cryptoToken */
             $cryptoToken = $indexedCryptos[$tokenName] ?? null;
+            $tradeble = $cryptoToken ?? $this->tokenManager->findByName($tokenName);
+
+            if (!$tradeble) {
+                $this->logger->info("[contract-handler] traedable name not exist ($tokenName)");
+            }
 
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
@@ -244,11 +253,11 @@ class ContractHandler implements ContractHandlerInterface
                     new Currency($cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL)
                 ),
                 $this->getFee(
-                    $cryptoToken ?? $this->tokenManager->findByName($tokenName),
+                    $tradeble,
                     $transaction['type'],
                     $wallet
                 ),
-                $cryptoToken ?? $this->tokenManager->findByName($tokenName),
+                $tradeble,
                 Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])
             );
