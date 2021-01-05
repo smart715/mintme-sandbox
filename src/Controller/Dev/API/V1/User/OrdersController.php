@@ -18,6 +18,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Validator\TradebleDigitsValidator;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -255,11 +256,19 @@ class OrdersController extends DevApiController
         /** @var User $user*/
         $user = $this->getUser();
 
+        $amount = (string)$request->get('amountInput');
+        $price = (string)$request->get('priceInput');
+
+        if (!($validator = new TradebleDigitsValidator($price, $base))->validate()
+            || !($validator = new TradebleDigitsValidator($amount, $quote))->validate()) {
+            throw new ApiBadRequestException($validator->getMessage());
+        }
+
         $tradeResult = $exchanger->placeOrder(
             $user,
             $market,
-            (string)$request->get('amountInput'),
-            (string)$request->get('priceInput'),
+            $amount,
+            $price,
             filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
             Order::SIDE_MAP[$request->get('action')]
         );
