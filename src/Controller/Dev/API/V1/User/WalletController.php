@@ -17,6 +17,7 @@ use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\NotificationTypes;
+use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -221,6 +222,10 @@ class WalletController extends DevApiController
         }
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
+
+        if (!($validator = new TradebleDigitsValidator($amount, $tradable))->validate()) {
+            throw new ApiBadRequestException($validator->getMessage());
+        }
 
         $validator = $this->vf->createMinAmountValidator($tradable, $amount);
 
