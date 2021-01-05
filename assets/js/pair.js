@@ -14,6 +14,7 @@ import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
+import Envelope from './components/chat/Envelope';
 import i18n from './utils/i18n/i18n';
 import TokenCreatedModal from './components/modal/TokenCreatedModal';
 
@@ -46,6 +47,7 @@ new Vue({
   },
   components: {
     Avatar,
+    Envelope,
     BalanceInit,
     CreatePost,
     Donation,

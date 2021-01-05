@@ -65,7 +65,7 @@ class ChatController extends Controller
         ]);
     }
 
-    /** @Route("/new/{tokenName}", name="new_dm_message") */
+    /** @Route("/new/{tokenName}", name="new_dm_message", options={"expose"=true}) */
     public function newDMMessage(string $tokenName): Response
     {
         /** @var User $user */
