@@ -41,7 +41,7 @@
                                 :disabled="useMarketPrice || !loggedIn"
                                 @keypress="checkPriceInput"
                                 @paste="checkPriceInput"
-                                tabindex="8"
+                                tabindex="3"
                                 :from="market.base.symbol"
                                 :to="USD.symbol"
                                 :subunit="4"
