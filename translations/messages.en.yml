@@ -508,7 +508,7 @@ email.withdraw.body: 'You can confirm your withdrawal by click on the following 
 log_in: 'Log In'
 sign_up: 'Sign Up'
 log_out: 'Log Out'
-rights_reserved: 'Copyright 2018-%date% mintMe. All rights reserved'
+rights_reserved: 'V1.5.0 | Copyright 2018-%date% mintMe. All rights reserved'
 terms_of_service: 'Terms of Service'
 privacy_policy: 'Privacy policy'
 yes: 'Yes'
