@@ -49,7 +49,7 @@ describe('TokenIntroductionDescription', () => {
             mocks: {$t: (val) => propsForTestCorrectlyRenders.name + val},
         });
         expect(wrapper.vm.newDescription).toBe('a'.repeat(200));
-        expect(wrapper.html()).toContain('token.intro.description.plan.header');
+        expect(wrapper.html()).toContain('token.intro.description.header');
         expect(wrapper.html()).toContain('a'.repeat(200));
         expect(wrapper.html()).toContain('fooName');
     });
