@@ -58,8 +58,9 @@
                     </tr>
                     </tbody>
                 </table>
-                {% set url = {{ absolute_url(path('token_show', {'name': tokenName })) }}/post %}
-                {% set vars = {'href': absolute_url(path('token_show', {'name': tokenName })), 'text': {{ new_post.link.text |trans|raw }} } %}
+                {% set url = absolute_url(path('token_show', {'name': tokenName })) %}
+                {% set posts_tab = '/posts' %}
+                {% set vars = {'href': url ~ posts_tab, 'text': 'new_post.link.text' } %}
                 {% include 'mail/mail_block_button.html.twig' with vars %}
             </td>
         </tr>
