@@ -480,7 +480,7 @@ new_post.msg: '%tokenName% created new post. Read it <a href="%urlToken%/posts">
 mail.new_post.msg: 'created new post.'
 mail.new_post.text_link: 'Read it here!'
 deployed.msg: '%tokenName% has been deployed to the blockchain! Visit <a href="%urlToken%">token page</a>.'
-mail.deployed.msg: '%tokenName% has been deployed to the blockchain'
+mail.deployed.msg: '<strong>%tokenName%</strong> has been deployed to the blockchain'
 mail.deployed.text_link: 'Visit token page'
 no_orders.msg: 'There are no sell orders on the market of your token %tokenName%. <a href="%urlToken%/trade">Please add them</a>.'
 userNotification.title: 'Notifications'
