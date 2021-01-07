@@ -1,9 +1,10 @@
-{% extends('mail/layout.txt.twig') %}
+{% extends('mail/new_layout.txt.twig') %}
 {% block content %}
 {% trans %}hello{% endtrans %}
 {{username}},
+{{ tokenName }}
 
-{% trans with {'%tokenName%': tokenName}%}knowledge_base.header.1{% endtrans %}
+{% trans %}knowledge_base.header.1{% endtrans %}
 - {% trans %}knowledge_base.link.1{% endtrans %}
 - {% trans %}knowledge_base.link.2{% endtrans %}
 - {% trans %}knowledge_base.link.3{% endtrans %}
