@@ -2,5 +2,6 @@
 {% block content %}
 {% trans %}hello{% endtrans %}
 {{username}}
-{% trans with {'%urlToken%':absolute_url(path('token_show', {'name': tokenName })), '%tokenName%': tokenName} %}deployed.msg{% endtrans %}
+{% trans with {'%tokenName%': tokenName} %}deployed.msg{% endtrans %}
+{% trans %}deployed.text_button{% endtrans %}
 {% endblock %}
