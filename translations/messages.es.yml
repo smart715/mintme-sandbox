@@ -847,6 +847,11 @@ token.telegram.empty_address: 'Add Telegram invitation link'
 token.telegram.submit: Guardar
 token.telegram.cancel: Cancel
 token.searcher.placeholder: 'Search for the token'
+token_reminder.msg.description: ''
+token_reminder.msg.description.2: ''
+token_reminder.msg.go_here: ''
+token_reminder.msg.click_edit: ''
+token_reminder.msg.description.to_do_that: ''
 trade.top_holders.header: 'Principales titulares/propietarios'
 trade.top_holders.no_holders: 'No hay titulares/propietarios aún'
 trade.top_holders.trader: Trader
