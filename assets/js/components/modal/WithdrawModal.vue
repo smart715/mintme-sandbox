@@ -88,7 +88,7 @@
                 <div class="input-group col-12 pt-2 justify-content-center">
                     <button
                         class="btn btn-primary"
-                        :disabled="$v.$anyError || withdrawing"
+                        :disabled="$v.$anyError || withdrawing || (twofa !== '' && !code)"
                         @click="onWithdraw">
                         {{ $t('withdraw_modal.submit') }}
                     </button>&nbsp;
