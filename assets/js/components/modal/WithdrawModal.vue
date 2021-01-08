@@ -264,7 +264,7 @@ export default {
                 required,
                 decimal,
                 maxValue: maxValue(
-                    toMoney(new Decimal(this.maxAmount).sub(this.fee || 0).toString(), this.subunit)
+                    Math.max(0, toMoney(new Decimal(this.maxAmount).sub(this.fee || 0).toString(), this.subunit))
                 ),
                 minValue: minValue(this.minAmount),
             },
