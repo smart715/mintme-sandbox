@@ -485,6 +485,8 @@ deployed.msg: '%tokenName% has been deployed to the blockchain! Visit <a href="%
 mail.deployed.msg: '<strong>%tokenName%</strong> has been deployed to the blockchain'
 mail.deployed.text_link: 'Visit token page'
 no_orders.msg: 'There are no sell orders on the market of your token %tokenName%. <a href="%urlToken%/trade">Please add them</a>.'
+mail.no_orders.msg: 'There are no sell orders on the market of your token'
+mail.no_orders.add_them: 'Please add them'
 userNotification.title: 'Notifications'
 userNotification.no_notifications_yet: 'No notifications yet.'
 userNotification.config.settings: 'Notifications Settings'
