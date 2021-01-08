@@ -475,7 +475,7 @@ email.withdraw.body: 'Puede confirmar su retiro haciendo click en el siguiente e
 log_in: 'Iniciar sesión'
 sign_up: Registrarse
 log_out: 'Cerrar Sesión'
-rights_reserved: 'V1.5.0 | Copyright 2018-%date% mintMe. Todos los derechos reservados'
+rights_reserved: 'Copyright 2018-%date% mintMe. Todos los derechos reservados'
 terms_of_service: 'Términos de Servicio'
 privacy_policy: 'Política de Privacidad'
 'yes': Si
