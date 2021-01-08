@@ -457,6 +457,8 @@ password_reset.reseted: 'Tu contraseña ha sido %action%.'
 token_deleted.finished.1: 'Su solicitud para eliminar el token <strong>%tokenName%<strong> de'
 token_deleted.finished.2: 'ha finalizado satisfactoriamente.'
 withdrawal.msg: 'Your withdrawal has been completed. Check <a href="%urlWallet%">deposit/withdrawal</a> history.'
+mail.withdrawal.msg: ''
+mail.withdrawal.text_link: ''
 withdraw.completed.see_soon: 'Pronto podrá verlo en su billetera.'
 nickname_field.header: Apodo
 nickname_field.body: 'Nombre utilizado en nuestro servicio, visible para todos.'
