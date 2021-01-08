@@ -73,7 +73,7 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            {% set url = urlWallet }
+                            {% set url = urlWallet %}
                             {% set tab = 'deposit/withdrawal' %}
                             {% set vars = {'href': url ~ tab, 'text': 'mail.withdrawal.text_link' } %}
                             {% include 'mail/mail_block_button.html.twig' with vars %}
