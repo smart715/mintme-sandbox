@@ -13,7 +13,7 @@
                              v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
                         >
                             <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block pl-md-3 pr-md-2 py-2">
+                                <div class="d-inline-block pl-md-2 pr-md-2 py-2">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
                                 <div class="crypto-pair d-inline-block align-middle">
@@ -101,6 +101,7 @@
                                         id="volume"
                                         variant="primary"
                                         :lazy="true"
+                                        boundary="viewport"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
@@ -129,6 +130,7 @@
                                         id="marketCap"
                                         variant="primary"
                                         :lazy="true"
+                                        boundary="viewport"
                                 >
                                     <template slot="button-content">
                                         {{ data.label|rebranding }}
