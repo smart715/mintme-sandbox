@@ -1,38 +1,56 @@
 <template>
-    <b-dropdown
-        id="currency"
-        variant="primary"
-        class="d-inline currency-mode-switcher"
-        :lazy="true"
-        dropup
+    <div
+        class="dropdown d-inline currency-mode-switcher dropup btn-group"
+        :class="{ show }"
+        v-on-clickaway="hide"
     >
-        <template slot="button-content">
+        <button
+            id="currency-mode-switcher-button"
+            class="btn dropdown-toggle btn-primary"
+            type="button"
+            aria-haspopup="true"
+            :aria-expanded="show"
+            @click="toggle"
+        >
             <span
-                v-html="selectedCurrency ? selectedCurrency : this.$t('trading.currency.' + currencyMode)">
-            >
-            </span>
-        </template>
-        <template>
-            <b-dropdown-item @click="changeCurrencyMode(currencyModes.crypto.value)">
-                {{ $t('trading.currency.crypto') }}
-            </b-dropdown-item>
-            <b-dropdown-item class="usdOption" @click="changeCurrencyMode(currencyModes.usd.value)">
-                {{ $t('trading.currency.usd') }}
-            </b-dropdown-item>
-        </template>
-    </b-dropdown>
+                v-html="selectedCurrency ? selectedCurrency : this.$t('trading.currency.' + currencyMode)"
+            ></span>
+        </button>
+        <ul
+            role="menu"
+            tabindex="-1"
+            aria-labelledby="currency-mode-switcher-button"
+            class="dropdown-menu"
+            :class="{ show }"
+        >
+            <li role="presentation" @click="changeCurrencyMode(currencyModes.crypto.value)">
+                <a role="menuItem" href="#" target="_self" class="dropdown-item">
+                    {{ $t('trading.currency.crypto') }}
+                </a>
+            </li>
+            <li role="presentation" class="usdOption" @click="changeCurrencyMode(currencyModes.usd.value)">
+                <a role="menuItem" href="#" target="_self" class="dropdown-item">
+                    {{ $t('trading.currency.usd') }}
+                </a>
+            </li>
+        </ul>
+    </div>
 </template>
 
 <script>
-
+import {directive as onClickaway} from 'vue-clickaway';
 import {currencyModes} from '../utils/constants';
 
 export default {
     name: 'CurrencyModeSwitcher',
+    directives: {
+        onClickaway,
+    },
     data() {
         return {
             selectedCurrency: '',
             currencyModes,
+            show: false,
         };
     },
     created() {
@@ -48,6 +66,12 @@ export default {
         },
         toggleCurrency: function(mode) {
             this.selectedCurrency = currencyModes[mode].text;
+        },
+        toggle() {
+            this.show = !this.show;
+        },
+        hide() {
+            this.show = false;
         },
     },
     computed: {
