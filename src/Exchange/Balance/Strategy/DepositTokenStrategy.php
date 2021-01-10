@@ -54,7 +54,6 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         )->getFee();
 
         if ($tokenDepositFee->isZero()) {
-
             return;
         }
 
