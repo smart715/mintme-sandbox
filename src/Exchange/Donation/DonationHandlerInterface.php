@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Donation;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
@@ -30,6 +31,7 @@ interface DonationHandlerInterface
         string $currency,
         Money $amount,
         Money $feeAmount,
-        Money $tokenAmount
+        Money $tokenAmount,
+        Token $token
     ): void;
 }
