@@ -362,7 +362,7 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 $dealData['deal_order_id'],
-                $dealData['order_id'],
+                $dealData['order_id'] ?? 0,
                 $market
             );
         }, $result);
@@ -391,7 +391,7 @@ class MarketHandler implements MarketHandlerInterface
             0,
             $this->marketFactory->create(
                 $this->cryptoManager->findBySymbol($donation->getCurrency()),
-                $donation->getTokenCreator()->getProfile()->getMintmeToken()
+                $donation->getToken() ?? $donation->getTokenCreator()->getProfile()->getMintmeToken()
             )
         ), $donations);
     }
