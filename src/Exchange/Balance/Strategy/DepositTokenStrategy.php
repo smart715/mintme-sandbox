@@ -53,7 +53,7 @@ class DepositTokenStrategy implements BalanceStrategyInterface
             Token::getFromSymbol($token->getCryptoSymbol())
         )->getFee();
 
-        if ($tokenDepositFee->isZero()) {
+        if ($tokenDepositFee->isNegative() || $tokenDepositFee->isZero()) {
             return;
         }
 
