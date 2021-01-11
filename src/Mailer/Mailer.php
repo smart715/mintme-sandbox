@@ -80,17 +80,17 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     public function sendAuthCodeToMail(
         string $subject,
         string $label,
-        TwoFactorInterface $user
+        User $user
     ): void {
         $body = $this->twigEngine->render('mail/auth_verification_code.html.twig', [
             'label' => $label,
-            'email' => $user->getEmailAuthRecipient(),
+            'username' => $user->getUsername(),
             'code' => $user->getEmailAuthCode(),
         ]);
 
         $textBody = $this->twigEngine->render('mail/auth_verification_code.txt.twig', [
             'label' => $label,
-            'email' => $user->getEmailAuthRecipient(),
+            'username' => $user->getUsername(),
             'code' => $user->getEmailAuthCode(),
         ]);
 
