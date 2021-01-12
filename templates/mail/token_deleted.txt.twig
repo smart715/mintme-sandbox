@@ -1,6 +1,7 @@
-{% extends('mail/layout.txt.twig') %}
+{% extends('mail/new_layout.txt.twig') %}
 {% block content %}
 {% trans %}hello{% endtrans %}
 {{username}}
-{% trans with {'%tokenName%': tokenName}%}token_deleted.finished{% endtrans %}
+{% trans with {'%tokenName%': tokenName}%}token_deleted.finished.1{% endtrans %}
+{% trans %}token_deleted.finished.2{% endtrans %}
 {% endblock %}

@@ -1,33 +1,33 @@
 {% apply inline_css(source('@public' ~ asset('build/mail.css'))) %}
     <table>
-    <tr>
-        <td align="center" valign="top">
-            <center>
-                <table class="table-inner" background="{{absolute_url(asset('build/images/body.png'))}}">
-                    <tr>
-                        <td>
-                            <table>
-                                <tr style="padding: 20px; width: 100%; margin: 0 auto">
-                                    <td cellpadding="" align="middle">
-                                        <a style="display: block" href="{{ absolute_url('/') }}" target=_blank><img width="200px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
-                                    </td>
-                                </tr>
-                            </table>
-                            {% block content %}{% endblock %}
-                            <table background="{{absolute_url(asset('build/images/footer.png'))}}" style="margin: 0; padding: 0; width: 100%">
-                                <tr style=" margin-bottom:0">
-                                    <td>
-                                        <div class="text-dark-white bg-black" style="text-align: center; margin-top: 20px; margin-bottom: 0;">
-                                            {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </center>
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td align="center" valign="top">
+                <center>
+                    <table class="table-inner" background="{{absolute_url(asset('build/images/body.png'))}}">
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr style="padding: 20px; width: 100%; margin: 0 auto">
+                                        <td cellpadding="" align="middle">
+                                            <a style="display: block" href="{{ absolute_url('/') }}" target=_blank><img width="200px" src="{{absolute_url(asset('build/images/logo.png'))}}" alt="MintMe"></a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                {% block content %}{% endblock %}
+                                <table background="{{absolute_url(asset('build/images/footer.png'))}}" style="margin: 0; padding: 0; width: 100%">
+                                    <tr style=" margin-bottom:0">
+                                        <td>
+                                            <div class="text-dark-white bg-black" style="text-align: center; margin-top: 20px; margin-bottom: 0;">
+                                                {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </td>
+        </tr>
+    </table>
 {% endapply %}
