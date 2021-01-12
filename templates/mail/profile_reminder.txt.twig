@@ -1,6 +1,6 @@
 {% extends('mail/new_layout.txt.twig') %}
 {% block content %}
-% trans %} hello {% endtrans %}
+{% trans %} hello {% endtrans %}
 {{username}},
 {% trans with {'%name%': profile_name} %}mail.profile_reminder.msg.add_description{% endtrans %}
 {% trans %} mail.profile_reminder.msg.others {% endtrans %}
