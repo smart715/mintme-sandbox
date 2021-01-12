@@ -8,6 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
+    public const CAN_ADD_MANUALLY_PART_OF_NAMES = [
+        'coin',
+        'token',
+    ];
+
     /** @var BlacklistRepository */
     private $repository;
 
