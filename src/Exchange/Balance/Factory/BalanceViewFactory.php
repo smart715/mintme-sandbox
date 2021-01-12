@@ -43,7 +43,9 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             }
 
             $name = $token->getName();
-            $fee = null;
+            $fee = $token->getId()
+                ? $token->getFee()
+                : $token->getCrypto()->getFee();
             $subunit = $this->tokenSubunit;
 
             $owner = !is_null($user) && !is_null($token->getProfile())
@@ -51,7 +53,6 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 : false;
 
             if (!$token->getId() && $token->getCrypto()) {
-                $fee = $token->getCrypto()->getFee();
                 $name = $token->getCrypto()->getName();
                 $subunit = $token->getCrypto()->getShowSubunit();
             }
