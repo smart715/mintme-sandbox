@@ -76,7 +76,8 @@
                                 </tbody>
                             </table>
                             {% set url = absolute_url(path('token_show', {'name': userTokenName })) %}
-                            {% set vars = {'href': url, 'text': 'Check Trading History' } %}
+                            {% set tab = '/trade' %}
+                            {% set vars = {'href': url ~ tab, 'text': 'Check Trading History' } %}
                             {% include 'mail/mail_block_button.html.twig' with vars %}
                         </td>
                     </tr>
