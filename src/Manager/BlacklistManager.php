@@ -151,7 +151,7 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatchesWithWords(string $name, string $val): bool
     {
-        foreach(self::CAN_ADD_MANUALLY_PART_OF_NAMES as $word){
+        foreach (self::CAN_ADD_MANUALLY_PART_OF_NAMES as $word) {
             if ($this->nameMatches($name, $val . $word)) {
                 return true;
             }
