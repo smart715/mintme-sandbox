@@ -8,7 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
-    public const CAN_ADD_MANUALLY_PART_OF_NAMES = [
+    private const CAN_ADD_MANUALLY_PART_OF_NAMES = [
+        '',
         'coin',
         'token',
     ];
@@ -70,11 +71,11 @@ class BlacklistManager implements BlacklistManagerInterface
                 return $this->repository->matchValue($token, Blacklist::CRYPTO_SYMBOL, $sensitive);
             }
 
-            if ($this->nameMatches($token, $value)) {
+            if ($this->nameMatchesWithWords($token, $value)) {
                 return true;
             }
 
-            if (isset($matches[0]) && $this->nameMatches($matches[0], $value)) {
+            if (isset($matches[0]) && $this->nameMatchesWithWords($matches[0], $value)) {
                 if ($secondMatch) {
                     return true;
                 }
@@ -82,7 +83,7 @@ class BlacklistManager implements BlacklistManagerInterface
                 $firstMatch = true;
             }
 
-            if (isset($matches[1]) && $this->nameMatches($matches[1], $value)) {
+            if (isset($matches[1]) && $this->nameMatchesWithWords($matches[1], $value)) {
                 if ($firstMatch) {
                     return true;
                 }
@@ -146,5 +147,16 @@ class BlacklistManager implements BlacklistManagerInterface
     {
         return false !== stripos($name, $val)
             && (strlen($name) - strlen($val)) <= 1;
+    }
+
+    private function nameMatchesWithWords(string $name, string $val): bool
+    {
+        foreach(self::CAN_ADD_MANUALLY_PART_OF_NAMES as $word){
+            if ($this->nameMatches($name, $val . $word)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
