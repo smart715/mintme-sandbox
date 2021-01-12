@@ -29,7 +29,7 @@ email.resetting.link: 'You can reset your password by click on the following lin
 email.sent: 'Email Sent!'
 email.sent.body: 'If the email you typed matches yours, you will receive a message which contains a link you must click to reset your password.<br/> Note: You can only request a new password once within %hours% hours.'
 email.sent.help: 'If you don''t get an email check your spam folder or try again.'
-email.register.complete: 'To complete your registration, click on the following link:'
+email.register.complete: 'To complete your registration, click on the following button:'
 register.accepting: 'By clicking Sign Up, you accept'
 register.confirmed.header: 'Congrats!'
 register.confirmed.body: 'The user has been created successfully!'

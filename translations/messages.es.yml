@@ -500,7 +500,7 @@ buy: Compra
 sell: Venta
 mintme: MINTME
 btc: BTC
-welcome: '¡Bienvenido a mintMe!'
+welcome: '¡Bienvenido a <strong>mintMe</strong>'
 go_trading: 'Ir a Mercados'
 hacker_menu.title: 'HACKER MENU'
 hacker_menu.tester_widget: 'Tester widget show/hide'
