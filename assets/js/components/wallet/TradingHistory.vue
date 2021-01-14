@@ -122,7 +122,7 @@ export default {
                     key: 'price',
                     label: this.$t('wallet.trading_history.table.price'),
                     sortable: true,
-                    formatter: formatMoney,
+                    formatter: (val) => '0' === val ? '-' : toMoney(val),
                     type: 'numeric',
                 },
                 total: {
@@ -151,19 +151,20 @@ export default {
         },
         history: function() {
             return this.tableData.map((history) => {
-                let isDonationOrder = 0 === history.id || 0 === history.dealOrderId;
+                let isDonationOrder = 0 === history.orderId || 0 === history.dealOrderId;
 
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
                     side: this.getSideByType(history.side, isDonationOrder) === 'Buy' ? this.$t('buy') : this.$t('sell'),
-                    name: this.pairNameFunc(
+                    name: isDonationOrder ? this.rebrandingFunc(history.market.quote) : this.pairNameFunc(
                         this.rebrandingFunc(history.market.base),
                         this.rebrandingFunc(history.market.quote)
                     ),
                     amount: toMoney(history.amount, history.market.base.subunit),
                     price: toMoney(history.price, history.market.base.subunit),
-                    total: toMoney(this.calculateTotalCost(history), GENERAL.precision),
-                    fee: this.createTicker(toMoney(history.fee, this.producePrecision(history)), history),
+                    total: toMoney(this.calculateTotalCost(history, isDonationOrder), GENERAL.precision) + ' '
+                        + this.rebrandingFunc(history.market.base),
+                    fee: this.createTicker(toMoney(history.fee), history, isDonationOrder),
                     pairUrl: this.generatePairUrl(history.market),
                     blocked: history.market.quote.hasOwnProperty('blocked') ? history.market.quote.blocked : false,
                 };
@@ -209,22 +210,36 @@ export default {
 
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        createTicker: function(toMoney, history) {
+        createTicker: function(toMoney, history, isDonationOrder) {
             if (history.market.identifier !== webBtcSymbol) {
-                return toMoney + ' ' + MINTME.symbol;
+                return toMoney + ' '
+                    + (isDonationOrder ? this.rebrandingFunc(history.market.base.symbol) : MINTME.symbol);
             }
             return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
                 ? this.rebrandingFunc(history.market.quote.symbol)
                 : this.rebrandingFunc(history.market.base.symbol));
         },
-        calculateTotalCost: function(history) {
-            return (new Decimal(history.price).times(history.amount)).toString();
+        /**
+         * @param {object} history
+         * @param {boolean} isDonationOrder
+         * @return {string}
+         */
+        calculateTotalCost: function(history, isDonationOrder) {
+            return toMoney(
+                (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
+                    .add(history.fee)
+                    .toString(),
+                history.market.base.subunit
+            );
         },
         producePrecision(history) {
             if (history.market.identifier !== webBtcSymbol) {
                 return MINTME.subunit;
             }
-            return WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit;
+
+            return isDonationOrder
+                ? history.market.base.subunit
+                : (WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit);
         },
 
     },

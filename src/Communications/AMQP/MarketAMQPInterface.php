@@ -6,5 +6,5 @@ use App\Exchange\Market;
 
 interface MarketAMQPInterface
 {
-    public function send(Market $market): void;
+    public function send(Market $market, int $retried = 0): void;
 }

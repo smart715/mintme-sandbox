@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
@@ -140,7 +141,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             } catch (Throwable $exception) {
                 return $this->view([
                     'error' => $this->translations->trans('api.wallet.withdrawal_went_wrong'),
-                ], Response::HTTP_BAD_GATEWAY);
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } else {
             $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
@@ -208,19 +209,21 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     public function getDepositInfo(
         string $crypto,
         WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ): View {
         $this->denyAccessUnlessGranted('deposit');
 
-        $crypto = $cryptoManager->findBySymbol($crypto);
+        /** @var TradebleInterface|null $tradable */
+        $tradable = $cryptoManager->findBySymbol($crypto) ?? $tokenManager->findByName($crypto);
 
-        if (!$crypto) {
+        if (!$tradable) {
             return $this->view([
                 'error' => $this->translations->trans('api.wallet.not_found_currency'),
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        return $this->view($depositCommunicator->getDepositInfo($crypto));
+        return $this->view($depositCommunicator->getDepositInfo($tradable));
     }
 
     /**
