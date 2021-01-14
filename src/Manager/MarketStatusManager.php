@@ -117,8 +117,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_FIRST:
                 $queryBuilder->addSelect(
                     "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
-                )->orderBy('deployed', 'DESC')
-                 ->orderBy('qt.crypto', 'ASC');
+                )->orderBy('deployed', 'DESC');
 
                 break;
             case self::FILTER_DEPLOYED_ONLY_MINTME:

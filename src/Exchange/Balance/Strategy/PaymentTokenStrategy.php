@@ -10,41 +10,53 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PaymentTokenStrategy implements BalanceStrategyInterface
 {
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private BalanceHandlerInterface $balanceHandler;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
+
+    private ParameterBagInterface $parameterBag;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ParameterBagInterface $parameterBag
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->parameterBag = $parameterBag;
     }
 
     /** @param Token $tradeble */
     public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
     {
-        $this->withdrawBaseFee($user, $tradeble);
+        if (!$tradeble->getFee()) {
+            $this->withdrawBaseFee($user, $tradeble);
+        }
+
         $this->depositTokens($user, $tradeble, $amount);
     }
 
     private function depositTokens(User $user, Token $token, string $amount): void
     {
+        $fullAmount = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+        $tokenFee = $token->getFee();
+
+        if ($tokenFee) {
+            $fullAmount = $fullAmount->add($tokenFee);
+        }
+
         $this->balanceHandler->deposit(
             $user,
             $token,
-            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
+            $fullAmount
         );
     }
 
@@ -56,10 +68,18 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
             throw new NotFoundTokenException();
         }
 
-        $this->balanceHandler->deposit(
-            $user,
-            Token::getFromCrypto($crypto),
-            $crypto->getFee()
-        );
+        $fee = Token::ETH_SYMBOL === $crypto->getSymbol()
+            ? $this->moneyWrapper->parse(
+                (string)$this->parameterBag->get('token_withdraw_fee'),
+                Token::ETH_SYMBOL
+            ) : $crypto->getFee();
+
+        if (!$token->getFee()) {
+            $this->balanceHandler->deposit(
+                $user,
+                Token::getFromCrypto($crypto),
+                $fee
+            );
+        }
     }
 }

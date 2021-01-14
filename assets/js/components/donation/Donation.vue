@@ -195,6 +195,8 @@ import {
     BTC,
     MINTME,
     USD,
+    ETH,
+    USDC,
     digitsLimits,
     currencyModes,
 } from '../../utils/constants';
@@ -275,9 +277,7 @@ export default {
                 : this.$t('donation.currency.select');
         },
         currencySubunit: function() {
-            return btcSymbol === this.selectedCurrency
-                ? BTC.subunit
-                : MINTME.subunit;
+            return ({BTC, MINTME, ETH, USDC}[this.selectedCurrency] || MINTME).subunit;
         },
         currencyMinAmount: function() {
             switch (this.selectedCurrency) {

@@ -2,6 +2,8 @@
 
 namespace App\Exchange\Market;
 
+use App\Exchange\Market;
+
 interface MarketFetcherInterface
 {
     public function getPendingOrders(string $market, int $offset, int $limit, int $side): array;
@@ -11,4 +13,5 @@ interface MarketFetcherInterface
     public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array;
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array;
     public function getKLineStat(string $market, int $start, int $end, int $interval): array;
+    public function getSummary(array $markets): array;
 }

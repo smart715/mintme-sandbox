@@ -18,8 +18,8 @@
                     name="amount"
                     type="text"
                     v-model="amount"
-                    @keypress="checkInput(4, 6)"
-                    @paste="checkInput(4, 6)"
+                    @keypress="checkInput(subunit, 6)"
+                    @paste="checkInput(subunit, 6)"
                 >
                 <div class="invalid-feedback">
                     {{ invalidAmountMessage }}
@@ -77,6 +77,7 @@ export default {
     },
     props: {
         tokenName: String,
+        subunit: Number,
         post: {
             type: Object,
             default: () => ({

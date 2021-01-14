@@ -249,12 +249,12 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     {
         $body = $this->twigEngine->render('mail/token_description_reminder.html.twig', [
             'username' => $token->getOwner()->getUsername(),
-            'token_name' => $token->getName(),
+            'tokenName' => $token->getName(),
         ]);
 
         $textBody = $this->twigEngine->render('mail/token_description_reminder.txt.twig', [
             'username' => $token->getOwner()->getUsername(),
-            'token_name' => $token->getName(),
+            'tokenName' => $token->getName(),
         ]);
 
         $subject = $this->translator->trans('email.mintme_reminder');

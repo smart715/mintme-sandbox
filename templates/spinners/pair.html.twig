@@ -110,7 +110,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 {% if isTokenPage and token.isMintmeToken %} col-lg-7 pr-lg-1 {% endif %}">
+                        <div class="col-12 col-lg-7 pr-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
                                     {% trans %}page.pair.recent_posts{% endtrans %}
@@ -122,7 +122,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% if isTokenPage and token.isMintmeToken %}
                         <div class="col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
                             <div class="card h-100">
                                 <div class="card-header">
@@ -142,7 +141,6 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
                         <div class="card h-100 col-12 mt-3">
                             <div class="card-header">
                                 {% trans %}trade.top_holders.header{% endtrans %}

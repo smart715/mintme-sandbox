@@ -88,7 +88,7 @@
                 <div class="input-group col-12 pt-2 justify-content-center">
                     <button
                         class="btn btn-primary"
-                        :disabled="$v.$anyError || withdrawing"
+                        :disabled="$v.$anyError || withdrawing || (twofa !== '' && !code)"
                         @click="onWithdraw">
                         {{ $t('withdraw_modal.submit') }}
                     </button>&nbsp;
@@ -180,15 +180,15 @@ export default {
             );
 
             return toMoney(
-                amount.add(this.fee).toString(),
+                amount.add(this.fee || 0).toString(),
                 this.subunit
             );
         },
         feeAmount: function() {
-            return this.isToken ? this.baseFee : this.fee;
+            return this.fee || this.baseFee;
         },
         feeCurrency: function() {
-            return this.isToken ? this.baseSymbol : this.currency;
+            return this.fee ? this.currency : this.baseSymbol;
         },
         translationsContext: function() {
             return {
@@ -212,7 +212,7 @@ export default {
                 return;
             }
 
-            if (this.isToken && new Decimal(this.availableBase).lessThan(this.baseFee)) {
+            if (!this.fee && new Decimal(this.availableBase).lessThan(this.baseFee)) {
                 this.notifyError(this.$t('toasted.error.do_not_have_enough', {currency: this.rebrandingFunc(this.feeCurrency)}));
                 return;
             }
@@ -248,8 +248,8 @@ export default {
         },
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
-            this.amount = amount.greaterThan(this.fee) ?
-                toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
+            this.amount = amount.greaterThan(this.fee || 0) ?
+                toMoney(amount.sub(this.fee || 0).toString(), this.subunit) : toMoney(0, this.subunit);
         },
         setFirstTimeOpen: function() {
             if (this.flag) {
@@ -264,7 +264,7 @@ export default {
                 required,
                 decimal,
                 maxValue: maxValue(
-                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString(), this.subunit)
+                    Math.max(0, toMoney(new Decimal(this.maxAmount).sub(this.fee || 0).toString(), this.subunit))
                 ),
                 minValue: minValue(this.minAmount),
             },
