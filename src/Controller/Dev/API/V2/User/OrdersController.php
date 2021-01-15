@@ -2,11 +2,8 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
+use App\Controller\Dev\API\V1\DevApiController;
 use App\Exchange\ExchangerInterface;
-use App\Exchange\Market;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -17,18 +14,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Rest\Route(path="/dev/api/v2/auth/user/orders")
  */
-class OrdersController extends AbstractFOSRestController
+class OrdersController extends DevApiController
 {
-    private CryptoManagerInterface $cryptoManager;
-    private TokenManagerInterface $tokenManager;
-
-    public function __construct(
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
-    ) {
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
-    }
     /**
      * List users active orders
      *
@@ -171,10 +158,7 @@ class OrdersController extends AbstractFOSRestController
     {
         $base = $request->get('base');
         $quote = $request->get('quote');
-        $baseEntity = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
-        $quoteEntity = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-        $market = new Market($baseEntity, $quoteEntity);
-        $tokenCryptoMarket = $market->isTokenCryptoMarket();
+        $tokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
 
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
@@ -211,16 +195,20 @@ class OrdersController extends AbstractFOSRestController
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): Response
     {
+        $base = $request->get('base');
+        $quote = $request->get('quote');
+        $tokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
+
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::cancelOrder',
             [
                 'request' => $request,
                 'id' => $id,
-                'reverseBaseQuote' => true,
+                'reverseBaseQuote' => $tokenCryptoMarket,
             ],
             [
-                'base' => $request->get('base'),
-                'quote' => $request->get('quote'),
+                'base' => $base,
+                'quote' => $quote,
             ]
         );
     }
