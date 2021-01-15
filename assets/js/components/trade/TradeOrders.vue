@@ -155,7 +155,11 @@ export default {
                 if (a[price] === undefined) {
                     a[price] = [];
                 }
-                a[price].push(e);
+
+                if (!e.hasOwnProperty('accounted')) {
+                    a[price].push(e);
+                }
+                
                 return a;
             }, {});
 
