@@ -49,7 +49,7 @@ class Market
     }
     public function isCryptoTokenMarket(): bool
     {
-        return $this->base instanceof Crypto || $this->quote instanceof Token;
+        return $this->base instanceof Crypto && $this->quote instanceof Token;
     }
     public function __toString(): string
     {
