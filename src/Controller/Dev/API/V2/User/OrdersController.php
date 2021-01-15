@@ -3,6 +3,9 @@
 namespace App\Controller\Dev\API\V2\User;
 
 use App\Exchange\ExchangerInterface;
+use App\Exchange\Market;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -16,6 +19,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrdersController extends AbstractFOSRestController
 {
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+
+    public function __construct(
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
+    ) {
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
+    }
     /**
      * List users active orders
      *
@@ -156,16 +169,23 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): Response
     {
+        $base = $request->get('base');
+        $quote = $request->get('quote');
+        $baseEntity = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
+        $quoteEntity = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+        $market = new Market($baseEntity, $quoteEntity);
+        $tokenCryptoMarket = $market->isTokenMarket();
+
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
-                'reverseBaseQuote' => true,
+                'reverseBaseQuote' => $tokenCryptoMarket,
             ],
             [
-                'base' => $request->get('base'),
-                'quote' => $request->get('quote'),
+                'base' => $base,
+                'quote' => $quote,
                 'priceInput' => $request->get('priceInput'),
                 'amountInput' => $request->get('amountInput'),
                 'marketPrice' => $request->get('marketPrice'),
