@@ -158,14 +158,14 @@ class OrdersController extends DevApiController
     {
         $base = $request->get('base');
         $quote = $request->get('quote');
-        $tokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
+        $isTokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
 
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
-                'reverseBaseQuote' => $tokenCryptoMarket,
+                'reverseBaseQuote' => $isTokenCryptoMarket,
             ],
             [
                 'base' => $base,
@@ -197,14 +197,14 @@ class OrdersController extends DevApiController
     {
         $base = $request->get('base');
         $quote = $request->get('quote');
-        $tokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
+        $isTokenCryptoMarket = $this->checkForTokenCryptoMarkets($base, $quote);
 
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::cancelOrder',
             [
                 'request' => $request,
                 'id' => $id,
-                'reverseBaseQuote' => $tokenCryptoMarket,
+                'reverseBaseQuote' => $isTokenCryptoMarket,
             ],
             [
                 'base' => $base,
