@@ -174,14 +174,14 @@ class OrdersController extends AbstractFOSRestController
         $baseEntity = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
         $quoteEntity = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
         $market = new Market($baseEntity, $quoteEntity);
-        $cryptoTokenMarket = $market->isCryptoTokenMarket();
-        
+        $tokenCryptoMarket = $market->isTokenCryptoMarket();
+
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
-                'reverseBaseQuote' => $cryptoTokenMarket,
+                'reverseBaseQuote' => $tokenCryptoMarket,
             ],
             [
                 'base' => $base,
