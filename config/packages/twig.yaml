@@ -41,3 +41,4 @@ twig:
         global_partner_id: '%coinify_partner_id%'
         global_coinify_crypto_currencies: '%coinify_crypto_currencies%'
         global_translation_flags: '%translation_flags%'
+        global_token_withdraw_fee: '%token_withdraw_fee%'

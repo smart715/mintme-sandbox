@@ -596,6 +596,7 @@ services:
             $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
             $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
             $contractWorkDir: '%env(CONTRACT_WORKDIR)%'
+            $isTestingServer: '%env(bool:TESTING_SERVER_ENV)%'
 
     App\Exchange\Config\AirdropConfig:
         arguments:

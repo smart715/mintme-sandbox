@@ -31,7 +31,7 @@
                             </div>
                         </div>
                         <template v-if="editable">
-                            <div v-show="editingDescription">
+                            <div v-if="editingDescription">
                                 <div class="pb-1">
                                     {{ $t('token.intro.description.plan.header') }}
                                     <guide>

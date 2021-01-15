@@ -229,6 +229,9 @@ parameters:
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
 
+    # token withdraw fee in ETH (0.003, 0.1 etc)
+    token_withdraw_fee: 0.01
+
     # api for sending SMS
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='

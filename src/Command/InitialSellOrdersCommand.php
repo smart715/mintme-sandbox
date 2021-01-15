@@ -84,6 +84,7 @@ class InitialSellOrdersCommand extends Command
         foreach ($tokens as $token) {
             if (!$token->isDeployed() &&
                 !$token->isBlocked() &&
+                $token->isMintmeToken() &&
                 $this->tokenHasEnoughAmount($token) &&
                 $this->noUserActiveSellOrder($token->getProfile()->getUser(), $token)
             ) {

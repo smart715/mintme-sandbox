@@ -5,6 +5,7 @@ namespace App\Exchange\Market;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
 
@@ -85,6 +86,14 @@ interface MarketHandlerInterface
     ): array;
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
+
+    /**
+     * @param Market[] $market
+     * @return Summary[]
+     */
+    public function getSummary(array $market): array;
+
+    public function getOneSummary(Market $market): Summary;
 
     /**
      * @param Market $market

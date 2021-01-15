@@ -2,14 +2,20 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Deal;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -30,17 +36,26 @@ class MarketHandler implements MarketHandlerInterface
     private MoneyWrapperInterface $moneyWrapper;
     private UserManagerInterface $userManager;
     private MarketNameConverterInterface $marketNameConverter;
+    private DonationManagerInterface $donationManager;
+    private MarketFactoryInterface $marketFactory;
+    private CryptoManagerInterface $cryptoManager;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
         MoneyWrapperInterface $moneyWrapper,
         UserManagerInterface $userManager,
-        MarketNameConverterInterface $marketNameConverter
+        MarketNameConverterInterface $marketNameConverter,
+        DonationManagerInterface $donationManager,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->userManager = $userManager;
         $this->marketNameConverter = $marketNameConverter;
+        $this->donationManager = $donationManager;
+        $this->marketFactory = $marketFactory;
+        $this->cryptoManager = $cryptoManager;
     }
 
     /** {@inheritdoc} */
@@ -134,13 +149,14 @@ class MarketHandler implements MarketHandlerInterface
             );
         }, $markets);
 
+        $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
         $deals = $marketDeals ? array_merge(...$marketDeals) : [];
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
             return $lDeal->getTimestamp() > $rDeal->getTimestamp();
         });
 
-        return $deals;
+        return array_slice(array_merge($deals, $donations), $offset, $limit);
     }
 
     /** {@inheritdoc} */
@@ -322,7 +338,7 @@ class MarketHandler implements MarketHandlerInterface
             $market = BaseQuote::reverseMarket($market);
         }
 
-        return array_map(function (array $dealData) use ($market) {
+        $deals = array_map(function (array $dealData) use ($market) {
             return new Deal(
                 $dealData['id'],
                 (int)$dealData['time'],
@@ -346,9 +362,38 @@ class MarketHandler implements MarketHandlerInterface
                     $this->getSymbol($market->getQuote())
                 ),
                 $dealData['deal_order_id'],
+                $dealData['order_id'] ?? 0,
                 $market
             );
         }, $result);
+
+        // Filter deals and return not donation deals
+        return array_filter($deals, fn(Deal $deal) => 0 !== $deal->getOrderId() && 0 !== $deal->getDealOrderId());
+    }
+
+    /**
+     * @param Donation[] $donations
+     * @return Deal[]
+     */
+    private function donationsToDeals(array $donations, User $user): array
+    {
+        return array_map(fn(Donation $donation) => new Deal(
+            0,
+            $donation->getCreatedAt()->getTimestamp(),
+            (int)$donation->getDonor()->getId(),
+            (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
+            (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
+            $donation->getAmount()->subtract($donation->getFeeAmount()),
+            $this->moneyWrapper->parse('0', $donation->getCurrency()),
+            $this->moneyWrapper->parse('0', $donation->getCurrency()),
+            $donation->getFeeAmount(),
+            0,
+            0,
+            $this->marketFactory->create(
+                $this->cryptoManager->findBySymbol($donation->getCurrency()),
+                $donation->getToken() ?? $donation->getTokenCreator()->getProfile()->getMintmeToken()
+            )
+        ), $donations);
     }
 
     /** {@inheritdoc} */
@@ -423,6 +468,27 @@ class MarketHandler implements MarketHandlerInterface
             ),
             $expires
         );
+    }
+
+    public function getSummary(array $market): array
+    {
+        $result = $this->marketFetcher->getSummary(
+            array_map(function (Market $market) {
+                return $this->marketNameConverter->convert($market);
+            }, $market)
+        );
+
+        return (new MarketSummaryFactory(
+            $result,
+            $market,
+            $this->moneyWrapper,
+            $this->marketNameConverter
+        ))->create();
+    }
+
+    public function getOneSummary(Market $market): Summary
+    {
+        return $this->getSummary([$market])[0];
     }
 
     private function getSymbol(TradebleInterface $tradable): string

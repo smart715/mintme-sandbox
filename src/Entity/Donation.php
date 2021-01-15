@@ -67,6 +67,12 @@ class Donation
      */
     private $createdAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
+     * @var Token|null
+     */
+    private $token;
+
     public function getId(): int
     {
         return $this->id;
@@ -155,5 +161,17 @@ class Donation
         $this->createdAt = new \DateTimeImmutable();
 
         return $this;
+    }
+
+    public function setToken(Token $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getToken(): ?Token
+    {
+        return $this->token;
     }
 }
