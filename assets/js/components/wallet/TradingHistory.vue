@@ -62,7 +62,7 @@
 import moment from 'moment';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol} from '../../utils/constants';
+import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol, webEthSymbol, webUsdcSymbol} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -164,7 +164,7 @@ export default {
                     price: toMoney(history.price, history.market.base.subunit),
                     total: toMoney(this.calculateTotalCost(history, isDonationOrder), GENERAL.precision) + ' '
                         + this.rebrandingFunc(history.market.base),
-                    fee: this.createTicker(toMoney(history.fee), history, isDonationOrder),
+                    fee: this.createTicker(toMoney(history.fee, history.market.base.subunit), history, isDonationOrder),
                     pairUrl: this.generatePairUrl(history.market),
                     blocked: history.market.quote.hasOwnProperty('blocked') ? history.market.quote.blocked : false,
                 };
@@ -210,14 +210,14 @@ export default {
 
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        createTicker: function(toMoney, history, isDonationOrder) {
-            if (history.market.identifier !== webBtcSymbol) {
-                return toMoney + ' '
-                    + (isDonationOrder ? this.rebrandingFunc(history.market.base.symbol) : MINTME.symbol);
+        createTicker: function(amount, history, isDonationOrder) {
+            if ([webBtcSymbol, webEthSymbol, webUsdcSymbol].includes(history.market.identifier)) {
+                return amount + ' ' + (WSAPI.order.type.BUY === history.side
+                    ? this.rebrandingFunc(history.market.quote.symbol)
+                    : this.rebrandingFunc(history.market.base.symbol));
             }
-            return toMoney + ' ' + (WSAPI.order.type.BUY === history.side
-                ? this.rebrandingFunc(history.market.quote.symbol)
-                : this.rebrandingFunc(history.market.base.symbol));
+            return amount + ' '
+                + (isDonationOrder ? this.rebrandingFunc(history.market.base.symbol) : MINTME.symbol);
         },
         /**
          * @param {object} history

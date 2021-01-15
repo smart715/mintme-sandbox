@@ -42,6 +42,8 @@ export const tokSymbol = 'TOK';
 export const usdcSymbol = 'USDC';
 export const tokEthSymbol = 'TOKETH';
 export const webBtcSymbol = 'WEBBTC';
+export const webEthSymbol = 'WEBETH';
+export const webUsdcSymbol = 'WEBUSDC';
 export const usdSign = '$';
 
 export const cryptoSymbols = [
