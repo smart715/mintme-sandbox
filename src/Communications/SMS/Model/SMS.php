@@ -29,6 +29,4 @@ class SMS
     {
         return $this->content;
     }
-
-
 }

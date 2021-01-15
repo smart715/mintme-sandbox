@@ -142,5 +142,4 @@ parameters:
     dm_min_amount: 1
     token_withdraw_fee: 0.01
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
-    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
-
+    d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
