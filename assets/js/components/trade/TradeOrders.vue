@@ -159,7 +159,7 @@ export default {
                 if (!e.hasOwnProperty('accounted')) {
                     a[price].push(e);
                 }
-                
+
                 return a;
             }, {});
 
