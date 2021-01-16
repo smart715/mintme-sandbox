@@ -160,7 +160,7 @@ export default {
                 if (e.hasOwnProperty('accounted')) {
                     accounted.push(e.id);
                     a[price].push(e);
-                } else if (-1 !== accounted.indexOf(e.id)) {
+                } else {
                     a[price].push(e);
                 }
 
