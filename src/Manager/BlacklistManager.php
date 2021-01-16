@@ -149,7 +149,7 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatches(string $name, string $val): bool
     {
-        return (bool)preg_match("/^" . $val . "(". $this->partsOfBlacklistedNames . ")*$/", $name);
+        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. $this->partsOfBlacklistedNames . ')*$/', $name);
     }
 
     private function createRegExTemplate(): string
