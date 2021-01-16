@@ -157,7 +157,7 @@ class BlacklistManager implements BlacklistManagerInterface
         $template = '';
 
         foreach (self::CAN_ADD_MANUALLY_PART_OF_NAMES as $word) {
-            if('' !== $template) {
+            if ('' !== $template) {
                 $template .= '|';
             }
 
