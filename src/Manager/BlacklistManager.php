@@ -8,14 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
-    private const CAN_ADD_MANUALLY_PART_OF_NAMES = [
+    private const TOKEN_NAME_APPEND = [
         'token',
         'coin',
         '-',
     ];
-
-    /** @var String */
-    private $partsOfBlacklistedNames;
 
     /** @var BlacklistRepository */
     private $repository;
@@ -31,7 +28,6 @@ class BlacklistManager implements BlacklistManagerInterface
         $repository = $this->em->getRepository(Blacklist::class);
 
         $this->repository = $repository;
-        $this->partsOfBlacklistedNames = $this->createRegExTemplate();
     }
 
     public function isBlacklistedAirdropDomain(string $url, bool $sensitive = false): bool
@@ -149,21 +145,6 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatches(string $name, string $val): bool
     {
-        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. $this->partsOfBlacklistedNames . ')*$/', $name);
-    }
-
-    private function createRegExTemplate(): string
-    {
-        $template = '';
-
-        foreach (self::CAN_ADD_MANUALLY_PART_OF_NAMES as $word) {
-            if ('' !== $template) {
-                $template .= '|';
-            }
-
-            $template .= $word;
-        }
-
-        return $template;
+        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', $name);
     }
 }
