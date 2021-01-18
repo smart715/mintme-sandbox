@@ -2,6 +2,7 @@
 
 namespace App\Exchange;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -46,7 +47,10 @@ class Market
     {
         return $this->base instanceof Token || $this->quote instanceof Token;
     }
-
+    public function isTokenCryptoMarket(): bool
+    {
+        return $this->base instanceof Token && $this->quote instanceof Crypto;
+    }
     public function __toString(): string
     {
         return $this->base->getSymbol() . '/' . $this->quote->getSymbol();
