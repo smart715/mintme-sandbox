@@ -145,6 +145,6 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatches(string $name, string $val): bool
     {
-        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', $name);
+        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', mb_strtolower($name));
     }
 }
