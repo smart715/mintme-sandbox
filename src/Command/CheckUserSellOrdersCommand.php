@@ -70,13 +70,12 @@ class CheckUserSellOrdersCommand extends Command
         foreach ($scheduledNotifications as $scheduledNotification) {
             $quoteTokens = $scheduledNotification->getUser()->getProfile()->getTokens();
 
-            if (empty($quoteTokens) &&
-                in_array($scheduledNotification->getType(), NotificationTypes::orders(), true)) {
-                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+            if (empty($quoteTokens)) {
+                $this->checkForTokensDeletions($scheduledNotification);
 
                 continue;
             }
-
+            
             foreach ($quoteTokens as $quoteToken) {
                 $this->scheduleNotificationForToken(
                     $scheduledNotification,
