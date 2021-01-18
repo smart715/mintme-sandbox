@@ -41,6 +41,11 @@ class CheckUserSellOrdersCommand extends Command
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    public const ORDERS = [
+        NotificationTypes::ORDER_FILLED,
+        NotificationTypes::ORDER_CANCELLED,
+    ];
+
     public function __construct(
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
         MarketHandlerInterface $marketHandler,
@@ -70,12 +75,12 @@ class CheckUserSellOrdersCommand extends Command
         foreach ($scheduledNotifications as $scheduledNotification) {
             $quoteTokens = $scheduledNotification->getUser()->getProfile()->getTokens();
 
-            if (empty($quoteTokens)) {
+            if (!$quoteTokens) {
                 $this->checkForTokensDeletions($scheduledNotification);
 
                 continue;
             }
-            
+
             foreach ($quoteTokens as $quoteToken) {
                 $this->scheduleNotificationForToken(
                     $scheduledNotification,
@@ -180,7 +185,7 @@ class CheckUserSellOrdersCommand extends Command
     {
         $notificationType = $scheduledNotification->getType();
 
-        if (in_array($notificationType, NotificationTypes::orders(), true)) {
+        if (in_array($notificationType, self::ORDERS, true)) {
             $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
         }
     }

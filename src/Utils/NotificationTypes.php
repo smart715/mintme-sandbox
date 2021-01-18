@@ -34,11 +34,4 @@ abstract class NotificationTypes
             self::TOKEN_DEPLOYED,
         ];
     }
-    public static function orders(): array
-    {
-        return [
-            self::ORDER_FILLED,
-            self::ORDER_CANCELLED,
-        ];
-    }
 }
