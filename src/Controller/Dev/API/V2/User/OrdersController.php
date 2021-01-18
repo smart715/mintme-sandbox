@@ -2,8 +2,8 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
+use App\Controller\Dev\API\V1\DevApiController;
 use App\Exchange\ExchangerInterface;
-use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @Rest\Route(path="/dev/api/v2/auth/user/orders")
  */
-class OrdersController extends AbstractFOSRestController
+class OrdersController extends DevApiController
 {
     /**
      * List users active orders
@@ -156,16 +156,19 @@ class OrdersController extends AbstractFOSRestController
      */
     public function placeOrder(ParamFetcherInterface $request, ExchangerInterface $exchanger): Response
     {
+        $base = $request->get('base');
+        $quote = $request->get('quote');
+
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::placeOrder',
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
-                'reverseBaseQuote' => true,
+                'reverseBaseQuote' => $this->checkForTokenCryptoMarkets($base, $quote),
             ],
             [
-                'base' => $request->get('base'),
-                'quote' => $request->get('quote'),
+                'base' => $base,
+                'quote' => $quote,
                 'priceInput' => $request->get('priceInput'),
                 'amountInput' => $request->get('amountInput'),
                 'marketPrice' => $request->get('marketPrice'),
@@ -191,16 +194,19 @@ class OrdersController extends AbstractFOSRestController
      */
     public function cancelOrder(ParamFetcherInterface $request, int $id): Response
     {
+        $base = $request->get('base');
+        $quote = $request->get('quote');
+
         return $this->forward(
             'App\Controller\Dev\API\V1\User\OrdersController::cancelOrder',
             [
                 'request' => $request,
                 'id' => $id,
-                'reverseBaseQuote' => true,
+                'reverseBaseQuote' => $this->checkForTokenCryptoMarkets($base, $quote),
             ],
             [
-                'base' => $request->get('base'),
-                'quote' => $request->get('quote'),
+                'base' => $base,
+                'quote' => $quote,
             ]
         );
     }
