@@ -70,6 +70,14 @@ class CheckUserSellOrdersCommand extends Command
         foreach ($scheduledNotifications as $scheduledNotification) {
             $quoteTokens = $scheduledNotification->getUser()->getProfile()->getTokens();
 
+            if (!$quoteTokens) {
+                $this->checkForTokensDeletions($scheduledNotification);
+            }
+
+            if (!$quoteTokens && NotificationTypes::ORDER_FILLED === $scheduledNotification->getType()) {
+                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+            }
+
             foreach ($quoteTokens as $quoteToken) {
                 $this->scheduleNotificationForToken(
                     $scheduledNotification,
@@ -168,5 +176,15 @@ class CheckUserSellOrdersCommand extends Command
             $newTimeInterval,
             $newTimeToBeSend
         );
+    }
+
+    private function checkForTokensDeletions(ScheduledNotification $scheduledNotification): void
+    {
+        $notificationType = $scheduledNotification->getType();
+
+        if (NotificationTypes::ORDER_FILLED === $notificationType ||
+            NotificationTypes::ORDER_CANCELLED === $notificationType) {
+            $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+        }
     }
 }
