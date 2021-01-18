@@ -162,6 +162,8 @@ export default {
                     a[price].push(e);
                 } else if (-1 === accounted.indexOf(e.id)) {
                     a[price].push(e);
+                } else {
+                    a[price].push(e);
                 }
 
                 return a;
