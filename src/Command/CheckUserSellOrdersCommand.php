@@ -73,6 +73,7 @@ class CheckUserSellOrdersCommand extends Command
             if (empty($quoteTokens) &&
                 in_array($scheduledNotification->getType(), NotificationTypes::orders(), true)) {
                 $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+
                 continue;
             }
 
