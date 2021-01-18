@@ -509,6 +509,8 @@ services:
     App\EventSubscriber\LocaleSubscriber:
         arguments:
             $defaultLocale: '%locale%'
+            $transLocales: '%translation_locales%'
+            $transAuto: '%translation_auto_detect%'
 
     App\Communications\DisposableEmailCommunicator:
         arguments:
