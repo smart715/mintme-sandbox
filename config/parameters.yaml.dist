@@ -210,6 +210,8 @@ parameters:
     translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
     translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # add more languages to the array if you want to auto translate the page based on browser language.
+    translation_auto_detect: [es]
     # Flag value should be in ISO 3166-1-alpha-2 code of a country.
     # Check this https://www.iso.org/obp/ui/#search/code/
     # To disable language selector menu you need to remove all languages except en or just set this var to ~
