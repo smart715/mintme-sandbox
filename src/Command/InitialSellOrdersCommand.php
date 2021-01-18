@@ -114,7 +114,10 @@ class InitialSellOrdersCommand extends Command
 
     private function noUserActiveSellOrder(User $user, Token $token): bool
     {
-        $market = $this->marketFactory->create($this->cryptoManager->findBySymbol(Token::WEB_SYMBOL), $token);
+        $market = $this->marketFactory->create(
+            $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
+            $token
+        );
 
         $sellOrders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
 
