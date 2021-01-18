@@ -177,7 +177,7 @@ class TokenController extends Controller
             'tokenDescription' => $metaDescription,
             'metaTokenDescription' => substr($metaDescription, 0, 200),
             'showDescription' => $token->isOwner($this->tokenManager->getOwnTokens()) || !$defaultActivated,
-            'currency' => Token::WEB_SYMBOL,
+            'currency' => $token->getExchangeCryptoSymbol(),
             'hash' => $user ? $user->getHash() : '',
             'profile' => $token->getProfile(),
             'isOwner' => $token->isOwner($this->tokenManager->getOwnTokens()),
