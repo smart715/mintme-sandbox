@@ -41,9 +41,9 @@ class CheckUserSellOrdersCommand extends Command
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
-    public const ORDERS = [
-        NotificationTypes::ORDER_FILLED,
-        NotificationTypes::ORDER_CANCELLED,
+    public const ORDER_TYPES = [
+        'filled',
+        'cancelled',
     ];
 
     public function __construct(
@@ -185,7 +185,7 @@ class CheckUserSellOrdersCommand extends Command
     {
         $notificationType = $scheduledNotification->getType();
 
-        if (in_array($notificationType, self::ORDERS, true)) {
+        if (in_array($notificationType, self::ORDER_TYPES, true)) {
             $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
         }
     }
