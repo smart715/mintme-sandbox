@@ -148,7 +148,6 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
-            let accounted = [];
 
             let grouped = this.clone(orders).reduce((a, e) => {
                 let price = parseFloat(e.price);
@@ -156,13 +155,7 @@ export default {
                 if (a[price] === undefined) {
                     a[price] = [];
                 }
-
-                if (e.hasOwnProperty('accounted')) {
-                    accounted.push(e.id);
-                    a[price].push(e);
-                } else if (-1 === accounted.indexOf(e.id)) {
-                    a[price].push(e);
-                }
+                a[price].push(e);
 
                 return a;
             }, {});
