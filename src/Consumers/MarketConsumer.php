@@ -79,7 +79,8 @@ class MarketConsumer implements ConsumerInterface
 
         $base = $this->cryptoManager->findBySymbol($clbResult->getBase())
             ?? $this->tokenManager->findByName($clbResult->getBase());
-        $quote = $this->tokenManager->findByName($clbResult->getQuote());
+        $quote = $this->cryptoManager->findBySymbol($clbResult->getQuote())
+            ?? $this->tokenManager->findByName($clbResult->getQuote());
 
         if (!$base && !$quote) {
             $this->logger->error(
