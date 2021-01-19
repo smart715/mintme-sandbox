@@ -9,6 +9,7 @@
                 :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
+                :is-mintme-token="isMintmeToken"
             />
         </div>
         <div class="row trade-orders">
