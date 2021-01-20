@@ -67,7 +67,7 @@
                     <br>
                     {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
-                <div class="my-1 text-center text-lg-right">
+                <div v-if="!isToken || isToken && isMintmeToken" class="my-1 text-center text-lg-right">
                     <span>{{ $t('trade.chart.market_cap') }} </span>
                     <guide>
                         <template slot="header">
@@ -129,6 +129,7 @@ export default {
         minimumVolumeForMarketcap: Number,
         buyDepth: String,
         isToken: Boolean,
+        isMintmeToken: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -333,7 +334,9 @@ export default {
                 this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
                 monthInfo.marketCap = 0;
             } else {
-              if (WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap) {
+              if (WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap ||
+                  this.isToken && !this.isMintmeToken
+              ) {
                   monthInfo.marketCap = '-';
               } else {
                   this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {

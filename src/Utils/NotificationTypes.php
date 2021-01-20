@@ -12,6 +12,11 @@ abstract class NotificationTypes
     public const ORDER_FILLED = 'filled';
     public const ORDER_CANCELLED = 'cancelled';
 
+    public const ORDER_TYPES = [
+        self::ORDER_CANCELLED,
+        self::ORDER_FILLED,
+    ];
+
     public static function getAll(): array
     {
         return [

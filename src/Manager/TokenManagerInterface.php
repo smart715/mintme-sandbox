@@ -41,7 +41,7 @@ interface TokenManagerInterface
     public function isExisted(string $tokenName): bool;
 
     /** @return Token[] */
-    public function getDeployedTokens(): array;
+    public function getDeployedTokens(?int $offset = null, ?int $limit = null): array;
 
     public function getUserDeployTokensReward(User $user): Money;
 }
