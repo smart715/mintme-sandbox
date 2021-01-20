@@ -55,12 +55,22 @@ class TokenRepository extends EntityRepository
      * @codeCoverageIgnore
      * @return Token[]
      */
-    public function getDeployedTokens(): array
+    public function getDeployedTokens(?int $offset = null, ?int $limit = null): array
     {
-        return $this->createQueryBuilder('token')
+        $query = $this->createQueryBuilder('token')
             ->leftJoin('token.crypto', 'crypto')
             ->where('token.deployed IS NOT NULL')
-            ->orderBy('token.crypto', 'ASC')
+            ->orderBy('token.crypto', 'ASC');
+
+        if (is_int($offset)) {
+            $query->setFirstResult($offset);
+        }
+
+        if (is_int($limit)) {
+            $query->setMaxResults($limit);
+        }
+
+        return $query
             ->getQuery()
             ->execute();
     }
