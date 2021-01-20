@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class KernelSubscriber implements EventSubscriberInterface
 {
-    /** @var ProfileManagerInterface  */
+    /** @var ProfileManagerInterface */
     private $profileManager;
 
     /** @var TokenStorageInterface */
@@ -81,7 +81,10 @@ class KernelSubscriber implements EventSubscriberInterface
              * @psalm-suppress UndefinedDocblockClass
              */
             $user = $this->tokenStorage->getToken()->getUser();
-            $this->profileManager->createHash($user, true, $this->isAuth);
+
+            if (!$user->getHash()) {
+                $this->profileManager->createHash($user, true, $this->isAuth);
+            }
         }
     }
 
