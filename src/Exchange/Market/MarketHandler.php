@@ -391,7 +391,7 @@ class MarketHandler implements MarketHandlerInterface
             0,
             $this->marketFactory->create(
                 $this->cryptoManager->findBySymbol($donation->getCurrency()),
-                $donation->getToken() ?? $donation->getTokenCreator()->getProfile()->getMintmeToken()
+                $donation->getToken()
             )
         ), $donations);
     }
