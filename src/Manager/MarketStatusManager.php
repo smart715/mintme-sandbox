@@ -176,6 +176,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             : 'DESC';
 
         $queryBuilder->addOrderBy($sort, $order)
+            ->addOrderBy('qt.crypto', 'ASC')
             ->addOrderBy('ms.id', $order);
 
         return $this->parseMarketStatuses(
