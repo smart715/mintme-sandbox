@@ -212,9 +212,9 @@ class TokenManager implements TokenManagerInterface
         return null !== $toSpaceToken && $tokenName !== $toSpaceTokenName;
     }
 
-    public function getDeployedTokens(): array
+    public function getDeployedTokens(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->getDeployedTokens();
+        return $this->repository->getDeployedTokens($offset, $limit);
     }
 
     public function getUserDeployTokensReward(User $user): Money
