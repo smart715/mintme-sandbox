@@ -155,8 +155,8 @@ class MarketHandler implements MarketHandlerInterface
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
             return $lDeal->getTimestamp() > $rDeal->getTimestamp();
         });
-
-        return array_slice(array_merge($deals, $donations), $offset, $limit);
+        
+        return array_slice(array_merge($deals, $donations), 0, $limit);
     }
 
     /** {@inheritdoc} */
