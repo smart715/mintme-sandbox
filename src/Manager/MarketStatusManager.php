@@ -117,7 +117,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_FIRST:
                 $queryBuilder->addSelect(
                     "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
-                )->orderBy('deployed', 'DESC');
+                )->addOrderBy('deployed', 'DESC');
 
                 break;
             case self::FILTER_DEPLOYED_ONLY_MINTME:
@@ -213,6 +213,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->leftJoin('qt.crypto', 'c')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->orderBy('qt.crypto', 'ASC')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
