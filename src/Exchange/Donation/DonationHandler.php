@@ -152,14 +152,15 @@ class DonationHandler implements DonationHandlerInterface
         $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationAmount);
 
+        $isDonationNotInMintme = Token::BTC_SYMBOL === $currency ||
+            Token::ETH_SYMBOL === $currency ||
+            Token::USDC_SYMBOL === $currency;
+
         if ($expectedAmount->greaterThanOrEqual($minTokensAmount) &&
             $sellOrdersSummary->greaterThanOrEqual($donationAmount)
         ) {
             // Donate using donation viabtc API (token creator has available sell orders)
-            if (Token::BTC_SYMBOL === $currency ||
-                Token::ETH_SYMBOL === $currency ||
-                Token::USDC_SYMBOL === $currency
-            ) {
+            if ($isDonationNotInMintme) {
                 $this->sendAmountFromUserToUser(
                     $donorUser,
                     // Sum of donation in any crypto (ETH, BTC)
@@ -181,10 +182,7 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            if (Token::BTC_SYMBOL === $currency ||
-                Token::ETH_SYMBOL === $currency ||
-                Token::USDC_SYMBOL === $currency
-            ) {
+            if ($isDonationNotInMintme) {
                 $this->sendAmountFromUserToUser(
                     $tokenCreator,
                     $tokensWorthInMintmeWithFee,
@@ -194,10 +192,7 @@ class DonationHandler implements DonationHandlerInterface
                     $currency
                 );
             }
-        } elseif ((
-            Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency || Token::USDC_SYMBOL === $currency)
-            && $twoWayDonation
-        ) {
+        } elseif ($isDonationNotInMintme && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $sellOrdersSummaryWithFee = $this->calculateAmountWithFee($sellOrdersSummary);
             $sellOrdersSummaryInCrypto = $this->getMintmeWorthInCrypto($sellOrdersSummaryWithFee, $currency);
