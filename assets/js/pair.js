@@ -10,7 +10,6 @@ import TokenAvatar from './components/token/TokenAvatar';
 import TopHolders from './components/trade/TopHolders';
 import {NotificationMixin} from './mixins/';
 import Trade from './components/trade/Trade';
-import store from './storage';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';

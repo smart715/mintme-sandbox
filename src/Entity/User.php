@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
@@ -185,7 +186,7 @@ class User extends BaseUser implements
     protected $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likes", fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $likes;
@@ -202,11 +203,26 @@ class User extends BaseUser implements
      */
     protected $airdropActions;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessToken;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessTokenSecret;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
     }
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
+     */
+    protected Collection $rewardClaimedPosts;
 
     /** @codeCoverageIgnore
      * @return array
@@ -544,5 +560,37 @@ class User extends BaseUser implements
     public function getAirdropActions(): ArrayCollection
     {
         return $this->airdropActions;
+    }
+
+    public function setTwitterAccessToken(?string $token): self
+    {
+        $this->twitterAccessToken = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessToken(): ?string
+    {
+        return $this->twitterAccessToken;
+    }
+
+    public function setTwitterAccessTokenSecret(?string $token): self
+    {
+        $this->twitterAccessTokenSecret = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessTokenSecret(): ?string
+    {
+        return $this->twitterAccessTokenSecret;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isSignedInWithTwitter(): bool
+    {
+        return null !== $this->twitterAccessToken && null !== $this->twitterAccessTokenSecret;
     }
 }

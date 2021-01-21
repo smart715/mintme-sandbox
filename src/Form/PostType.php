@@ -14,11 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /** @codeCoverageIgnore  */
 class PostType extends AbstractType
 {
-    /** @var XSSProtectionTransformer */
-    private $xssProtectionTransformer;
-
-    /** @var MoneyTransformer */
-    private $moneyTransformer;
+    private XSSProtectionTransformer $xssProtectionTransformer;
+    private MoneyTransformer $moneyTransformer;
 
     public function __construct(
         XSSProtectionTransformer $xssProtectionTransformer,
@@ -33,12 +30,17 @@ class PostType extends AbstractType
         $builder
             ->add('content', TextareaType::class)
             ->add('amount', TextType::class)
+            ->add('title', TextType::class)
+            ->add('shareReward', TextType::class)
         ;
 
         $builder->get('content')
             ->addModelTransformer($this->xssProtectionTransformer);
 
         $builder->get('amount')
+            ->addModelTransformer($this->moneyTransformer);
+
+        $builder->get('shareReward')
             ->addModelTransformer($this->moneyTransformer);
     }
 

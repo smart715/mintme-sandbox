@@ -36,6 +36,7 @@ trait RefererTrait
     {
         return [
             'token_show',
+            'show_post',
         ];
     }
 
