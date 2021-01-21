@@ -6,6 +6,7 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -20,6 +21,7 @@ use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\PostManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Security\Config\DisabledServicesConfig;
@@ -353,6 +355,28 @@ class TokenController extends Controller
     public function showModal(): Response
     {
         return $this->redirectToOwnToken('intro', 'settings');
+    }
+
+    /**
+     * @Route("/token/{tokenName}/posts/{slug}", name="new_show_post", options={"expose"=true})
+     */
+    public function showPost(string $tokenName, string $slug, PostManagerInterface $postManager): Response
+    {
+        $post = $postManager->getBySlug($slug);
+
+        if (!$post) {
+            throw new NotFoundPostException();
+        }
+
+        if ($post->getToken()->getName() !== $tokenName) {
+            throw new NotFoundPostException();
+        }
+
+        return $this->render('pages/show_post.html.twig', [
+            'post' => $this->normalize($post),
+            'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
+            'comments' => $this->normalize($post->getComments()),
+        ]);
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
