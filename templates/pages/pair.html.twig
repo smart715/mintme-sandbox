@@ -174,8 +174,8 @@
                         </div>
                         <div class="row">
                             <top-holders
-                                    class="col-12 mt-3"
-                                    :token-name="{{ market.quote.symbol | json_encode }}">
+                                class="col-12 mt-3"
+                                :token-name="{{ market.quote.symbol | json_encode }}">
                             </top-holders>
                         </div>
                     </b-tab>
@@ -230,29 +230,29 @@
                 {% endif %}
                 {% if showTrade %}
                     <b-tab
-                            title="{% trans %}page.pair.tab.trade{% endtrans %}"
-                            title-link-class="token-trade-tab-link"
-                            {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
-                            {% if tab == 'trade' %} {{ 'active' }} {% endif %}
+                        title="{% trans %}page.pair.tab.trade{% endtrans %}"
+                        title-link-class="token-trade-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
                     >
                         <trade
-                                :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                                :is-mintme-token="{{ isMintmeToken }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                hash="{{ hash }}"
-                                login-url="{{ path('fos_user_security_login') }}"
-                                signup-url="{{ path('fos_user_registration_register') }}"
-                                :market="{{ market | json_encode }}"
-                                :logged-in="{{ loggedIn }}"
-                                :is-owner="{{ isOwner }}"
-                                :precision="{{ precision }}"
-                                :user-id="{{ app.user ? app.user.id : 0 }}"
-                                mintme-supply-url="{{ mintme_supply }}"
-                                :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
-                                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                                {% if isTokenPage %}
-                                    :taker-fee="{{ taker_fee }}"
-                                {% endif %}
+                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                            :is-mintme-token="{{ isMintmeToken }}"
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market="{{ market | json_encode }}"
+                            :logged-in="{{ loggedIn }}"
+                            :is-owner="{{ isOwner }}"
+                            :precision="{{ precision }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            {% if isTokenPage %}
+                                :taker-fee="{{ taker_fee }}"
+                            {% endif %}
                         >
                         </trade>
                     </b-tab>

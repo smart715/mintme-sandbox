@@ -16,10 +16,12 @@
                                     :show-edit="{{ showEdit }}"
                                     @go-to-trade="$emit('go-to-trade', $event)"
                                     :logged-in="{{ loggedIn }}"
+                                    single-page
                                 ></post>
                                 <comments
                                     :comments="comments || (comments = {{ comments | json_encode }})"
                                     :post-id="{{ post.id }}"
+                                    token-name="{{ post.token.name }}"
                                     :logged-in="{{ loggedIn }}"
                                     @delete-comment="deleteComment"
                                     @new-comment="newComment"

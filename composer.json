@@ -10,6 +10,7 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-openssl": "*",
+        "abraham/twitteroauth": "^1.2",
         "brick/math": "^0.8.14",
         "cron/cron-bundle": "^2.4",
         "doctrine/doctrine-fixtures-bundle": "^3.3",

@@ -2,6 +2,8 @@ import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
 import Vuelidate from 'vuelidate';
 import sanitizeHtml from './sanitize_html';
+import store from './storage';
+import UserInit from './components/UserInit';
 
 /*
     To enable passive listeners,
@@ -36,3 +38,11 @@ const imagesContext = require.context(
     /\.(png|jpg|jpeg|gif|ico|svg)$/
 );
 imagesContext.keys().forEach(imagesContext);
+
+new Vue({
+    el: '#user-init',
+    components: {
+        UserInit,
+    },
+    store,
+});
