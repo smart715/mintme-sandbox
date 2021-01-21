@@ -167,7 +167,7 @@ class DonationHandler implements DonationHandlerInterface
                     $amountInCrypto,
                     $donorUser,
                     // Sum of donation in MINTME
-                    $donationAmount,
+                    $tokensWorthInMintme,
                     $currency,
                     Token::WEB_SYMBOL
                 );
@@ -176,7 +176,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($donationAmount),
+                $this->moneyWrapper->format($tokensWorthInMintme),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
@@ -242,8 +242,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                (string)BigDecimal::of($this->moneyWrapper->format($sellOrdersSummary))
-                    ->dividedBy(1, 4, RoundingMode::UP),
+                $this->moneyWrapper->format($tokensWorthInMintme),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
