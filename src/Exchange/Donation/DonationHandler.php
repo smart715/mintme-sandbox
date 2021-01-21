@@ -200,7 +200,7 @@ class DonationHandler implements DonationHandlerInterface
                 $donorUser,
                 $sellOrdersSummaryInCrypto,
                 $donorUser,
-                $sellOrdersSummary,
+                $tokensWorthInMintme,
                 $currency,
                 Token::WEB_SYMBOL
             );
@@ -208,7 +208,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
-                $this->moneyWrapper->format($sellOrdersSummary),
+                $this->moneyWrapper->format($tokensWorthInMintme),
                 $this->donationConfig->getFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
