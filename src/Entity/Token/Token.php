@@ -545,6 +545,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getTelegramUrl(): ?string
     {
         return $this->telegramUrl;
@@ -557,6 +558,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getDiscordUrl(): ?string
     {
         return $this->discordUrl;
@@ -703,6 +705,16 @@ class Token implements TradebleInterface, ImagineInterface
 
         return $profile
             ? $profile->getUser()
+            : null;
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getOwnerId(): ?int
+    {
+        $owner = $this->getOwner();
+
+        return $owner
+            ? $owner->getId()
             : null;
     }
 

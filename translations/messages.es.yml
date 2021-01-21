@@ -416,7 +416,7 @@ post.tab.bbcode.ol : '[ol]<br> [li]One[/li]<br> [li]Two[/li]<br>[/ol]'
 post.tab.content : 'Content can''t be empty or contain only bbcodes and whitespaces'
 post.required: 'Required amount of tokens:'
 post.not_any_post: 'The token creator has not added any posts yet.'
-post.created: 'Post created. es'
+post.created: 'Post created.'
 post.comments: 'Comments.'
 post.no_one_commented: 'No one commented yet.'
 post.likes: 'Likes'
@@ -682,7 +682,23 @@ post.logged_in.1: 'Para ver esta publicación necesita tener'
 post.logged_in.2: 'en su balance. Visite la página trade y cree ordenes de compra para alcanzar la cantidad de tokens requeridos.'
 post.not_logged: 'Para ver esta publicación necesita tener'
 post.delete: '¿Realmente desea eliminar esta publicación?'
+post.not_found:
+post.edited:
+post.delete.error:
+post.share:
+post.share.reward:
+post.share.sign_in_twitter:
+post.share.confirm_modal:
+post.share.accept:
+post.share.message:
+post.share.not_enough_funds:
+post.share.try_here:
+post.share.success:
+post.reward.not_logged_in:
 post_form.require_amount: 'Cantidad de tokens requerida:'
+post_form.title:
+post_form.share_reward:
+post_form.share_reward_guide:
 post_form.body: 'Puede restringir la visibilidad de esta publicación o dejarla en 0. El usuario debe tener la cantidad de tokens requerida para poder ver esta publicación.'
 post_form.msg.empty: 'El contenido no puede estar vacío o solamente contener bbcodes y espacios en blanco'
 post_form.msg.min_length: 'El contenido debe tener al menos %minContentLength% caracteres'
@@ -691,7 +707,19 @@ post_form.msg.amount.required: 'La cantidad es requerida'
 post_form.msg.amount.numeric: 'La cantidad debe ser un valor numérico'
 post_form.msg.amount.max_decimals: 'La cantidad puede tener máximo %maxDecimals% decimales'
 post_form.msg.amount.between: 'La cantidad debe estar entre 0 y %maxAmount%'
+post_form.msg.share_reward.required:
+post_form.msg.share_reward.numeric:
+post_form.msg.share_reward.max_decimals:
+post_form.msg.share_reward.between:
+post_form.msg.title.required:
+post_form.msg.title.max_length:
+post_form.backend.no_token:
 posts.all: 'Todas las publicaciones'
+comment.created:
+comment.deleted:
+comment.edited:
+comment.liked:
+like.removed:
 airdrop.end: 'Finalizar este airdrop'
 airdrop.amount_tokens: 'Cantidad de tokens para el airdrop:'
 airdrop.insufficient_funds: 'Fondos insuficientes para la campaña de airdrop.'
@@ -1163,6 +1191,8 @@ api.tokens.unathorized: 'Sin autorización'
 api.tokens.deleted: 'El token %tokeName% fue eliminado exitosamente.'
 api.no_enough_amount: 'No enough amount'
 api.not_found: 'Not found'
+api.something_went_wrong:
+api.success:
 api.documentation.authorize: 'Authorize'
 api.documentation.open: 'Open'
 api.documentation.currencies: 'Currencies'
@@ -1199,4 +1229,6 @@ token.creation.disabled: 'Token creation disabled. Try again later.'
 trade.page.disabled: 'Trade page has been disabled. Try again later.'
 donate.page.disabled: 'Buy page has been disabled. Try again later.'
 donate.disabled: 'Direct purchases disabled'
+twitter.sign_in:
+twitter.must_sign_in:
 mail.verification_code: ''

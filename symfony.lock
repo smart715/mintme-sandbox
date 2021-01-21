@@ -1,4 +1,7 @@
 {
+    "abraham/twitteroauth": {
+        "version": "1.2.0"
+    },
     "amphp/amp": {
         "version": "v2.4.4"
     },

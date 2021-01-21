@@ -662,3 +662,8 @@ services:
     App\Controller\API\WalletController:
         arguments:
             $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
+
+    Abraham\TwitterOAuth\TwitterOAuth:
+        arguments:
+            $consumerKey: '%env(TWITTER_API_KEY)%'
+            $consumerSecret: '%env(TWITTER_API_SECRET)%'

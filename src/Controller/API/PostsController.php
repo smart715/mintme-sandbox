@@ -2,10 +2,13 @@
 
 namespace App\Controller\API;
 
+use Abraham\TwitterOAuth\TwitterOAuth;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\CommentType;
 use App\Form\PostType;
 use App\Mailer\MailerInterface;
@@ -20,8 +23,11 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -29,37 +35,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PostsController extends AbstractFOSRestController
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
-
-    /** @var PostManagerInterface */
-    private $postManager;
-
-    /** @var UserNotificationManagerInterface */
-    private UserNotificationManagerInterface $userNotificationManager;
-
-    /** @var MailerInterface */
-    private MailerInterface $mailer;
-
+    public const TWITTER_INVALID_TOKEN_ERROR = 89;
+    private TokenManagerInterface $tokenManager;
+    private EntityManagerInterface $entityManager;
+    private PostManagerInterface $postManager;
     private TranslatorInterface $translator;
+    private LoggerInterface $logger;
+    private UserNotificationManagerInterface $userNotificationManager;
+    private MailerInterface $mailer;
+    private AsciiSlugger $slugger;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         EntityManagerInterface $entityManager,
         PostManagerInterface $postManager,
+        TranslatorInterface $translator,
+        LoggerInterface $logger,
         UserNotificationManagerInterface $userNotificationManager,
-        MailerInterface $mailer,
-        TranslatorInterface $translator
+        MailerInterface $mailer
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
         $this->postManager = $postManager;
+        $this->translator = $translator;
+        $this->logger = $logger;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
-        $this->translator = $translator;
+        $this->slugger = new AsciiSlugger();
     }
 
     /**
@@ -67,6 +70,8 @@ class PostsController extends AbstractFOSRestController
      * @Rest\Post("/create/{tokenName}", name="create_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
+     * @Rest\RequestParam(name="title", nullable=false)
+     * @Rest\RequestParam(name="shareReward", nullable=false)
      */
     public function create(string $tokenName, ParamFetcherInterface $request): View
     {
@@ -79,13 +84,13 @@ class PostsController extends AbstractFOSRestController
         $token = $this->tokenManager->getOwnTokenByName($tokenName);
 
         if (!$token) {
-            throw new ApiNotFoundException('Current user has not created a token');
+            throw new ApiNotFoundException($this->translator->trans('post_form.backend.no_token'));
         }
 
         $post = new Post();
         $post->setToken($token);
 
-        return $this->handlePostForm($post, $request, 'Post created.', true);
+        return $this->handlePostForm($post, $request, $this->translator->trans('post.created'), true);
     }
 
     /**
@@ -93,6 +98,8 @@ class PostsController extends AbstractFOSRestController
      * @Rest\Post("/edit/{id<\d+>}", name="edit_post", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      * @Rest\RequestParam(name="amount", nullable=false)
+     * @Rest\RequestParam(name="title", nullable=false)
+     * @Rest\RequestParam(name="shareReward", nullable=false)
      */
     public function edit(ParamFetcherInterface $request, int $id): View
     {
@@ -105,12 +112,12 @@ class PostsController extends AbstractFOSRestController
         $post = $this->postManager->getById($id);
 
         if (!$post) {
-            throw new ApiNotFoundException("Post not found");
+            throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
         $this->denyAccessUnlessGranted('edit', $post);
 
-        return $this->handlePostForm($post, $request, 'Post edited.');
+        return $this->handlePostForm($post, $request, $this->translator->trans('post.edited'));
     }
 
     /**
@@ -140,7 +147,7 @@ class PostsController extends AbstractFOSRestController
         $post = $this->postManager->getById($id);
 
         if (!$post) {
-            throw new ApiNotFoundException("Post not found");
+            throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
         $this->denyAccessUnlessGranted('edit', $post);
@@ -148,7 +155,7 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->remove($post);
         $this->entityManager->flush();
 
-        return $this->view(['message' => 'Post deleted.'], Response::HTTP_OK);
+        return $this->view(['message' => $this->translator->trans('post.deleted')], Response::HTTP_OK);
     }
 
     /**
@@ -168,13 +175,13 @@ class PostsController extends AbstractFOSRestController
         $post = $this->postManager->getById($id);
 
         if (!$post) {
-            throw new ApiNotFoundException('Post not found.');
+            throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
         $comment = new Comment();
         $comment->setPost($post)->setAuthor($user);
 
-        return $this->handleCommentForm($comment, $request, 'Comment created.');
+        return $this->handleCommentForm($comment, $request, $this->translator->trans('comment.created'));
     }
 
     /**
@@ -208,7 +215,7 @@ class PostsController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('edit', $comment);
 
-        return $this->handleCommentForm($comment, $request, 'Comment edited.');
+        return $this->handleCommentForm($comment, $request, $this->translator->trans('comment.edited'));
     }
 
     /**
@@ -232,14 +239,113 @@ class PostsController extends AbstractFOSRestController
 
             $this->entityManager->flush();
 
-            return $this->view(['message' => 'Like removed.', Response::HTTP_OK]);
+            return $this->view(['message' => $this->translator->trans('like.removed'), Response::HTTP_OK]);
         }
 
         $comment->addLike($user);
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
 
-        return $this->view(['message' => 'Liked comment.', Response::HTTP_OK]);
+        return $this->view(['message' => $this->translator->trans('comment.liked'), Response::HTTP_OK]);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/{id<\d+>}/share", name="share_post", options={"expose"=true})
+     */
+    public function sharePost(int $id, TwitterOAuth $twitter, BalanceHandlerInterface $balanceHandler): View
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        if (!$user->isSignedInWithTwitter()) {
+            throw new ApiBadRequestException('invalid twitter token');
+        }
+
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new ApiNotFoundException($this->translator->trans('post.not_found'));
+        }
+
+        if ($post->isUserAlreadyRewarded($user)) {
+            throw new ApiBadRequestException('already rewarded');
+        }
+
+        if ($user->getId() === $post->getToken()->getOwner()->getId()) {
+            throw new ApiBadRequestException();
+        }
+
+        $twitter->setOauthToken(
+            $user->getTwitterAccessToken(),
+            $user->getTwitterAccessTokenSecret()
+        );
+
+        $url = $this->generateUrl('new_show_post', [
+            'tokenName' => $post->getToken()->getName(),
+            'slug' => $post->getSlug(),
+        ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $message = $this->translator->trans('post.share.message', [
+            '%title%' => $post->getTitle(),
+            '%url%' => $url,
+        ]);
+
+        try {
+            /** @var object $response */
+            $response = $twitter->post('statuses/update', ['status' => $message]);
+        } catch (\Throwable $e) {
+            $this->logger->error("Failed to post message on twitter: {$e->getMessage()}");
+
+            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        }
+
+        /** @var array $errors */
+        $errors = $response->errors ?? []; // @phpstan-ignore-line
+
+        if (count($errors) > 0) {
+            // expired or invalid access token
+            if (self::TWITTER_INVALID_TOKEN_ERROR === $errors[0]->code) {
+                $user->setTwitterAccessToken(null)->setTwitterAccessTokenSecret(null);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
+
+                throw new ApiBadRequestException('invalid twitter token');
+            }
+
+            $this->logger->error("Failed to post message on twitter: {$errors[0]->message}");
+
+            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        }
+
+        $token = $post->getToken();
+        $tokenOwner = $token->getOwner();
+
+        $tokenOwnerBalance = $balanceHandler->exchangeBalance($tokenOwner, $token);
+
+        $reward = $post->getShareReward();
+
+        if ($tokenOwnerBalance->lessThan($reward)) {
+            return $this->view(['message' => 'not enough funds'], Response::HTTP_CONFLICT);
+        }
+
+        try {
+            $balanceHandler->withdraw($tokenOwner, $token, $reward);
+            $balanceHandler->deposit($user, $token, $reward);
+            $post->addRewardedUser($user);
+            $this->entityManager->persist($post);
+            $this->entityManager->flush();
+        } catch (\Throwable $e) {
+            $this->logger->error("Failed to give reward for sharing post: {$e->getMessage()}");
+
+            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        }
+
+        return $this->view(['message' => $this->translator->trans('api.success')], Response::HTTP_OK);
     }
 
     private function handlePostForm(
@@ -255,6 +361,14 @@ class PostsController extends AbstractFOSRestController
         if (!$form->isValid()) {
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
+
+        $slug = $baseSlug = $this->slugger->slug($post->getTitle())->toString();
+
+        for ($i = 2; $this->postManager->getBySlug($slug); $i++) {
+            $slug = $baseSlug.'-'.$i;
+        }
+
+        $post->setSlug($slug);
 
         $this->entityManager->persist($post);
         $this->entityManager->flush();
