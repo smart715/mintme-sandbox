@@ -95,16 +95,16 @@ class DonationHandler implements DonationHandlerInterface
     public function makeDonation(
         Market $market,
         string $currency,
-        string $amount,
-        string $expectedAmount,
+        string $donationAmount,
+        string $expectedTokensAmount,
         User $donorUser,
         string $sellOrdersSummary
     ): void {
         // Sum of donation in any crypto (MINTME, BTC, ETH, USDC)
-        $amountObj = $this->moneyWrapper->parse($amount, $currency);
+        $amountInCrypto = $this->moneyWrapper->parse($donationAmount, $currency);
 
         // Check if user has enough balance
-        $this->checkAmount($donorUser, $amountObj, $currency);
+        $this->checkAmount($donorUser, $amountInCrypto, $currency);
 
         /** @var Token $token */
         $token = $market->getQuote();
@@ -115,10 +115,10 @@ class DonationHandler implements DonationHandlerInterface
         $sellOrdersSummary = $this->moneyWrapper->parse($sellOrdersSummary, Token::WEB_SYMBOL);
 
         // Amount of tokens which user receive after donation
-        $expectedAmount = $this->moneyWrapper->parse($expectedAmount, Token::WEB_SYMBOL);
+        $expectedAmount = $this->moneyWrapper->parse($expectedTokensAmount, Token::WEB_SYMBOL);
         $minTokensAmount = $this->donationConfig->getMinTokensAmount();
 
-        $donationAmount = $amountObj;
+        $donationAmount = $amountInCrypto;
 
         if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency || Token::USDC_SYMBOL === $currency) {
             // Convert sum of donation in any Crypto to MINTME
@@ -164,7 +164,7 @@ class DonationHandler implements DonationHandlerInterface
                 $this->sendAmountFromUserToUser(
                     $donorUser,
                     // Sum of donation in any crypto (ETH, BTC)
-                    $amountObj,
+                    $amountInCrypto,
                     $donorUser,
                     // Sum of donation in MINTME
                     $donationAmount,
@@ -214,7 +214,7 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            $donationAmountLeftInCrypto = $amountObj->subtract($sellOrdersSummaryInCrypto);
+            $donationAmountLeftInCrypto = $amountInCrypto->subtract($sellOrdersSummaryInCrypto);
             $feeFromDonationAmount = $this->calculateFee($donationAmountLeftInCrypto);
             $amountToDonate = $donationAmountLeftInCrypto->subtract($feeFromDonationAmount);
             $this->sendAmountFromUserToUser(
@@ -260,11 +260,11 @@ class DonationHandler implements DonationHandlerInterface
             );
         } else {
             // Donate (send) funds from user to user (token creator has no sell orders).
-            $feeFromDonationAmount = $this->calculateFee($amountObj);
-            $amountToDonate = $amountObj->subtract($feeFromDonationAmount);
+            $feeFromDonationAmount = $this->calculateFee($amountInCrypto);
+            $amountToDonate = $amountInCrypto->subtract($feeFromDonationAmount);
             $this->sendAmountFromUserToUser(
                 $donorUser,
-                $amountObj,
+                $amountInCrypto,
                 $tokenCreator,
                 $amountToDonate,
                 $currency,
@@ -272,8 +272,8 @@ class DonationHandler implements DonationHandlerInterface
             );
         }
 
-        $feeAmount = $this->calculateFee($amountObj);
-        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountObj, $feeAmount, $expectedAmount, $token);
+        $feeAmount = $this->calculateFee($amountInCrypto);
+        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountInCrypto, $feeAmount, $expectedAmount, $token);
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
     }
 
