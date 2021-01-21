@@ -15,8 +15,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Brick\Math\BigDecimal;
-use Brick\Math\RoundingMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
