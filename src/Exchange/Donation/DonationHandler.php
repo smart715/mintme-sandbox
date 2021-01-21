@@ -236,8 +236,7 @@ class DonationHandler implements DonationHandlerInterface
             );
         } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
-            $sellOrdersSummary = $this->calculateAmountWithFee($sellOrdersSummary);
-            $amountToSendManually = $donationAmount->subtract($sellOrdersSummary);
+            $amountToSendManually = $donationAmount->subtract($tokensWorthInMintme);
 
             $this->donationFetcher->makeDonation(
                 $donorUser->getId(),
