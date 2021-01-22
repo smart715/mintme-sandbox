@@ -150,15 +150,13 @@ class DonationHandler implements DonationHandlerInterface
         $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationAmount);
 
-        $isDonationNotInMintme = Token::BTC_SYMBOL === $currency ||
-            Token::ETH_SYMBOL === $currency ||
-            Token::USDC_SYMBOL === $currency;
+        $isDonationInMintme = Token::WEB_SYMBOL === $currency;
 
         if ($expectedAmount->greaterThanOrEqual($minTokensAmount) &&
             $sellOrdersSummary->greaterThanOrEqual($donationAmount)
         ) {
             // Donate using donation viabtc API (token creator has available sell orders)
-            if ($isDonationNotInMintme) {
+            if (!$isDonationInMintme) {
                 $this->sendAmountFromUserToUser(
                     $donorUser,
                     // Sum of donation in any crypto (ETH, BTC)
@@ -180,7 +178,7 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            if ($isDonationNotInMintme) {
+            if (!$isDonationInMintme) {
                 $this->sendAmountFromUserToUser(
                     $tokenCreator,
                     $tokensWorthInMintmeWithFee,
@@ -190,7 +188,7 @@ class DonationHandler implements DonationHandlerInterface
                     $currency
                 );
             }
-        } elseif ($isDonationNotInMintme && $twoWayDonation) {
+        } elseif (!$isDonationInMintme && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $sellOrdersSummaryWithFee = $this->calculateAmountWithFee($sellOrdersSummary);
             $sellOrdersSummaryInCrypto = $this->getMintmeWorthInCrypto($sellOrdersSummaryWithFee, $currency);
@@ -232,7 +230,7 @@ class DonationHandler implements DonationHandlerInterface
                 Token::WEB_SYMBOL,
                 $currency
             );
-        } elseif (Token::WEB_SYMBOL === $currency && $twoWayDonation) {
+        } elseif ($isDonationInMintme && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
             $amountToSendManually = $donationAmount->subtract($tokensWorthInMintme);
 
