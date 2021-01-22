@@ -139,6 +139,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->leftJoin('qt.crypto', 'c')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->orderBy('qt.crypto', 'ASC')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
@@ -151,7 +152,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             $queryBuilder->addSelect(
                 "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
             )
-            ->orderBy('deployed', 'DESC');
+            ->addOrderBy('deployed', 'DESC');
         } elseif (self::DEPLOYED_ONLY === $filter) {
             $queryBuilder->andWhere(
                 "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
