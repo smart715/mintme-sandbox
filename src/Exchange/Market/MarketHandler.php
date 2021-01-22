@@ -150,13 +150,13 @@ class MarketHandler implements MarketHandlerInterface
         }, $markets);
 
         $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
-        $deals = $marketDeals ? array_merge(...$marketDeals) : [];
+        $deals = array_merge($marketDeals ? array_merge(...$marketDeals) : [], $donations);
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
-            return $lDeal->getTimestamp() > $rDeal->getTimestamp();
+            return $lDeal->getTimestamp() < $rDeal->getTimestamp();
         });
-        
-        return array_slice(array_merge($deals, $donations), 0, $limit);
+
+        return array_slice($deals, 0, $limit);
     }
 
     /** {@inheritdoc} */
