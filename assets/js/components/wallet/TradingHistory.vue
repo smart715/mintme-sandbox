@@ -86,6 +86,7 @@ export default {
         return {
             tableData: null,
             currentPage: 1,
+            donations: 0,
             fields: {
                 date: {
                     key: 'date',
@@ -180,14 +181,23 @@ export default {
     methods: {
         updateTableData: function() {
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
+                this.$axios.retry.get(this.$routing.generate('executed_user_orders', {
+                    page: this.currentPage,
+                    donations: this.donations,
+                }))
                     .then((res) => {
-                        res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+                        let orders = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+                        orders.forEach((order) => {
+                            if (0 === order.id) {
+                               this.donations++;
+                            }
+                        });
+
                         if (this.tableData === null) {
-                            this.tableData = res.data;
+                            this.tableData = orders;
                             this.currentPage++;
-                        } else if (res.data.length > 0) {
-                            this.tableData = this.tableData.concat(res.data);
+                        } else if (orders.length > 0) {
+                            this.tableData = this.tableData.concat(orders);
                             this.currentPage++;
                         }
 

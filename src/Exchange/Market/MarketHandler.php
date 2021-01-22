@@ -134,7 +134,8 @@ class MarketHandler implements MarketHandlerInterface
         array $markets,
         int $offset = 0,
         int $limit = 100,
-        bool $reverseBaseQuote = false
+        bool $reverseBaseQuote = false,
+        int $donationsOffset = 0
     ): array {
         $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
             return $this->parseDeals(
@@ -150,6 +151,7 @@ class MarketHandler implements MarketHandlerInterface
         }, $markets);
 
         $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
+        $donations = array_slice($donations, $offset, count($donations));
         $deals = array_merge($marketDeals ? array_merge(...$marketDeals) : [], $donations);
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {

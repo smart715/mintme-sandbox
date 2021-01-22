@@ -66,7 +66,8 @@ interface MarketHandlerInterface
         array $markets,
         int $offset = 0,
         int $limit = 50,
-        bool $reverseBaseQuote = false
+        bool $reverseBaseQuote = false,
+        int $donationsOffset = 0
     ): array;
 
     /**
