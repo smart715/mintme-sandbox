@@ -183,15 +183,6 @@ class DepositConsumer implements ConsumerInterface
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
-            if ($exception instanceof BalanceException) {
-                $this->logger->error(
-                    '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
-                );
-                $this->clock->sleep(10);
-
-                return false;
-            }
-
             $this->logger->error(
                 '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
             );
