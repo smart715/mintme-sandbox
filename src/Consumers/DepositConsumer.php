@@ -48,9 +48,6 @@ class DepositConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var ClockInterface */
-    private $clock;
-
     /** @var WalletInterface */
     private $depositCommunicator;
 
@@ -73,7 +70,6 @@ class DepositConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        ClockInterface $clock,
         WalletInterface $depositCommunicator,
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher,
@@ -86,7 +82,6 @@ class DepositConsumer implements ConsumerInterface
         $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
-        $this->clock = $clock;
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
@@ -183,15 +178,6 @@ class DepositConsumer implements ConsumerInterface
 
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
-            if ($exception instanceof BalanceException) {
-                $this->logger->error(
-                    '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
-                );
-                $this->clock->sleep(10);
-
-                return false;
-            }
-
             $this->logger->error(
                 '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
             );
