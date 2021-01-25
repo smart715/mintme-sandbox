@@ -134,14 +134,15 @@ class MarketHandler implements MarketHandlerInterface
         array $markets,
         int $offset = 0,
         int $limit = 100,
-        bool $reverseBaseQuote = false
+        bool $reverseBaseQuote = false,
+        int $donationsOffset = 0
     ): array {
-        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
+        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote, $donationsOffset) {
             return $this->parseDeals(
                 $this->marketFetcher->getUserExecutedHistory(
                     $user->getId(),
                     $this->marketNameConverter->convert($market),
-                    $offset,
+                    $offset - $donationsOffset,
                     $limit
                 ),
                 $market,
@@ -150,13 +151,14 @@ class MarketHandler implements MarketHandlerInterface
         }, $markets);
 
         $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
-        $deals = $marketDeals ? array_merge(...$marketDeals) : [];
+        $donations = array_slice($donations, $donationsOffset, count($donations) - $donationsOffset);
+        $deals = array_merge($marketDeals ? array_merge(...$marketDeals) : [], $donations);
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
-            return $lDeal->getTimestamp() > $rDeal->getTimestamp();
+            return $lDeal->getTimestamp() < $rDeal->getTimestamp();
         });
 
-        return array_slice(array_merge($deals, $donations), $offset, $limit);
+        return array_slice($deals, 0, $limit);
     }
 
     /** {@inheritdoc} */
