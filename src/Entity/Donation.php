@@ -69,8 +69,7 @@ class Donation
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token")
-     * @ORM\JoinColumn(name="token_id", nullable=false)
-     * @var Token
+     * @var Token|null
      */
     private $token;
 
@@ -171,7 +170,7 @@ class Donation
         return $this;
     }
 
-    public function getToken(): Token
+    public function getToken(): ?Token
     {
         return $this->token;
     }

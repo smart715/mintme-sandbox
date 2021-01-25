@@ -379,23 +379,32 @@ class MarketHandler implements MarketHandlerInterface
      */
     private function donationsToDeals(array $donations, User $user): array
     {
-        return array_map(fn(Donation $donation) => new Deal(
-            0,
-            $donation->getCreatedAt()->getTimestamp(),
-            (int)$donation->getDonor()->getId(),
-            (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
-            (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
-            $donation->getAmount()->subtract($donation->getFeeAmount()),
-            $this->moneyWrapper->parse('0', $donation->getCurrency()),
-            $this->moneyWrapper->parse('0', $donation->getCurrency()),
-            $donation->getFeeAmount(),
-            0,
-            0,
-            $this->marketFactory->create(
-                $this->cryptoManager->findBySymbol($donation->getCurrency()),
-                $donation->getToken()
-            )
-        ), $donations);
+        $donations = array_map(function (Donation $donation) use ($user) {
+            if (!$donation->getToken()) {
+                // ToDo: Show these donations on frontend instead of skip it
+                return null;
+            }
+
+            return new Deal(
+                0,
+                $donation->getCreatedAt()->getTimestamp(),
+                (int)$donation->getDonor()->getId(),
+                (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
+                (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
+                $donation->getAmount()->subtract($donation->getFeeAmount()),
+                $this->moneyWrapper->parse('0', $donation->getCurrency()),
+                $this->moneyWrapper->parse('0', $donation->getCurrency()),
+                $donation->getFeeAmount(),
+                0,
+                0,
+                $this->marketFactory->create(
+                    $this->cryptoManager->findBySymbol($donation->getCurrency()),
+                    $donation->getToken()
+                )
+            );
+        }, $donations);
+
+        return array_filter($donations, fn ($donation) => !is_null($donation));
     }
 
     /** {@inheritdoc} */
