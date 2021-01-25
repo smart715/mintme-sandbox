@@ -29,8 +29,6 @@ new Vue({
             tokenNameInBlacklist: false,
             description: '',
             tokenCreation: true,
-            iCancel: this.$t('cancel'),
-            iClear: this.$t('clear'),
         };
     },
     components: {
@@ -47,13 +45,6 @@ new Vue({
             return {
                 maxDescriptionLength: descriptionLength.max,
             };
-        },
-        cancelBtnText: function() {
-            if (this.tokenName || this.description) {
-                return this.iClear;
-            } else {
-                return this.iCancel;
-            }
         },
     },
     watch: {
@@ -120,15 +111,6 @@ new Vue({
                         frm.submit();
                     }
                 }, (err) => this.notifyError(err.response.data.message));
-        },
-        cancelBtnSwitch: function(e) {
-            this.cancelBtnText === this.iClear ?
-            this.formClear() :
-            this.historyBack(e);
-        },
-        formClear: function() {
-            this.tokenName = '';
-            this.$refs.description.internalValue = '';
         },
         historyBack: function(e) {
             e.preventDefault();
