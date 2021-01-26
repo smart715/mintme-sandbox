@@ -341,11 +341,9 @@ class Profile implements ImagineInterface
 
     public function getTokens(): array
     {
-        if ($this->hasTokens()) {
-            return $this->tokens->toArray();
-        }
-
-        return [];
+        return $this->hasTokens()
+            ? $this->tokens->toArray()
+            : [];
     }
 
     public function hasTokens(): bool
