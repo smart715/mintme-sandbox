@@ -24,7 +24,7 @@ final class Version20201113121114 extends AbstractMigration
 
         $this->addSql('
             INSERT INTO `crypto` (`name`, `symbol`, `subunit`, `fee`, `tradable`, `exchangeble`, `show_subunit`, `image_path`, `is_token`) 
-            VALUES (\'USD Coin\', \'USDC\', 6, 3000000, 1, 0, 8, \'/media/default_mintme.png\', 1);');
+            VALUES (\'USD Coin\', \'USDC\', 6, 14000000, 1, 0, 8, \'/media/default_mintme.png\', 1);');
     }
 
     public function down(Schema $schema) : void
