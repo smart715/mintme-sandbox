@@ -189,6 +189,21 @@
         <div v-else class="text-center py-1">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
         </div>
+        <confirm-modal
+            :visible="showConfirmTwitterMessageModal"
+            :show-image="false"
+            @confirm="doClaimTwitterMessage"
+            @cancel="showConfirmTwitterMessageModal = false"
+            @close="showConfirmTwitterMessageModal = false"
+        >
+            <p>
+                {{ $t('ongoing_airdrop.twitter_message.confirm') }}
+            </p>
+            <p>
+                "{{ actionMessage }}"
+            </p>
+            <template v-slot:confirm>{{ $t('ongoing_airdrop.accept') }}</template>
+        </confirm-modal>
     </div>
 </template>
 
@@ -196,9 +211,9 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin, FiltersMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
-import {toMoney} from '../../../utils';
+import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
 
@@ -211,6 +226,7 @@ export default {
         NotificationMixin,
         LoggerMixin,
         FiltersMixin,
+        TwitterMixin,
     ],
     components: {
         ConfirmModal,
@@ -235,6 +251,7 @@ export default {
             timeElapsed: false,
             showDuration: true,
             postLinkUrl: '',
+            showConfirmTwitterMessageModal: false,
         };
     },
     mounted: function() {
@@ -390,6 +407,8 @@ export default {
                 return;
             }
 
+            this.alreadyClaimed = true;
+
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -398,7 +417,6 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
-                    this.alreadyClaimed = true;
                 })
                 .catch((err) => {
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
@@ -409,6 +427,7 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
+                        this.alreadyClaimed = false;
                         this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
@@ -418,19 +437,6 @@ export default {
         modalOnCancel: function() {
             if (!this.loggedIn) {
                 window.location.replace(this.signupUrl);
-            }
-        },
-        openPopup(link, callback = null) {
-            let popup = window.open(link, 'popup', 'width=600,height=600');
-
-            // this is for giving the points after the popup is closed, but it doesn't work with twitter
-            if (callback) {
-                let interval = setInterval(() => {
-                    if (popup.closed) {
-                        clearInterval(interval);
-                        callback();
-                    }
-                }, 1000);
             }
         },
         claimAction(action) {
@@ -449,12 +455,50 @@ export default {
             });
         },
         claimTwitterMessage() {
-            this.openPopup(this.twitterMessageLink);
-            this.claimAction(this.airdropCampaign.actions.twitterMessage);
+            if (this.airdropCampaign.actions.twitterMessage.done) {
+                return openPopup(this.twitterMessageLink);
+            }
+
+            if (!this.isSignedInWithTwitter) {
+                return this.signInWithTwitter().then(this.claimTwitterMessage, (err) => this.notifyError(err.message));
+            }
+
+            this.showConfirmTwitterMessageModal = true;
+        },
+        doClaimTwitterMessage() {
+            this.$axios.single.post(this.$routing.generate('airdrop_share_twitter', {
+                tokenName: this.tokenName,
+            })).then(() => {
+                this.claimAction(this.airdropCampaign.actions.twitterMessage);
+            }).catch((err) => {
+                if (err.response.data.message === 'invalid twitter token') {
+                    return this.signInWithTwitter().then(this.claimTwitterMessage, (err) => this.notifyError(err.message));
+                }
+                this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                this.sendLogs('error', 'Error claiming twitter message action', err);
+            });
         },
         claimTwitterRetweet() {
-            this.openPopup(this.twitterRetweetLink);
-            this.claimAction(this.airdropCampaign.actions.twitterRetweet);
+            if (this.airdropCampaign.actions.twitterRetweet.done) {
+                return openPopup(this.twitterRetweetLink);
+            }
+
+            if (!this.isSignedInWithTwitter) {
+                return this.signInWithTwitter().then(this.claimTwitterRetweet, (err) => this.notifyError(err.message));
+            }
+
+            this.$axios.single.post(this.$routing.generate('retweet_action', {
+                tokenName: this.tokenName,
+                id: this.airdropCampaign.actions.twitterRetweet.id,
+            })).then(() => {
+                this.claimAction(this.airdropCampaign.actions.twitterRetweet);
+            }).catch((err) => {
+                if (err.response.data.message === 'invalid twitter token') {
+                    return this.signInWithTwitter().then(this.claimTwitterRetweet, (err) => this.notifyError(err.message));
+                }
+                this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                this.sendLogs('error', 'Error claiming twitter retweet action', err);
+            });
         },
         openFacebookMessage() {
             FB.ui({
@@ -463,10 +507,10 @@ export default {
             }, () => this.claimAction(this.airdropCampaign.actions.facebookMessage));
         },
         claimLinkedin() {
-            this.openPopup(this.linkedinLink, () => this.claimAction(this.airdropCampaign.actions.linkedinMessage));
+            openPopup(this.linkedinLink).then(() => this.claimAction(this.airdropCampaign.actions.linkedinMessage));
         },
         claimYoutube() {
-            this.openPopup(this.youtubeLink, () => {
+            openPopup(this.youtubeLink).then(() => {
                 this.signInYoutube()
                 .then(this.checkIfSubscribed, () => Promise.reject(new Error(this.$t('ongoing_airdrop.youtube_authentication_required'))))
                 .then(() => this.claimAction(this.airdropCampaign.actions.youtubeSubscribe), (err) => this.notifyError(err.message));
