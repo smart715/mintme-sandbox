@@ -112,11 +112,17 @@ new Vue({
                     }
                 }, (err) => this.notifyError(err.response.data.message));
         },
-        historyBack: function(e) {
-            e.preventDefault();
-            window.history.length > 1 ?
-            window.history.back() :
-            window.location.href = '/';
+        tokenInvalid: function(e) {
+            e.target.setCustomValidity('Invalid token name.');
+            e.target.title = 'Invalid token name.';
+        },
+        tokenChange: function(e) {
+            e.target.setCustomValidity('');
+            e.target.title = '';
+        },
+        tokenInput: function(e) {
+            e.target.setCustomValidity('');
+            e.target.title = '';
         },
     },
     mounted: function() {
