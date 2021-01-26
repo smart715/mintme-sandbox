@@ -104,9 +104,15 @@ class Profile implements ImagineInterface
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\PhoneNumber", mappedBy="profile", orphanRemoval=true, cascade={"persist", "remove"})
+     * @ORM\OneToOne(
+     *     targetEntity="App\Entity\PhoneNumber",
+     *     mappedBy="profile",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
+     * @ORM\JoinColumn(name="phone_number_id", referencedColumnName="id")
      */
-    protected ?string $phoneNumber;
+    protected ?PhoneNumber $phoneNumber;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
@@ -464,13 +470,13 @@ class Profile implements ImagineInterface
         return $this->created;
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhoneNumber(): ?PhoneNumber
     {
         return $this->phoneNumber;
     }
 
 
-    public function setPhoneNumber(?string $phoneNumber): self
+    public function setPhoneNumber(?PhoneNumber $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
