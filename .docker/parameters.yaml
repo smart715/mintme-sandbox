@@ -110,6 +110,8 @@ parameters:
         - fr
         - pl
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    translation_auto_detect:
+        - es
     translation_flags:
         en:
             label: English
