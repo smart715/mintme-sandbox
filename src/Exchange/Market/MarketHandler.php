@@ -134,14 +134,15 @@ class MarketHandler implements MarketHandlerInterface
         array $markets,
         int $offset = 0,
         int $limit = 100,
-        bool $reverseBaseQuote = false
+        bool $reverseBaseQuote = false,
+        int $donationsOffset = 0
     ): array {
-        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
+        $marketDeals = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote, $donationsOffset) {
             return $this->parseDeals(
                 $this->marketFetcher->getUserExecutedHistory(
                     $user->getId(),
                     $this->marketNameConverter->convert($market),
-                    $offset,
+                    $offset - $donationsOffset,
                     $limit
                 ),
                 $market,
@@ -150,13 +151,14 @@ class MarketHandler implements MarketHandlerInterface
         }, $markets);
 
         $donations = $this->donationsToDeals($this->donationManager->getAllUserRelated($user), $user);
-        $deals = $marketDeals ? array_merge(...$marketDeals) : [];
+        $donations = array_slice($donations, $donationsOffset, count($donations) - $donationsOffset);
+        $deals = array_merge($marketDeals ? array_merge(...$marketDeals) : [], $donations);
 
         uasort($deals, static function (Deal $lDeal, Deal $rDeal) {
-            return $lDeal->getTimestamp() > $rDeal->getTimestamp();
+            return $lDeal->getTimestamp() < $rDeal->getTimestamp();
         });
 
-        return array_slice(array_merge($deals, $donations), $offset, $limit);
+        return array_slice($deals, 0, $limit);
     }
 
     /** {@inheritdoc} */
@@ -377,23 +379,32 @@ class MarketHandler implements MarketHandlerInterface
      */
     private function donationsToDeals(array $donations, User $user): array
     {
-        return array_map(fn(Donation $donation) => new Deal(
-            0,
-            $donation->getCreatedAt()->getTimestamp(),
-            (int)$donation->getDonor()->getId(),
-            (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
-            (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
-            $donation->getAmount()->subtract($donation->getFeeAmount()),
-            $this->moneyWrapper->parse('0', $donation->getCurrency()),
-            $this->moneyWrapper->parse('0', $donation->getCurrency()),
-            $donation->getFeeAmount(),
-            0,
-            0,
-            $this->marketFactory->create(
-                $this->cryptoManager->findBySymbol($donation->getCurrency()),
-                $donation->getToken()
-            )
-        ), $donations);
+        $donations = array_map(function (Donation $donation) use ($user) {
+            if (!$donation->getToken()) {
+                // ToDo: Show these donations on frontend instead of skip it
+                return null;
+            }
+
+            return new Deal(
+                0,
+                $donation->getCreatedAt()->getTimestamp(),
+                (int)$donation->getDonor()->getId(),
+                (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
+                (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
+                $donation->getAmount()->subtract($donation->getFeeAmount()),
+                $this->moneyWrapper->parse('0', $donation->getCurrency()),
+                $this->moneyWrapper->parse('0', $donation->getCurrency()),
+                $donation->getFeeAmount(),
+                0,
+                0,
+                $this->marketFactory->create(
+                    $this->cryptoManager->findBySymbol($donation->getCurrency()),
+                    $donation->getToken()
+                )
+            );
+        }, $donations);
+
+        return array_filter($donations, fn ($donation) => !is_null($donation));
     }
 
     /** {@inheritdoc} */

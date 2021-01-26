@@ -547,7 +547,7 @@ hacker_menu.permissions.user: 'Make me User'
 hacker_menu.crypto.title: Crypto
 hacker_menu.crypto.web: 'Add 100 MINTME'
 hacker_menu.crypto.eth: 'Add 0.05 ETH'
-hacker_menu.crypto.btc: 'Add 100 BTC'
+hacker_menu.crypto.btc: 'Add 0.001 BTC'
 hacker_menu.crypto.usdc: 'Add 10 USDC'
 hacker_menu.quick_registration: 'Quick registration'
 api_clients.id.title: 'ID:'
@@ -765,6 +765,16 @@ ongoing_airdrop.confirm_message.logged_in: 'Tiene que ingresar para poder recibi
 ongoing_airdrop.confirm_message.cant_participate: 'Disculpe, usted no puede participar en su propio airdrop.'
 ongoing_airdrop.confirm_message: '¿Está seguro que quiere recibir? %airdropReward% %tokenName%?'
 ongoing_airdrop.ended: 'Disculpe, este airdrop ha concluido.'
+ongoing_airdrop.submit_url:
+ongoing_airdrop.actions.message:
+ongoing_airdrop.youtube_authentication_required:
+ongoing_airdrop.not_subscribed:
+ongoing_airdrop.subscription_error:
+ongoing_airdrop.verification_failed:
+ongoing_airdrop.post_link_placeholder:
+ongoing_airdrop.actions.claim_error:
+ongoing_airdrop.twitter_message.confirm:
+ongoing_airdrop.accept: 'Accept'
 token.deploy.final_step: 'Este es el último paso para la creación del token. Despues de pagar el despliegue de su token en la blockchain, usted y otros podrán retirar tokens desde MintMe hacia su billetera MintMe Coin.'
 token.deploy.frozen: 'Los MINTME gastados acá serán inaccesibles (congelados) para todos durante 5 años. De esta manera se disminuyen los MINTME en circulación con cada compra y se incrementa la probabilidad de que el precio de MINTME aumente.'
 token.deploy.irreversible: 'Este proceso es irreversible, una vez que confirmes el pago no hay vuelta atrás.'
