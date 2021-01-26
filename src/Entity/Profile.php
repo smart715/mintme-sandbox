@@ -104,6 +104,11 @@ class Profile implements ImagineInterface
     protected $user;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\PhoneNumber", mappedBy="profile", orphanRemoval=true, cascade={"persist", "remove"})
+     */
+    protected ?string $phoneNumber;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
      * @var ArrayCollection
      * @Groups({"API"})
@@ -457,5 +462,18 @@ class Profile implements ImagineInterface
     public function getCreated(): ?DateTimeImmutable
     {
         return $this->created;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+
+    public function setPhoneNumber(?string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
     }
 }
