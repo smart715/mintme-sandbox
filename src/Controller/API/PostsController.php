@@ -8,12 +8,14 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exception\InvalidTwitterTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Form\CommentType;
 use App\Form\PostType;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwitterManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\TokenPostNotificationStrategy;
@@ -45,6 +47,7 @@ class PostsController extends AbstractFOSRestController
     private UserNotificationManagerInterface $userNotificationManager;
     private MailerInterface $mailer;
     private AsciiSlugger $slugger;
+    private TwitterManagerInterface $twitterManager;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -53,7 +56,8 @@ class PostsController extends AbstractFOSRestController
         TranslatorInterface $translator,
         LoggerInterface $logger,
         UserNotificationManagerInterface $userNotificationManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        TwitterManagerInterface $twitterManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
@@ -63,6 +67,7 @@ class PostsController extends AbstractFOSRestController
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
         $this->slugger = new AsciiSlugger();
+        $this->twitterManager = $twitterManager;
     }
 
     /**
@@ -253,17 +258,13 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Post("/{id<\d+>}/share", name="share_post", options={"expose"=true})
      */
-    public function sharePost(int $id, TwitterOAuth $twitter, BalanceHandlerInterface $balanceHandler): View
+    public function sharePost(int $id, BalanceHandlerInterface $balanceHandler): View
     {
         /** @var User|null $user */
         $user = $this->getUser();
 
         if (!$user) {
             throw new AccessDeniedHttpException();
-        }
-
-        if (!$user->isSignedInWithTwitter()) {
-            throw new ApiBadRequestException('invalid twitter token');
         }
 
         $post = $this->postManager->getById($id);
@@ -280,15 +281,7 @@ class PostsController extends AbstractFOSRestController
             throw new ApiBadRequestException();
         }
 
-        $twitter->setOauthToken(
-            $user->getTwitterAccessToken(),
-            $user->getTwitterAccessTokenSecret()
-        );
-
-        $url = $this->generateUrl('new_show_post', [
-            'tokenName' => $post->getToken()->getName(),
-            'slug' => $post->getSlug(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->generateUrl('show_post', ['id' => $post->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $message = $this->translator->trans('post.share.message', [
             '%title%' => $post->getTitle(),
@@ -296,29 +289,10 @@ class PostsController extends AbstractFOSRestController
         ]);
 
         try {
-            /** @var object $response */
-            $response = $twitter->post('statuses/update', ['status' => $message]);
+            $this->twitterManager->sendTweet($user, $message);
+        } catch (InvalidTwitterTokenException $e) {
+            throw new ApiBadRequestException($e->getMessage());
         } catch (\Throwable $e) {
-            $this->logger->error("Failed to post message on twitter: {$e->getMessage()}");
-
-            throw new \Exception($this->translator->trans('api.something_went_wrong'));
-        }
-
-        /** @var array $errors */
-        $errors = $response->errors ?? []; // @phpstan-ignore-line
-
-        if (count($errors) > 0) {
-            // expired or invalid access token
-            if (self::TWITTER_INVALID_TOKEN_ERROR === $errors[0]->code) {
-                $user->setTwitterAccessToken(null)->setTwitterAccessTokenSecret(null);
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                throw new ApiBadRequestException('invalid twitter token');
-            }
-
-            $this->logger->error("Failed to post message on twitter: {$errors[0]->message}");
-
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 

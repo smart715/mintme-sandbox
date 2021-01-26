@@ -9,11 +9,14 @@ use App\Entity\User;
 use App\Exception\ApiBadForbiddenException;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiUnauthorizedException;
+use App\Exception\InvalidTwitterTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\TwitterManagerInterface;
+use App\Utils\AirdropCampaignActions;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -39,17 +42,20 @@ class AirdropCampaignController extends AbstractFOSRestController
     private AirdropCampaignManagerInterface $airdropCampaignManager;
     private AirdropConfig $airdropConfig;
     private TranslatorInterface $translator;
+    private TwitterManagerInterface $twitterManager;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         AirdropConfig $airdropConfig,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        TwitterManagerInterface $twitterManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
         $this->airdropConfig = $airdropConfig;
         $this->translator = $translator;
+        $this->twitterManager = $twitterManager;
     }
 
     /**
@@ -141,6 +147,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             $participants,
             $endDate
         );
+
+        $actionsData = $this->transformData($actions, $actionsData);
 
         foreach ($actions as $action => $active) {
             if ($active) {
@@ -273,6 +281,69 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $this->view(['verified' => $verified], Response::HTTP_OK);
     }
 
+    /**
+     * @Rest\View()
+     * @Rest\Post("{tokenName}/share/twitter", name="airdrop_share_twitter", options={"expose"=true})
+     */
+    public function shareOnTwitter(string $tokenName): View
+    {
+        $this->fetchToken($tokenName, false, true);
+
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new ApiUnauthorizedException();
+        }
+
+        $url = $this->generateUrl('token_show', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $message = $this->translator->trans('ongoing_airdrop.actions.message', [
+            '%tokenName%' => $tokenName,
+            '%tokenUrl%' => $url,
+        ]);
+
+        try {
+            $this->twitterManager->sendTweet($user, $message);
+        } catch (InvalidTwitterTokenException $e) {
+            throw new ApiBadRequestException($e->getMessage());
+        } catch (\Throwable $e) {
+            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        }
+
+        return $this->view(['message' => $this->translator->trans('api.success')], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("{tokenName}/action/{id}/retweet", name="retweet_action", options={"expose"=true})
+     */
+    public function retweetAction(string $tokenName, AirdropAction $action): View
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new ApiUnauthorizedException();
+        }
+
+        $token = $this->fetchToken($tokenName, false, true);
+
+        if ($action->getAirdrop()->getToken() !== $token
+            || $action->getType() !== AirdropAction::TYPE_MAP['twitterRetweet']
+        ) {
+            throw new ApiBadRequestException();
+        }
+
+        try {
+            $this->twitterManager->retweet($user, $action->getData());
+        } catch (InvalidTwitterTokenException $e) {
+            throw new ApiBadRequestException($e->getMessage());
+        } catch (\Throwable $e) {
+            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        }
+
+        return $this->view();
+    }
+
     private function checkAirdropParams(Money $amount, int $participants, Money $balance): void
     {
         if ($amount->lessThan($this->airdropConfig->getMinTokensAmount()) || $amount->greaterThan($balance)) {
@@ -324,5 +395,22 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         return $token;
+    }
+
+    private function transformData(array $actions, array $actionsData): array
+    {
+        if (in_array(AirdropCampaignActions::TWITTER_RETWEET, array_keys($actions))) {
+            $matches = [];
+
+            preg_match(
+                '/^(?:https?:\/\/)?(?:www\.)?twitter\.com\/[\S]+\/status\/([\d]+)$/',
+                $actionsData[AirdropCampaignActions::TWITTER_RETWEET],
+                $matches
+            );
+
+            $actionsData[AirdropCampaignActions::TWITTER_RETWEET] = $matches[1];
+        }
+
+        return $actionsData;
     }
 }
