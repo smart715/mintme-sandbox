@@ -78,6 +78,20 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/mintme-aml-policy.pdf", name="aml_policy",
+     *      options={"2fa_progress"=false}
+     * )
+     */
+    public function amlPolicy(MainDocumentsManagerInterfaces $mainDocs): Response
+    {
+        $projectDir = $this->getParameter('kernel.project_dir');
+        $docsPath = $this->getParameter('docs_path');
+        $doc = $mainDocs->findDocPathByName('AML Policy');
+
+        return new BinaryFileResponse($projectDir.'/public'.$docsPath.'/'.$doc);
+    }
+
+    /**
      * @Route("/links",
      *      name="links",
      *      options={"sitemap" = false}
