@@ -18,8 +18,8 @@
                     name="amount"
                     type="text"
                     v-model="amount"
-                    @keypress="checkInput(4, 6)"
-                    @paste="checkInput(4, 6)"
+                    @keypress="checkInput(subunit, 6)"
+                    @paste="checkInput(subunit, 6)"
                 >
                 <div class="invalid-feedback">
                     {{ invalidAmountMessage }}
@@ -32,6 +32,7 @@
                     :value="content"
                     @change="onContentChange"
                     @input="onContentChange"
+                    ref="input"
                 />
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
@@ -75,10 +76,8 @@ export default {
         Guide,
     },
     props: {
-        apiUrl: {
-            type: String,
-            required: true,
-        },
+        tokenName: String,
+        subunit: Number,
         post: {
             type: Object,
             default: () => ({
@@ -165,7 +164,11 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.apiUrl, {
+            const url = this.post.id
+                ? this.$routing.generate('edit_post', {tokenName: this.tokenName, id: this.post.id})
+                : this.$routing.generate('create_post', {tokenName: this.tokenName});
+
+            this.$axios.single.post(url, {
                 content: this.content,
                 amount: this.amount,
             })
@@ -202,6 +205,9 @@ export default {
         reset() {
             this.content = '';
             this.amount = '0';
+            this.$nextTick(() => {
+                this.$refs.input.$el.dispatchEvent(new Event('input'));
+            });
         },
         cancel() {
             this.$emit('cancel');

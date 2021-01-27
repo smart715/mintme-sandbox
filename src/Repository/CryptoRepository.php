@@ -12,4 +12,10 @@ class CryptoRepository extends EntityRepository
     {
         return $this->findOneBy(['symbol' => $symbol]);
     }
+
+    /** @codeCoverageIgnore */
+    public function getByName(string $name): ?Crypto
+    {
+        return $this->findOneBy(['name' => $name]);
+    }
 }

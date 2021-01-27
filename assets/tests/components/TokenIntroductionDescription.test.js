@@ -4,6 +4,7 @@ import Toasted from 'vue-toasted';
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TokenIntroductionDescription from '../../js/components/token/introduction/TokenIntroductionDescription';
 import moxios from 'moxios';
+import '../__mocks__/ResizeObserver';
 import axios from 'axios';
 Vue.use(Vuelidate);
 Vue.use(Toasted);
@@ -48,7 +49,7 @@ describe('TokenIntroductionDescription', () => {
             mocks: {$t: (val) => propsForTestCorrectlyRenders.name + val},
         });
         expect(wrapper.vm.newDescription).toBe('a'.repeat(200));
-        expect(wrapper.html()).toContain('token.intro.description.plan.header');
+        expect(wrapper.html()).toContain('token.intro.description.header');
         expect(wrapper.html()).toContain('a'.repeat(200));
         expect(wrapper.html()).toContain('fooName');
     });

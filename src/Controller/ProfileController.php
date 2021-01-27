@@ -38,6 +38,11 @@ class ProfileController extends Controller
         string $nickname
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
+        $user = $this->getUser();
+
+        if ($user && $profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
 
         if (null === $profile) {
             throw new NotFoundProfileException();
@@ -127,6 +132,10 @@ class ProfileController extends Controller
         /** @var User $user*/
         $user = $this->getUser();
 
+        if ($profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
+
         $profileDescription = $profile->getDescription() ?? '';
         $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);
         $profileDescription = preg_replace(
@@ -137,7 +146,7 @@ class ProfileController extends Controller
         $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
         return $this->render('pages/profile.html.twig', [
-            'token' => $profile->getToken(),
+            'token' => $profile->getMintmeToken(),
             'profile' => $profile,
             'savedNickname' => $clonedProfile->getNickname(),
             'profileDescription' => substr($profileDescription, 0, 200),

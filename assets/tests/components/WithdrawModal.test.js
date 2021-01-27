@@ -41,13 +41,14 @@ let rebrandingTest = (val) => {
 
 let propsForTestCorrectlyRenders = {
     visible: true,
-    currency: '',
+    currency: 'Token',
     isToken: true,
     fee: '0',
-    webFee: '0',
+    baseFee: '0',
+    baseSymbol: 'WEB',
     withdrawUrl: 'withdraw_url',
     maxAmount: '0',
-    availableWeb: '0',
+    availableBase: '0',
     subunit: 0,
     twofa: '0',
     noClose: false,
@@ -146,7 +147,7 @@ describe('WithdrawModal', () => {
             propsData: propsForTestCorrectlyRenders,
             localVue: mockVue(),
         });
-        expect(wrapper.vm.feeCurrency).toBe('WEB');
+        expect(wrapper.vm.feeCurrency).toBe('Token');
     });
 
     it('should be equal "webTest" when isToken props is false', () => {

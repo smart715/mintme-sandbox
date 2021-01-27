@@ -470,7 +470,6 @@ export default {
                     this.balanceLoaded = true;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_load_token_balance'));
                     this.sendLogs('error', 'Can not load token balance data', err);
                 });
         },
@@ -491,7 +490,6 @@ export default {
                     this.loading = false;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },

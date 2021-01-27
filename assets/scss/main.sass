@@ -67,6 +67,24 @@ body
   @include media-breakpoint-up(xl)
     content: "xl"
 
+@mixin truncate($rows, $line-height, $background: '')
+  position: relative
+  overflow: hidden
+  max-height: $line-height * $rows
+  line-height: $line-height
+
+  @supports (-webkit-line-clamp: $rows)
+    display: -webkit-box
+    -webkit-line-clamp: $rows
+    -webkit-box-orient: vertical
+
+    &:after
+      display: none
+
+.show-hide-text
+  p
+    @include truncate(20, 20px, #fff)
+
 .content-wrapper
   min-height: 100vh
 
@@ -107,7 +125,7 @@ body
   min-height: 100vh
   margin-top: -4.5%
   padding-top: 4.5%
-  background: url("../img/hero_image.jpg") no-repeat, linear-gradient(#102238 50%, transparent)
+  background: url("../img/hero_image.png") no-repeat, linear-gradient(#102238 50%, transparent)
   background-size: 100% auto
   @include media-breakpoint-down(sm)
     background: linear-gradient($secondary-dark 50%, transparent)
@@ -1247,11 +1265,6 @@ a.hover-icon:hover, div.hover-icon:hover
   @media(max-width: 393px)
     height: 116px
 
-.small-profile-link
-  margin-top: 3px
-  position: absolute
-  right: 15px
-
   .chat-envelope
     background: $secondary
 
@@ -1343,3 +1356,25 @@ li.trade-tab
 
 .input-disabled
   color: #6c757d !important
+
+.nav-envelope-badge
+  border-radius: 50%
+  min-width: 12px
+  height: 12px
+  bottom: 4px
+  left: 12px
+  padding: 1px
+  background-color: red
+  font-size: 8px
+
+.account-settings
+  form
+    padding: 11px
+    padding-left: 0px
+
+.custom-switch
+  .custom-control-label::before
+    border-color: gray !important
+
+  .custom-control-label::after
+    background-color: gray !important

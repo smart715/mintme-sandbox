@@ -39,7 +39,11 @@ export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
 export const tokSymbol = 'TOK';
+export const usdcSymbol = 'USDC';
+export const tokEthSymbol = 'TOKETH';
 export const webBtcSymbol = 'WEBBTC';
+export const webEthSymbol = 'WEBETH';
+export const webUsdcSymbol = 'WEBUSDC';
 export const usdSign = '$';
 
 export const cryptoSymbols = [
@@ -86,6 +90,7 @@ export const USD = {
 export const WEB = {
     symbol: 'WEB',
     subunit: 4,
+    digits: 8,
 };
 
 export const TOK = {
@@ -96,10 +101,17 @@ export const TOK = {
 export const BTC = {
     symbol: 'BTC',
     subunit: 8,
+    digits: 4,
 };
 
 export const ETH = {
     symbol: 'ETH',
+    subunit: 8,
+    digits: 4,
+};
+
+export const USDC = {
+    symbol: 'USDC',
     subunit: 18,
 };
 
@@ -136,4 +148,21 @@ export const notificationTypes = {
 export const descriptionLength = {
     min: 200,
     max: 10000,
+};
+
+export const digitsLimits = {
+    WEB: WEB.digits,
+    BTC: BTC.digits,
+    ETH: ETH.digits,
+};
+
+export const currencyModes = {
+    usd: {
+        value: 'usd',
+        text: 'USD',
+    },
+    crypto: {
+        value: 'crypto',
+        text: 'Crypto',
+    },
 };

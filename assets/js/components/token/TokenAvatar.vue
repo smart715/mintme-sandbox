@@ -1,8 +1,9 @@
 <template>
-    <div class="token-avatar">
+    <div class="token-avatar" :class="{'show-avatar ml-2': isMintmeToken}">
         <div class="d-flex align-items-center token-name">
             <div class="align-items-center token-avatar-link">
                 <avatar
+                    v-if="isMintmeToken"
                     type="token"
                     size="large"
                     :image="image"
@@ -14,8 +15,9 @@
                 :editable="isOwner"
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-token-created="isTokenCreated"
-                :identifier="identifier"
-                :name="name"
+                :is-mintme-token="isMintmeToken"
+                :identifier="market.quote.identifier"
+                :name="market.quote.name"
                 :precision="precision"
                 :status-prop="statusProp"
                 :twofa="twofa"
@@ -39,6 +41,8 @@
                 :disabled-services-config="disabledServicesConfig"
             />
             <token-deploy-icon
+                :is-mintme="isMintmeToken"
+                :token-crypto="tokenCrypto"
                 class="ml-2 token-deploy-icon"
                 :is-owner="isOwner"
                 :status-prop="statusProp"
@@ -71,8 +75,9 @@ export default {
         isOwner: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
-        identifier: String,
-        name: String,
+        isMintmeToken: Boolean,
+        market: Object,
+        tokenCrypto: Object,
         precision: Number,
         statusProp: String,
         twofa: Boolean,

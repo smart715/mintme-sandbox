@@ -87,7 +87,7 @@ class TokenManagerTest extends TestCase
             $this->mockCryptoManager([]),
             $this->mockConfig(0)
         );
-        $this->assertEquals($token, $tokenManager->getOwnToken());
+        $this->assertEquals($token, $tokenManager->getOwnMintmeToken());
     }
 
     /** @dataProvider findByHiddenNameDataProvider */

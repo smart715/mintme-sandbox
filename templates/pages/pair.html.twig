@@ -28,6 +28,7 @@
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
 {% set loggedIn = app.user ? 'true' : 'false' %}
+{% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 <div id="token" class="container">
@@ -53,8 +54,9 @@
                 :is-owner="{{ isOwner }}"
                 :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                 :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                identifier="{{ market.quote.identifier }}"
-                name="{{ market.quote.name }}"
+                :is-mintme-token="{{ isMintmeToken }}"
+                :market="{{ market | json_encode }}"
+                :token-crypto="{{ tokenCrypto | json_encode }}"
                 :precision="{{ precision }}"
                 :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                 :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
@@ -72,7 +74,7 @@
                 @updated-youtube="youtubeUpdated"
                 @updated-discord="discordUpdated"
                 @updated-telegram="telegramUpdated"
-                image="{{token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
+                image="{{token.image is null or token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
                 profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
                 profile-name="{{ profile.firstName }}"
                 profile-lastname="{{ profile.lastname }}"
@@ -125,7 +127,7 @@
                     <b-tab
                         title="{% trans %}page.pair.tab.introduction{% endtrans %}"
                         title-link-class="token-intro-tab-link"
-                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
+                        {% if isTokenPage and token.isMintmeToken %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">
@@ -154,6 +156,7 @@
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
                             <token-introduction-statistics
+                                :is-mintme-token="{{ isMintmeToken }}"
                                 class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
@@ -164,7 +167,8 @@
                                 :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
-                            />
+                            >
+                            </token-introduction-statistics>
                         </div>
                         <div class="row">
                             <top-holders
@@ -204,6 +208,8 @@
                             {% if is_granted('edit', token) %}
                                 <div class="row justify-content-center">
                                     <create-post class="col-12 col-md-10 col-lg-8"
+                                         token-name="{{ token.name }}"
+                                         :subunit="{{ tokenSubunit }}"
                                         @update-posts="updatePosts"
                                     />
                                 </div>
@@ -229,6 +235,7 @@
                     >
                         <trade
                                 :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                                :is-mintme-token="{{ isMintmeToken }}"
                                 websocket-url="{{ global_websocket_url }}"
                                 hash="{{ hash }}"
                                 login-url="{{ path('fos_user_security_login') }}"
@@ -250,7 +257,7 @@
                 {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
-                        <li class="nav-item ml-auto small-profile-link">
+                        <li class="nav-item ml-auto my-2 my-lg-0">
                             <div class="d-flex align-items-center h-100">
                                 <a
                                     v-if="getQuoteBalance >= {{ dMMinAmount }} || {{ isOwner }}"
@@ -301,6 +308,13 @@
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
         {% endif %}
     </div>
+    {% if showCreatedModal and isOwner is same as('true') %}
+        <token-created-modal
+            :visible="showCreatedModal"
+            token-name="{{ market.quote.name }}"
+            @close="showCreatedModal = false"
+        ></token-created-modal>
+    {% endif %}
 </div>
 
 <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">

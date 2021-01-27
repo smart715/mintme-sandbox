@@ -101,8 +101,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
             'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
             'referralsCount' => count($user->getReferrals()),
-            'userToken' => null == $user->getProfile()->getToken()
-                ? null : $user->getProfile()->getToken()->getName(),
+            'userToken' => null == $user->getProfile()->getMintmeToken()
+                ? null : $user->getProfile()->getMintmeToken()->getName(),
         ]);
     }
 
@@ -188,8 +188,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return $this->redirectToRoute('settings');
         }
 
-        return $this->redirectToRoute(
-            'two_factor_auth',
+        return $this->forward(
+            'App\Controller\UserController::twoFactorAuth',
             ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }

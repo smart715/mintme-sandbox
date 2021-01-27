@@ -6,6 +6,7 @@ use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
@@ -261,7 +262,7 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function setProfile(Profile $profile): self
+    public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
 

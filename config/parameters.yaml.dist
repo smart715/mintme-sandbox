@@ -30,8 +30,8 @@ parameters:
 
     # 0.2%
     taker_fee_rate: 0.002
-    # 0.1%
-    maker_fee_rate: 0.001
+    # 0.2%
+    maker_fee_rate: 0.002
 
     # Max timeout to check user website hash
     verify_timeout_seconds: 10
@@ -46,6 +46,7 @@ parameters:
         minBtcAmount: 0.000001
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
+        minUsdcAmount: 0.1
         minTokensAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-22'
@@ -172,6 +173,7 @@ parameters:
     coinify_crypto_currencies:
         - BTC
         - ETH
+        - USDC
 
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
@@ -227,3 +229,5 @@ parameters:
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
 
+    # token withdraw fee in ETH (0.003, 0.1 etc)
+    token_withdraw_fee: 0.01

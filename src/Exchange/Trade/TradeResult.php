@@ -19,7 +19,7 @@ class TradeResult
             'place_order.created',
 
         self::FAILED =>
-            'place_order.failed.',
+            'place_order.failed',
 
         self::INSUFFICIENT_BALANCE =>
             'place_order.insufficient_balance',

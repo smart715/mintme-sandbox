@@ -23,6 +23,7 @@ use App\Wallet\Model\Amount;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Wallet;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use DateTime;
@@ -32,6 +33,7 @@ use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class WalletTest extends TestCase
 {
@@ -60,7 +62,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler($tokenTransactions),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);
@@ -144,7 +148,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $wallet->withdrawInit(
@@ -166,7 +172,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -194,7 +202,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $wallet->withdrawInit(
@@ -220,7 +230,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager($this->once(), true),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(NotFoundTokenException::class);
@@ -248,7 +260,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -276,7 +290,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager($this->once()),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -300,7 +316,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
@@ -317,7 +335,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -336,7 +356,9 @@ class WalletTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockContractHandler([], $this->once()),
             $this->createMock(LoggerInterface::class),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockParameterBagInterface(),
+            $this->mockMoneyWrapper()
         );
 
         $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
@@ -523,7 +545,10 @@ class WalletTest extends TestCase
 
     private function mockToken(): Token
     {
-        return $this->createMock(Token::class);
+        $token = $this->createMock(Token::class);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
+
+        return $token;
     }
 
     private function mockDateTime(int $timestamp): DateTime
@@ -561,5 +586,25 @@ class WalletTest extends TestCase
         );
 
         return $tm;
+    }
+
+    public function mockParameterBagInterface(): ParameterBagInterface
+    {
+        $pb = $this->createMock(ParameterBagInterface::class);
+        $pb->method('get')
+            ->with('token_withdraw_fee')
+            ->willReturn(0.01);
+
+        return $pb;
+    }
+
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $mw = $this->createMock(MoneyWrapperInterface::class);
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
+            return new Money((int)$amount, new Currency($symbol));
+        });
+
+        return $mw;
     }
 }

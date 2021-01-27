@@ -3,34 +3,43 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Token\Token;
-use App\Entity\UserNotification;
 use App\Events\OrderCompletedEvent;
-use App\Events\UserNotificationEvent;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Mailer\MailerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NewInvestorNotificationStrategy;
+use App\Notifications\Strategy\NotificationContext;
+use App\Utils\NotificationTypes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderCompletedSubscriber implements EventSubscriberInterface
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
 
     /** @var MarketHandlerInterface */
     private $marketHandler;
 
+    /** @var MailerInterface */
+    private $mailer;
+
     /** @var ScheduledNotificationManagerInterface */
     private $scheduledNotificationManager;
 
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
     public function __construct(
-        EventDispatcherInterface $eventDispatcher,
         MarketHandlerInterface $marketHandler,
-        ScheduledNotificationManagerInterface $scheduledNotificationManager
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
-        $this->eventDispatcher = $eventDispatcher;
         $this->marketHandler = $marketHandler;
+        $this->mailer = $mailer;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
     }
 
     public static function getSubscribedEvents(): array
@@ -69,24 +78,25 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
                     'profile' => $userProfile,
                     'tokenName' => $tokenName,
                 ];
-                /** @psalm-suppress TooManyArguments */
-                $this->eventDispatcher->dispatch(
-                    new UserNotificationEvent(
-                        $userTokenCreator,
-                        UserNotification::NEW_INVESTOR_NOTIFICATION,
-                        $extraData
-                    ),
-                    UserNotificationEvent::NAME
+                $notificationType = NotificationTypes::NEW_INVESTOR;
+                $strategy = new NewInvestorNotificationStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer,
+                    $quote,
+                    $notificationType,
+                    $extraData
                 );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($userTokenCreator);
             }
 
             if (Order::BUY_SIDE === $orderType &&
                 !$this->marketHandler->getSellOrdersSummaryByUser($userTokenCreator, $market)
             ) {
-                $notificationType = UserNotification::ORDER_FILLED_NOTIFICATION;
+                $notificationType = NotificationTypes::ORDER_FILLED;
                 $this->scheduledNotificationManager->createScheduledNotification(
                     $notificationType,
-                    $userTokenCreator
+                    $userTokenCreator,
                 );
             }
         }
@@ -99,18 +109,15 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         if ($quote instanceof Token) {
             $market = $event->getOrder()->getMarket();
             $currentUser = $quote->getProfile()->getUser();
-            $userToken = $currentUser->getProfile()->getToken();
 
-            if ($userToken && $quote === $userToken) {
-                $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
+            $userSellOrdersSummary = $this->marketHandler->getSellOrdersSummaryByUser($currentUser, $market);
 
-                if (!$userSellOrdersSummary) {
-                    $notificationType = UserNotification::ORDER_CANCELLED_NOTIFICATION;
-                    $this->scheduledNotificationManager->createScheduledNotification(
-                        $notificationType,
-                        $currentUser
-                    );
-                }
+            if (!$userSellOrdersSummary) {
+                $notificationType = NotificationTypes::ORDER_CANCELLED;
+                $this->scheduledNotificationManager->createScheduledNotification(
+                    $notificationType,
+                    $currentUser
+                );
             }
         }
     }

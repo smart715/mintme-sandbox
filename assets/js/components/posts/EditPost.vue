@@ -1,7 +1,7 @@
 <template>
     <post-form
-        :api-url="$routing.generate('edit_post', {id: post.id})"
         :post="post"
+        :subunit="subunit"
         @save-success="redirect"
         @cancel="redirect"
     >
@@ -22,6 +22,7 @@ export default {
             type: Object,
             required: true,
         },
+        subunit: Number,
     },
     methods: {
         redirect() {

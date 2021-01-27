@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Manager\UserNotificationConfigManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -58,6 +59,9 @@ class RegistrationController extends FOSRegistrationController
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var UserNotificationConfigManagerInterface */
+    private UserNotificationConfigManagerInterface $userNotificationConfigManager;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
@@ -67,7 +71,8 @@ class RegistrationController extends FOSRegistrationController
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserNotificationConfigManagerInterface $userNotificationConfigManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -77,6 +82,7 @@ class RegistrationController extends FOSRegistrationController
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->em = $entityManager;
+        $this->userNotificationConfigManager = $userNotificationConfigManager;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -132,6 +138,12 @@ class RegistrationController extends FOSRegistrationController
 
         if ($response) {
             return $response;
+        }
+
+        if ($request->get('formContentOnly', false)) {
+            return $this->render("@FOSUser/Registration/register_content_body.html.twig", [
+                'form' => $form->createView(),
+            ]);
         }
 
         return $this->render('@FOSUser/Registration/register.html.twig', [
@@ -222,6 +234,7 @@ class RegistrationController extends FOSRegistrationController
         }
 
         $bonus = $user->getBonus();
+        $this->userNotificationConfigManager->initializeUserNotificationConfig($user);
 
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
@@ -257,13 +270,19 @@ class RegistrationController extends FOSRegistrationController
         if ($referer && $this->isRefererValid($referer)) {
             $session->remove('register_referer');
 
+            $path = $this->getRefererPathData();
+
+            if ('token_show' === $path['_route'] && 'buy' === $path['tab'] && 'signup' === $path['modal']) {
+                return $this->redirectToRoute('wallet');
+            }
+
             return $this->redirect($referer);
         }
 
         $refCode = $request->cookies->get('referral-code');
 
         if (!is_null($refCode)) {
-            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getToken();
+            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getMintmeToken();
         }
 
         if (isset($token)) {

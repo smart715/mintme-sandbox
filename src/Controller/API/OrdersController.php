@@ -169,11 +169,13 @@ class OrdersController extends AbstractFOSRestController
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
         $pendingSellOrders = $this->marketHandler->getPendingSellOrders(
             $market,
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
@@ -195,10 +197,15 @@ class OrdersController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/executed/page/{page}", name="executed_user_orders", defaults={"page"=1}, options={"expose"=true})
+     * @Rest\Get(
+     *     "/executed/page/{page}/{donations}",
+     *     name="executed_user_orders",
+     *     defaults={"page"=1,"donations"=0},
+     *     options={"expose"=true}
+     * )
      * @Rest\View()
      */
-    public function getExecutedUserOrders(int $page): array
+    public function getExecutedUserOrders(int $page, int $donations): array
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -217,7 +224,9 @@ class OrdersController extends AbstractFOSRestController
             $user,
             $markets,
             ($page - 1) * self::WALLET_OFFSET,
-            self::WALLET_OFFSET
+            self::WALLET_OFFSET,
+            false,
+            $donations
         );
     }
 

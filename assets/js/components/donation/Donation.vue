@@ -8,11 +8,10 @@
                 <div class="card h-100">
                     <div class="h-100 donation">
                         <div class="donation-header text-left">
-                            <span v-if="loggedIn">{{ $t('donation.header.logged') }}</span>
-                            <span v-else>{{ $t('donation.header.not_logged') }}</span>
+                            <span>{{ $t('donation.header.logged') }}</span>
                         </div>
                         <div class="card-body donation-body">
-                            <div v-if="loggedIn" class="h-100">
+                            <div v-show="!showForms" class="h-100">
                                 <div>
                                     <div>
                                         <p class="info" v-html="$sanitize(nonrefundHtml)"></p>
@@ -36,8 +35,9 @@
                                             </b-dropdown>
                                         </div>
                                         <div
-                                            v-if="isCurrencySelected"
+                                            v-if="isCurrencySelected && loggedIn"
                                             class="col"
+                                            id="show-balance"
                                         >
                                             <p class="mb-2">{{ $t('donation.balance') }}</p>
                                             <span v-if="balanceLoaded" class="d-block">
@@ -54,7 +54,9 @@
                                                     {{ $t('donation.insufficient_funds') }}
                                                 </span>
                                                 <span class="d-block">
-                                                    {{ $t('donation.make') }} <a :href="getDepositLink">{{ $t('donation.deposit') }}</a> {{ $t('donation.first') }}
+                                                    {{ $t('donation.make') }}
+                                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
+                                                    {{ $t('donation.first') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -75,10 +77,11 @@
                                                     @keyup="onKeyup"
                                                     :from="selectedCurrency"
                                                     :to="USD.symbol"
-                                                    :subunit="2"
+                                                    :subunit="4"
                                                     symbol="$"
+                                                    :show-converter="currencyMode === currencyModes.usd.value"
                                                 />
-                                                <div class="input-group-append">
+                                                <div v-if="loggedIn" class="input-group-append">
                                                     <button
                                                         @click="all"
                                                         class="btn btn-primary all-button"
@@ -89,7 +92,12 @@
                                             <div
                                                 v-if="insufficientFundsError"
                                                 class="w-100 mt-1 text-danger">
-                                                {{ $t('donation.min_amount', {donationCurrency:donationCurrency, currencyMinAmount:currencyMinAmount}) }}
+                                                {{
+                                                    $t('donation.min_amount', {
+                                                      donationCurrency:donationCurrency,
+                                                      currencyMinAmount:currencyMinAmount
+                                                    })
+                                                }}
                                             </div>
                                             <p class="mt-2 mb-4 text-nowrap">
                                                 {{ $t('donation.receive') }}
@@ -142,9 +150,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <Register v-if="!loggedIn"
-                            :google-recaptcha-site-key="googleRecaptchaSiteKey"
-                            ></Register>
+                            <div v-if="!loggedIn">
+                                <login-signup-switcher
+                                    v-show="showForms"
+                                    :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                                    @login="onLogin"
+                                    @signup="onSignup"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -170,10 +183,23 @@ import {
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 import Guide from '../Guide';
-import Register from '../Register';
+import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
-import {webSymbol, btcSymbol, ethSymbol, HTTP_BAD_REQUEST, BTC, MINTME, USD} from '../../utils/constants';
+import {
+    webSymbol,
+    btcSymbol,
+    ethSymbol,
+    usdcSymbol,
+    HTTP_BAD_REQUEST,
+    BTC,
+    MINTME,
+    USD,
+    ETH,
+    USDC,
+    digitsLimits,
+    currencyModes,
+} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -190,7 +216,7 @@ export default {
         PriceConverterInput,
         Guide,
         ConfirmModal,
-        Register,
+        LoginSignupSwitcher,
     },
     props: {
         market: Object,
@@ -205,7 +231,9 @@ export default {
                 webSymbol,
                 btcSymbol,
                 ethSymbol,
+                usdcSymbol,
             },
+            currencyModes,
             selectedCurrency: null,
             amountToDonate: 0,
             amountToReceive: 0,
@@ -218,9 +246,13 @@ export default {
             showModal: false,
             tokensAvailabilityChanged: false,
             USD,
+            showForms: false,
         };
     },
     computed: {
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
+        },
         translationsContext: function() {
           return {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
@@ -245,22 +277,25 @@ export default {
                 : this.$t('donation.currency.select');
         },
         currencySubunit: function() {
-            return btcSymbol === this.selectedCurrency
-                ? BTC.subunit
-                : MINTME.subunit;
+            return ({BTC, MINTME, ETH, USDC}[this.selectedCurrency] || MINTME).subunit;
         },
         currencyMinAmount: function() {
-            return btcSymbol === this.selectedCurrency
-                ? this.donationParams.minBtcAmount
-                : (ethSymbol === this.selectedCurrency
-                    ? this.donationParams.minEthAmount
-                    : this.donationParams.minMintmeAmount);
+            switch (this.selectedCurrency) {
+              case btcSymbol:
+                return this.donationParams.minBtcAmount;
+              case ethSymbol:
+                return this.donationParams.minEthAmount;
+              case usdcSymbol:
+                return this.donationParams.minUsdcAmount;
+              default:
+                return this.donationParams.minMintmeAmount;
+            }
         },
         minTotalPrice: function() {
             return toMoney('1e-' + this.currencySubunit, this.currencySubunit);
         },
         insufficientFunds: function() {
-            return this.balanceLoaded &&
+            return this.loggedIn && this.balanceLoaded &&
                 (
                     (new Decimal(this.balance)).lessThan(this.minTotalPrice)
                     ||
@@ -268,21 +303,19 @@ export default {
                 );
         },
         insufficientFundsError: function() {
-            return this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
+            return this.loggedIn && this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
         },
         isAmountValid: function() {
             return !!parseFloat(this.amountToDonate)
                 && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return !this.loggedIn
+            return (this.loggedIn &&
+                (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
                 || !this.isCurrencySelected
-                || this.insufficientFunds
-                || !parseFloat(this.balance)
                 || !parseFloat(this.amountToDonate)
                 || this.donationChecking
-                || this.donationInProgress
-                || this.insufficientFundsError;
+                || this.donationInProgress;
         },
         nonrefundHtml: function() {
             return this.$t('donation.nonrefund', {
@@ -297,6 +330,17 @@ export default {
         },
     },
     mounted() {
+        if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
+            this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
+            this.$nextTick(() => {
+                this.amountToDonate = window.localStorage.getItem('mintme_donation_amount');
+                window.localStorage.removeItem('mintme_donation_amount');
+            });
+
+            window.localStorage.removeItem('mintme_loggedin_from_donation');
+            window.localStorage.removeItem('mintme_donation_currency');
+        }
+
         if (this.loggedIn) {
             this.sendMessage(JSON.stringify({
                 method: 'order.subscribe',
@@ -308,8 +352,10 @@ export default {
                 if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }
-            });
+            }, null, 'Donation');
         }
+
+        this.selectedCurrency = webSymbol;
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
@@ -326,12 +372,11 @@ export default {
                     this.balanceLoaded = true;
                 })
                 .catch((error) => {
-                    this.notifyError('Can not load balance. Try again later.');
                     this.sendLogs('error', 'Can not load crypto balance.', error);
                 });
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit, this.currencySubunit);
+            return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
         },
         onKeyup: function() {
             this.debouncedCheck();
@@ -355,12 +400,6 @@ export default {
                     this.sellOrdersSummary = res.data.sellOrdersSummary;
                 })
                 .catch((error) => {
-                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
-                        this.notifyError(error.response.data.message);
-                    } else {
-                        this.notifyError('Can not to calculate amount of tokens. Try again later.');
-                    }
-
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 })
                 .then(() => this.donationChecking = false);
@@ -392,7 +431,9 @@ export default {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
                         this.notifyError(error.response.data.message);
 
-                        if ('Tokens availability changed. Please adjust donation amount.' === error.response.data.message) {
+                        if ('Tokens availability changed. Please adjust donation amount.' ===
+                            error.response.data.message
+                        ) {
                             location.reload();
                         }
                     } else if (error.response.data.message) {
@@ -421,6 +462,23 @@ export default {
                 this.disabledServices.tradingDisabled
             ) {
                 this.notifyError(this.$t('donate.disabled'));
+
+                return;
+            }
+
+            if (!this.loggedIn) {
+                if (window.history.replaceState) {
+                    // prevents browser from storing history with each change:
+                    window.history.replaceState(
+                        {}, document.title, this.$routing.generate('token_show', {
+                            name: this.market.quote.symbol,
+                            tab: 'buy',
+                            modal: 'signup',
+                        })
+                    );
+                }
+                this.showForms = true;
+
                 return;
             }
 
@@ -440,6 +498,15 @@ export default {
         cancelDonation: function() {
             this.showModal = false;
             this.resetAmount();
+        },
+        onLogin() {
+            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_donation_amount', this.amountToDonate);
+            window.localStorage.setItem('mintme_loggedin_from_donation', true);
+        },
+        onSignup() {
+            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_signedup_from_donation', true);
         },
     },
     watch: {

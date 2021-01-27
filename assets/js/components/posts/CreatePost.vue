@@ -1,6 +1,7 @@
 <template>
     <post-form
-        :api-url="$routing.generate('create_post')"
+        :token-name="tokenName"
+        :subunit="subunit"
         @save-success="$emit('update-posts')"
         reset-after-action
         reset-cancel
@@ -14,6 +15,10 @@ export default {
     name: 'CreatePost',
     components: {
         PostForm,
+    },
+    props: {
+        tokenName: String,
+        subunit: Number,
     },
 };
 </script>

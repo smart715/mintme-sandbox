@@ -7,13 +7,13 @@ use App\Entity\Crypto;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
 use App\Entity\Message\Thread;
-use App\Entity\Message\ThreadMetadata;
 use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Validator\Constraints as AppAssert;
+use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,6 +36,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const WEB_SYMBOL = "WEB";
     public const BTC_SYMBOL = "BTC";
     public const ETH_SYMBOL = "ETH";
+    public const USDC_SYMBOL = "USDC";
     public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
@@ -74,6 +75,11 @@ class Token implements TradebleInterface, ImagineInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="bigint",nullable=true)
+     */
+    protected ?string $fee = null; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -150,7 +156,7 @@ class Token implements TradebleInterface, ImagineInterface
     protected $websiteConfirmationToken;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="tokens")
      * @Groups({"API_TOK"})
      * @var Profile|null
      */
@@ -167,8 +173,19 @@ class Token implements TradebleInterface, ImagineInterface
      */
     protected $lockIn;
 
-    /** @var Crypto|null */
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\JoinColumn(nullable=true)
+     * @var Crypto|null
+     */
     protected $crypto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\JoinColumn(nullable=true)
+     * @var Crypto|null
+     */
+    protected $exchangeCrypto;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -199,7 +216,7 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
      * @Groups({"Default", "API"})
-     * @var Image
+     * @var Image|null
      */
     protected $image;
 
@@ -257,6 +274,13 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $threads;
 
+    /**
+     * @ORM\Column(type="integer", options={"default"=12})
+     * @Groups({"Default", "API"})
+     * @var int|null
+     */
+    private $decimals = 12;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -286,9 +310,33 @@ class Token implements TradebleInterface, ImagineInterface
         return $this->crypto;
     }
 
+    /**
+     * @Groups({"API"})
+     */
+    public function getCryptoSymbol(): string
+    {
+        return $this->crypto
+            ? $this->crypto->getSymbol()
+            : self::WEB_SYMBOL;
+    }
+
     public function setCrypto(?Crypto $crypto): self
     {
         $this->crypto = $crypto;
+
+        return $this;
+    }
+
+    public function getExchangeCryptoSymbol(): string
+    {
+        return $this->exchangeCrypto
+            ? $this->exchangeCrypto->getSymbol()
+            : self::WEB_SYMBOL;
+    }
+
+    public function setExchangeCrypto(?Crypto $crypto): self
+    {
+        $this->exchangeCrypto = $crypto;
 
         return $this;
     }
@@ -322,6 +370,22 @@ class Token implements TradebleInterface, ImagineInterface
     public function getAddress(): ?string
     {
         return $this->address;
+    }
+
+    public function getFee(): ?Money
+    {
+        return $this->fee ?
+            new Money($this->fee, new Currency(MoneyWrapper::TOK_SYMBOL))
+            : null;
+    }
+
+    public function setFee(?Money $fee): self
+    {
+        $this->fee = $fee
+            ? $fee->getAmount()
+            : null;
+
+        return $this;
     }
 
     public function setPendingDeployment(): self
@@ -538,9 +602,15 @@ class Token implements TradebleInterface, ImagineInterface
         $this->image = $image;
     }
 
-    public function getImage(): Image
+    public function getImage(): ?Image
     {
-        return $this->image ?? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL);
+        if ($this->image) {
+            return $this->image;
+        }
+
+        return Token::WEB_SYMBOL === $this->getCryptoSymbol()
+            ? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL)
+            : null;
     }
 
     public function getMintedAmount(): Money
@@ -670,5 +740,37 @@ class Token implements TradebleInterface, ImagineInterface
     public function getThreads(): array
     {
         return $this->threads->toArray();
+    }
+
+    public function setDecimals(int $decimals): self
+    {
+        $this->decimals = $decimals;
+
+        return $this;
+    }
+
+    public function getDecimals(): ?int
+    {
+        return $this->decimals;
+    }
+
+    /*
+     * @Groups({"Default"})
+     */
+    public function isMintmeToken(): bool
+    {
+        return Token::WEB_SYMBOL === $this->getCryptoSymbol();
+    }
+
+    public function isOwner(array $ownTokens): bool
+    {
+        /** @var Token $ownToken */
+        foreach ($ownTokens as $ownToken) {
+            if ($ownToken->getId() === $this->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

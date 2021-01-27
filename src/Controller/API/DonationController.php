@@ -45,7 +45,7 @@ class DonationController extends AbstractFOSRestController
      *     "/{base}/{quote}/check/{currency}/{amount}",
      *     name="check_donation",
      *     options={"expose"=true},
-     *     requirements={"currency"="^(WEB|BTC|ETH)$"}
+     *     requirements={"currency"="^(WEB|BTC|ETH|USDC)$"}
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
@@ -60,7 +60,9 @@ class DonationController extends AbstractFOSRestController
         string $amount
     ): View {
         try {
-            $user = $this->getCurrentUser();
+            /** @var User|null $user */
+            $user = $this->getUser();
+
             $checkDonationResult = $this->donationHandler->checkDonation(
                 $market,
                 $currency,
@@ -107,7 +109,7 @@ class DonationController extends AbstractFOSRestController
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC|ETH)",
+     *     requirements="(WEB|BTC|ETH|USDC)",
      *     description="Selected currency to donate."
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")

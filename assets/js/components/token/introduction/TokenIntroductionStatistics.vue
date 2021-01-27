@@ -8,7 +8,8 @@
                         <h5 class="font-bold">{{ $t('token.intro.statistics.guide_header') }}</h5>
                     </div>
                     <template slot="body">
-                        <span v-html="this.$t('token.intro.statistics.guide_body', translationsContext)"></span>
+                        <span v-html="this.statisticGuideTranslation">
+                        </span>
                     </template>
                 </guide>
             </div>
@@ -42,10 +43,10 @@
                     </div>
                     <div class="row">
                         <div class="col pr-1">
-                            <div class="font-weight-bold pb-4">
+                            <div class="font-weight-bold pb-1">
                                 {{ $t('token.intro.statistics.balance') }}
                             </div>
-                            <div class="pb-1">
+                            <div class="pb-1" v-if="isMintmeToken">
                                 {{ $t('token.intro.statistics.exchange.header') }} <br>
                                 {{ walletBalance | toMoney(precision, false) | formatMoney }}
                                 <guide>
@@ -56,9 +57,9 @@
                                         {{ $t('token.intro.statistics.exchange.guide_body') }}
                                     </template>
                                 </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.active.header') }} <br>
+                              </div>
+                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
+                                {{ $t('token.intro.statistics.active.header') }} <br v-if="isMintmeToken">
                                 {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
@@ -69,8 +70,8 @@
                                     </template>
                                 </guide>
                             </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.withdraw.header') }} <br>
+                            <div class="pb-1" v-if="isMintmeToken">
+                                {{ $t('token.intro.statistics.withdraw.header') }} <br v-if="isMintmeToken">
                                 {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
@@ -81,8 +82,8 @@
                                     </template>
                                 </guide>
                             </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.sold.header') }} <br>
+                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
+                                {{ $t('token.intro.statistics.sold.header') }} <br v-if="isMintmeToken">
                                 {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
@@ -93,8 +94,8 @@
                                     </template>
                                 </guide>
                             </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.donation.header') }} <br />
+                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
+                                {{ $t('token.intro.statistics.donation.header') }} <br v-if="isMintmeToken">
                                 {{ donationVolume }}
                                 <guide>
                                     <template slot="header">
@@ -106,7 +107,7 @@
                                 </guide>
                             </div>
                         </div>
-                        <div class="col px-1">
+                        <div class="col px-1" v-if="isMintmeToken">
                             <div class="font-weight-bold pb-4">
                                 {{ $t('token.intro.statistics.token_release.header') }}
                                 <guide>
@@ -195,7 +196,6 @@ import {mapGetters, mapMutations} from 'vuex';
 import {
   LoggerMixin,
   MoneyFilterMixin,
-  NotificationMixin,
   WebSocketMixin,
 } from '../../../mixins';
 
@@ -205,7 +205,6 @@ export default {
     name: 'TokenIntroductionStatistics',
     mixins: [
         MoneyFilterMixin,
-        NotificationMixin,
         LoggerMixin,
         WebSocketMixin,
     ],
@@ -215,6 +214,7 @@ export default {
         Guide,
     },
     props: {
+        isMintmeToken: Boolean,
         deploymentStatus: String,
         market: Object,
         precision: Number,
@@ -233,62 +233,16 @@ export default {
         };
     },
     mounted: function() {
-        this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
-            .then((res) => this.isTokenExchanged = res.data)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_token_data'));
-                this.sendLogs('error', 'Can not load token data', err);
-            });
+        if (this.isMintmeToken) {
+            this.getTokenWithdrawn();
+            this.getLockPeriod();
+            this.getTokExchangeAmount();
+        }
 
-        this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
-            .then((res) => this.stats = res.data || this.stats)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
-                this.sendLogs('error', 'Can not load statistic data', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
-            .then((res) => this.tokenExchangeAmount = res.data)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
-                this.sendLogs('error', 'Can not load statistic data', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
-            name: this.market.quote.symbol,
-        }))
-            .then((res) => this.soldOnMarket = res.data)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_sold_on_market'));
-                this.sendLogs('error', 'Can not load soldOnMarket value', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
-            .then((res) => this.tokenWithdrawn = res.data)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_withdrawn_data'));
-                this.sendLogs('error', 'Can not load token withdrawn value', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('pending_orders', {
-            base: this.market.base.symbol,
-            quote: this.market.quote.symbol,
-        }))
-            .then((res) => this.pendingSellOrders = res.data.sell)
-            .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
-                this.sendLogs('error', 'Can not load statistic data', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('market_status', {
-            base: this.market.base.symbol,
-            quote: this.market.quote.symbol,
-        })).then((res) => {
-            this.donationVolume = res.data.volumeDonation || 0;
-        }).catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_donation_volume'));
-            this.sendLogs('error', 'Can not load market status', err);
-        });
+        this.getIsTokenExchanged();
+        this.getTokenSoldOnMarket();
+        this.getPendingOrders();
+        this.getMarketStatus();
 
         this.sendMessage(JSON.stringify({
             method: 'kline.subscribe',
@@ -300,22 +254,89 @@ export default {
             if ('kline.update' === result.method) {
                 this.donationVolume = result.params[0][8] || 0;
             }
-        });
+        }, null, 'TokenIntroductionStatistics');
     },
     methods: {
         ...mapMutations('tokenStatistics', [
             'setStats',
             'setTokenExchangeAmount',
         ]),
+        getTokenWithdrawn: function() {
+            this.$axios.retry.get(this.$routing.generate('token_withdrawn', {name: this.market.quote.symbol}))
+                .then((res) => this.tokenWithdrawn = res.data)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load token withdrawn value', err);
+                });
+        },
+        getLockPeriod: function() {
+            this.$axios.retry.get(this.$routing.generate('lock-period', {name: this.market.quote.symbol}))
+                .then((res) => this.stats = res.data || this.stats)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load statistic data', err);
+                });
+        },
+        getTokExchangeAmount: function() {
+            this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.market.quote.symbol}))
+                .then((res) => this.tokenExchangeAmount = res.data)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load statistic data', err);
+                });
+        },
+        getIsTokenExchanged: function() {
+            this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
+                .then((res) => this.isTokenExchanged = res.data)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load token data', err);
+                });
+        },
+        getTokenSoldOnMarket: function() {
+            this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
+              name: this.market.quote.symbol,
+            }))
+                .then((res) => this.soldOnMarket = res.data)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load soldOnMarket value', err);
+                });
+        },
+        getPendingOrders: function() {
+            this.$axios.retry.get(this.$routing.generate('pending_orders', {
+              base: this.market.base.symbol,
+              quote: this.market.quote.symbol,
+            }))
+                .then((res) => this.pendingSellOrders = res.data.sell)
+                .catch((err) => {
+                  this.sendLogs('error', 'Can not load statistic data', err);
+                });
+        },
+        getMarketStatus: function() {
+            this.$axios.retry.get(this.$routing.generate('market_status', {
+              base: this.market.base.symbol,
+              quote: this.market.quote.symbol,
+            })).then((res) => {
+              this.donationVolume = res.data.volumeDonation || 0;
+            }).catch((err) => {
+              this.sendLogs('error', 'Can not load market status', err);
+            });
+        },
     },
     computed: {
+        statisticGuideTranslation: function() {
+            return this.$t(
+                this.isMintmeToken
+                    ? 'token.intro.statistics.guide_body.mintme_token'
+                    : 'token.intro.statistics.guide_body.eth_token',
+                this.translationsContext
+            );
+        },
         translationsContext: function() {
-          return {
-            symbol: this.market.quote.symbol,
-          };
+            return {
+                symbol: this.market.quote.symbol,
+            };
         },
         loaded: function() {
-            return this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null;
+            return this.isMintmeToken
+                ? this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null
+                : this.pendingSellOrders !== null && this.soldOnMarket !== null;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);

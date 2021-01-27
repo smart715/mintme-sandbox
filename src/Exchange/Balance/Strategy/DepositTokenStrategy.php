@@ -5,13 +5,10 @@ namespace App\Exchange\Balance\Strategy;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
-use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use Money\Currency;
-use Money\Money;
 
 class DepositTokenStrategy implements BalanceStrategyInterface
 {
@@ -37,7 +34,7 @@ class DepositTokenStrategy implements BalanceStrategyInterface
     /** @param Token $tradeble */
     public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
     {
-        $this->withdrawWebFee($user, $tradeble);
+        $this->withdrawBaseFee($user, $tradeble);
         $this->depositTokens($user, $tradeble, $amount);
     }
 
@@ -50,14 +47,12 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         );
     }
 
-    private function withdrawWebFee(User $user, Token $token): void
+    private function withdrawBaseFee(User $user, Token $token): void
     {
         $this->balanceHandler->withdraw(
             $user,
-            Token::getFromSymbol(Token::WEB_SYMBOL),
-            $this->wallet->getDepositInfo(
-                Token::getFromSymbol(Token::WEB_SYMBOL)
-            )->getFee()
+            Token::getFromSymbol($token->getCryptoSymbol()),
+            $this->wallet->getDepositInfo($token)->getFee()
         );
     }
 }

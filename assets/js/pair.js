@@ -15,6 +15,7 @@ import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import Avatar from './components/Avatar';
 import i18n from './utils/i18n/i18n';
+import TokenCreatedModal from './components/modal/TokenCreatedModal';
 
 new Vue({
   el: '#token',
@@ -40,21 +41,23 @@ new Vue({
       tokenAddress: null,
       posts: null,
       postFromUrl: null,
+      showCreatedModal: true,
     };
   },
   components: {
+    Avatar,
     BalanceInit,
     CreatePost,
     Donation,
     Posts,
-    TokenIntroductionDescription,
     TokenAvatar,
+    TokenCreatedModal,
+    TokenIntroductionDescription,
     TokenIntroductionStatistics,
     TokenOngoingAirdropCampaign,
     TokenSocialMediaIcons,
     TopHolders,
     Trade,
-    Avatar,
   },
   mounted: function() {
     let divEl = document.createElement('div');
@@ -171,10 +174,13 @@ new Vue({
       this.tokenTelegram = val;
     },
     updatePosts: function() {
+      if (!this.tokenName) {
+        return;
+      }
       this.$axios.single.get(this.$routing.generate('list_posts', {tokenName: this.tokenName}))
-      .then((res) => {
-        this.posts = res.data;
-      });
+          .then((res) => {
+            this.posts = res.data;
+          });
     },
     goToPosts: function() {
       this.tabIndex = 2;

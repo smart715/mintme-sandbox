@@ -3,17 +3,21 @@
 namespace App\Controller\Dev\API\V1\User;
 
 use App\Controller\Dev\API\V1\DevApiController;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\NotificationTypes;
+use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
@@ -25,7 +29,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
 use Throwable;
@@ -53,8 +56,8 @@ class WalletController extends DevApiController
     /** @var ValidatorFactoryInterface */
     private $vf;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
 
     public function __construct(
         WalletInterface $wallet,
@@ -63,7 +66,7 @@ class WalletController extends DevApiController
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        EventDispatcherInterface $eventDispatcher
+        UserNotificationManagerInterface $userNotificationManager
     ) {
         $this->wallet = $wallet;
         $this->userActionLogger = $userActionLogger;
@@ -71,7 +74,7 @@ class WalletController extends DevApiController
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->vf = $validatorFactory;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
     }
 
     /**
@@ -100,12 +103,10 @@ class WalletController extends DevApiController
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
-            $this->cryptoManager->findAll()
+            $crypto = array_filter($this->cryptoManager->findAll(), fn(Crypto $crypto) => !$crypto->isToken())
         ) : [];
 
-        $isBlockedToken = $user->getProfile()->getToken()
-            ? $user->getProfile()->getToken()->isBlocked()
-            : false;
+        $isBlockedToken = $user->getProfile()->hasBlockedTokens();
 
         $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
@@ -222,6 +223,10 @@ class WalletController extends DevApiController
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
 
+        if (!($validator = new TradebleDigitsValidator($amount, $tradable))->validate()) {
+            throw new ApiBadRequestException($validator->getMessage());
+        }
+
         $validator = $this->vf->createMinAmountValidator($tradable, $amount);
 
         if (!$validator->validate()) {
@@ -263,11 +268,13 @@ class WalletController extends DevApiController
             throw new ApiBadRequestException('Withdrawal failed');
         }
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
-            UserNotificationEvent::NAME
+        $notificationType = NotificationTypes::WITHDRAWAL;
+        $strategy = new WithdrawalNotificationStrategy(
+            $this->userNotificationManager,
+            $notificationType
         );
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
 
         $this->userActionLogger->info("Withdraw funds from API for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),

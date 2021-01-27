@@ -28,7 +28,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '200',
             'participants' => 150,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
             'endDate' => $endDate->getTimestamp(),
         ]);
@@ -37,7 +39,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '200',
             'participants' => 150,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
             'endDate' => $endDate->getTimestamp(),
         ]);
@@ -67,7 +71,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '0.0099',
             'participants' => 150,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
         ]);
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
@@ -77,7 +83,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '10000001',
             'participants' => 200,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
         ]);
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
@@ -87,7 +95,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '0.12',
             'participants' => 1227,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
         ]);
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
@@ -100,7 +110,9 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '0.01',
             'participants' => 99,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
         ]);
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
@@ -111,13 +123,75 @@ class AirdropCampaignControllerTest extends WebTestCase
         $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
             'amount' => '200',
             'participants' => 150,
-            'actions' => [],
+            'actions' => [
+                'postLink' => true,
+            ],
             'actionsData' => [],
             'endDate' => $endDate->getTimestamp(),
         ]);
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertTrue($this->client->getResponse()->isClientError());
         $this->assertEquals('Invalid end date.', $res['message']);
+    }
+
+    public function testCreateAirdropCampaignWithInvalidActions(): void
+    {
+        $this->register($this->client);
+        $tokName = $this->createToken($this->client);
+
+        $endDate = new \DateTimeImmutable('+2 days');
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid actions', $res['message']);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'actions' => [
+                'twitterMessage' => 'not bool',
+                'twitterRetweet' => false,
+                'facebookMessage' => false,
+                'facebookPage' => false,
+                'facebookPost' => false,
+                'linkedinMessage' => false,
+                'youtubeSubscribe' => false,
+                'postLink' => false,
+            ],
+            'actionsData' => [],
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid actions', $res['message']);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'actions' => [
+                'badName' => false,
+            ],
+            'actionsData' => [],
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid actions', $res['message']);
+
+        $this->client->request('POST', '/api/airdrop_campaign/' . $tokName . '/create', [
+            'amount' => '200',
+            'participants' => 150,
+            'actions' => 'not an array',
+            'actionsData' => [],
+            'endDate' => $endDate->getTimestamp(),
+        ]);
+        $res = json_decode((string)$this->client->getResponse()->getContent(), true);
+        $this->assertTrue($this->client->getResponse()->isClientError());
+        $this->assertEquals('Invalid actions eez', $res['message']);
     }
 
     public function testDeleteAirdropCampaign(): void

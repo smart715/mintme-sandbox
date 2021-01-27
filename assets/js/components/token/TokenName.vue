@@ -7,6 +7,7 @@
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
                 :is-token-created="isTokenCreated"
+                :is-mintme-token="isMintmeToken"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -57,7 +58,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
-import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {WebSocketMixin, FiltersMixin, LoggerMixin} from '../../mixins/';
 import TokenEditModal from '../modal/TokenEditModal';
 import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
@@ -69,6 +70,7 @@ export default {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
+        isMintmeToken: Boolean,
         identifier: String,
         name: String,
         precision: Number,
@@ -91,7 +93,7 @@ export default {
         FontAwesomeIcon,
         TokenEditModal,
     },
-    mixins: [WebSocketMixin, FiltersMixin, NotificationMixin, clickaway, LoggerMixin],
+    mixins: [WebSocketMixin, FiltersMixin, clickaway, LoggerMixin],
     data() {
         return {
             currentName: this.name,
@@ -141,7 +143,7 @@ export default {
             ) {
                 this.checkIfTokenExchanged();
             }
-        }, 'token-name-asset-update');
+        }, 'token-name-asset-update', 'TokenName');
 
         if (this.showTokenEditModalProp) {
             window.history.replaceState(
@@ -161,7 +163,6 @@ export default {
             }))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_fetch_token_data'));
                 this.sendLogs('error', 'Can not fetch token data now', err);
             });
         },

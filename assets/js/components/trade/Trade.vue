@@ -9,6 +9,7 @@
                 :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
+                :is-mintme-token="isMintmeToken"
             />
         </div>
         <div class="row trade-orders">
@@ -26,6 +27,7 @@
                     :taker-fee="takerFee"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
+                    :currency-mode="currencyMode"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -42,6 +44,7 @@
                     :is-owner="isOwner"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
+                    :currency-mode="currencyMode"
                 />
             </div>
         </div>
@@ -54,7 +57,8 @@
                 :sell-orders="sellOrders"
                 :market="market"
                 :user-id="userId"
-                :logged-in="loggedIn"/>
+                :logged-in="loggedIn"
+                :currency-mode="currencyMode"/>
         </div>
         <div class="row mt-3">
             <trade-trade-history
@@ -62,6 +66,7 @@
                 :hash="hash"
                 :websocket-url="websocketUrl"
                 :market="market"
+                :currency-mode="currencyMode"
             />
         </div>
     </div>
@@ -122,6 +127,7 @@ export default {
         isToken: Boolean,
         disabledServicesConfig: String,
         takerFee: Number,
+        isMintmeToken: Boolean,
     },
     data() {
         return {
@@ -140,6 +146,9 @@ export default {
         ...mapGetters('tradeBalance', {
             balances: 'getBalances',
         }),
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
+        },
         baseBalance: function() {
             return this.balances && this.balances[this.market.base.symbol] ? this.balances[this.market.base.symbol].available
                 : false;
@@ -193,7 +202,7 @@ export default {
                 if ('order.update' === response.method) {
                     this.processOrders(response.params[1], response.params[0]);
                 }
-            }, 'trade-update-orders');
+            }, 'trade-update-orders', 'Trade');
         });
 
         if (!this.requestingRates) {

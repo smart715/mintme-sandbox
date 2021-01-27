@@ -4,12 +4,15 @@ namespace App\Command;
 
 use App\Entity\ScheduledNotification;
 use App\Entity\Token\Token;
-use App\Entity\UserNotification;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\OrderNotificationStrategy;
+use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,16 +38,21 @@ class CheckUserSellOrdersCommand extends Command
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var MailerInterface */
+    private MailerInterface $mailer;
+
     public function __construct(
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
         MarketHandlerInterface $marketHandler,
         CryptoManagerInterface $cryptoManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        MailerInterface $mailer
     ) {
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->userNotificationManager = $userNotificationManager;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
@@ -58,57 +66,86 @@ class CheckUserSellOrdersCommand extends Command
     {
         $scheduledNotifications = $this->scheduledNotificationManager->getScheduledNotifications();
 
+        /** @var ScheduledNotification $scheduledNotification */
         foreach ($scheduledNotifications as $scheduledNotification) {
-            $notificationType = $scheduledNotification->getType();
-            $timeInterval = $scheduledNotification->getTimeInterval();
-            $dateToBeSend = $scheduledNotification->getDateToBeSend();
-            $user = $scheduledNotification->getUser();
-            $quoteToken = $user->getProfile()->getToken();
-            $baseCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-            $UserMarket = new Market($baseCrypto, $quoteToken);
+            $quoteTokens = $scheduledNotification->getUser()->getProfile()->getTokens();
 
-            $userSellOrders = $this->marketHandler->getSellOrdersSummaryByUser($user, $UserMarket);
+            if (!$quoteTokens) {
+                $this->checkForTokensDeletions($scheduledNotification);
 
-            if ($userSellOrders) {
-                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+                continue;
             }
 
-            $actual_date = new DateTimeImmutable();
-
-            if (!$userSellOrders && $dateToBeSend <= $actual_date) {
-                $this->userNotificationManager->createNotification(
-                    $user,
-                    $notificationType,
-                    []
+            foreach ($quoteTokens as $quoteToken) {
+                $this->scheduleNotificationForToken(
+                    $scheduledNotification,
+                    $quoteToken
                 );
-
-                $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
-
-                if ($lastSent) {
-                    $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
-                } else {
-                    $this->updateScheduledNotification(
-                        $scheduledNotification,
-                        $notificationType,
-                        $timeInterval,
-                        $dateToBeSend
-                    );
-                }
             }
         }
 
         return 0;
     }
 
+    private function scheduleNotificationForToken(
+        ScheduledNotification $scheduledNotification,
+        Token $quoteToken
+    ): void {
+        $notificationType = $scheduledNotification->getType();
+        $user = $scheduledNotification->getUser();
+        $timeInterval = $scheduledNotification->getTimeInterval();
+        $dateToBeSend = $scheduledNotification->getDateToBeSend();
+        $baseCrypto = $this->cryptoManager->findBySymbol($quoteToken->getCryptoSymbol());
+        $userMarket = new Market($baseCrypto, $quoteToken);
+
+        $userSellOrders = $this->marketHandler->getSellOrdersSummaryByUser($user, $userMarket);
+
+        if (count($userSellOrders) > 0) {
+            $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+        }
+
+        $actual_date = new DateTimeImmutable();
+
+        if (0 === count($userSellOrders) && $dateToBeSend <= $actual_date) {
+            $this->userNotificationManager->createNotification(
+                $user,
+                $notificationType,
+                []
+            );
+
+            $strategy = new OrderNotificationStrategy(
+                $this->userNotificationManager,
+                $this->mailer,
+                $quoteToken,
+                $notificationType
+            );
+            $notificationContext = new NotificationContext($strategy);
+            $notificationContext->sendNotification($user);
+
+            $lastSent = $this->isLastNotificationSent($notificationType, $timeInterval);
+
+            if ($lastSent) {
+                $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+            } else {
+                $this->updateScheduledNotification(
+                    $scheduledNotification,
+                    $notificationType,
+                    $timeInterval,
+                    $dateToBeSend
+                );
+            }
+        }
+    }
+
     private function isLastNotificationSent(String $notificationType, String $timeInterval): bool
     {
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType &&
+        if (NotificationTypes::ORDER_CANCELLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval
         ) {
             return true;
         }
 
-        return UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType &&
+        return NotificationTypes::ORDER_FILLED === $notificationType &&
             (string)$this->timeIntervals[2] === $timeInterval;
     }
 
@@ -120,11 +157,11 @@ class CheckUserSellOrdersCommand extends Command
     ): void {
         $newTimeInterval = '0';
 
-        if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType) {
+        if (NotificationTypes::ORDER_CANCELLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[2];
         }
 
-        if (UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType) {
+        if (NotificationTypes::ORDER_FILLED === $notificationType) {
             $newTimeInterval = (string)$this->timeIntervals[0] === $timeInterval ?
                 (string)$this->timeIntervals[1] :
                 (string)$this->timeIntervals[2];
@@ -137,5 +174,14 @@ class CheckUserSellOrdersCommand extends Command
             $newTimeInterval,
             $newTimeToBeSend
         );
+    }
+
+    private function checkForTokensDeletions(ScheduledNotification $scheduledNotification): void
+    {
+        $notificationType = $scheduledNotification->getType();
+
+        if (in_array($notificationType, NotificationTypes::ORDER_TYPES, true)) {
+            $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
+        }
     }
 }

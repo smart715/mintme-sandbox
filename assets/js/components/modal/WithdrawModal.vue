@@ -30,10 +30,10 @@
                             input-id="wamount"
                             v-model="$v.amount.$model"
                             :input-class="{ 'is-invalid': $v.amount.$error }"
-                            :show-converter="!isToken"
+                            :show-converter="!isToken && currencyMode === currencyModes.usd.value"
                             :from="currency"
                             :to="USD.symbol"
-                            :subunit="2"
+                            :subunit="4"
                             symbol="$"
                             @change="setFirstTimeOpen"
                             @keypress="checkInput(subunit, 8)"
@@ -88,7 +88,7 @@
                 <div class="input-group col-12 pt-2 justify-content-center">
                     <button
                         class="btn btn-primary"
-                        :disabled="$v.$anyError || withdrawing"
+                        :disabled="$v.$anyError || withdrawing || (twofa !== '' && !code)"
                         @click="onWithdraw">
                         {{ $t('withdraw_modal.submit') }}
                     </button>&nbsp;
@@ -111,7 +111,14 @@ import Decimal from 'decimal.js';
 import Modal from './Modal.vue';
 import {required, minLength, maxLength, maxValue, decimal, minValue} from 'vuelidate/lib/validators';
 import {toMoney} from '../../utils';
-import {addressLength, webSymbol, addressContain, addressFirstSymbol, twoFACode, USD} from '../../utils/constants';
+import {
+    addressLength,
+    addressContain,
+    addressFirstSymbol,
+    twoFACode,
+    USD,
+    currencyModes,
+} from '../../utils/constants';
 import {
     CheckInputMixin,
     MoneyFilterMixin,
@@ -139,23 +146,26 @@ export default {
         currency: String,
         isToken: Boolean,
         fee: String,
-        webFee: String,
+        baseFee: String,
+        baseSymbol: String,
         withdrawUrl: String,
         maxAmount: String,
-        availableWeb: String,
+        availableBase: String,
         subunit: Number,
         twofa: String,
         noClose: Boolean,
         expirationTime: Number,
+        currencyMode: String,
     },
     data() {
         return {
-            code: '',
+            code: null,
             amount: 0,
             address: '',
             withdrawing: true,
             flag: true,
             USD,
+            currencyModes,
         };
     },
     computed: {
@@ -170,15 +180,15 @@ export default {
             );
 
             return toMoney(
-                amount.add(this.fee).toString(),
+                amount.add(this.fee || 0).toString(),
                 this.subunit
             );
         },
         feeAmount: function() {
-            return this.isToken ? this.webFee : this.fee;
+            return this.fee || this.baseFee;
         },
         feeCurrency: function() {
-            return this.isToken ? webSymbol : this.currency;
+            return this.fee ? this.currency : this.baseSymbol;
         },
         translationsContext: function() {
             return {
@@ -192,7 +202,7 @@ export default {
             this.$v.$reset();
             this.amount = 0;
             this.address = '';
-            this.code = '';
+            this.code = null;
             this.$emit('close');
         },
         onWithdraw: function() {
@@ -202,7 +212,7 @@ export default {
                 return;
             }
 
-            if (this.isToken && new Decimal(this.availableWeb).lessThan(this.webFee)) {
+            if (!this.fee && new Decimal(this.availableBase).lessThan(this.baseFee)) {
                 this.notifyError(this.$t('toasted.error.do_not_have_enough', {currency: this.rebrandingFunc(this.feeCurrency)}));
                 return;
             }
@@ -213,10 +223,15 @@ export default {
                 'crypto': this.currency,
                 'amount': this.amount,
                 'address': this.address,
-                'code': this.code || null,
+                'code': this.code,
             })
             .then((response) => {
-                this.notifySuccess(this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                if (this.code === null) {
+                    this.notifySuccess(
+                        this.$t('toasted.success.email_sent', {hours: Math.floor(this.expirationTime / 3600)}));
+                } else {
+                    this.notifySuccess(this.$t('toasted.success.withdrawal.queued'));
+                }
                 this.closeModal();
             })
             .catch((error) => {
@@ -233,8 +248,8 @@ export default {
         },
         setMaxAmount: function() {
             let amount = new Decimal(this.maxAmount);
-            this.amount = amount.greaterThan(this.fee) ?
-                toMoney(amount.sub(this.fee).toString(), this.subunit) : toMoney(0, this.subunit);
+            this.amount = amount.greaterThan(this.fee || 0) ?
+                toMoney(amount.sub(this.fee || 0).toString(), this.subunit) : toMoney(0, this.subunit);
         },
         setFirstTimeOpen: function() {
             if (this.flag) {
@@ -249,7 +264,7 @@ export default {
                 required,
                 decimal,
                 maxValue: maxValue(
-                    toMoney(new Decimal(this.maxAmount).sub(this.fee).toString(), this.subunit)
+                    Math.max(0, toMoney(new Decimal(this.maxAmount).sub(this.fee || 0).toString(), this.subunit))
                 ),
                 minValue: minValue(this.minAmount),
             },
@@ -266,7 +281,6 @@ export default {
                     addressFirstSymbol[this.currency] ? addressFirstSymbol[this.currency] : addressFirstSymbol['WEB'],
             },
             code: {
-                required,
                 twoFACode,
             },
         };

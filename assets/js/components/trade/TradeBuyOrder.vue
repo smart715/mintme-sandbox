@@ -44,8 +44,9 @@
                                 tabindex="8"
                                 :from="market.base.symbol"
                                 :to="USD.symbol"
-                                :subunit="2"
+                                :subunit="4"
                                 symbol="$"
+                                :show-converter="currencyMode === currencyModes.usd.value"
                             />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.buy_order.your.header') }}
@@ -189,7 +190,7 @@ import {
 import {toMoney} from '../../utils';
 import Decimal from 'decimal.js';
 import {mapMutations, mapGetters} from 'vuex';
-import {USD} from '../../utils/constants';
+import {USD, currencyModes} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
 export default {
@@ -218,6 +219,7 @@ export default {
         balanceLoaded: [String, Boolean],
         takerFee: Number,
         tradeDisabled: Boolean,
+        currencyMode: String,
     },
     data() {
         return {
@@ -225,6 +227,7 @@ export default {
             placingOrder: false,
             balanceManuallyEdited: false,
             USD,
+            currencyModes,
         };
     },
     methods: {
@@ -236,7 +239,12 @@ export default {
             this.setBalanceManuallyEdited(true);
         },
         checkAmountInput() {
-            this.$emit('check-input', this.market.quote.subunit);
+            this.$emit(
+                'check-input',
+                this.market.quote.decimals > this.market.quote.subunit
+                    ? this.market.quote.subunit
+                    : this.market.quote.decimals
+            );
         },
         placeOrder: function() {
             if (this.tradeDisabled) {
@@ -346,7 +354,7 @@ export default {
         translationsContext: function() {
             return {
                 baseSymbol: this.rebrandingFunc(this.market.base.symbol),
-                quoteSymbol: this.market.quote.symbol,
+                quoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 rebrandedQuoteSymbol: this.rebrandingFunc(this.market.quote.symbol),
                 minTotalPrice: this.minTotalPrice,
             };

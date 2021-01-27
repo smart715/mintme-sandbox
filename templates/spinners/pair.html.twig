@@ -20,7 +20,7 @@
                 <div class="tabs-left-margin-container"></div>
                 <ul role="tablist" class="nav nav-tabs spinner-tabs">
                     <li role="presentation"
-                        class="nav-item {% if isTokenPage %} token-avatar-left {% endif %}">
+                        class="nav-item {% if isTokenPage and token.isMintmeToken %} token-avatar-left {% endif %}">
                         <a
                             role="tab"
                             aria-selected="true"

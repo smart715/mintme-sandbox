@@ -20,6 +20,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumerTest extends TestCase
@@ -36,7 +37,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -63,7 +65,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -90,7 +93,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -117,7 +121,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -148,7 +153,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertFalse(
@@ -179,7 +185,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -210,7 +217,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockParameterBagInterface()
         );
 
         $this->assertTrue(
@@ -285,6 +293,7 @@ class PaymentConsumerTest extends TestCase
     {
         $token = $this->createMock(Token::class);
         $token->method('getSymbol')->willReturn($name);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
 
         return $token;
     }
@@ -317,5 +326,15 @@ class PaymentConsumerTest extends TestCase
         );
 
         return $em;
+    }
+
+    public function mockParameterBagInterface(): ParameterBagInterface
+    {
+        $pb = $this->createMock(ParameterBagInterface::class);
+        $pb->method('get')
+            ->with('token_withdraw_fee')
+            ->willReturn('0.01');
+
+        return $pb;
     }
 }

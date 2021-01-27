@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
@@ -73,7 +74,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="required"})
+     * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="optional"})
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
      * @Rest\RequestParam(
@@ -81,7 +82,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      *      allowBlank=false,
      *      requirements="^[a-zA-Z0-9]+$"
      *     )
-     * @Rest\RequestParam(name="code", allowBlank=false)
+     * @Rest\RequestParam(name="code", allowBlank=true)
      */
     public function withdraw(
         ParamFetcherInterface $request,
@@ -126,41 +127,35 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+        if ($user->isGoogleAuthenticatorEnabled()) {
+            try {
+                $wallet->withdrawCommit($pendingWithdraw);
 
-        $this->userActionLogger->info($this->translations->trans(
-            'api.wallet.went_withdrawal_email',
-            ['%symbol%' => $tradable->getSymbol()]
-        ), [
-            'address' => $pendingWithdraw->getAddress()->getAddress(),
-            'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
-        ]);
+                $this->userActionLogger->info(
+                    'Withdrawal request sent to queue for'. " " .$pendingWithdraw->getSymbol(),
+                    [
+                        'address' => $pendingWithdraw->getAddress()->getAddress(),
+                        'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+                    ]
+                );
+            } catch (Throwable $exception) {
+                return $this->view([
+                    'error' => $this->translations->trans('api.wallet.withdrawal_went_wrong'),
+                ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+
+            $this->userActionLogger->info(
+                'Sent withdrawal email for'. " " .$tradable->getSymbol(),
+                [
+                    'address' => $pendingWithdraw->getAddress()->getAddress(),
+                    'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
+                ]
+            );
+        }
 
         return $this->view();
-    }
-
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/addresses", name="deposit_addresses", options={"expose"=true})
-     */
-    public function getDepositAddresses(
-        WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager
-    ): View {
-        $this->denyAccessUnlessGranted('deposit');
-
-        /** @var User $user*/
-        $user = $this->getUser();
-
-        $depositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
-            $user,
-            $cryptoManager->findAll()
-        ) : [];
-
-        $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
-
-        return $this->view(array_merge($depositAddresses, $tokenDepositAddresses));
     }
 
     /**
@@ -176,9 +171,12 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         /** @var User $user*/
         $user = $this->getUser();
 
+        $allCrypto = $cryptoManager->findAll();
+        $crypto = array_filter($allCrypto, fn(Crypto $crypto) => !$crypto->isToken());
+
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
-            $cryptoManager->findAll()
+            $crypto
         ) : [];
 
         $tokenDepositAddresses = $depositCommunicator->getTokenDepositCredentials($user);
@@ -211,19 +209,21 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     public function getDepositInfo(
         string $crypto,
         WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager
     ): View {
         $this->denyAccessUnlessGranted('deposit');
 
-        $crypto = $cryptoManager->findBySymbol($crypto);
+        /** @var TradebleInterface|null $tradable */
+        $tradable = $cryptoManager->findBySymbol($crypto) ?? $tokenManager->findByName($crypto);
 
-        if (!$crypto) {
+        if (!$tradable) {
             return $this->view([
                 'error' => $this->translations->trans('api.wallet.not_found_currency'),
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        return $this->view($depositCommunicator->getDepositInfo($crypto));
+        return $this->view($depositCommunicator->getDepositInfo($tradable));
     }
 
     /**

@@ -20,9 +20,12 @@
       .crypto-pair
         font-size: smaller
 
+.crypto-pair
+  font-size: 13px
+
 .market-data
   font-size: smaller
-  width: 35%
+  width: 47%
   @include media-breakpoint-down(md)
     width: 40%
 
@@ -46,8 +49,10 @@
   max-width: 90%
   vertical-align: middle
 
-@media (min-width: 576px)
-  .trading-table
+.trading-table
+  overflow: auto
+
+  @media (min-width: 576px)
     .table
       thead
         th:first-child
@@ -86,7 +91,8 @@
   .token-avatar
     z-index: 1
     min-width: 0
-    margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
+    &.show-avatar
+      margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
 
     @media(max-width: 1199px)
       margin-left: calc(111px + 20px) !important
