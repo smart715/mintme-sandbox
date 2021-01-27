@@ -53,10 +53,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col py-2">
+                                <div class="col-12 py-2">
                                     {{ form_widget(form.name, {'attr': {
                                         'v-model': '$v.tokenName.$model',
-                                        'class' : 'form-control',
+                                        'class': 'form-control',
+                                        '@invalid': 'tokenInvalid',
+                                        '@change': 'tokenChange',
+                                        '@input': 'tokenInput'
                                     }}) }}
                                 </div>
                                 <div class="col-12">
@@ -83,10 +86,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-12">
                                     <div class="description">
                                         {{ form_widget(form.description, {'attr': {
-                                            'v-model': '$v.description.$model',
+                                            'v-model': '$v.description.$model'
                                         }}) }}
                                     </div>
                                 </div>
@@ -118,13 +121,19 @@
                             <div class="col-md-12 text-left">
                                 <input
                                     type="submit"
-                                    :disabled="saveBtnDisabled"
-                                    @click="createToken"
                                     class="btn btn-primary submit-creation"
                                     :class="{'input-disabled': !tokenCreation}"
+                                    :disabled="saveBtnDisabled"
+                                    @click="createToken"
                                     value="{% trans %}page.token_creation.create{% endtrans %}"
                                 />
-                                <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
+                                <input
+                                    type="reset"
+                                    class="btn btn-cancel ml-3"
+                                    style="text-transform: capitalize;"
+                                    @click="$goBack"
+                                    value="{% trans %}cancel{% endtrans %}"
+                                />
                             </div>
                         </div>
                         {{ form_end(form) }}
@@ -137,12 +146,4 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/token_creation.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let tokenCreateName = document.getElementById('token_create_name');
-            tokenCreateName.addEventListener('invalid', tokenCreateName.setCustomValidity("Invalid token name."));
-            tokenCreateName.addEventListener('change', tokenCreateName.setCustomValidity(""));
-            tokenCreateName.addEventListener('input', tokenCreateName.setCustomValidity(""));
-        });
-    </script>
 {% endblock %}
