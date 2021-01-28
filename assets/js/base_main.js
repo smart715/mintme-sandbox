@@ -21,12 +21,14 @@ import VueI18n from 'vue-i18n';
 import CustomFormatter from './utils/i18n/custom-formatter';
 import UserNotification from './components/UserNotification';
 import NavEnvelope from './components/chat/NavEnvelope';
+import Helpers from './helpers';
 
 window.Vue = Vue;
 Vue.use(VueBootstrap);
 Vue.use(Routing);
 Vue.use(Axios);
 Vue.use(VueI18n);
+Vue.use(Helpers);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
@@ -111,3 +113,4 @@ if (document.getElementById('description')) {
         },
     });
 }
+
