@@ -150,7 +150,7 @@ class UpdatePendingWithdrawals extends Command
                         );
 
                     $feeToken = Token::getFromCrypto($token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto());
-                    $isFeeInCrypto = $token->isMintmeToken() || !$token->isMintmeToken() && !$token->getFee();
+                    $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();
                     $amount = $isFeeInCrypto
                         ? $item->getAmount()->getAmount()
                         : $item->getAmount()->getAmount()->add($token->getFee());
