@@ -6,6 +6,6 @@ new Typed('#typed', {
     backSpeed: 100,
     loop: true,
     showCursor: true,
-    cursorChar: '.',
+    cursorChar: '|',
     backDelay: 2500,
 });
