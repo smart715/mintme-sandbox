@@ -105,7 +105,7 @@ class Profile implements ImagineInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
-     * @var ArrayCollection
+     * @var ArrayCollection|null
      * @Groups({"API"})
      */
     protected $tokens;
@@ -341,7 +341,7 @@ class Profile implements ImagineInterface
 
     public function getTokens(): array
     {
-        return $this->hasTokens()
+        return null !== $this->tokens
             ? $this->tokens->toArray()
             : [];
     }
