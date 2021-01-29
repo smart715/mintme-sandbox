@@ -74,6 +74,7 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
+        - { path: '^/', roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/media/upload,                                role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/send-code$,              role: ROLE_USER, requires_channel: https }
