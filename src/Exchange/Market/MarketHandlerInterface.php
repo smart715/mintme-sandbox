@@ -2,12 +2,14 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use Money\Money;
 
 interface MarketHandlerInterface
 {
@@ -118,4 +120,6 @@ interface MarketHandlerInterface
      * @return array
      */
     public function getMarketStatus(Market $market, int $period = 86400): array;
+
+    public function soldOnMarket(Token $token): Money;
 }
