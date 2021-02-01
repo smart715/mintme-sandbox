@@ -130,7 +130,7 @@
             "cache:clear": "symfony-cmd",
             "ckeditor:install --clear=drop": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "security-checker security:check": "script"
+            "./local-php-security-checker_1.0.0": "script"
         },
         "post-install-cmd": [
             "@symfony-scripts",
