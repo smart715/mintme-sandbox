@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -82,10 +81,10 @@ class MarketStatus
     private $buyDepth = '0';
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @var string|null
+     * @ORM\Column(type="string", options={"default": "0"})
+     * @var string
      */
-    private ?string $marketCap = null; // phpcs:ignore
+    private $soldOnMarket;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -102,6 +101,7 @@ class MarketStatus
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
+        $this->soldOnMarket = $marketInfo->getSoldOnMarket()->getAmount();
     }
 
     /**
@@ -154,16 +154,6 @@ class MarketStatus
         return new Money($this->monthVolume, new Currency($this->crypto->getSymbol()));
     }
 
-    /**
-     * @Groups({"API", "dev"})
-     */
-    public function getMarketCap(): ?Money
-    {
-        return $this->marketCap
-            ? new Money($this->marketCap, new Currency($this->crypto->getSymbol()))
-            : null;
-    }
-
     public function setQuote(?TradebleInterface $quote): self
     {
         if ($quote instanceof Crypto) {
@@ -185,7 +175,7 @@ class MarketStatus
         return $this->quoteCrypto ?? $this->quoteToken;
     }
 
-    public function updateStats(MarketInfo $marketInfo, ?Money $marketCap): self
+    public function updateStats(MarketInfo $marketInfo): self
     {
         $this->openPrice = $marketInfo->getOpen()->getAmount();
         $this->lastPrice = $marketInfo->getLast()->getAmount();
@@ -193,9 +183,8 @@ class MarketStatus
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
         $this->expires = $marketInfo->getExpires();
-        $this->marketCap = $marketCap
-            ? $marketCap->getAmount()
-            : null;
+        $this->soldOnMarket = $marketInfo->getSoldOnMarket()->getAmount();
+        $this->expires = $marketInfo->getExpires();
 
         return $this;
     }
@@ -206,6 +195,14 @@ class MarketStatus
     public function getBuyDepth(): Money
     {
         return new Money($this->buyDepth, new Currency($this->crypto->getSymbol()));
+    }
+
+    public function getSoldOnMarket(): Money
+    {
+        return new Money(
+            $this->soldOnMarket,
+            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Token::TOK_SYMBOL)
+        );
     }
 
     public function getExpires(): ?\DateTimeImmutable
