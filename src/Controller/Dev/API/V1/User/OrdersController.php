@@ -18,6 +18,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Utils\Validator\TradebleDigitsValidator;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -247,14 +248,26 @@ class OrdersController extends DevApiController
 
         $this->denyAccessUnlessGranted('not-blocked', $quote);
 
+        /** @var User $user*/
+        $user = $this->getUser();
+
+        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+        $maxAllowedValidator = new MaxAllowedOrdersValidator(
+            $maxAllowedOrders,
+            $user,
+            $this->marketHandler,
+            $this->marketFactory,
+        );
+
+        if (!$maxAllowedValidator->validate()) {
+            throw new ApiBadRequestException($maxAllowedValidator->getMessage());
+        }
+
         if (is_null($base) || is_null($quote)) {
             throw new ApiNotFoundException('Market not found');
         }
 
         $market = new Market($base, $quote);
-
-        /** @var User $user*/
-        $user = $this->getUser();
 
         $amount = (string)$request->get('amountInput');
         $price = (string)$request->get('priceInput');

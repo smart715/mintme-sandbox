@@ -12,6 +12,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
+use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -23,6 +24,7 @@ use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/orders")
@@ -45,16 +47,21 @@ class OrdersController extends AbstractFOSRestController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var TranslatorInterface */
+    private $translations;
+
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translations
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translations = $translations;
     }
 
     /**
@@ -132,6 +139,24 @@ class OrdersController extends AbstractFOSRestController
         $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+
+        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+        $maxAllowedValidator = new MaxAllowedOrdersValidator(
+            $maxAllowedOrders,
+            $currentUser,
+            $this->marketHandler,
+            $this->marketManager
+        );
+
+        if (!$maxAllowedValidator->validate()) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => $this->translations->trans(
+                    'api.orders.max_allowed_active_orders',
+                    ['%maxAllowed%' => $maxAllowedOrders],
+                ),
+            ], Response::HTTP_OK);
+        }
 
         if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
