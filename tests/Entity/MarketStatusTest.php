@@ -90,7 +90,7 @@ class MarketStatusTest extends TestCase
             $ms->getBuyDepth()->getAmount(),
         ]);
 
-        $ms->updateStats($this->mockMarketInfo(3, 4, 5, 6, 7), $this->mockMoney(8));
+        $ms->updateStats($this->mockMarketInfo(3, 4, 5, 6, 7));
 
         $this->assertEquals([3, 4, 5, 6, 7], [
             $ms->getOpenPrice()->getAmount(),

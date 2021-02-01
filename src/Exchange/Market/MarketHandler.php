@@ -6,6 +6,7 @@ use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
@@ -24,13 +25,14 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
 use Money\Money;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class MarketHandler implements MarketHandlerInterface
 {
     public const SELL = 1;
     public const BUY = 2;
-
-    private const MONTH_PERIOD = 2592000;
+    public const DAY_PERIOD = 86400;
+    public const MONTH_PERIOD = 2592000;
 
     private MarketFetcherInterface $marketFetcher;
     private MoneyWrapperInterface $moneyWrapper;
@@ -39,6 +41,8 @@ class MarketHandler implements MarketHandlerInterface
     private DonationManagerInterface $donationManager;
     private MarketFactoryInterface $marketFactory;
     private CryptoManagerInterface $cryptoManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private ParameterBagInterface $parameterBag;
 
     public function __construct(
         MarketFetcherInterface $marketFetcher,
@@ -47,7 +51,9 @@ class MarketHandler implements MarketHandlerInterface
         MarketNameConverterInterface $marketNameConverter,
         DonationManagerInterface $donationManager,
         MarketFactoryInterface $marketFactory,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        BalanceHandlerInterface $balanceHandler,
+        ParameterBagInterface $parameterBag
     ) {
         $this->marketFetcher = $marketFetcher;
         $this->moneyWrapper = $moneyWrapper;
@@ -56,6 +62,8 @@ class MarketHandler implements MarketHandlerInterface
         $this->donationManager = $donationManager;
         $this->marketFactory = $marketFactory;
         $this->cryptoManager = $cryptoManager;
+        $this->balanceHandler = $balanceHandler;
+        $this->parameterBag = $parameterBag;
     }
 
     /** {@inheritdoc} */
@@ -216,7 +224,7 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getMarketStatus(Market $market, int $period = 86400): array
+    public function getMarketStatus(Market $market, int $period = self::DAY_PERIOD): array
     {
         return $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
@@ -408,7 +416,7 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getMarketInfo(Market $market, int $period = 86400): MarketInfo
+    public function getMarketInfo(Market $market, int $period = self::DAY_PERIOD): MarketInfo
     {
         $result = $this->marketFetcher->getMarketInfo(
             $this->marketNameConverter->convert($market),
@@ -425,6 +433,12 @@ class MarketHandler implements MarketHandlerInterface
         );
 
         $buyDepth = $this->getBuyDepth($market);
+        $quote = $market->getQuote();
+        $soldOnMarket = $this->moneyWrapper->parse('0', $this->getSymbol($market->getBase()));
+
+        if ($quote instanceof Token && $quote->isMintmeToken()) {
+            $soldOnMarket = $this->soldOnMarket($quote);
+        }
 
         $expires = new \DateTimeImmutable();
 
@@ -477,6 +491,7 @@ class MarketHandler implements MarketHandlerInterface
                 $buyDepth,
                 $this->getSymbol($market->getBase())
             ),
+            $soldOnMarket,
             $expires
         );
     }
@@ -620,5 +635,25 @@ class MarketHandler implements MarketHandlerInterface
             $pendingOrdersSliced,
             $pricesKeys
         );
+    }
+
+    public function soldOnMarket(Token $token): Money
+    {
+        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $market = new Market($token->getCrypto() ?? $mintmeCrypto, $token);
+        $available = $this->balanceHandler->balance($token->getProfile()->getUser(), $token)->getAvailable();
+        $init = $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('token_quantity'),
+            Token::TOK_SYMBOL
+        );
+        $ownPendingOrders = $this->getPendingOrdersByUser($token->getOwner(), [$market]);
+
+        foreach ($ownPendingOrders as $order) {
+            if (Order::SELL_SIDE === $order->getSide()) {
+                $available = $available->add($order->getAmount());
+            }
+        }
+
+        return $init->subtract($available);
     }
 }
