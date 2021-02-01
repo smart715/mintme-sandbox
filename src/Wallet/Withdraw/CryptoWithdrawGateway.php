@@ -44,4 +44,9 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
     {
         return $this->mapper->getBalance($crypto);
     }
+
+    public function checkAddress(string $getAddress): string
+    {
+        return $this->mapper->checkAddress($address);
+    }
 }
