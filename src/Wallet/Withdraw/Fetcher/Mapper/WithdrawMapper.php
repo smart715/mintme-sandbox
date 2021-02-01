@@ -62,4 +62,9 @@ class WithdrawMapper implements MapperInterface
             $crypto->getSymbol()
         );
     }
+
+    public function checkAddress(string $address): string
+    {
+        return $this->storage->requestAddress($address);
+    }
 }
