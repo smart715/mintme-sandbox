@@ -122,9 +122,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 $tradable
             );
         } catch (Throwable $exception) {
-            return $this->view([
+            dd($exception->getMessage());
+           /* return $this->view([
                 'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);*/
         }
 
         if ($user->isGoogleAuthenticatorEnabled()) {
