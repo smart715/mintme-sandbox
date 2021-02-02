@@ -110,8 +110,6 @@ parameters:
         - fr
         - pl
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
-    translation_auto_detect:
-        - es
     translation_flags:
         en:
             label: English
@@ -143,5 +141,6 @@ parameters:
         - 43200
     dm_min_amount: 1
     token_withdraw_fee: 0.01
+    max_allowed_active_orders: 100
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=

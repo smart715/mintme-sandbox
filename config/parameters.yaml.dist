@@ -233,6 +233,8 @@ parameters:
 
     # token withdraw fee in ETH (0.003, 0.1 etc)
     token_withdraw_fee: 0.01
+    #max amount of active orders allowed per user
+    max_allowed_active_orders: 100
 
     # api for sending SMS
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'

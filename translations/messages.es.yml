@@ -1211,6 +1211,7 @@ api.documentation.name:
 api.documentation.in:
 api.documentation.value:
 api.documentation.close:
+api.orders.max_allowed_active_orders: ''
 mixin.place_order.created: 'Orden creada'
 knowledge_base.header.1: ''
 knowledge_base.link.1: ''
