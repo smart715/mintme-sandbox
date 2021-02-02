@@ -13,12 +13,13 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityRepository = $entityManager->getRepository(PhoneNumber::class);
+        /** @var PhoneNumberRepository */
+        $objRepo = $entityManager->getRepository(PhoneNumber::class);
+        $this->entityRepository = $objRepo;
     }
 
     public function getPhoneNumber(Profile $profile): ?PhoneNumber
     {
-        return $this->entityRepository->findBy(['profile' => $profile]);
+        return $this->entityRepository->findOneBy(['profile' => $profile]);
     }
-
 }
