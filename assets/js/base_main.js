@@ -81,6 +81,7 @@ new Vue({
             items: [],
             showNavbarMenu: false,
             showProfileMenu: false,
+            displayLarge: window.matchMedia("(min-width: 992px)").matches,
         };
     },
     components: {
