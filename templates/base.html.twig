@@ -34,6 +34,17 @@
                     {% include 'topnav.html.twig' %}
                 {% endblock %}
                 <main class="flex-fill content {% block bgclass %}{% endblock %}">
+                    {% if (app.request.attributes.get('_route') != 'homepage') and
+                        app.user is not null and
+                        app.user.profile.phoneNumber is null or
+                        not app.user.profile.phoneNumber.verified
+                    %}
+                        <div class="row justify-content-center">
+                            <div class="col-7 alert alert-primary mb-0" role="alert">
+                                {% trans %}phone.add_number.notification{% endtrans %}
+                            </div>
+                        </div>
+                    {% endif %}
                     {% block main %}
                         {% block messageContainer %}
                             {% if app.session.flashbag.peekAll() is not empty %}
