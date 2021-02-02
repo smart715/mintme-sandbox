@@ -790,7 +790,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         // todo: use marketStats.soldOnMarket instead of calling different gateway.
         $marketStatus = $marketStatusManager->getMarketStatus(new Market($crypto, $token));
 
-        return $this->view($marketStatus->getSoldOnMarket(), Response::HTTP_OK);
+        $soldOnMarket = $marketStatus
+            ? $marketStatus->getSoldOnMarket()
+            : new Money('0', new Currency(Token::TOK_SYMBOL));
+
+        return $this->view($soldOnMarket, Response::HTTP_OK);
     }
 
     /**
