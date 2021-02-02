@@ -44,8 +44,11 @@ class WithdrawStorage implements StorageAdapterInterface
 
     public function requestAddress(string $address): string
     {
-        // todo make a RPC querest
-
+        $response = $this->sendRequest('RPC_ADDRESS', [
+            'address' => $address,
+            ]
+        );
+        dd($response);
     }
 
     private function sendRequest(string $method, array $params): array
