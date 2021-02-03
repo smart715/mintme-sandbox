@@ -414,4 +414,36 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $this->mailer->send($msg);
     }
+
+    public function sendTokenMarketingTipMail(User $user, String $kbLink): void
+    {
+        $pieces = explode('-', $kbLink);
+        $title = implode(' ', $pieces);
+
+        $url = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => $kbLink],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/token_marketing_tips.html.twig", [
+            'username' => $user->getUsername(),
+            'url' => $url,
+            'title' => $title,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_marketing_tips.txt.twig", [
+            'username' => $user->getUsername(),
+            'url' => $url,
+            'title' => $title,
+        ]);
+        $subject = $this->translator->trans('userNotification.type.token_marketing_tips');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
 }
