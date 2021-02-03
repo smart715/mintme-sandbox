@@ -11,6 +11,7 @@ abstract class NotificationTypes
     public const TOKEN_DEPLOYED = 'deployed';
     public const ORDER_FILLED = 'filled';
     public const ORDER_CANCELLED = 'cancelled';
+    public const TOKEN_MARKETING_TIPS = 'token_marketing_tips';
 
     public const ORDER_TYPES = [
         self::ORDER_CANCELLED,
@@ -27,6 +28,7 @@ abstract class NotificationTypes
             self::TOKEN_DEPLOYED,
             self::ORDER_FILLED,
             self::ORDER_CANCELLED,
+            self::TOKEN_MARKETING_TIPS,
         ];
     }
     public static function getConfigurable(): array
@@ -37,6 +39,7 @@ abstract class NotificationTypes
             self::NEW_INVESTOR,
             self::TOKEN_NEW_POST,
             self::TOKEN_DEPLOYED,
+            self::TOKEN_MARKETING_TIPS,
         ];
     }
 }
