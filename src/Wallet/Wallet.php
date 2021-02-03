@@ -136,10 +136,9 @@ class Wallet implements WalletInterface
                 throw new IncorrectAddressException();
             }
         }
-        dd($this->withdrawGateway->checkAddress($address->getAddress()));
-        /*if ('0x' === $this->withdrawGateway->checkAddress($address->getAddress())) {
-            throw new IncorrectAddressException();
-        }*/
+
+        $this->withdrawGateway->checkAddress($address->getAddress(), $crypto);
+
 
         $available = $this->tokenManager->getRealBalance(
             $token,

@@ -63,8 +63,8 @@ class WithdrawMapper implements MapperInterface
         );
     }
 
-    public function checkAddress(string $address): string
+    public function checkAddress(string $address, Crypto $crypto): array
     {
-        return $this->storage->requestAddress($address);
+        return $this->storage->requestAddress($address, $crypto);
     }
 }
