@@ -193,9 +193,12 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Command\CheckUserSellOrdersCommand:
-        properties:
-            timeIntervals: '%time_intervals%'
+    App\Command\CheckScheduledNotificationsCommand:
+        arguments:
+            $kbLinks: '%kb_links%'
+            $filled_intervals: '%orders_filled_intervals%'
+            $cancelled_intervals: '%orders_cancelled_intervals%'
+            $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -657,7 +660,9 @@ services:
 
     App\Manager\ScheduledNotificationManager:
         properties:
-            timeIntervals: '%time_intervals%'
+            filled_intervals: '%orders_filled_intervals%'
+            cancelled_intervals: '%orders_cancelled_intervals%'
+            token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
 
     App\Controller\API\WalletController:
         arguments:
