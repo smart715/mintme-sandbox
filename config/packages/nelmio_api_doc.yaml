@@ -37,13 +37,14 @@ nelmio_api_doc:
     models:
         use_jms: false
         names:
-            - { alias: Сurrency,                type: App\Entity\TradebleInterface, groups: [dev] }
-            - { alias: Market,                  type: App\Exchange\Market,          groups: [dev] }
-            - { alias: MarketStatus,            type: App\Entity\MarketStatus,      groups: [dev] }
-            - { alias: MarketStatusDetails,     type: App\Exchange\MarketInfo,      groups: [dev] }
-            - { alias: Order,                   type: App\Exchange\AbstractOrder,   groups: [dev] }
-            - { alias: Address,                 type: App\Wallet\Model\Address,     groups: [dev] }
-            - { alias: Transaction,             type: App\Wallet\Model\Transaction, groups: [dev] }
+            - { alias: Сurrency,                type: App\Entity\TradebleInterface,             groups: [dev] }
+            - { alias: Market,                  type: App\Exchange\Market,                      groups: [dev] }
+            - { alias: MarketStatus,            type: App\Entity\MarketStatus,                  groups: [dev] }
+            - { alias: MarketStatusDetails,     type: App\Exchange\MarketInfo,                  groups: [dev] }
+            - { alias: Order,                   type: App\Exchange\AbstractOrder,               groups: [dev] }
+            - { alias: Address,                 type: App\Wallet\Model\Address,                 groups: [dev] }
+            - { alias: Transaction,             type: App\Wallet\Model\Transaction,             groups: [dev] }
+            - { alias: BalanceResult,           type: App\Exchange\Balance\Model\BalanceResult, groups: [dev] }
 
     areas:
         default:
