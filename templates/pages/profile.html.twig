@@ -119,6 +119,7 @@
                                     <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center">
                                         {% trans %}page.profile.error.nickname.letters_numbers{% endtrans %}
                                     </div>
+                                    <phone-number/>
                                     <div class="pb-1">
                                         {{ form_row(form.firstName, {'attr':
                                             {

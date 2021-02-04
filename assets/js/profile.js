@@ -2,6 +2,7 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import Avatar from './components/Avatar.vue';
+import PhoneNumber from './components/profile/PhoneNumber.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
 import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
@@ -18,6 +19,7 @@ new Vue({
     el: '#profile',
     i18n,
     components: {
+        PhoneNumber,
         BbcodeEditor,
         BbcodeHelp,
         BbcodeView,
