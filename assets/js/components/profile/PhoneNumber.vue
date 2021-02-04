@@ -1,7 +1,8 @@
 <template>
-    <div>
+    <div class="phone-number">
         <MazPhoneNumberInput
             v-model="phoneNumber"
+            dark
         />
     </div>
 </template>
