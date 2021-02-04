@@ -242,7 +242,7 @@ export default {
             }
             this.updaterId = setInterval(() => {
                 this.updateMessages();
-                }, updateMessagesMS);
+            }, updateMessagesMS);
         },
         scrollToDown: function() {
             let parentDiv = this.$refs.tableContainer;
