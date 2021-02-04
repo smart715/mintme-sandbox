@@ -11,7 +11,6 @@ use App\Exchange\Balance\Factory\TraderBalanceView;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
-use App\Exchange\Order;
 use Money\Money;
 
 /**
@@ -55,14 +54,6 @@ interface BalanceHandlerInterface
     public function balances(User $user, array $tokens): BalanceResultContainer;
 
     public function isNotExchanged(Token $token, int $amount): bool;
-
-    /**
-     * @param Token $token
-     * @param int $amount
-     * @param Order[] $ownerPendingOrders
-     * @return Money
-     */
-    public function soldOnMarket(Token $token, int $amount, array $ownerPendingOrders): Money;
 
     /**
      * @param  TradebleInterface $tradable
