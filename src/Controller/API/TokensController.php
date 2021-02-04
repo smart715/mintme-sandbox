@@ -16,7 +16,6 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Market;
-use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -24,6 +23,7 @@ use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
+use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
@@ -772,15 +772,13 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
      * @param string $name
-     * @param BalanceHandlerInterface $balanceHandler
-     * @param MarketHandlerInterface $marketHandler
+     * @param MarketStatusManagerInterface $marketStatusManager
      * @return View
      * @throws ApiNotFoundException
      */
     public function soldOnMarket(
         string $name,
-        BalanceHandlerInterface $balanceHandler,
-        MarketHandlerInterface $marketHandler
+        MarketStatusManagerInterface $marketStatusManager
     ): View {
         $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
         $token = $this->tokenManager->findByName($name);
@@ -789,19 +787,14 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        $ownerPendingOrders = $marketHandler->getPendingOrdersByUser(
-            $token->getProfile()->getUser(),
-            [new Market($crypto, $token)]
-        );
+        // todo: use marketStats.soldOnMarket instead of calling different gateway.
+        $marketStatus = $marketStatusManager->getMarketStatus(new Market($crypto, $token));
 
-        return $this->view(
-            $balanceHandler->soldOnMarket(
-                $token,
-                $token->isMintmeToken() ? $this->getParameter('token_quantity') : 0,
-                $ownerPendingOrders
-            ),
-            Response::HTTP_OK
-        );
+        $soldOnMarket = $marketStatus
+            ? $marketStatus->getSoldOnMarket()
+            : new Money('0', new Currency(Token::TOK_SYMBOL));
+
+        return $this->view($soldOnMarket, Response::HTTP_OK);
     }
 
     /**
