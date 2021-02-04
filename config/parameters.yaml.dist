@@ -226,7 +226,9 @@ parameters:
         fr: {label: Française, flag: fr}
 
     #time Interval for scheduled notifications
-    time_intervals: [10, 1440, 43200]
+    orders_filled_intervals: [10 minutes, 1 day, 30 day]
+    orders_cancelled_intervals: [1 day, 30 day]
+    token_marketing_tips_intervals: [2 day, 4 day, 7 day, 10 day, 15 day, 21 day]
 
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
@@ -235,6 +237,16 @@ parameters:
     token_withdraw_fee: 0.01
     #max amount of active orders allowed per user
     max_allowed_active_orders: 100
+
+    # kb links
+    kb_links: [
+    'Quickstart-Guide-to-MintMe',
+    'Talking-to-your-followers-about-MintMe-we-got-some-ideas',
+    'Time-for-token-sales-how-can-I-make-a-difference',
+    'Ideas-to-promote-and-sell-your-token',
+    'Aiming-at-a-strong-token',
+    'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
+    ]
 
     # api for sending SMS
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'

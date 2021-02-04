@@ -27,7 +27,11 @@ class KnowledgeBaseController extends Controller
     }
 
     /**
-     * @Route(path="/kb/{url}", name="kb_show", methods={"GET"})
+     * @Route(
+     *     path="/kb/{url}",
+     *     name="kb_show",
+     *     methods={"GET"},
+     *     options={"expose"=true})
      */
     public function show(string $url, KnowledgeBaseManagerInterface $kbManager): Response
     {
@@ -36,7 +40,7 @@ class KnowledgeBaseController extends Controller
         if (!$article) {
             throw new NotFoundKnowledgeBaseException();
         }
-        
+
         $metaDescription = trim(
             preg_replace(
                 '/ +/',
