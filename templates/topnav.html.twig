@@ -29,8 +29,8 @@
         <div>
             {% if show_links %}
                 <div class="d-lg-none float-left d-flex align-items-center">
-                    <user-notification v-if="!displayLarge" class="small-bell mx-xs-1 mx-sm-2"></user-notification>
-                    <nav-envelope v-if="!displayLarge" class="mx-xs-1 mx-sm-2" href="{{ path('chat') }}"></nav-envelope>
+                    <user-notification class="small-bell mx-xs-1 mx-sm-2"></user-notification>
+                    <nav-envelope class="mx-xs-1 mx-sm-2" href="{{ path('chat') }}"></nav-envelope>
                 </div>
             {% endif %}
             <button
@@ -111,10 +111,10 @@
                 </li>
                 {% if show_links %}
                     <li class="align-self-center c-pointer desktop-notification-bell">
-                        <user-notification v-if="displayLarge"></user-notification>
+                        <user-notification></user-notification>
                     </li>
                     <li class="align-self-center c-pointer d-none d-lg-flex">
-                        <nav-envelope v-if="displayLarge" href="{{ path('chat') }}"></nav-envelope>
+                        <nav-envelope href="{{ path('chat') }}"></nav-envelope>
                     </li>
                 {% endif %}
                 {% if not app.user %}
