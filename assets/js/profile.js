@@ -31,6 +31,7 @@ new Vue({
         return {
             showEditForm: false,
             nickname: '',
+            phoneNumber: 'test',
             firstName: '',
             lastName: '',
             country: '',

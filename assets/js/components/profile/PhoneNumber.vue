@@ -15,10 +15,8 @@ export default {
     components: {
         MazPhoneNumberInput,
     },
-    data() {
-        return {
-            phoneNumber: null,
-        };
+    props: {
+        phoneNumber: String,
     },
-}
+};
 </script>
