@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
@@ -19,7 +20,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
@@ -280,29 +280,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
             );
         }
 
-        $marketInfo = $this->marketHandler->getMarketInfo($market);
+        $marketInfo = $this->marketHandler->getMarketInfo(
+            $market,
+            MarketHandler::DAY_PERIOD
+        );
 
-        /** @var Token|null $quote */
-        $quote = $market->getQuote();
-
-        $marketCap = null;
-
-        if ($quote instanceof Token && $quote->isMintmeToken()) {
-            $ownerPendingOrders = $this->marketHandler->getPendingOrdersByUser(
-                $quote->getProfile()->getUser(),
-                [$market]
-            );
-
-            $soldOnMarket = $this->balanceHandler->soldOnMarket(
-                $quote,
-                $this->bag->get('token_quantity'),
-                $ownerPendingOrders
-            );
-
-            $marketCap = $marketInfo->getLast()->multiply($this->moneyWrapper->format($soldOnMarket));
-        }
-
-        $marketStatus->updateStats($marketInfo, $marketCap);
+        $marketStatus->updateStats($marketInfo);
 
         $this->em->merge($marketStatus);
         $this->em->flush();

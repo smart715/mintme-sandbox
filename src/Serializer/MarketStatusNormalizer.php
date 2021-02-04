@@ -3,6 +3,7 @@
 namespace App\Serializer;
 
 use App\Entity\MarketStatus;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -10,10 +11,12 @@ class MarketStatusNormalizer implements NormalizerInterface
 {
 
     private ObjectNormalizer $normalizer;
+    private MoneyWrapperInterface $moneyWrapper;
 
-    public function __construct(ObjectNormalizer $normalizer)
+    public function __construct(ObjectNormalizer $normalizer, MoneyWrapperInterface $moneyWrapper)
     {
         $this->normalizer = $normalizer;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
@@ -31,6 +34,12 @@ class MarketStatusNormalizer implements NormalizerInterface
             $normalized['base'] = $normalized['quote'];
             $normalized['quote'] = $temp;
         }
+
+        $normalized['marketCap'] = $this->moneyWrapper->format(
+            $marketStatus->getLastPrice()->multiply(
+                $this->moneyWrapper->format($marketStatus->getSoldOnMarket())
+            )
+        );
 
         return $normalized;
     }
