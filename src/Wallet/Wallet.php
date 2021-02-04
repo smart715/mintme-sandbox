@@ -131,14 +131,12 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
-        if (Token::WEB_SYMBOL === $crypto->getSymbol()) {
+        if (Token::WEB_SYMBOL === $crypto->getSymbol() ||
+            !$this->withdrawGateway->checkAddress($address->getAddress(), $crypto)
+        ) {
             if (!$this->validateEtheriumAddress($address->getAddress())) {
                 throw new IncorrectAddressException();
             }
-        }
-
-        if ('0x' === $this->withdrawGateway->checkAddress($address->getAddress(), $crypto)['address']) {
-            throw new IncorrectAddressException();
         }
 
         $available = $this->tokenManager->getRealBalance(
@@ -268,10 +266,9 @@ class Wallet implements WalletInterface
 
         $balance = $this->balanceHandler->balance($user, Token::getFromCrypto($crypto));
 
-        if (
-            $balance->getAvailable()->lessThan(
-                Token::ETH_SYMBOL === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
-            )
+        if ($balance->getAvailable()->lessThan(
+            Token::ETH_SYMBOL === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
+        )
         ) {
             $this->logger->warning(
                 "Requested withdraw-gateway balance to pay '{$user->getEmail()}'. Not enough amount to pay fee"
