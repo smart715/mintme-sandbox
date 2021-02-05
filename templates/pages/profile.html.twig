@@ -121,8 +121,14 @@
                                     </div>
                                     <div class="pb-1">
                                         {{ form_label(form.phoneNumber) }}
-                                        {{ form_row(form.phoneNumber) }}
-                                        <phone-number>
+                                        {{ form_widget(form.phoneNumber, {
+                                            'attr': {
+                                                'v-model': 'phoneNumber'
+                                            }
+                                        }) }}
+                                        <phone-number
+                                            :phone-number="phoneNumber"
+                                        >
                                         </phone-number>
                                     </div>
                                     <div class="pb-1">

@@ -11,7 +11,6 @@ use App\Form\Type\NicknameType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -86,8 +85,11 @@ class ProfileType extends AbstractType
                 ],
                 'label_attr' => ['class' => 'custom-control-label'],
             ])
-            ->add('phoneNumber', HiddenType::class, [
+            ->add('phoneNumber', TextType::class, [
                 'label' => $this->translator->trans('page.profile.form.phone_number'),
+                'attr' => [
+                    'class' => 'd-none',
+                ],
             ]);
 
         if ($this->showFullDataInProfile) {
