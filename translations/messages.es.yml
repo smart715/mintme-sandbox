@@ -1243,3 +1243,7 @@ twitter.sign_in:
 twitter.must_sign_in:
 mail.verification_code: ''
 phone.add_number.notification:
+phone.country_selector.label:
+phone.country_selector.error:
+phone.phone_number.label:
+phone.example:

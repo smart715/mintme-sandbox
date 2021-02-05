@@ -65,6 +65,10 @@ class ProfileController extends Controller
             $profile->setNextReminderDate(new \DateTime('+1 month'));
         }
 
+        if ($profile->getPhoneNumber()) {
+            $profile->getPhoneNumber()->setProfile($profile);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
 

@@ -2,7 +2,9 @@
     <div class="phone-number">
         <MazPhoneNumberInput
             @update="updatePhone"
+            :translations="translations"
             dark
+            showCodeOnList
         />
     </div>
 </template>
@@ -32,6 +34,14 @@ export default {
             get: function() {
                 return this.phone;
             },
+        },
+        translations() {
+            return {
+                countrySelectorLabel: this.$t('phone.country_selector.label'),
+                countrySelectorError: this.$t('phone.country_selector.error'),
+                phoneNumberLabel: this.$t('phone.phone_number.label'),
+                example: this.$t('phone.example'),
+            };
         },
     },
     methods: {

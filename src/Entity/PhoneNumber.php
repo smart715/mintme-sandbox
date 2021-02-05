@@ -25,7 +25,7 @@ class PhoneNumber
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="phoneNumber")
      */
-    private int $profile;
+    private Profile $profile;
 
     /**
      * @ORM\Column(type="phone_number", unique=true)
@@ -43,12 +43,12 @@ class PhoneNumber
      */
     private bool $verified = false; // phpcs:ignore
 
-    public function getProfile(): int
+    public function getProfile(): Profile
     {
         return $this->profile;
     }
 
-    public function setProfile(int $profile): self
+    public function setProfile(Profile $profile): self
     {
         $this->profile = $profile;
 
