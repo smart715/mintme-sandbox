@@ -131,7 +131,7 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
-        if (Token::WEB_SYMBOL === $crypto->getSymbol() || Token::ETH_SYMBOL === $crypto->getSymbol() ) {
+        if (in_array($crypto->getSymbol(), Token::WEB_ETH_SYMBOLS, true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
                 !$this->withdrawGateway->isNotContractAddress($address->getAddress(), $crypto)
             ) {

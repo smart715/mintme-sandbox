@@ -47,6 +47,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
     public const PENDING_ADDR = '0x';
+    public const WEB_ETH_SYMBOLS = [self::ETH_SYMBOL, self::WEB_SYMBOL];
 
     /**
      * @ORM\Id()
