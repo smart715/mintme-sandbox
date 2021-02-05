@@ -68,7 +68,9 @@ new Vue({
                 this.$refs.zipCode.disabled = state;
             }
         },
-
+        phoneChange: function(phone) {
+            this.phoneNumber = phone;
+        },
         validation: function(event) {
             if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);

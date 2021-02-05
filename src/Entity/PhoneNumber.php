@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
 /**
  * @codeCoverageIgnore
@@ -28,6 +29,7 @@ class PhoneNumber
 
     /**
      * @ORM\Column(type="phone_number", unique=true)
+     * @AssertPhoneNumber(type="mobile")
      */
     private \libphonenumber\PhoneNumber $phoneNumber;
 
