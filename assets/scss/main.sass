@@ -1372,13 +1372,12 @@ li.trade-tab
     padding: 11px
     padding-left: 0px
 
-.custom-control-input:checked
-  + label.custom-control-label::before
-    background-color: #646464 !important
-
 .custom-switch
+  .custom-control-input:checked + label.custom-control-label::before
+    background-color: $blue !important
+    
   .custom-control-label::before
-    border-color: gray !important
+    border-color: $input-bg !important
 
   .custom-control-label::after
-    background-color: gray !important
+    background-color: $white !important
