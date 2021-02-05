@@ -10,7 +10,6 @@ use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

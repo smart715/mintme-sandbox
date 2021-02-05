@@ -120,8 +120,8 @@
                                         {% trans %}page.profile.error.nickname.letters_numbers{% endtrans %}
                                     </div>
                                     <div class="pb-1">
-                                        {{ form_label(form.phoneNumber) }}
-                                        {{ form_widget(form.phoneNumber, {
+                                        {{ form_label(form.phoneNumber.phoneNumber) }}
+                                        {{ form_widget(form.phoneNumber.phoneNumber, {
                                             'attr': {
                                                 'v-model': 'phoneNumber'
                                             }

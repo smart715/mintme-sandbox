@@ -29,7 +29,7 @@ class PhoneNumber
     /**
      * @ORM\Column(type="phone_number", unique=true)
      */
-    private string $phoneNumber;
+    private \libphonenumber\PhoneNumber $phoneNumber;
 
     /**
      * @ORM\Column(type="string", length=PhoneNumber::CODE_LENGTH, nullable=true)
@@ -53,12 +53,12 @@ class PhoneNumber
         return $this;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): \libphonenumber\PhoneNumber
     {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): self
+    public function setPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
