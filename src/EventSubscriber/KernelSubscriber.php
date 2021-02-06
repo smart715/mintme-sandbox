@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -59,6 +60,18 @@ class KernelSubscriber implements EventSubscriberInterface
     public function onRequest(RequestEvent $request): void
     {
         $csrf = $request->getRequest()->headers->get('X-CSRF-TOKEN', '');
+
+        if ($this->isAuth) {
+            switch ($request->getRequest()->attributes->get('_route')) {
+                case 'token_create':
+                case 'wallet':
+                case 'chat':
+                case 'profile':
+                    $request->setResponse(new RedirectResponse('/login'));
+                    
+                    return;
+            }
+        }
 
         if (!is_string($csrf) ||
             ($request->getRequest()->isXmlHttpRequest() &&
