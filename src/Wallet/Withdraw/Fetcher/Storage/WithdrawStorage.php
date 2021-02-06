@@ -43,13 +43,12 @@ class WithdrawStorage implements StorageAdapterInterface
         ])['balance'] ?? '0';
     }
 
-    public function requestAddress(string $address, Crypto $crypto): bool
+    public function requestAddress(string $address): bool
     {
         return '0x' === $this->sendRequest(
             self::RPC_ADDRESS,
             [
                     'address' => $address,
-                    'crypto' => $crypto->getSymbol(),
             ]
         )['address'];
     }

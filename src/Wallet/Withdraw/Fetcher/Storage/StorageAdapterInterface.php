@@ -11,5 +11,5 @@ interface StorageAdapterInterface
 
     public function requestBalance(string $symbol): string;
 
-    public function requestAddress(string $address, Crypto $crypto): bool;
+    public function requestAddress(string $address): bool;
 }
