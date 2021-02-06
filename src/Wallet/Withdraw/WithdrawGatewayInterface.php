@@ -20,5 +20,5 @@ interface WithdrawGatewayInterface extends RowsFetcherInterface
     /** @return Transaction[] */
     public function getHistory(User $user, int $offset = 0, int $limit = 50): array;
 
-    public function isNotContractAddress(string $address, Crypto $crypto): bool;
+    public function isNotContractAddress(string $address): bool;
 }
