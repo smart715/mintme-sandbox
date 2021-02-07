@@ -32,4 +32,6 @@ interface ContractHandlerInterface
     public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
 
     public function ping(): bool;
+
+    public function getDecimalsContract(string $tokenAddress): int;
 }
