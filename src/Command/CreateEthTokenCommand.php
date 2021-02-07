@@ -140,6 +140,18 @@ class CreateEthTokenCommand extends Command
             $io->error('User with provided email has already created a token');
         }
 
+        $contractDecimals = (int)$this->contractHandler->getDecimalsContract($tokenAddress);
+
+        if ($minDeposit && !$this->checkDecimals($minDeposit, $contractDecimals)) {
+            $hasErrors = true;
+            $io->error('Min deposit with more decimals than allowed for eth token. Allowed: '.$contractDecimals);
+        }
+
+        if ($withdrawalFee && !$this->checkDecimals($withdrawalFee, $contractDecimals)) {
+            $hasErrors = true;
+            $io->error('Withdraw fee with more decimals than allowed for eth token. Allowed: '.$contractDecimals);
+        }
+
         if ($hasErrors) {
             return 1;
         }
@@ -206,5 +218,13 @@ class CreateEthTokenCommand extends Command
         $this->em->flush();
 
         return $token;
+    }
+
+    private function checkDecimals(string $numericString, int $contractDecimals): bool
+    {
+        $ignoreTrailingZeros = (float)$numericString;
+        $explodeDigits = explode('.', (string)$ignoreTrailingZeros);
+
+        return !(isset($explodeDigits[1]) && $contractDecimals < strlen((string)$explodeDigits[1]));
     }
 }
