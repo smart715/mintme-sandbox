@@ -34,6 +34,7 @@ class ContractHandler implements ContractHandlerInterface
     private const GET_DEPOSIT_INFO = "get_deposit_info";
     private const PING = 'ping';
     private const DEPOSIT_TYPE = 'deposit';
+    private const GET_DECIMALS_CONTRACT = 'get_decimals_contract';
 
     /** @var JsonRpcInterface */
     private $rpc;
@@ -290,5 +291,23 @@ class ContractHandler implements ContractHandlerInterface
             new Money($result['fee'], new Currency(MoneyWrapper::TOK_SYMBOL)),
             new Money($result['minDeposit'], new Currency(MoneyWrapper::TOK_SYMBOL))
         );
+    }
+
+    public function getDecimalsContract(string $tokenAddress): int
+    {
+        $response = $this->rpc->send(
+            self::GET_DECIMALS_CONTRACT,
+            [
+                'address' => $tokenAddress,
+            ]
+        );
+
+        if ($response->hasError()) {
+            $this->logger->error("Failed to get decimals contract'{$tokenAddress}'");
+
+            throw new Exception($response->getError()['message'] ?? 'get error response');
+        }
+
+        return (int)$response->getResult();
     }
 }
