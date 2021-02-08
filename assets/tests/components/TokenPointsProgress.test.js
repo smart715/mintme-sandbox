@@ -28,6 +28,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -55,6 +56,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -84,6 +86,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -113,6 +116,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -133,6 +137,36 @@ describe('TokenPointsProgress', () => {
         wrapper.setProps({profileAnonymously: '1'});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
         });
+    it('should calculate token points gained correctly if is not MINTME token', () => {
+        const localVue = mockVue();
+        const store = new Vuex.Store({
+            modules: {tokenStatistics},
+        });
+        const wrapper = shallowMount(TokenPointsProgress, {
+            store,
+            localVue,
+            propsData: {
+                isMintmeToken: true,
+                profileAnonymously: '',
+                profileDescription: 'Description',
+                profileLastname: 'last name',
+                profileName: 'name',
+                tokenDescription: null,
+                tokenFacebook: null,
+                tokenStatus: tokenDeploymentStatus.deployed,
+                tokenWebsite: null,
+                tokenYoutube: null,
+            },
+            data() {
+                return {
+                    tokenReleasePeriodPoint: 4,
+                };
+            },
+        });
+        expect(wrapper.vm.tokenPointsGained).toBe(12);
+        wrapper.setProps({profileAnonymously: '1'});
+        expect(wrapper.vm.tokenPointsGained).toBe(8);
+    });
     it('should calculate token points gained correctly with all items', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
@@ -142,6 +176,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: false,
                 profileAnonymously: '',
                 profileDescription: 'description',
                 profileLastname: 'last name',
@@ -169,6 +204,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -210,6 +246,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
