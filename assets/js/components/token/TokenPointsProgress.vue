@@ -77,8 +77,12 @@ export default {
             }
             return 0;
         },
+        tokenSelfPoints: function() {
+            return this.isMintmeToken ? 0 : 4;
+        },
         tokenPointsGained: function() {
-            return (this.isMintmeToken ? this.tokenReleasePeriodPoint : 4) +
+            return this.tokenSelfPoints +
+                this.tokenReleasePeriodPoint +
                 this.tokenDescriptionSet +
                 this.socialMediaSet +
                 this.tokenDeployedSet +
