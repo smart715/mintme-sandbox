@@ -9,7 +9,7 @@ class WithdrawStorage implements StorageAdapterInterface
 {
     private const RPC_HISTORY = 'history';
     private const RPC_BALANCE = 'balance';
-    private const RPC_ADDRESS = 'code';
+    private const RPC_ADDRESS_CODE = 'code';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -45,11 +45,11 @@ class WithdrawStorage implements StorageAdapterInterface
     public function requestAddressCode(string $address): bool
     {
         return '0x' === $this->sendRequest(
-            self::RPC_ADDRESS,
+            self::RPC_ADDRESS_CODE,
             [
                     'address' => $address,
             ]
-        )['address'];
+        )['code'];
     }
 
     private function sendRequest(string $method, array $params): array
