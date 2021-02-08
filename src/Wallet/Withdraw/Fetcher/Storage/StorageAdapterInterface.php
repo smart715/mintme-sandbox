@@ -2,8 +2,6 @@
 
 namespace App\Wallet\Withdraw\Fetcher\Storage;
 
-use App\Entity\Crypto;
-
 interface StorageAdapterInterface
 {
     /** @return mixed[] */
@@ -11,5 +9,5 @@ interface StorageAdapterInterface
 
     public function requestBalance(string $symbol): string;
 
-    public function requestAddress(string $address): bool;
+    public function requestAddressCode(string $address): bool;
 }

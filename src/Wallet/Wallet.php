@@ -133,7 +133,7 @@ class Wallet implements WalletInterface
 
         if (in_array($crypto->getSymbol(), Token::WEB_ETH_SYMBOLS, true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
-                !$this->withdrawGateway->isNotContractAddress($address->getAddress())
+                !$this->withdrawGateway->isContractAddress($address->getAddress())
             ) {
                 throw new IncorrectAddressException();
             }
