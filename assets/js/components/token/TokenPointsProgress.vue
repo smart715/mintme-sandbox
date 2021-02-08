@@ -33,6 +33,7 @@ export default {
         tokenYoutube: String,
         tokenWebsite: String,
         tokenStatus: String,
+        isMintmeToken: Boolean,
     },
     components: {
         CircleProgress,
@@ -77,7 +78,7 @@ export default {
             return 0;
         },
         tokenPointsGained: function() {
-            return this.tokenReleasePeriodPoint +
+            return (this.isMintmeToken ? this.tokenReleasePeriodPoint : 4) +
                 this.tokenDescriptionSet +
                 this.socialMediaSet +
                 this.tokenDeployedSet +
