@@ -1,4 +1,4 @@
-{% extends 'mail/new_layout.html.twig' %}
+tokenName{% extends 'mail/new_layout.html.twig' %}
 
 {% block content %}
 <table align="center" class="container float-center" style="Margin:0 auto;background:#fefefe;border-collapse:collapse;border-spacing:0;float:none;margin:0 auto;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;text-align:center;vertical-align:top;width:580px">
@@ -47,7 +47,7 @@
                                         </tbody>
                                     </table>
 
-                                    <h4 class="text-center" style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;text-align:center;word-wrap:normal">{% trans %} knowledge_base.header.1 {% endtrans %}</h4>
+                                    <h4 class="text-center" style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;text-align:center;word-wrap:normal">{% trans with {'%tokenNname%': tokenName} %} knowledge_base.header.1 {% endtrans %}</h4>
 
                                     <h1 class="text-center" style="Margin:0;Margin-bottom:10px;color:inherit;font-family:Helvetica,Arial,sans-serif;font-size:34px;font-weight:400;line-height:1.3;margin:0;margin-bottom:10px;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;text-align:center;word-wrap:normal"><span style="color:#2199e8">{{ tokenName }}</span></h1>
 
