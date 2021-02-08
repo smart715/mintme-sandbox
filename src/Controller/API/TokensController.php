@@ -862,7 +862,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
                 }
 
                 if ('name' === $childForm->getName()) {
-                    throw new ApiBadRequestException('api.tokens.invalid_argument');
+                    throw new ApiBadRequestException($this->translator->trans('api.tokens.invalid_argument'));
                 }
             }
 
