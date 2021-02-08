@@ -63,7 +63,7 @@ class WithdrawMapper implements MapperInterface
         );
     }
 
-    public function isNotContractAddress(string $address, string $crypto): bool
+    public function isContractAddress(string $address, string $crypto): bool
     {
         return $this->storage->requestAddressCode($address, $crypto);
     }
