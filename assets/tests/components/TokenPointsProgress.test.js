@@ -176,7 +176,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: false,
+                isMintmeToken: true,
                 profileAnonymously: '',
                 profileDescription: 'description',
                 profileLastname: 'last name',
