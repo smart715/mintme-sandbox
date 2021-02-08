@@ -312,7 +312,7 @@ class TokenController extends Controller
      */
     public function getWebsiteConfirmationFile(string $name): Response
     {
-        $token = $this->tokenManager->findByNameMintme($name);
+        $token = $this->tokenManager->findByName($name);
 
         if (null === $token) {
             throw $this->createNotFoundException('Token does not exist');
