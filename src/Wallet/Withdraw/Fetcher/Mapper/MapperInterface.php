@@ -10,5 +10,5 @@ interface MapperInterface extends RowsFetcherInterface
 {
     public function getBalance(Crypto $crypto): Money;
 
-    public function isNotContractAddress(string $address): bool;
+    public function isContractAddress(string $address, string $crypto): bool;
 }
