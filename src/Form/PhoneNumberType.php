@@ -24,8 +24,11 @@ class PhoneNumberType extends AbstractType
     {
 
         $builder->add('phoneNumber', \Misd\PhoneNumberBundle\Form\Type\PhoneNumberType::class, [
-            'format' => PhoneNumberFormat::NATIONAL,
+            'format' => PhoneNumberFormat::E164,
             'label' => $this->translator->trans('page.profile.form.phone_number'),
+            'constraints' => [
+                new \Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber(['type' => 'mobile']),
+            ],
             'attr' => [
                 'class' => 'd-none',
             ],
