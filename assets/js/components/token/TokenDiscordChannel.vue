@@ -146,7 +146,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                       let state = this.newDiscord ? 'added' : 'removed';
+                       let state = this.newDiscord ? 'added' : 'deleted';
                        this.$emit('saveDiscord', this.newDiscord);
                        this.newDiscord = this.newDiscord || 'https://discord.gg/';
                        this.notifySuccess(this.$t('toasted.success.discord.' + state));
