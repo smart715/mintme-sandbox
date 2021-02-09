@@ -142,9 +142,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $discordUrl;
 
     /**
-     * @Assert\NotBlank()
      * @ORM\Column(type="text", length=Token::DESC_MAX_LENGTH, nullable=true)
-     * @Assert\Length(min=Token::DESC_MIN_LENGTH, max=Token::DESC_MAX_LENGTH)
+     * @AppAssert\TokenDescription(
+     *     min = Token::DESC_MIN_LENGTH,
+     *     max = Token::DESC_MAX_LENGTH
+     * )
      * @Groups({"API_TOK"})
      * @var string|null
      */

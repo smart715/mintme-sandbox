@@ -149,7 +149,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                        let state = this.newTelegram ? 'added' : 'removed';
+                        let state = this.newTelegram ? 'added' : 'deleted';
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.notifySuccess(this.$t('toasted.success.telegram.' + state));
