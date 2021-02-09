@@ -11,40 +11,29 @@ use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
+use App\Wallet\Money\MoneyWrapperInterface;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
 /* Cron job added to DB. */
 class UpdatePendingWithdrawals extends Command
 {
-    /** @var LoggerInterface */
     private LoggerInterface $logger;
-
-    /** @var EntityManagerInterface */
     private EntityManagerInterface $em;
-
-    /** @var DateTime */
     private DateTime $date;
-
-    /** @var BalanceHandlerInterface */
     private BalanceHandlerInterface $balanceHandler;
-
-    /** @var CryptoManagerInterface */
     private CryptoManagerInterface $cryptoManager;
-
-    /** @var int */
     public int $withdrawExpirationTime;
-
-    /** @var int */
     public int $viabtcResponseTimeout;
-
-    /** @var LockFactory */
     private LockFactory $lockFactory;
+    private ParameterBagInterface $parameterBag;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
         LoggerInterface $logger,
@@ -52,7 +41,9 @@ class UpdatePendingWithdrawals extends Command
         DateTime $dateTime,
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        ParameterBagInterface $parameterBag,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
@@ -60,6 +51,8 @@ class UpdatePendingWithdrawals extends Command
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
         $this->lockFactory = $lockFactory;
+        $this->parameterBag = $parameterBag;
+        $this->moneyWrapper = $moneyWrapper;
 
         parent::__construct();
     }
@@ -140,6 +133,11 @@ class UpdatePendingWithdrawals extends Command
             $items = $this->getPendingTokenWithdrawRepository()->findAll();
             $itemsCount = count($items);
             $pendingCount = 0;
+            $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+            $ethTokenFeeInCrypto = $this->moneyWrapper->parse(
+                (string)$this->parameterBag->get('token_withdraw_fee'),
+                Token::ETH_SYMBOL
+            );
 
             /** @var PendingTokenWithdraw $item */
             foreach ($items as $item) {
@@ -148,15 +146,21 @@ class UpdatePendingWithdrawals extends Command
                     $errorMessage = '';
                     $token = $item->getToken();
                     $this->em->beginTransaction();
-                    $crypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
-                    $fee = $crypto->getFee();
-                    $feeToken = Token::getFromCrypto($crypto);
+                    $fee = $token->isMintmeToken()
+                        ? $mintmeCrypto->getFee()
+                        : $ethTokenFeeInCrypto;
+
+                    $feeToken = Token::getFromCrypto($token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto());
+                    $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();
+                    $amount = $isFeeInCrypto
+                        ? $item->getAmount()->getAmount()
+                        : $item->getAmount()->getAmount()->add($token->getFee());
 
                     try {
                         $this->balanceHandler->deposit(
                             $item->getUser(),
                             $token,
-                            $item->getAmount()->getAmount(),
+                            $amount,
                             $item->getId()
                         );
                     } catch (\Throwable $e) {
@@ -164,16 +168,18 @@ class UpdatePendingWithdrawals extends Command
                         $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
                     }
 
-                    try {
-                        $this->balanceHandler->deposit(
-                            $item->getUser(),
-                            $feeToken,
-                            $fee,
-                            $item->getId() + 1000000
-                        );
-                    } catch (\Throwable $e) {
-                        $errorMessage = $e->getMessage();
-                        $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
+                    if ($isFeeInCrypto) {
+                        try {
+                            $this->balanceHandler->deposit(
+                                $item->getUser(),
+                                $feeToken,
+                                $fee,
+                                $item->getId() + 1000000
+                            );
+                        } catch (\Throwable $e) {
+                            $errorMessage = $e->getMessage();
+                            $this->logger->info("[withdrawals] Pending token withdrawal error: $errorMessage");
+                        }
                     }
 
                     if ('' !== $errorMessage && 'repeat update' !== $errorMessage) {

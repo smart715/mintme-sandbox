@@ -23,12 +23,14 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Utils\NotificationTypes;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -73,6 +75,9 @@ class TokenController extends Controller
     /** @var UserActionLogger  */
     private $userActionLogger;
 
+    /** @var ScheduledNotificationManagerInterface  */
+    private $scheduledNotificationManager;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -82,7 +87,8 @@ class TokenController extends Controller
         TraderInterface $trader,
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
-        BlacklistManager $blacklistManager
+        BlacklistManager $blacklistManager,
+        ScheduledNotificationManagerInterface $scheduledNotificationManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -92,6 +98,7 @@ class TokenController extends Controller
         $this->trader = $trader;
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
+        $this->scheduledNotificationManager = $scheduledNotificationManager;
 
         parent::__construct($normalizer);
     }
@@ -267,6 +274,11 @@ class TokenController extends Controller
             $this->em->flush();
 
             $mailer->sendKnowledgeBaseMail($user, $token);
+            $notificationType = NotificationTypes::TOKEN_MARKETING_TIPS;
+            $this->scheduledNotificationManager->createScheduledNotification(
+                $notificationType,
+                $user,
+            );
 
             try {
                 /** @var User $user*/

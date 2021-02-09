@@ -97,8 +97,8 @@ page.news.title: Noticias
 page.news.read_more: 'Leer más'
 page.news.current: 'Leer más'
 page.index.title: 'mintMe, financiación colectiva | cree su token para monetizarse!'
-page.index.promo.main: 'Cree una moneda <br/> para su'
-page.index.promo.description: 'u obtenga ganancias por ayudar a crecer otros tokens'
+page.index.promo.main: 'Cree su moneda<br/> Monetízate <br />'
+page.index.promo.description: 'MintMe es una plataforma de financiación colectiva<br/> donde los patrocinadores también se benefician<br/> del éxito de sus influencers favoritos.'
 page.index.promo.btn.register: 'Regístrese ahora'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
@@ -476,6 +476,9 @@ userNotification.type.new_post: 'Publicaciones relacionadas a tokens que posee'
 userNotification.type.deployed: 'Nuevos tokens desplegados que posee'
 userNotification.type.order_filled: 'Orders filled'
 userNotification.type.order_cancelled: 'Orders cancelled'
+token_marketing_tips.msg: ''
+mail.token_marketing_tips.msg: ''
+userNotification.type.token_marketing_tips: ''
 password_reset.reseted: 'Tu contraseña ha sido %action%.'
 token_deleted.finished.1: 'Su solicitud para eliminar el token <strong>%tokenName%<strong> de'
 token_deleted.finished.2: 'ha finalizado satisfactoriamente.'
@@ -1211,6 +1214,7 @@ api.documentation.name:
 api.documentation.in:
 api.documentation.value:
 api.documentation.close:
+api.orders.max_allowed_active_orders: ''
 mixin.place_order.created: 'Orden creada'
 knowledge_base.header.1: ''
 knowledge_base.link.1: ''

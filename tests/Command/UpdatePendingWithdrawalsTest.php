@@ -16,6 +16,7 @@ use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
 use App\Wallet\Model\Amount;
+use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -26,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Lock\LockInterface;
 
 class UpdatePendingWithdrawalsTest extends KernelTestCase
@@ -49,7 +51,9 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $cm,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(ParameterBagInterface::class),
+            $this->createMock(MoneyWrapperInterface::class)
         );
 
         $upw->withdrawExpirationTime = 1;
@@ -86,7 +90,9 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $cm,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(ParameterBagInterface::class),
+            $this->createMock(MoneyWrapperInterface::class)
         );
 
         $upw->withdrawExpirationTime = 1;

@@ -142,6 +142,7 @@ export const notificationTypes = {
     deployed: 'deployed',
     newPost: 'new_post',
     newInvestor: 'new_investor',
+    tokenMarketingTips: 'token_marketing_tips',
 };
 
 

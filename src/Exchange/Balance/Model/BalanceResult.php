@@ -10,11 +10,14 @@ class BalanceResult
 {
     /**
      * @var Money
-     * @Groups({"Default", "API"})
+     * @Groups({"Default", "API", "dev"})
      */
     private $available;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @Groups({"Default", "API", "dev"})
+     */
     private $freeze;
 
     /** @var Money */

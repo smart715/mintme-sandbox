@@ -53,9 +53,9 @@ class UserNotificationManager implements UserNotificationManagerInterface
         return $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
     }
 
-    public function updateNotifications(User $user): void
+    public function updateNotifications(User $user, ?int $notificationLimit): void
     {
-        $notifications =  $this->userNotificationRepository->findUserNotifications($user, null);
+        $notifications =  $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
 
         if (!$notifications) {
             throw new ApiBadRequestException('Internal error, Please try again later');
