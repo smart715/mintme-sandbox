@@ -54,7 +54,9 @@ export default {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            if (typeof this.releasePeriod === 'number' || !this.isMintmeToken) return 4;
+            if (typeof this.releasePeriod === 'number' || !this.isMintmeToken) {
+                return 4;
+            }
             return 0;
         },
         tokenDescriptionSet: function() {
