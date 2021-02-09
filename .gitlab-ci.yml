@@ -95,6 +95,7 @@ staging_release:
   only:
     # this job only will be executed for branches
     - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
+    - master
   allow_failure: true
 
 clean_mintme_unused_sites:
