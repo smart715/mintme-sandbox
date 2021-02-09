@@ -18,7 +18,7 @@ class TokenDescriptionValidator extends ConstraintValidator
         /** @var Token $token */
         $token = $this->context->getObject();
 
-        $descLength = strlen($value);
+        $descLength = strlen((string)$value);
         $min = $constraint->min;
         $max = $constraint->max;
 
