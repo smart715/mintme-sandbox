@@ -6,6 +6,9 @@
             dark
             showCodeOnList
         />
+        <div v-if="false === isValid" class="text-danger text-center">
+            Wrong number
+        </div>
     </div>
 </template>
 
@@ -20,6 +23,7 @@ export default {
     data() {
         return {
             phone: this.phoneNumber,
+            isValidNumber: null,
         };
     },
     props: {
@@ -35,6 +39,9 @@ export default {
                 return this.phone;
             },
         },
+        isValid: function() {
+            return this.isValidNumber;
+        },
         translations() {
             return {
                 countrySelectorLabel: this.$t('phone.country_selector.label'),
@@ -46,6 +53,7 @@ export default {
     },
     methods: {
         updatePhone: function(data) {
+            this.isValidNumber = data.isValid;
             this.phoneNumberModel = data.e164;
         },
     },
