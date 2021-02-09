@@ -99,3 +99,5 @@ security:
         - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN, requires_channel: https}
+        - { path: ^/2fa,                                                                     role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
+        - { path: '^/',                                                                      roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
