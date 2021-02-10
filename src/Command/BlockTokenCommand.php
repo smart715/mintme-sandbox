@@ -126,7 +126,6 @@ class BlockTokenCommand extends Command
             $user = $entityToBlock;
             /** @var Token|null $token */
             $token = $user->getProfile()->getMintmeToken();
-
         } else {
             /** @var Token $token */
             $token = $entityToBlock;
@@ -178,7 +177,6 @@ class BlockTokenCommand extends Command
 
         $this->em->persist($user);
         $this->em->flush();
-
 
         $this->logger->info($entityExecutedMsg.' was '.($unblock ? 'unblocked' : 'blocked'));
         $io->success($entityExecutedMsg.' was '.($unblock ? 'unblocked' : 'blocked'));
