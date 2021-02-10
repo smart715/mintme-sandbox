@@ -33,7 +33,8 @@ class PhoneVerificationType extends AbstractType
                 ]),
             ],
         ])
-        ->add('Verify Code', SubmitType::class, [
+        ->add('submit', SubmitType::class, [
+                'label' => $this->translator->trans('phone_confirmation.form.submit'),
                 'attr' => [
                     'class' => 'btn btn-primary',
                     'type' => 'submit',

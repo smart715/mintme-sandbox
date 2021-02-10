@@ -5,17 +5,36 @@
 {% set formHeader = 'phone_confirmation.header'|trans %}
 
 {% block content %}
-    <div class="container">
-        <div class="row pt-4 justify-content-center">
-            <div class="col-12">
-                <div class="card card-fixed-small mx-auto">
-                    <div class="card-header">
-                        {{ formHeader }}
-                    </div>
-                    <div class="card-body py-3">
-                        {% block formBody %}
-                            {{ form(form) }}
-                        {% endblock %}
+    <div id="phone-verification">
+        <div class="container">
+            <div class="row pt-4 justify-content-center">
+                <div class="col-12">
+                    <div class="card card-fixed-small mx-auto">
+                        <div class="card-header">
+                            {{ formHeader }}
+                        </div>
+                        <div class="card-body py-3">
+                            {% block formBody %}
+                                <div class="pb-3">
+                                    {{ form_label(form.verificationCode) }}
+                                    <div class="d-flex">
+                                        <div class="position-relative h-fit-content d-inline-block flex-grow-1">
+                                            {{ form_widget(form.verificationCode) }}
+                                        </div>
+                                        <button
+                                            @click="sendVerificationCode"
+                                            type="button"
+                                            class="btn btn-primary btn-input"
+                                        >
+                                            {% trans %}phone_confirmation.send_code{% endtrans %}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="pb-1">
+                                    {{ form_row(form.submit) }}
+                                </div>
+                            {% endblock %}
+                        </div>
                     </div>
                 </div>
             </div>

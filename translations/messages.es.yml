@@ -1249,3 +1249,5 @@ phone.phone_number.label:
 phone.example:
 phone_confirmation.title:
 phone_confirmation.form.verification_code:
+phone_confirmation.form.submit:
+phone_confirmation.send_code:
