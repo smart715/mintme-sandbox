@@ -4,7 +4,10 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,16 +35,31 @@ class BlockTokenCommand extends Command
     /** @var UserActionLogger */
     private $logger;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var MarketFactoryInterface */
+    private $marketFactory;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
         EntityManagerInterface $em,
-        UserActionLogger $logger
+        UserActionLogger $logger,
+        MarketHandlerInterface $marketHandler,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
         $this->em = $em;
         $this->logger = $logger;
+        $this->marketHandler = $marketHandler;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
         parent::__construct();
     }
 
@@ -102,6 +120,7 @@ class BlockTokenCommand extends Command
             $user = $entityToBlock;
             /** @var Token|null $token */
             $token = $user->getProfile()->getMintmeToken();
+
         } else {
             /** @var Token $token */
             $token = $entityToBlock;
@@ -147,8 +166,10 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
+
         $this->em->persist($user);
         $this->em->flush();
+
 
         $this->logger->info($entityExecutedMsg.' was '.($unblock ? 'unblocked' : 'blocked'));
         $io->success($entityExecutedMsg.' was '.($unblock ? 'unblocked' : 'blocked'));
@@ -188,5 +209,29 @@ class BlockTokenCommand extends Command
         }
 
         return false;
+    }
+
+    private function cancelOrders(bool $unblock, User $user, Token $token, SymfonyStyle $io): void
+    {
+        if (!$unblock) {
+            $io->warning([
+                json_encode($token),
+            ]);
+            $market = $this->marketFactory->create(
+                $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
+                $token
+            );
+
+            $orders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
+
+            $io->warning([
+                json_encode($market),
+            ]);
+          //  $market = ;
+          //  $order = ;
+            /*foreach () {
+                $this->exchanger->cancelOrder();
+            }*/
+        }
     }
 }
