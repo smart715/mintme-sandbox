@@ -119,7 +119,7 @@ export default {
     computed: {
         translationsContext: function() {
             return {
-                tokenName: this.TokenName,
+                tokenName: this.tokenName,
             };
         },
         tokenLink() {
