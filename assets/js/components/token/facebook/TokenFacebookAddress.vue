@@ -164,7 +164,7 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                        let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
+                        let state = this.selectedUrl ? `added` : 'deleted';
                         this.notifySuccess(this.$t(
                             'toasted.success.facebook.' + state,
                             {address: this.selectedUrl}
