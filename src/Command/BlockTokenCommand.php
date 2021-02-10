@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\UserActionLogger;
@@ -44,6 +45,9 @@ class BlockTokenCommand extends Command
     /** @var CryptoManagerInterface */
     private $cryptoManager;
 
+    /** @var ExchangerInterface */
+    private $exchanger;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
@@ -51,7 +55,8 @@ class BlockTokenCommand extends Command
         UserActionLogger $logger,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        ExchangerInterface $exchanger
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
@@ -60,6 +65,7 @@ class BlockTokenCommand extends Command
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
+        $this->exchanger = $exchanger;
         parent::__construct();
     }
 
@@ -166,6 +172,9 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
+        if (!$unblock) {
+            $this->cancelOrders($user, $token);
+        }
 
         $this->em->persist($user);
         $this->em->flush();
@@ -211,27 +220,17 @@ class BlockTokenCommand extends Command
         return false;
     }
 
-    private function cancelOrders(bool $unblock, User $user, Token $token, SymfonyStyle $io): void
+    private function cancelOrders(User $user, Token $token): void
     {
-        if (!$unblock) {
-            $io->warning([
-                json_encode($token),
-            ]);
-            $market = $this->marketFactory->create(
-                $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
-                $token
-            );
+        $market = $this->marketFactory->create(
+            $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
+            $token
+        );
 
-            $orders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
+        $orders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
 
-            $io->warning([
-                json_encode($market),
-            ]);
-          //  $market = ;
-          //  $order = ;
-            /*foreach () {
-                $this->exchanger->cancelOrder();
-            }*/
+        foreach ($orders as $order) {
+            $this->exchanger->cancelOrder($market, $order);
         }
     }
 }
