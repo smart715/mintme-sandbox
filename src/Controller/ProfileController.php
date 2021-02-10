@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Exception\NotFoundProfileException;
+use App\Form\PhoneVerificationType;
 use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
@@ -87,6 +88,17 @@ class ProfileController extends Controller
         $this->userActionLogger->info('Edit profile');
 
         return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
+    }
+
+    /** @Route("/phone/verify", name="phone-verification") */
+    public function phoneConfirmation(Request $request): Response
+    {
+        $form = $this->createForm(PhoneVerificationType::class);
+        $form->handleRequest($request);
+
+        return $this->render('pages/phone_verification.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     /** @Route(name="profile") */

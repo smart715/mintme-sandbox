@@ -1248,3 +1248,4 @@ phone.country_selector.error:
 phone.phone_number.label:
 phone.example:
 phone_confirmation.title:
+phone_confirmation.form.verification_code:
