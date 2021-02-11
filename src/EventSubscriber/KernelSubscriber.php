@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -29,16 +31,31 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @var bool */
     private $isAuth;
 
+    private AuthorizationCheckerInterface $security;
+
+    private UrlGeneratorInterface $urlGenerator;
+
+    private const PATHS_REQUIRED_AUTH = [
+        'token_create',
+        'wallet',
+        'chat',
+        'profile',
+    ];
+
     public function __construct(
         bool $isAuth,
         ProfileManagerInterface $profileManager,
         TokenStorageInterface $tokenStorage,
-        CsrfTokenManagerInterface $csrfTokenManager
+        CsrfTokenManagerInterface $csrfTokenManager,
+        AuthorizationCheckerInterface $security,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->isAuth = $isAuth;
         $this->profileManager = $profileManager;
         $this->tokenStorage = $tokenStorage;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->security = $security;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /** @codeCoverageIgnore */
@@ -61,16 +78,12 @@ class KernelSubscriber implements EventSubscriberInterface
     {
         $csrf = $request->getRequest()->headers->get('X-CSRF-TOKEN', '');
 
-        if ($this->isAuth) {
-            switch ($request->getRequest()->attributes->get('_route')) {
-                case 'token_create':
-                case 'wallet':
-                case 'chat':
-                case 'profile':
-                    $request->setResponse(new RedirectResponse('/login'));
-                    
-                    return;
-            }
+        if (in_array($request->getRequest()->attributes->get('_route'), self::PATHS_REQUIRED_AUTH) &&
+            !$this->security->isGranted('ROLE_USER')
+        ) {
+            $request->setResponse(new RedirectResponse($this->urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL)));
+
+            return;
         }
 
         if (!is_string($csrf) ||
