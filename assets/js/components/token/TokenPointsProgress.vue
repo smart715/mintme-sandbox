@@ -54,7 +54,7 @@ export default {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            if (typeof this.releasePeriod === 'number' || !this.isMintmeToken) {
+            if (typeof this.releasePeriod === 'number') {
                 return 4;
             }
             return 0;
@@ -79,8 +79,12 @@ export default {
             }
             return 0;
         },
+        noMintmeToken: function() {
+          return !this.isMintmeToken ? 4 : 0;
+        },
         tokenPointsGained: function() {
-            return this.tokenReleasePeriodPoint +
+            return this.noMintmeToken +
+                this.tokenReleasePeriodPoint +
                 this.tokenDescriptionSet +
                 this.socialMediaSet +
                 this.tokenDeployedSet +
