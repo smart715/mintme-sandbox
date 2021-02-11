@@ -6,6 +6,7 @@ use App\Communications\SMS\D7NetworksCommunicatorInterface;
 use App\Communications\SMS\Model\SMS;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use App\Utils\RandomNumberInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -80,12 +81,14 @@ class ProfileController extends AbstractFOSRestController
      * @Rest\Get("/send-phone-verification-code", name="send_phone_verification_code", options={"expose"=true})
      * @param D7NetworksCommunicatorInterface $d7NetworksCommunicator
      * @param PhoneNumberUtil $numberUtil
+     * @param RandomNumberInterface $randomNumber
      * @return View
      * @throws \Exception
      */
     public function sendPhoneVerificationCode(
         D7NetworksCommunicatorInterface $d7NetworksCommunicator,
-        PhoneNumberUtil $numberUtil
+        PhoneNumberUtil $numberUtil,
+        RandomNumberInterface $randomNumber
     ): View {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -95,7 +98,7 @@ class ProfileController extends AbstractFOSRestController
         }
 
         $phoneNumber = $user->getProfile()->getPhoneNumber();
-        $phoneNumber->setVerificationCode();
+        $phoneNumber->setVerificationCode($randomNumber->generateVerificationCode());
 
         $sms = new SMS(
             'MINTME',

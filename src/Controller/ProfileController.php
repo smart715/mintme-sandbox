@@ -11,6 +11,8 @@ use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,10 +37,14 @@ class ProfileController extends Controller
     public function profileView(
         Request $request,
         ProfileManagerInterface $profileManager,
+        PhoneNumberUtil $numberUtil,
         string $nickname
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
         $user = $this->getUser();
+        $phoneNumber = $profile->getPhoneNumber() ?
+            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
+            null;
 
         if ($user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
@@ -70,6 +76,14 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->setProfile($profile);
         }
 
+        $newPhoneNumber = $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164);
+        $phoneIsChanged = !$phoneNumber || $newPhoneNumber !== $phoneNumber;
+
+        if ($phoneIsChanged) {
+            $profile->getPhoneNumber()->setVerified(false);
+            $profile->getPhoneNumber()->setVerificationCode(null);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($profile);
 
@@ -87,14 +101,31 @@ class ProfileController extends Controller
 
         $this->userActionLogger->info('Edit profile');
 
+        if ($phoneIsChanged) {
+            return $this->redirectToRoute('phone-verification');
+        }
+
         return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
     }
 
     /** @Route("/phone/verify", name="phone-verification") */
     public function phoneConfirmation(Request $request): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+        $profile = $user->getProfile();
+
         $form = $this->createForm(PhoneVerificationType::class);
         $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $profile->getPhoneNumber()->setVerified(true);
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($profile);
+            $entityManager->flush();
+
+            $this->redirectToRoute('profile-view');
+        }
 
         return $this->render('pages/phone_verification.html.twig', [
             'form' => $form->createView(),

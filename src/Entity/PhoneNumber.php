@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Utils\RandomNumber;
 use Doctrine\ORM\Mapping as ORM;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
@@ -34,7 +35,7 @@ class PhoneNumber
     private \libphonenumber\PhoneNumber $phoneNumber;
 
     /**
-     * @ORM\Column(type="string", length=PhoneNumber::CODE_LENGTH, nullable=true)
+     * @ORM\Column(type="string", length=RandomNumber::CODE_LENGTH, nullable=true)
      */
     private ?string $verificationCode;
 
@@ -72,13 +73,9 @@ class PhoneNumber
         return $this->verificationCode;
     }
 
-    public function setVerificationCode(): self
+    public function setVerificationCode(?string $code): self
     {
-        // generate a fixed-length verification code that's zero-padded, e.g. 007828, 936504, 150222
-        $this->verificationCode = sprintf(
-            '%0'.self::CODE_LENGTH.'d',
-            mt_rand(1, (int)str_repeat((string)9, self::CODE_LENGTH))
-        );
+        $this->verificationCode = $code;
 
         return $this;
     }
