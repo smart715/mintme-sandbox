@@ -172,7 +172,7 @@ class BlockTokenCommand extends Command
             );
 
         if (!$unblock) {
-            $this->cancelOrders($user, $token);
+            $this->cancelOrders($token);
         }
 
         $this->em->persist($user);
@@ -218,14 +218,17 @@ class BlockTokenCommand extends Command
         return false;
     }
 
-    private function cancelOrders(User $user, Token $token): void
+    private function cancelOrders(Token $token): void
     {
         $market = $this->marketFactory->create(
-            $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol()),
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
 
-        $orders = $this->marketHandler->getPendingOrdersByUser($user, [$market]);
+        $orders = array_merge(
+            $this->marketHandler->getPendingSellOrders($market),
+            $this->marketHandler->getPendingBuyOrders($market)
+        );
 
         foreach ($orders as $order) {
             $this->exchanger->cancelOrder($market, $order);
