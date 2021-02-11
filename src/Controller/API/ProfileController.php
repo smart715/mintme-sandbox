@@ -6,6 +6,7 @@ use App\Communications\SMS\D7NetworksCommunicatorInterface;
 use App\Communications\SMS\Model\SMS;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -23,10 +24,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProfileController extends AbstractFOSRestController
 {
     private TranslatorInterface $translator;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, EntityManagerInterface $entityManager)
     {
         $this->translator = $translator;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -74,7 +77,7 @@ class ProfileController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/send-phone-verification-code", name="send_phone_verification_code", options={"expose"=true})
+     * @Rest\Get("/send-phone-verification-code", name="send_phone_verification_code", options={"expose"=true})
      * @param D7NetworksCommunicatorInterface $d7NetworksCommunicator
      * @param PhoneNumberUtil $numberUtil
      * @return View
@@ -108,6 +111,9 @@ class ProfileController extends AbstractFOSRestController
         } catch (\Throwable $e) {
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
+
+        $this->entityManager->persist($phoneNumber);
+        $this->entityManager->flush();
 
         return $this->view(Response::HTTP_OK);
     }

@@ -27,6 +27,7 @@ Encore
     .addEntry('chat', './assets/js/chat.js')
     .addEntry('home', './assets/js/home.js')
     .addEntry('footer', './assets/js/footer.js')
+    .addEntry('phone_verification', './assets/js/phone_verification.js')
 
     .enablePostCssLoader()
 
