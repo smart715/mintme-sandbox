@@ -1,6 +1,7 @@
 <template>
     <div class="phone-number">
         <MazPhoneNumberInput
+            v-model="phone"
             @update="updatePhone"
             :translations="translations"
             dark

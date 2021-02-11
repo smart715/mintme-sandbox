@@ -118,13 +118,16 @@ class ProfileController extends Controller
         $form = $this->createForm(PhoneVerificationType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() &&
+            $form->isValid() &&
+            $form->get('verificationCode')->getData() === $profile->getPhoneNumber()->getVerificationCode()
+        ) {
             $profile->getPhoneNumber()->setVerified(true);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
 
-            $this->redirectToRoute('profile-view');
+            return $this->redirectToRoute('profile');
         }
 
         return $this->render('pages/phone_verification.html.twig', [

@@ -127,6 +127,7 @@
                                     <div class="pb-1">
                                         {{ form_label(form.phoneNumber.phoneNumber) }}
                                         {{ form_widget(form.phoneNumber.phoneNumber, {
+                                            'value': profile.phoneNumber.phoneNumber|phone_number_format('E164'),
                                             'attr': {
                                                 'v-model': 'phoneNumber'
                                             }

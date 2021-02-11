@@ -49,6 +49,7 @@ new Vue({
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
+        this.phoneNumber = this.$refs.phoneNumber.getAttribute('value');
 
         if (this.$refs.city) {
             this.city = this.$refs.city.getAttribute('value');
