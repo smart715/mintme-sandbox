@@ -58,7 +58,7 @@
                 :token-youtube="tokenYoutube"
                 :token-website="tokenWebsite"
                 :token-status="statusProp"
-                :is-mintme="isMintmeToken"
+                :is-mintme-token="isMintmeToken"
             />
         </div>
     </div>
