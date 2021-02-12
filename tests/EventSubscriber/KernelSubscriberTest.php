@@ -136,7 +136,7 @@ class KernelSubscriberTest extends TestCase
     /** @return UrlGeneratorInterface|MockObject */
     private function mockUrlGenerator(string $url): UrlGeneratorInterface
     {
-        $ac = $this->createMock(AuthorizationCheckerInterface::class);
+        $ac = $this->createMock(UrlGeneratorInterface::class);
         $ac->method('generate')->willReturn($url);
 
         return $ac;
