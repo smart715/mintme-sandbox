@@ -9,4 +9,6 @@ use Money\Money;
 interface MapperInterface extends RowsFetcherInterface
 {
     public function getBalance(Crypto $crypto): Money;
+
+    public function isContractAddress(string $address, string $crypto): bool;
 }
