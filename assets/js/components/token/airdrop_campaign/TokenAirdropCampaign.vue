@@ -396,8 +396,9 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
-        allUncheckOptions: function() {
-            return Object.values(!this.actions).every(Boolean);
+        allOptionsUnChecked: function() {
+            return Object.values(this.actions)
+                .every((item) => item === false);
         },
         minTokensAmount: function() {
             return this.airdropParams.min_tokens_amount || 0;
@@ -415,7 +416,11 @@ export default {
             return parseInt(this.airdropCampaignId) > 0;
         },
         btnDisabled: function() {
-            return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid) /* || this.allUncheckOptions*/ || this.$v.$invalid;
+            return !(this.isAmountValid &&
+                this.isParticipantsAmountValid &&
+                this.isDateEndValid) ||
+                this.allOptionsUnChecked ||
+                this.$v.$invalid;
         },
         insufficientBalance: function() {
             if (this.balanceLoaded) {
@@ -636,6 +641,9 @@ export default {
         },
         tokenExchangeAmount: function() {
             this.tokenBalance = this.tokenExchangeAmount;
+        },
+        allOptionsUnChecked: function(value) {
+            this.errorMessage = value ? 'error' : '';
         },
     },
     validations() {
