@@ -11,8 +11,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class KernelSubscriberTest extends TestCase
@@ -23,7 +25,9 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->once()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockAuthorizationChecker(true),
+            $this->mockUrlGenerator('login')
         );
 
         $sub->onRequest(
@@ -37,7 +41,9 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockAuthorizationChecker(true),
+            $this->mockUrlGenerator('login')
         );
 
         $event = $this->mockEvent(null, '/foo/bar', true, true);
@@ -52,7 +58,9 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(false)
+            $this->mockCsrfTokenManager(false),
+            $this->mockAuthorizationChecker(true),
+            $this->mockUrlGenerator('login')
         );
 
         $event = $this->mockEvent('foo', '/api/bar', true, true);
@@ -114,5 +122,23 @@ class KernelSubscriberTest extends TestCase
         $ctm->method('isTokenValid')->willReturn($isValid);
 
         return $ctm;
+    }
+
+    /** @return AuthorizationCheckerInterface|MockObject */
+    private function mockAuthorizationChecker(bool $isValid): AuthorizationCheckerInterface
+    {
+        $ac = $this->createMock(AuthorizationCheckerInterface::class);
+        $ac->method('isGranted')->willReturn($isValid);
+
+        return $ac;
+    }
+
+    /** @return UrlGeneratorInterface|MockObject */
+    private function mockUrlGenerator(string $url): UrlGeneratorInterface
+    {
+        $ac = $this->createMock(UrlGeneratorInterface::class);
+        $ac->method('generate')->willReturn($url);
+
+        return $ac;
     }
 }
