@@ -643,7 +643,7 @@ export default {
             this.tokenBalance = this.tokenExchangeAmount;
         },
         allOptionsUnChecked: function(value) {
-            this.errorMessage = value ? 'error' : '';
+            this.errorMessage = value ? this.$t('airdrop.actions.error_message') : '';
         },
     },
     validations() {
