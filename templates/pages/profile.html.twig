@@ -126,8 +126,18 @@
                                     </div>
                                     <div class="pb-1">
                                         {{ form_label(form.phoneNumber.phoneNumber) }}
+                                        <guide>
+                                            <template slot="header">
+                                                {% trans %}phone.guide.header{% endtrans %}
+                                            </template>
+                                            <template slot="body">
+                                                {% trans %}phone.guide.body{% endtrans %}
+                                            </template>
+                                        </guide>
                                         {{ form_widget(form.phoneNumber.phoneNumber, {
-                                            'value': profile.phoneNumber.phoneNumber|phone_number_format('NATIONAL'),
+                                            'value': profile.phoneNumber
+                                                ? profile.phoneNumber.phoneNumber|phone_number_format('NATIONAL')
+                                                : '',
                                             'attr': {
                                                 'v-model': 'phoneNumber'
                                             }

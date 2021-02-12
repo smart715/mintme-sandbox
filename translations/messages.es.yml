@@ -1247,7 +1247,10 @@ phone.country_selector.label:
 phone.country_selector.error:
 phone.phone_number.label:
 phone.example:
+phone.guide.header:
+phone.guide.body:
 phone_confirmation.title:
 phone_confirmation.form.verification_code:
 phone_confirmation.form.submit:
 phone_confirmation.send_code:
+phone_number.wrong:

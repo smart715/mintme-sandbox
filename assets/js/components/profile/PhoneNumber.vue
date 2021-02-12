@@ -7,8 +7,8 @@
             dark
             showCodeOnList
         />
-        <div v-if="false === isValid" class="text-danger text-center">
-            Wrong number
+        <div v-if="false === isValid && this.phone" class="text-danger text-center">
+            {{ $t('phone_number.wrong') }}
         </div>
     </div>
 </template>
