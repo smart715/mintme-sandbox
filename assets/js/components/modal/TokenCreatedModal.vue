@@ -8,7 +8,7 @@
             <template v-slot:body>
                 <div class="overflow-wrap-break-word">
                     <p>
-                        {{ $t('token.intro.created_modal.paragraph_1.part_1', {tokenName}) }}
+                        {{ $t('token.intro.created_modal.paragraph_1.part_1', translationsContext) }}
                         <a :href="tokenLink" target="_blank">
                             {{ tokenLink }}
                         </a>
@@ -117,6 +117,11 @@ export default {
         tokenName: String,
     },
     computed: {
+        translationsContext: function() {
+            return {
+                tokenName: this.tokenName,
+            };
+        },
         tokenLink() {
             return this.$routing.generate('token_show', {name: this.tokenName}, true);
         },
