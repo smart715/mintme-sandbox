@@ -22,7 +22,16 @@ describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly with any item', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
-            modules: {tokenStatistics},
+            modules: {
+                tokenStatistics: {
+                    ...tokenStatistics,
+                    state: {
+                        stats: {
+                            releasePeriod: '-',
+                        },
+                    },
+                },
+            },
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -38,11 +47,6 @@ describe('TokenPointsProgress', () => {
                 tokenStatus: tokenDeploymentStatus.notDeployed,
                 tokenWebsite: null,
                 tokenYoutube: null,
-            },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 0,
-                };
             },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(0);
@@ -50,7 +54,16 @@ describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly "release period"', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
-            modules: {tokenStatistics},
+            modules: {
+                tokenStatistics: {
+                    ...tokenStatistics,
+                    state: {
+                        stats: {
+                            releasePeriod: '-',
+                        },
+                    },
+                },
+            },
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -67,14 +80,10 @@ describe('TokenPointsProgress', () => {
                 tokenWebsite: null,
                 tokenYoutube: null,
             },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 4,
-                };
-            },
         });
+        store.commit('tokenStatistics/setStats', {releasePeriod: 10});
         expect(wrapper.vm.tokenPointsGained).toBe(4);
-        wrapper.vm.tokenReleasePeriodPoint = 0;
+        store.commit('tokenStatistics/setStats', {releasePeriod: '-'});
         expect(wrapper.vm.tokenPointsGained).toBe(0);
     });
     it('should calculate token points gained correctly "token description"', () => {
@@ -96,11 +105,6 @@ describe('TokenPointsProgress', () => {
                 tokenStatus: tokenDeploymentStatus.notDeployed,
                 tokenWebsite: null,
                 tokenYoutube: null,
-            },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 0,
-                };
             },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(4);
@@ -127,11 +131,6 @@ describe('TokenPointsProgress', () => {
                 tokenWebsite: null,
                 tokenYoutube: null,
             },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 0,
-                };
-            },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(4);
         wrapper.setProps({profileAnonymously: '1'});
@@ -140,13 +139,22 @@ describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly if is not MINTME token', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
-            modules: {tokenStatistics},
+            modules: {
+                tokenStatistics: {
+                    ...tokenStatistics,
+                    state: {
+                        stats: {
+                            releasePeriod: '-',
+                        },
+                    },
+                },
+            },
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isMintmeToken: false,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -157,11 +165,6 @@ describe('TokenPointsProgress', () => {
                 tokenWebsite: null,
                 tokenYoutube: null,
             },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 4,
-                };
-            },
         });
         expect(wrapper.vm.tokenPointsGained).toBe(12);
         wrapper.setProps({profileAnonymously: '1'});
@@ -170,7 +173,16 @@ describe('TokenPointsProgress', () => {
     it('should calculate token points gained correctly with all items', () => {
         const localVue = mockVue();
         const store = new Vuex.Store({
-            modules: {tokenStatistics},
+            modules: {
+                tokenStatistics: {
+                    ...tokenStatistics,
+                    state: {
+                        stats: {
+                            releasePeriod: '-',
+                        },
+                    },
+                },
+            },
         });
         const wrapper = shallowMount(TokenPointsProgress, {
             store,
@@ -187,12 +199,8 @@ describe('TokenPointsProgress', () => {
                 tokenWebsite: 'website',
                 tokenYoutube: 'youtube',
             },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 4,
-                };
-            },
         });
+        store.commit('tokenStatistics/setStats', {releasePeriod: 10});
         expect(wrapper.vm.tokenPointsGained).toBe(18);
     });
     describe('token status', () => {
@@ -214,11 +222,6 @@ describe('TokenPointsProgress', () => {
                 tokenStatus: tokenDeploymentStatus.notDeployed,
                 tokenWebsite: null,
                 tokenYoutube: null,
-            },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 0,
-                };
             },
         });
         it('should calculate token points gained correctly on token status "not deployed"', () => {
@@ -256,11 +259,6 @@ describe('TokenPointsProgress', () => {
                 tokenStatus: tokenDeploymentStatus.notDeployed,
                 tokenWebsite: null,
                 tokenYoutube: null,
-            },
-            data() {
-                return {
-                    tokenReleasePeriodPoint: 0,
-                };
             },
         });
         it('should calculate token points gained correctly any social media', () => {
