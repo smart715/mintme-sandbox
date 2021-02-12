@@ -19,4 +19,6 @@ interface WithdrawGatewayInterface extends RowsFetcherInterface
 
     /** @return Transaction[] */
     public function getHistory(User $user, int $offset = 0, int $limit = 50): array;
+
+    public function isContractAddress(string $address, string $crypto): bool;
 }
