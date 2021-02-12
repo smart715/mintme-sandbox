@@ -71,12 +71,6 @@ class ProfileController extends Controller
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
         $user = $this->getUser();
-        $e164phoneNumber = $profile->getPhoneNumber() ?
-            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
-            null;
-        $phoneIsVerified = $profile->getPhoneNumber()
-            ? $profile->getPhoneNumber()->isVerified()
-            : null;
 
         if ($user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
@@ -85,6 +79,13 @@ class ProfileController extends Controller
         if (null === $profile) {
             throw new NotFoundProfileException();
         }
+
+        $e164phoneNumber = $profile->getPhoneNumber() ?
+            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
+            null;
+        $phoneIsVerified = $profile->getPhoneNumber()
+            ? $profile->getPhoneNumber()->isVerified()
+            : null;
 
         $clonedProfile = clone $profile;
         $form = $this->createForm(ProfileType::class, $profile);
