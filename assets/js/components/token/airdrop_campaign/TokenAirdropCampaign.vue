@@ -313,7 +313,7 @@
                 </div>
                 <button
                     class="btn btn-primary float-left"
-                    :disabled="btnDisabled || insufficientBalance"
+                    :disabled="allOptionsUnChecked"
                     @click="createAirdropCampaign"
                 >
                     {{ $t('save') }}
@@ -419,7 +419,6 @@ export default {
             return !(this.isAmountValid &&
                 this.isParticipantsAmountValid &&
                 this.isDateEndValid) ||
-                this.allOptionsUnChecked ||
                 this.$v.$invalid;
         },
         insufficientBalance: function() {
