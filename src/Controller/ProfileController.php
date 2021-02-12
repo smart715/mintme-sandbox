@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\PhoneNumber;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Exception\NotFoundProfileException;
@@ -33,82 +34,7 @@ class ProfileController extends Controller
         $this->userActionLogger = $userActionLogger;
     }
 
-    /** @Route("/{nickname}", name="profile-view", options={"expose"=true}) */
-    public function profileView(
-        Request $request,
-        ProfileManagerInterface $profileManager,
-        PhoneNumberUtil $numberUtil,
-        string $nickname
-    ): Response {
-        $profile = $profileManager->getProfileByNickname($nickname);
-        $user = $this->getUser();
-        $phoneNumber = $profile->getPhoneNumber() ?
-            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
-            null;
-
-        if ($user && $profile->getUser() === $user) {
-            $profile->setDisabledAnonymous(true);
-        }
-
-        if (null === $profile) {
-            throw new NotFoundProfileException();
-        }
-
-        $clonedProfile = clone $profile;
-        $form = $this->createForm(ProfileType::class, $profile);
-        $form->handleRequest($request);
-
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->renderProfileViewForm(
-                $profile,
-                $clonedProfile,
-                $form,
-                (bool)$form->getErrors(true)->count()
-            );
-        }
-
-        if (null === $profile->getDescription() || '' == $profile->getDescription()) {
-            $profile->setNumberOfReminder(0);
-            $profile->setNextReminderDate(new \DateTime('+1 month'));
-        }
-
-        if ($profile->getPhoneNumber()) {
-            $profile->getPhoneNumber()->setProfile($profile);
-        }
-
-        $newPhoneNumber = $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164);
-        $phoneIsChanged = !$phoneNumber || $newPhoneNumber !== $phoneNumber;
-
-        if ($phoneIsChanged) {
-            $profile->getPhoneNumber()->setVerified(false);
-            $profile->getPhoneNumber()->setVerificationCode(null);
-        }
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($profile);
-
-        try {
-            $entityManager->flush();
-        } catch (\Throwable $exception) {
-            $this->addFlash('danger', 'an error occurred please try again!');
-
-            return $this->renderProfileViewForm($profile, $clonedProfile, $form, true);
-        }
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->get("security.csrf.token_manager")->refreshToken("form_intention");
-        }
-
-        $this->userActionLogger->info('Edit profile');
-
-        if ($phoneIsChanged) {
-            return $this->redirectToRoute('phone-verification');
-        }
-
-        return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
-    }
-
-    /** @Route("/phone/verify", name="phone-verification") */
+    /** @Route("/phone/verify", name="phone_verification") */
     public function phoneConfirmation(Request $request): Response
     {
         /** @var User $user */
@@ -133,6 +59,85 @@ class ProfileController extends Controller
         return $this->render('pages/phone_verification.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    /** @Route("/{nickname}/{edit}", defaults={"edit"=false}, name="profile-view", options={"expose"=true}) */
+    public function profileView(
+        Request $request,
+        ProfileManagerInterface $profileManager,
+        PhoneNumberUtil $numberUtil,
+        string $nickname,
+        bool $edit
+    ): Response {
+        $profile = $profileManager->getProfileByNickname($nickname);
+        $user = $this->getUser();
+        $e164phoneNumber = $profile->getPhoneNumber() ?
+            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
+            null;
+        $phoneIsVerified = $profile->getPhoneNumber()
+            ? $profile->getPhoneNumber()->isVerified()
+            : null;
+
+        if ($user && $profile->getUser() === $user) {
+            $profile->setDisabledAnonymous(true);
+        }
+
+        if (null === $profile) {
+            throw new NotFoundProfileException();
+        }
+
+        $clonedProfile = clone $profile;
+        $form = $this->createForm(ProfileType::class, $profile);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->renderProfileViewForm(
+                $profile,
+                $clonedProfile,
+                $form,
+                true === $edit ? $edit : (bool)$form->getErrors(true)->count()
+            );
+        }
+
+        if (null === $profile->getDescription() || '' == $profile->getDescription()) {
+            $profile->setNumberOfReminder(0);
+            $profile->setNextReminderDate(new \DateTime('+1 month'));
+        }
+
+        if ($profile->getPhoneNumber()) {
+            $profile->getPhoneNumber()->setProfile($profile);
+        }
+
+        $newPhoneNumber = $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164);
+        $verifyPhone = !$e164phoneNumber || $newPhoneNumber !== $e164phoneNumber || !$phoneIsVerified;
+
+        if ($verifyPhone) {
+            $profile->getPhoneNumber()->setVerified(false);
+            $profile->getPhoneNumber()->setVerificationCode(null);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($profile);
+
+        try {
+            $entityManager->flush();
+        } catch (\Throwable $exception) {
+            $this->addFlash('danger', 'an error occurred please try again!');
+
+            return $this->renderProfileViewForm($profile, $clonedProfile, $form, true);
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->get("security.csrf.token_manager")->refreshToken("form_intention");
+        }
+
+        $this->userActionLogger->info('Edit profile');
+
+        if ($verifyPhone) {
+            return $this->redirectToRoute('phone_verification');
+        }
+
+        return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
     }
 
     /** @Route(name="profile") */
