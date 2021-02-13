@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
+use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundProfileException;
 use App\Exception\NotFoundTokenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -68,6 +69,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => 'ARTICLE NOT FOUND',
+                ]),
+                404
+            ));
+        }
+
+        if ($exception instanceof NotFoundPostException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => 'POST NOT FOUND',
                 ]),
                 404
             ));
