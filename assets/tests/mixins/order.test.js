@@ -87,10 +87,10 @@ describe('OrderMixin', function() {
     });
 
     it('should return correctly order side by type', () => {
-        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY)).toBe('Buy');
-        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL)).toBe('Sell');
-        expect(wrapper.vm.getSideByType(WSAPI.order.type.DONATION)).toBe('Donation');
-        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY, true)).toBe('Buy (donation)');
-        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL, true)).toBe('Sell (donation)');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY)).toBe('buy');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL)).toBe('sell');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.DONATION)).toBe('donation.order.donation');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.BUY, true)).toBe('donation.order.buy');
+        expect(wrapper.vm.getSideByType(WSAPI.order.type.SELL, true)).toBe('donation.order.sell');
     });
 });
