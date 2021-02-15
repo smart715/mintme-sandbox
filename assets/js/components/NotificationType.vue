@@ -25,25 +25,42 @@ export default {
         };
     },
     methods: {
-
         translationsContext: function(notification) {
             if ([
-                this.notificationTypes.withdrawal,
-                this.notificationTypes.deposit,
-                this.notificationTypes.tokenMarketingTips].includes(notification.type)) {
+                this.notificationTypes.deployed,
+                this.notificationTypes.cancelled,
+                this.notificationTypes.filled,
+                this.notificationTypes.newPost,
+                ].includes(notification.type)) {
                 let jsonData = JSON.parse(notification.jsonData);
                 return {
-                    urlProfile: this.$routing.generate('profile-view', {nickname: jsonData.profile}),
-                    profile: jsonData.profile,
                     tokenName: jsonData.tokenName,
                     urlToken: this.$routing.generate('token_show', {name: jsonData.tokenName}),
+                };
+            }
+
+            if (this.notificationTypes.newInvestor === notification.type) {
+                let jsonData = JSON.parse(notification.jsonData);
+                return {
+                    profile: jsonData.profile,
+                    urlProfile: this.$routing.generate('profile-view', {nickname: jsonData.profile}),
+                    urlToken: this.$routing.generate('token_show', {name: jsonData.tokenName}),
+                };
+            }
+
+            if (this.notificationTypes.tokenMarketingTips === notification.type) {
+                let jsonData = JSON.parse(notification.jsonData);
+                return {
                     url: this.$routing.generate('kb_show', {url: jsonData.kbLink}),
                     title: this.kbTitle(jsonData.kbLink),
                 };
             }
-            return {
-                urlWallet: this.$routing.generate('wallet', {tab: 'dw-history'}),
-            };
+
+            if ([this.notificationTypes.deposit, this.notificationTypes.withdrawal].includes(notification.type)) {
+                return {
+                    urlWallet: this.$routing.generate('wallet', {tab: 'dw-history'}),
+                };
+            }
         },
         kbTitle: function(kbLink) {
             return kbLink.split('-').join(' ');
