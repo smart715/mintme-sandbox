@@ -112,8 +112,12 @@ class OrderbookController extends AbstractFOSRestController
         $level = (int)$request->get('level');
 
         if (self::ONLY_BEST === $level) {
-            $orderDepth['asks'] = min($orderDepth['asks']);
-            $orderDepth['bids'] = max($orderDepth['bids']);
+            $orderDepth['asks'] = count($orderDepth['asks'])
+                ? min($orderDepth['asks'])
+                : [];
+            $orderDepth['bids'] = count($orderDepth['bids'])
+                ? max($orderDepth['bids'])
+                : [];
         } elseif (self::ARRANGED_BY_BEST === $level) {
             sort($orderDepth['asks']);
             rsort($orderDepth['bids']);
