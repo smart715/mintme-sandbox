@@ -313,7 +313,7 @@
                 </div>
                 <button
                     class="btn btn-primary float-left"
-                    :disabled="allOptionsUnChecked"
+                    :disabled="btnDisabled || insufficientBalance || allOptionsUnChecked"
                     @click="createAirdropCampaign"
                 >
                     {{ $t('save') }}
