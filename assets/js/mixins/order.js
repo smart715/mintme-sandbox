@@ -45,9 +45,9 @@ export default {
                 case WSAPI.order.type.BUY:
                     return isDonationOrder ? this.$t('donation.order.buy') : this.$t('buy');
                 case WSAPI.order.type.SELL:
-                    return isDonationOrder ? donation.order.sell : this.$t('sell');
+                    return isDonationOrder ? this.$t('donation.order.sell') : this.$t('sell');
                 case WSAPI.order.type.DONATION:
-                    return donation.order.donation;
+                    return this.$t('donation.order.donation');
             }
         },
     },
