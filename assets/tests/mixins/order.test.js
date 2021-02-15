@@ -30,6 +30,7 @@ describe('OrderMixin', function() {
                 return val;
             },
         },
+        mocks: {$t: (val) => val},
     });
 
     it('should show "Deposit more" link if user logged in', () => {
