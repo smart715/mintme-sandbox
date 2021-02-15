@@ -4,6 +4,7 @@
             v-model="phone"
             @update="updatePhone"
             :translations="translations"
+            :default-country-code="countryCode"
             dark
             showCodeOnList
         />
@@ -28,6 +29,7 @@ export default {
         };
     },
     props: {
+        countryCode: String,
         phoneNumber: String,
     },
     computed: {

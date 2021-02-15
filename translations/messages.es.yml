@@ -1251,7 +1251,9 @@ phone.example:
 phone.guide.header:
 phone.guide.body:
 phone_confirmation.title:
+phone_confirmation.header:
 phone_confirmation.form.verification_code:
 phone_confirmation.form.submit:
 phone_confirmation.send_code:
+phone_confirmation.your_verification_code:
 phone_number.wrong:

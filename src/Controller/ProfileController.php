@@ -25,13 +25,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ProfileController extends Controller
 {
-    /** @var UserActionLogger */
-    private $userActionLogger;
+    private UserActionLogger $userActionLogger;
+    private PhoneNumberUtil $phoneNumberUtil;
 
-    public function __construct(NormalizerInterface $normalizer, UserActionLogger $userActionLogger)
-    {
+    public function __construct(
+        NormalizerInterface $normalizer,
+        UserActionLogger $userActionLogger,
+        PhoneNumberUtil $phoneNumberUtil
+    ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
+        $this->phoneNumberUtil = $phoneNumberUtil;
     }
 
     /** @Route("/phone/verify", name="phone_verification") */
@@ -65,7 +69,6 @@ class ProfileController extends Controller
     public function profileView(
         Request $request,
         ProfileManagerInterface $profileManager,
-        PhoneNumberUtil $numberUtil,
         string $nickname,
         bool $edit
     ): Response {
@@ -81,7 +84,7 @@ class ProfileController extends Controller
         }
 
         $e164phoneNumber = $profile->getPhoneNumber() ?
-            $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
+            $this->phoneNumberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
             null;
         $phoneIsVerified = $profile->getPhoneNumber()
             ? $profile->getPhoneNumber()->isVerified()
@@ -109,7 +112,10 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->setProfile($profile);
         }
 
-        $newPhoneNumber = $numberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164);
+        $newPhoneNumber = $this->phoneNumberUtil->format(
+            $profile->getPhoneNumber()->getPhoneNumber(),
+            PhoneNumberFormat::E164
+        );
         $verifyPhone = !$e164phoneNumber || $newPhoneNumber !== $e164phoneNumber || !$phoneIsVerified;
 
         if ($verifyPhone) {
@@ -208,6 +214,9 @@ class ProfileController extends Controller
             'form' =>  $form->createView(),
             'canEdit' => null !== $user && $profile === $user->getProfile(),
             'editFormShowFirst' => $showEdit,
+            'phoneCountryCode' => $profile->getPhoneNumber()
+                ? $this->phoneNumberUtil->getRegionCodeForNumber($profile->getPhoneNumber()->getPhoneNumber())
+                : null,
         ]);
     }
 }
