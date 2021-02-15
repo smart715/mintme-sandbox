@@ -13,6 +13,7 @@ describe('OrderMixin', function() {
     const wrapper = shallowMount(Component, {
         mocks: {
             $routing,
+            $t: (val) => val,
         },
         propsData: {
             loggedIn: false,
@@ -30,7 +31,6 @@ describe('OrderMixin', function() {
                 return val;
             },
         },
-        mocks: {$t: (val) => val},
     });
 
     it('should show "Deposit more" link if user logged in', () => {
