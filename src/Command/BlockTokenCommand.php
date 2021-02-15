@@ -48,6 +48,8 @@ class BlockTokenCommand extends Command
     /** @var ExchangerInterface */
     private $exchanger;
 
+    private int $maxActiveOrders;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
@@ -56,7 +58,8 @@ class BlockTokenCommand extends Command
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
-        ExchangerInterface $exchanger
+        ExchangerInterface $exchanger,
+        int $maxActiveOrders
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
@@ -66,6 +69,7 @@ class BlockTokenCommand extends Command
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
         $this->exchanger = $exchanger;
+        $this->maxActiveOrders = $maxActiveOrders;
         parent::__construct();
     }
 
@@ -171,8 +175,8 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
-        if ((!$unblock && $tokenOption) || (!$unblock && !$tokenOption && !$userOption)) {
-            $this->cancelOrders($token);
+        if (!$unblock) {
+            $this->cancelOrders($token, $tokenOption, $userOption);
         }
 
         $this->em->persist($user);
@@ -218,19 +222,37 @@ class BlockTokenCommand extends Command
         return false;
     }
 
-    private function cancelOrders(Token $token): void
+    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption): void
     {
-        $market = $this->marketFactory->create(
+        /** @var User $user */
+        $user = $token->getOwner();
+        $userMarkets = $this->marketFactory->createUserRelated($user);
+        $coinMarkets = $this->marketFactory->getCoinMarkets();
+        $tokenMarket = $this->marketFactory->create(
             $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
 
-        $orders = array_merge(
-            $this->marketHandler->getPendingSellOrders($market),
-            $this->marketHandler->getPendingBuyOrders($market)
+        $markets = $userOption && !$tokenOption
+            ? $coinMarkets
+            : $userMarkets;
+
+        $orders = $this->marketHandler->getPendingOrdersByUser(
+            $user,
+            $markets,
+            0,
+            $this->maxActiveOrders
         );
 
+        if (!$userOption && $tokenOption) {
+            $orders = array_merge(
+                $this->marketHandler->getPendingSellOrders($tokenMarket),
+                $this->marketHandler->getPendingBuyOrders($tokenMarket)
+            );
+        }
+
         foreach ($orders as $order) {
+            $market = $order->getMarket();
             $this->exchanger->cancelOrder($market, $order);
         }
     }
