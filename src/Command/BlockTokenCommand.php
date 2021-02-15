@@ -171,7 +171,7 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
-        if (!$unblock) {
+        if ((!$unblock && $tokenOption) || (!$unblock && !$tokenOption && !$userOption)) {
             $this->cancelOrders($token);
         }
 
