@@ -233,9 +233,15 @@ class BlockTokenCommand extends Command
             $token
         );
 
-        $markets = $userOption && !$tokenOption
-            ? $coinMarkets
-            : $userMarkets;
+        $markets = $userMarkets;
+        
+        if (!$userOption && $tokenOption) {
+            $markets = [$tokenMarket];
+        }
+
+        if ($userOption && !$tokenOption) {
+            $markets = $coinMarkets;
+        }
 
         $orders = $this->marketHandler->getPendingOrdersByUser(
             $user,
@@ -243,13 +249,6 @@ class BlockTokenCommand extends Command
             0,
             $this->maxActiveOrders
         );
-
-        if (!$userOption && $tokenOption) {
-            $orders = array_merge(
-                $this->marketHandler->getPendingSellOrders($tokenMarket),
-                $this->marketHandler->getPendingBuyOrders($tokenMarket)
-            );
-        }
 
         foreach ($orders as $order) {
             $market = $order->getMarket();
