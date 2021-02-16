@@ -1242,3 +1242,8 @@ donate.disabled: 'Las compras directas están deshabilitadas'
 twitter.sign_in:
 twitter.must_sign_in:
 mail.verification_code: ''
+404.post:
+404.article:
+404.profile:
+404.token:
+404.pair:
