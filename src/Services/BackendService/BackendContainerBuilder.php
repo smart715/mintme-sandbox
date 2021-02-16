@@ -20,7 +20,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function createContainer(string $branch): ?string
     {
-        $process = new Process(self::CREATE_CONTAINER);
+        $process = new Process(self::CREATE_CONTAINER, $branch);
 
         try {
             $process->mustRun();
@@ -36,7 +36,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function deleteContainer(string $branch): ?string
     {
-        $process = new Process(self::DELETE_CONTAINER);
+        $process = new Process(self::DELETE_CONTAINER, $branch);
 
         try {
             $process->mustRun();
@@ -52,7 +52,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function getStatusContainer(string $branch): ?string
     {
-        $process = new Process(self::STATUS_CONTAINER);
+        $process = new Process(self::STATUS_CONTAINER, $branch);
 
         try {
             $process->mustRun();
