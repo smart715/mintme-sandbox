@@ -104,7 +104,7 @@ describe('TokenAirdropCampaign', () => {
             data() {
                 return {
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
@@ -406,7 +406,7 @@ describe('TokenAirdropCampaign', () => {
                     participantsAmount: 100,
                     showEndDate: false,
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
@@ -456,7 +456,7 @@ describe('TokenAirdropCampaign', () => {
                     participantsAmount: 196,
                     showEndDate: false,
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
