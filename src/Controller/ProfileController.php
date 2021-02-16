@@ -53,6 +53,7 @@ class ProfileController extends Controller
             $form->get('verificationCode')->getData() === $profile->getPhoneNumber()->getVerificationCode()
         ) {
             $profile->getPhoneNumber()->setVerified(true);
+            $profile->getPhoneNumber()->setVerificationCode(null);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();

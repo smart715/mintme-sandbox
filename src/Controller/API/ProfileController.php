@@ -115,6 +115,9 @@ class ProfileController extends AbstractFOSRestController
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
+        if (!$phoneNumber->getAttemptsDate()) {
+            $phoneNumber->setAttemptsDate();
+        }
         $this->entityManager->persist($phoneNumber);
         $this->entityManager->flush();
 

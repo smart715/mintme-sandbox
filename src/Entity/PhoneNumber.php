@@ -171,9 +171,9 @@ class PhoneNumber
         return $this->attemptsDate;
     }
 
-    public function setAttemptsDate(?DateTimeImmutable $attemptsDate): self
+    public function setAttemptsDate(?DateTimeImmutable $attemptsDate = null): self
     {
-        $this->attemptsDate = $attemptsDate;
+        $this->attemptsDate = $attemptsDate ?? new DateTimeImmutable();
 
         return $this;
     }
