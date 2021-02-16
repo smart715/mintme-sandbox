@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Utils\RandomNumber;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber as AssertPhoneNumber;
 
@@ -43,6 +44,31 @@ class PhoneNumber
      * @ORM\Column(type="boolean")
      */
     private bool $verified = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $dailyAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $weeklyAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $monthlyAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $totalAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private ?DateTimeImmutable $attemptsDate = null; // phpcs:ignore
 
     public function getProfile(): Profile
     {
@@ -88,6 +114,66 @@ class PhoneNumber
     public function setVerified(bool $verified): self
     {
         $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getDailyAttempts(): int
+    {
+        return $this->dailyAttempts;
+    }
+
+    public function setDailyAttempts(int $dailyAttempts): self
+    {
+        $this->dailyAttempts = $dailyAttempts;
+
+        return $this;
+    }
+
+    public function getWeeklyAttempts(): int
+    {
+        return $this->weeklyAttempts;
+    }
+
+    public function setWeeklyAttempts(int $weeklyAttempts): self
+    {
+        $this->weeklyAttempts = $weeklyAttempts;
+
+        return $this;
+    }
+
+    public function getMonthlyAttempts(): int
+    {
+        return $this->monthlyAttempts;
+    }
+
+    public function setMonthlyAttempts(int $monthlyAttempts): self
+    {
+        $this->monthlyAttempts = $monthlyAttempts;
+
+        return $this;
+    }
+
+    public function getTotalAttempts(): int
+    {
+        return $this->totalAttempts;
+    }
+
+    public function setTotalAttempts(int $totalAttempts): self
+    {
+        $this->totalAttempts = $totalAttempts;
+
+        return $this;
+    }
+
+    public function getAttemptsDate(): ?DateTimeImmutable
+    {
+        return $this->attemptsDate;
+    }
+
+    public function setAttemptsDate(?DateTimeImmutable $attemptsDate): self
+    {
+        $this->attemptsDate = $attemptsDate;
 
         return $this;
     }
