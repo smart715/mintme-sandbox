@@ -8,5 +8,5 @@ interface BackendContainerBuilderInterface
 
     public function deleteContainer(string $branch): ?string;
 
-    public function getStatusContainer(String $branch): void;
+    public function getStatusContainer(String $branch): ?string;
 }

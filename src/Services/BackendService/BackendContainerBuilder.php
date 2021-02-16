@@ -50,8 +50,19 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         }
     }
 
-    public function getStatusContainer(string $branch): void
+    public function getStatusContainer(string $branch): ?string
     {
-        // TODO: Implement getStatusContainer() method.
+        $process = new Process(self::STATUS_CONTAINER);
+
+        try {
+            $process->mustRun();
+
+            return $process->getOutput();
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to delete container services for the'.$branch. ' branch. 
+            Reason: '.$exception->getMessage());
+
+            return null;
+        }
     }
 }
