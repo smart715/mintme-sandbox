@@ -69,8 +69,8 @@
                     <b>Bcks:</b>
                     <span :class="[getBackendStatus]"/>
                 </span>
-                <b-button class="btn-sm float-right mr-5 toggle-btn">Create backend services</b-button>
-                <div class="close-btn p-sm-2" @click="close">
+                <b-button @click="createBackendServices" class="btn-sm float-right mr-5 toggle-btn">Create backend services</b-button>
+                <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
                 </div>
             </div>
@@ -155,6 +155,15 @@ export default {
         },
     },
     methods: {
+        createBackendServices: function() {
+            console.log('click');
+            this.$axios.retry.post(this.$routing.generate('create_container'), {
+                branch: this.infoData.panelBranch,
+            })
+                .then((res) => {
+                    console.log(res, 'ok');
+                });
+        },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
