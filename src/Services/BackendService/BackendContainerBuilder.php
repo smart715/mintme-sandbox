@@ -7,10 +7,6 @@ use Symfony\Component\Process\Process;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
-    private const CREATE_CONTAINER = ['sudo', 'create-branch.sh'];
-    private const DELETE_CONTAINER = ['sudo', 'delete-branch.sh'];
-    private const STATUS_CONTAINER = ['sudo', 'list-branch.sh', '-I'];
-
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
@@ -20,7 +16,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function createContainer(string $branch): ?string
     {
-        $process = new Process(self::CREATE_CONTAINER, $branch);
+         $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
             $process->mustRun();
@@ -36,7 +32,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function deleteContainer(string $branch): ?string
     {
-        $process = new Process(self::DELETE_CONTAINER, $branch);
+        $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
             $process->mustRun();
@@ -52,7 +48,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function getStatusContainer(string $branch): ?string
     {
-        $process = new Process(self::STATUS_CONTAINER, $branch);
+        $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
         try {
             $process->mustRun();
