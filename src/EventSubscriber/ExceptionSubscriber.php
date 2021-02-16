@@ -14,17 +14,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /** @codeCoverageIgnore */
 class ExceptionSubscriber implements EventSubscriberInterface
 {
-    /** @var Environment */
-    private $template;
+    private Environment $template;
+    private TranslatorInterface $translator;
 
-    public function __construct(Environment $environment)
+    public function __construct(Environment $environment, TranslatorInterface $translator)
     {
         $this->template = $environment;
+        $this->translator = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -41,7 +43,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundPairException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'PAIR NOT FOUND',
+                    'error_message' => $this->translator->trans('404.pair'),
                 ]),
                 404
             ));
@@ -50,7 +52,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundTokenException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'TOKEN NOT FOUND',
+                    'error_message' => $this->translator->trans('404.token'),
                 ]),
                 404
             ));
@@ -59,7 +61,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundProfileException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'PROFILE DOES NOT EXIST',
+                    'error_message' => $this->translator->trans('404.profile'),
                 ]),
                 404
             ));
@@ -68,7 +70,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundKnowledgeBaseException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'ARTICLE NOT FOUND',
+                    'error_message' => $this->translator->trans('404.article'),
                 ]),
                 404
             ));
@@ -77,7 +79,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         if ($exception instanceof NotFoundPostException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
-                    'error_message' => 'POST NOT FOUND',
+                    'error_message' => $this->translator->trans('404.post'),
                 ]),
                 404
             ));
