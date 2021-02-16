@@ -782,6 +782,7 @@ airdrop.min_amount_participants: 'Minimum amount of participants %minParticipant
 airdrop.add_end_date: 'Add end date'
 airdrop.end_date: 'End date:'
 airdrop.error_message: 'Reward can''t be lower than %minTokenReward% %tokenName% Set higher amount of tokens for airdrop or lower amount of participants.'
+airdrop.actions.error_message: 'You need to select at least one action.'
 airdrop.msg_created: 'Your airdrop was created successfully.'
 airdrop.msg_removed: 'Your airdrop was removed successfully.'
 airdrop.actions.twitter_message: 'Write message on Twitter'
