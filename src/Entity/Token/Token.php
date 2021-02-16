@@ -177,14 +177,14 @@ class Token implements TradebleInterface, ImagineInterface
     protected $lockIn;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
      * @ORM\JoinColumn(nullable=true)
      * @var Crypto|null
      */
     protected $crypto;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
      * @ORM\JoinColumn(nullable=true)
      * @var Crypto|null
      */
