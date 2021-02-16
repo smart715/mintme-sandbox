@@ -6,6 +6,7 @@ use App\Communications\SMS\D7NetworksCommunicatorInterface;
 use App\Communications\SMS\Model\SMS;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use App\Manager\PhoneNumberManagerInterface;
 use App\Utils\RandomNumberInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -88,7 +89,8 @@ class ProfileController extends AbstractFOSRestController
     public function sendPhoneVerificationCode(
         D7NetworksCommunicatorInterface $d7NetworksCommunicator,
         PhoneNumberUtil $numberUtil,
-        RandomNumberInterface $randomNumber
+        RandomNumberInterface $randomNumber,
+        PhoneNumberManagerInterface $phoneNumberManager
     ): View {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -115,11 +117,7 @@ class ProfileController extends AbstractFOSRestController
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
-        if (!$phoneNumber->getAttemptsDate()) {
-            $phoneNumber->setAttemptsDate();
-        }
-        $this->entityManager->persist($phoneNumber);
-        $this->entityManager->flush();
+        $phoneNumberManager->updateNumberAndAttempts($phoneNumber);
 
         return $this->view(Response::HTTP_OK);
     }

@@ -251,3 +251,9 @@ parameters:
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
 
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        daily: 5
+        weekly: 10
+        monthly: 20
+        overall: 50

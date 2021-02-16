@@ -8,4 +8,6 @@ use App\Entity\Profile;
 interface PhoneNumberManagerInterface
 {
     public function getPhoneNumber(Profile $profile): ?PhoneNumber;
+
+    public function updateNumberAndAttempts(PhoneNumber $phoneNumber): void;
 }
