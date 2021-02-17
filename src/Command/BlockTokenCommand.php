@@ -232,8 +232,6 @@ class BlockTokenCommand extends Command
             $token
         );
 
-        $markets = array_push($coinMarkets, $tokenMarket);
-
         if (!$userOption && $tokenOption) {
             $markets = [$tokenMarket];
         }
@@ -241,6 +239,9 @@ class BlockTokenCommand extends Command
         if ($userOption && !$tokenOption) {
             $markets = $coinMarkets;
         }
+
+        $coinMarkets[] = $tokenMarket;
+        $markets = $coinMarkets;
 
         $orders = $this->marketHandler->getPendingOrdersByUser(
             $user,
