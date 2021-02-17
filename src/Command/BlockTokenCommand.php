@@ -226,15 +226,14 @@ class BlockTokenCommand extends Command
     {
         /** @var User $user */
         $user = $token->getOwner();
-        $userMarkets = $this->marketFactory->createUserRelated($user);
         $coinMarkets = $this->marketFactory->getCoinMarkets();
         $tokenMarket = $this->marketFactory->create(
             $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
 
-        $markets = $userMarkets;
-        
+        $markets = array_push($coinMarkets, $tokenMarket);
+
         if (!$userOption && $tokenOption) {
             $markets = [$tokenMarket];
         }
