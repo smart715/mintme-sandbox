@@ -9,5 +9,5 @@ interface PhoneNumberManagerInterface
 {
     public function getPhoneNumber(Profile $profile): ?PhoneNumber;
 
-    public function updateNumberAndAttempts(PhoneNumber $phoneNumber): void;
+    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): void;
 }

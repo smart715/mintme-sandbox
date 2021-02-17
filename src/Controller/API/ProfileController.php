@@ -117,7 +117,9 @@ class ProfileController extends AbstractFOSRestController
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
-        $phoneNumberManager->updateNumberAndAttempts($phoneNumber);
+        if (!$phoneNumber->getEditDate()) {
+            $phoneNumberManager->updateNumberAndAddingAttempts($phoneNumber);
+        }
 
         return $this->view(Response::HTTP_OK);
     }

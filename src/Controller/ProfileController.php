@@ -12,6 +12,7 @@ use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use DateTimeImmutable;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Form\FormInterface;
@@ -54,6 +55,7 @@ class ProfileController extends Controller
         ) {
             $profile->getPhoneNumber()->setVerified(true);
             $profile->getPhoneNumber()->setVerificationCode(null);
+            $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();

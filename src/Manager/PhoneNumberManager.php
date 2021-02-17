@@ -5,8 +5,8 @@ namespace App\Manager;
 use App\Entity\PhoneNumber;
 use App\Entity\Profile;
 use App\Repository\PhoneNumberRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use PHP_CodeSniffer\Standards\Generic\Sniffs\Commenting\TodoSniff;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PhoneNumberManager implements PhoneNumberManagerInterface
@@ -29,16 +29,14 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
         return $this->entityRepository->findOneBy(['profile' => $profile]);
     }
 
-    public function updateNumberAndAttempts(PhoneNumber $phoneNumber): void
+    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): void
     {
-        $phoneNumber->setMonthlyAttempts($phoneNumber->getWeeklyAttempts()+1);
-
-        $dateNow = new \DateTimeImmutable();
+        $dateNow = new DateTimeImmutable();
         $oldDate = $phoneNumber->getAttemptsDate();
 
-        $updDailyLimit = $dateNow->format('D') !== $oldDate->format('D');
-        $updWeeklyLimit = $dateNow->format('W') !== $oldDate->format('W');
-        $updMonthlyLimit = $dateNow->format('M') !== $oldDate->format('M');
+        $updDailyLimit = $oldDate && $dateNow->format('DMY') !== $oldDate->format('DMY');
+        $updWeeklyLimit = $oldDate && $dateNow->format('WY') !== $oldDate->format('WY');
+        $updMonthlyLimit = $oldDate && $dateNow->format('MY') !== $oldDate->format('MY');
 
         if ($updDailyLimit) {
             $phoneNumber->setDailyAttempts(1);
@@ -52,13 +50,15 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
             $phoneNumber->setWeeklyAttempts($phoneNumber->getWeeklyAttempts()+1);
         }
 
-        /** @TODO update attempts date depends on compare date and weeks */
         if ($updMonthlyLimit) {
-            $phoneNumber->setWeeklyAttempts(1);
+            $phoneNumber->setMonthlyAttempts(1);
         } else {
-            $phoneNumber->setWeeklyAttempts($phoneNumber->getWeeklyAttempts()+1);
+            $phoneNumber->setMonthlyAttempts($phoneNumber->getMonthlyAttempts()+1);
         }
 
+        $phoneNumber->setTotalAttempts($phoneNumber->getTotalAttempts()+1);
+
+        $phoneNumber->setAttemptsDate(new DateTimeImmutable());
         $this->entityManager->persist($phoneNumber);
         $this->entityManager->flush();
     }

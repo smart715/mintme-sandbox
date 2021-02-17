@@ -70,6 +70,16 @@ class PhoneNumber
      */
     private ?DateTimeImmutable $attemptsDate = null; // phpcs:ignore
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $editAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private ?DateTimeImmutable $editDate = null; // phpcs:ignore
+
     public function getProfile(): Profile
     {
         return $this->profile;
@@ -174,6 +184,30 @@ class PhoneNumber
     public function setAttemptsDate(?DateTimeImmutable $attemptsDate = null): self
     {
         $this->attemptsDate = $attemptsDate ?? new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getEditAttempts(): int
+    {
+        return $this->editAttempts;
+    }
+
+    public function setEditAttempts(int $editAttempts): self
+    {
+        $this->editAttempts = $editAttempts;
+
+        return $this;
+    }
+
+    public function getEditDate(): ?DateTimeImmutable
+    {
+        return $this->editDate;
+    }
+
+    public function setEditDate(?DateTimeImmutable $editDate): self
+    {
+        $this->editDate = $editDate;
 
         return $this;
     }
