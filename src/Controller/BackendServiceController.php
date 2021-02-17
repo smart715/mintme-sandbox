@@ -27,7 +27,10 @@ class BackendServiceController extends AbstractController
      */
     public function createContainer(Request $request): RedirectResponse
     {
-        $branch = $request->get('branch');
+        $branchFromRequest = $request->get('branch');
+        $branch = '-' === $branchFromRequest
+            ? $request->getHttpHost()
+            : $branchFromRequest;
 
         /** @var string $referer */
         $referer = $request->headers->get('referer');
