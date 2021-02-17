@@ -2,9 +2,11 @@
 
 namespace App\Services\BackendService;
 
+use Symfony\Component\HttpFoundation\Request;
+
 interface BackendContainerBuilderInterface
 {
-    public function createContainer(string $branch): ?string;
+    public function createContainer(Request $request): ?string;
 
     public function deleteContainer(string $branch): ?string;
 

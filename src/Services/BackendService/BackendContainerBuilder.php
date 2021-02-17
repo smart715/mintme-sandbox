@@ -3,20 +3,33 @@
 namespace App\Services\BackendService;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
     private LoggerInterface $logger;
+    private bool $isTestingServer;
+    private KernelInterface $environment;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, bool $isTestingServer, KernelInterface $environment)
     {
         $this->logger = $logger;
+        $this->isTestingServer = $isTestingServer;
+        $this->environment = $environment;
     }
 
-    public function createContainer(string $branch): ?string
+    public function createContainer(Request $request): ?string
     {
-         $process = new Process(['sudo', 'create-branch.sh', $branch]);
+        if ('dev' === $this->environment->getEnvironment() && !$this->isTestingServer) {
+            return null;
+        }
+
+        $host = $request->getHttpHost();
+        $hostExploded =  explode('.', $host);
+        $branch = $hostExploded[1];
+        $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
             $process->mustRun();

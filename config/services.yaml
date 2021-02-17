@@ -672,3 +672,7 @@ services:
         arguments:
             $consumerKey: '%env(TWITTER_API_KEY)%'
             $consumerSecret: '%env(TWITTER_API_SECRET)%'
+
+    App\Services\BackendService\BackendContainerBuilder:
+        arguments:
+            $isTestingServer: '%env(bool:TESTING_SERVER_ENV)%'
