@@ -170,4 +170,4 @@ parameters:
         overall: 50
     edit_phone:
         attempts: 3
-        interval: '30 days'
+        interval: '30D'

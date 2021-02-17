@@ -9,7 +9,6 @@ use App\Exception\ApiBadRequestException;
 use App\Manager\PhoneNumberManagerInterface;
 use App\Utils\RandomNumberInterface;
 use App\Validator\Constraints\AddPhoneNumber;
-use App\Validator\Constraints\AddPhoneNumberValidator;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -18,10 +17,7 @@ use FOS\RestBundle\View\View;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Sirprize\PostalCodeValidator\Validator as PostalCodeValidator;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -96,17 +92,29 @@ class ProfileController extends AbstractFOSRestController
         PhoneNumberUtil $numberUtil,
         RandomNumberInterface $randomNumber,
         PhoneNumberManagerInterface $phoneNumberManager,
-        ParameterBagInterface $parameterBag,
         ValidatorInterface $validator
     ): View {
         /** @var User|null $user */
         $user = $this->getUser();
 
         if (!$user || !$user->getProfile()->getPhoneNumber()) {
-            $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
 
         $phoneNumber = $user->getProfile()->getPhoneNumber();
+        $totalLimit = $this->getParameter('adding_phone_attempts_limit')['overall'];
+
+        /** @TODO=ADD_LOGGING */
+        if ($totalLimit <= $phoneNumber->getTotalAttempts()) {
+            $user->setIsBlocked(true);
+            $phoneNumber->setTotalAttempts(0);
+            $this->entityManager->persist($user);
+            $this->entityManager->persist($phoneNumber);
+            $this->entityManager->flush();
+
+            throw $this->createAccessDeniedException();
+        }
+
         $phoneNumber->setVerificationCode($randomNumber->generateVerificationCode());
 
         $addPhoneNumberConstraint = new AddPhoneNumber();

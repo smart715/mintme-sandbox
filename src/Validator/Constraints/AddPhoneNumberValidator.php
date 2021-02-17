@@ -3,7 +3,6 @@
 namespace App\Validator\Constraints;
 
 use App\Manager\PhoneNumberManagerInterface;
-use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Validator\Constraint;
