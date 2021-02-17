@@ -29,7 +29,17 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
         return $this->entityRepository->findOneBy(['profile' => $profile]);
     }
 
-    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): void
+    public function findByPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber
+    {
+        return $this->entityRepository->findOneBy(['phoneNumber' => $phoneNumber]);
+    }
+
+    public function findByCode(string $code): ?PhoneNumber
+    {
+        return $this->entityRepository->findOneBy(['verificationCode' => $code]);
+    }
+
+    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): PhoneNumber
     {
         $dateNow = new DateTimeImmutable();
         $oldDate = $phoneNumber->getAttemptsDate();
@@ -59,7 +69,7 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
         $phoneNumber->setTotalAttempts($phoneNumber->getTotalAttempts()+1);
 
         $phoneNumber->setAttemptsDate(new DateTimeImmutable());
-        $this->entityManager->persist($phoneNumber);
-        $this->entityManager->flush();
+
+        return $phoneNumber;
     }
 }

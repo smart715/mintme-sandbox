@@ -1266,3 +1266,6 @@ phone_confirmation.form.submit:
 phone_confirmation.send_code:
 phone_confirmation.your_verification_code:
 phone_number.wrong:
+phone_number.add.limit_daily:
+phone_number.add.limit_weekly:
+phone_number.add.limit_monthly:

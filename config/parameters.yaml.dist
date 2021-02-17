@@ -253,7 +253,10 @@ parameters:
 
     # Limits for adding and editing phone number (max attempts)
     adding_phone_attempts_limit:
-        daily: 5
+        daily: 3
         weekly: 10
         monthly: 20
         overall: 50
+    edit_phone:
+        attempts: 3
+        interval: '30 days'

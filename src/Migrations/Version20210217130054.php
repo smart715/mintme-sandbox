@@ -14,7 +14,7 @@ final class Version20210217130054 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'Create table for PhonNumber and add foreign keys and join it to Profile table';
     }
 
     public function up(Schema $schema) : void

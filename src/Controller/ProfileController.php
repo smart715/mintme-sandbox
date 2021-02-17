@@ -56,6 +56,7 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->setVerified(true);
             $profile->getPhoneNumber()->setVerificationCode(null);
             $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
+            $profile->getPhoneNumber()->setEditAttempts(0);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();

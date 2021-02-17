@@ -9,5 +9,9 @@ interface PhoneNumberManagerInterface
 {
     public function getPhoneNumber(Profile $profile): ?PhoneNumber;
 
-    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): void;
+    public function findByPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
+
+    public function findByCode(string $code): ?PhoneNumber;
+
+    public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): PhoneNumber;
 }
