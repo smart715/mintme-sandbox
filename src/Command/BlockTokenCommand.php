@@ -231,17 +231,15 @@ class BlockTokenCommand extends Command
             $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
-
+        
         if (!$userOption && $tokenOption) {
             $markets = [$tokenMarket];
-        }
-
-        if ($userOption && !$tokenOption) {
+        } else if ($userOption && !$tokenOption) {
+            $markets = $coinMarkets;
+        } else {
+            $coinMarkets[] = $tokenMarket;
             $markets = $coinMarkets;
         }
-
-        $coinMarkets[] = $tokenMarket;
-        $markets = $coinMarkets;
 
         $orders = $this->marketHandler->getPendingOrdersByUser(
             $user,
