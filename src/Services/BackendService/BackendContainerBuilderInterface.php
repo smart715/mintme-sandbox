@@ -8,7 +8,7 @@ interface BackendContainerBuilderInterface
 {
     public function createContainer(Request $request): ?string;
 
-    public function deleteContainer(string $branch): ?string;
+    public function deleteContainer(Request $request): ?string;
 
-    public function getStatusContainer(String $branch): ?string;
+    public function getStatusContainer(Request $request): ?string;
 }

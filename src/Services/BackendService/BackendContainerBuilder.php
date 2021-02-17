@@ -22,7 +22,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function createContainer(Request $request): ?string
     {
-        if ('dev' === $this->environment->getEnvironment() && !$this->isTestingServer) {
+        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
             return null;
         }
 
@@ -36,15 +36,22 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             return $process->getOutput();
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to create container services for the'.$branch. ' branch. 
-            Reason: '.$exception->getMessage());
+            $this->logger->error('Failed to create container services for the'.$branch.' branch. Reason: '
+                .$exception->getMessage());
 
             return null;
         }
     }
 
-    public function deleteContainer(string $branch): ?string
+    public function deleteContainer(Request $request): ?string
     {
+        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
+            return null;
+        }
+
+        $host = $request->getHttpHost();
+        $hostExploded =  explode('.', $host);
+        $branch = $hostExploded[1];
         $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
@@ -52,15 +59,24 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             return $process->getOutput();
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to delete container services for the'.$branch. ' branch. 
-            Reason: '.$exception->getMessage());
+            $this->logger->error(
+                'Failed to delete container services for the '.$branch.' branch. Reason: '
+                .$exception->getMessage()
+            );
 
             return null;
         }
     }
 
-    public function getStatusContainer(string $branch): ?string
+    public function getStatusContainer(Request $request): ?string
     {
+        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
+            return null;
+        }
+
+        $host = $request->getHttpHost();
+        $hostExploded =  explode('.', $host);
+        $branch = $hostExploded[1];
         $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
         try {
@@ -68,8 +84,8 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             return $process->getOutput();
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to delete container services for the'.$branch. ' branch. 
-            Reason: '.$exception->getMessage());
+            $this->logger->error('Failed to delete container services for the'.$branch. ' branch. Reason: '
+                .$exception->getMessage());
 
             return null;
         }
