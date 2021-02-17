@@ -730,6 +730,7 @@ airdrop.min_amount_participants: 'Cantidad mínima de participantes: %minPartici
 airdrop.add_end_date: 'Añadir fecha de culminación'
 airdrop.end_date: 'Fecha de culminación:'
 airdrop.error_message: 'La recompensa no puede ser menor a %minTokenReward% %tokenName%. Establezca una mayor cantidad de tokens o menor de participantes para el airdrop.'
+airdrop.actions.error_message: ''
 airdrop.msg_created: 'Su airdrop fue creado satisfactoriamente.'
 airdrop.msg_removed: 'Su airdrop fue removido satisfactoriamente.'
 airdrop.actions.twitter_message: 'Escribir mensaje en Twitter'
@@ -1242,3 +1243,8 @@ donate.disabled: 'Las compras directas están deshabilitadas'
 twitter.sign_in:
 twitter.must_sign_in:
 mail.verification_code: ''
+404.post:
+404.article:
+404.profile:
+404.token:
+404.pair:
