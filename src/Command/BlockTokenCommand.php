@@ -231,24 +231,38 @@ class BlockTokenCommand extends Command
             $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
-        
-        if (!$userOption && $tokenOption) {
-            $markets = [$tokenMarket];
-        } else if ($userOption && !$tokenOption) {
-            $markets = $coinMarkets;
-        } else {
-            $coinMarkets[] = $tokenMarket;
-            $markets = $coinMarkets;
-        }
 
-        $orders = $this->marketHandler->getPendingOrdersByUser(
+        $tokenPendingOrders = array_merge(
+            $this->marketHandler->getPendingSellOrders(
+                $tokenMarket,
+                0,
+                $this->maxActiveOrders
+            ),
+            $this->marketHandler->getPendingBuyOrders(
+                $tokenMarket,
+                0,
+                $this->maxActiveOrders
+            )
+        );
+
+        $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
             $user,
-            $markets,
+            $coinMarkets,
             0,
             $this->maxActiveOrders
         );
 
-        foreach ($orders as $order) {
+        $ordersToCancel = array_merge($tokenPendingOrders, $userPendingOrders);
+
+        if (!$userOption && $tokenOption) {
+            $ordersToCancel = $tokenPendingOrders;
+        }
+
+        if ($userOption && !$tokenOption) {
+            $ordersToCancel = $userPendingOrders;
+        }
+
+        foreach ($ordersToCancel as $order) {
             $market = $order->getMarket();
             $this->exchanger->cancelOrder($market, $order);
         }
