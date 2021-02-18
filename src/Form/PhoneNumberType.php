@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\PhoneNumber;
+use App\Validator\Constraints\EditPhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,6 +29,7 @@ class PhoneNumberType extends AbstractType
             'label' => $this->translator->trans('page.profile.form.phone_number'),
             'constraints' => [
                 new \Misd\PhoneNumberBundle\Validator\Constraints\PhoneNumber(['type' => 'mobile']),
+                new EditPhoneNumber(),
             ],
             'attr' => [
                 'class' => 'd-none',

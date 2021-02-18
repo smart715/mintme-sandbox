@@ -2,8 +2,13 @@
 
 namespace App\Validator\Constraints;
 
+use App\Entity\User;
 use App\Manager\PhoneNumberManagerInterface;
+use libphonenumber\PhoneNumber;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -11,17 +16,28 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EditPhoneNumberValidator extends ConstraintValidator
 {
     private ParameterBagInterface $parameterBag;
-    private PhoneNumberManagerInterface $phoneNumberManager;
     private TranslatorInterface $translator;
+    private User $user;
+    private PhoneNumberUtil $numberUtil;
+    private PhoneNumberManagerInterface $numberManager;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
-        PhoneNumberManagerInterface $phoneNumberManager,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        TokenStorageInterface $token,
+        PhoneNumberUtil $numberUtil,
+        PhoneNumberManagerInterface $numberManager
     ) {
+        /**
+         * @var User $user
+         * @psalm-suppress UndefinedDocblockClass
+         */
+        $user = $token->getToken()->getUser();
+        $this->user = $user;
         $this->parameterBag = $parameterBag;
-        $this->phoneNumberManager = $phoneNumberManager;
         $this->translator = $translator;
+        $this->numberUtil = $numberUtil;
+        $this->numberManager = $numberManager;
     }
 
     /**
@@ -32,9 +48,13 @@ class EditPhoneNumberValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
-        $phoneNumber = $this->phoneNumberManager->findByPhoneNumber($value);
+        $phoneNumber = $this->numberManager->getPhoneNumber($this->user->getProfile());
 
-        if (!$phoneNumber || !$phoneNumber->getEditDate()) {
+        if (!$phoneNumber ||
+            !$phoneNumber->getEditDate() ||
+            $this->numberUtil->format($value, PhoneNumberFormat::E164) ===
+            $this->numberUtil->format($phoneNumber->getPhoneNumber(), PhoneNumberFormat::E164)
+        ) {
             return;
         }
 
