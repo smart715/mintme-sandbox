@@ -4,25 +4,22 @@ namespace App\Services\BackendService;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
     private LoggerInterface $logger;
     private bool $isTestingServer;
-    private KernelInterface $environment;
 
-    public function __construct(LoggerInterface $logger, bool $isTestingServer, KernelInterface $environment)
+    public function __construct(LoggerInterface $logger, bool $isTestingServer)
     {
         $this->logger = $logger;
         $this->isTestingServer = $isTestingServer;
-        $this->environment = $environment;
     }
 
     public function createContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
+        if (!$this->isTestingServer) {
             return null;
         }
 
@@ -45,7 +42,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function deleteContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
+        if (!$this->isTestingServer) {
             return null;
         }
 
@@ -70,7 +67,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function getStatusContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer && 'dev' === $this->environment->getEnvironment()) {
+        if (!$this->isTestingServer) {
             return null;
         }
 
