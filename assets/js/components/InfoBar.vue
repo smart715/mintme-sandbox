@@ -157,7 +157,7 @@ export default {
     methods: {
         createBackendServices: function() {
             console.log('click');
-            this.$axios.retry.get(this.$routing.generate('create_container'))
+            this.$axios.retry.post(this.$routing.generate('create_container'))
                 .then((res) => {
                     console.log(res, 'ok');
                 });

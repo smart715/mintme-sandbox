@@ -4,48 +4,40 @@ namespace App\Services\BackendService;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
     private LoggerInterface $logger;
-    private bool $isTestingServer;
 
-    public function __construct(LoggerInterface $logger, bool $isTestingServer)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->isTestingServer = $isTestingServer;
     }
 
     public function createContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer) {
-            return null;
-        }
-
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[1];
-        $process = new Process(['sudo', 'create-branch.sh', $branch]);
+
+        $process = new Process(['ls']);
 
         try {
             $process->mustRun();
 
-            return $process->getOutput();
-        } catch (\Throwable $exception) {
-            $this->logger->error('Failed to create container services for the'.$branch.' branch. Reason: '
+            echo $process->getOutput();
+        } catch (ProcessFailedException $exception) {
+            $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
-
-            return null;
         }
+
+        return $process->getOutput();
     }
 
     public function deleteContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer) {
-            return null;
-        }
-
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[1];
@@ -67,10 +59,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function getStatusContainer(Request $request): ?string
     {
-        if (!$this->isTestingServer) {
-            return null;
-        }
-
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[1];
