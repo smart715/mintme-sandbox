@@ -87,13 +87,6 @@ class ProfileController extends Controller
             throw new NotFoundProfileException();
         }
 
-        $e164phoneNumber = $profile->getPhoneNumber() ?
-            $this->phoneNumberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164) :
-            null;
-        $phoneIsVerified = $profile->getPhoneNumber()
-            ? $profile->getPhoneNumber()->isVerified()
-            : null;
-
         $clonedProfile = clone $profile;
         $form = $this->createForm(ProfileType::class, $profile);
         $form->handleRequest($request);
@@ -116,13 +109,14 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->setProfile($profile);
         }
 
-        $newPhoneNumber = $this->phoneNumberUtil->format(
-            $profile->getPhoneNumber()->getPhoneNumber(),
-            PhoneNumberFormat::E164
-        );
-        $verifyPhone = !$e164phoneNumber || $newPhoneNumber !== $e164phoneNumber || !$phoneIsVerified;
+        $phoneNumber = $form->get('phoneNumber')->getData()['phoneNumber'];
+
+        $verifyPhone = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164)
+            !== $this->phoneNumberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164)
+            || !$profile->getPhoneNumber()->isVerified();
 
         if ($verifyPhone) {
+            $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
             $profile->getPhoneNumber()->setVerified(false);
             $profile->getPhoneNumber()->setVerificationCode(null);
         }

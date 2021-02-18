@@ -134,6 +134,13 @@
                                                 {% trans %}phone.guide.body{% endtrans %}
                                             </template>
                                         </guide>
+                                        {% if form_errors(form.phoneNumber.phoneNumber)|length > 0 %}
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="bg-danger text-white">{{ form_errors(form.phoneNumber.phoneNumber) }}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
                                         {{ form_widget(form.phoneNumber.phoneNumber, {
                                             'value': profile.phoneNumber
                                                 ? profile.phoneNumber.phoneNumber|phone_number_format('NATIONAL')

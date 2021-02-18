@@ -3,8 +3,6 @@
 namespace App\Validator\Constraints;
 
 use App\Entity\User;
-use App\Manager\PhoneNumberManagerInterface;
-use libphonenumber\PhoneNumber;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -19,14 +17,12 @@ class EditPhoneNumberValidator extends ConstraintValidator
     private TranslatorInterface $translator;
     private User $user;
     private PhoneNumberUtil $numberUtil;
-    private PhoneNumberManagerInterface $numberManager;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
         TranslatorInterface $translator,
         TokenStorageInterface $token,
-        PhoneNumberUtil $numberUtil,
-        PhoneNumberManagerInterface $numberManager
+        PhoneNumberUtil $numberUtil
     ) {
         /**
          * @var User $user
@@ -37,7 +33,6 @@ class EditPhoneNumberValidator extends ConstraintValidator
         $this->parameterBag = $parameterBag;
         $this->translator = $translator;
         $this->numberUtil = $numberUtil;
-        $this->numberManager = $numberManager;
     }
 
     /**
@@ -48,22 +43,24 @@ class EditPhoneNumberValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
-        $phoneNumber = $this->numberManager->getPhoneNumber($this->user->getProfile());
+        $oldPhoneNumber = $this->user->getProfile()->getPhoneNumber();
 
-        if (!$phoneNumber ||
-            !$phoneNumber->getEditDate() ||
+        if (!$oldPhoneNumber ||
+            !$oldPhoneNumber->getEditDate() ||
             $this->numberUtil->format($value, PhoneNumberFormat::E164) ===
-            $this->numberUtil->format($phoneNumber->getPhoneNumber(), PhoneNumberFormat::E164)
+            $this->numberUtil->format($oldPhoneNumber->getPhoneNumber(), PhoneNumberFormat::E164)
         ) {
             return;
         }
 
-        $editDate = $phoneNumber->getEditDate();
+        $editDate = $oldPhoneNumber->getEditDate();
         $possibleEditDate = $editDate->add(
             new \DateInterval('P'.$this->parameterBag->get('edit_phone')['interval'])
         );
 
-        if ($possibleEditDate > $editDate) {
+        if ($possibleEditDate > $editDate ||
+            $oldPhoneNumber->getEditAttempts() >= (int)$this->parameterBag->get('edit_phone')['attempts']
+        ) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{message}}', $this->translator->trans('phone_number.edit.limit'))
                 ->addViolation();
