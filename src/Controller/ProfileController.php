@@ -15,6 +15,7 @@ use App\Utils\Converter\String\StringConverter;
 use DateTimeImmutable;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,8 +51,7 @@ class ProfileController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() &&
-            $form->isValid() &&
-            $form->get('verificationCode')->getData() === $profile->getPhoneNumber()->getVerificationCode()
+            $form->isValid()
         ) {
             $profile->getPhoneNumber()->setVerified(true);
             $profile->getPhoneNumber()->setVerificationCode(null);

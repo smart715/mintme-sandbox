@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Validator\Constraints\PhoneNumberVerificationCode;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -31,6 +32,7 @@ class PhoneVerificationType extends AbstractType
                     'min' => 6,
                     'max' => 6,
                 ]),
+                new PhoneNumberVerificationCode(),
             ],
         ])
         ->add('submit', SubmitType::class, [

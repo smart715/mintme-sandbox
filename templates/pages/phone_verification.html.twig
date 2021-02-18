@@ -18,6 +18,7 @@
                                 {{ form_start(form) }}
                                 <div class="pb-3">
                                     {{ form_label(form.verificationCode) }}
+                                    {{ form_errors(form.verificationCode) }}
                                     <div class="d-flex">
                                         <div class="position-relative h-fit-content d-inline-block flex-grow-1">
                                             {{ form_widget(form.verificationCode) }}

@@ -53,12 +53,12 @@ class EditPhoneNumberValidator extends ConstraintValidator
             return;
         }
 
-        $editDate = $oldPhoneNumber->getEditDate();
-        $possibleEditDate = $editDate->add(
+        $now = new \DateTimeImmutable();
+        $possibleEditDate = $oldPhoneNumber->getEditDate()->add(
             new \DateInterval('P'.$this->parameterBag->get('edit_phone')['interval'])
         );
 
-        if ($possibleEditDate > $editDate ||
+        if ($possibleEditDate > $now ||
             $oldPhoneNumber->getEditAttempts() >= (int)$this->parameterBag->get('edit_phone')['attempts']
         ) {
             $this->context->buildViolation($constraint->message)

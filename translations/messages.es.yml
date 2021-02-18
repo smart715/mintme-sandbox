@@ -1264,6 +1264,7 @@ phone_confirmation.header:
 phone_confirmation.form.verification_code:
 phone_confirmation.form.submit:
 phone_confirmation.send_code:
+phone_confirmation.invalid_code:
 phone_confirmation.your_verification_code:
 phone_number.wrong:
 phone_number.add.limit_daily:
