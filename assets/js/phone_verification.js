@@ -1,11 +1,26 @@
 import i18n from './utils/i18n/i18n';
 import {HTTP_OK} from './utils/constants';
 import {NotificationMixin} from './mixins/';
+import {minLength, maxLength} from 'vuelidate/lib/validators';
+import {phoneVerificationCode} from './utils/constants';
 
 new Vue({
     el: '#phone-verification',
     i18n,
     mixins: [NotificationMixin],
+    data() {
+        return {
+            code: '',
+        };
+    },
+    mounted() {
+        this.code = this.$refs.code.getAttribute('value');
+    },
+    computed: {
+        disableSave: function() {
+            return this.$v.$invalid;
+        },
+    },
     methods: {
         sendVerificationCode: function() {
             this.$axios.single.get(this.$routing.generate('send_phone_verification_code'))
@@ -21,5 +36,14 @@ new Vue({
                     this.notifyError(this.$t('toasted.error.try_later'));
                 });
         },
+    },
+    validations() {
+        return {
+            code: {
+                helpers: phoneVerificationCode,
+                minLength: minLength(6),
+                maxLength: maxLength(6),
+            },
+        };
     },
 });
