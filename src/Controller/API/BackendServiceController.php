@@ -8,7 +8,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Rest\Route("/api/backend_servie")
+ * @Rest\Route("/api/backend_service")
  */
 class BackendServiceController extends AbstractFOSRestController
 {
