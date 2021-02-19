@@ -91,20 +91,15 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     private function isManagingBackendServices(string $branch): bool
     {
-        $deleteLockFileCommand = '[^-f^/tmp/delete-%branch%.lock^]^&&^echo^1^||^echo^0';
-        $createLockFileCommand = '[^-f^/tmp/create-%branch%.lock^]^&&^echo^1^||^echo^0';
-
-        $lockFilesCommands = str_replace('%branch%', $branch, [$createLockFileCommand, $deleteLockFileCommand]);
-
-        $checkDeleteLockFileProcess = new Process(explode('^', $lockFilesCommands[0]));
-        $checkCreateLockFileProcess = new Process(explode('^', $lockFilesCommands[1]));
+        $checkLockFilesCommand = '[^-f^/tmp/delete-branch-%branch%.lock^]^'
+            .'||^[^-f^/tmp/create-branch-%branch%.lock^]^&&^echo^1^||^echo^0';
+        $lockFilesCommands = str_replace('%branch%', $branch, $checkLockFilesCommand);
+        $checkLockFilesProcess = new Process(explode('^', $lockFilesCommands[0]));
 
         try {
-            $checkCreateLockFileProcess->mustRun();
-            $checkDeleteLockFileProcess->mustRun();
+            $checkLockFilesProcess->mustRun();
 
-            return false !== strpos($checkCreateLockFileProcess->getOutput(), '1') ||
-                false !== strpos($checkDeleteLockFileProcess->getOutput(), '1');
+            return false !== strpos($checkLockFilesProcess->getOutput(), '1');
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed getting the lock file for  '.$branch.' branch. Reason: '
