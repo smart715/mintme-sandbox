@@ -57,9 +57,9 @@ class BackendServiceController extends AbstractFOSRestController
      *     options={"expose"=true}
      *     )
      * @param Request $request
-     * @return string|null
+     * @return int|null
      */
-    public function statusContainer(Request $request): ?string
+    public function statusContainer(Request $request): ?int
     {
         return $this->backendContainerBuilder->getStatusContainer($request);
     }

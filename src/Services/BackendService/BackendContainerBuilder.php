@@ -63,22 +63,55 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         }
     }
 
-    public function getStatusContainer(Request $request): ?string
+    public function getStatusContainer(Request $request): ?int
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
+
+        if ($this->isManagingBackendServices($branch)) {
+            return 2;
+        }
+
         $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
         try {
             $process->mustRun();
 
-            return $process->getOutput();
+            return 'no matched branch was found' === $process->getOutput()
+                ? 0
+                : 1;
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to delete container services for the'.$branch. ' branch. Reason: '
+            $this->logger->error('Failed getting the container status for the'.$branch. ' branch. Reason: '
                 .$exception->getMessage());
 
             return null;
+        }
+    }
+
+    private function isManagingBackendServices(string $branch): bool
+    {
+        $deleteLockFileCommand = '[^-f^/tmp/delete-%branch%.lock^]^&&^echo^1^||^echo^0';
+        $createLockFileCommand = '[^-f^/tmp/create-%branch%.lock^]^&&^echo^1^||^echo^0';
+
+        $lockFilesCommands = str_replace('%branch%', $branch, [$createLockFileCommand, $deleteLockFileCommand]);
+
+        $checkDeleteLockFileProcess = new Process(explode('^', $lockFilesCommands[0]));
+        $checkCreateLockFileProcess = new Process(explode('^', $lockFilesCommands[1]));
+
+        try {
+            $checkCreateLockFileProcess->mustRun();
+            $checkDeleteLockFileProcess->mustRun();
+
+            return 1 === (int)$checkCreateLockFileProcess->getOutput() ||
+                    1 === (int)$checkDeleteLockFileProcess->getOutput();
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                'Failed getting the lock file for  '.$branch.' branch. Reason: '
+                .$exception->getMessage()
+            );
+
+            return false;
         }
     }
 }
