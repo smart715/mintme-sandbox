@@ -60,6 +60,12 @@ class ProfileController extends Controller
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
+            $this->userActionLogger->info(
+                'Phone number '.$this->phoneNumberUtil->format(
+                    $profile->getPhoneNumber()->getPhoneNumber(),
+                    PhoneNumberFormat::E164
+                ).' verified.'
+            );
 
             return $this->redirectToRoute('profile');
         }
@@ -110,10 +116,14 @@ class ProfileController extends Controller
         }
 
         $phoneNumber = $form->get('phoneNumber')->getData()['phoneNumber'];
+        $oldPhoneE164 = $this->phoneNumberUtil->format(
+            $profile->getPhoneNumber()->getPhoneNumber(),
+            PhoneNumberFormat::E164
+        );
+        $newPhoneE164 = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164);
+        $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
 
-        $verifyPhone = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164)
-            !== $this->phoneNumberUtil->format($profile->getPhoneNumber()->getPhoneNumber(), PhoneNumberFormat::E164)
-            || !$profile->getPhoneNumber()->isVerified();
+        $verifyPhone = $phoneChanged || !$profile->getPhoneNumber()->isVerified();
 
         if ($verifyPhone) {
             $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
@@ -137,6 +147,12 @@ class ProfileController extends Controller
         }
 
         $this->userActionLogger->info('Edit profile');
+
+        if ($phoneChanged) {
+            $this->userActionLogger->info(
+                'Phone number changed. From: '.$oldPhoneE164. '. To: '.$newPhoneE164.' (not verified yet)'
+            );
+        }
 
         if ($verifyPhone) {
             return $this->redirectToRoute('phone_verification');

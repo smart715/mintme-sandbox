@@ -6,6 +6,7 @@ use App\Communications\SMS\D7NetworksCommunicatorInterface;
 use App\Communications\SMS\Model\SMS;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
+use App\Logger\UserActionLogger;
 use App\Manager\PhoneNumberManagerInterface;
 use App\Utils\RandomNumberInterface;
 use App\Validator\Constraints\AddPhoneNumber;
@@ -28,11 +29,16 @@ class ProfileController extends AbstractFOSRestController
 {
     private TranslatorInterface $translator;
     private EntityManagerInterface $entityManager;
+    private UserActionLogger $userActionLogger;
 
-    public function __construct(TranslatorInterface $translator, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        EntityManagerInterface $entityManager,
+        UserActionLogger $userActionLogger
+    ) {
         $this->translator = $translator;
         $this->entityManager = $entityManager;
+        $this->userActionLogger = $userActionLogger;
     }
 
     /**
@@ -135,6 +141,7 @@ class ProfileController extends AbstractFOSRestController
 
         try {
             $d7NetworksCommunicator->send($sms);
+            $this->userActionLogger->info('Phone number verification code requested.');
         } catch (\Throwable $e) {
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
