@@ -235,7 +235,7 @@
                             </div>
                         </template>
                         <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        && tokens.length < perPage">
+                        && tokens.length && tokens.length < perPage">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
