@@ -78,7 +78,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         try {
             $process->mustRun();
 
-            return 'no matched branch was found' === $process->getOutput()
+            return false !== strpos($process->getOutput(), 'no matched branch was found')
                 ? 0
                 : 1;
         } catch (\Throwable $exception) {
@@ -103,8 +103,8 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             $checkCreateLockFileProcess->mustRun();
             $checkDeleteLockFileProcess->mustRun();
 
-            return 1 === (int)$checkCreateLockFileProcess->getOutput() ||
-                    1 === (int)$checkDeleteLockFileProcess->getOutput();
+            return false !== strpos($checkCreateLockFileProcess->getOutput(), '1') ||
+                false !== strpos($checkDeleteLockFileProcess->getOutput(), '1');
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed getting the lock file for  '.$branch.' branch. Reason: '
