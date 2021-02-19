@@ -65,11 +65,11 @@
                     <b>Tcuc:</b>
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Status of backend services">
-                    <b>Bcks:</b>
-                    <span :class="[getBackendStatus]"/>
-                </span>
-                <b-button @click="createBackendServices" class="btn-sm float-right mr-5 toggle-btn">Create backend services</b-button>
+                <b-button
+                    @click="createBackendServices"
+                    class="btn-sm float-right mr-5 toggle-btn">
+                    Create backend services
+                </b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
                 </div>
@@ -101,16 +101,6 @@ export default {
                     'payment': null,
                     'market': null,
                     'contract-update': null,
-                },
-                backendServices: {
-                    DgS: null,
-                    Tgs: null,
-                    WgS: null,
-                    DgC: null,
-                    WgC: null,
-                    MgC: null,
-                    TgC: null,
-                    TgUC: null,
                 },
                 isTokenContractActive: false,
             },
