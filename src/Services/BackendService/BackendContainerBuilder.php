@@ -20,9 +20,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
-        $branch = $hostExploded[1];
+        $branch = $hostExploded[0];
 
-        $process = new Process(['ls']);
+        $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
             $process->mustRun();
@@ -40,11 +40,17 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
-        $branch = $hostExploded[1];
+        $branch = $hostExploded[0];
         $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
-            $process->mustRun();
+            $process->mustRun(function ($type, $buffer): void {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                } else {
+                    echo 'OUT > '.$buffer;
+                }
+            });
 
             return $process->getOutput();
         } catch (\Throwable $exception) {
@@ -61,7 +67,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
-        $branch = $hostExploded[1];
+        $branch = $hostExploded[0];
         $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
         try {
