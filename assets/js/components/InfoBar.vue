@@ -67,9 +67,9 @@
                 </span>
                 <b-button
                     @click="createBackendServices"
-                    class="btn-sm float-right mr-5 toggle-btn">
-                    getButtonName
-                </b-button>
+                    class="btn-sm float-right mr-5 toggle-btn"
+                    v-text="getButtonName"
+                ></b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
                 </div>
@@ -119,6 +119,7 @@ export default {
             .then((res) => {
                 this.infoData = res.data;
             });
+        this.fetchBackendServiceStatus();
 
         if (this.username) {
             this.fetchBalance();
@@ -152,6 +153,7 @@ export default {
         fetchBackendServiceStatus: function() {
           this.$axios.get(this.$routing.generate('status_container'))
               .then((res) => {
+                  console.log(res, 'fetch');
                   this.backendServiceStatus = res.data;
               });
         },
@@ -160,6 +162,7 @@ export default {
             this.$axios.retry.post(this.$routing.generate('create_container'))
                 .then((res) => {
                     this.fetchBackendServiceStatus();
+                    console.log(this.backendServiceStatus);
                     console.log(res, 'ok');
                 });
         },
