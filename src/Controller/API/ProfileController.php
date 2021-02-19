@@ -100,6 +100,8 @@ class ProfileController extends AbstractFOSRestController
         PhoneNumberManagerInterface $phoneNumberManager,
         ValidatorInterface $validator
     ): View {
+        $this->denyAccessUnlessGranted('not-blocked');
+
         /** @var User|null $user */
         $user = $this->getUser();
 

@@ -47,6 +47,13 @@ class ProfileController extends Controller
         $user = $this->getUser();
         $profile = $user->getProfile();
 
+        if (!$profile->getPhoneNumber()) {
+            return $this->redirectToRoute('profile-view', [
+                'nickname' => $profile->getNickname(),
+                'edit' => true,
+            ]);
+        }
+
         $form = $this->createForm(PhoneVerificationType::class);
         $form->handleRequest($request);
 
@@ -111,21 +118,23 @@ class ProfileController extends Controller
             $profile->setNextReminderDate(new \DateTime('+1 month'));
         }
 
-        if ($profile->getPhoneNumber()) {
-            $profile->getPhoneNumber()->setProfile($profile);
-        }
-
         $phoneNumber = $form->get('phoneNumber')->getData()['phoneNumber'];
-        $oldPhoneE164 = $this->phoneNumberUtil->format(
+        $oldPhoneE164 = $profile->getPhoneNumber() ? $this->phoneNumberUtil->format(
             $profile->getPhoneNumber()->getPhoneNumber(),
             PhoneNumberFormat::E164
-        );
+        ) : null;
         $newPhoneE164 = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164);
         $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
 
         $verifyPhone = $phoneChanged || !$profile->getPhoneNumber()->isVerified();
 
         if ($verifyPhone) {
+            if (!$oldPhoneE164) {
+                $profile->setPhoneNumber(new PhoneNumber());
+                $profile->getPhoneNumber()->setProfile($profile);
+            }
+
+            $profile->getPhoneNumber()->setProfile($profile);
             $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
             $profile->getPhoneNumber()->setVerified(false);
             $profile->getPhoneNumber()->setVerificationCode(null);
