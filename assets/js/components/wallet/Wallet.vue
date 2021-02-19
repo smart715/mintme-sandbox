@@ -453,13 +453,12 @@ export default {
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
-            this.withdraw.fee = fee ? toMoney(fee, subunit) : null;
+            this.withdraw.fee = fee ? toMoney(fee) : null;
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
                 isToken
                     ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
-                    : 0,
-                subunit
+                    : 0
             );
             this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
