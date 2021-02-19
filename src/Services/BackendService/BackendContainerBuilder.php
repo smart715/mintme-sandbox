@@ -107,7 +107,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                 .$exception->getMessage()
             );
 
-            return false;
+            return '';
         }
     }
 }
