@@ -68,7 +68,7 @@
                 <b-button
                     @click="createBackendServices"
                     class="btn-sm float-right mr-5 toggle-btn">
-                    Create backend services
+                    getButtonName
                 </b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
@@ -104,6 +104,7 @@ export default {
                 },
                 isTokenContractActive: false,
             },
+            backendServiceStatus: null,
             balance: {
                 WEB: null,
                 BTC: null,
@@ -125,6 +126,9 @@ export default {
         }
     },
     computed: {
+        getButtonName: function() {
+          return !this.backendServiceStatus ? 'Create Backend Service' : 'Delete Backend Service';
+        },
         mintmeBalance: function() {
             return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
         },
@@ -145,10 +149,17 @@ export default {
         },
     },
     methods: {
+        fetchBackendServiceStatus: function() {
+          this.$axios.get(this.$routing.generate('status_container'))
+              .then((res) => {
+                  this.backendServiceStatus = res.data;
+              });
+        },
         createBackendServices: function() {
-            console.log('click');
+            console.log('creating services...');
             this.$axios.retry.post(this.$routing.generate('create_container'))
                 .then((res) => {
+                    this.fetchBackendServiceStatus();
                     console.log(res, 'ok');
                 });
         },
