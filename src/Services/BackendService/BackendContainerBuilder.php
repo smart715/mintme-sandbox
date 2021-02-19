@@ -68,8 +68,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
+        $this->logger->error('testing gustavo'.$this->isManagingBackendServices($branch));
 
-        if ($this->isManagingBackendServices($branch)) {
+        if ('1' === $this->isManagingBackendServices($branch)) {
             return 2;
         }
 
@@ -89,17 +90,17 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         }
     }
 
-    private function isManagingBackendServices(string $branch): bool
+    private function isManagingBackendServices(string $branch): string
     {
         $checkLockFilesCommand = '[^-f^/tmp/delete-branch-%branch%.lock^]^'
             .'||^[^-f^/tmp/create-branch-%branch%.lock^]^&&^echo^1^||^echo^0';
         $lockFilesCommands = str_replace('%branch%', $branch, $checkLockFilesCommand);
-        $checkLockFilesProcess = new Process(explode('^', $lockFilesCommands[0]));
+        $checkLockFilesProcess = new Process(explode('^', $lockFilesCommands));
 
         try {
             $checkLockFilesProcess->mustRun();
 
-            return false !== strpos($checkLockFilesProcess->getOutput(), '1');
+            return $checkLockFilesProcess->getOutput();
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed getting the lock file for  '.$branch.' branch. Reason: '
