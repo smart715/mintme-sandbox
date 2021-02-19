@@ -66,7 +66,7 @@
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
                 <b-button
-                    @click="createBackendServices"
+                    @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     v-text="getButtonName"
                 ></b-button>
@@ -150,12 +150,18 @@ export default {
         },
     },
     methods: {
+        manageBackendService: function() {
+            !this.backendServiceStatus ?
+                this.createBackendServices() :
+                this.deleteBackendServices();
+        },
         fetchBackendServiceStatus: function() {
-          this.$axios.get(this.$routing.generate('status_container'))
-              .then((res) => {
-                  console.log(res, 'fetch');
-                  this.backendServiceStatus = res.data;
-              });
+            console.log('fetching services status...');
+            this.$axios.retry.get(this.$routing.generate('status_container'))
+                .then((res) => {
+                    console.log(res, 'fetch');
+                    this.backendServiceStatus = res.data;
+                });
         },
         createBackendServices: function() {
             console.log('creating services...');
@@ -163,7 +169,16 @@ export default {
                 .then((res) => {
                     this.fetchBackendServiceStatus();
                     console.log(this.backendServiceStatus);
-                    console.log(res, 'ok');
+                    console.log(res, 'created');
+                });
+        },
+        deleteBackendServices: function() {
+            console.log('deleting services...');
+            this.$axios.retry.post(this.$routing.generate('delete_container'))
+                .then((res) => {
+                    this.fetchBackendServiceStatus();
+                    console.log(this.backendServiceStatus);
+                    console.log(res, 'deleted');
                 });
         },
         fetchBalance: function() {
@@ -205,6 +220,10 @@ export default {
 .circle-info-on
     @extend .circle-info
     background-color: green
+
+.circle-info-waring
+    @extend .circle-info
+    background-color: darkorange
 
 .resize-btn
     position: absolute
