@@ -203,7 +203,7 @@ class PostsController extends AbstractFOSRestController
 
         $post = $comment->getPost();
 
-        if ($user->getId() !== $post->getAuthor()->getId()) {
+        if ($user->getId() !== $post->getToken()->getOwner()->getId()) {
             $this->denyAccessUnlessGranted('edit', $comment);
         }
 

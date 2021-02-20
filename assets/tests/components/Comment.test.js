@@ -116,7 +116,7 @@ describe('Comments', () => {
             propsData: {
                 comment: testComment,
                 post: testPost,
-                authUsername: 'bagdarrell'
+                authUsername: 'bagdarrell',
             },
         });
 
