@@ -61,9 +61,9 @@
             @confirm="deleteComment"
             @close="closeModal"
         >
-          <p class="text-white modal-title pt-2">
-            {{ $t('comment.delete') }}
-          </p>
+            <p class="text-white modal-title pt-2">
+                {{ $t('comment.delete') }}
+            </p>
         </confirm-modal>
         <p
             v-if="!editing"
