@@ -47,6 +47,27 @@ const testComment = {
     },
 };
 
+const testPost = {
+    id: 1,
+    amount: '0',
+    content: 'foo',
+    title: 'Test',
+    shareReward: '0',
+    isUserAlreadyRewarded: false,
+    createdAt: '2016-01-01T23:35:01',
+    author: {
+        firstName: 'John',
+        lastName: 'Doe',
+        page_url: 'testPageUrl',
+        nickname: 'John',
+        image: {avatar_small: ''},
+    },
+    token: {
+        name: 'tok',
+        ownerId: 1,
+    },
+};
+
 describe('Comments', () => {
     beforeEach(() => {
         moxios.install();
@@ -62,6 +83,7 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comment: testComment,
+                post: testPost,
             },
         });
 
@@ -77,11 +99,29 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comment,
+                post: testPost,
             },
         });
 
         expect(wrapper.find('.delete-icon').exists()).toBe(true);
         expect(wrapper.find('.comment-edit-icon').exists()).toBe(true);
+    });
+
+    it('show only delete icon for the owner of token', () => {
+        const localVue = mockVue();
+        let post = Object.assign({}, testPost);
+        post.author.nickname = 'bagdarrell';
+        const wrapper = shallowMount(Comment, {
+            localVue,
+            propsData: {
+                comment: testComment,
+                post: testPost,
+                authUsername: 'bagdarrell'
+            },
+        });
+
+        expect(wrapper.find('.delete-icon').exists()).toBe(true);
+        expect(wrapper.find('.comment-edit-icon').exists()).toBe(false);
     });
 
     it('shows comment content if editing is false', () => {
@@ -90,6 +130,7 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comment: testComment,
+                post: testPost,
             },
         });
 
@@ -102,6 +143,7 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comment: testComment,
+                post: testPost,
             },
         });
 
@@ -116,6 +158,7 @@ describe('Comments', () => {
             propsData: {
                 comment: testComment,
                 loggedIn: true,
+                post: testPost,
             },
         });
 
@@ -140,6 +183,7 @@ describe('Comments', () => {
             propsData: {
                 comment,
                 loggedIn: true,
+                post: testPost,
             },
         });
 
@@ -172,6 +216,7 @@ describe('Comments', () => {
             propsData: {
                 comment: testComment,
                 loggedIn: false,
+                post: testPost,
             },
         });
 

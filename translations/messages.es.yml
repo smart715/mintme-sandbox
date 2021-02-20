@@ -720,6 +720,7 @@ post_form.msg.title.max_length:
 post_form.backend.no_token:
 posts.all: 'Todas las publicaciones'
 comment.created:
+comment.delete:
 comment.deleted:
 comment.edited:
 comment.liked:

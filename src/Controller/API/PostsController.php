@@ -195,7 +195,17 @@ class PostsController extends AbstractFOSRestController
      */
     public function deleteComment(Comment $comment): View
     {
-        $this->denyAccessUnlessGranted('edit', $comment);
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $post = $comment->getPost();
+
+        if ($user->getId() !== $post->getAuthor()->getId()) {
+            $this->denyAccessUnlessGranted('edit', $comment);
+        }
 
         $this->entityManager->remove($comment);
         $this->entityManager->flush();

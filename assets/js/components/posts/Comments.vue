@@ -17,6 +17,8 @@
                     :key="i"
                     :index="i"
                     :logged-in="loggedIn"
+                    :auth-username="authUsername"
+                    :post="post"
                     @delete-comment="$emit('delete-comment', $event)"
                 />
             </template>
@@ -46,6 +48,8 @@ export default {
         postId: Number,
         loggedIn: Boolean,
         tokenName: String,
+        authUsername: String,
+        post: Object,
     },
     computed: {
         commentsCount() {

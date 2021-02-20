@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {%  set loggedIn = app.user ? 'true' : 'false' %}
+{% set authUsername = app.user ? app.user.profile.nickname : '' %}
 
 {% block content %}
     <div id="show_post" class="container">
@@ -23,6 +24,8 @@
                                     :post-id="{{ post.id }}"
                                     token-name="{{ post.token.name }}"
                                     :logged-in="{{ loggedIn }}"
+                                    auth-username="{{ authUsername }}"
+                                    :post="{{ post | json_encode }}"
                                     @delete-comment="deleteComment"
                                     @new-comment="newComment"
                                 ></comments>

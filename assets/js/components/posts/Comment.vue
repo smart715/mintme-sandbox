@@ -16,12 +16,27 @@
                 {{ date }}
             </span>
             <template
-                v-if="comment.editable"
+                v-if="post.author.nickname === authUsername && !comment.editable"
             >
                 <button
                     class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
                     :disabled="deleteDisabled"
-                    @click="deleteComment"
+                    @click="showModal"
+                >
+                    <font-awesome-icon
+                        class="icon-default c-pointer align-middle"
+                        icon="trash"
+                        transform="shrink-4 up-1.5"
+                    />
+                </button>
+            </template>
+            <template
+                v-else-if="comment.editable"
+            >
+                <button
+                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                    :disabled="deleteDisabled"
+                    @click="showModal"
                 >
                     <font-awesome-icon
                         class="icon-default c-pointer align-middle"
@@ -41,6 +56,15 @@
                 </button>
             </template>
         </div>
+        <confirm-modal
+            :visible="isModalVisible"
+            @confirm="deleteComment"
+            @close="closeModal"
+        >
+          <p class="text-white modal-title pt-2">
+            {{ $t('comment.delete') }}
+          </p>
+        </confirm-modal>
         <p
             v-if="!editing"
             v-html="comment.content"
@@ -74,6 +98,7 @@ import {faEdit, faTrash, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
 import {NotificationMixin} from '../../mixins';
+import ConfirmModal from '../modal/ConfirmModal';
 
 library.add(faEdit);
 library.add(faTrash);
@@ -87,11 +112,15 @@ export default {
     components: {
         FontAwesomeIcon,
         CommentForm,
+        ConfirmModal,
     },
     props: {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
+        authUsername: String,
+        post: Object,
+        isModalVisible: false,
     },
     data() {
         return {
@@ -151,6 +180,12 @@ export default {
                     this.notifyError('Error liking comment.');
                 })
                 .finally(() => this.liking = false);
+        },
+        showModal() {
+            this.isModalVisible = true;
+        },
+        closeModal() {
+            this.isModalVisible = false;
         },
     },
 };

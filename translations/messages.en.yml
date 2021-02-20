@@ -772,6 +772,7 @@ post_form.msg.title.max_length: 'Title can''t be more than %maxTitleLength% char
 post_form.backend.no_token: 'Current user has not created a token'
 posts.all: 'All Posts'
 comment.created: 'Comment created.'
+comment.delete: 'Are you sure you want to permanently delete this comment?'
 comment.deleted: 'Comment deleted.'
 comment.edited: 'Comment edited.'
 comment.liked: 'Liked comment.'
