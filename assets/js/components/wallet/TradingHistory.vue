@@ -156,7 +156,7 @@ export default {
 
                 return {
                     date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
-                    side: this.getSideByType(history.side, isDonationOrder) === 'Buy' ? this.$t('buy') : this.$t('sell'),
+                    side: this.getSideByType(history.side, isDonationOrder),
                     name: isDonationOrder ? this.rebrandingFunc(history.market.quote) : this.pairNameFunc(
                         this.rebrandingFunc(history.market.base),
                         this.rebrandingFunc(history.market.quote)
