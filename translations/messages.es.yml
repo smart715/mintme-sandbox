@@ -13,6 +13,7 @@ footer.press: ''
 footer.wallet: ''
 footer.explorer: ''
 footer.pool: ''
+footer.coin: ''
 api.page.title: 'Documentación de la API'
 api.page.v2.body.1: 'Todas las solicitudes de la API abierta no requieren autenticación. Todas las solicitudes de la API no abiertas deben estar provistas de claves únicas para la API, que puede generar en'
 api.page.v2.body.2: 'o con un token OAuth.'
@@ -517,8 +518,8 @@ log_in: 'Iniciar Sesión'
 sign_up: Registrarse
 log_out: 'Cerrar Sesión'
 rights_reserved: 'Copyright 2018-%date% mintMe. Todos los derechos reservados'
-terms_of_service: 'Términos de Servicio'
-privacy_policy: 'Política de Privacidad'
+terms_of_service: 'Términos&nbsp;de&nbsp;Servicio'
+privacy_policy: 'Política&nbsp;de&nbsp;Privacidad'
 'yes': Si
 'no': 'No'
 anonymous: Anónimo
@@ -539,7 +540,7 @@ settings: 'settings'
 sell: Venta
 mintme: MINTME
 btc: BTC
-welcome: '¡Bienvenido a <strong>mintMe</strong>'
+welcome: '¡Bienvenido a'
 go_trading: 'Ir a Mercados'
 hacker_menu.title: 'HACKER MENU'
 hacker_menu.tester_widget: 'Tester widget show/hide'

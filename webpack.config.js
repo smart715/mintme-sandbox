@@ -21,7 +21,6 @@ Encore
     .addEntry('token_creation', './assets/js/token_creation.js')
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
-    .addEntry('mail', './assets/scss/mail.sass')
     .addEntry('concord-bold', './assets/fonts/Concord-Bold.ttf')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
