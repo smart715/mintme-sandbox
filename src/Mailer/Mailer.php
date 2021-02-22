@@ -403,6 +403,12 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $textBody = $this->twigEngine->render("mail/knowledge_base_suggestions.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $token->getName(),
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+            'deployUrl' => $deployUrl,
         ]);
 
         $subject = $this->translator->trans('email.what_now');
