@@ -7,6 +7,7 @@
             :default-country-code="countryCode"
             dark
             showCodeOnList
+            noValidation
         />
         <div v-if="false === isValid && this.phone" class="text-danger text-center">
             {{ $t('phone_number.wrong') }}
