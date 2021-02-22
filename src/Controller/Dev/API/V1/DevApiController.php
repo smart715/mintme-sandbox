@@ -42,6 +42,11 @@ abstract class DevApiController extends AbstractFOSRestController
     {
         $baseEntity = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
         $quoteEntity = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
+
+        if (is_null($baseEntity) || is_null($quoteEntity)) {
+            throw new ApiNotFoundException('Market not found');
+        }
+
         $market = new Market($baseEntity, $quoteEntity);
 
         return $market->isTokenCryptoMarket();
