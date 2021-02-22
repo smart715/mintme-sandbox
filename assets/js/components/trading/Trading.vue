@@ -463,9 +463,9 @@ export default {
         },
         shouldShowAll: function() {
             return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
-                && this.tokens.length 
-                && this.tokens.length < this.perPage
-        }
+                && this.tokens.length
+                && this.tokens.length < this.perPage;
+        },
     },
     mounted() {
         this.initialLoad();
