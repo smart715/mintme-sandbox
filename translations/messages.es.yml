@@ -690,7 +690,6 @@ post.not_logged: 'Para ver esta publicación necesita tener'
 post.delete: '¿Realmente desea eliminar esta publicación?'
 post.not_found:
 post.edited:
-post.delete.error:
 post.share:
 post.share.reward:
 post.share.sign_in_twitter:
