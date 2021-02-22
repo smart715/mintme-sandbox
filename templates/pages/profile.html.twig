@@ -70,7 +70,7 @@
                                         {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
                                     </div>
                                 {% endif %}
-                                {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified %}
+                                {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified and canEdit %}
                                     <div class="pb-1">
                                         {% trans %}page.profile.form.phone_number{% endtrans %} {{ profile.phoneNumber.phoneNumber|phone_number_format('E164') }}
                                     </div>
