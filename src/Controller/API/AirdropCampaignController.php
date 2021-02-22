@@ -14,6 +14,7 @@ use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\AirdropCampaignActions;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -141,6 +142,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             $participants,
             $endDate
         );
+
+        $actionsData = $this->transformData($actions, $actionsData, $airdrop);
 
         foreach ($actions as $action => $active) {
             if ($active) {
@@ -324,5 +327,31 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         return $token;
+    }
+
+
+    private function transformData(array $actions, array $actionsData, Airdrop $airdrop): array
+    {
+        if ($actions[AirdropCampaignActions::TWITTER_RETWEET]) {
+            $matches = [];
+
+            preg_match(
+                '/^(?:https?:\/\/)?(?:www\.)?twitter\.com\/[\S]+\/status\/([\d]+)$/',
+                $actionsData[AirdropCampaignActions::TWITTER_RETWEET],
+                $matches
+            );
+
+            $actionsData[AirdropCampaignActions::TWITTER_RETWEET] = $matches[1];
+        }
+
+        if ($actions[AirdropCampaignActions::YOUTUBE_SUBSCRIBE]) {
+            $actionsData[AirdropCampaignActions::YOUTUBE_SUBSCRIBE] = $airdrop->getToken()->getYoutubeChannelId();
+        }
+
+        if ($actions[AirdropCampaignActions::FACEBOOK_PAGE]) {
+            $actionsData[AirdropCampaignActions::FACEBOOK_PAGE] = $airdrop->getToken()->getFacebookUrl();
+        }
+
+        return $actionsData;
     }
 }
