@@ -90,14 +90,15 @@ class ProfileController extends Controller
         bool $edit
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
+
+        if (null === $profile) {
+            throw new NotFoundProfileException();
+        }
+
         $user = $this->getUser();
 
         if ($user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
-        }
-
-        if (null === $profile) {
-            throw new NotFoundProfileException();
         }
 
         $clonedProfile = clone $profile;
