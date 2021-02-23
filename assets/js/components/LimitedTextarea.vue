@@ -12,7 +12,7 @@
         <div
             class="left small characters-used"
         >
-          {{ $t('form.token.characters_used') }} {{ internalValue.length }} ({{ $t('form.token.min') }} {{ limit }})
+            {{ $t('form.token.characters_used') }} {{ internalValue.length }} ({{ $t('form.token.min') }} {{ limit }})
         </div>
     </div>
 </template>
