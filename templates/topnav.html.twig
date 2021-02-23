@@ -263,13 +263,11 @@
     (app.user.profile.phoneNumber is null or
     not app.user.profile.phoneNumber.verified)
 %}
-    <div class="container">
-        <div class="row justify-content-center">
-            <div role="alert">
+        <div class="add-phone-notification">
+            <div class="alert alert-primary" role="alert">
                 {% trans with {'%url%': path('profile-view', {'nickname': app.user.profile.nickname, 'edit': true}) } %}
                     phone.add_number.notification
                 {% endtrans %}
             </div>
         </div>
-    </div>
 {% endif %}
