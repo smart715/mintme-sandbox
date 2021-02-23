@@ -171,6 +171,7 @@ export default {
                     console.log(this.backendServiceStatus);
                     console.log(res, 'created');
                 });
+            window.reload();
         },
         deleteBackendServices: function() {
             console.log('deleting services...');
@@ -180,6 +181,7 @@ export default {
                     console.log(this.backendServiceStatus);
                     console.log(res, 'deleted');
                 });
+            window.reload();
         },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))

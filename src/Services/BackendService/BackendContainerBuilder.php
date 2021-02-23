@@ -26,7 +26,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
         try {
             $process->mustRun();
-            $this->logger->error('CAMILO '.$process->getOutput());
             echo $process->getOutput();
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
