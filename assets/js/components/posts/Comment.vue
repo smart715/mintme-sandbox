@@ -15,46 +15,29 @@
             <span class="comment-date">
                 {{ date }}
             </span>
-            <template
+            <button
                 v-if="comment.deletable"
+                class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showConfirm"
             >
-                <button
-                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                    :disabled="deleteDisabled"
-                    @click="showConfirm"
-                >
-                    <font-awesome-icon
-                        class="icon-default c-pointer align-middle"
-                        icon="trash"
-                        transform="shrink-4 up-1.5"
-                    />
-                </button>
-            </template>
-            <template
-                v-else-if="comment.editable"
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="trash"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
+            <button
+                v-if="comment.editable"
+                class="btn btn-link p-0 comment-edit-icon float-right text-decoration-none text-reset"
+                @click="editing = true"
             >
-                <button
-                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                    :disabled="deleteDisabled"
-                    @click="showConfirm"
-                >
-                    <font-awesome-icon
-                        class="icon-default c-pointer align-middle"
-                        icon="trash"
-                        transform="shrink-4 up-1.5"
-                    />
-                </button>
-                <button
-                    class="btn btn-link p-0 comment-edit-icon float-right text-decoration-none text-reset"
-                    @click="editing = true"
-                >
-                    <font-awesome-icon
-                        class="icon-default c-pointer align-middle"
-                        icon="edit"
-                        transform="shrink-4 up-1.5"
-                    />
-                </button>
-            </template>
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
         </div>
         <confirm-modal
             :visible="isConfirmVisible"
