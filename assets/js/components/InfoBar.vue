@@ -159,28 +159,17 @@ export default {
             console.log('fetching services status...');
             this.$axios.retry.get(this.$routing.generate('status_container'))
                 .then((res) => {
-                    console.log(res, 'fetch');
                     this.backendServiceStatus = res.data;
                 });
         },
         createBackendServices: function() {
             console.log('creating services...');
-            this.$axios.retry.post(this.$routing.generate('create_container'))
-                .then((res) => {
-                    this.fetchBackendServiceStatus();
-                    console.log(this.backendServiceStatus);
-                    console.log(res, 'created');
-                });
+            this.$axios.retry.post(this.$routing.generate('create_container'));
             location.reload();
         },
         deleteBackendServices: function() {
             console.log('deleting services...');
-            this.$axios.retry.post(this.$routing.generate('delete_container'))
-                .then((res) => {
-                    this.fetchBackendServiceStatus();
-                    console.log(this.backendServiceStatus);
-                    console.log(res, 'deleted');
-                });
+            this.$axios.retry.post(this.$routing.generate('delete_container'));
             location.reload();
         },
         fetchBalance: function() {
