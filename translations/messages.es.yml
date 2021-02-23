@@ -691,7 +691,6 @@ post.not_logged: 'Para ver esta publicación necesita tener'
 post.delete: '¿Realmente desea eliminar esta publicación?'
 post.not_found:
 post.edited:
-post.delete.error:
 post.share:
 post.share.reward:
 post.share.sign_in_twitter:
@@ -1013,7 +1012,7 @@ trade.buy_order.your.guide_body: 'Su balance de %baseSymbol%'
 trade.buy_order.deposit_more: 'Depositar más'
 trade.buy_order.market_price.header: 'Precio del Mercado'
 trade.buy_order.market_price.guide_header: 'Precio del Mercado'
-trade.buy_order.market_price.guide_body: 'Al marcar esta casilla se obtiene el mejor precio actual del mercado por el que se puede comprar %baseSymbol%.'
+trade.buy_order.market_price.guide_body: 'Al marcar esta casilla se obtiene el mejor precio actual del mercado por el que se puede comprar %rebrandedQuoteSymbol%.'
 trade.buy_order.price_in.header: 'Precio en %baseSymbol%:'
 trade.buy_order.price_in.guide_header: 'Precio en %baseSymbol%:'
 trade.buy_order.price_in.guide_body: 'Precio al cual desea comprar un %quoteSymbol%'
