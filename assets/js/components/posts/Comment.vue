@@ -16,12 +16,12 @@
                 {{ date }}
             </span>
             <template
-                v-if="post.author.nickname === authUsername && !comment.editable"
+                v-if="post.author.nickname === authNickname && !comment.editable"
             >
                 <button
                     class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
                     :disabled="deleteDisabled"
-                    @click="showModal"
+                    @click="showConfirm"
                 >
                     <font-awesome-icon
                         class="icon-default c-pointer align-middle"
@@ -36,7 +36,7 @@
                 <button
                     class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
                     :disabled="deleteDisabled"
-                    @click="showModal"
+                    @click="showConfirm"
                 >
                     <font-awesome-icon
                         class="icon-default c-pointer align-middle"
@@ -57,9 +57,9 @@
             </template>
         </div>
         <confirm-modal
-            :visible="isModalVisible"
+            :visible="isConfirmVisible"
             @confirm="deleteComment"
-            @close="closeModal"
+            @close="closeConfirm"
         >
             <p class="text-white modal-title pt-2">
                 {{ $t('comment.delete') }}
@@ -118,9 +118,9 @@ export default {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
-        authUsername: String,
         post: Object,
-        isModalVisible: false,
+        isConfirmVisible: false,
+        authNickname: String,
     },
     data() {
         return {
@@ -181,11 +181,11 @@ export default {
                 })
                 .finally(() => this.liking = false);
         },
-        showModal() {
-            this.isModalVisible = true;
+        showConfirm() {
+            this.isConfirmVisible = true;
         },
-        closeModal() {
-            this.isModalVisible = false;
+        closeConfirm() {
+            this.isConfirmVisible = false;
         },
     },
 };

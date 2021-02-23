@@ -10,8 +10,10 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class CommentVoter extends Voter
 {
     private const EDIT = 'edit';
+    private const DELETE = 'delete';
     private const ACTIONS = [
         self::EDIT,
+        self::DELETE,
     ];
 
     /**
@@ -40,11 +42,20 @@ class CommentVoter extends Voter
             return $this->canEdit($comment, $user);
         }
 
+        if (self::DELETE === $attribute) {
+            return $this->canDELETE($comment, $user);
+        }
+
         return false;
     }
 
     private function canEdit(Comment $comment, ?User $user): bool
     {
         return $comment->getAuthor() === $user;
+    }
+
+    private function canDELETE(Comment $comment, ?User $user): bool
+    {
+        return $comment->getPost()->getAuthor()->getUser() === $user;
     }
 }

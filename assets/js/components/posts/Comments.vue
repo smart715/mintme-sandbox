@@ -17,7 +17,7 @@
                     :key="i"
                     :index="i"
                     :logged-in="loggedIn"
-                    :auth-username="authUsername"
+                    :auth-nickname="authNickname"
                     :post="post"
                     @delete-comment="$emit('delete-comment', $event)"
                 />
@@ -48,7 +48,7 @@ export default {
         postId: Number,
         loggedIn: Boolean,
         tokenName: String,
-        authUsername: String,
+        authNickname: String,
         post: Object,
     },
     computed: {

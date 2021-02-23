@@ -195,16 +195,9 @@ class PostsController extends AbstractFOSRestController
      */
     public function deleteComment(Comment $comment): View
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        if ($user->getProfile()->getNickname() !== $comment->getPost()->getAuthor()->getNickname()) {
-            $this->denyAccessUnlessGranted('edit', $comment);
-        }
-
+        $this->denyAccessUnlessGranted('delete', $comment);
         $this->entityManager->remove($comment);
         $this->entityManager->flush();
-
         $message = $this->translator->trans('post.comment.deleted');
 
         return $this->view(['message' => $message], Response::HTTP_OK);
