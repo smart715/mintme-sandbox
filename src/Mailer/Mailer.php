@@ -152,7 +152,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $subject = 'email.password_changed';
 
         if ($resetting) {
-            $subject = 'email.subject.password_rest';
+            $subject = 'email.password_reset';
         }
 
         $subject = $this->translator->trans($subject);
