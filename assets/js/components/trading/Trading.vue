@@ -204,7 +204,9 @@
                                         </span>
                                     </a>
                                     <guide
-                                        v-if="row.item.tokenized && row.item.quoteImage"
+                                        v-if="row.item.tokenized &&
+                                        row.item.quoteImage &&
+                                        row.item.cryptoSymbol === MINTME.symbol"
                                         placement="top"
                                         max-width="150px">
                                         <template slot="icon">
@@ -234,8 +236,7 @@
                                 <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
                             </div>
                         </template>
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        && tokens.length < perPage">
+                        <template v-if="shouldShowAll">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
@@ -305,6 +306,7 @@ export default {
     },
     data() {
         return {
+            MINTME: MINTME,
             deployedFirst: ('' === this.sort),
             tableLoading: false,
             markets: null,
@@ -461,6 +463,11 @@ export default {
             return this.showUsd
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
+        },
+        shouldShowAll: function() {
+            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                && this.tokens.length
+                && this.tokens.length < this.perPage;
         },
     },
     mounted() {
