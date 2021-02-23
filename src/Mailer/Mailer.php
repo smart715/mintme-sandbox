@@ -152,10 +152,10 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $subject = 'email.password_changed';
 
         if ($resetting) {
-            $subject = 'resetting.email.subject';
+            $subject = 'email.subject.password_rest';
         }
 
-        $subject = $this->translator->trans($subject, [], 'FOSUserBundle');
+        $subject = $this->translator->trans($subject);
 
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
