@@ -43,7 +43,7 @@ class CommentVoter extends Voter
         }
 
         if (self::DELETE === $attribute) {
-            return $this->canDELETE($comment, $user);
+            return $this->canDelete($comment, $user);
         }
 
         return false;
@@ -54,8 +54,8 @@ class CommentVoter extends Voter
         return $comment->getAuthor() === $user;
     }
 
-    private function canDELETE(Comment $comment, ?User $user): bool
+    private function canDelete(Comment $comment, ?User $user): bool
     {
-        return $comment->getPost()->getAuthor()->getUser() === $user;
+        return $comment->getPost()->getAuthor()->getUser() === $user || $comment->getAuthor() === $user;
     }
 }

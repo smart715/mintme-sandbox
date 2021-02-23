@@ -37,6 +37,7 @@ class CommentNormalizer implements NormalizerInterface
         $comment = $this->normalizer->normalize($object, $format, $context);
 
         $comment['editable'] = $this->authorizationChecker->isGranted('edit', $object);
+        $comment['deletable'] = $this->authorizationChecker->isGranted('delete', $object);
 
         $token = $this->tokenStorage->getToken();
         $user = $token

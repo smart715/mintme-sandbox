@@ -16,7 +16,7 @@
                 {{ date }}
             </span>
             <template
-                v-if="post.author.nickname === authNickname && !comment.editable"
+                v-if="comment.deletable"
             >
                 <button
                     class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
@@ -118,9 +118,7 @@ export default {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
-        post: Object,
         isConfirmVisible: false,
-        authNickname: String,
     },
     data() {
         return {
