@@ -25,15 +25,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
-            $process->mustRun(function ($type, $buffer): void {
-                if (Process::ERR === $type) {
-                    echo 'ERR > '.$buffer;
-                    $this->logger->error('CAMILO', $buffer);
-                } else {
-                    echo 'OUT > '.$buffer;
-                    $this->logger->info('CAMILO', $buffer);
-                }
-            });
+            $process->mustRun();
+            $this->logger->error('CAMILO '.$process->getOutput());
+            echo $process->getOutput();
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
@@ -74,11 +68,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-        $this->logger->error('testing gustavo'.$this->isManagingBackendServices($branch));
-
-        if ('1' === $this->isManagingBackendServices($branch)) {
-            return 2;
-        }
 
         $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
@@ -93,27 +82,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                 .$exception->getMessage());
 
             return null;
-        }
-    }
-
-    private function isManagingBackendServices(string $branch): string
-    {
-        $checkLockFilesCommand = '[^-f^/tmp/delete-branch-%branch%.lock^]^'
-            .'||^[^-f^/tmp/create-branch-%branch%.lock^]^&&^echo^1^||^echo^0';
-        $lockFilesCommands = str_replace('%branch%', $branch, $checkLockFilesCommand);
-        $checkLockFilesProcess = new Process(explode('^', $lockFilesCommands));
-
-        try {
-            $checkLockFilesProcess->mustRun();
-
-            return $checkLockFilesProcess->getOutput();
-        } catch (\Throwable $exception) {
-            $this->logger->error(
-                'Failed getting the lock file for  '.$branch.' branch. Reason: '
-                .$exception->getMessage()
-            );
-
-            return '';
         }
     }
 }
