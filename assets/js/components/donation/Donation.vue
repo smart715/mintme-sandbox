@@ -382,7 +382,7 @@ export default {
             this.debouncedCheck();
         },
         checkDonation: function() {
-            if (this.insufficientFunds || !this.isAmountValid) {
+            if (!this.isAmountValid) {
                 return;
             }
 
@@ -395,6 +395,7 @@ export default {
                 amount: this.amountToDonate,
             }))
                 .then((res) => {
+                    console.log(res.data);
                     this.amountToReceive = res.data.amountToReceive;
                     this.tokensWorth = res.data.tokensWorth;
                     this.sellOrdersSummary = res.data.sellOrdersSummary;
