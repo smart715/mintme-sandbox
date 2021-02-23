@@ -25,9 +25,15 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
-            $process->mustRun();
-
-            echo $process->getOutput();
+            $process->mustRun(function ($type, $buffer): void {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                    $this->logger->error('CAMILO', $buffer);
+                } else {
+                    echo 'OUT > '.$buffer;
+                    $this->logger->info('CAMILO', $buffer);
+                }
+            });
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
