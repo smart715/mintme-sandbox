@@ -32,6 +32,10 @@
                 type: String,
                 default: '',
             },
+            token: {
+                type: String,
+                default: null,
+            },
         },
         data() {
             return {
@@ -58,6 +62,7 @@
 
                 formData.append('file', file);
                 formData.append('type', this.type);
+                formData.append('token', this.token);
 
                 this.uploading = true;
 
