@@ -38,14 +38,15 @@ class ProfileController extends Controller
         string $nickname
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
+
+        if (null === $profile) {
+            throw new NotFoundProfileException();
+        }
+
         $user = $this->getUser();
 
         if ($user && $profile->getUser() === $user) {
             $profile->setDisabledAnonymous(true);
-        }
-
-        if (null === $profile) {
-            throw new NotFoundProfileException();
         }
 
         $clonedProfile = clone $profile;

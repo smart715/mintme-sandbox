@@ -46,6 +46,10 @@ class AvatarType extends AbstractType
             ->add('type', TextType::class, [
                 'required' => true,
                 'mapped'   => false,
+            ])
+             ->add('token', TextType::class, [
+                'required' => false,
+                'mapped'   => false,
             ]);
     }
 

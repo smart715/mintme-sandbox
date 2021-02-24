@@ -4,7 +4,11 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\ExchangerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,16 +36,40 @@ class BlockTokenCommand extends Command
     /** @var UserActionLogger */
     private $logger;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var MarketFactoryInterface */
+    private $marketFactory;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var ExchangerInterface */
+    private $exchanger;
+
+    private int $maxActiveOrders;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
         EntityManagerInterface $em,
-        UserActionLogger $logger
+        UserActionLogger $logger,
+        MarketHandlerInterface $marketHandler,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager,
+        ExchangerInterface $exchanger,
+        int $maxActiveOrders
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
         $this->em = $em;
         $this->logger = $logger;
+        $this->marketHandler = $marketHandler;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
+        $this->exchanger = $exchanger;
+        $this->maxActiveOrders = $maxActiveOrders;
         parent::__construct();
     }
 
@@ -147,6 +175,10 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
+        if (!$unblock) {
+            $this->cancelOrders($token, $tokenOption, $userOption);
+        }
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -188,5 +220,51 @@ class BlockTokenCommand extends Command
         }
 
         return false;
+    }
+
+    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption): void
+    {
+        /** @var User $user */
+        $user = $token->getOwner();
+        $coinMarkets = $this->marketFactory->getCoinMarkets();
+        $tokenMarket = $this->marketFactory->create(
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+            $token
+        );
+
+        $tokenPendingOrders = array_merge(
+            $this->marketHandler->getPendingSellOrders(
+                $tokenMarket,
+                0,
+                $this->maxActiveOrders
+            ),
+            $this->marketHandler->getPendingBuyOrders(
+                $tokenMarket,
+                0,
+                $this->maxActiveOrders
+            )
+        );
+
+        $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
+            $user,
+            $coinMarkets,
+            0,
+            $this->maxActiveOrders
+        );
+
+        $ordersToCancel = array_merge($tokenPendingOrders, $userPendingOrders);
+
+        if (!$userOption && $tokenOption) {
+            $ordersToCancel = $tokenPendingOrders;
+        }
+
+        if ($userOption && !$tokenOption) {
+            $ordersToCancel = $userPendingOrders;
+        }
+
+        foreach ($ordersToCancel as $order) {
+            $market = $order->getMarket();
+            $this->exchanger->cancelOrder($market, $order);
+        }
     }
 }
