@@ -58,10 +58,10 @@ export default {
         },
         modelConfirmProp: String,
     },
-    computed:{
+    computed: {
         modalConfirm: function() {
             return this.modelConfirmProp ? this.modelConfirmProp : 'confirm_modal.confirm';
-        }
+        },
     },
     methods: {
         closeModal: function() {
