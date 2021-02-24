@@ -73,6 +73,7 @@ describe('Comments', () => {
         const localVue = mockVue();
         let comment = Object.assign({}, testComment);
         comment.editable = true;
+        comment.deletable = true;
         const wrapper = shallowMount(Comment, {
             localVue,
             propsData: {

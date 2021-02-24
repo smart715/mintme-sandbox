@@ -650,6 +650,7 @@ donation.order.sell: ''
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
 confirm_modal.cancel: Cancelar
+confirm_modal.delete_comment:
 deposit_modal.title: DEPOSITAR
 deposit_modal.min_value: 'Cantidad mínima:'
 deposit_modal.fee: 'Comisión:'

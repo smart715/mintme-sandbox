@@ -43,6 +43,7 @@
             :visible="isConfirmVisible"
             @confirm="deleteComment"
             @close="closeConfirm"
+            model-confirm-prop="confirm_modal.delete_comment"
         >
             <p class="text-white modal-title pt-2">
                 {{ $t('comment.delete') }}
