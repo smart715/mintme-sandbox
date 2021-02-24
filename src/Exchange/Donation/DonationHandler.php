@@ -373,35 +373,28 @@ class DonationHandler implements DonationHandlerInterface
 
     private function checkAmount(?User $user, Money $amount, string $currency): void
     {
-        $balance = $user
-            ? $this->balanceHandler->balance(
-                $user,
-                Token::getFromSymbol($currency)
-            )->getAvailable()
-            : null;
-
         if (Token::BTC_SYMBOL === $currency) {
             $minBtcAmount = $this->donationConfig->getMinBtcAmount();
 
-            if ($amount->lessThan($minBtcAmount) || !$balance) {
+            if ($amount->lessThan($minBtcAmount)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } elseif (Token::WEB_SYMBOL === $currency) {
             $minMintmeAmount = $this->donationConfig->getMinMintmeAmount();
 
-            if ($amount->lessThan($minMintmeAmount) || !$balance) {
+            if ($amount->lessThan($minMintmeAmount)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } elseif (Token::ETH_SYMBOL === $currency) {
             $minEthAmount = $this->donationConfig->getMinEthAmount();
 
-            if ($amount->lessThan($minEthAmount) || !$balance) {
+            if ($amount->lessThan($minEthAmount)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } else {
             $minUsdcAmount = $this->donationConfig->getMinUsdcAmount();
 
-            if ($amount->lessThan($minUsdcAmount) || !$balance) {
+            if ($amount->lessThan($minUsdcAmount)) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }
