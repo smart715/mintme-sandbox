@@ -169,6 +169,35 @@ a
     color: $color-link-hover
     text-decoration: underline
 
+.alert
+  &.alert-danger
+    border-color: $toast-error-bg
+    background-color: $toast-error-bg
+    color: $toast-error-text
+
+  &.alert-success
+    border-color: $toast-success-bg
+    background-color: $toast-success-bg
+    color: $toast-success-text
+
+  &.alert-primary, &.alert-info
+    border-color: $toast-info-bg
+    background-color: $toast-info-bg
+    color: $toast-info-text
+
+  &.alert-warning
+    border-color: $toast-warning-bg
+    background-color: $toast-warning-bg
+    color: $toast-warning-text
+
+  font-size: 20px
+  padding: 6px 15px
+  border-radius: 2px
+
+.alert, .toast
+  i
+    margin-right: 15px
+
 .add-phone-notification
   width: 100%
   margin: 0 auto
@@ -178,6 +207,8 @@ a
     text-decoration: underline
   a:hover
     color: $primary-light
+  .alert
+    border-radius: 0
 
 .faq-block
   a:hover
@@ -863,31 +894,6 @@ nav.top-navbar
 .modal-dialog
   @extend .modal-dialog-centered
 
-.alert
-  &.alert-danger
-    border-color: $toast-error-bg
-    background-color: $toast-error-bg
-    color: $toast-error-text
-
-  &.alert-success
-    border-color: $toast-success-bg
-    background-color: $toast-success-bg
-    color: $toast-success-text
-
-  &.alert-primary, &.alert-info
-    border-color: $toast-info-bg
-    background-color: $toast-info-bg
-    color: $toast-info-text
-
-  &.alert-warning
-    border-color: $toast-warning-bg
-    background-color: $toast-warning-bg
-    color: $toast-warning-text
-
-  font-size: 20px
-  padding: 6px 15px
-  border-radius: 2px
-
 .empty-table
   .b-table-has-details
     display: none
@@ -966,10 +972,6 @@ nav.top-navbar
 .tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
-
-.alert, .toast
-  i
-    margin-right: 15px
 
 .toast
   &.toasted-primary
