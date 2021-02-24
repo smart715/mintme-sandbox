@@ -31,7 +31,9 @@ new Vue({
         return {
             showEditForm: false,
             nickname: '',
-            phoneNumber: document.getElementById('profile_phoneNumber_phoneNumber').getAttribute('value'),
+            phoneNumber: document.getElementById('profile_phoneNumber_phoneNumber')
+                ? document.getElementById('profile_phoneNumber_phoneNumber').getAttribute('value')
+                : null,
             firstName: '',
             lastName: '',
             country: '',
