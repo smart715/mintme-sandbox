@@ -36,8 +36,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                     echo 'CREATING-OUTPUT > '.$buffer;
                 }
             });
-
-
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
