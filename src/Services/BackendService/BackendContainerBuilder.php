@@ -6,14 +6,17 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
     private LoggerInterface $logger;
+    private KernelInterface $kernel;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, KernelInterface $kernel)
     {
         $this->logger = $logger;
+        $this->kernel = $kernel;
     }
 
     public function createContainer(Request $request): ?string
@@ -31,6 +34,8 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
         }
+
+        $this->setMaintenanceMode();
 
         return $process->getOutput();
     }
@@ -57,9 +62,11 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                 'Failed to delete container services for the '.$branch.' branch. Reason: '
                 .$exception->getMessage()
             );
-
-            return null;
         }
+
+        $this->setMaintenanceMode();
+
+        return $process->getOutput();
     }
 
     public function getStatusContainer(Request $request): ?int
@@ -81,6 +88,20 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                 .$exception->getMessage());
 
             return null;
+        }
+    }
+
+    private function setMaintenanceMode(): void
+    {
+        $workDir = $this->kernel->getProjectDir();
+        $process = new Process(['touch', $workDir.'/maintenance_on']);
+
+        try {
+            $process->mustRun();
+            echo $process->getOutput();
+        } catch (ProcessFailedException $exception) {
+            $this->logger->error('Failed to set maintenance mode, Reason: '
+                .$exception->getMessage());
         }
     }
 }
