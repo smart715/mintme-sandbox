@@ -4,9 +4,9 @@ namespace App\Services\BackendService;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
