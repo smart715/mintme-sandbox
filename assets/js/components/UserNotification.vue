@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown" v-on-clickaway="hideUserNotifications">
       <a
-          class="nav-link dropdown-toggle c-pointer"
+          class="nav-link pl-1 dropdown-toggle c-pointer"
           aria-haspopup="true"
           :aria-expanded="showUserNotifications"
           @click="toggleUserNotifications"
