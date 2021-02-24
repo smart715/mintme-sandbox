@@ -28,14 +28,20 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
-            $process->mustRun();
-            echo $process->getOutput();
+            $this->setMaintenanceMode();
+            $process->mustRun(function ($type, $buffer): void {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                } else {
+                    echo 'CREATING-OUTPUT > '.$buffer;
+                }
+            });
+
+
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
         }
-
-        $this->setMaintenanceMode();
 
         return $process->getOutput();
     }
@@ -48,23 +54,20 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
+            $this->setMaintenanceMode();
             $process->mustRun(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     echo 'ERR > '.$buffer;
                 } else {
-                    echo 'OUT > '.$buffer;
+                    echo 'DELETING-OUTPUT > '.$buffer;
                 }
             });
-
-            return $process->getOutput();
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed to delete container services for the '.$branch.' branch. Reason: '
                 .$exception->getMessage()
             );
         }
-
-        $this->setMaintenanceMode();
 
         return $process->getOutput();
     }
