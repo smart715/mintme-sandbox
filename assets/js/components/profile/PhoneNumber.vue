@@ -9,7 +9,7 @@
             showCodeOnList
             noValidation
         />
-        <div v-if="false === isValid && this.phone" class="text-danger text-center">
+        <div v-if="showValidationMessage" class="text-danger text-center">
             {{ $t('phone_number.wrong') }}
         </div>
     </div>
@@ -32,8 +32,12 @@ export default {
     props: {
         countryCode: String,
         phoneNumber: String,
+        enableValidMsg: Boolean,
     },
     computed: {
+        showValidationMessage: function() {
+            return false === this.isValid && this.phone || false === this.isValid && this.enableValidMsg;
+        },
         phoneNumberModel: {
             set: function(phone) {
                 this.phone = phone;

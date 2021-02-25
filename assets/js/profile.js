@@ -45,6 +45,7 @@ new Vue({
             firstNameAux: false,
             lastNameAux: false,
             isValidPhone: false,
+            enablePhoneMessage: false,
         };
     },
     mounted: function() {
@@ -78,6 +79,7 @@ new Vue({
             this.isValidPhone = isValidPhone;
         },
         validation: function(event) {
+            this.enablePhoneMessage = true;
             if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
