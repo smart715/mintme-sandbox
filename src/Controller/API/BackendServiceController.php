@@ -31,7 +31,7 @@ class BackendServiceController extends AbstractFOSRestController
      */
     public function createContainer(Request $request): string
     {
-       return  $this->backendContainerBuilder->createContainer($request);
+        return  $this->backendContainerBuilder->createContainer($request);
     }
 
     /**
