@@ -1332,3 +1332,4 @@ phone_number.add.limit_weekly: 'You have reached the limit for this week, please
 phone_number.add.limit_monthly: 'You have reached the limit for this month, please try to add phone number next month'
 phone_confirmation.sent: 'Sent'
 phone_number.edit.limit: 'You can edit phone number only once per month'
+phone_number.in_use: 'This phone number is already in use'

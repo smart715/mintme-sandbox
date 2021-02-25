@@ -3,6 +3,7 @@
 namespace App\Validator\Constraints;
 
 use App\Entity\User;
+use App\Manager\PhoneNumberManagerInterface;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -17,12 +18,14 @@ class EditPhoneNumberValidator extends ConstraintValidator
     private TranslatorInterface $translator;
     private User $user;
     private PhoneNumberUtil $numberUtil;
+    private PhoneNumberManagerInterface $phoneNumberManager;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
         TranslatorInterface $translator,
         TokenStorageInterface $token,
-        PhoneNumberUtil $numberUtil
+        PhoneNumberUtil $numberUtil,
+        PhoneNumberManagerInterface $phoneNumberManager
     ) {
         /**
          * @var User $user
@@ -33,6 +36,7 @@ class EditPhoneNumberValidator extends ConstraintValidator
         $this->parameterBag = $parameterBag;
         $this->translator = $translator;
         $this->numberUtil = $numberUtil;
+        $this->phoneNumberManager = $phoneNumberManager;
     }
 
     /**
@@ -44,6 +48,14 @@ class EditPhoneNumberValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint): void
     {
         $oldPhoneNumber = $this->user->getProfile()->getPhoneNumber();
+
+        $newPhoneEntity = $this->phoneNumberManager->findByPhoneNumber($value);
+
+        if ($newPhoneEntity) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{message}}', $this->translator->trans('phone_number.in_use'))
+                ->addViolation();
+        }
 
         if (!$oldPhoneNumber ||
             !$oldPhoneNumber->getEditDate() ||
