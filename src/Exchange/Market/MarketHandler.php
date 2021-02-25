@@ -177,12 +177,17 @@ class MarketHandler implements MarketHandlerInterface
         int $limit = 100,
         bool $reverseBaseQuote = false
     ): array {
+        $tempLimit=$limit;
+        if($limit<100){
+            $limit=100;
+        }
+
         $marketOrders = array_map(function (Market $market) use ($user, $offset, $limit, $reverseBaseQuote) {
             return $this->parsePendingOrders(
                 $this->marketFetcher->getPendingOrdersByUser(
                     $user->getId(),
                     $this->marketNameConverter->convert($market),
-                    $offset,
+                    0,
                     $limit
                 ),
                 $market,
@@ -196,7 +201,7 @@ class MarketHandler implements MarketHandlerInterface
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
         });
 
-        return $orders;
+        return array_slice($orders,$offset,$tempLimit);
     }
 
     /** {@inheritdoc} */
