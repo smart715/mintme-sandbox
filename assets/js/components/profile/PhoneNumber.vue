@@ -58,6 +58,7 @@ export default {
     methods: {
         updatePhone: function(data) {
             this.isValidNumber = data.isValid;
+            this.$emit('is-valid-phone', this.isValidNumber);
             this.phoneNumberModel = data.e164;
         },
     },

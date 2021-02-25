@@ -44,6 +44,7 @@ new Vue({
             zipCodeProcessing: false,
             firstNameAux: false,
             lastNameAux: false,
+            isValidPhone: false,
         };
     },
     mounted: function() {
@@ -72,6 +73,9 @@ new Vue({
         },
         phoneChange: function(phone) {
             this.phoneNumber = phone;
+        },
+        validPhone: function(isValidPhone) {
+            this.isValidPhone = isValidPhone;
         },
         validation: function(event) {
             if (event.target.id ==='profile_firstName') {
@@ -140,7 +144,12 @@ new Vue({
     },
     computed: {
         disableSave: function() {
-            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing || this.firstNameAux || this.lastNameAux;
+            return this.$v.$invalid ||
+                !this.zipCodeValid ||
+                this.zipCodeProcessing ||
+                this.firstNameAux ||
+                this.lastNameAux ||
+                !this.isValidPhone;
         },
     },
     validations() {
