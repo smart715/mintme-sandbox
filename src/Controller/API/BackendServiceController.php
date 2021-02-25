@@ -27,11 +27,11 @@ class BackendServiceController extends AbstractFOSRestController
      *     options={"expose"=true}
      *     )
      * @param Request $request
-     * @return string|null
+     * @return void
      */
-    public function createContainer(Request $request): ?string
+    public function createContainer(Request $request): void
     {
-        return $this->backendContainerBuilder->createContainer($request);
+        $this->backendContainerBuilder->createContainer($request);
     }
 
     /**

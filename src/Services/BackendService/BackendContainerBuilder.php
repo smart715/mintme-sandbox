@@ -19,13 +19,13 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $this->kernel = $kernel;
     }
 
-    public function createContainer(Request $request): ?string
+    public function createContainer(Request $request): void
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
 
-        $process =  new AsyncProcess(['sudo', 'create-branch.sh', $branch]);
+        $process =  new AsyncProcess(['sudo', 'create-branch-7116.sh', $branch]);
 
         try {
             $this->setMaintenanceMode('block');
@@ -44,8 +44,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
         }
-
-        return $process->getOutput();
     }
 
     public function deleteContainer(Request $request): ?string
