@@ -44,6 +44,8 @@ form.token.name.invalid: 'Nombre de token inválido.'
 form.token.description: 'Description:'
 form.token.initial_order: ''
 form.token.initial_order.guide: ''
+form.token.characters_used: ''
+form.token.min: ''
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar
