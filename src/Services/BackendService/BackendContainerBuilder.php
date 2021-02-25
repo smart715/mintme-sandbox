@@ -25,7 +25,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
 
-        $process = new Process(['sudo', 'create-branch.sh', $branch]);
+        $process =  new AsyncProcess(['sudo', 'create-branch.sh', $branch]);
 
         try {
             $this->setMaintenanceMode('block');
@@ -34,9 +34,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    $this->logger->info('CREATING-ERROR > '.$buffer);
+                    $this->logger->error('CREATING-ERROR > '.$buffer);
                 } else {
-                    $this->logger->info('CREATING-OUTPUT > '.$buffer);
+                    $this->logger->error('CREATING-OUTPUT > '.$buffer);
                 }
             });
             $this->setMaintenanceMode('unblock');
@@ -53,7 +53,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-        $process = new Process(['sudo', 'delete-branch.sh', $branch]);
+        $process = new AsyncProcess(['sudo', 'delete-branch.sh', $branch]);
 
         try {
             $this->setMaintenanceMode('block');
@@ -61,9 +61,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    $this->logger->info('DELETING-ERROR > '.$buffer);
+                    $this->logger->error('DELETING-ERROR > '.$buffer);
                 } else {
-                    $this->logger->info('DELETING-OUTPUT > '.$buffer);
+                    $this->logger->error('DELETING-OUTPUT > '.$buffer);
                 }
             });
             $this->setMaintenanceMode('unblock');
