@@ -138,7 +138,6 @@ class MarketFetcher implements MarketFetcherInterface
         $order = $response->getResult();
 
         $order['user'] -= $this->config->getOffset();
-
         return $order;
     }
 
