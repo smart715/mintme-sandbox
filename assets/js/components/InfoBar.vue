@@ -164,7 +164,10 @@ export default {
         },
         createBackendServices: function() {
             console.log('creating services...');
-            this.$axios.retry.post(this.$routing.generate('create_container'));
+            this.$axios.retry.post(this.$routing.generate('create_container'))
+                .then((res) => {
+                    console.log(res);
+                });
         },
         deleteBackendServices: function() {
             console.log('deleting services...');
