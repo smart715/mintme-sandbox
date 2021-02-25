@@ -28,14 +28,18 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
-            $this->setMaintenanceMode();
-            $process->mustRun(function ($type, $buffer): void {
+            $this->setMaintenanceMode('block');
+
+            $process->start();
+
+            $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    echo 'ERR > '.$buffer;
+                    $this->logger->info('CREATING-ERROR > '.$buffer);
                 } else {
-                    echo 'CREATING-OUTPUT > '.$buffer;
+                    $this->logger->info('CREATING-OUTPUT > '.$buffer);
                 }
             });
+            $this->setMaintenanceMode('unblock');
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
@@ -52,14 +56,17 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
-            $this->setMaintenanceMode();
-            $process->mustRun(function ($type, $buffer): void {
+            $this->setMaintenanceMode('block');
+            $process->start();
+
+            $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    echo 'ERR > '.$buffer;
+                    $this->logger->info('DELETING-ERROR > '.$buffer);
                 } else {
-                    echo 'DELETING-OUTPUT > '.$buffer;
+                    $this->logger->info('DELETING-OUTPUT > '.$buffer);
                 }
             });
+            $this->setMaintenanceMode('unblock');
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed to delete container services for the '.$branch.' branch. Reason: '
@@ -92,10 +99,11 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         }
     }
 
-    private function setMaintenanceMode(): void
+    private function setMaintenanceMode(?string $type): void
     {
         $workDir = $this->kernel->getProjectDir();
-        $process = new Process(['touch', $workDir.'/maintenance_on']);
+        $process = 'unblock' === $type ? new Process(['touch', $workDir.'/maintenance_on']) :
+            new Process(['rm', '-Rf', $workDir.'/maintenance_on']);
 
         try {
             $process->mustRun();
