@@ -82,6 +82,7 @@
                 profile-description="{{ profile.description }}"
                 profile-anonymously="{{ profile.anonymous }}"
                 :token-description="tokenDescription"
+                token-name="{{ market.quote.name }}"
                 :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
                 :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
@@ -129,7 +130,7 @@
                     <b-tab
                         title="{% trans %}page.pair.tab.introduction{% endtrans %}"
                         title-link-class="token-intro-tab-link"
-                        {% if isTokenPage and token.isMintmeToken %} title-item-class="token-avatar-left" {% endif %}
+                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row">

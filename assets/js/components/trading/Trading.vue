@@ -204,7 +204,9 @@
                                         </span>
                                     </a>
                                     <guide
-                                        v-if="row.item.tokenized && row.item.quoteImage"
+                                        v-if="row.item.tokenized &&
+                                        row.item.quoteImage &&
+                                        row.item.cryptoSymbol === MINTME.symbol"
                                         placement="top"
                                         max-width="150px">
                                         <template slot="icon">
@@ -305,6 +307,7 @@ export default {
     },
     data() {
         return {
+            MINTME: MINTME,
             deployedFirst: ('' === this.sort),
             tableLoading: false,
             markets: null,

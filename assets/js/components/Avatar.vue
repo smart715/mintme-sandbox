@@ -13,6 +13,7 @@
             ref="uploader"
             v-if="editable"
             :type="type"
+            :token="token"
             @upload="setImage"
         />
     </div>
@@ -27,6 +28,7 @@ export default {
         ImageUploader,
     },
     props: {
+        token: String,
         image: {
             type: String,
         },

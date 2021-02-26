@@ -1,12 +1,12 @@
 <template>
-    <div class="token-avatar" :class="{'show-avatar ml-2': isMintmeToken}">
+    <div class="token-avatar show-avatar ml-2">
         <div class="d-flex align-items-center token-name">
             <div class="align-items-center token-avatar-link">
                 <avatar
-                    v-if="isMintmeToken"
                     type="token"
                     size="large"
                     :image="image"
+                    :token="tokenName"
                     :editable="isOwner"
                 />
             </div>
@@ -101,6 +101,7 @@ export default {
         discordUrl: String,
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
+        tokenName: String,
     },
     components: {
         Avatar,
