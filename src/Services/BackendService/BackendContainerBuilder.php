@@ -11,15 +11,18 @@ use Symfony\Component\Process\Process;
 class BackendContainerBuilder implements BackendContainerBuilderInterface
 {
     private LoggerInterface $logger;
+
     private KernelInterface $kernel;
 
-    public function __construct(LoggerInterface $logger, KernelInterface $kernel)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        KernelInterface $kernel
+    ) {
         $this->logger = $logger;
         $this->kernel = $kernel;
     }
 
-    public function createContainer(Request $request): string
+    public function createContainer(Request $request): void
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
@@ -44,8 +47,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
                 .$exception->getMessage());
         }
-
-        return 'OK';
     }
 
     public function deleteContainer(Request $request): ?string

@@ -5,7 +5,9 @@ namespace App\Controller\API;
 use App\Services\BackendService\BackendContainerBuilderInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @Rest\Route("/api/backend_service")
@@ -14,9 +16,14 @@ class BackendServiceController extends AbstractFOSRestController
 {
     private BackendContainerBuilderInterface $backendContainerBuilder;
 
-    public function __construct(BackendContainerBuilderInterface $backendContainerBuilder)
-    {
+    private EventDispatcherInterface $eventDispatcher;
+
+    public function __construct(
+        BackendContainerBuilderInterface $backendContainerBuilder,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->backendContainerBuilder = $backendContainerBuilder;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -31,7 +38,9 @@ class BackendServiceController extends AbstractFOSRestController
      */
     public function createContainer(Request $request): string
     {
-        return  $this->backendContainerBuilder->createContainer($request);
+        $this->eventDispatcher->dispatch((object)KernelEvents::TERMINATE);
+
+       return 'OK';
     }
 
     /**
