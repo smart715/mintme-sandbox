@@ -19,7 +19,7 @@
                         @click="onConfirm"
                         :disabled="buttonDisabled"
                     >
-                        <slot name="confirm">{{ $t('confirm_modal.confirm') }}</slot>
+                        <slot name="confirm">{{ $t(modalConfirm) }}</slot>
                     </button>
                     <button
                         v-if="showCancelButton"
@@ -55,6 +55,12 @@ export default {
         buttonDisabled: {
             type: Boolean,
             default: false,
+        },
+        modelConfirmProp: String,
+    },
+    computed: {
+        modalConfirm: function() {
+            return this.modelConfirmProp ? this.modelConfirmProp : 'confirm_modal.confirm';
         },
     },
     methods: {
