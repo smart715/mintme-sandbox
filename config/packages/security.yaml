@@ -80,6 +80,7 @@ security:
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/deploy,                  role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/contract/update,         role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/posts/comments/delete/[0-9]+,               role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/users,                                       role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/message,                                          role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER, requires_channel: https }
