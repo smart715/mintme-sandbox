@@ -482,6 +482,7 @@ export default {
             let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
                 && (
                     value === this.marketFilters.options.deployed.key
+                    || value === this.marketFilters.options.deployedEth.key
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
