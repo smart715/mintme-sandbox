@@ -2,16 +2,18 @@
 
 namespace App\EventSubscriber;
 
+use App\Services\BackendService\BackendContainerBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class BackendServiceSubscriber implements EventSubscriberInterface
 {
+    private BackendContainerBuilderInterface $backendContainerBuilder;
 
-
-    public function __construct()
+    public function __construct(BackendContainerBuilderInterface $backendContainerBuilder)
     {
+        $this->backendContainerBuilder = $backendContainerBuilder;
     }
 
     /** @codeCoverageIgnore */
@@ -27,6 +29,8 @@ class BackendServiceSubscriber implements EventSubscriberInterface
      */
     public function onTerminate(TerminateEvent $event): void
     {
-        // Todo run backgroun process
+        if (preg_match('/(create-container)/', $event->getRequest()->getPathInfo())) {
+            $this->backendContainerBuilder->createContainer($event->getRequest());
+        }
     }
 }

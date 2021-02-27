@@ -24,17 +24,15 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function createContainer(Request $request): void
     {
+
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
 
-        $process =  new AsyncProcess(['sudo', 'create-branch-7116.sh', $branch]);
+         $process =  new Process(['sudo', 'run-create-branch.sh', $branch]);
 
         try {
-            $this->setMaintenanceMode('block');
-
             $process->start();
-
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     $this->logger->error('CREATING-ERROR > '.$buffer);
@@ -42,9 +40,8 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                     $this->logger->error('CREATING-OUTPUT > '.$buffer);
                 }
             });
-            $this->setMaintenanceMode('unblock');
         } catch (ProcessFailedException $exception) {
-            $this->logger->error('Failed to create container services for the branch '.$branch.' Reason: '
+            $this->logger->error('Failed to create container services for the branch  Reason: '
                 .$exception->getMessage());
         }
     }
@@ -54,7 +51,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-        $process = new AsyncProcess(['sudo', 'delete-branch.sh', $branch]);
+        $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
             $this->setMaintenanceMode('block');
