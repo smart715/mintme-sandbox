@@ -279,7 +279,7 @@ import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
 const DEPLOYED_FIRST = 1;
-const DEPLOYED_ONLY = 2;
+const DEPLOYED_ONLY_MINTME = 2;
 const AIRDROP_ONLY = 3;
 const DEPLOYED_ONLY_ETH = 4;
 
@@ -559,7 +559,7 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.filter = DEPLOYED_ONLY;
+                    params.filter = DEPLOYED_ONLY_MINTME;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
                 ) {
