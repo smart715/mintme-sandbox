@@ -90,10 +90,15 @@ class OrderbookController extends AbstractFOSRestController
             throw new ApiNotFoundException('Market pair not found');
         }
 
-        $depth =
-            !empty($request->get('depth')) ?
-                (int)$request->get('depth') :
-                100;
+        $level = (int)$request->get('level');
+
+        $depth = 100;
+
+        if (self::ONLY_BEST === $level) {
+            $depth = 1;
+        } elseif (self::ARRANGED_BY_BEST === $level && !empty($request->get('depth'))) {
+            $depth = (int)$request->get('depth');
+        }
 
         $market = BaseQuote::reverseMarket($market);
 
@@ -109,22 +114,14 @@ class OrderbookController extends AbstractFOSRestController
             $this->marketHandler->getPendingSellOrders($market, 0, $depth)
         );
 
-        $level = (int)$request->get('level');
-
-        if (self::ONLY_BEST === $level) {
-            $orderDepth['asks'] = count($orderDepth['asks'])
-                ? min($orderDepth['asks'])
-                : [];
-            $orderDepth['bids'] = count($orderDepth['bids'])
-                ? max($orderDepth['bids'])
-                : [];
-        } elseif (self::ARRANGED_BY_BEST === $level) {
-            sort($orderDepth['asks']);
-            rsort($orderDepth['bids']);
+        if (self::ONLY_BEST === $level && 1 === $depth) {
+            // Flatten array
+            $orderDepth['bids'] = $orderDepth['bids'][0];
+            $orderDepth['asks'] = $orderDepth['asks'][0];
         }
 
         $date = new DateTimeImmutable();
-        $orderDepth['timestamp'] = $date->getTimestamp();
+        $orderDepth['timestamp'] = $date->getTimestamp() ;
 
         return $orderDepth;
     }
