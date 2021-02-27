@@ -26,6 +26,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_DEPLOYED_FIRST = 1;
     public const FILTER_DEPLOYED_ONLY_MINTME = 2;
     public const FILTER_AIRDROP_ONLY = 3;
+    public const FILTER_DEPLOYED_ONLY_ETH = 4;
     public const FILTER_AIRDROP_ACTIVE = true;
 
     public const SORT_LAST_PRICE = 'lastPrice';
@@ -124,6 +125,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_ETH:
+                $queryBuilder->andWhere(
+                    "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
+                )->setParameter('cryptoSymbol', Token::ETH_SYMBOL);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:

@@ -281,6 +281,7 @@ import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '..
 const DEPLOYED_FIRST = 1;
 const DEPLOYED_ONLY = 2;
 const AIRDROP_ONLY = 3;
+const DEPLOYED_ONLY_ETH = 4;
 
 export default {
     name: 'Trading',
@@ -340,6 +341,10 @@ export default {
                     deployed: {
                         key: 'deployed',
                         label: this.$t('trading.deployed.label'),
+                    },
+                    deployedEth: {
+                        key: 'deployedEth',
+                        label: this.$t('trading.deployed_eth.label'),
                     },
                     airdrop: {
                         key: 'airdrop',
@@ -554,6 +559,10 @@ export default {
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
                     params.filter = DEPLOYED_ONLY;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
+                ) {
+                    params.filter = DEPLOYED_ONLY_ETH;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {
