@@ -69,6 +69,7 @@
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     v-text="getButtonName"
+                    :disabled="!backendServiceStatus"
                 ></b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
@@ -164,21 +165,17 @@ export default {
         },
         createBackendServices: function() {
             console.log('creating services...');
-            this.$axios.retry.post(this.$routing.generate('create_container'))
-                .then((res) => {
-                    setTimeout(function() {
-                        location.reload();
-                    }, 10000);
-                });
+            this.$axios.retry.post(this.$routing.generate('create_container'));
+            setTimeout(function() {
+                location.reload();
+            }, 18000);
         },
         deleteBackendServices: function() {
             console.log('deleting services...');
-            this.$axios.retry.post(this.$routing.generate('delete_container'))
-                .then((res) => {
-                    setTimeout(function() {
-                        location.reload();
-                    }, 10000);
-                });
+            this.$axios.retry.post(this.$routing.generate('delete_container'));
+            setTimeout(function() {
+                location.reload();
+            }, 10000);
         },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))

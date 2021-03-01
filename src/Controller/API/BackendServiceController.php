@@ -27,10 +27,9 @@ class BackendServiceController extends AbstractFOSRestController
      *     name="create_container",
      *     options={"expose"=true}
      *     )
-     * @param Request $request
      * @return string|null
      */
-    public function createContainer(Request $request): ?string
+    public function createContainer(): ?string
     {
         return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
@@ -42,10 +41,9 @@ class BackendServiceController extends AbstractFOSRestController
      *     name="delete_container",
      *     options={"expose"=true}
      *     )
-     * @param Request $request
      * @return string|null
      */
-    public function deleteContainer(Request $request): ?string
+    public function deleteContainer(): ?string
     {
         return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
