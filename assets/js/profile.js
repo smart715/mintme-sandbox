@@ -31,9 +31,6 @@ new Vue({
         return {
             showEditForm: false,
             nickname: '',
-            phoneNumber: document.getElementById('profile_phoneNumber_phoneNumber')
-                ? document.getElementById('profile_phoneNumber_phoneNumber').getAttribute('value')
-                : null,
             firstName: '',
             lastName: '',
             country: '',
@@ -47,6 +44,10 @@ new Vue({
             isValidPhone: false,
             enablePhoneMessage: false,
         };
+    },
+    beforeMount() {
+        let phoneElement = document.getElementById('profile_phoneNumber_phoneNumber');
+        this.phoneNumber = phoneElement ? phoneElement.getAttribute('value') : null;
     },
     mounted: function() {
         this.nickname = this.$refs.nickname.getAttribute('value');

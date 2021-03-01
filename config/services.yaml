@@ -67,7 +67,7 @@ services:
             $url: '%d7_networks_url%'
             $timeoutSeconds: '10'
             $headers:
-                Authorization: 'Basic %d7_networks_token%'
+                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
 
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper

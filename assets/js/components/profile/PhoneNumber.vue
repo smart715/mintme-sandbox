@@ -1,6 +1,6 @@
 <template>
     <div class="phone-number">
-        <MazPhoneNumberInput
+        <maz-phone-number-input
             v-model="phone"
             @update="updatePhone"
             :translations="translations"
@@ -36,7 +36,7 @@ export default {
     },
     computed: {
         showValidationMessage: function() {
-            return false === this.isValid && this.phone || false === this.isValid && this.enableValidMsg;
+            return false === this.isValid && (this.phone || this.enableValidMsg);
         },
         phoneNumberModel: {
             set: function(phone) {

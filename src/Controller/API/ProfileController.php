@@ -112,7 +112,6 @@ class ProfileController extends AbstractFOSRestController
         $phoneNumber = $user->getProfile()->getPhoneNumber();
         $totalLimit = $this->getParameter('adding_phone_attempts_limit')['overall'];
 
-        /** @TODO=ADD_LOGGING */
         if ($totalLimit <= $phoneNumber->getTotalAttempts()) {
             $user->setIsBlocked(true);
             $phoneNumber->setTotalAttempts(0);
