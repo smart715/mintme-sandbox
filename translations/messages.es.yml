@@ -44,6 +44,8 @@ form.token.name.invalid: 'Nombre de token inválido.'
 form.token.description: 'Description:'
 form.token.initial_order: ''
 form.token.initial_order.guide: ''
+form.token.characters_used: ''
+form.token.min: ''
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar
@@ -650,6 +652,7 @@ donation.order.sell: ''
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
 confirm_modal.cancel: Cancelar
+confirm_modal.accept_delete:
 deposit_modal.title: DEPOSITAR
 deposit_modal.min_value: 'Cantidad mínima:'
 deposit_modal.fee: 'Comisión:'
@@ -720,6 +723,7 @@ post_form.msg.title.max_length:
 post_form.backend.no_token:
 posts.all: 'Todas las publicaciones'
 comment.created:
+comment.confirm_delete:
 comment.deleted:
 comment.edited:
 comment.liked:
