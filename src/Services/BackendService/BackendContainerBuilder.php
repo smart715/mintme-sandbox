@@ -31,7 +31,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process =  new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
-            $this->setMaintenanceMode('block');
             $process->setTimeout(3600);
             $process->mustRun(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
@@ -58,7 +57,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $process = new Process(['sudo', 'delete-branch.sh', $branch]);
 
         try {
-            $this->setMaintenanceMode('block');
             $process->setTimeout(3600);
             $process->mustRun(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
@@ -101,17 +99,21 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         }
     }
 
-    private function setMaintenanceMode(?string $type): void
+    public function setMaintenanceMode(string $mode): ?string
     {
         $workDir = $this->kernel->getProjectDir();
-        $process = 'block' === $type ? new Process(['touch', $workDir.'/maintenance_on']) :
+        $process = 'block' === $mode ? new Process(['touch', $workDir.'/maintenance_on']) :
             new Process(['rm', '-Rf', $workDir.'/maintenance_on']);
 
         try {
             $process->mustRun();
+
+            return $process->getOutput();
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to set maintenance mode, Reason: '
                 .$exception->getMessage());
+
+            return null;
         }
     }
 }

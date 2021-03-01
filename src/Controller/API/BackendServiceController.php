@@ -30,9 +30,9 @@ class BackendServiceController extends AbstractFOSRestController
      * @param Request $request
      * @return string
      */
-    public function createContainer(Request $request): string
+    public function createContainer(Request $request): ?string
     {
-        return 'creating container...';
+        return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
 
     /**
@@ -47,7 +47,7 @@ class BackendServiceController extends AbstractFOSRestController
      */
     public function deleteContainer(Request $request): string
     {
-        return 'deleting container...';
+        return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
 
     /**
