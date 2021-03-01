@@ -104,12 +104,11 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
     private function setMaintenanceMode(?string $type): void
     {
         $workDir = $this->kernel->getProjectDir();
-        $process = 'unblock' === $type ? new Process(['touch', $workDir.'/maintenance_on']) :
+        $process = 'block' === $type ? new Process(['touch', $workDir.'/maintenance_on']) :
             new Process(['rm', '-Rf', $workDir.'/maintenance_on']);
 
         try {
             $process->mustRun();
-            echo $process->getOutput();
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to set maintenance mode, Reason: '
                 .$exception->getMessage());
