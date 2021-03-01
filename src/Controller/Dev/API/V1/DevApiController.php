@@ -2,11 +2,12 @@
 
 namespace App\Controller\Dev\API\V1;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
-use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 
 abstract class DevApiController extends AbstractFOSRestController
@@ -17,13 +18,16 @@ abstract class DevApiController extends AbstractFOSRestController
 
     private CryptoManagerInterface $cryptoManager;
     private TokenManagerInterface $tokenManager;
+    private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->rebrandingConverter = $rebrandingConverter;
     }
 
     protected function checkForDisallowedValues(string $base, ?string $quote = null): void
@@ -36,19 +40,5 @@ abstract class DevApiController extends AbstractFOSRestController
 
             throw new ApiNotFoundException('Market not found');
         }
-    }
-
-    protected function checkForTokenCryptoMarkets(string $base, string $quote): bool
-    {
-        $baseEntity = $this->cryptoManager->findBySymbol($base) ?? $this->tokenManager->findByName($base);
-        $quoteEntity = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
-
-        if (!$baseEntity || !$quoteEntity) {
-            throw new ApiNotFoundException('Market not found');
-        }
-
-        $market = new Market($baseEntity, $quoteEntity);
-
-        return $market->isTokenCryptoMarket();
     }
 }
