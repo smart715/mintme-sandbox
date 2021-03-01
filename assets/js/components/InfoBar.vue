@@ -166,16 +166,18 @@ export default {
             console.log('creating services...');
             this.$axios.retry.post(this.$routing.generate('create_container'))
                 .then((res) => {
-                    console.log('mantienance_on', res);
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 10000);
                 });
         },
         deleteBackendServices: function() {
             console.log('deleting services...');
             this.$axios.retry.post(this.$routing.generate('delete_container'))
                 .then((res) => {
-                    console.log('mantienance_on', res);
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 10000);
                 });
         },
         fetchBalance: function() {
