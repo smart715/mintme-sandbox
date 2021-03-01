@@ -4,6 +4,9 @@ namespace App\Controller\Dev\API\V2\User;
 
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Exchange\ExchangerInterface;
+use App\Manager\CryptoManagerInterface;
+use App\Manager\TokenManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -16,6 +19,20 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class OrdersController extends DevApiController
 {
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+    private RebrandingConverterInterface $rebrandingConverter;
+
+    public function __construct(
+        CryptoManagerInterface $cryptoManager,
+        TokenManagerInterface $tokenManager,
+        RebrandingConverterInterface $rebrandingConverter
+    ) {
+        $this->cryptoManager = $cryptoManager;
+        $this->tokenManager = $tokenManager;
+        $this->rebrandingConverter = $rebrandingConverter;
+    }
+
     /**
      * List users active orders
      *
@@ -164,7 +181,7 @@ class OrdersController extends DevApiController
             [
                 'request' => $request,
                 'exchanger' => $exchanger,
-                'reverseBaseQuote' => $this->checkForTokenCryptoMarkets($base, $quote),
+                'reverseBaseQuote' => true,
             ],
             [
                 'base' => $base,
@@ -202,7 +219,7 @@ class OrdersController extends DevApiController
             [
                 'request' => $request,
                 'id' => $id,
-                'reverseBaseQuote' => $this->checkForTokenCryptoMarkets($base, $quote),
+                'reverseBaseQuote' => true,
             ],
             [
                 'base' => $base,
