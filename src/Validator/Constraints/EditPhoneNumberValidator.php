@@ -51,7 +51,7 @@ class EditPhoneNumberValidator extends ConstraintValidator
 
         $newPhoneEntity = $this->phoneNumberManager->findByPhoneNumber($value);
 
-        if ($newPhoneEntity) {
+        if ($newPhoneEntity && $oldPhoneNumber !== $newPhoneEntity) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{message}}', $this->translator->trans('phone_number.in_use'))
                 ->addViolation();
