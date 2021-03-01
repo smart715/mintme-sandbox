@@ -32,16 +32,18 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
         try {
             $this->setMaintenanceMode('block');
-            $process->start();
             $process->setTimeout(3600);
-            $process->wait(function ($type, $buffer): void {
+            $process->mustRun(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     $this->logger->error('CREATING-ERROR > '.$buffer);
                 } else {
-                    $this->logger->error('CREATING-OUTPUT > '.$buffer);
+                    $this->logger->debug('CREATING-OUTPUT > '.$buffer);
                 }
             });
-            $this->setMaintenanceMode('unblock');
+
+            if ($process->isSuccessful()) {
+                $this->setMaintenanceMode('unblock');
+            }
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch  Reason: '
                 .$exception->getMessage());
@@ -57,16 +59,18 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
         try {
             $this->setMaintenanceMode('block');
-            $process->start();
             $process->setTimeout(3600);
-            $process->wait(function ($type, $buffer): void {
+            $process->mustRun(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    $this->logger->debug('DELETING-ERROR > '.$buffer);
+                    $this->logger->error('DELETING-ERROR > '.$buffer);
                 } else {
                     $this->logger->debug('DELETING-OUTPUT > '.$buffer);
                 }
             });
-            $this->setMaintenanceMode('unblock');
+
+            if ($process->isSuccessful()) {
+                $this->setMaintenanceMode('unblock');
+            }
         } catch (\Throwable $exception) {
             $this->logger->error(
                 'Failed to delete container services for the '.$branch.' branch. Reason: '
