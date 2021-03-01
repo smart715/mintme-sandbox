@@ -32,5 +32,9 @@ class BackendServiceSubscriber implements EventSubscriberInterface
         if (preg_match('/(create-container)/', $event->getRequest()->getPathInfo())) {
             $this->backendContainerBuilder->createContainer($event->getRequest());
         }
+
+        if (preg_match('/(delete-container)/', $event->getRequest()->getPathInfo())) {
+            $this->backendContainerBuilder->deleteContainer($event->getRequest());
+        }
     }
 }

@@ -29,9 +29,10 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
 
-         $process =  new Process(['sudo', 'run-create-branch.sh', $branch]);
+        $process =  new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
+            $this->setMaintenanceMode('block');
             $process->start();
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
@@ -40,13 +41,14 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                     $this->logger->error('CREATING-OUTPUT > '.$buffer);
                 }
             });
+            $this->setMaintenanceMode('unblock');
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to create container services for the branch  Reason: '
                 .$exception->getMessage());
         }
     }
 
-    public function deleteContainer(Request $request): ?string
+    public function deleteContainer(Request $request): void
     {
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
@@ -59,9 +61,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
-                    $this->logger->error('DELETING-ERROR > '.$buffer);
+                    $this->logger->debug('DELETING-ERROR > '.$buffer);
                 } else {
-                    $this->logger->error('DELETING-OUTPUT > '.$buffer);
+                    $this->logger->debug('DELETING-OUTPUT > '.$buffer);
                 }
             });
             $this->setMaintenanceMode('unblock');
@@ -71,8 +73,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
                 .$exception->getMessage()
             );
         }
-
-        return $process->getOutput();
     }
 
     public function getStatusContainer(Request $request): ?int
