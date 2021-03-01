@@ -91,4 +91,15 @@ class TokenRepository extends EntityRepository
 
         return $query->getQuery()->getResult();
     }
+
+    public function getBlockedTokens(): ?array
+    {
+        $qb = $this->createQueryBuilder('token');
+
+        return $qb->select('token')
+            ->from(Token::class, 't')
+            ->andWhere('token.isBlocked = 1')
+            ->getQuery()
+            ->execute();
+    }
 }

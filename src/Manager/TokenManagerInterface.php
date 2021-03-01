@@ -44,4 +44,6 @@ interface TokenManagerInterface
     public function getDeployedTokens(?int $offset = null, ?int $limit = null): array;
 
     public function getUserDeployTokensReward(User $user): Money;
+
+    public function getBlockedTokens(): ?array;
 }
