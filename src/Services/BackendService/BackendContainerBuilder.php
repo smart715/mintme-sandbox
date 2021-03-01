@@ -28,12 +28,12 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
-
         $process =  new Process(['sudo', 'create-branch.sh', $branch]);
 
         try {
             $this->setMaintenanceMode('block');
             $process->start();
+            $process->setTimeout(3600);
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     $this->logger->error('CREATING-ERROR > '.$buffer);
@@ -58,7 +58,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         try {
             $this->setMaintenanceMode('block');
             $process->start();
-
+            $process->setTimeout(3600);
             $process->wait(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     $this->logger->debug('DELETING-ERROR > '.$buffer);
