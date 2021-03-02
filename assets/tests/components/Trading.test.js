@@ -5,6 +5,13 @@ import axios from 'axios';
 
 // TODO: Improve tests and add more tests
 
+const filterForTokens = {
+    deployed_first: 1,
+    deployed_only_mintme: 2,
+    airdrop_only: 3,
+    deployed_only_eth: 4,
+};
+
 /**
  * @return {VueConstructor}
  */
@@ -34,6 +41,7 @@ function mockTrading(props = {}) {
         propsData: {
             websocketUrl: 'testWebsocketUrl',
             enableUsd: true,
+            filterForTokens: filterForTokens,
             ...props,
         },
         methods: {
