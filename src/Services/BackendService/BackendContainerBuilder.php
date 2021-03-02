@@ -24,7 +24,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
     public function createContainer(Request $request): void
     {
-
         $host = $request->getHttpHost();
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
@@ -32,13 +31,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
         try {
             $process->setTimeout(3600);
-            $process->mustRun(function ($type, $buffer): void {
-                if (Process::ERR === $type) {
-                    $this->logger->error('CREATING-ERROR > '.$buffer);
-                } else {
-                    $this->logger->debug('CREATING-OUTPUT > '.$buffer);
-                }
-            });
+            $process->mustRun();
 
             if ($process->isSuccessful()) {
                 $this->setMaintenanceMode('unblock');
@@ -58,13 +51,7 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
 
         try {
             $process->setTimeout(3600);
-            $process->mustRun(function ($type, $buffer): void {
-                if (Process::ERR === $type) {
-                    $this->logger->error('DELETING-ERROR > '.$buffer);
-                } else {
-                    $this->logger->debug('DELETING-OUTPUT > '.$buffer);
-                }
-            });
+            $process->mustRun();
 
             if ($process->isSuccessful()) {
                 $this->setMaintenanceMode('unblock');
@@ -88,9 +75,13 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         try {
             $process->mustRun();
 
-            return false !== strpos($process->getOutput(), 'no matched branch was found')
-                ? 0
-                : 1;
+            if ($process->isSuccessful()) {
+                return false !== strpos($process->getOutput(), 'no matched branch was found')
+                    ? 0
+                    : 1;
+            }
+
+            return null;
         } catch (\Throwable $exception) {
             $this->logger->error('Failed getting the container status for the'.$branch. ' branch. Reason: '
                 .$exception->getMessage());
@@ -108,7 +99,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         try {
             $process->mustRun();
 
-            return $process->getOutput();
+            return $process->isSuccessful()
+                ? 'OK'
+                : null;
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to set maintenance mode, Reason: '
                 .$exception->getMessage());

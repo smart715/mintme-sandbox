@@ -8,7 +8,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Rest\Route("/api/backend_service")
+ * @Rest\Route("/api/backend-service")
  */
 class BackendServiceController extends AbstractFOSRestController
 {
@@ -23,13 +23,13 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post(
-     *     "/create-container",
+     *     "/container/create",
      *     name="create_container",
      *     options={"expose"=true}
      *     )
-     * @return string|null
+     * @return string
      */
-    public function createContainer(): ?string
+    public function createContainer(): string
     {
         return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
@@ -37,7 +37,7 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post(
-     *     "/delete-container",
+     *     "/container"/delelte,
      *     name="delete_container",
      *     options={"expose"=true}
      *     )
@@ -51,7 +51,7 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\get(
-     *     "/status-container",
+     *     "/container/status",
      *     name="status_container",
      *     options={"expose"=true}
      *     )
