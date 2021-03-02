@@ -37,7 +37,7 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post(
-     *     "/container-delelte",
+     *     "/container-delete",
      *     name="delete_container",
      *     options={"expose"=true}
      *     )
@@ -51,7 +51,7 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\get(
-     *     "/containe-status",
+     *     "/container-status",
      *     name="status_container",
      *     options={"expose"=true}
      *     )
