@@ -255,3 +255,10 @@ parameters:
     # mails available to send via app:sendCustomMail
     available_mails:
         - 'MintmeHost'
+
+    # tokens filter parameters for trading page
+    filter_for_tokens:
+        deployed_first: 1
+        deployed_only_mintme: 2
+        airdrop_only: 3
+        deployed_only_eth: 4
