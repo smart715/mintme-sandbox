@@ -27,9 +27,9 @@ class BackendServiceController extends AbstractFOSRestController
      *     name="create_container",
      *     options={"expose"=true}
      *     )
-     * @return string
+     * @return string|null
      */
-    public function createContainer(): string
+    public function createContainer(): ?string
     {
         return $this->backendContainerBuilder->setMaintenanceMode('block');
     }
