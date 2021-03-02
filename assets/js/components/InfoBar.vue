@@ -69,7 +69,7 @@
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     v-text="getButtonName"
-                    :disabled="!backendServiceStatus"
+                    :disabled="null === backendServiceStatus || managinBackednService"
                 ></b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
@@ -106,6 +106,7 @@ export default {
                 isTokenContractActive: false,
             },
             backendServiceStatus: null,
+            managinBackednService: false,
             balance: {
                 WEB: null,
                 BTC: null,
@@ -157,25 +158,26 @@ export default {
                 this.deleteBackendServices();
         },
         fetchBackendServiceStatus: function() {
-            console.log('fetching services status...');
+            this.managinBackednService = true;
             this.$axios.retry.get(this.$routing.generate('status_container'))
                 .then((res) => {
                     this.backendServiceStatus = res.data;
+                    this.managinBackednService = false;
                 });
         },
         createBackendServices: function() {
-            console.log('creating services...');
+            this.managinBackednService = true;
             this.$axios.retry.post(this.$routing.generate('create_container'));
             setTimeout(function() {
                 location.reload();
-            }, 18000);
+            }, 5000);
         },
         deleteBackendServices: function() {
-            console.log('deleting services...');
+            this.managinBackednService = true;
             this.$axios.retry.post(this.$routing.generate('delete_container'));
             setTimeout(function() {
                 location.reload();
-            }, 10000);
+            }, 5000);
         },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
