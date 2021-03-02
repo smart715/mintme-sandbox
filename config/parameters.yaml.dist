@@ -247,3 +247,11 @@ parameters:
         - 'Aiming-at-a-strong-token'
         - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
 
+    # MintMe.host promotion mail
+    freeDays: 7
+    price: 100
+    mintmeHostPath: https://www.mintme.host
+
+    # mails available to send via app:sendCustomMail
+    available_mails:
+        - 'MintmeHost'
