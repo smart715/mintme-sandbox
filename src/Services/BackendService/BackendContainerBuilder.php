@@ -97,7 +97,9 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             new Process(['rm', '-Rf', $workDir.'/maintenance_on']);
 
         try {
-            $process->mustRun();
+            $process->start();
+
+            $process->wait();
 
             return $process->isSuccessful()
                 ? 'OK'
