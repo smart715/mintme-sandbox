@@ -409,6 +409,9 @@ services:
             $formFactory: '@fos_user.registration.form.factory'
             $userManager: '@fos_user.user_manager'
             $tokenStorage: '@security.token_storage'
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
 
     App\Exchange\Config\Config:
         arguments:
@@ -688,3 +691,9 @@ services:
     App\Command\BlockTokenCommand:
         arguments:
             $maxActiveOrders: '%max_allowed_active_orders%'
+
+    App\Command\SendCustomMailCommand:
+        arguments:
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'

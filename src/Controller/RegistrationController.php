@@ -7,6 +7,7 @@ use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Mailer\MailerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
@@ -62,6 +63,14 @@ class RegistrationController extends FOSRegistrationController
     /** @var UserNotificationConfigManagerInterface */
     private UserNotificationConfigManagerInterface $userNotificationConfigManager;
 
+    private MailerInterface $mailer;
+
+    private string $mintmeHostFreeDays;
+
+    private string $mintmeHostPrice;
+
+    private string $mintmeHostPath;
+
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FactoryInterface $formFactory,
@@ -72,7 +81,11 @@ class RegistrationController extends FOSRegistrationController
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
         EntityManagerInterface $entityManager,
-        UserNotificationConfigManagerInterface $userNotificationConfigManager
+        UserNotificationConfigManagerInterface $userNotificationConfigManager,
+        MailerInterface $mailer,
+        string $mintmeHostFreeDays,
+        string $mintmeHostPrice,
+        string $mintmeHostPath
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -83,6 +96,10 @@ class RegistrationController extends FOSRegistrationController
         $this->cryptoManager = $cryptoManager;
         $this->em = $entityManager;
         $this->userNotificationConfigManager = $userNotificationConfigManager;
+        $this->mailer = $mailer;
+        $this->mintmeHostFreeDays = $mintmeHostFreeDays;
+        $this->mintmeHostPrice =$mintmeHostPrice;
+        $this->mintmeHostPath = $mintmeHostPath;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -235,6 +252,12 @@ class RegistrationController extends FOSRegistrationController
 
         $bonus = $user->getBonus();
         $this->userNotificationConfigManager->initializeUserNotificationConfig($user);
+        $this->mailer->sendMintmeHostMail(
+            $user,
+            $this->mintmeHostPrice,
+            $this->mintmeHostFreeDays,
+            $this->mintmeHostPath
+        );
 
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&

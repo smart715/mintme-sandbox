@@ -161,6 +161,11 @@ parameters:
         - Ideas-to-promote-and-sell-your-token
         - Aiming-at-a-strong-token
         - The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported
+    freeDays: 7
+    price: 100
+    mintmeHostPath: 'https://mintme.host'
+    available_mails:
+        - MintmeHost
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
     adding_phone_attempts_limit:
