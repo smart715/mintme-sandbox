@@ -115,9 +115,8 @@ class OrderbookController extends AbstractFOSRestController
         );
 
         if (self::ONLY_BEST === $level && 1 === $depth) {
-            // Flatten array
-            $orderDepth['bids'] = $orderDepth['bids'][0];
-            $orderDepth['asks'] = $orderDepth['asks'][0];
+            $orderDepth['bids'] = $orderDepth['bids'][0] ?? [];
+            $orderDepth['asks'] = $orderDepth['asks'][0] ?? [];
         }
 
         $date = new DateTimeImmutable();
