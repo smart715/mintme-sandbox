@@ -92,7 +92,7 @@ class OrderbookController extends AbstractFOSRestController
 
         $level = (int)$request->get('level');
 
-        $depth = 100;
+        $depth = $this->getParameter('max_allowed_active_orders');
 
         if (self::ONLY_BEST === $level) {
             $depth = 1;
