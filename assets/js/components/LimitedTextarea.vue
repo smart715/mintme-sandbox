@@ -10,9 +10,9 @@
         v-model="internalValue">
     </textarea>
         <div
-            class="text-right small"
+            class="left small characters-used"
         >
-            {{ internalValue.length }}/{{ limit }}
+            {{ $t('form.token.characters_used') }} {{ internalValue.length }} ({{ $t('form.token.min') }} {{ limit }})
         </div>
     </div>
 </template>

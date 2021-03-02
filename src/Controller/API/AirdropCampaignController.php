@@ -148,7 +148,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $endDate
         );
 
-        $actionsData = $this->transformData($actions, $actionsData);
+        $actionsData = $this->transformData($actions, $actionsData, $airdrop);
 
         foreach ($actions as $action => $active) {
             if ($active) {
@@ -397,9 +397,10 @@ class AirdropCampaignController extends AbstractFOSRestController
         return $token;
     }
 
-    private function transformData(array $actions, array $actionsData): array
+
+    private function transformData(array $actions, array $actionsData, Airdrop $airdrop): array
     {
-        if (in_array(AirdropCampaignActions::TWITTER_RETWEET, array_keys($actions))) {
+        if ($actions[AirdropCampaignActions::TWITTER_RETWEET]) {
             $matches = [];
 
             preg_match(
@@ -409,6 +410,14 @@ class AirdropCampaignController extends AbstractFOSRestController
             );
 
             $actionsData[AirdropCampaignActions::TWITTER_RETWEET] = $matches[1];
+        }
+
+        if ($actions[AirdropCampaignActions::YOUTUBE_SUBSCRIBE]) {
+            $actionsData[AirdropCampaignActions::YOUTUBE_SUBSCRIBE] = $airdrop->getToken()->getYoutubeChannelId();
+        }
+
+        if ($actions[AirdropCampaignActions::FACEBOOK_PAGE]) {
+            $actionsData[AirdropCampaignActions::FACEBOOK_PAGE] = $airdrop->getToken()->getFacebookUrl();
         }
 
         return $actionsData;
