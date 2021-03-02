@@ -278,11 +278,6 @@ import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
-const DEPLOYED_FIRST = 1;
-const DEPLOYED_ONLY_MINTME = 2;
-const AIRDROP_ONLY = 3;
-const DEPLOYED_ONLY_ETH = 4;
-
 export default {
     name: 'Trading',
     mixins: [
