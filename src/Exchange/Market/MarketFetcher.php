@@ -86,6 +86,14 @@ class MarketFetcher implements MarketFetcherInterface
 
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array
     {
+        if ($limit<100) {
+            $limit=100;
+        }
+
+        if ($offset>0) {
+            $offset=0;
+        }
+
         $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
             $userId + $this->config->getOffset(),
             $market,
@@ -138,6 +146,7 @@ class MarketFetcher implements MarketFetcherInterface
         $order = $response->getResult();
 
         $order['user'] -= $this->config->getOffset();
+
         return $order;
     }
 
