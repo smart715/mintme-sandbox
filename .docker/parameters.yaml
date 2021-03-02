@@ -155,9 +155,14 @@ parameters:
     token_withdraw_fee: 0.01
     max_allowed_active_orders: 100
     kb_links:
-        - 'Quickstart-Guide-to-MintMe'
-        - 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'
-        - 'Time-for-token-sales-how-can-I-make-a-difference'
-        - 'Ideas-to-promote-and-sell-your-token'
-        - 'Aiming-at-a-strong-token'
-        - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
+        - Quickstart-Guide-to-MintMe
+        - Talking-to-your-followers-about-MintMe-we-got-some-ideas
+        - Time-for-token-sales-how-can-I-make-a-difference
+        - Ideas-to-promote-and-sell-your-token
+        - Aiming-at-a-strong-token
+        - The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported
+    freeDays: 7
+    price: 100
+    mintmeHostPath: 'https://mintme.host'
+    available_mails:
+        - MintmeHost
