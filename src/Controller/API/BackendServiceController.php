@@ -37,7 +37,7 @@ class BackendServiceController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Post(
-     *     "/container"/delelte,
+     *     "/container/delelte",
      *     name="delete_container",
      *     options={"expose"=true}
      *     )
