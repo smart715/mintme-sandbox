@@ -301,6 +301,7 @@ export default {
         minimumVolumeForMarketcap: Number,
         sort: String,
         order: Boolean,
+        filterForTokens: Object,
     },
     components: {
         Guide,
@@ -470,6 +471,18 @@ export default {
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
         },
+        filterDeployedFirst: function() {
+            return this.filterForTokens.deployed_first || 0;
+        },
+        filterDeployedOnlyMintme: function() {
+            return this.filterForTokens.deployed_only_mintme || 0;
+        },
+        filterAirdropOnly: function() {
+            return this.filterForTokens.airdrop_only || 0;
+        },
+        filterDeployedOnlyEth: function() {
+            return this.filterForTokens.deployed_only_eth || 0;
+        },
     },
     mounted() {
         this.initialLoad();
@@ -559,17 +572,17 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.filter = DEPLOYED_ONLY_MINTME;
+                    params.filter = this.filterDeployedOnlyMintme;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
                 ) {
-                    params.filter = DEPLOYED_ONLY_ETH;
+                    params.filter = this.filterDeployedOnlyEth;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {
-                    params.filter = AIRDROP_ONLY;
+                    params.filter = this.filterAirdropOnly;
                 } else if (deployedFirst) {
-                    params.filter = DEPLOYED_FIRST;
+                    params.filter = this.filterDeployedFirst;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
