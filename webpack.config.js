@@ -1,4 +1,6 @@
 const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 Encore
     .setOutputPath('public/build/')
@@ -26,6 +28,7 @@ Encore
     .addEntry('chat', './assets/js/chat.js')
     .addEntry('home', './assets/js/home.js')
     .addEntry('footer', './assets/js/footer.js')
+    .addEntry('phone_verification', './assets/js/phone_verification.js')
 
     .enablePostCssLoader()
 
@@ -54,5 +57,15 @@ let config = Encore.getWebpackConfig();
 config.resolve.alias['vue$'] = Encore.isProduction()
     ? 'vue/dist/vue.min.js'
     : 'vue/dist/vue.js';
+
+if (Encore.isProduction()) {
+    // Remove the old UglifyJs version
+    config.plugins = config.plugins.filter(
+        (plugin) => !(plugin instanceof webpack.optimize.UglifyJsPlugin)
+    );
+
+    // Add the new one
+    config.plugins.push(new UglifyJsPlugin());
+}
 
 module.exports = config;

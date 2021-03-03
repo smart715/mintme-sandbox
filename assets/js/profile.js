@@ -2,6 +2,7 @@ import BbcodeEditor from './components/bbcode/BbcodeEditor.vue';
 import BbcodeHelp from './components/bbcode/BbcodeHelp.vue';
 import BbcodeView from './components/bbcode/BbcodeView.vue';
 import Avatar from './components/Avatar.vue';
+import PhoneNumber from './components/profile/PhoneNumber.vue';
 import LimitedTextarea from './components/LimitedTextarea.vue';
 import {minLength} from 'vuelidate/lib/validators';
 import {zipCodeContain} from './utils/constants.js';
@@ -18,6 +19,7 @@ new Vue({
     el: '#profile',
     i18n,
     components: {
+        PhoneNumber,
         BbcodeEditor,
         BbcodeHelp,
         BbcodeView,
@@ -39,7 +41,13 @@ new Vue({
             zipCodeProcessing: false,
             firstNameAux: false,
             lastNameAux: false,
+            isValidPhone: false,
+            enablePhoneMessage: false,
         };
+    },
+    beforeMount() {
+        let phoneElement = document.getElementById('profile_phoneNumber_phoneNumber');
+        this.phoneNumber = phoneElement ? phoneElement.getAttribute('value') : null;
     },
     mounted: function() {
         this.nickname = this.$refs.nickname.getAttribute('value');
@@ -65,8 +73,14 @@ new Vue({
                 this.$refs.zipCode.disabled = state;
             }
         },
-
+        phoneChange: function(phone) {
+            this.phoneNumber = phone;
+        },
+        validPhone: function(isValidPhone) {
+            this.isValidPhone = isValidPhone;
+        },
         validation: function(event) {
+            this.enablePhoneMessage = true;
             if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
@@ -133,7 +147,12 @@ new Vue({
     },
     computed: {
         disableSave: function() {
-            return this.$v.$invalid || !this.zipCodeValid || this.zipCodeProcessing || this.firstNameAux || this.lastNameAux;
+            return this.$v.$invalid ||
+                !this.zipCodeValid ||
+                this.zipCodeProcessing ||
+                this.firstNameAux ||
+                this.lastNameAux ||
+                !this.isValidPhone;
         },
     },
     validations() {
