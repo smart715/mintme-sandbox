@@ -191,7 +191,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** {@inheritDoc} */
     public function getUserRelatedMarketsCount(int $userId): int
     {
-        return (int)$this->repository->createQueryBuilder()
+        return (int)$this->repository->createQueryBuilder('ms')
             ->select('COUNT(ms)')
             ->join('ms.quoteToken', 'qt')
             ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
