@@ -166,3 +166,13 @@ parameters:
     mintmeHostPath: 'https://mintme.host'
     available_mails:
         - MintmeHost
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
+    adding_phone_attempts_limit:
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        interval: 30D
