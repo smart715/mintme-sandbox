@@ -90,25 +90,29 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** {@inheritDoc} */
     public function getMarketsCount(int $filter = 0): int
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms')
-            ->join('ms.quoteToken', 'qt');
+        $queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->select('COUNT(ms)')
+            ->join('ms.quoteToken', 'qt')
+            ->leftJoin('qt.crypto', 'c')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false');
 
         switch ($filter) {
             case self::FILTER_DEPLOYED_ONLY_MINTME:
-                $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
+                $queryBuilder->andWhere(
+                    "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
+                )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
-                $qb->innerJoin('qt.airdrops', 'a')
-                    ->where('a.status = :active')
+                $queryBuilder->innerJoin('qt.airdrops', 'a')
+                    ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
 
                 break;
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     private function getMarketsInfoFilter(int $filter, QueryBuilder $queryBuilder): void
@@ -187,11 +191,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** {@inheritDoc} */
     public function getUserRelatedMarketsCount(int $userId): int
     {
-        return (int)$this->em->createQueryBuilder()
+        return (int)$this->repository->createQueryBuilder()
             ->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms')
             ->join('ms.quoteToken', 'qt')
             ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
             ->setParameter('id', $userId)
             ->getQuery()
             ->getSingleScalarResult();
