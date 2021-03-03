@@ -2,18 +2,30 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import TopHolders from '../../js/components/trade/TopHolders';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
 
 /**
  * @return {VueConstructor}
  */
 function mockVue() {
     const localVue = createLocalVue();
+    localVue.use(Vuex);
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$toasted = {show: () => false};
             Vue.prototype.$t = (val) => val;
+            Vue.prototype.$store = new Vuex.Store({
+                modules: {
+                    websocket: {
+                        namespaced: true,
+                        actions: {
+                            addMessageHandler: jest.fn(),
+                        },
+                    },
+                },
+            });
         },
     });
     localVue.component('font-awesome-icon', {});
