@@ -262,3 +262,18 @@ parameters:
         deployed_only_mintme: 2
         airdrop_only: 3
         deployed_only_eth: 4
+
+    # api for sending SMS
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        # 30 days = 30D
+        interval: '30D'
