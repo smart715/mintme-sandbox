@@ -86,6 +86,7 @@ security:
         - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/token$,                                          role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/chat,                                            role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/profile/phone/verify,                            role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/wallet,                                          role: ROLE_USER, requires_channel: https }

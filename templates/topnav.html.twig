@@ -248,3 +248,18 @@
         <admin-menu :is-user-logged="{{ app.user ? 'true' : 'false' }}"></admin-menu>
     {% endif %}
 </nav>
+{% if app.request.attributes.get('_route') != 'homepage' and
+    app.request.attributes.get('_route') != '2fa_login' and
+    app.request.attributes.get('_route') != 'phone_verification' and
+    app.user is not null and
+    (app.user.profile.phoneNumber is null or
+    not app.user.profile.phoneNumber.verified)
+%}
+        <div class="add-phone-notification">
+            <div class="alert alert-primary" role="alert">
+                {% trans with {'%url%': path('profile-view', {'nickname': app.user.profile.nickname, 'edit': true}) } %}
+                    phone.add_number.notification
+                {% endtrans %}
+            </div>
+        </div>
+{% endif %}
