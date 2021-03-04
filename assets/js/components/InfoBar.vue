@@ -66,6 +66,7 @@
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
                 <b-button
+                    v-if="'dev' !== environment"
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     :disabled="null === backendServiceStatus || managingBackendService"
