@@ -111,7 +111,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 $transaction['hash'],
                 $transaction['from'],
-                !$user->isBlocked() ? $transaction['to'] : '',
+                $transaction['to'],
                 new Money(
                     $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
                     new Currency($transaction['crypto'])
