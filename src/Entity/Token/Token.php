@@ -330,9 +330,7 @@ class Token implements TradebleInterface, ImagineInterface
     public function getTypeOfToken(): ?string
     {
         return $this->crypto
-            ? (isset(self::TOKEN_TYPE[$this->crypto->getSymbol()])
-                ? self::TOKEN_TYPE[$this->crypto->getSymbol()]
-                : null)
+            ? (self::TOKEN_TYPE[$this->crypto->getSymbol()] ?? null)
             : null;
     }
 
