@@ -43,6 +43,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -51,32 +52,16 @@ use Throwable;
 class TokenController extends Controller
 {
 
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
-
-    /** @var BlacklistManagerInterface */
-    protected $blacklistManager;
-
-    /** @var TokenManagerInterface */
-    protected $tokenManager;
-
-    /** @var CryptoManagerInterface */
-    protected $cryptoManager;
-
-    /** @var MarketFactoryInterface */
-    protected $marketManager;
-
-    /** @var TraderInterface */
-    protected $trader;
-
-    /** @var UserActionLogger  */
-    private $userActionLogger;
-
-    /** @var ScheduledNotificationManagerInterface  */
-    private $scheduledNotificationManager;
+    protected EntityManagerInterface $em;
+    protected ProfileManagerInterface $profileManager;
+    protected BlacklistManagerInterface $blacklistManager;
+    protected TokenManagerInterface $tokenManager;
+    protected CryptoManagerInterface $cryptoManager;
+    protected MarketFactoryInterface $marketManager;
+    protected TraderInterface $trader;
+    private UserActionLogger $userActionLogger;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
+    private TranslatorInterface $translator;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -88,7 +73,8 @@ class TokenController extends Controller
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
-        ScheduledNotificationManagerInterface $scheduledNotificationManager
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        TranslatorInterface $translator
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -101,6 +87,7 @@ class TokenController extends Controller
         $this->scheduledNotificationManager = $scheduledNotificationManager;
 
         parent::__construct($normalizer);
+        $this->translator = $translator;
     }
 
     /**
@@ -325,7 +312,7 @@ class TokenController extends Controller
         }
 
         return $this->render('pages/token_creation.html.twig', [
-            'formHeader' => 'Create your own token',
+            'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
         ]);
     }
