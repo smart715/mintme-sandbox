@@ -141,7 +141,7 @@ export default {
         getButtonName: function() {
             if (this.managingBackendService) {
                 return this.$t('info_bar.backend_service.in_progress');
-            } else if (!this.managingBackendService) {
+            } else if (!this.backendServiceStatus) {
                 return this.$t('info_bar.backend_service.create');
             } else {
                 return this.$t('info_bar.backend_service.delete');
