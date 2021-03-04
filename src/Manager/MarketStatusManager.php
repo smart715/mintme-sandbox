@@ -23,10 +23,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
-    public const FILTER_DEPLOYED_FIRST = 1;
-    public const FILTER_DEPLOYED_ONLY_MINTME = 2;
-    public const FILTER_AIRDROP_ONLY = 3;
-    public const FILTER_DEPLOYED_ONLY_ETH = 4;
     public const FILTER_AIRDROP_ACTIVE = true;
 
     public const SORT_LAST_PRICE = 'lastPrice';
@@ -102,11 +98,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->join('ms.quoteToken', 'qt');
 
         switch ($filter) {
-            case self::FILTER_DEPLOYED_ONLY_MINTME:
+            case (int)($this->filterForTokens['deployed_only_mintme'] ?? 0):
                 $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
 
                 break;
-            case self::FILTER_AIRDROP_ONLY:
+            case (int)($this->filterForTokens['airdrop_only'] ?? 0):
                 $qb->innerJoin('qt.airdrops', 'a')
                     ->where('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
@@ -120,25 +116,25 @@ class MarketStatusManager implements MarketStatusManagerInterface
     private function getMarketsInfoFilter(int $filter, QueryBuilder $queryBuilder): void
     {
         switch ($filter) {
-            case self::FILTER_DEPLOYED_FIRST:
+            case (int)($this->filterForTokens['deployed_first'] ?? 0):
                 $queryBuilder->addSelect(
                     "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
                 )->addOrderBy('deployed', 'DESC');
 
                 break;
-            case self::FILTER_DEPLOYED_ONLY_MINTME:
+            case (int)($this->filterForTokens['deployed_only_mintme'] ?? 0):
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
 
                 break;
-            case self::FILTER_DEPLOYED_ONLY_ETH:
+            case (int)($this->filterForTokens['deployed_only_eth'] ?? 0):
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::ETH_SYMBOL);
 
                 break;
-            case self::FILTER_AIRDROP_ONLY:
+            case (int)($this->filterForTokens['airdrop_only'] ?? 0):
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
