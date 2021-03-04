@@ -70,10 +70,6 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
         $hostExploded =  explode('.', $host);
         $branch = $hostExploded[0];
 
-        if ($this->isCreatingOrDeleting($branch)) {
-            return 2;
-        }
-
         $process = new Process(['sudo', 'list-branch.sh', '-I', $branch]);
 
         try {
@@ -101,37 +97,13 @@ class BackendContainerBuilder implements BackendContainerBuilderInterface
             new Process(['rm', '-Rf', $workDir.'/maintenance_on']);
 
         try {
-            $process->start();
-
-            $process->wait();
+            $process->mustRun();
 
             return $process->isSuccessful()
                 ? 'OK'
                 : null;
         } catch (ProcessFailedException $exception) {
             $this->logger->error('Failed to set maintenance mode, Reason: '
-                .$exception->getMessage());
-
-            return null;
-        }
-    }
-    private function isCreatingOrDeleting(string $branch): ?bool
-    {
-        $checkIfCreatingCommand = '[^-f^/tmp/'.$branch.'_creating_backend ]^&&^echo^1^||^echo^0';
-        //  $checkIfDeletingCommand = '[^-f^/tmp/'.$branch.'_deleting_backend ]^&&^echo^1^||^echo^0';
-        $command = explode('^', $checkIfCreatingCommand);
-        $process = new Process($command);
-
-        try {
-            $process->mustRun();
-
-            if ($process->isSuccessful()) {
-                return true === strpos($process->getOutput(), '1');
-            }
-
-            return null;
-        } catch (\Throwable $exception) {
-            $this->logger->error('Failed getting the container status for the'.$branch. ' branch. Reason: '
                 .$exception->getMessage());
 
             return null;

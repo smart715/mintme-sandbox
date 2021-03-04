@@ -66,28 +66,22 @@
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
                 <b-button
-
+                    v-if="'dev' !== environment"
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     v-text="getButtonName"
-                    :disabled="null === backendServiceStatus || managinBackednService"
+                    :disabled="null === backendServiceStatus || managingBackendService"
                 ></b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
                 </div>
             </div>
         </b-collapse>
-        <lock-screen
-            :is-loading="managinBackednService"
-        >
-
-        </lock-screen>
     </div>
 </template>
 
 <script>
 import Decimal from 'decimal.js';
-import LockScreen from './LockScreen';
 
 export default {
     name: 'InfoBar',
@@ -114,7 +108,7 @@ export default {
                 isTokenContractActive: false,
             },
             backendServiceStatus: null,
-            managinBackednService: false,
+            managingBackendService: false,
             balance: {
                 WEB: null,
                 BTC: null,
@@ -123,9 +117,6 @@ export default {
             },
             interval: null,
         };
-    },
-    components: {
-      LockScreen,
     },
     created() {
         this.fetchBackendServiceStatus();
@@ -170,26 +161,26 @@ export default {
                 this.deleteBackendServices();
         },
         fetchBackendServiceStatus: function() {
-            this.managinBackednService = true;
+            this.managingBackendService = true;
             this.$axios.retry.get(this.$routing.generate('status_container'))
                 .then((res) => {
                     this.backendServiceStatus = res.data;
-                    this.managinBackednService = '2' === res;
+                    this.managingBackendService = false;
                 });
         },
         createBackendServices: function() {
-            this.managinBackednService = true;
-            this.$axios.retry.post(this.$routing.generate('create_container'));
-            setTimeout(function() {
-                location.reload();
-            }, 20000);
+            this.managingBackendService = true;
+            this.$axios.retry.post(this.$routing.generate('create_container'))
+                .then((res) => {
+                    location.reload();
+                });
         },
         deleteBackendServices: function() {
-            this.managinBackednService = true;
-            this.$axios.retry.post(this.$routing.generate('delete_container'));
-            setTimeout(function() {
-                location.reload();
-            }, 5000);
+            this.managingBackendService = true;
+            this.$axios.retry.post(this.$routing.generate('delete_container'))
+                .then((res) => {
+                    location.reload();
+                });
         },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
