@@ -146,6 +146,7 @@ export const notificationTypes = {
     tokenMarketingTips: 'token_marketing_tips',
 };
 
+export const tabs = ['intro', 'buy', 'posts', 'trade'];
 
 export const descriptionLength = {
     min: 200,
