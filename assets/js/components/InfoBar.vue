@@ -66,7 +66,7 @@
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
                 <b-button
-                    v-if="'dev' !== environment"
+
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
                     v-text="getButtonName"
@@ -77,11 +77,17 @@
                 </div>
             </div>
         </b-collapse>
+        <lock-screen
+            :is-loading="managinBackednService"
+        >
+
+        </lock-screen>
     </div>
 </template>
 
 <script>
 import Decimal from 'decimal.js';
+import LockScreen from './LockScreen';
 
 export default {
     name: 'InfoBar',
@@ -118,13 +124,17 @@ export default {
             interval: null,
         };
     },
+    components: {
+      LockScreen,
+    },
+    created() {
+        this.fetchBackendServiceStatus();
+    },
     mounted() {
         this.$axios.retry.get(this.$routing.generate('hacker_info'))
             .then((res) => {
                 this.infoData = res.data;
             });
-        this.fetchBackendServiceStatus();
-
         if (this.username) {
             this.fetchBalance();
             this.interval = setInterval(this.fetchBalance, 10000);
@@ -155,7 +165,7 @@ export default {
     },
     methods: {
         manageBackendService: function() {
-            !this.backendServiceStatus ?
+           !this.backendServiceStatus ?
                 this.createBackendServices() :
                 this.deleteBackendServices();
         },
@@ -164,7 +174,7 @@ export default {
             this.$axios.retry.get(this.$routing.generate('status_container'))
                 .then((res) => {
                     this.backendServiceStatus = res.data;
-                    this.managinBackednService = false;
+                    this.managinBackednService = '2' === res;
                 });
         },
         createBackendServices: function() {
@@ -172,7 +182,7 @@ export default {
             this.$axios.retry.post(this.$routing.generate('create_container'));
             setTimeout(function() {
                 location.reload();
-            }, 5000);
+            }, 20000);
         },
         deleteBackendServices: function() {
             this.managinBackednService = true;
