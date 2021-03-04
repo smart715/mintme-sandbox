@@ -22,7 +22,7 @@ interface MailerInterface
     public function sendProfileFillingReminderMail(User $user): void;
     public function sendTokenDescriptionReminderMail(Token $token): void;
     public function sendNewInvestorMail(Token $token, string $newInvestor): void;
-    public function sendNewPostMail(User $user, String $tokenName): void;
+    public function sendNewPostMail(User $user, String $tokenName, String $slug): void;
     public function sendTokenDeployedMail(User $user, String $tokenName): void;
     public function sendNoOrdersMail(User $user, String $tokenName): void;
     public function sendKnowledgeBaseMail(User $user, Token $token): void;

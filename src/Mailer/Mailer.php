@@ -292,16 +292,18 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendNewPostMail(User $user, String $tokenName): void
+    public function sendNewPostMail(User $user, String $tokenName, String $slug): void
     {
         $body = $this->twigEngine->render("mail/new_post.html.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
         $textBody = $this->twigEngine->render("mail/new_post.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
         $subject = $this->translator->trans('email.new_post');
