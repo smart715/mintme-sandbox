@@ -2,15 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\PhoneNumber;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Exception\NotFoundProfileException;
+use App\Form\PhoneVerificationType;
 use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
-use Symfony\Component\Form\Form;
+use DateTimeImmutable;
+use libphonenumber\PhoneNumberFormat;
+use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,20 +26,67 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ProfileController extends Controller
 {
-    /** @var UserActionLogger */
-    private $userActionLogger;
+    private UserActionLogger $userActionLogger;
+    private PhoneNumberUtil $phoneNumberUtil;
 
-    public function __construct(NormalizerInterface $normalizer, UserActionLogger $userActionLogger)
-    {
+    public function __construct(
+        NormalizerInterface $normalizer,
+        UserActionLogger $userActionLogger,
+        PhoneNumberUtil $phoneNumberUtil
+    ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
+        $this->phoneNumberUtil = $phoneNumberUtil;
     }
 
-    /** @Route("/{nickname}", name="profile-view", options={"expose"=true}) */
+    /** @Route("/phone/verify", name="phone_verification") */
+    public function phoneConfirmation(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $profile = $user->getProfile();
+
+        if (!$profile->getPhoneNumber()) {
+            return $this->redirectToRoute('profile-view', [
+                'nickname' => $profile->getNickname(),
+                'edit' => true,
+            ]);
+        }
+
+        $form = $this->createForm(PhoneVerificationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() &&
+            $form->isValid()
+        ) {
+            $profile->getPhoneNumber()->setVerified(true);
+            $profile->getPhoneNumber()->setVerificationCode(null);
+            $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
+            $profile->getPhoneNumber()->setEditAttempts(0);
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($profile);
+            $entityManager->flush();
+            $this->userActionLogger->info(
+                'Phone number '.$this->phoneNumberUtil->format(
+                    $profile->getPhoneNumber()->getPhoneNumber(),
+                    PhoneNumberFormat::E164
+                ).' verified.'
+            );
+
+            return $this->redirectToRoute('profile');
+        }
+
+        return $this->render('pages/phone_verification.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /** @Route("/{nickname}/{edit}", defaults={"edit"=false}, name="profile-view", options={"expose"=true}) */
     public function profileView(
         Request $request,
         ProfileManagerInterface $profileManager,
-        string $nickname
+        string $nickname,
+        bool $edit
     ): Response {
         $profile = $profileManager->getProfileByNickname($nickname);
 
@@ -58,13 +109,35 @@ class ProfileController extends Controller
                 $profile,
                 $clonedProfile,
                 $form,
-                (bool)$form->getErrors(true)->count()
+                true === $edit ? $edit : (bool)$form->getErrors(true)->count()
             );
         }
 
         if (null === $profile->getDescription() || '' == $profile->getDescription()) {
             $profile->setNumberOfReminder(0);
             $profile->setNextReminderDate(new \DateTime('+1 month'));
+        }
+
+        $phoneNumber = $form->get('phoneNumber')->getData()['phoneNumber'];
+        $oldPhoneE164 = $profile->getPhoneNumber() ? $this->phoneNumberUtil->format(
+            $profile->getPhoneNumber()->getPhoneNumber(),
+            PhoneNumberFormat::E164
+        ) : null;
+        $newPhoneE164 = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164);
+        $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
+
+        $verifyPhone = $phoneChanged || !$profile->getPhoneNumber()->isVerified();
+
+        if ($verifyPhone) {
+            if (!$oldPhoneE164) {
+                $profile->setPhoneNumber(new PhoneNumber());
+                $profile->getPhoneNumber()->setProfile($profile);
+            }
+
+            $profile->getPhoneNumber()->setProfile($profile);
+            $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
+            $profile->getPhoneNumber()->setVerified(false);
+            $profile->getPhoneNumber()->setVerificationCode(null);
         }
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -83,6 +156,16 @@ class ProfileController extends Controller
         }
 
         $this->userActionLogger->info('Edit profile');
+
+        if ($phoneChanged) {
+            $this->userActionLogger->info(
+                'Phone number changed. From: '.$oldPhoneE164. '. To: '.$newPhoneE164.' (not verified yet)'
+            );
+        }
+
+        if ($verifyPhone) {
+            return $this->redirectToRoute('phone_verification');
+        }
 
         return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
     }
@@ -154,6 +237,9 @@ class ProfileController extends Controller
             'form' =>  $form->createView(),
             'canEdit' => null !== $user && $profile === $user->getProfile(),
             'editFormShowFirst' => $showEdit,
+            'phoneCountryCode' => $profile->getPhoneNumber()
+                ? $this->phoneNumberUtil->getRegionCodeForNumber($profile->getPhoneNumber()->getPhoneNumber())
+                : null,
         ]);
     }
 }
