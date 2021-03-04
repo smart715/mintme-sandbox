@@ -656,7 +656,7 @@ services:
         properties:
             minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
         arguments:
-            filterForTokens: '%filter_for_tokens%'
+            $filterForTokens: '%filter_for_tokens%'
 
     monolog.formatter.unsubscribe:
         class: Monolog\Formatter\LineFormatter
