@@ -16,6 +16,7 @@ import Avatar from './components/Avatar';
 import Envelope from './components/chat/Envelope';
 import i18n from './utils/i18n/i18n';
 import TokenCreatedModal from './components/modal/TokenCreatedModal';
+import {tabs} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -24,7 +25,6 @@ new Vue({
   data() {
     return {
       tabIndex: 0,
-      tabs: ['intro', 'buy', 'posts', 'trade'],
       tokenDescription: null,
       tokenWebsite: null,
       tokenFacebook: null,
@@ -86,13 +86,13 @@ new Vue({
       tokenName = tokenName.replace(/\s/g, '-');
       document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
-        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[0]});
+        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[0]});
         let donateLink = document.querySelectorAll('a.token-buy-tab-link')[0];
-        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[1]});
+        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[1]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[2]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[2]});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: this.tabs[3]});
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[3]});
       });
     }
   },
@@ -145,7 +145,7 @@ new Vue({
         window.history.replaceState(
             {}, document.title, this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: this.tabs[i],
+              tab: tabs[i],
             })
         );
       }
