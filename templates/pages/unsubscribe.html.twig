@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Unsubscribe{% endblock %}
+{% block title %}{% trans %}page.unsubscribe.title{% endtrans %}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -24,7 +24,7 @@
                   </div>
                   <div class="row">
                      <div class="col-12">
-                        <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'Yes' }) }}</div>
+                        <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'yes'|trans }) }}</div>
                         <div class="float-left">
                            <a href="{{ path('homepage') }}" class="btn-cancel">{% trans %}no{% endtrans %}</a>
                         </div>

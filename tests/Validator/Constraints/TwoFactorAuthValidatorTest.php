@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TwoFactorAuthValidatorTest extends TestCase
 {
@@ -32,7 +33,7 @@ class TwoFactorAuthValidatorTest extends TestCase
         $tm = $this->createMock(TwoFactorManager::class);
         $tm->method('checkCode')->willReturn(false);
 
-        $validator = new TwoFactorAuthValidator($storage, $tm);
+        $validator = new TwoFactorAuthValidator($storage, $tm, $this->createMock(TranslatorInterface::class));
         $validator->user = $this->createMock(User::class);
         $validator->initialize($context);
         $validator->validate('123', $this->createMock(TwoFactorAuth::class));

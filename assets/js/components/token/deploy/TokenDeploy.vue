@@ -163,7 +163,7 @@ export default {
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
-                this.notifySuccess('Process in pending status and it will take some minutes to be done.');
+                this.notifySuccess(this.$t('toasted.success.deploy_pending'));
             })
             .catch(({response}) => {
                 if (!response) {
