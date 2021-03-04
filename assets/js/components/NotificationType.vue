@@ -13,6 +13,7 @@
 
 <script>
 import {notificationTypes} from '../utils/constants';
+import {tabs} from '../utils/constants';
 
 export default {
     name: 'NotificationType',
@@ -30,12 +31,21 @@ export default {
                 this.notificationTypes.deployed,
                 this.notificationTypes.cancelled,
                 this.notificationTypes.filled,
-                this.notificationTypes.newPost,
                 ].includes(notification.type)) {
                 let jsonData = JSON.parse(notification.jsonData);
                 return {
                     tokenName: jsonData.tokenName,
                     urlToken: this.$routing.generate('token_show', {name: jsonData.tokenName}),
+                };
+            }
+
+            if (this.notificationTypes.newPost === notification.type) {
+                let jsonData = JSON.parse(notification.jsonData);
+                return {
+                  tokenName: jsonData.tokenName,
+                  urlToken: jsonData.hasOwnProperty('slug')
+                      ? this.$routing.generate('new_show_post', {tokenName: jsonData.tokenName, slug: jsonData.slug})
+                      : this.$routing.generate('token_show', {name: jsonData.tokenName, tab: tabs[2]}),
                 };
             }
 
