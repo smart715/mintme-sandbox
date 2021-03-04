@@ -38,6 +38,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const SORT_MARKET_CAP = 'marketCap';
     public const SORT_MARKET_CAP_USD = 'marketCapUsd';
 
+    /** @var array<int> */
+    private $filterForTokens;
+
     /** @var MarketStatusRepository */
     protected $repository;
 
@@ -66,6 +69,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
+        array $filterForTokens,
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
         CryptoManagerInterface $cryptoManager,
@@ -75,6 +79,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         ParameterBagInterface $bag,
         MoneyWrapperInterface $moneyWrapper
     ) {
+        $this->filterForTokens = $filterForTokens;
         /** @var  MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
         $this->repository = $repository;

@@ -697,3 +697,8 @@ services:
             $mintmeHostFreeDays: '%freeDays%'
             $mintmeHostPrice: '%price%'
             $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Manager\MarketStatusManager:
+        arguments:
+            filterForTokens: '%filter_for_tokens%'
+
