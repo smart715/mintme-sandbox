@@ -69,7 +69,9 @@
                     v-if="'dev' !== environment"
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
-                    v-text="getButtonName"
+                    :v-text="!backendServiceStatus ?
+                        this.$t('info_bar.backend_service.create') :
+                            this.$t('info_bar.backend_service.create')"
                     :disabled="null === backendServiceStatus || managingBackendService"
                 ></b-button>
                 <div class="close-btn p-sm-2">
@@ -132,9 +134,6 @@ export default {
         }
     },
     computed: {
-        getButtonName: function() {
-          return !this.backendServiceStatus ? 'Create Backend Service' : 'Delete Backend Service';
-        },
         mintmeBalance: function() {
             return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
         },
@@ -172,14 +171,18 @@ export default {
             this.managingBackendService = true;
             this.$axios.retry.post(this.$routing.generate('create_container'))
                 .then((res) => {
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
                 });
         },
         deleteBackendServices: function() {
             this.managingBackendService = true;
             this.$axios.retry.post(this.$routing.generate('delete_container'))
                 .then((res) => {
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
                 });
         },
         fetchBalance: function() {
