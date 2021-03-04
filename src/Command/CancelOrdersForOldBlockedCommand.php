@@ -2,20 +2,14 @@
 
 namespace App\Command;
 
-use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
-use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -24,37 +18,23 @@ class CancelOrdersForOldBlockedCommand extends Command
     /** @var string */
     protected static $defaultName = 'app:cancelOrders';
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private TokenManagerInterface $tokenManager;
 
-    /** @var UserManagerInterface */
-    private $userManager;
+    private UserManagerInterface $userManager;
 
-    /** @var EntityManagerInterface */
-    private $em;
+    private MarketHandlerInterface $marketHandler;
 
-    /** @var UserActionLogger */
-    private $logger;
+    private MarketFactoryInterface $marketFactory;
 
-    /** @var MarketHandlerInterface */
-    private $marketHandler;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var MarketFactoryInterface */
-    private $marketFactory;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var ExchangerInterface */
-    private $exchanger;
+    private ExchangerInterface $exchanger;
 
     private int $maxActiveOrders;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
-        EntityManagerInterface $em,
-        UserActionLogger $logger,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
@@ -63,8 +43,6 @@ class CancelOrdersForOldBlockedCommand extends Command
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
-        $this->em = $em;
-        $this->logger = $logger;
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
@@ -84,22 +62,45 @@ class CancelOrdersForOldBlockedCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         foreach ($this->userManager->getBlockedUsers() as $user) {
+            $coinMarkets = $this->marketFactory->getCoinMarkets();
+            $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
+                $user,
+                $coinMarkets,
+                0,
+                $this->maxActiveOrders
+            );
 
-            // todo get all user blocked
+            foreach ($userPendingOrders as $order) {
+                $market = $order->getMarket();
+                $this->exchanger->cancelOrder($market, $order);
+            }
         }
 
-        foreach ($this->tokenManager->getBlockedTokens()) {
-            // todo get all token blocked
+        foreach ($this->tokenManager->getBlockedTokens() as $token) {
+            $tokenMarket = $this->marketFactory->create(
+                $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+                $token
+            );
+            $tokenPendingOrders = array_merge(
+                $this->marketHandler->getPendingSellOrders(
+                    $tokenMarket,
+                    0,
+                    $this->maxActiveOrders
+                ),
+                $this->marketHandler->getPendingBuyOrders(
+                    $tokenMarket,
+                    0,
+                    $this->maxActiveOrders
+                )
+            );
 
+            foreach ($tokenPendingOrders as $order) {
+                $market = $order->getMarket();
+                $this->exchanger->cancelOrder($market, $order);
+            }
         }
 
-
-
-
-
-
-
-        $io->success('user/token orders has been cancel');
+        $io->success('orders for old user/token blocked has been cancelled');
 
         return 0;
     }

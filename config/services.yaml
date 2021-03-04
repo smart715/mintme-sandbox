@@ -676,3 +676,7 @@ services:
     App\Command\BlockTokenCommand:
         arguments:
             $maxActiveOrders: '%max_allowed_active_orders%'
+
+    App\Command\CancelOrdersForOldBlockedCommand:
+        arguments:
+            $maxActiveOrders: '%max_allowed_active_orders%'
