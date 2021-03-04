@@ -10,5 +10,5 @@ use Symfony\Component\Validator\Constraint;
 class TwoFactorAuth extends Constraint
 {
     /** @var string */
-    public $message = 'Invalid two-factor authentication code.';
+    public $message = '2fa.invalid';
 }
