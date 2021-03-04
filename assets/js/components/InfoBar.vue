@@ -23,6 +23,19 @@
                 <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
             <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
+            <b-button
+                @click="manageBackendService"
+                class="btn-sm float-right mr-4 toggle-btn"
+                :disabled="null === backendServiceStatus || managingBackendService"
+            >
+                <font-awesome-icon
+                    v-if="managingBackendService"
+                    icon="circle-notch"
+                    spin
+                    class="loading-spinner" fixed-width
+                />
+                {{ getButtonName }}
+            </b-button>
             <div class="close-btn p-sm-2" @click="close">
                 <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
             </div>
@@ -65,23 +78,6 @@
                     <b>Tcuc:</b>
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
-                <b-button
-                    v-if="'dev' !== environment"
-                    @click="manageBackendService"
-                    class="btn-sm float-right mr-5 toggle-btn"
-                    :disabled="null === backendServiceStatus || managingBackendService"
-                >
-                    <font-awesome-icon
-                        v-if="managingBackendService"
-                        icon="circle-notch"
-                        spin
-                        class="loading-spinner" fixed-width
-                    />
-                    {{ getButtonName }}
-                </b-button>
-                <div class="close-btn p-sm-2">
-                    <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
-                </div>
             </div>
         </b-collapse>
     </div>
