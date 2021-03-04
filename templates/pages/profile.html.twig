@@ -70,6 +70,11 @@
                                         {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
                                     </div>
                                 {% endif %}
+                                {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified and canEdit %}
+                                    <div class="pb-1">
+                                        {% trans %}page.profile.form.phone_number{% endtrans %} {{ profile.phoneNumber.phoneNumber|phone_number_format('E164') }}
+                                    </div>
+                                {%  endif %}
                                 {% if profile.country is not empty %}
                                     <div class="pb-1">
                                         {% trans %}page.profile.form.country{% endtrans %} {{ profile.getCountryFullName() }}
@@ -118,6 +123,40 @@
                                     </div>
                                     <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center">
                                         {% trans %}page.profile.error.nickname.letters_numbers{% endtrans %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_label(form.phoneNumber.phoneNumber) }}
+                                        <guide>
+                                            <template slot="header">
+                                                {% trans %}phone.guide.header{% endtrans %}
+                                            </template>
+                                            <template slot="body">
+                                                {% trans %}phone.guide.body{% endtrans %}
+                                            </template>
+                                        </guide>
+                                        {% if form_errors(form.phoneNumber.phoneNumber)|length > 0 %}
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="bg-danger text-white">{{ form_errors(form.phoneNumber.phoneNumber) }}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        {{ form_widget(form.phoneNumber.phoneNumber, {
+                                            'value': profile.phoneNumber
+                                                ? profile.phoneNumber.phoneNumber|phone_number_format('NATIONAL')
+                                                : '',
+                                            'attr': {
+                                                'v-model': 'phoneNumber'
+                                            }
+                                        }) }}
+                                        <phone-number
+                                            country-code="{{ phoneCountryCode }}"
+                                            :phone-number="phoneNumber"
+                                            :enable-valid-msg="enablePhoneMessage"
+                                            @phone-change="phoneChange"
+                                            @is-valid-phone="validPhone"
+                                        >
+                                        </phone-number>
                                     </div>
                                     <div class="pb-1">
                                         {{ form_row(form.firstName, {'attr':

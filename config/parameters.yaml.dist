@@ -247,3 +247,26 @@ parameters:
         - 'Aiming-at-a-strong-token'
         - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
 
+    # MintMe.host promotion mail
+    freeDays: 7
+    price: 100
+    mintmeHostPath: https://www.mintme.host
+
+    # mails available to send via app:sendCustomMail
+    available_mails:
+        - 'MintmeHost'
+
+    # api for sending SMS
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        # 30 days = 30D
+        interval: '30D'

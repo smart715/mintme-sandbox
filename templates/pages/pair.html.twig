@@ -176,7 +176,9 @@
                         <div class="row">
                             <top-holders
                                 class="col-12 mt-3"
-                                :token-name="{{ market.quote.symbol | json_encode }}">
+                                :token-name="{{ market.quote.symbol | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
                             </top-holders>
                         </div>
                     </b-tab>

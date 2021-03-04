@@ -7,29 +7,28 @@ navbar.referrals: Referencias
 navbar.help: Ayuda
 navbar.profile: Perfil
 navbar.settings: Ajustes
-navbar.direct_messages: 'Mensajes Directos'
 footer.cookies: 'Esta página web usa cookies'
-footer.press: ''
-footer.wallet: ''
-footer.explorer: ''
-footer.pool: ''
-footer.coin: ''
+footer.press: Press
+footer.wallet: Billetera
+footer.explorer: Explorador
+footer.pool: Pool
+footer.coin: 'MintMe&nbsp;Coin'
 api.page.title: 'Documentación de la API'
 api.page.v2.body.1: 'Todas las solicitudes de la API abierta no requieren autenticación. Todas las solicitudes de la API no abiertas deben estar provistas de claves únicas para la API, que puede generar en'
 api.page.v2.body.2: 'o con un token OAuth.'
-api.page.v2.body.3: 'La base y la cotización del par de monedas (los símbolos de las monedas) se invirtieron (cambiaron de lugar) en el API v2, con respecto al API v1. Lo que era MINTME/token (base=mintme, contización=token) se convirtió en token/MINTME (base=token, contización=mintme), lo que era BTC/MINTME, se convirtió en MINTME/BTC.'
+api.page.v2.body.3: 'La base y la cotización del par de monedas (los símbolos de las monedas) se invirtieron (cambiaron de lugar) en el API v2, con respecto al API v1. Lo que era MINTME/token (base=mintme, cotización=token) se convirtió en token/MINTME (base=token, cotización=mintme), lo que era BTC/MINTME, se convirtió en MINTME/BTC.'
 api.page.body.1: 'Todas las solicitudes debe ser enviadas con claves API únicas, las cuales puede generar en'
 api.page.body.2: 'o con el OAuth token.'
-api.page.body.3: 'Debe proveer las claves API con cada solicitud en el encabezado HTTP como'
+api.page.body.3: 'Debe proveer las claves API con cada solicitud en el encabezado HTTP como los parámetros'
 api.page.body.4: '(pública) y'
-api.page.body.5: '(privado) parámetros. O pasar un token OAuth con cada petición en los encabezados como el parámetro'
+api.page.body.5: '(privado) o pasar un token OAuth con cada petición en los encabezados como el parámetro'
 api.page.body.6: .
 api.page.body.7: 'Puede obtener el token OAuth enviando una solicitud de autorización a la dirección de la API de OAuth:'
 api.page.body.8: 'El token expira luego de cierto tiempo, puede generar un token nuevo luego de su vencimiento.'
 api.page.body.9: 'Nuestros datos se entregan por encargo, usando la bien documentada y simple HTTP RESTful API en formato JSON. Las solicitudes a la API están limitadas a 5 por segundo con un máximo de 10 solicitudes. Todas las solicitudes que excedan este límite no serán procesadas y la API devolverá el código HTTP 503. Para evitar que se supere el límite, se recomienda implementar un mecanismo de almacenamiento en la memoria caché en su aplicación.'
 api.page.body.10: 'Ir a'
 api.page.body.11: 'para generar tus propias claves para la API o un ID y clave secreta para un cliente OAuth.'
-api.page.body.12: '<a href="%path%">Registrarse</a> para generar sus propias claves de API o un ID de cliente OAuth y llave secreta.'
+api.page.body.12: '<a href="%path%">Regístrese</a> para generar sus propias claves de API o un ID de cliente OAuth y llave secreta.'
 api.page.body.13: 'Puede probar nuestras API aquí. Autorice el acceso con sus llaves o tokens generados y haga clic en el método específico para ver cómo funcionan inmediatamente.'
 form.email.label: 'Correo electrónico:'
 form.registration.plain_password: 'Contraseña:'
@@ -38,25 +37,30 @@ form.avatar.file.label: 'Imagen:'
 form.avatar.file.valid_img: 'Por favor, suba una imagen válida'
 form.nickname.label: 'Apodo (Alias):'
 form.nickname.constraint: 'Este apodo (alias) no está permitido'
+form.change_password.current_password: null
 form.change_password.plain_password: 'Nueva contraseña:'
 form.token.name: 'Nombre del token:'
 form.token.name.invalid: 'Nombre de token inválido.'
 form.token.description: 'Description:'
-form.token.initial_order: ''
-form.token.initial_order.guide: ''
+form.token.initial_order: 'Coloque órdenes de venta iniciales '
+form.token.initial_order.guide: 'El 15% de sus tokens serán colocados en venta a precios que van desde 0.1 a 10 MINTME. Sí usted desmarca esta casilla, por favor asegúrese de que se agreguen órdenes de venta manualmente en la sección de Trade de su token.'
 form.token.characters_used: ''
 form.token.min: ''
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar
 page.settings.2fa.header: 'Autentificación de dos factores'
-page.settings.2fa.body: 'Incremente la seguridad de su cuenta habilitando la Autentificación de Dos Factores (2FA)'
+page.settings.2fa.body: 'Incremente la seguridad de su cuenta habilitando la Autentificación de Dos Factores (2FA).'
 page.settings.2fa.enable: 'Habilite la autentificación de dos factores'
 page.settings.2fa.manage: 'Gestionar la autentificación de dos factores'
 page.settings.api.header: API
 page.settings.api.body_1: 'Consulte la'
 page.settings.api.body_2: documentación
 page.settings.api.body_3: 'para mayor información'
+page.settings.oauth.header: null
+page.settings.oauth.body_1: 'Consulte la'
+page.settings.oauth.body_2: documentación
+page.settings.oauth.body_3: 'para mayor información'
 page.settings_2fa.header: 'Ajustes de 2FA'
 page.settings_2fa.body.download_1: 'Descargue el Autenticador de Google desde'
 page.settings_2fa.body.download.app_store: 'el App Store'
@@ -75,9 +79,9 @@ page.landing.content.3: '¡Si se registra AHORA!'
 page.landing.content.4: '¿Qué es'
 page.landing.content.5: '¡Es una novedosa e innovadora plataforma de financiación colectiva en la que ambas partes pueden obtener ganancias!'
 page.landing.content.6: 'El creador de contenidos emite sus propios tokens'
-page.landing.content.7: 'La persona que apoya la compra tales tokens y si el proyecto tiene éxito'
+page.landing.content.7: 'La persona que apoya compra tales tokens y si el proyecto tiene éxito'
 page.landing.content.8: '¡Dichos tokens ganan más valor y pueden ser vendidos por más dinero!'
-page.landing.content.9: '¡Así que usted invierte en alguna idea <br>no sólo da dinero para apoyarla! <br>'
+page.landing.content.9: '¡Así que usted invierte en alguna idea y <br> no sólo da dinero para apoyarla! <br>'
 page.landing.content.10: 'Para motivarle a usar nuestro nuevo servicio, le daremos <b>%landing_web_bonus% MINTME</b> (MintMe coins) si <b> se registra ahora</b>. De forma gratuita...'
 page.landing.content.11: 'Los MintMe coins aparecerán de inmediato en su cuenta <b><i>mintMe</i></b> y puede retirarlos si lo desea.<br> MINTME es la blockchain nativa del exchange <b><i>mintMe</i></b>, en la que se basarán todos los tokens.<br> Si mintme tiene éxito, los %landing_web_bonus% MINTME puede valer mucho más que ahora. ¿Puede imaginar tener la oportunidad de obtener %landing_web_bonus% BTC gratis y no hacerlo en 2010 cuando no valía mucho?'
 page.landing.content.12: '¿Se puede permitir quedarse sin intentarlo?'
@@ -99,9 +103,9 @@ page.error.500.body: 'Algo está mal. Por favor, háganos saber lo que estaba ha
 page.news.title: Noticias
 page.news.read_more: 'Leer más'
 page.news.current: 'Leer más'
-page.index.title: 'mintMe, financiación colectiva | cree su token para monetizarse!'
-page.index.promo.main: 'Cree su moneda<br/> Monetízate <br />'
-page.index.promo.description: 'MintMe es una plataforma de financiación colectiva<br/> donde los patrocinadores también se benefician<br/> del éxito de sus influencers favoritos.'
+page.index.title: 'Cree su moneda, cree su token, ¡ayude a otros y gane! Cree su propio token intercambiable gratis'
+page.index.promo.main: 'Cree su moneda<br/> para su <br />'
+page.index.promo.description: 'o gane ayudando a otros tokens a crecer.'
 page.index.promo.btn.register: 'Regístrese ahora'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
@@ -123,15 +127,15 @@ page.index.faq.header: 'PREGUNTAS FRECUENTES'
 page.index.faq.q1.header: 'Al crear un token, ¿tiene algún valor?'
 page.index.faq.q1.body: 'Las monedas son tan valiosas como usted las haga, usted escoge el valor ya que el token es una representación suya o de su proyecto.'
 page.index.faq.q2.header: 'Ya creé un token. ¿Cómo puedo darle un valor real?'
-page.index.faq.q2.body: 'Depende enteramente de usted. Existen numerosas formas de incrementar el valor de su token. Pudiera tener un servicio que ofrecer en el cual únicamente acepte pagos en tu moneda, o quizás pudiera crear un sistema de recompensas para sus seguidores más fieles que posean cierta cantidad de sus tokens. Puede ser tan creativo como lo deseé, las reglas las hace usted.'
+page.index.faq.q2.body: 'Depende enteramente de usted. Existen numerosas formas de incrementar el valor de su token. Pudiera tener un servicio que ofrecer en el cual únicamente acepte pagos en su moneda, o quizás pudiera crear un sistema de recompensas para sus seguidores más fieles que posean cierta cantidad de sus tokens. Puede ser tan creativo como lo deseé, las reglas las hace usted.'
 page.index.faq.q3.header: '¿Por qué aceptaría token en lugar de USD por mi trabajo?'
 page.index.faq.q3.body: 'Para recibir dinero cuando lo necesite. Quizás pudieras necesitar herramientas para empezar a generar ganancias, pero no tienes el dinero para comprarlas, entonces ¿cómo empezar? Permitiendo que clientes potenciales juzguen su oferta y decidan si merece la pena confiar en usted. Si su oferta es plausible, ellos pudiesen comprar tokens que valgan lo que cuesta su servicio, de esta forma primero obtienes las herramientas necesarias para tu trabajo y tus clientes reciben el servicio que necesitan.'
 page.index.faq.q4.header: '¿Por qué alguien creería en mí o en mi moneda?'
 page.index.faq.q4.body: 'Porque ya se ha creado una reputación que indudablemente tiene valor. Ustes es un activo valioso que puede ser representado como token en la plataforma MintMe. Sus seguidores además pueden sentirse más cómodos siendo capaces de beneficiarse luego de apoyarle en el presente.'
 page.index.faq.q5.header: '¿Hay alguna garantía al comprar tokens de otras personas?'
-page.index.faq.q5.body: 'No, no hay garantías cuando se compran tokens de otras personas. La demanda de cada token dependerá únicamente de la presión de compra que el creador genere para su token a través del método que elija. No hay garantías de que un determinado token aumente de valor sólo porque fue creado. Proporcionaremos herramientas de verificación para comprobar si las páginas web y los perfiles sociales presentados por los creadores de los token son oficiales, pero no podemos garantizar que cada creador cumpla con lo que prometió o propuso. Los creadores honestos, éticos y trabajadores deberían ser recompensados con gran liquidez en sus mercados que han creado a partir de un valor intrínseco cero.'
+page.index.faq.q5.body: 'No, no hay garantías cuando se compran tokens de otras personas. La demanda de cada token dependerá únicamente de la presión de compra que el creador genere para su token a través del método que elija. No hay garantías de que un determinado token aumente de valor sólo porque fue creado. Proporcionaremos herramientas de verificación para comprobar si las páginas web y los perfiles sociales presentados por los creadores de los tokens son oficiales, pero no podemos garantizar que cada creador cumpla con lo que prometió o propuso. Los creadores honestos, éticos y trabajadores deberían ser recompensados con gran liquidez en sus mercados que han creado a partir de un valor intrínseco cero.'
 page.index.faq.q6.header: 'Estoy escéptico acerca de esto, ¿que tal si el creador del token está tratando de estafarme? '
-page.index.faq.q6.body: 'Con todo lo que ha sucedido en los mercados últimamente, entendemos totalmente su preocupación. Por favor, sea consiente que siempre es importante realizar una minuciosa investigación sobre todos los creadores que pretende apoyar y nunca gastar más de lo que está dispuesto a perder. También, tenga en cuenta que esto es una plataforma de financiamiento colectivo, por lo que quizás no siempre sea su intención recuperar su dinero. Puede simplemente usar este servicio como una plataforma para donar y guardar sus tokens como souvenirs del apoyo aportado. Nunca se sabe, quizás algún día el creador de los tokens que recibió apoyo desee mostrar su aprecio por quienes lo apoyaron anteriormente y ¿decida comprar de vuelta todos los tokens a un precio mucho mayor? Las posibilidades son ilimitadas.'
+page.index.faq.q6.body: 'Con todo lo que ha sucedido en los mercados últimamente, entendemos totalmente su preocupación. Por favor, sea consciente que siempre es importante realizar una minuciosa investigación sobre todos los creadores que pretende apoyar y nunca gastar más de lo que está dispuesto a perder. También, tenga en cuenta que esto es una plataforma de financiamiento colectivo, por lo que quizás no siempre sea su intención recuperar su dinero. Puede simplemente usar este servicio como una plataforma para donar y guardar sus tokens como souvenirs del apoyo aportado. Nunca se sabe, quizás algún día el creador de los tokens que recibió apoyo desee mostrar su aprecio por quienes lo apoyaron anteriormente y ¿decida comprar de vuelta todos los tokens a un precio mucho mayor? Las posibilidades son ilimitadas.'
 page.kb.404: 'No se encontraron publicaciones.'
 page.kb.title: 'Base de conocimiento'
 page.kb.help: Ayuda
@@ -155,7 +159,7 @@ page.privacy.1.1.2: '1.1.2. <strong>Información residencial:</strong> Direcció
 page.privacy.1.1.3: '1.1.3. <strong>Información de contacto</strong>: dirección de correo electrónico, dirección postal, número de teléfono.'
 page.privacy.1.1.4: '1.1.4. <strong>Información de seguridad</strong>: alias.'
 page.privacy.1.1.5: '1.1.5. <strong>Información financiera y de facturación:</strong> número de cuentas bancarias y nombres de instituciones bancarias, identificadores en los sistemas de pago u otros medios de pago, información sobre el balance de sus cuentas, su historial comercial, direcciones de billetera de entrada y salida.'
-page.privacy.1.1.6.1: '1.1.6. <strong>Cookies:</strong> Las cookies son archivos con una pequeña cantidad de datos que pueden incluir un identificador único anónimo. Las cookies se envían a su navegador desde un sitio web y se almacenan en su dispositivo (el directorio donde se almacena su navegador). Las tecnologías de rastreo también se utilizan balizas, etiquetas y secuencias de comandos para recopilar y rastrear información y para mejorar y analizar nuestro Servicio.'
+page.privacy.1.1.6.1: '1.1.6. <strong>Cookies:</strong> Las cookies son archivos con una pequeña cantidad de datos que pueden incluir un identificador único anónimo. Las cookies se envían a su navegador desde un sitio web y se almacenan en su dispositivo (el directorio donde se almacena su navegador). Las tecnologías de rastreo que también se utilizan son las balizas, etiquetas y secuencias de comandos para recopilar y rastrear información y para mejorar y analizar nuestro Servicio.'
 page.privacy.1.1.6.2: 'Puede ordenar a su navegador que rechace todas las cookies o que indique cuando se envía una cookie. También puede eliminar las cookies de su navegador. Sin embargo, si no acepta las cookies, es posible que no pueda utilizar algunas partes de nuestro Servicio.'
 page.privacy.1.1.6.3: 'Ejemplos de Cookies que usamos:'
 page.privacy.1.1.6.4: '<strong>Cookies de Sesión</strong>: almacenamos Cookies de Sesión cuando un visitante abre y navega a través de nuestra página web y estas cookies se eliminan normalmente cuando el usuario abandona el sitio.'
@@ -228,6 +232,7 @@ page.profile.form.token: 'Token:'
 page.profile.form.country_placeholder: 'Seleccione su país'
 page.profile.form.description: 'Descripción:'
 page.profile.form.trade_anonymously: 'Ocultar mi información personal'
+page.profile.form.phone_number: null
 page.profile.error.nickname.min: 'Mínimo 2 caracteres'
 page.profile.error.nickname.letters_numbers: 'El apodo solo puede contener letras latinas y números'
 page.profile.error.fn.required: 'Debe suministrar su nombre si suministró su apellido'
@@ -297,7 +302,7 @@ page.terms.content.3: '3. DECLARACIÓN DE RIESGOS'
 page.terms.content.3.1: '3.1. Debido a nuestras políticas internas solo proveemos los servicios a aquellos usuarios con suficiente experiencia, conocimiento y entendimiento de los principios de funcionamiento de nuestra Plataforma Tecnológica y a aquellos quienes entienden completamente los riesgos asociados. Usted reconoce y acepta que accederá y usará MintMe bajo su propio riesgo. Los riesgos de pérdidas en el intercambio de criptoactivos pueden ser sustanciales. Por lo tanto, usted deberá considerar si dicho intercambio es apropiado para usted en virtud de sus circumstancias y recursos. Usted reconoce y acepta la posibilidad de lo siguiente:'
 page.terms.content.3.1a: 'a) Usted puede sufrir una pérdida total de los activos criptográficos de su cuenta MintMe y en algunos casos puede incurrir en pérdidas más allá de dichos activos criptográficos.'
 page.terms.content.3.1b: '(b) Bajo ciertas condiciones de mercado le puede parecer difícil o imposible liquidar una posición. Esto puede ocurrir por ejemplo cuando un mercado alcanza un límite de flucuación en el precio diario ("Movimiento limitado") y hay liquidez insuficiente en el mercado.'
-page.terms.content.3.1c: '(c) La colocación de ordenes contingentes, como las ordenes de "stop-loss" o "stop-limit", no necesariamente limitará sus pérdidas a las cantidades previstas, ya que las condiciones del mercado pueden hacer imposible la ejecución de dichas ordenes.'
+page.terms.content.3.1c: '(c) La colocación de órdenes contingentes, como las órdenes de "stop-loss" o "stop-limit", no necesariamente limitará sus pérdidas a las cantidades previstas, ya que las condiciones del mercado pueden hacer imposible la ejecución de dichas órdenes.'
 page.terms.content.3.1d: '(d) Todas las posiciones de los criptoactivos involucran riesgo, y una posición "extendida" puede no ser menos riesgosa que una posición "larga" o "corta".'
 page.terms.content.3.1e: '(e) El uso de nivelamiento puede tener efecto tanto en contra como a favor de usted y puede conducir tanto a grandes pérdidas como granancias.'
 page.terms.content.3.1f: '(f) Todos los puntos señalados anteriormente se aplican a todos los criptoactivos. Sin embargo, esta breve declaración no puede indicar todos los riesgos y otros aspectos relacionados con el comercio de los criptoactivos y no se considerará como un asesoramiento profesional.'
@@ -318,7 +323,7 @@ page.terms.content.6.4: '6.4. Insuficientes criptoactivos. Si usted posee un mon
 page.terms.content.6.5: '6.5. Impuestos. Es su responsabilidad determinar que impuestos aplican, si los hay, a las Transferencias que completa a través de MintMe, y es su responsabilidad reportar y remitir el impuesto correcto a la autoridad fiscal correspondiente. Usted está de acuerdo en que MintMe no es responsable de determinar si aplican impuestos a sus transferencias o de recaudar, reportar, retener o remitir cualquier impuesto surgido a partir de cualquier Intercambio y Transferencia, y no actúa como su agente tributario.'
 page.terms.content.6.6: '6.6. Comentarios. Nosotros poseemos los derechos exclusivos, incluyendo toda la propiedad intelectual, de Comentarios. Cualquier Comentarios que usted envíe no es confidencial y se convertirá en propiedad de MintMe. Nosotros tendremos la facultad de utilizar y difundir sin restricciones dicha información para cualquier propósito, comercial o de otro tipo, sin reconocimiento o compensación hacia usted. Usted renuncia a cualquier derecho que pueda tener sobre el Comentarios (incluyendo cualquier derecho de autor). No suministré Comentarios si usted espera ser recompensado o desea continuar siendo el propietario de los derechos; su idea puede ser buena, pero es posible que Nosotros ya tengamos la misma idea o una similar y no deseamos ninguna disputa. También tenemos el derecho de revelar su identidad a cualquier tercero si este afirma que cualquier contenido publicado por usted constituye una violación de su propiedad intelectual o su derecho a la privacidad. Tenemos el derecho de remover cualquier publicación que usted haga en nuestra Plataforma si encontramos que su opinión en dicha publicación no cumple con los estándares de contenido establecidos.'
 page.terms.content.7: '7. SUSPENSIÓN Y TERMINACIÓN DE SU CUENTA MINTME'
-page.terms.content.7.1: '7. En caso de que usted rompa estos Términos, o cualquier otro evento que consideremos necesario, incluyendo pero no limitándose a la perturbación del mercado y/o Causa de Fuerza Mayor, nosotros podremos en nuestra sola discreción y sin responsabilidad hacia usted, con o sin previo aviso:'
+page.terms.content.7.1: '7.1 En caso de que usted rompa estos Términos, o cualquier otro evento que consideremos necesario, incluyendo pero no limitándose a la perturbación del mercado y/o Causa de Fuerza Mayor, nosotros podremos en nuestra sola discreción y sin responsabilidad hacia usted, con o sin previo aviso:'
 page.terms.content.7.1a: '(a) suspender todo o parte de su acceso a nuestros Servicios o;'
 page.terms.content.7.1b: '(b) impedirle completar cualquier acción en la Plataforma, incluyendo cerrar cualquier orden de Trade abierta.'
 page.terms.content.7.1c: '(c) En caso de que la transferencia se reanude, usted reconoce que las tarifas vigentes en el mercado pueden diferir considerablemente de las disponibles antes de ese acontecimiento o;'
@@ -337,7 +342,7 @@ page.terms.content.8.3: '8.3. Salvo que la ley exija lo contrario, en ningún ca
 page.terms.content.8.4: '8.4. Nos reservamos el derecho, en nuestra sola discreción, de controlar cualquier acción o procedimiento (a nuestras expensas) en la cual Nosotros somos participantes y determinar como deseamos resolverlo.'
 page.terms.content.8.5: '8.5. En la medida máxima permitida por la ley aplicable, en ningún caso la responsabilidad total de MintMe (incluidos nuestros directores, funcionarios, miembros, empleados y agentes), ya sea en contrato, garantía, agravio (incluida la negligencia, ya sea activa, pasiva o imputada), responsabilidad de producto, responsabilidad estricta u otra teoría, que surja o esté relacionada con el uso o la incapacidad de uso de MintMe o con estos términos, excederá los honorarios pagados por usted a MintMe dentro de los 3 meses inmediatamente anteriores a la fecha de cualquier reclamo que dé lugar a dicha responsabilidad.'
 page.terms.content.8.6: '8.6. Las tenencias de activos criptográficos no están cubiertas por ningún plan de garantía de depósitos. Como los pagos de los activos criptográficos no son reversibles, Usted es responsable de la protección y seguridad de su cuenta MintMe. El precio de los activos criptográficos puede cambiar rápidamente y el riesgo de pérdida en el comercio o en la tenencia de activos criptográficos puede ser considerable. Por lo tanto, debe considerar cuidadosamente si el comercio o la tenencia de activos criptográficos es adecuado para usted a la luz de su condición financiera, experiencia y nivel de tolerancia al riesgo.'
-page.terms.content.8.7: '8.7. Nos esforzamos por proteger a nuestros usuarios de actividades fraudulentas y de estafa en la esfera de los activos cifrados. Es posible que algunos activos criptográficos estén destinados a la incautación ilegal de la propiedad, o se interpreten como un fraude, una estafa o cualquier otra actividad, reconocida por las leyes como ilegal y/o no conforme a los requisitos legales. Nos reservamos el derecho de prohibir e interrumpir cualquier transacción en nuestra plataforma con dicho activo criptográfico a nuestra entera discreción, sin previo aviso y sin publicar el motivo de dicha decisión, siempre que tengamos conocimiento de ello.'
+page.terms.content.8.7: '8.7. Nosotros nos esforzamos en proteger a nuestros usuarios de actividades fraudulentas y estafas en el sector de los criptoactivos. Es posible que algunos criptoactivos estén destinados para tomas ilícitas de la propiedad o se interpreten como un fraude, estafa o cualquier otra actividad reconocida como ilegal y/o no conforme a los requisitos legales. Nos reservamos el derecho de prohibir e interrumpir cualquier transacción en nuestra plataforma con dicho criptoactivo a nuestra entera discreción, sin previo aviso y sin publicar el motivo de dicha decisión, siempre que tengamos conocimiento de ello.'
 page.terms.content.9: '9. NO HAY OFERTA DE GARANTÍAS'
 page.terms.content.9.1: '9.1. MintMe se esfuerza en tomar todas las medidas posibles para asegurarse de que los criptoactivos disponibles a través de nuestra Plataforma no puedan ser clasificados como "valores" por la SEC de los Estados Unidos y/u otras autoridades competentes. Además, MintMe declara que nunca tuvo la intención o el deseo de hacer disponibles tokens y/o monedas que puedan ser clasificadas como "valores" a través de nuestra Plataforma Tecnológica.'
 page.terms.content.9.2: '9.2. La responsabilidad por el hecho de que el instrumento no pueda ser tratado como un "valor" recae en el propietario del token y/o moneda. Si existe algún riesgo o especulación de que el token y/o moneda pueda ser tratado como un "valor", MintMe se reserva el derecho de prohibir e interrumpir cualquier transacción en nuestra Plataforma Tecnológica con dichos tokens y/o monedas a su entera discreción.'
@@ -358,13 +363,13 @@ page.terms.content.11.6: '11.6. Disponibilidad. La invalidez o incapacidad de ap
 page.terms.content.11.7: '11.7. Asignación. Usted no puede ceder o transferir ninguno de sus derechos u obligaciones bajo estos términos sin el previo consentimiento escrito por parte de MintMe, incluyendo la operacion por ley o en conexión con cualquier cambio de control. MintMe puede asignar o transferir parte o todos sus derechos bajo estos términos, en su totalidad o por partes, sin obtener su previo consentimiento o aprobación.'
 page.terms.content.11.8: '11.8. Encabezados. Los encabezados de las secciones son sólo por conveniencia y no se utilizarán para limitar o interpretar dichas secciones.'
 page.terms.content.11.9: '11.9. Interpretaciones. Los términos "Remesa", "Depósito", " Retiro", "Trade" y algunos otros a los que se hace referencia en el presente documento se utilizan con fines de referencia a los cripotactivos únicamente y, según la definición ut supra, no se considerarán interpretados para el uso financiero habitual.'
-page.terms.content.11.10: '11.10 Competiciones. De vez en cuando nuestros socios comerciales, contratistas, clientes, contrapartes, pueden sostenes competencias, desafíos, juegos y cualquier otro tipo de evento disponibles para los Usuarios a través de nuestra Plataforma Tecnológica. Al aceptar participar en dichas competencias, usted deberá cumplir con las reglas establecidas en cada competencia y actuar en conformidad con ellas. MintMe no controla y no esta asociada con cualquiera de dichas competencias y no tendrá responsabilidad por conducir y sostener la competencia a menos que las reglas de tal competencia lo establezcan. MintMe se reserva el derecho de publicar las reglas de la competencia recibidas por parte del dueño de la misma. Usted reconoce y acepta que su participación, e interacciones con el dueño de la competencia, son bajo su propio riesgo.'
+page.terms.content.11.10: '11.10 Competiciones. De vez en cuando nuestros socios comerciales, contratistas, clientes, contrapartes, pueden sostener competencias, desafíos, juegos y cualquier otro tipo de evento disponibles para los Usuarios a través de nuestra Plataforma Tecnológica. Al aceptar participar en dichas competencias, usted deberá cumplir con las reglas establecidas en cada competencia y actuar en conformidad con ellas. MintMe no controla y no esta asociada con cualquiera de dichas competencias y no tendrá responsabilidad por conducir y sostener la competencia a menos que las reglas de tal competencia lo establezcan. MintMe se reserva el derecho de publicar las reglas de la competencia recibidas por parte del dueño de la misma. Usted reconoce y acepta que su participación, e interacciones con el dueño de la competencia, son bajo su propio riesgo.'
 page.terms.content.12: '12. REGISTRO DE UNA CUENTA CON MINTME'
 page.terms.content.12.1: '12.1. Es necesario pasar por el proceso de registro y crear una cuenta con MintMe para usar nuestra Plataforma Tecnológica  en orden correcto y con todas sus funciones.'
 page.terms.content.12.2: '12.2. MintMe se reserva el derecho, a su entera discreción, de limitar la cantidad de cuentas MintMe que usted pudiera tener, mantener o crear. Las cuentas de MintMe no pueden ser asignadas a ningún tercero.'
 page.terms.content.12.3: '12.3. Cuando usted crea una cuenta en MintMe, usted se compromete a: '
 page.terms.content.12.3a: '(a) Crear una contraseña fuerte que usted no use en ningún otro sitio web, servicios en línea y fuera de línea; '
-page.terms.content.12.3b: '(b) Proporcionar información precisa y veraz. Por favor revise <a target="_blank" href="%privacy_policy%">Privacy policy</a> y <a target="_blank" href="%aml_policy%">AML policy</a> para información de como recopilamos, usamos y compartimos su información personal; '
+page.terms.content.12.3b: '(b) Proporcionar información precisa y veraz. Por favor revise nuestra <a target="_blank" href="%privacy_policy%">Política de privacidad</a> y <a target="_blank" href="%aml_policy%">Política de AML</a> para información de como recopilamos, usamos y compartimos su información personal; '
 page.terms.content.12.3c: '(c) Asumir la responsabilidad de todas las actividades que ocurren en su cuenta MintMe y aceptar todos los riesgos de cualquier acceso autorizado o ilegal  a su cuenta MintMe, hasta donde la ley lo permita.'
 page.terms.content.13: '13. DEPÓSITO/RETIROS DE CRIPTOACTIVOS A UNA CUENTA MINTME'
 page.terms.content.13.1: '13.1. Nuestra Plataforma Tecnológica permite a los Usuarios enviar criptoactivos a una Cuenta MintMe desde un servicio externo de un tercero y viceversa exceptuando ciertas condiciones, el cual puede ser actualizado cada cierto tiempo.'
@@ -391,6 +396,7 @@ page.terms.content.15.2: '15.2. Pago de Comisiones. Usted nos autoriza a Nosotro
 page.terms.content.16: '16. CONTENIDO DE TERCEROS'
 page.terms.content.16.1: 'Mientras se encuentre usando nuestra Plataforma Tecnológica usted puede visualizar Contenido de Terceros. Nosotros no controlamos, respaldamos o adoptamos (aunque sin embargo expresamente instaurado por Nosotros) cualquier Contenido de Terceros y no tendremos responsabilidad por el Contenido de Terceros, incluyendo sin limitación esencial que pueda ser desviada, incompleta, errónea, ofensiva, indecente o en caso tal cuestionable. Además, su relación de negocio o correspondencia con terceras partes son exclusivamente entre usted y terceros. Nosotros no somos responsables o sujetos por cualquier pérdida o daño de cualquier índole como resultado de tales relaciones, y usted entiende que su uso del Contenido de Terceros, y sus interacciones con terceros, están bajo su propio riesgo.'
 page.token_creation.title: 'Creación del token'
+page.token_creation.form_header: null
 page.token_creation.error.taken: 'Ya existe un token con ese nombre'
 page.token_creation.error.forbidden: 'Nombre de token prohibido.'
 page.token_creation.error.contain: 'El nombre del token sólo puede contener letras, números y espacios'
@@ -399,18 +405,20 @@ page.token_creation.error.min: 'El nombre del token debe tener al menos 4 símbo
 page.token_creation.error.max: 'El nombre del token no puede tener más de 60 caracteres'
 page.token_creation.error.blocked: 'El nombre del token no puede contener palabras como "token" o "coin".'
 page.token_creation.create: 'Crear un token'
-page.trading.title: Trading
+page.trading.title: Mercados
+page.unsubscribe.title: null
 page.unsubscribe.header: 'Cancelar la suscripción'
 page.unsubscribe.already: '%mail% ya se ha dado de baja.'
-page.unsubscribe.question: '¿Quiere dar de baja %mail% de nuestra lista de correo?'
+page.unsubscribe.question: '¿Quiere dar de baja a %mail% de nuestra lista de correo?'
+page.unsubscribe.success: null
 page.wallet.title: Billetera
-page.wallet.account: Cuenta
-page.wallet.trading_history: 'Historial de trading'
+page.wallet.account: 'Su cuenta'
+page.wallet.trading_history: 'Historial de Trading'
 page.wallet.dep_with: 'Historial de Depósitos/Retiros'
-page.wallet.active_orders: 'Órdenes activas'
+page.wallet.active_orders: 'Órdenes Activas'
 page.wallet.balance.spinner: Saldo
 page.wallet.tokens_own.spinner: 'Tokens que posee'
-page.wallet.token: Token
+page.wallet.token: 'Su Token'
 page.wallet.blocked: 'fue bloqueado.<br> Retirar o depositar'
 page.wallet.for: 'para el token'
 page.wallet.unavailable: 'no está disponible'
@@ -419,13 +427,13 @@ post.tab.bbcode.ol: '[ol]<br> [li]Uno[/li]<br> [li]Dos[/li]<br>[/ol]'
 post.tab.content: 'El contenido no puede estar vacío o contener sólo bbcodes y espacios en blanco'
 post.required: 'Cantidad requerida de tokens:'
 post.not_any_post: 'El creador del token no ha añadido ninguna publicación todavía.'
-post.created: ''
-post.comments: ''
-post.no_one_commented: ''
-post.likes: ''
-post.deleted: ''
-post.error.deleted: ''
-post.comment.deleted: ''
+post.created: 'Su publicación fue creada.'
+post.comments: Comentarios
+post.no_one_commented: 'Sin comentarios.'
+post.likes: 'Me gusta'
+post.deleted: 'La publicación fue eliminada.'
+post.error.deleted: 'Un error ocurrió eliminando la publicación.'
+post.comment.deleted: 'El comentario fue eliminado.'
 read_more: 'Ver más'
 read_less: 'Ver menos'
 img.creator: 'Ícono de creador de contenido'
@@ -440,31 +448,31 @@ deposit.msg: 'Su depósito de %amount% %symbol% fue completado. Puede verlo disp
 deposit_completed.msg.available: 'Puede verlo disponible en su cuenta.'
 profile_reminder.msg.add_description: 'Por favor agregue una descripción a su perfil %name% para que otros puedan conocerle mejor.'
 profile_reminder.msg.what_to_do: '<a href="%url%/%profile%">Visite su perfil</a> y haga clic en el icono de edición para agregar su descripción.'
-mail.profile_reminder.msg.add_description: ''
-mail.profile_reminder.msg.others: ''
-mail.profile_reminder.msg.to_do_that: ''
-mail.profile_reminder.msg.go_gere: ''
-mail.profile_reminder.msg.click_edit: ''
+mail.profile_reminder.msg.add_description: 'Por favor agregue una descripción en su perfil <strong>%name%,</strong>'
+mail.profile_reminder.msg.others: 'así otros traders pueden conocerle mejor.'
+mail.profile_reminder.msg.to_do_that: 'Para realizar eso,'
+mail.profile_reminder.msg.go_gere: 'ingrese aquí'
+mail.profile_reminder.msg.click_edit: 'y clickee en el ícono de edición'
 new_device_icon: 'new device icon'
 device_label: 'Dispositivo:'
 new_device.date: 'Fecha:'
 new_device.ip: 'Dirección de IP:'
 new_device.detected.msg: 'Hemos detectado un intento de inicio de sesión desde una nueva direción IP.'
 new_investor.msg: 'You got new investor! <a href="%urlProfile%">%profile%</a> bought your token. Check <a href="%urlToken%/trade">Trading History</a>'
-mail.new_investor.msg: ''
-mail.new_investor_bought_token.msg: ''
-mail.new_investor_check_hostory: ''
-mail.new_device.login.msg: ''
-mail.new_device.new_ip.msg: ''
-new_post.msg: ''
-mail.new_post.msg: ''
-mail.new_post.text_link: ''
-deployed.msg: ''
-mail.deployed.msg: ''
-mail.deployed.text_link: ''
+mail.new_investor.msg: '¡Usted obtuvo un nuevo inversor!'
+mail.new_investor_bought_token.msg: 'compró su token.'
+mail.new_investor_check_hostory: 'Chequee el Historial de Comercio'
+mail.new_device.login.msg: 'Nuestro sistema ha detectado un nuevo intento de acceso'
+mail.new_device.new_ip.msg: 'desde una nueva dirección IP o dispositivo'
+new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%/posts">aquí</a>'
+mail.new_post.msg: 'Nueva publicación creada.'
+mail.new_post.text_link: '¡Léalo aquí!'
+deployed.msg: '¡%tokenName% ha sido desplegado a la blockchain! Visítelo <a href="%urlToken%">aquí</a>.'
+mail.deployed.msg: '<strong>%tokenName%</strong> ha sido desplegado en la blockchain                                                                                                                                                                                             '
+mail.deployed.text_link: 'Visite la página del token'
 no_orders.msg: 'There are no sell orders on the market of your token %tokenName%. <a href="%urlToken%/trade">Please add them</a>.'
-mail.no_orders.msg: ''
-mail.no_orders.add_them: ''
+mail.no_orders.msg: 'No hay órdenes de venta en el mercado de su token'
+mail.no_orders.add_them: 'Por favor agréguelos'
 userNotification.title: Notificaciones
 userNotification.no_notifications_yet: 'No hay notificaciones aún.'
 userNotification.config.settings: 'Ajustes de notificaciones '
@@ -479,10 +487,10 @@ userNotification.type.new_post: 'Publicaciones relacionadas a tokens que posee'
 userNotification.type.deployed: 'Nuevos tokens desplegados que posee'
 userNotification.type.order_filled: 'Orders filled'
 userNotification.type.order_cancelled: 'Orders cancelled'
-token_marketing_tips.msg: ''
-mail.token_marketing_tips.msg: ''
-userNotification.type.token_marketing_tips: ''
-password_reset.reseted: 'Tu contraseña ha sido %action%.'
+token_marketing_tips.msg: 'Consulte este artículo <a href="%url%">%title%</a>'
+mail.token_marketing_tips.msg: 'Consulte este artículo'
+userNotification.type.token_marketing_tips: 'Consejos de marketing para sus tokens'
+password_reset.reseted: 'Se ha restablecido su contraseña satisfactoriamente.'
 token_deleted.finished.1: 'Su solicitud para eliminar el token <strong>%tokenName%<strong> de'
 token_deleted.finished.2: 'ha finalizado satisfactoriamente.'
 withdrawal.msg: 'Su retiro ha sido completado. Compruebe <a href="%urlWallet%">El historial de depósito/retiro.</a>'
@@ -494,27 +502,28 @@ nickname_field.body: 'Nombre utilizado en nuestro servicio, visible para todos.'
 2fa.trusted_device: 'Guardar este dispositivo como confiable por %days% días'
 2fa.login.title: 'Autenticación de Correo Electrónico'
 2fa.auth.title: 'Autenticación de Dos Factores'
-2fa.code: 'Code'
-2fa.notification.enabled: 'Congratulations! You have enabled two-factor authentication!'
-2fa.notification.disabled: 'You have disabled two-factor authentication!'
-2fa.notification.download_backup_code: 'Downloading backups codes...'
+2fa.code: Código
+2fa.notification.enabled: '¡Felicidades! Usted ha habilitado la autenticación 2Fa'
+2fa.notification.disabled: 'Usted ha deshabilitado la autenticación 2Fa'
+2fa.notification.download_backup_code: 'Descargando el archivo de códigos...'
+2fa.invalid: null
 error.csrf: 'Token CSRF inválido.'
 email.withdraw.confirm: '¡Confirme su retiro!'
 email.withdraw.body: 'Puede confirmar su retiro haciendo click en el siguiente enlace:'
-email.verification_code: ''
-email.confirm_authentication: ''
-email.new_post: ''
-email.new_investor: ''
-email.new_login_from_new_ip: ''
-email.what_now: ''
-email.token_deleted: ''
-email.mintme_reminder: ''
-email.new_token_deployed: ''
-email.orders: ''
-email.confirm_withdraw: ''
-email.completed: ''
-email.password_changed: ''
-email.password_reset: ''
+email.verification_code: 'Su código de verificación:'
+email.confirm_authentication: 'Confirme la autenticidad '
+email.new_post: 'Nueva Publicación'
+email.new_investor: 'Nuevo Inversor'
+email.new_login_from_new_ip: 'Intento de ingreso desde un nuevo dispositivo o dirección IP nueva'
+email.what_now: '¿Ahora qué?'
+email.token_deleted: 'Token eliminado'
+email.mintme_reminder: 'Recordatorio MintMe'
+email.new_token_deployed: 'Nuevo token desplegado '
+email.orders: Ordenes
+email.confirm_withdraw: 'Confirmación de retiro'
+email.completed: Completado
+email.password_changed: 'Su contraseña ha sido cambiada'
+email.password_reset: 'Su contraseña ha sido restablecida'
 log_in: 'Iniciar Sesión'
 sign_up: Registrarse
 log_out: 'Cerrar Sesión'
@@ -537,7 +546,7 @@ avatar: avatar
 or: o
 and: 'y'
 buy: Compra
-settings: 'settings'
+settings: settings
 sell: Venta
 mintme: MINTME
 btc: BTC
@@ -627,9 +636,9 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.header.logged: Donaciones
-donation.header.not_logged: 'Para realizar donaciones tiene que registrase o ingresar'
-donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no quieres apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>.'
+donation.header.logged: Comprar
+donation.header.not_logged: 'Para comprar tokens, tiene que registrarse o ingresar'
+donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no deseas apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>'
 donation.currency: Moneda
 donation.currency.select: 'Seleccionar moneda'
 donation.balance: 'Su saldo:'
@@ -642,24 +651,24 @@ donation.min_amount: 'Cantidad mínima de %donationCurrency% %currencyMinAmount%
 donation.diff_number: 'La cantidad de tokens que recibirá puede variar ligeramente, dependiendo de la actividad de otros traders.'
 donation.receive: 'Recibirá aproximadamente:'
 donation.fee: 'Comisión por compra: %fee%%'
-donation.donate: Donar
-donation.modal.1: 'La cantidad donada excede el valor de los tokens disponibles para la venta. Puede continuar, o cancelar y ajustar la cantidad a donar. Alternativamente, puede comunicarse con el creador del token y pedirle que agregue más ordenes de venta al mercado y hacer la donación luego.'
+donation.buy: Comprar
+donation.modal.1: 'La cantidad donada excede el valor de los tokens disponibles para la venta. Puede continuar, o cancelar y ajustar la cantidad a donar. Alternativamente, puede comunicarse con el creador del token y pedirle que agregue más órdenes de venta al mercado y hacer la donación luego.'
 donation.modal.2: '¿Desea donar %amountToDonate% por %amountToReceive% que valen %worth%?'
-donation.button_all: 'All'
-donation.order.donation: ''
-donation.order.buy: ''
-donation.order.sell: ''
+donation.button_all: Todo
+donation.order.donation: Donación
+donation.order.buy: 'Compra (Donación)'
+donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
 confirm_modal.cancel: Cancelar
-confirm_modal.accept_delete:
+confirm_modal.accept_delete: null
 deposit_modal.title: DEPOSITAR
 deposit_modal.min_value: 'Cantidad mínima:'
 deposit_modal.fee: 'Comisión:'
 deposit_modal.ok: OK
 order_modal.ok: OK
 token_edit_modal.add_social_media: 'Agregar redes sociales'
-token_edit_modal.period: 'Período de lanzamiento de token'
+token_edit_modal.period: 'Período de liberación del token'
 token_edit_modal.deploy: 'Desplegar el token en la blockchain'
 token_edit_modal.airdrop: 'Campaña de airdrop'
 token_edit_modal.change_name: 'Cambiar nombre del token'
@@ -679,33 +688,33 @@ withdraw_modal.do_not_have: 'No tiene suficiente(s) %currency%'
 withdraw_modal.min_withdraw: 'El monto mínimo a retirar es de %minAmount% %currency%'
 withdraw_modal.invalid_amount: 'Monto inválido'
 withdraw_modal.twofa_code: 'Código de Autorización de Dos Factores:'
-withdraw_modal.fee: 'Comisión de retiro'
-withdraw_modal.total: 'Total a retirar'
+withdraw_modal.fee: 'Comisión de retiro:'
+withdraw_modal.total: 'Total a retirar:'
 withdraw_modal.submit: Retirar
 withdraw_modal.cancel: Cancelar
-withdraw_modal.confirmation_sent: 'Se ha enviado un correó electrónico de confirmación a su dirección. Este expira en 4 horas. '
+withdraw_modal.confirmation_sent: 'Se ha enviado un correo electrónico de confirmación a su dirección. Este expira en 4 horas. '
 withdraw_modal.length: 'La dirección de la billetera debe ser de 42 caracteres iniciando en 0x'
 withdraw_modal.invalid_addr: 'La dirección de la billetera es inválida'
 post.logged_in.1: 'Para ver esta publicación necesita tener'
-post.logged_in.2: 'en su fondos. Visite la página trade y cree ordenes de compra para alcanzar la cantidad de tokens requeridos.'
+post.logged_in.2: 'en su fondos. Visite la página trade y cree órdenes de compra para alcanzar la cantidad de tokens requeridos.'
 post.not_logged: 'Para ver esta publicación necesita tener'
 post.delete: '¿Realmente desea eliminar esta publicación?'
-post.not_found:
-post.edited:
-post.share:
-post.share.reward:
-post.share.sign_in_twitter:
-post.share.confirm_modal:
-post.share.accept:
-post.share.message:
-post.share.not_enough_funds:
-post.share.try_here:
-post.share.success:
-post.reward.not_logged_in:
-post_form.require_amount: 'Cantidad de tokens requerida:'
-post_form.title:
-post_form.share_reward:
-post_form.share_reward_guide:
+post.not_found: 'Publicación no encontrada'
+post.edited: 'La publicación fue editada.'
+post.share: Compartir
+post.share.reward: 'Comparte y obten %amount% %tokenName%'
+post.share.sign_in_twitter: 'Para compartir y obtener ganancias, usted necesita acceder a su cuenta en Twitter.'
+post.share.confirm_modal: 'Al aceptar, publicaremos el siguiente mensaje en Twitter desde su cuenta, y usted recibirá %amount% %tokenName%'
+post.share.accept: Aceptar
+post.share.message: 'Usted debería chequear "%title%" en %url%'
+post.share.not_enough_funds: 'No hay suficientes fondos para su recompensa, por favor contacte al creador del token para recibir ayuda.'
+post.share.try_here: 'Usted puede intentarlo aquí'
+post.share.success: 'Usted ha recibido %amount% %tokenName% con éxito'
+post.reward.not_logged_in: 'Usted debe estar logueado para reclamar %amount% %tokenName%'
+post_form.require_amount: 'Cantidad de tokens requerida: '
+post_form.title: 'Título: '
+post_form.share_reward: 'Ganancia por compartir: '
+post_form.share_reward_guide: 'Usted puede configurar una ganancia de los tokens que entregará a los usuarios quienes compartan su publicación. Los tokens serán descontados de su cuenta.'
 post_form.body: 'Puede restringir la visibilidad de esta publicación o dejarla en 0. El usuario debe tener la cantidad de tokens requerida para poder ver esta publicación.'
 post_form.msg.empty: 'El contenido no puede estar vacío o solamente contener bbcodes y espacios en blanco'
 post_form.msg.min_length: 'El contenido debe tener al menos %minContentLength% caracteres'
@@ -714,20 +723,20 @@ post_form.msg.amount.required: 'La cantidad es requerida'
 post_form.msg.amount.numeric: 'La cantidad debe ser un valor numérico'
 post_form.msg.amount.max_decimals: 'La cantidad puede tener máximo %maxDecimals% decimales'
 post_form.msg.amount.between: 'La cantidad debe estar entre 0 y %maxAmount%'
-post_form.msg.share_reward.required:
-post_form.msg.share_reward.numeric:
-post_form.msg.share_reward.max_decimals:
-post_form.msg.share_reward.between:
-post_form.msg.title.required:
-post_form.msg.title.max_length:
-post_form.backend.no_token:
+post_form.msg.share_reward.required: 'La ganancia es requerida'
+post_form.msg.share_reward.numeric: 'La ganancia debe ser un valor numérico'
+post_form.msg.share_reward.max_decimals: 'La ganancia puede tener solamente como máximo %maxDecimals% decimales'
+post_form.msg.share_reward.between: 'La ganancia debe estar entre 0 y %maxReward%'
+post_form.msg.title.required: 'El título es requerido'
+post_form.msg.title.max_length: 'El título no puede ser mayor a %maxTitleLength% caracteres'
+post_form.backend.no_token: 'El usuario actual no ha creado un token'
 posts.all: 'Todas las publicaciones'
-comment.created:
-comment.confirm_delete:
-comment.deleted:
-comment.edited:
-comment.liked:
-like.removed:
+comment.created: 'Comentario creado.'
+comment.confirm_delete: null
+comment.deleted: 'Comentario borrado.'
+comment.edited: 'Comentario editado.'
+comment.liked: 'Comentario que gustó.'
+like.removed: 'Me gusta eliminado '
 airdrop.end: 'Finalizar este airdrop'
 airdrop.amount_tokens: 'Cantidad de tokens para el airdrop:'
 airdrop.insufficient_funds: 'Fondos insuficientes para la campaña de airdrop.'
@@ -737,7 +746,7 @@ airdrop.min_amount_participants: 'Cantidad mínima de participantes: %minPartici
 airdrop.add_end_date: 'Añadir fecha de culminación'
 airdrop.end_date: 'Fecha de culminación:'
 airdrop.error_message: 'La recompensa no puede ser menor a %minTokenReward% %tokenName%. Establezca una mayor cantidad de tokens o menor de participantes para el airdrop.'
-airdrop.actions.error_message: ''
+airdrop.actions.error_message: 'Debe seleccionar al menos una acción.'
 airdrop.msg_created: 'Su airdrop fue creado satisfactoriamente.'
 airdrop.msg_removed: 'Su airdrop fue removido satisfactoriamente.'
 airdrop.actions.twitter_message: 'Escribir mensaje en Twitter'
@@ -774,16 +783,16 @@ ongoing_airdrop.confirm_message.logged_in: 'Tiene que ingresar para poder recibi
 ongoing_airdrop.confirm_message.cant_participate: 'Disculpe, usted no puede participar en su propio airdrop.'
 ongoing_airdrop.confirm_message: '¿Está seguro que quiere recibir %airdropReward% %tokenName%?'
 ongoing_airdrop.ended: 'Disculpe, este airdrop ha finalizado.'
-ongoing_airdrop.submit_url:
-ongoing_airdrop.actions.message:
-ongoing_airdrop.youtube_authentication_required:
-ongoing_airdrop.not_subscribed:
-ongoing_airdrop.subscription_error:
-ongoing_airdrop.verification_failed:
-ongoing_airdrop.post_link_placeholder:
-ongoing_airdrop.actions.claim_error:
-ongoing_airdrop.twitter_message.confirm:
-ongoing_airdrop.accept: 'Accept'
+ongoing_airdrop.submit_url: 'Enviar dirección'
+ongoing_airdrop.actions.message: '¡%tokenName% esta lanzando su token! Visite %tokenUrl% para conocer mas sobre el token y su airdrop.'
+ongoing_airdrop.youtube_authentication_required: 'Para completar esta acción se requiere autenticación en YouTube.'
+ongoing_airdrop.not_subscribed: 'No suscrito'
+ongoing_airdrop.subscription_error: 'Error al verificar el estado de la suscripción'
+ongoing_airdrop.verification_failed: 'Falló en la verificación'
+ongoing_airdrop.post_link_placeholder: 'Dirección de la pagina con el enlace publicado'
+ongoing_airdrop.actions.claim_error: 'Ocurrió un error al completar la tarea, inténtelo mas tarde'
+ongoing_airdrop.twitter_message.confirm: 'Al hacer clic en aceptar, publicaremos el siguiente mensaje en twitter desde su cuenta'
+ongoing_airdrop.accept: Aceptar
 token.deploy.final_step: 'Este es el último paso para la creación del token. Despues de pagar el despliegue de su token en la blockchain, usted y otros podrán retirar tokens desde MintMe hacia su billetera MintMe Coin.'
 token.deploy.frozen: 'Los MINTME gastados acá serán inaccesibles (congelados) para todos durante 5 años. De esta manera se disminuyen los MINTME en circulación con cada compra y se incrementa la probabilidad de que el precio de MINTME aumente.'
 token.deploy.irreversible: 'Este proceso es irreversible, una vez que confirmes el pago no hay vuelta atrás.'
@@ -793,11 +802,11 @@ token.deploy.deploy_to_blockchain: 'Desplegar en la blockchain'
 token.deploy.pending: 'El despliegue está pendiente. Puede tardar unos momentos.'
 token.deploy.deployed: 'El token ya está desplegado'
 token.deploy.edit_release_period: 'Por favor modifique el periodo de lanzamiento antes de desplegar el token.'
-token.deploy_icon.body: 'This token exists on the blockchain.'
-token.deploy_icon.body_not_mintme: 'This token exists on the %baseName% blockchain.'
+token.deploy_icon.body: 'Este token existe en la blockchain.'
+token.deploy_icon.body_not_mintme: 'Este token existe en la blockchain de %baseName% .'
 token.deploy_icon.img_alt.deployed: desplegado
 token.deploy_icon.img_alt.not_deployed: 'no desplegado'
-token.deploy_icon.doesnt_exist_on_blockchain: 'Este token no existe en la blockchain. Los Tokens en la cadena de bloques pueden ser retirados desde la billetera y además son promocionados en la página trading. Los creadores de tokens pueden activarlo haciendo click en el icono editar en esta página.'
+token.deploy_icon.doesnt_exist_on_blockchain: 'Este token no existe en la blockchain. Los tokens en la cadena de bloques pueden ser retirados desde la billetera y además son promocionados en la página de trading. Los creadores de tokens pueden activarlo haciendo clic en el icono editar en esta página.'
 token.intro.description.header: Descripción
 token.intro.description.guide_header: Descripción
 token.intro.description.guide_body: 'Descripción de las metas, objetivos y promesas. Todo lo que ud. debería saber antes de comprar %name%.'
@@ -805,7 +814,7 @@ token.intro.description.plan: 'Por favor describa las metas, objetivos, planes y
 token.intro.description.plan.header: 'Sobre su plan:'
 token.intro.description.plan.guide_header: 'Sobre su plan:'
 token.intro.description.plan.guide_body: 'Escriba aquí sus planes, metas, pruebas de su identidad y todo lo que pueda interesar a los compradores.'
-token.intro.description.min_length: 'La descripción del token debe tener mas de un carácter'
+token.intro.description.min_length: 'La descripción del token debe tener más de un carácter'
 token.intro.description.max_length: 'La descripción del token debe ser menor a %maxDescriptionLength% caracteres '
 token.intro.description.submit: Guardar
 token.intro.description.cancel: Cancelar
@@ -818,9 +827,9 @@ token.intro.profile.contract_address.header: 'Dirección de contrato del token'
 token.intro.profile.contract_address.body: 'Dirección de contrato única del token, creada cuando el token se despliega en la blockchain. Es necesaria cuando se añade el token a la aplicación MintMe Wallet.'
 token.intro.statistics.header: Estadísticas
 token.intro.statistics.guide_header: Estadísticas
-token.intro.statistics.guide_body.mintme_token: ''
-token.intro.statistics.guide_body.eth_token: ''
-token.intro.statistics.balance: 'Saldo de token:'
+token.intro.statistics.guide_body.mintme_token: 'Estadísticas asociadas con %symbol%. Aquí usted puede descubrir cómo el creador del token maneja sus tokens y si establece alguna restricción en la liberación del token.'
+token.intro.statistics.guide_body.eth_token: 'Estadísticas asociadas con %symbol%, aquí usted puede descubrir cómo el creador del token maneja sus tokens.'
+token.intro.statistics.balance: 'Saldo del token:'
 token.intro.statistics.token_address: 'Dirección de contrato del token:'
 token.intro.statistics.token_address.header: 'Dirección de contrato del token:'
 token.intro.statistics.token_address.body: 'Dirección de contrato única del token, creada cuando el token se despliega en la blockchain. Es necesaria cuando se añade el token a la aplicación MintMe Wallet.'
@@ -850,7 +859,7 @@ token.intro.statistics.hourly.guide_header: 'Cuota por hora'
 token.intro.statistics.hourly.guide_body: 'Cantidad de tokens liberados por hora.'
 token.intro.statistics.already_released.header: 'Ya liberado:'
 token.intro.statistics.already_released.guide_header: 'Ya liberado'
-token.intro.statistics.already_released.guide_body: 'La cantidad de unidades de tokens liberados al creador del token en el momento de la creación de las mismas.'
+token.intro.statistics.already_released.guide_body: 'La cantidad de unidades de tokens liberados al creador del token al momento de su creación.'
 token.intro.statistics.not_yet_released.header: 'No liberadas aún:'
 token.intro.statistics.not_yet_released.guide_header: 'No liberados aún'
 token.intro.statistics.not_yet_released.guide_body: 'Número de tokens que aún no han sido entregados al creador del token o vendidos en el mercado'
@@ -858,7 +867,7 @@ token.intro.statistics.created: 'Creado el:'
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
 token.intro.created_modal.paragraph_2.part_1: 'Los usuarios que compren tokens a través de este enlace'
-token.intro.created_modal.paragraph_2.part_3: 'comprarlo sólo a usted, en contra de la opción de trade. Recuerda que la comercialización de su token depende de usted, así que empiece a compartir el enlace de su token ahora y buena suerte!'
+token.intro.created_modal.paragraph_2.part_2: 'comprarlo sólo a usted, en contra de la opción de trade. Recuerda que la comercialización de su token depende de usted, así que empiece a compartir el enlace de su token ahora y buena suerte!'
 token.intro.created_modal.paragraph_3: 'Además, consulte nuestros artículos con consejos de marketing:'
 token.intro.created_modal.list_1.item_1: 'Es hora de la venta de tokens, ¿cómo puedo hacer la diferencia?'
 token.intro.created_modal.list_1.item_2: '¿Apuntando a un token fuerte?'
@@ -873,7 +882,7 @@ token.intro.created_modal.paragraph_6.part_1: 'Lea el artículo'
 token.intro.created_modal.paragraph_6.part_2: '¿Cómo desplegar mi token en la blockchain?'
 token.intro.created_modal.paragraph_6.part_3: 'para conocer los detalles.'
 token.release_period.header: 'Período de liberación del token:'
-token.release_period.body: 'El período que tomará para la liberación completa de todos sus tokens no liberadas durante la creación. Los tokens se liberan lentamente durante un tiempo seleccionado para asegurarse de que no inundará el mercado. Si elige liberar el 100% de sus tokens inmediatamente, esta función estará desactivada y los 10 millones estarán accesibles para usted en este momento.'
+token.release_period.body: 'El período que tomará para la liberación completa de todos sus tokens no liberados durante la creación. Los tokens se liberan lentamente durante el tiempo seleccionado para asegurar de que no inundará el mercado. Sí elige liberar el 100% de sus tokens, esta función será desactivada en seguida y los 10 millones estarán accesibles para usted de inmediato.'
 token.release_period.amount: 'Cantidad liberada al principio: %released%%'
 token.release_period.time: 'Tiempo necesario para desbloquear todos los tokens: %currentPeriod% años'
 token.release_period.submit: Guardar
@@ -939,26 +948,26 @@ token.telegram.empty_address: 'Agregar el enlace de invitación a Telegram'
 token.telegram.submit: Guardar
 token.telegram.cancel: Cancelar
 token.searcher.placeholder: 'Buscar un token'
-token_reminder.msg.description: ''
-token_reminder.msg.description.2: ''
-token_reminder.msg.go_here: ''
-token_reminder.msg.click_edit: ''
-token_reminder.msg.description.to_do_that: ''
+token_reminder.msg.description: 'Por favor agregue una descripción a su <strong>%tokenName%,</strong>'
+token_reminder.msg.description.2: 'Esto incrementará considerablemente su oportunidad de éxito'
+token_reminder.msg.go_here: 'ingrese aquí'
+token_reminder.msg.click_edit: 'y clickee sobre el ícono de edición cerca de la descripción'
+token_reminder.msg.description.to_do_that: 'para hacer eso,'
 trade.top_holders.header: 'Principales titulares/propietarios'
 trade.top_holders.no_holders: 'No hay titulares/propietarios aún'
 trade.top_holders.trader: Trader
 trade.top_holders.date: Fecha
 trade.top_holders.amount: Monto
-trade.buy_orders.header: 'Ordenes de compra'
+trade.buy_orders.header: 'Órdenes de compra'
 trade.buy_orders.header_total: 'Total:'
-trade.buy_orders.guide_header: 'Ordenes de compra'
+trade.buy_orders.guide_header: 'Órdenes de compra'
 trade.buy_orders.guide_body: 'Lista de todas las órdenes de compras activas para %name%.'
-trade.buy_orders.no_orders: 'No se ha añadido ninguna orden aún'
-trade.sell_orders.header: 'Ordenes de venta'
+trade.buy_orders.no_orders: 'No se ha agregado una orden aún'
+trade.sell_orders.header: 'Órdenes de venta'
 trade.sell_orders.header_total: 'Total:'
-trade.sell_orders.guide_header: 'Ordenes de venta'
+trade.sell_orders.guide_header: 'Órdenes de venta'
 trade.sell_orders.guide_body: 'Lista de todas las órdenes de venta activas para %name%.'
-trade.sell_orders.no_orders: 'No se ha añadido ninguna orden aún'
+trade.sell_orders.no_orders: 'No se ha agregado una orden aún'
 trade.chart.date: Fecha
 trade.chart.open: Apertura
 trade.chart.close: Cierre
@@ -974,7 +983,7 @@ trade.chart.spinner.mintme: '0 MINTME'
 trade.chart.spinner.0_mintme: '0/0 MINTME'
 trade.chart.buy_depth: 'Demanda:'
 trade.chart.buy_depth_guide: Demanda
-trade.chart.buy_depth_guide_body: 'La demanda es la cantidad de ordenes de compra expresadas en MINTME para cada mercado. Este valor puede representar, de manera más sencilla, el tamaño del mercado del token comparado con la capitalización de mercados'
+trade.chart.buy_depth_guide_body: 'La demanda es la cantidad de órdenes de compra expresadas en MINTME para cada mercado. Este valor puede representar, de manera más sencilla, el tamaño del mercado del token comparado con la capitalización de mercados'
 trade.chart.market_cap: 'Capitalización del mercado:'
 trade.chart.market_cap.body: 'Capitalización del mercado'
 trade.chart.market_cap.info: 'La capitalización del mercado de %quoteSymbol% está basada en 10 millones de tokens creados. Para hacer sencilla la comparación entre tokens, consideramos los tokens aún no desplegados como ya creados. La capitalización del mercado no se muestra si el volumen de 30d es inferior a %minimumVolumeForMarketcap% MINTME.'
@@ -988,11 +997,11 @@ trade.chart.volume_token.guide_body.spinner: 'La cantidad de %quoteSymbol% que h
 trade.chart.volume_crypto.header: 'Volumen en 24h/30d:'
 trade.chart.volume_crypto.guide_header: 'Volumen en 24h/30d'
 trade.chart.volume_crypto.guide_body: 'La cantidad de %quoteSymbol% que ha sido intercambiado en las últimas 24 horas y en los últimos 30 días.'
-trade.orders.confirm.body_1: 'Usted desea eliminar las siguientes ordenes:'
+trade.orders.confirm.body_1: 'Usted desea eliminar las siguientes órdenes:'
 trade.orders.confirm.body_2: '¿Está seguro?'
 trade.orders.price: Precio
 trade.orders.amount: Cantidad
-trade.orders.sum: Suma
+trade.orders.sum: Total
 trade.orders.trader: Trader
 trade.history.header: 'Historial de Trade'
 trade.history.guide_header: 'Historial de Trade'
@@ -1001,8 +1010,8 @@ trade.history.price_per: 'Precio por'
 trade.history.amount: cantidad
 trade.history.no_deals: 'No se ha realizado ninguna transacción'
 trade.history.type: Tipo
-trade.history.order_maker: 'Creador de la orden'
-trade.history.order_taker: 'Tomador de la orden'
+trade.history.order_maker: Creador
+trade.history.order_taker: Tomador
 trade.history.time: 'Fecha y hora'
 trade.orders.disabled: 'Trades are disabled'
 trade.buy_order.header: 'Orden de compra'
@@ -1012,8 +1021,8 @@ trade.buy_order.your.header: Sus
 trade.buy_order.your.guide_header: 'Sus %baseSymbol%'
 trade.buy_order.your.guide_body: 'Su balance de %baseSymbol%'
 trade.buy_order.deposit_more: 'Depositar más'
-trade.buy_order.market_price.header: 'Precio del Mercado'
-trade.buy_order.market_price.guide_header: 'Precio del Mercado'
+trade.buy_order.market_price.header: 'Precio de Mercado'
+trade.buy_order.market_price.guide_header: 'Precio de Mercado'
 trade.buy_order.market_price.guide_body: 'Al marcar esta casilla se obtiene el mejor precio actual del mercado por el que se puede comprar %rebrandedQuoteSymbol%.'
 trade.buy_order.price_in.header: 'Precio en %baseSymbol%:'
 trade.buy_order.price_in.guide_header: 'Precio en %baseSymbol%:'
@@ -1033,7 +1042,7 @@ trade.sell_order.your.guide_body: 'Su balance de %quoteSymbol% '
 trade.sell_order.deposit_more: 'Depositar más'
 trade.sell_order.market_price.header: 'Precio de Mercado'
 trade.sell_order.market_price.guide_header: 'Precio de Mercado'
-trade.sell_order.market_price.guide_body: 'Tilda esta casilla para mostrar el mejor precio actual en el mercado al cual usted puede vender %baseSymbol%.'
+trade.sell_order.market_price.guide_body: 'Al marcar esta casilla se obtiene el mejor precio actual del mercado por el que se puede vender %quoteSymbol%.'
 trade.sell_order.price_in.header: 'Precio en %baseSymbol%'
 trade.sell_order.price_in.guide_header: 'Precio en %baseSymbol%:'
 trade.sell_order.price_in.guide_body: 'Precio al cual desea vender un %quoteSymbol%'
@@ -1097,7 +1106,7 @@ wallet.table.available: Saldo
 wallet.table.action: Acciones
 wallet.loading: Cargando...
 wallet.send_to_address: 'Envíe %currency% a la dirección indicada arriba.'
-wallet.active_orders.no_order: 'No se ha agregado una orden todavía'
+wallet.active_orders.no_order: 'No se ha agregado una orden aún'
 wallet.active_orders.confirm_body: '¿Está seguro que desea remover %name% con la cantidad de %amount% y el precio %price%?'
 wallet.active_orders.table.date: Fecha
 wallet.active_orders.table.type: Tipo
@@ -1107,7 +1116,7 @@ wallet.active_orders.table.price: Precio
 wallet.active_orders.table.total_cost: 'Costo total'
 wallet.active_orders.table.fee: Comisión
 wallet.active_orders.table.action: Acción
-wallet.history.no_transactions: 'No se han agregado transacciones todavía'
+wallet.history.no_transactions: 'No se han agregado transacciones aún'
 wallet.history.date: Fecha
 wallet.history.type: Tipo
 wallet.history.symbol: Nombre
@@ -1115,7 +1124,7 @@ wallet.history.to_address: Dirección
 wallet.history.amount: Cantidad
 wallet.history.status: Estatus
 wallet.history.fee: Comisión
-wallet.trading_history.no_deals: 'No se ha realizado una oferta aún'
+wallet.trading_history.no_deals: 'No se ha agregado ninguna transacción aún'
 wallet.trading_history.table.date: Fecha
 wallet.trading_history.table.type: Tipo
 wallet.trading_history.table.name: Nombre
@@ -1181,13 +1190,13 @@ toasted.success.discord.added: 'El enlace de invitación de Discord fue registra
 toasted.success.discord.deleted: 'El enlace de invitación de Discord fue eliminado exitosamente'
 toasted.success.telegram.added: 'El enlace de invitación de Telegram fue registrado exitosamente'
 toasted.success.telegram.deleted: 'El enlace de invitación de Telegram fue eliminado exitosamente'
-toasted.success.release_period_updated: 'Se ha actualizado el período de lanzamiento.'
+toasted.success.release_period_updated: 'Se ha actualizado el período de liberación.'
 toasted.success.password_updated: 'Su password fue actualizado exitosamente.'
-toasted.error.didnt_send_message: 'el mensaje no se envió, ¡por favor inténtelo de nuevo!'
+toasted.success.deploy_pending: null
 api.user.no_keys_attached: 'No hay llaves enlazadas a esta cuenta'
 api.user.no_clients_attached: 'No hay clientes enlazados a esta cuenta'
 api.user.key_already_created: 'La llaves fueron creadas'
-api.wallet.went_withdrawal_email: 'Un correo electrónico por retiro de %symbol% fue envíado'
+api.wallet.withdrawal_went_wrong: 'Algo salió mal durante el retiro. ¡Contáctenos o inténtelo de nuevo mas tarde!'
 api.wallet.not_found_currency: 'Criptomoneda no encontrada'
 api.wallet.withdrawal_failed: 'El retiro falló'
 api.wallet.not_found: 'No encontrado'
@@ -1207,51 +1216,77 @@ api.tokens.not_found: 'No encontrado'
 api.tokens.has_not_releaded_period: 'El token no tiene período de liberación'
 api.tokens.internal_error: 'Error interno, por favor intente de nuevo más tarde'
 api.tokens.unathorized: 'Sin autorización'
-api.something_went_wrong:
-api.success:
-api.documentation.authorize:
-api.documentation.open:
-api.documentation.currencies:
-api.documentation.markets:
-api.documentation.orders:
-api.documentation.user_orders:
-api.documentation.user_wallet:
-api.documentation.models:
-api.documentation.available_authorizations:
-api.documentation.name:
-api.documentation.in:
-api.documentation.value:
-api.documentation.close:
-api.orders.max_allowed_active_orders: ''
+api.something_went_wrong: 'Algo salió mal'
+api.success: Exitoso
+api.documentation.authorize: Autorizar
+api.documentation.open: Abrir
+api.documentation.currencies: Monedas
+api.documentation.markets: Mercados
+api.documentation.orders: Órdenes
+api.documentation.user_orders: 'Órdenes del Usuario'
+api.documentation.user_wallet: 'Billetera del Usuario'
+api.documentation.models: Modelos
+api.documentation.available_authorizations: 'Autorizaciones disponibles'
+api.documentation.name: Nombre
+api.documentation.in: En
+api.documentation.value: Valor
+api.documentation.close: Cerrar
+api.orders.max_allowed_active_orders: 'Usted puede tener un máximo de %maxAllowed% órdenes activas'
 mixin.place_order.created: 'Orden creada'
-knowledge_base.header.1: ''
-knowledge_base.link.1: ''
-knowledge_base.link.2: ''
-knowledge_base.link.3: ''
-knowledge_base.link.4: ''
-knowledge_base.link.5: ''
-mail.knowledge_base.header.2: ''
-mail.knowledge_base.header.3: ''
-knowledge_base.header2.msg.1: ''
-knowledge_base.header2.msg.2: ''
-knowledge_base.read.txt: ''
-knowledge_base.link.blockchain: ''
-knowledge_base.article.txt: ''
-knowledge_base.whatnext.txt: ''
-knowlegde_base.whatnext.link1: ''
-knowlegde_base.whatnext.link2: ''
-knowlegde_base.whatnext.link3: ''
-knowlegde_base.whatnext.link4: ''
-knowlegde_base.whatnext.link5: ''
+knowledge_base.header.1: 'Felicitaciones por crear su propio token (%tokenName%). Aquí hay algunos artículos que pueden ayudarle con su siguiente paso'
+knowledge_base.link.1: 'A la hora de vender un token, ¿Cómo puedo marcar la diferencia?'
+knowledge_base.link.2: '¿Aspira tener un token fuerte?'
+knowledge_base.link.3: 'Ideas para promocionar y vender su token'
+knowledge_base.link.4: '¿Atascado sin saber que hacer después?'
+knowledge_base.link.5: '¿Habla con sus seguidores acerca de MintMe? ¡Tenemos algunas ideas!'
+mail.knowledge_base.header.2: 'Felicitaciones por crear su nuevo token'
+mail.knowledge_base.header.3: 'Aquí tenemos algunos artículos que le pueden ayudar de aquí en adelante'
+knowledge_base.header2.msg.1: 'Puede ser retirado o depositado'
+knowledge_base.header2.msg.2: 'Mejor posición en la página de mercados'
+knowledge_base.read.txt: Lea
+knowledge_base.link.blockchain: '¿Cómo desplegar mi token en la cadena de bloques?'
+knowledge_base.article.txt: 'artículo para leer sobre los detalles.'
+knowledge_base.whatnext.txt: '¿Qué sigue?'
+knowlegde_base.whatnext.link1: '1. Invitar a un referido directamente hacia su token'
+knowlegde_base.whatnext.link2: '2. Trade para invitados con Metamask'
+knowlegde_base.whatnext.link3: '3. Programa para miembros'
+knowlegde_base.whatnext.link4: '4. Los invitados pueden hacer donaciones con Metamask y recibir sus tokens'
+knowlegde_base.whatnext.link5: '5. Direcciones especiales de deposito que funcionan como donaciones incluyendo tokens como recompensa'
 token.creation.disabled: 'Creación de Tokens desactivada. Inténtalo de nuevo más tarde.'
 trade.page.disabled: 'La página de trader ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.page.disabled: 'La página de compra ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.disabled: 'Las compras directas están deshabilitadas'
-twitter.sign_in:
-twitter.must_sign_in:
-mail.verification_code: ''
-404.post:
-404.article:
-404.profile:
-404.token:
-404.pair:
+twitter.sign_in: 'Loguearse con Twitter'
+twitter.must_sign_in: 'Usted debe estar logueado con twitter para completar esta acción'
+mail.verification_code: 'Su código de verificación:'
+404.post: 'PUBLICACIÓN NO ENCONTRADA'
+404.article: 'ARTICULO NO ENCONTRADO'
+404.profile: 'PERFIL NO EXISTE'
+404.token: 'TOKEN NO ENCONTRADO'
+404.pair: 'PAR NO ENCONTRADO'
+mail.mintme_host.1: ''
+mail.mintme_host.2: ''
+mail.mintme_host.3: ''
+mail.mintme_host.4: ''
+mail.mintme_host.btn_text: ''
+mail.mintme_host.btn_mintmeHost: ''
+mail.mintme_host_subject: ''
+phone.add_number.notification: null
+phone.country_selector.label: null
+phone.country_selector.error: null
+phone.phone_number.label: null
+phone.example: null
+phone.guide.header: null
+phone.guide.body: null
+phone_confirmation.title: null
+phone_confirmation.header: null
+phone_confirmation.form.verification_code: null
+phone_confirmation.form.submit: null
+phone_confirmation.send_code: null
+phone_confirmation.invalid_code: null
+phone_confirmation.your_verification_code: null
+phone_number.wrong: null
+phone_number.add.limit_daily: null
+phone_number.add.limit_weekly: null
+phone_number.add.limit_monthly: null
+phone_number.in_use: null
