@@ -156,12 +156,6 @@ export default {
         usdcBalance: function() {
           return this.balance.USDC ? new Decimal(this.balance.USDC.available).toFixed(this.balance.USDC.subunit) : '-';
         },
-        upBackendServices: function() {
-            return true;
-        },
-        getBackendStatus: function() {
-            return this.upBackendServices ? 'circle-info-on' : 'circle-info-off';
-        },
     },
     methods: {
         manageBackendService: function() {
@@ -234,11 +228,6 @@ export default {
 .circle-info-on
     @extend .circle-info
     background-color: green
-
-.circle-info-waring
-    @extend .circle-info
-    background-color: darkorange
-
 .resize-btn
     position: absolute
     right: 0
