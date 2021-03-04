@@ -20,14 +20,15 @@ resetting.reset.submit: 'Cambiar contraseña'
 page.login.title: 'Iniciar sesión'
 page.register.title: Regístrese
 error.credentials: 'Credenciales incorrectas.'
+login.header: null
 resetting.header: 'Restablecer contraseña'
 request.header: 'Cambiar Contraseña'
 email.resetting.body: '¡Restableciendo su contraseña!'
 email.resetting.link: 'Puede restablecer su contraseña haciendo clic en el siguiente boton:'
 email.sent: '¡Correo enviado!'
 email.sent.body: 'Si el correo electrónico que introdujo coincide con el suyo, usted recibirá un mensaje con un enlace el cual deberá hacer clic para restablecer su contraseña.<br/> Nota: Usted solo puede solicitar una nueva contraseña una sola vez cada %hours% horas.'
-email.sent.help: 'Si usted no recibe ningún mensaje, revise su carpeta de correo no deseado o inténtalo nuevamente.'
-email.register.complete: ''
+email.sent.help: 'Si usted no recibe ningún mensaje, revise su carpeta de correo no deseado o inténtelo nuevamente.'
+email.register.complete: 'Para completar su registro, haga clic en el siguiente enlace:'
 register.accepting: 'Al hacer clic en registrarse, usted acepta'
 register.confirmed.header: ¡Felicitaciones!
 register.confirmed.body: '¡El usuario se ha creado exitosamente!'
