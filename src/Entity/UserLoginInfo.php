@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
  * )
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
- * @ORM\Entity
  */
 class UserLoginInfo
 {
