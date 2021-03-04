@@ -351,11 +351,15 @@ class PostsController extends AbstractFOSRestController
             $token = $post->getToken();
             $notificationType = NotificationTypes::TOKEN_NEW_POST;
             $tokenUsers = $token->getUsers();
+            $extraData = [
+                'slug' => $post->getSlug(),
+            ];
 
             $strategy = new TokenPostNotificationStrategy(
                 $this->userNotificationManager,
                 $this->mailer,
                 $token,
+                $extraData,
                 $notificationType
             );
             $notificationContext = new NotificationContext($strategy);
