@@ -382,7 +382,7 @@ export default {
             this.debouncedCheck();
         },
         checkDonation: function() {
-            if (this.insufficientFunds || !this.isAmountValid) {
+            if (!this.isAmountValid) {
                 return;
             }
 
