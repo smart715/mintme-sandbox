@@ -408,7 +408,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 sprintf("%s %s\n", $mail, $date->format('Y-m-d H:i:s'))
             );
 
-            $this->addFlash('success', "{$mail} was successfully unsubscribed");
+            $this->addFlash('success', $this->translator->trans('page.unsubscribe.success', [
+                '%mail%' => $mail,
+            ]));
 
             return $this->redirectToRoute('homepage');
         }
