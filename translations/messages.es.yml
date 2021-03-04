@@ -1264,13 +1264,13 @@ mail.verification_code: 'Su código de verificación:'
 404.profile: 'PERFIL NO EXISTE'
 404.token: 'TOKEN NO ENCONTRADO'
 404.pair: 'PAR NO ENCONTRADO'
-mail.mintme_host.1: ''
-mail.mintme_host.2: ''
-mail.mintme_host.3: ''
-mail.mintme_host.4: ''
-mail.mintme_host.btn_text: ''
-mail.mintme_host.btn_mintmeHost: ''
-mail.mintme_host_subject: ''
+mail.mintme_host.1:
+mail.mintme_host.2:
+mail.mintme_host.3:
+mail.mintme_host.4:
+mail.mintme_host.btn_text:
+mail.mintme_host.btn_mintmeHost:
+mail.mintme_host_subject:
 phone.add_number.notification: null
 phone.country_selector.label: null
 phone.country_selector.error: null
