@@ -66,14 +66,18 @@
                     <span :class="[infoData.consumersInfo['contract-update'] ? 'circle-info-on' : 'circle-info-off']"/>
                 </span>
                 <b-button
-                    v-if="'dev' !== environment"
                     @click="manageBackendService"
                     class="btn-sm float-right mr-5 toggle-btn"
-                    :v-text="!backendServiceStatus ?
-                        this.$t('info_bar.backend_service.create') :
-                            this.$t('info_bar.backend_service.create')"
                     :disabled="null === backendServiceStatus || managingBackendService"
-                ></b-button>
+                >
+                    <font-awesome-icon
+                        v-if="managingBackendService"
+                        icon="circle-notch"
+                        spin
+                        class="loading-spinner" fixed-width
+                    />
+                    {{ getButtonName }}
+                </b-button>
                 <div class="close-btn p-sm-2">
                     <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
                 </div>
@@ -134,6 +138,15 @@ export default {
         }
     },
     computed: {
+        getButtonName: function() {
+            if (this.managingBackendService) {
+                return this.$t('info_bar.backend_service.in_progress');
+            } else if (!this.managingBackendService) {
+                return this.$t('info_bar.backend_service.create');
+            } else {
+                return this.$t('info_bar.backend_service.delete');
+            }
+        },
         mintmeBalance: function() {
             return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
         },
