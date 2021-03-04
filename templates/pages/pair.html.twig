@@ -260,6 +260,35 @@
                         </trade>
                     </b-tab>
                 {% endif %}
+                {% if isTokenPage and post is not null %}
+                    <b-tab
+                        title="post"
+                        title-link-class=""
+                        {% if isTokenPage %} title-item-class="d-none" {% endif %}
+                        {% if tab == 'post' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-10 col-lg-8">
+                                <div class="card h-100 single-post-page">
+                                    <div class="card-body posts">
+                                        <post
+                                            :post="{{ post | json_encode }}"
+                                            :show-edit="false"
+                                            :logged-in="{{ loggedIn }}"
+                                            single-page
+                                        ></post>
+                                        <comments
+                                            :comments="comments || (comments = {{ comments | json_encode }})"
+                                            :post-id="{{ post.id }}"
+                                            token-name="{{ post.token.name }}"
+                                            :logged-in="{{ loggedIn }}"
+                                        ></comments>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </b-tab>
+                {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto my-2 my-lg-0">

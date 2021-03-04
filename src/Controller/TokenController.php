@@ -78,6 +78,8 @@ class TokenController extends Controller
     /** @var ScheduledNotificationManagerInterface  */
     private $scheduledNotificationManager;
 
+    private PostManagerInterface $postManager;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -88,7 +90,8 @@ class TokenController extends Controller
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
-        ScheduledNotificationManagerInterface $scheduledNotificationManager
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        PostManagerInterface $postManager
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -99,6 +102,7 @@ class TokenController extends Controller
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->postManager = $postManager;
 
         parent::__construct($normalizer);
     }
@@ -106,9 +110,9 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/{tab}/{modal}",
      *     name="token_show",
-     *     defaults={"tab" = "intro","modal" = "false"},
+     *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup|created"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -116,7 +120,7 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        ?string $modal,
+        ?string $modal = null,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig,
@@ -179,6 +183,20 @@ class TokenController extends Controller
 
         $tokenDecimals = $token->getDecimals();
 
+        if ('posts' === $tab && null !== $modal) {
+            $post = $this->postManager->getBySlug($modal);
+
+            if (!$post) {
+                throw new NotFoundPostException();
+            }
+
+            if ($post->getToken()->getName() !== $name) {
+                throw new NotFoundPostException();
+            }
+
+            $tab = 'post';
+        }
+
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
@@ -212,6 +230,8 @@ class TokenController extends Controller
             'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                 ? Token::TOKEN_SUBUNIT
                 : $tokenDecimals,
+            'post' => $this->normalize($post ?? null),
+            'comments' => $this->normalize(isset($post) ? $post->getComments() : null),
         ]);
     }
 
@@ -370,7 +390,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/token/{tokenName}/posts/{slug}", name="new_show_post", options={"expose"=true})
+     * @Route("/token/asdfg/{tokenName}/{slug}", name="new_show_post", options={"expose"=true})
      */
     public function showPost(string $tokenName, string $slug, PostManagerInterface $postManager): Response
     {

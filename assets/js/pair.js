@@ -2,6 +2,8 @@ import BalanceInit from './components/trade/BalanceInit';
 import CreatePost from './components/posts/CreatePost';
 import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
+import Post from './components/posts/Post';
+import Comments from './components/posts/Comments';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
@@ -49,7 +51,9 @@ new Vue({
     Envelope,
     BalanceInit,
     CreatePost,
+    Comments,
     Donation,
+    Post,
     Posts,
     TokenAvatar,
     TokenCreatedModal,
