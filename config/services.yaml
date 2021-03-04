@@ -61,6 +61,14 @@ services:
             $url: '%origin_to_disposable_email_domains%'
             $timeoutSeconds: '%disposable_domains_timeout_seconds%'
 
+    d7_networks.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%d7_networks_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -110,6 +118,10 @@ services:
         arguments:
             $rpc: '@coinify.rest_rpc'
             $partnerId: '%coinify_partner_id%'
+
+    App\Communications\SMS\D7NetworksCommunicator:
+        arguments:
+            $rpc: '@d7_networks.rest_rpc'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -397,6 +409,9 @@ services:
             $formFactory: '@fos_user.registration.form.factory'
             $userManager: '@fos_user.user_manager'
             $tokenStorage: '@security.token_storage'
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
 
     App\Exchange\Config\Config:
         arguments:
@@ -676,6 +691,12 @@ services:
     App\Command\BlockTokenCommand:
         arguments:
             $maxActiveOrders: '%max_allowed_active_orders%'
+
+    App\Command\SendCustomMailCommand:
+        arguments:
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
 
     App\Command\CancelOrdersForOldBlockedCommand:
         arguments:

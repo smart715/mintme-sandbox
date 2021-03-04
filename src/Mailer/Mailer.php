@@ -292,16 +292,18 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendNewPostMail(User $user, String $tokenName): void
+    public function sendNewPostMail(User $user, String $tokenName, String $slug): void
     {
         $body = $this->twigEngine->render("mail/new_post.html.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
         $textBody = $this->twigEngine->render("mail/new_post.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
         $subject = $this->translator->trans('email.new_post');
@@ -446,6 +448,32 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'title' => $title,
         ]);
         $subject = $this->translator->trans('userNotification.type.token_marketing_tips');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void
+    {
+        $body = $this->twigEngine->render("mail/mintme_host.html.twig", [
+            'username' => $user->getUsername(),
+            'freeDays' => $freeDays,
+            'price' => $price,
+            'mintmeHostPath' => $mintmeHostPath,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/mintme_host.txt.twig", [
+            'username' => $user->getUsername(),
+            'freeDays' => $freeDays,
+            'price' => $price,
+            'mintmeHostPath' => $mintmeHostPath,
+        ]);
+
+        $subject = $this->translator->trans('mail.mintme_host_subject');
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())

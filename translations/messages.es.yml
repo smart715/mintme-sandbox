@@ -228,6 +228,7 @@ page.profile.form.token: 'Token:'
 page.profile.form.country_placeholder: 'Seleccione su país'
 page.profile.form.description: 'Descripción:'
 page.profile.form.trade_anonymously: 'Ocultar mi información personal'
+page.profile.form.phone_number:
 page.profile.error.nickname.min: 'Mínimo 2 caracteres'
 page.profile.error.nickname.letters_numbers: 'El apodo solo puede contener letras latinas y números'
 page.profile.error.fn.required: 'Debe suministrar su nombre si suministró su apellido'
@@ -1255,3 +1256,29 @@ mail.verification_code: ''
 404.profile:
 404.token:
 404.pair:
+mail.mintme_host.1: ''
+mail.mintme_host.2: ''
+mail.mintme_host.3: ''
+mail.mintme_host.4: ''
+mail.mintme_host.btn_text: ''
+mail.mintme_host.btn_mintmeHost: ''
+mail.mintme_host_subject: ''
+phone.add_number.notification:
+phone.country_selector.label:
+phone.country_selector.error:
+phone.phone_number.label:
+phone.example:
+phone.guide.header:
+phone.guide.body:
+phone_confirmation.title:
+phone_confirmation.header:
+phone_confirmation.form.verification_code:
+phone_confirmation.form.submit:
+phone_confirmation.send_code:
+phone_confirmation.invalid_code:
+phone_confirmation.your_verification_code:
+phone_number.wrong:
+phone_number.add.limit_daily:
+phone_number.add.limit_weekly:
+phone_number.add.limit_monthly:
+phone_number.in_use:
