@@ -92,6 +92,11 @@ class MarketStatus
      */
     private $expires = null;
 
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private int $lastDealId = 0; // phpcs:ignore
+
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
@@ -208,5 +213,17 @@ class MarketStatus
     public function getExpires(): ?\DateTimeImmutable
     {
         return $this->expires;
+    }
+
+    public function setLastDealId(int $lastDealId): self
+    {
+        $this->lastDealId = $lastDealId;
+
+        return $this;
+    }
+
+    public function getLastDealId(): int
+    {
+        return $this->lastDealId;
     }
 }

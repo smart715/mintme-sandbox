@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Donation;
 
+use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Donation\Model\CheckDonationResult;
@@ -16,6 +17,7 @@ interface DonationHandlerInterface
         string $amount,
         User $donorUser
     ): CheckDonationResult;
+
     public function makeDonation(
         Market $market,
         string $currency,
@@ -23,8 +25,10 @@ interface DonationHandlerInterface
         string $expectedAmountUser,
         User $donorUser,
         string $sellOrdersSummary
-    ): void;
+    ): Donation;
+
     public function getTokensWorth(string $sellOrdersWorth, string $currency): string;
+
     public function saveDonation(
         User $donor,
         User $tokenCreator,
@@ -33,5 +37,5 @@ interface DonationHandlerInterface
         Money $feeAmount,
         Money $tokenAmount,
         Token $token
-    ): void;
+    ): Donation;
 }

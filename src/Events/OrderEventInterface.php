@@ -6,8 +6,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Order;
 
-interface OrderCompleteEventInterface
+interface OrderEventInterface
 {
     public function getOrder(): Order;
-    public function getQuote(): TradebleInterface;
 }
