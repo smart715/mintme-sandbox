@@ -32,12 +32,17 @@
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="cryptoActionsClass('depositDisabled', data)"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="isCryptoActionDisabled('depositDisabled', data) ?
+                                     'text-muted pointer-events-none' :
+                                     'text-white'"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isCryptoActionDisabled('depositDisabled', data)
+                                        }"
                                     :icon="['fac', 'deposit']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -46,8 +51,10 @@
                             </div>
                         </button>
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="cryptoActionsClass('withdrawalsDisabled', data)"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="isCryptoActionDisabled('withdrawalsDisabled', data) ?
+                                     'text-muted pointer-events-none' :
+                                     'text-white'"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -58,6 +65,9 @@
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isCryptoActionDisabled('withdrawalsDisabled', data)
+                                        }"
                                     :icon="['fac', 'withdraw']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -125,10 +135,10 @@
                         class="row pl-2"
                     >
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="(data.item.blocked
-                                || disabledServices.depositDisabled
-                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="isTokenActionDisabled('depositDisabled', data) ?
+                                     'text-muted pointer-events-none' :
+                                     'text-white'"
                             @click="openDeposit(
                                 data.item.name,
                                 data.item.subunit,
@@ -140,6 +150,9 @@
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isTokenActionDisabled('depositDisabled', data)
+                                        }"
                                     :icon="['fac', 'deposit']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -148,10 +161,10 @@
                             </div>
                         </button>
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="(data.item.blocked
-                                || disabledServices.withdrawalsDisabled
-                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="isTokenActionDisabled('withdrawalsDisabled', data) ?
+                                     'text-muted pointer-events-none' :
+                                     'text-white'"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -166,6 +179,9 @@
                                 <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data)
+                                        }"
                                     :icon="['fac', 'withdraw']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -424,15 +440,16 @@ export default {
          * @param {object} data
          * @return {string}
          */
-        cryptoActionsClass: function(action, data) {
-            let {name} = data;
-
+        isCryptoActionDisabled: function(action, data) {
             return this.isUserBlocked
-            || this.isDisabledCrypto(name)
+            || this.isDisabledCrypto(data.name)
             || this.disabledServices[action]
-            || this.disabledServices.allServicesDisabled
-              ? 'text-muted'
-              : 'text-white';
+            || this.disabledServices.allServicesDisabled;
+        },
+        isTokenActionDisabled: function(action, data) {
+            return data.item.blocked
+            || this.disabledServices[action]
+            || this.disabledServices.allServicesDisabled;
         },
         isDisabledCrypto: function(name) {
             return JSON.parse(this.disabledCrypto).includes(name);
