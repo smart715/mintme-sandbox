@@ -2,10 +2,11 @@
 
 namespace App\Controller\API;
 
-use Abraham\TwitterOAuth\TwitterOAuth;
 use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Events\PostEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Exception\InvalidTwitterTokenException;
@@ -26,6 +27,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -48,6 +50,7 @@ class PostsController extends AbstractFOSRestController
     private MailerInterface $mailer;
     private AsciiSlugger $slugger;
     private TwitterManagerInterface $twitterManager;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -57,7 +60,8 @@ class PostsController extends AbstractFOSRestController
         LoggerInterface $logger,
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
-        TwitterManagerInterface $twitterManager
+        TwitterManagerInterface $twitterManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
@@ -68,6 +72,7 @@ class PostsController extends AbstractFOSRestController
         $this->mailer = $mailer;
         $this->slugger = new AsciiSlugger();
         $this->twitterManager = $twitterManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -95,7 +100,12 @@ class PostsController extends AbstractFOSRestController
         $post = new Post();
         $post->setToken($token);
 
-        return $this->handlePostForm($post, $request, $this->translator->trans('post.created'), true);
+        $response = $this->handlePostForm($post, $request, 'Post created.', true);
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(new PostEvent($post), TokenEvents::POST_CREATED);
+
+        return $response;
     }
 
     /**
