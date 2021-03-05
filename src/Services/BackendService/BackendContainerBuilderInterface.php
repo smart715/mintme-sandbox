@@ -11,6 +11,4 @@ interface BackendContainerBuilderInterface
     public function deleteContainer(Request $request): void;
 
     public function getStatusContainer(Request $request): ?int;
-
-    public function setMaintenanceMode(string $mode): ?string;
 }
