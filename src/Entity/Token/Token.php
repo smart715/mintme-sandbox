@@ -48,7 +48,6 @@ class Token implements TradebleInterface, ImagineInterface
     public const TOKEN_SUBUNIT = 4;
     public const PENDING_ADDR = '0x';
     public const WEB_ETH_SYMBOLS = [self::ETH_SYMBOL, self::WEB_SYMBOL];
-    public const TOKEN_TYPE = [self::MINTME_SYMBOL => 'mintme', self::ETH_SYMBOL => 'eth'];
 
     /**
      * @ORM\Id()
@@ -322,16 +321,6 @@ class Token implements TradebleInterface, ImagineInterface
         return $this->crypto
             ? $this->crypto->getSymbol()
             : self::WEB_SYMBOL;
-    }
-
-    /**
-     * @Groups({"API"})
-     */
-    public function getTypeOfToken(): ?string
-    {
-        return $this->crypto
-            ? (self::TOKEN_TYPE[$this->crypto->getSymbol()] ?? null)
-            : null;
     }
 
     public function setCrypto(?Crypto $crypto): self
