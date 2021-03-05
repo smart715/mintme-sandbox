@@ -29,12 +29,6 @@ class BackendServiceSubscriber implements EventSubscriberInterface
      */
     public function onTerminate(TerminateEvent $event): void
     {
-        if (preg_match('/(container-create)/', $event->getRequest()->getPathInfo())) {
-            $this->backendContainerBuilder->createContainer($event->getRequest());
-        }
-
-        if (preg_match('/(container-delete)/', $event->getRequest()->getPathInfo())) {
-            $this->backendContainerBuilder->deleteContainer($event->getRequest());
-        }
+       
     }
 }
