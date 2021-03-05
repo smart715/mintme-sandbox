@@ -9,6 +9,8 @@ use Symfony\Component\Lock\Store\PdoStore;
 
 class LockFactory
 {
+    public const LOCK_BALANCE = 'balance-';
+
     /** @var EntityManagerInterface */
     private $em;
 
