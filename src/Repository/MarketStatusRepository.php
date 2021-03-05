@@ -63,9 +63,9 @@ class MarketStatusRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getCryptoAndDeployedTokenMarketStatuses(): array
+    public function getCryptoAndDeployedTokenMarketStatuses(?int $offset = null, ?int $limit = null): array
     {
-        return $this->createQueryBuilder('ms')
+        $qb = $this->createQueryBuilder('ms')
             ->leftJoin('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'qt_crypto')
             ->where('ms.quoteToken IS NULL')
@@ -73,8 +73,16 @@ class MarketStatusRepository extends EntityRepository
             ->orWhere('qt_crypto.symbol IS NOT NULL AND qt_crypto.symbol = :ethSymbol')
             ->setParameter('pending', Token::PENDING_ADDR)
             ->setParameter('ethSymbol', Token::ETH_SYMBOL)
-            ->orderBy('ms.lastPrice', Criteria::DESC)
-            ->getQuery()
-            ->getResult();
+            ->orderBy('ms.lastPrice', Criteria::DESC);
+
+        if (null !== $offset) {
+            $qb->setFirstResult($offset);
+        }
+
+        if (null !== $limit) {
+            $qb->setMaxResults($limit);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }
