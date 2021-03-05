@@ -26,7 +26,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_DEPLOYED_FIRST = 1;
     public const FILTER_DEPLOYED_ONLY_MINTME = 2;
     public const FILTER_AIRDROP_ONLY = 3;
-    public const FILTER_DEPLOYED_ONLY_ETH = 2;
+    public const FILTER_DEPLOYED_ONLY_ETH = 4;
     public const FILTER_AIRDROP_ACTIVE = true;
 
     public const SORT_LAST_PRICE = 'lastPrice';
@@ -412,7 +412,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         return [
             'deployed_first' => self::FILTER_DEPLOYED_FIRST,
-            'deployed_only_mintme' => self::ETH_SYMBOL,
+            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
             'airdrop_only' => self::FILTER_AIRDROP_ONLY,
             'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
         ];
