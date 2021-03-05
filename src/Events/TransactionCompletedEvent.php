@@ -6,19 +6,14 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class TransactionCompletedEvent extends Event implements TransactionCompletedEventInterface
+class TransactionCompletedEvent extends Event implements TransactionCompletedEventInterface
 {
     public const NAME = "transaction.completed";
     public const TYPE = "transaction";
 
-    /** @var TradebleInterface */
-    protected $tradable;
-
-    /** @var User */
-    protected $user;
-
-    /** @var string */
-    protected $amount;
+    protected TradebleInterface $tradable;
+    protected User $user;
+    protected string $amount;
 
     public function __construct(TradebleInterface $tradable, User $user, string $amount)
     {

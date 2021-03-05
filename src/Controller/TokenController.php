@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
@@ -36,6 +38,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,6 +66,8 @@ class TokenController extends Controller
     private ScheduledNotificationManagerInterface $scheduledNotificationManager;
     private TranslatorInterface $translator;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $em,
         ProfileManagerInterface $profileManager,
@@ -74,7 +79,8 @@ class TokenController extends Controller
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -85,9 +91,10 @@ class TokenController extends Controller
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct($normalizer);
-        $this->translator = $translator;
     }
 
     /**
@@ -288,6 +295,10 @@ class TokenController extends Controller
                 $marketStatusManager->createMarketStatus($market);
 
                 $this->em->commit();
+
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::CREATED);
+
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
                 return $this->json("success", Response::HTTP_OK);

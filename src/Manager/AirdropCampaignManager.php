@@ -7,6 +7,8 @@ use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\AirdropCampaign\AirdropParticipant;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\AirdropEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
@@ -17,34 +19,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
     private const AIRDROP_REWARD_PRECISION = 4;
     private const ONE_HOUR_IN_SEC = 3600;
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var AirdropParticipantRepository */
-    private $participantRepository;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private EntityManagerInterface $em;
+    private AirdropParticipantRepository $participantRepository;
+    private MoneyWrapperInterface $moneyWrapper;
+    private BalanceHandlerInterface $balanceHandler;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->em = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->balanceHandler = $balanceHandler;
+        $this->eventDispatcher = $eventDispatcher;
 
-        /** @var AirdropParticipantRepository */
+        /** @var AirdropParticipantRepository $objRepository */
         $objRepository = $entityManager->getRepository(AirdropParticipant::class);
         $this->participantRepository = $objRepository;
     }
@@ -117,6 +116,9 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         $this->em->persist($airdrop);
         $this->em->flush();
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(new AirdropEvent($airdrop), TokenEvents::AIRDROP_ENDED);
     }
 
     public function deleteActiveAirdrop(Token $token): void
@@ -145,8 +147,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         /** @var Airdrop $activeAirdrop */
         $activeAirdrop = $token->getActiveAirdrop();
         $activeAirdrop->incrementActualParticipants();
-        $airdropReward = $activeAirdrop->getLockedAmount()
-            ->divide($activeAirdrop->getParticipants());
+        $airdropReward = $activeAirdrop->getReward();
 
         $this->tokenBlockAirDropBalance($activeAirdrop);
 
