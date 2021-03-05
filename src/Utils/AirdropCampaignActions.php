@@ -2,7 +2,7 @@
 
 namespace App\Utils;
 
-abstract class AirdropCampaignActions
+final class AirdropCampaignActions
 {
     public const TWITTER_MESSAGE = 'twitterMessage';
     public const TWITTER_RETWEET = 'twitterRetweet';
@@ -12,6 +12,10 @@ abstract class AirdropCampaignActions
     public const LINKEDIN_MESSAGE = 'linkedinMessage';
     public const YOUTUBE_SUBSCRIBE = 'youtubeSubscribe';
     public const POST_LINK = 'postLink';
+
+    private function __construct()
+    {
+    }
 
     private static function getAll(): array
     {
