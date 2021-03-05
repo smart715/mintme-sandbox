@@ -22,7 +22,9 @@
                         {% else %}
                             {{ form_start(passwordForm) }}
                         {% endif %}
-                            <label for="app_user_change_password_current_password" class="d-block label-featured">Current Password:</label>
+                            <label for="app_user_change_password_current_password" class="d-block label-featured">
+                                {% trans %}form.change_password.current_password{% endtrans %}
+                            </label>
                             <template v-if="showErrorMessage">
                                 <div class="p-2 mb-2 bg-danger text-center text-white">The entered password is invalid.</div>
                             </template>
@@ -85,7 +87,7 @@
                                 <api-keys class="mb-2" :api-keys="{{ keys | json_encode }}" v-cloak></api-keys>
                             </div>
                             <p>
-                                Check <a href="{{ path('nelmio_api_doc.swagger_ui') }}">documentation</a> for more information
+                                {% trans %}page.settings.api.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.api.body_2{% endtrans %}</a> {% trans %}page.settings.api.body_3{% endtrans %}
                             </p>
                         </div>
                     </div>
@@ -93,7 +95,7 @@
             </div>
             <div class="card-fixed-large ml-3 mr-3 pl-0">
                 <div class="card">
-                    <div class="card-header">Clients for OAuth access to API</div>
+                    <div class="card-header">{% trans %}page.settings.oauth.header{% endtrans %}</div>
                     <div class="card-body m-0 pt-4">
                         <div class="text-center">
                             <div v-cloak>
@@ -101,7 +103,7 @@
                                 <api-clients class="mb-2" :api-clients="{{ clients | json_encode }}" v-cloak></api-clients>
                             </div>
                             <p>
-                                {% trans %}page.settings.api.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.api.body_2{% endtrans %}</a> {% trans %}page.settings.api.body_3{% endtrans %}
+                                {% trans %}page.settings.oauth.body_1{% endtrans %} <a href="{{ path('nelmio_api_doc.swagger_ui') }}">{% trans %}page.settings.oauth.body_2{% endtrans %}</a> {% trans %}page.settings.oauth.body_3{% endtrans %}
                             </p>
                         </div>
                     </div>
