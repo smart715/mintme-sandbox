@@ -250,9 +250,4 @@ class TokenManager implements TokenManagerInterface
     {
         return $this->repository->findAllTokensWithEmptyDescription($param);
     }
-
-    public function getBlockedTokens(): ?array
-    {
-        return $this->repository->getBlockedTokens();
-    }
 }

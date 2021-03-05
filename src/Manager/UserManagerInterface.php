@@ -30,5 +30,4 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
     public function getUsersByDomains(array $domains): ?array;
     public function findByDomain(string $domain): array;
     public function checkExistCanonicalEmail(string $email): bool;
-    public function getBlockedUsers(): ?array;
 }

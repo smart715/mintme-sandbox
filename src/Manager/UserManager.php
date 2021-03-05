@@ -100,15 +100,4 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
 
         return $emailDomains;
     }
-
-    public function getBlockedUsers(): ?array
-    {
-        $qb = $this->getRepository()->createQueryBuilder('ub');
-
-        return $qb->select('u')
-            ->from(User::class, 'u')
-            ->andWhere('u.isBlocked = 1')
-            ->getQuery()
-            ->execute();
-    }
 }

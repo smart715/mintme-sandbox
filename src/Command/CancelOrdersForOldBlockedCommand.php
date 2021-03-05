@@ -2,12 +2,14 @@
 
 namespace App\Command;
 
+use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
-use App\Manager\UserManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,11 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CancelOrdersForOldBlockedCommand extends Command
 {
     /** @var string */
-    protected static $defaultName = 'app:cancelOrders';
-
-    private TokenManagerInterface $tokenManager;
-
-    private UserManagerInterface $userManager;
+    protected static $defaultName = 'app:cancel-orders';
 
     private MarketHandlerInterface $marketHandler;
 
@@ -30,19 +28,17 @@ class CancelOrdersForOldBlockedCommand extends Command
 
     private ExchangerInterface $exchanger;
 
+    private EntityManagerInterface $em;
+
     private int $maxActiveOrders;
 
     public function __construct(
-        TokenManagerInterface $tokenManager,
-        UserManagerInterface $userManager,
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
         ExchangerInterface $exchanger,
         int $maxActiveOrders
     ) {
-        $this->tokenManager = $tokenManager;
-        $this->userManager = $userManager;
         $this->marketHandler = $marketHandler;
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
@@ -61,7 +57,7 @@ class CancelOrdersForOldBlockedCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        foreach ($this->userManager->getBlockedUsers() as $user) {
+        foreach ($this->getUserRepository()->findBy(['isBlocked' => true]) as $user) {
             $coinMarkets = $this->marketFactory->getCoinMarkets();
             $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
                 $user,
@@ -76,7 +72,7 @@ class CancelOrdersForOldBlockedCommand extends Command
             }
         }
 
-        foreach ($this->tokenManager->getBlockedTokens() as $token) {
+        foreach ($this->getTokenRepository()->findBy(['isBlocked' => true]) as $token) {
             $tokenMarket = $this->marketFactory->create(
                 $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                 $token
@@ -103,5 +99,15 @@ class CancelOrdersForOldBlockedCommand extends Command
         $io->success('orders for old user/token blocked has been cancelled');
 
         return 0;
+    }
+
+    private function getUserRepository(): EntityRepository
+    {
+        return $this->em->getRepository(User::class);
+    }
+
+    private function getTokenRepository(): EntityRepository
+    {
+        return $this->em->getRepository(Token::class);
     }
 }
