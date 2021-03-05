@@ -3,7 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
-use App\Events\OrderCompletedEvent;
+use App\Events\OrderEvent;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -101,16 +101,8 @@ class OrdersController extends AbstractFOSRestController
             $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
 
-            $quote = $market->getQuote();
-
             /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new OrderCompletedEvent(
-                    $order,
-                    $quote
-                ),
-                OrderCompletedEvent::CANCELLED
-            );
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
 
         return $this->view(Response::HTTP_OK);

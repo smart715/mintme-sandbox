@@ -103,10 +103,16 @@ page.error.500.body: 'Algo está mal. Por favor, háganos saber lo que estaba ha
 page.news.title: Noticias
 page.news.read_more: 'Leer más'
 page.news.current: 'Leer más'
-page.index.title: 'Cree su moneda, cree su token, ¡ayude a otros y gane! Cree su propio token intercambiable gratis'
-page.index.promo.main: 'Cree su moneda<br/> para su <br />'
-page.index.promo.description: 'o gane ayudando a otros tokens a crecer.'
 page.index.promo.btn.register: 'Regístrese ahora'
+page.index.title: 'mintMe, financiación colectiva | cree su token para monetizarse!'
+page.index.promo.main_1: 'Cree su moneda<br/> Monetízate <br />'
+page.index.promo.main_2:
+page.index.promo.main_3:
+page.index.promo.main.word_1:
+page.index.promo.main.word_2:
+page.index.promo.main.word_3:
+page.index.promo.main.word_4:
+page.index.promo.description: 'MintMe es una plataforma de financiación colectiva<br/> donde los patrocinadores también se benefician<br/> del éxito de sus influencers favoritos.'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
 page.index.block_1.body: 'Cualquiera puede emitir o crear un token (moneda) que lo represente a sí mismo o a un proyecto que haya creado para que la comunidad de fans y sus seguidores lo apoyen.<br /> Lo cual contribuye a que los creadores de contenidos consigan su máximo potencial a través de una nueva e innovadora forma de financiación colectiva.<br /> También es una plataforma social donde los traders pueden interactuar con los creadores de tokens y otros traders.<br /> Los tokens son creados (acuñados) sobre nuestra blockchain descentralizada y personalizada llamada <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br /> Cuando crea una moneda o token, te haces dueño de tu propio futuro financiero. Cree un token, cree una moneda para su proyecto, para usted mismo o simplemente comercie con las monedas de otras personas.'
@@ -1271,22 +1277,32 @@ mail.mintme_host.4: ''
 mail.mintme_host.btn_text: ''
 mail.mintme_host.btn_mintmeHost: ''
 mail.mintme_host_subject: ''
-phone.add_number.notification: null
-phone.country_selector.label: null
-phone.country_selector.error: null
-phone.phone_number.label: null
-phone.example: null
-phone.guide.header: null
-phone.guide.body: null
-phone_confirmation.title: null
-phone_confirmation.header: null
-phone_confirmation.form.verification_code: null
-phone_confirmation.form.submit: null
-phone_confirmation.send_code: null
-phone_confirmation.invalid_code: null
-phone_confirmation.your_verification_code: null
-phone_number.wrong: null
-phone_number.add.limit_daily: null
-phone_number.add.limit_weekly: null
-phone_number.add.limit_monthly: null
-phone_number.in_use: null
+phone.add_number.notification:
+phone.country_selector.label:
+phone.country_selector.error:
+phone.phone_number.label:
+phone.example:
+phone.guide.header:
+phone.guide.body:
+phone_confirmation.title:
+phone_confirmation.header:
+phone_confirmation.form.verification_code:
+phone_confirmation.form.submit:
+phone_confirmation.send_code:
+phone_confirmation.invalid_code:
+phone_confirmation.your_verification_code:
+phone_number.wrong:
+phone_number.add.limit_daily:
+phone_number.add.limit_weekly:
+phone_number.add.limit_monthly:
+phone_number.in_use:
+activity_0_message:
+activity_1_message:
+activity_2_message:
+activity_3_message:
+activity_4_message:
+activity_5_message:
+activity_6_message:
+activity_7_message:
+activity_8_message:
+activity_9_message:

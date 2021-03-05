@@ -42,3 +42,4 @@ twig:
         global_coinify_crypto_currencies: '%coinify_crypto_currencies%'
         global_translation_flags: '%translation_flags%'
         global_token_withdraw_fee: '%token_withdraw_fee%'
+        mercure_hub_url: '%env(MERCURE_PUBLISH_URL)%'

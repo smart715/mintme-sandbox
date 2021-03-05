@@ -4,6 +4,8 @@ namespace App\Controller\API;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\User;
+use App\Events\DonationEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
@@ -15,20 +17,17 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @Rest\Route("/api/donate")
  */
 class DonationController extends AbstractFOSRestController
 {
-    /** @var DonationHandlerInterface */
-    protected $donationHandler;
-
-    /** @var MarketHandlerInterface */
-    protected $marketHandler;
-
-    /** @var DonationLogger */
-    protected $logger;
+    protected DonationHandlerInterface $donationHandler;
+    protected MarketHandlerInterface $marketHandler;
+    protected DonationLogger $logger;
+    protected EventDispatcherInterface $eventDispatcher;
 
     private LockFactory $lockFactory;
 
@@ -36,12 +35,14 @@ class DonationController extends AbstractFOSRestController
         DonationHandlerInterface $donationHandler,
         MarketHandlerInterface $marketHandler,
         DonationLogger $logger,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
         $this->logger = $logger;
         $this->lockFactory = $lockFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -139,7 +140,7 @@ class DonationController extends AbstractFOSRestController
         try {
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
 
-            $this->donationHandler->makeDonation(
+            $donation = $this->donationHandler->makeDonation(
                 $market,
                 $request->get('currency'),
                 (string)$request->get('amount'),
@@ -147,6 +148,9 @@ class DonationController extends AbstractFOSRestController
                 $user,
                 $sellOrdersSummary
             );
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
 
             return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
