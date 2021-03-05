@@ -29,6 +29,5 @@ class BackendServiceSubscriber implements EventSubscriberInterface
      */
     public function onTerminate(TerminateEvent $event): void
     {
-       
     }
 }
