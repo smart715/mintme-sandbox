@@ -36,7 +36,7 @@ class TradingController extends Controller
     public function trading(
         string $page,
         Request $request,
-        CryptoManagerInterface $cryptoManager,
+        CryptoManagerInterface $cryptoManager
     ): Response {
         $btcCrypto = $cryptoManager->findBySymbol(Token::BTC_SYMBOL);
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
