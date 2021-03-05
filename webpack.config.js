@@ -22,6 +22,7 @@ Encore
     .addEntry('settings', './assets/js/settings.js')
     .addEntry('admin', './assets/js/admin/admin.js')
     .addEntry('concord-bold', './assets/fonts/Concord-Bold.ttf')
+    .addEntry('concord', './assets/fonts/Concord.otf')
     .addEntry('news', './assets/js/news.js')
     .addEntry('edit_post', './assets/js/edit_post.js')
     .addEntry('show_post', './assets/js/show_post.js')

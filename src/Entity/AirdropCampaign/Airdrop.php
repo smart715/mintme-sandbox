@@ -253,4 +253,9 @@ class Airdrop
 
         return $this;
     }
+
+    public function getReward(): Money
+    {
+        return $this->getLockedAmount()->divide($this->getParticipants());
+    }
 }
