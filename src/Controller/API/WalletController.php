@@ -12,6 +12,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\LockFactory;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapper;
@@ -36,14 +37,17 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     private UserActionLogger $userActionLogger;
     private TranslatorInterface $translations;
     private string $coinifySharedSecret;
+    private LockFactory $lockFactory;
 
     public function __construct(
         TranslatorInterface $translations,
         UserActionLogger $userActionLogger,
+        LockFactory $lockFactory,
         string $coinifySharedSecret
     ) {
         $this->translations = $translations;
         $this->userActionLogger = $userActionLogger;
+        $this->lockFactory = $lockFactory;
         $this->coinifySharedSecret = $coinifySharedSecret;
     }
 
@@ -92,6 +96,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         WalletInterface $wallet,
         MailerInterface $mailer
     ): View {
+        /** @var User $user*/
+        $user = $this->getUser();
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
+        }
+
         $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
             ?? $tokenManager->findByName($request->get('crypto'));
 
@@ -100,9 +112,6 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 'error' => $this->translations->trans('api.wallet.not_found'),
             ], Response::HTTP_BAD_REQUEST);
         }
-
-        /** @var User $user*/
-        $user = $this->getUser();
 
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
         $this->denyAccessUnlessGranted('withdraw');
@@ -154,6 +163,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 ]
             );
         }
+
+        $lock->release();
 
         return $this->view();
     }
