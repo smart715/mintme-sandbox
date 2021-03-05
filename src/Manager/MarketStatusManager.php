@@ -23,6 +23,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
+    public const FILTER_DEPLOYED_FIRST = 1;
+    public const FILTER_DEPLOYED_ONLY_MINTME = 2;
+    public const FILTER_AIRDROP_ONLY = 3;
+    public const FILTER_DEPLOYED_ONLY_ETH = 2;
     public const FILTER_AIRDROP_ACTIVE = true;
 
     public const SORT_LAST_PRICE = 'lastPrice';
@@ -33,9 +37,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const SORT_BUY_DEPTH = 'buyDepth';
     public const SORT_MARKET_CAP = 'marketCap';
     public const SORT_MARKET_CAP_USD = 'marketCapUsd';
-
-    /** @var array<int> */
-    private $filterForTokens;
 
     /** @var MarketStatusRepository */
     protected $repository;
@@ -65,7 +66,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
-        array $filterForTokens,
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
         CryptoManagerInterface $cryptoManager,
@@ -75,7 +75,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
         ParameterBagInterface $bag,
         MoneyWrapperInterface $moneyWrapper
     ) {
-        $this->filterForTokens = $filterForTokens;
         /** @var  MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
         $this->repository = $repository;
@@ -100,13 +99,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->andWhere('qt.isBlocked=false');
 
         switch ($filter) {
-            case (int)($this->filterForTokens['deployed_only_mintme'] ?? 0):
+            case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
 
                 break;
-            case (int)($this->filterForTokens['airdrop_only'] ?? 0):
+            case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
@@ -120,25 +119,25 @@ class MarketStatusManager implements MarketStatusManagerInterface
     private function getMarketsInfoFilter(int $filter, QueryBuilder $queryBuilder): void
     {
         switch ($filter) {
-            case (int)($this->filterForTokens['deployed_first'] ?? 0):
+            case self::FILTER_DEPLOYED_FIRST:
                 $queryBuilder->addSelect(
                     "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
                 )->addOrderBy('deployed', 'DESC');
 
                 break;
-            case (int)($this->filterForTokens['deployed_only_mintme'] ?? 0):
+            case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
 
                 break;
-            case (int)($this->filterForTokens['deployed_only_eth'] ?? 0):
+            case self::FILTER_DEPLOYED_ONLY_ETH:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
                 )->setParameter('cryptoSymbol', Token::ETH_SYMBOL);
 
                 break;
-            case (int)($this->filterForTokens['airdrop_only'] ?? 0):
+            case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
@@ -406,5 +405,16 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getExpired(): array
     {
         return $this->repository->getExpired();
+    }
+
+    /** {@inheritDoc} */
+    public function getFilterForTokens(): array
+    {
+        return [
+            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
+            'deployed_only_mintme' => self::ETH_SYMBOL,
+            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
+            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
+        ];
     }
 }

@@ -256,13 +256,6 @@ parameters:
     available_mails:
         - 'MintmeHost'
 
-    # tokens filter parameters for trading page
-    filter_for_tokens:
-        deployed_first: 1
-        deployed_only_mintme: 2
-        airdrop_only: 3
-        deployed_only_eth: 4
-
     # api for sending SMS
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
