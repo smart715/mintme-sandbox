@@ -48,11 +48,9 @@ class MinOrderValidator implements ValidatorInterface
             ? $quote->getShowSubunit()
             : 0;
 
-        if ($baseUnit > $quoteUnit) {
-            bcscale($baseUnit);
-        } else {
-            bcscale($quoteUnit);
-        }
+        $scale = $baseUnit > $quoteUnit
+            ? $baseUnit
+            : $quoteUnit;
 
         $baseMinimal = $baseUnit > 0
             ? $this->getMinimal($baseUnit)
@@ -64,7 +62,11 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && BigDecimal::of((float)$this->price)->multipliedBy((float)$this->amount)->toFloat() >= $baseMinimal;
+            && BigDecimal::of((float)$this->price)
+                ->toScale($scale)
+                ->multipliedBy(
+                    BigDecimal::of((float)$this->amount)->toScale($scale)
+                )->toFloat() >= $baseMinimal;
     }
 
     public function getMessage(): string

@@ -97,7 +97,7 @@ class DonationHandler implements DonationHandlerInterface
         string $expectedTokensAmount,
         User $donorUser,
         string $sellOrdersSummary
-    ): void {
+    ): Donation {
         // Sum of donation in any crypto (MINTME, BTC, ETH, USDC)
         $amountInCrypto = $this->moneyWrapper->parse($donationAmount, $currency);
 
@@ -267,8 +267,10 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         $feeAmount = $this->calculateFee($amountInCrypto);
-        $this->saveDonation($donorUser, $tokenCreator, $currency, $amountInCrypto, $feeAmount, $expectedAmount, $token);
+        $donation = $this->saveDonation($donorUser, $tokenCreator, $currency, $amountInCrypto, $feeAmount, $expectedAmount, $token);
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
+
+        return $donation;
     }
 
     public function getTokensWorth(string $tokensWorth, string $currency): string
@@ -291,7 +293,7 @@ class DonationHandler implements DonationHandlerInterface
         Money $feeAmount,
         Money $tokenAmount,
         Token $token
-    ): void {
+    ): Donation {
         $donation = new Donation();
         $donation
             ->setDonor($donor)
@@ -305,6 +307,8 @@ class DonationHandler implements DonationHandlerInterface
 
         $this->em->persist($donation);
         $this->em->flush();
+
+        return $donation;
     }
 
     private function sendAmountFromUserToUser(

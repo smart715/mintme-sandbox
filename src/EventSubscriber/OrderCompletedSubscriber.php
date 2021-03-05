@@ -3,7 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Token\Token;
-use App\Events\OrderCompletedEvent;
+use App\Events\OrderEvent;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
 use App\Mailer\MailerInterface;
@@ -45,25 +45,25 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            OrderCompletedEvent::CREATED => 'orderCreated',
-            OrderCompletedEvent::CANCELLED => 'orderCancelled',
+            OrderEvent::CREATED => 'orderCreated',
+            OrderEvent::CANCELLED => 'orderCancelled',
         ];
     }
 
-    public function orderCreated(OrderCompletedEvent $event): void
+    public function orderCreated(OrderEvent $event): void
     {
         $this->sendUserNotificationOnCreated($event);
     }
 
-    public function orderCancelled(OrderCompletedEvent $event): void
+    public function orderCancelled(OrderEvent $event): void
     {
         $this->sendUserNotificationOnCancel($event);
     }
 
-    private function sendUserNotificationOnCreated(OrderCompletedEvent $event): void
+    private function sendUserNotificationOnCreated(OrderEvent $event): void
     {
         $order = $event->getOrder();
-        $quote =  $event->getQuote();
+        $quote =  $order->getMarket()->getQuote();
 
         if ($quote instanceof Token) {
             $makerTokens = $order->getMaker()->getProfile()->getUser()->getTokens();
@@ -102,9 +102,9 @@ class OrderCompletedSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function sendUserNotificationOnCancel(OrderCompletedEvent $event): void
+    private function sendUserNotificationOnCancel(OrderEvent $event): void
     {
-        $quote =  $event->getQuote();
+        $quote =  $event->getOrder()->getMarket()->getQuote();
 
         if ($quote instanceof Token) {
             $market = $event->getOrder()->getMarket();
