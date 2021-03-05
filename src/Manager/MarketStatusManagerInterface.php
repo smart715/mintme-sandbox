@@ -59,9 +59,4 @@ interface MarketStatusManagerInterface
      * @return array
      */
     public function getExpired(): array;
-
-    /**
-     * @return array
-     */
-    public function getFilterForTokens(): array;
 }

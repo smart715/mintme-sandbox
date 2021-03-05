@@ -28,6 +28,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_AIRDROP_ONLY = 3;
     public const FILTER_DEPLOYED_ONLY_ETH = 4;
     public const FILTER_AIRDROP_ACTIVE = true;
+    public const FILTER_FOR_TOKENS = [
+            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
+            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
+            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
+            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
+        ];
 
     public const SORT_LAST_PRICE = 'lastPrice';
     public const SORT_MONTH_VOLUME = 'monthVolume';
@@ -405,16 +411,5 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getExpired(): array
     {
         return $this->repository->getExpired();
-    }
-
-    /** {@inheritDoc} */
-    public function getFilterForTokens(): array
-    {
-        return [
-            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
-            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
-            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
-            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
-        ];
     }
 }

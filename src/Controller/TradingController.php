@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Image;
 use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
-use App\Manager\MarketStatusManagerInterface;
+use App\Manager\MarketStatusManager;
 use App\Repository\TokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +37,6 @@ class TradingController extends Controller
         string $page,
         Request $request,
         CryptoManagerInterface $cryptoManager,
-        MarketStatusManagerInterface $marketStatusManager
     ): Response {
         $btcCrypto = $cryptoManager->findBySymbol(Token::BTC_SYMBOL);
         $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
@@ -50,7 +49,7 @@ class TradingController extends Controller
             'page' => $page,
             'sort' => $request->query->get('sort'),
             'order' => 'ASC' !== $request->query->get('order'),
-            'filterForTokens'=> $marketStatusManager->getFilterForTokens(),
+            'filterForTokens'=> MarketStatusManager::FILTER_FOR_TOKENS,
         ]);
     }
 
