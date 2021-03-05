@@ -248,9 +248,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getCryptoAndDeployedMarketsInfo(): array
+    public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->getCryptoAndDeployedTokenMarketStatuses();
+        return $this->repository->getCryptoAndDeployedTokenMarketStatuses($offset, $limit);
     }
 
     /** {@inheritDoc} */
