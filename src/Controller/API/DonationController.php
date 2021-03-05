@@ -9,6 +9,7 @@ use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\DonationLogger;
+use App\Utils\LockFactory;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -29,14 +30,18 @@ class DonationController extends AbstractFOSRestController
     /** @var DonationLogger */
     protected $logger;
 
+    private LockFactory $lockFactory;
+
     public function __construct(
         DonationHandlerInterface $donationHandler,
         MarketHandlerInterface $marketHandler,
-        DonationLogger $logger
+        DonationLogger $logger,
+        LockFactory $lockFactory
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
         $this->logger = $logger;
+        $this->lockFactory = $lockFactory;
     }
 
     /**
@@ -123,9 +128,15 @@ class DonationController extends AbstractFOSRestController
     {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
+        $user = $this->getCurrentUser();
+
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
+        }
 
         try {
-            $user = $this->getCurrentUser();
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
 
             $this->donationHandler->makeDonation(
@@ -139,6 +150,8 @@ class DonationController extends AbstractFOSRestController
 
             return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
+            $lock->release();
+
             return $this->view([
                 'message' => $ex->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
@@ -153,6 +166,8 @@ class DonationController extends AbstractFOSRestController
                     'market' => $market,
                 ]
             );
+
+            $lock->release();
 
             return $this->view([
                 'error' => $message,
