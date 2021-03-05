@@ -9,8 +9,10 @@ use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route("/dev/api/v2/open/summary")
@@ -39,6 +41,18 @@ class SummaryController extends AbstractFOSRestController
      *
      * @Rest\Get("/")
      * @Rest\View(serializerGroups={"dev"})
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     requirements=@Assert\Range(min="0"),
+     *     default=0
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     requirements=@Assert\Range(min="1", max="101"),
+     *     default=101
+     * )
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Response(
      *     response="200",
      *     description="Returns data for all tickers and all markets with crypto or deployed tokens."
@@ -47,9 +61,12 @@ class SummaryController extends AbstractFOSRestController
      * @SWG\Tag(name="Open")
      * @Security(name="")
      */
-    public function getSummary(): array
+    public function getSummary(ParamFetcherInterface $request): array
     {
-        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo();
+        $offset = (int)$request->get('offset');
+        $limit = (int)$request->get('limit');
+
+        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo($offset, $limit);
 
         return array_map(
             function ($marketStatus) {
