@@ -412,16 +412,13 @@ page.unsubscribe.already: '%mail% ya se ha dado de baja.'
 page.unsubscribe.question: '¿Quiere dar de baja a %mail% de nuestra lista de correo?'
 page.unsubscribe.success: null
 page.wallet.title: Billetera
-page.wallet.account: 'Su cuenta'
 page.wallet.trading_history: 'Historial de Trading'
 page.wallet.dep_with: 'Historial de Depósitos/Retiros'
 page.wallet.active_orders: 'Órdenes Activas'
 page.wallet.balance.spinner: Saldo
 page.wallet.tokens_own.spinner: 'Tokens que posee'
-page.wallet.token: 'Su Token'
-page.wallet.blocked: 'fue bloqueado.<br> Retirar o depositar'
-page.wallet.for: 'para el token'
-page.wallet.unavailable: 'no está disponible'
+page.wallet.blocked.account:
+page.wallet.blocked.token:
 post.tab.bbcode.ul: '[ul]<br> [li]Uno[/li]<br> [li]Dos[/li]<br>[/ul]'
 post.tab.bbcode.ol: '[ol]<br> [li]Uno[/li]<br> [li]Dos[/li]<br>[/ol]'
 post.tab.content: 'El contenido no puede estar vacío o contener sólo bbcodes y espacios en blanco'
