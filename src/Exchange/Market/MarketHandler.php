@@ -328,7 +328,7 @@ class MarketHandler implements MarketHandlerInterface
                 Order::SIDE_MAP[$orderData['type']],
                 $this->moneyWrapper->parse(
                     $orderData['price'],
-                    $this->getSymbol($market->getQuote())
+                    $this->getSymbol($market->getBase())
                 ),
                 Order::FINISHED_STATUS,
                 $this->moneyWrapper->parse(
