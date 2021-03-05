@@ -17,6 +17,7 @@ use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwitterManagerInterface;
 use App\Utils\AirdropCampaignActions;
+use App\Utils\LockFactory;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -29,6 +30,7 @@ use Money\Money;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -43,19 +45,22 @@ class AirdropCampaignController extends AbstractFOSRestController
     private AirdropConfig $airdropConfig;
     private TranslatorInterface $translator;
     private TwitterManagerInterface $twitterManager;
+    private LockFactory $lockFactory;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         AirdropConfig $airdropConfig,
         TranslatorInterface $translator,
-        TwitterManagerInterface $twitterManager
+        TwitterManagerInterface $twitterManager,
+        LockFactory $lockFactory
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
         $this->airdropConfig = $airdropConfig;
         $this->translator = $translator;
         $this->twitterManager = $twitterManager;
+        $this->lockFactory = $lockFactory;
     }
 
     /**
@@ -101,6 +106,12 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         if (!$user instanceof User) {
             throw new ApiUnauthorizedException();
+        }
+
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw new AccessDeniedException();
         }
 
         $token = $this->fetchToken($tokenName, true);
@@ -155,6 +166,8 @@ class AirdropCampaignController extends AbstractFOSRestController
                 $this->airdropCampaignManager->createAction($action, $actionsData[$action] ?? null, $airdrop);
             }
         }
+
+        $lock->release();
 
         return $this->view([
             'id' => $airdrop->getId(),
@@ -240,7 +253,15 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiUnauthorizedException();
         }
 
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw new AccessDeniedException();
+        }
+
         $this->airdropCampaignManager->claimAirdropAction($action, $user);
+
+        $lock->release();
 
         return $this->view(null, Response::HTTP_OK);
     }
