@@ -6,6 +6,9 @@ use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\AirdropEvent;
+use App\Events\TokenEvents;
+use App\Events\UserAirdropEvent;
 use App\Exception\ApiBadForbiddenException;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiUnauthorizedException;
@@ -27,6 +30,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Money;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -46,6 +50,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     private TranslatorInterface $translator;
     private TwitterManagerInterface $twitterManager;
     private LockFactory $lockFactory;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -53,7 +58,8 @@ class AirdropCampaignController extends AbstractFOSRestController
         AirdropConfig $airdropConfig,
         TranslatorInterface $translator,
         TwitterManagerInterface $twitterManager,
-        LockFactory $lockFactory
+        LockFactory $lockFactory,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
@@ -61,6 +67,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->translator = $translator;
         $this->twitterManager = $twitterManager;
         $this->lockFactory = $lockFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -167,6 +174,9 @@ class AirdropCampaignController extends AbstractFOSRestController
             }
         }
 
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(new AirdropEvent($airdrop), TokenEvents::AIRDROP_CREATED);
+
         $lock->release();
 
         return $this->view([
@@ -234,6 +244,12 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->airdropCampaignManager->claimAirdropCampaign(
             $user,
             $token
+        );
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new UserAirdropEvent($airdrop, $user),
+            TokenEvents::AIRDROP_CLAIMED
         );
 
         return $this->view(null, Response::HTTP_OK);

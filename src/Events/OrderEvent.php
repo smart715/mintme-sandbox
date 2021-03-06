@@ -6,30 +6,21 @@ use App\Entity\TradebleInterface;
 use App\Exchange\Order;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class OrderCompletedEvent extends Event implements OrderCompleteEventInterface
+class OrderEvent extends Event implements OrderEventInterface
 {
     public const CREATED = "order.created";
     public const CANCELLED = "order.cancelled";
+    public const COMPLETED = "order.completed";
 
-    /** @var Order */
     protected Order $order;
 
-    /** @var TradebleInterface */
-    protected TradebleInterface $quote;
-
-    public function __construct(Order $order, TradebleInterface $quote)
+    public function __construct(Order $order)
     {
         $this->order = $order;
-        $this->quote = $quote;
     }
 
     public function getOrder(): Order
     {
         return $this->order;
-    }
-
-    public function getQuote(): TradebleInterface
-    {
-        return $this->quote;
     }
 }

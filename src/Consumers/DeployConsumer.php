@@ -8,6 +8,8 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +18,7 @@ use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DeployConsumer implements ConsumerInterface
 {
@@ -34,18 +37,22 @@ class DeployConsumer implements ConsumerInterface
     /** @var DeployCostFetcherInterface */
     private $deployCostFetcher;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
-        DeployCostFetcherInterface $deployCostFetcher
+        DeployCostFetcherInterface $deployCostFetcher,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -136,6 +143,9 @@ class DeployConsumer implements ConsumerInterface
 
             return false;
         }
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::DEPLOYED);
 
         return true;
     }
