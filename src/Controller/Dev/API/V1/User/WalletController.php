@@ -16,6 +16,7 @@ use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\LockFactory;
 use App\Utils\NotificationTypes;
 use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
@@ -30,6 +31,7 @@ use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Throwable;
 
@@ -200,8 +202,18 @@ class WalletController extends DevApiController
     public function withdraw(
         ParamFetcherInterface $request,
         MoneyWrapperInterface $moneyWrapper,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        LockFactory $lockFactory
     ): View {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $lock = $lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw new AccessDeniedException();
+        }
+
         $this->denyAccessUnlessGranted('withdraw');
 
         $currency = $request->get('currency');
@@ -280,6 +292,8 @@ class WalletController extends DevApiController
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
+
+        $lock->release();
 
         return $this->view([
             'message' => "Your transaction has been successfully processed and queued to be sent.",

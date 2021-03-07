@@ -26,7 +26,7 @@ parameters:
         - "%rootDir%/../../../tests/Command/UpdateDisposableEmailDomainsTest.php"
         - "%rootDir%/../../../tests/Command/Blacklist/SynchronizeTokenBlacklistTest.php"
 
-    autoload_files:
+    bootstrapFiles:
         - vendor/bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
 
     ignoreErrors:

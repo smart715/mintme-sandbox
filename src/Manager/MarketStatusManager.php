@@ -6,11 +6,13 @@ use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\OrderEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -20,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
@@ -64,6 +67,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
     private MoneyWrapperInterface $moneyWrapper;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
@@ -72,7 +77,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
         MarketHandlerInterface $marketHandler,
         BalanceHandlerInterface $balanceHandler,
         ParameterBagInterface $bag,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         /** @var  MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
@@ -85,6 +91,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->balanceHandler = $balanceHandler;
         $this->bag = $bag;
         $this->moneyWrapper = $moneyWrapper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritDoc} */
@@ -240,9 +247,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
     }
 
     /** {@inheritDoc} */
-    public function getCryptoAndDeployedMarketsInfo(): array
+    public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->getCryptoAndDeployedTokenMarketStatuses();
+        return $this->repository->getCryptoAndDeployedTokenMarketStatuses($offset, $limit);
     }
 
     /** {@inheritDoc} */
@@ -291,6 +298,21 @@ class MarketStatusManager implements MarketStatusManagerInterface
         );
 
         $marketStatus->updateStats($marketInfo);
+
+        $orders = $this->marketHandler->getExecutedOrders($market, $marketStatus->getLastDealId());
+
+        foreach ($orders as $order) {
+            if (Order::DONATION_SIDE === $order->getSide()) {
+                continue;
+            }
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::COMPLETED);
+        }
+
+        if (isset($orders[0])) {
+            $marketStatus->setLastDealId($orders[0]->getId());
+        }
 
         $this->em->merge($marketStatus);
         $this->em->flush();

@@ -4,39 +4,45 @@ namespace App\Controller\API;
 
 use App\Communications\Exception\FetchException;
 use App\Entity\User;
+use App\Events\DonationEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\DonationLogger;
+use App\Utils\LockFactory;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @Rest\Route("/api/donate")
  */
 class DonationController extends AbstractFOSRestController
 {
-    /** @var DonationHandlerInterface */
-    protected $donationHandler;
+    protected DonationHandlerInterface $donationHandler;
+    protected MarketHandlerInterface $marketHandler;
+    protected DonationLogger $logger;
+    protected EventDispatcherInterface $eventDispatcher;
 
-    /** @var MarketHandlerInterface */
-    protected $marketHandler;
-
-    /** @var DonationLogger */
-    protected $logger;
+    private LockFactory $lockFactory;
 
     public function __construct(
         DonationHandlerInterface $donationHandler,
         MarketHandlerInterface $marketHandler,
-        DonationLogger $logger
+        DonationLogger $logger,
+        LockFactory $lockFactory,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
         $this->logger = $logger;
+        $this->lockFactory = $lockFactory;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -123,12 +129,18 @@ class DonationController extends AbstractFOSRestController
     {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
+        $user = $this->getCurrentUser();
+
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw $this->createAccessDeniedException();
+        }
 
         try {
-            $user = $this->getCurrentUser();
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
 
-            $this->donationHandler->makeDonation(
+            $donation = $this->donationHandler->makeDonation(
                 $market,
                 $request->get('currency'),
                 (string)$request->get('amount'),
@@ -137,8 +149,13 @@ class DonationController extends AbstractFOSRestController
                 $sellOrdersSummary
             );
 
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
+
             return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
+            $lock->release();
+
             return $this->view([
                 'message' => $ex->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
@@ -153,6 +170,8 @@ class DonationController extends AbstractFOSRestController
                     'market' => $market,
                 ]
             );
+
+            $lock->release();
 
             return $this->view([
                 'error' => $message,

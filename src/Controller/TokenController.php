@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
@@ -36,6 +38,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +46,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -51,32 +55,18 @@ use Throwable;
 class TokenController extends Controller
 {
 
-    /** @var EntityManagerInterface */
-    protected $em;
+    protected EntityManagerInterface $em;
+    protected ProfileManagerInterface $profileManager;
+    protected BlacklistManagerInterface $blacklistManager;
+    protected TokenManagerInterface $tokenManager;
+    protected CryptoManagerInterface $cryptoManager;
+    protected MarketFactoryInterface $marketManager;
+    protected TraderInterface $trader;
+    private UserActionLogger $userActionLogger;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
+    private TranslatorInterface $translator;
 
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
-
-    /** @var BlacklistManagerInterface */
-    protected $blacklistManager;
-
-    /** @var TokenManagerInterface */
-    protected $tokenManager;
-
-    /** @var CryptoManagerInterface */
-    protected $cryptoManager;
-
-    /** @var MarketFactoryInterface */
-    protected $marketManager;
-
-    /** @var TraderInterface */
-    protected $trader;
-
-    /** @var UserActionLogger  */
-    private $userActionLogger;
-
-    /** @var ScheduledNotificationManagerInterface  */
-    private $scheduledNotificationManager;
+    private EventDispatcherInterface $eventDispatcher;
 
     private PostManagerInterface $postManager;
 
@@ -91,6 +81,8 @@ class TokenController extends Controller
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
         PostManagerInterface $postManager
     ) {
         $this->em = $em;
@@ -102,6 +94,8 @@ class TokenController extends Controller
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
         $this->postManager = $postManager;
 
         parent::__construct($normalizer);
@@ -321,6 +315,10 @@ class TokenController extends Controller
                 $marketStatusManager->createMarketStatus($market);
 
                 $this->em->commit();
+
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::CREATED);
+
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
                 return $this->json("success", Response::HTTP_OK);
@@ -345,7 +343,7 @@ class TokenController extends Controller
         }
 
         return $this->render('pages/token_creation.html.twig', [
-            'formHeader' => 'Create your own token',
+            'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
         ]);
     }
