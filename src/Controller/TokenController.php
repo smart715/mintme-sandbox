@@ -10,6 +10,7 @@ use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
+use App\Exception\RedirectException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\OrdersFactoryInterface;
@@ -65,10 +66,12 @@ class TokenController extends Controller
     private UserActionLogger $userActionLogger;
     private ScheduledNotificationManagerInterface $scheduledNotificationManager;
     private TranslatorInterface $translator;
-
     private EventDispatcherInterface $eventDispatcher;
-
     private PostManagerInterface $postManager;
+    private TokenNameConverterInterface $tokenNameConverter;
+    private AirdropCampaignManagerInterface $airdropCampaignManager;
+    private LimitOrderConfig $orderConfig;
+    private DisabledServicesConfig $disabledServicesConfig;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -83,7 +86,11 @@ class TokenController extends Controller
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
-        PostManagerInterface $postManager
+        PostManagerInterface $postManager,
+        TokenNameConverterInterface $tokenNameConverter,
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        LimitOrderConfig $orderConfig,
+        DisabledServicesConfig $disabledServicesConfig
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -97,8 +104,59 @@ class TokenController extends Controller
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
         $this->postManager = $postManager;
+        $this->tokenNameConverter = $tokenNameConverter;
+        $this->airdropCampaignManager = $airdropCampaignManager;
+        $this->orderConfig = $orderConfig;
+        $this->disabledServicesConfig = $disabledServicesConfig;
 
         parent::__construct($normalizer);
+    }
+
+    /**
+     * @Route("/{name}/donate",
+     *     name="token_show_donate",
+     *     defaults={"tab" = "intro"},
+     *     methods={"GET", "POST"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts"},
+     *     options={"expose"=true,"2fa_progress"=false}
+     * )
+     */
+    public function donate(string $name): RedirectResponse
+    {
+        return $this->redirectToRoute('token_show', [
+            'name' => $name,
+            'tab' => 'buy',
+        ]);
+    }
+
+    /**
+     * @Route("/{name}/posts/{slug}", name="new_show_post", options={"expose"=true})
+     */
+    public function showPost(string $name, ?string $slug = null, Request $request): Response
+    {
+        $token = $this->fetchToken($request, $name);
+
+        $post = $slug
+            ? $this->postManager->getBySlug($slug)
+            : null;
+
+        if ($slug && !$post) {
+            throw new NotFoundPostException();
+        }
+
+        if ($post && $post->getToken()->getName() !== $name) {
+            throw new NotFoundPostException();
+        }
+
+        $tab = $post ? 'post' : 'posts';
+
+        $extraData = [
+            'post' => $this->normalize($post),
+            'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
+            'comments' => $this->normalize($post->getComments()),
+        ];
+
+        return $this->renderPairPage($token, $request, $tab, $extraData);
     }
 
     /**
@@ -106,7 +164,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts"},
+     *     requirements={"tab" = "trade|intro|buy"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -114,118 +172,17 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        ?string $modal = null,
-        TokenNameConverterInterface $tokenNameConverter,
-        AirdropCampaignManagerInterface $airdropCampaignManager,
-        LimitOrderConfig $orderConfig,
-        DisabledServicesConfig $disabledServicesConfig
+        ?string $modal = null
     ): Response {
         if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
-        if ('donate' === $tab) {
-            return $this->redirectToRoute('token_show', [
-                'name' => $name,
-                'tab' => 'buy',
-            ]);
-        }
+        $token = $this->fetchToken($request, $name);
 
-        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
-
-        if ($dashedName != $name) {
-            return $this->redirectToRoute('token_show', ['name' => $dashedName]);
-        }
-
-        //rebranding
-        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
-            $name = Token::WEB_SYMBOL;
-        }
-
-        $token = $this->tokenManager->findByName($name);
-
-        if (!$token || $token->isBlocked()) {
-            throw new NotFoundTokenException();
-        }
-
-        if ($this->tokenManager->isPredefined($token)) {
-            return $this->redirectToRoute('coin', [
-                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
-                    'quote'=> Token::MINTME_SYMBOL,
-                ], 301);
-        }
-
-        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
-        $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
-        $market = $exchangeCrypto
-            ? $this->marketManager->create($exchangeCrypto, $token)
-            : null;
-        $tokenDescription = $token->getDescription() ?: '';
-        $defaultDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
-        $tokenDescription = $tokenDescription ?: $defaultDescription;
-        $defaultActivated = $tokenDescription === $defaultDescription;
-        $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
-        $tokenDescription = preg_replace(
-            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
-            '\2',
-            $tokenDescription
-        );
-        $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
-
-        /** @var  User|null $user */
-        $user = $this->getUser();
-
-        $tokenDecimals = $token->getDecimals();
-
-        if ('posts' === $tab && null !== $modal) {
-            $post = $this->postManager->getBySlug($modal);
-
-            if (!$post) {
-                throw new NotFoundPostException();
-            }
-
-            if ($post->getToken()->getName() !== $name) {
-                throw new NotFoundPostException();
-            }
-
-            $tab = 'post';
-        }
-
-        return $this->render('pages/pair.html.twig', [
-            'showSuccessAlert' => $request->isMethod('POST') ? true : false,
-            'token' => $token,
-            'tokenCrypto' => $this->normalize($tokenCrypto),
-            'tokenDescription' => $metaDescription,
-            'metaTokenDescription' => substr($metaDescription, 0, 200),
-            'showDescription' => $token->isOwner($this->tokenManager->getOwnTokens()) || !$defaultActivated,
-            'currency' => $token->getExchangeCryptoSymbol(),
-            'hash' => $user ? $user->getHash() : '',
-            'profile' => $token->getProfile(),
-            'isOwner' => $token->isOwner($this->tokenManager->getOwnTokens()),
-            'isTokenCreated' => $this->isTokenCreated(),
-            'tab' => $tab,
-            'showTrade' => true,
-            'showDonation' => true,
-            'market' => $this->normalize($market),
-            'tokenHiddenName' => $market ?
-                $tokenNameConverter->convert($token) :
-                '',
-            'precision' => $this->getParameter('token_precision'),
-            'isTokenPage' => true,
-            'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
-            'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
-            'userAlreadyClaimed' => $airdropCampaignManager
-                ->checkIfUserClaimed($user, $token),
-            'posts' => $this->normalize($token->getPosts()),
-            'taker_fee' => $orderConfig->getTakerFeeRate(),
+        return $this->renderPairPage($token, $request, $tab, [
             'showTokenEditModal' => 'settings' === $modal,
-            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
             'showCreatedModal' => 'created' === $modal,
-            'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
-                ? Token::TOKEN_SUBUNIT
-                : $tokenDecimals,
-            'post' => $this->normalize($post ?? null),
-            'comments' => $this->normalize(isset($post) ? $post->getComments() : null),
         ]);
     }
 
@@ -387,26 +344,35 @@ class TokenController extends Controller
         return $this->redirectToOwnToken('intro', 'settings');
     }
 
-    /**
-     * @Route("/token/asdfg/{tokenName}/{slug}", name="new_show_post", options={"expose"=true})
-     */
-    public function showPost(string $tokenName, string $slug, PostManagerInterface $postManager): Response
+    private function fetchToken(Request $request, string $name): Token
     {
-        $post = $postManager->getBySlug($slug);
+        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
-        if (!$post) {
-            throw new NotFoundPostException();
+        if ($dashedName != $name) {
+            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName]));
         }
 
-        if ($post->getToken()->getName() !== $tokenName) {
-            throw new NotFoundPostException();
+        //rebranding
+        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
+            $name = Token::WEB_SYMBOL;
         }
 
-        return $this->render('pages/show_post.html.twig', [
-            'post' => $this->normalize($post),
-            'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
-            'comments' => $this->normalize($post->getComments()),
-        ]);
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token || $token->isBlocked()) {
+            throw new NotFoundTokenException();
+        }
+
+        if ($this->tokenManager->isPredefined($token)) {
+            throw new RedirectException(
+                $this->redirectToRoute('coin', [
+                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
+                    'quote'=> Token::MINTME_SYMBOL,
+                ], 301)
+            );
+        }
+
+        return $token;
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
@@ -431,5 +397,74 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return count($this->tokenManager->getOwnTokens()) > 0;
+    }
+
+    private function renderPairPage(Token $token, Request $request, string $tab, array $extraData = []): Response
+    {
+        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
+        $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
+        $market = $exchangeCrypto
+            ? $this->marketManager->create($exchangeCrypto, $token)
+            : null;
+
+        if ($token->getDescription()) {
+            $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($token->getDescription());
+            $tokenDescription = preg_replace(
+                '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+                '\2',
+                $tokenDescription
+            );
+            $tokenDescription = str_replace("\n", " ", $tokenDescription);
+            $defaultActivated = true;
+        } else {
+            $tokenDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
+            $defaultActivated = false;
+        }
+
+        /** @var  User|null $user */
+        $user = $this->getUser();
+
+        $tokenDecimals = $token->getDecimals();
+
+        return $this->render(
+            'pages/pair.html.twig',
+            array_merge([
+                'showSuccessAlert' => $request->isMethod('POST'),
+                'token' => $token,
+                'tokenCrypto' => $this->normalize($tokenCrypto),
+                'tokenDescription' => $tokenDescription,
+                'metaTokenDescription' => substr($tokenDescription, 0, 200),
+                'showDescription' => $token->isOwner($this->tokenManager->getOwnTokens()) || !$defaultActivated,
+                'currency' => $token->getExchangeCryptoSymbol(),
+                'hash' => $user ? $user->getHash() : '',
+                'profile' => $token->getProfile(),
+                'isOwner' => $token->isOwner($this->tokenManager->getOwnTokens()),
+                'isTokenCreated' => $this->isTokenCreated(),
+                'tab' => $tab,
+                'showTrade' => true,
+                'showDonation' => true,
+                'market' => $this->normalize($market),
+                'tokenHiddenName' => $market ?
+                    $this->tokenNameConverter->convert($token) :
+                    '',
+                'precision' => $this->getParameter('token_precision'),
+                'isTokenPage' => true,
+                'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
+                'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
+                'userAlreadyClaimed' => $this->airdropCampaignManager
+                    ->checkIfUserClaimed($user, $token),
+                'posts' => $this->normalize($token->getPosts()),
+                'taker_fee' => $this->orderConfig->getTakerFeeRate(),
+                'showTokenEditModal' => false,
+                'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
+                'showCreatedModal' => false,
+                'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
+                    ? Token::TOKEN_SUBUNIT
+                    : $tokenDecimals,
+                'post' => null,
+                'showEdit' => false,
+                'comments' => [],
+            ], $extraData)
+        );
     }
 }
