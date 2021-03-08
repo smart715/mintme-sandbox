@@ -236,8 +236,7 @@
                                 <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
                             </div>
                         </template>
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        && tokens.length">
+                        <template v-if="shouldShowAll">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
@@ -464,6 +463,13 @@ export default {
             return this.showUsd
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
+        },
+        shouldShowAll: function() {
+            const totalPages = Math.ceil(this.totalRows / this.perPage);
+
+            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                && this.tokens.length
+                && this.currentPage === totalPages;
         },
     },
     mounted() {
