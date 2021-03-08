@@ -33,9 +33,7 @@
                     <div class="row pl-2">
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="isCryptoActionDisabled('depositDisabled', data) ?
-                                     'text-muted pointer-events-none' :
-                                     'text-white'"
+                            :class="actionButtonClass(isCryptoActionDisabled('depositDisabled', data))"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div class="hover-icon">
                                 <font-awesome-icon
@@ -52,9 +50,7 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="isCryptoActionDisabled('withdrawalsDisabled', data) ?
-                                     'text-muted pointer-events-none' :
-                                     'text-white'"
+                            :class="actionButtonClass(isCryptoActionDisabled('withdrawalsDisabled', data))"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -136,9 +132,7 @@
                     >
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="isTokenActionDisabled('depositDisabled', data) ?
-                                     'text-muted pointer-events-none' :
-                                     'text-white'"
+                            :class="actionButtonClass(isTokenActionDisabled('depositDisabled', data))"
                             @click="openDeposit(
                                 data.item.name,
                                 data.item.subunit,
@@ -162,9 +156,7 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="isTokenActionDisabled('withdrawalsDisabled', data) ?
-                                     'text-muted pointer-events-none' :
-                                     'text-white'"
+                            :class="actionButtonClass(isTokenActionDisabled('withdrawalsDisabled', data))"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -450,6 +442,11 @@ export default {
             return data.item.blocked
             || this.disabledServices[action]
             || this.disabledServices.allServicesDisabled;
+        },
+        actionButtonClass: function(disabled) {
+            return disabled ?
+                'text-muted pointer-events-none' :
+                'text-white';
         },
         isDisabledCrypto: function(name) {
             return JSON.parse(this.disabledCrypto).includes(name);
