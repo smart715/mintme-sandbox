@@ -146,7 +146,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 break;
             case self::FILTER_DEPLOYED_ONLY_ETH:
                 $queryBuilder->andWhere(
-                    "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
+                    "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND c.symbol = :cryptoSymbol"
                 )->setParameter('cryptoSymbol', Token::ETH_SYMBOL);
 
                 break;

@@ -480,7 +480,8 @@ export default {
         shouldShowAll: function() {
             const totalPages = Math.ceil(this.totalRows / this.perPage);
 
-            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+            return (this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    || this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key)
                 && this.tokens.length
                 && this.currentPage === totalPages;
         },
