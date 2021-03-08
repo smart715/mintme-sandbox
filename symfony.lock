@@ -289,6 +289,9 @@
     "incenteev/composer-parameter-handler": {
         "version": "v2.1.4"
     },
+    "jbbcode/jbbcode": {
+        "version": "v1.4.2"
+    },
     "jms/i18n-routing-bundle": {
         "version": "3.0.4"
     },
