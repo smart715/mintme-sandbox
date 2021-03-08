@@ -32,8 +32,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class HackerController extends AbstractController
 {
-    public const BTC_SYMBOL = 'BTC';
-
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 

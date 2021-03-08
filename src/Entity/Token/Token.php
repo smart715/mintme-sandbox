@@ -33,12 +33,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token implements TradebleInterface, ImagineInterface
 {
-    public const MINTME_SYMBOL = "MINTME";
-    public const WEB_SYMBOL = "WEB";
-    public const BTC_SYMBOL = "BTC";
-    public const ETH_SYMBOL = "ETH";
-    public const USDC_SYMBOL = "USDC";
-    public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const DESC_MIN_LENGTH = 200;
@@ -48,7 +42,6 @@ class Token implements TradebleInterface, ImagineInterface
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
     public const PENDING_ADDR = '0x';
-    public const WEB_ETH_SYMBOLS = [self::ETH_SYMBOL, self::WEB_SYMBOL];
 
     /**
      * @ORM\Id()
