@@ -195,6 +195,7 @@ class MarketInfo
         return $this->buyDepth;
     }
 
+    /** @Groups({"Default"}) */
     public function getSoldOnMarket(): Money
     {
         return $this->soldOnMarket;

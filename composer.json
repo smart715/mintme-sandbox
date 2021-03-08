@@ -28,6 +28,7 @@
         "gedmo/doctrine-extensions": "^2.4",
         "graze/guzzle-jsonrpc": "^3.2",
         "incenteev/composer-parameter-handler": "^2.1",
+        "jbbcode/jbbcode": "^1.4",
         "jms/i18n-routing-bundle": "^3.0",
         "laminas/laminas-code": "^3.4",
         "laminas/laminas-eventmanager": "^3.2",

@@ -17,12 +17,13 @@ abstract class Controller extends AbstractController
 
     /**
      * @param mixed $object
+     * @param array $groups
      * @return array|string|int|float|bool|\ArrayObject|null
      */
-    protected function normalize($object)
+    protected function normalize($object, array $groups = ['Default'])
     {
         return $this->normalizer->normalize($object, null, [
-            'groups' => ['Default'],
+            'groups' => $groups,
         ]);
     }
 }
