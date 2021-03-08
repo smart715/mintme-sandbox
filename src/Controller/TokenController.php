@@ -13,6 +13,8 @@ use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\OrdersFactoryInterface;
+use App\Exchange\Factory\TradeInfoFactory;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
@@ -38,6 +40,7 @@ use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -64,6 +67,9 @@ class TokenController extends Controller
     protected TraderInterface $trader;
     private UserActionLogger $userActionLogger;
     private ScheduledNotificationManagerInterface $scheduledNotificationManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private MarketHandlerInterface $marketHandler;
+    private ParameterBagInterface $parameterBag;
     private TranslatorInterface $translator;
 
     private EventDispatcherInterface $eventDispatcher;
@@ -79,6 +85,9 @@ class TokenController extends Controller
         UserActionLogger $userActionLogger,
         BlacklistManager $blacklistManager,
         ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        BalanceHandlerInterface $balanceHandler,
+        MarketHandlerInterface $marketHandler,
+        ParameterBagInterface $parameterBag,
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher
     ) {
@@ -91,6 +100,9 @@ class TokenController extends Controller
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
         $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->balanceHandler = $balanceHandler;
+        $this->marketHandler = $marketHandler;
+        $this->parameterBag = $parameterBag;
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
 
@@ -173,6 +185,17 @@ class TokenController extends Controller
 
         $tokenDecimals = $token->getDecimals();
 
+        $tradeInfo = null;
+
+        if ('intro' === $tab) {
+            $tradeInfo = (new TradeInfoFactory(
+                $market,
+                $this->balanceHandler,
+                $this->marketHandler,
+                $this->parameterBag
+            ))->create();
+        }
+
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
@@ -206,6 +229,7 @@ class TokenController extends Controller
             'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                 ? Token::TOKEN_SUBUNIT
                 : $tokenDecimals,
+            'tradeInfo' => $this->normalize($tradeInfo, ['API']),
         ]);
     }
 

@@ -1262,6 +1262,7 @@ token.creation.disabled: 'Creación de Tokens desactivada. Inténtalo de nuevo m
 trade.page.disabled: 'La página de trader ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.page.disabled: 'La página de compra ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.disabled: 'Las compras directas están deshabilitadas'
+text.time.year:
 twitter.sign_in: 'Loguearse con Twitter'
 twitter.must_sign_in: 'Usted debe estar logueado con twitter para completar esta acción'
 mail.verification_code: 'Su código de verificación:'
