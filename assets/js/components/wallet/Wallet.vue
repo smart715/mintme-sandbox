@@ -427,11 +427,6 @@ export default {
         });
     },
     methods: {
-        /**
-         * @param {string} action
-         * @param {object} data
-         * @return {string}
-         */
         isCryptoActionDisabled: function(action, data) {
             return this.isUserBlocked
             || this.isDisabledCrypto(data.name)
