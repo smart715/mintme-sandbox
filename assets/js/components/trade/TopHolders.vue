@@ -8,7 +8,7 @@
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
                         ref="table"
-                        :items="traders"
+                        :items="holders"
                         :fields="fields"
                     >
                         <template v-slot:cell(trader)="row">
@@ -45,11 +45,15 @@ export default {
         HolderName,
     },
     props: {
-      tokenName: String,
+        tokenName: String,
+        tradersProp: {
+            type: Array,
+            default: () => null,
+        },
     },
     data() {
         return {
-            traders: null,
+            traders: this.tradersProp,
             fields: [
                 {
                     key: 'trader',
@@ -74,6 +78,17 @@ export default {
         hasTraders: function() {
             return this.traders.length > 0;
         },
+        holders: function() {
+            return this.traders.map((row) => {
+                return {
+                    trader: row.user.profile.nickname,
+                    traderAvatar: row.user.profile.image.avatar_small,
+                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
+                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
+                    amount: Math.round(row.balance),
+                };
+            });
+        },
     },
     methods: {
         scrollDown: function() {
@@ -85,16 +100,10 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('top_holders', {
                     name: this.tokenName,
                 }))
-                    .then(({data}) => this.traders = data.map((row) => {
+                    .then(({data}) => {
+                        this.traders = data;
                         resolve(data);
-                        return {
-                            trader: row.user.profile.nickname,
-                            traderAvatar: row.user.profile.image.avatar_small,
-                            url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
-                            date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
-                            amount: Math.round(row.balance),
-                        };
-                    }))
+                    })
                     .catch((err) => reject(
                         this.sendLogs('error', 'Can not get top holders', err)
                     ));
@@ -102,6 +111,10 @@ export default {
         },
     },
     mounted: function() {
+        if (!this.traders) {
+            this.getTraders();
+        }
+
         this.getTraders().then(() => {
             this.addMessageHandler((response) => {
                 if ('deals.update' === response.method) {
