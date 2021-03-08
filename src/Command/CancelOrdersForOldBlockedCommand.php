@@ -32,9 +32,9 @@ class CancelOrdersForOldBlockedCommand extends Command
 
     private int $maxActiveOrders;
 
-    private UserRepository $userRepository;
+    private EntityRepository $userRepository;
 
-    private TokenRepository $tokenRepository;
+    private EntityRepository $tokenRepository;
 
     public function __construct(
         MarketHandlerInterface $marketHandler,
@@ -81,7 +81,7 @@ class CancelOrdersForOldBlockedCommand extends Command
 
         foreach ($this->tokenRepository->findBy(['isBlocked' => true]) as $token) {
             $tokenMarket = $this->marketFactory->create(
-                $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+                $this->cryptoManager->findBySymbol((string)$token->getCryptoSymbol()),
                 $token
             );
             $tokenPendingOrders = array_merge(
