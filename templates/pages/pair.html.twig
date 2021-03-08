@@ -32,6 +32,8 @@
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
+{% set tokenDeployedDate = isTokenPage and token.isDeployed ? token.getDeployed | json_encode : 'null' %}
+
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -88,6 +90,10 @@
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
                 :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                current-locale="{{ currentLocale }}"
+                :token-deployed-date="{{ tokenDeployedDate }}"
+                :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                mintme-explorer-url="{{ global_mintme_explorer_url }}"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"

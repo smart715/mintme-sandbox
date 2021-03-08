@@ -67,6 +67,11 @@
                 <p class="bg-info m-0 py-1 px-3">
                     {{ $t('token.deploy.deployed') }}
                 </p>
+                <br>
+                <a v-if="isSmartContractCreated"
+                    :href="mintmeExplorerUrl"
+                    target="_blank"
+                >{{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: formatTokenDeployedDate}) }}</a>
             </div>
         </template>
         <div
@@ -84,7 +89,8 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, GENERAL} from '../../../utils/constants';
+import moment from 'moment';
 
 export default {
     name: 'TokenDeploy',
@@ -96,6 +102,11 @@ export default {
         precision: Number,
         statusProp: String,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: Object,
+        tokenContractAddress: String,
+        mintmeExplorerUrl: String,
+        isMintmeToken: Boolean,
     },
     data() {
         return {
@@ -132,6 +143,18 @@ export default {
         costExceed: function() {
             return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
         },
+        formatTokenDeployedDate: function() {
+            return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormatWithoutTime);
+        },
+        createContractFactory: function () {
+            return this.deployed && this.isOwner && this.isMintmeToken;
+        },
+        contractDateAddressExistence: function() {
+            return this.tokenDeployedDate && this.tokenContractAddress
+        },
+        isSmartContractCreated: function() {
+            return this.createContractFactory && this.contractDateAddressExistence;
+        }
     },
     methods: {
         fetchBalances: function() {
@@ -179,8 +202,19 @@ export default {
             })
             .then(() => this.deploying = false);
         },
+        createContractLink: function () {
+            if (this.isSmartContractCreated) {
+                this.mintmeExplorerUrl = this.mintmeExplorerUrl.concat('/tx/' + this.tokenContractAddress);
+            }
+        },
     },
     mounted() {
+        if (this.currentLocale) {
+            moment.locale(this.currentLocale);
+        }
+
+        this.createContractLink();
+
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {

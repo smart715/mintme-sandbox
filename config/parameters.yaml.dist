@@ -68,6 +68,9 @@ parameters:
     mintme_coin: 'MintMe Coin'
     mintme_coin_link: 'https://www.mintme.com/coin/'
 
+    # mintme explorer url
+    mintme_explorer_url: 'https://mintme.com/explorer'
+
     # the cost of deploying token to blockchain in USD
     deploy_cost: 99
     deploy_cost_referral_reward: 0.1
