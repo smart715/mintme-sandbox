@@ -595,11 +595,7 @@
             <div class="card-header">
                 {% trans %}page.pair.posts_title{% endtrans %}
             </div>
-            <div class="card-body posts">
-                <div>
-                    {% trans %}post.not_any_post{% endtrans %}
-                </div>
-            </div>
+            {% include 'spinners/posts_card_body.html.twig' %}
         </div>
     </div>
 </div>

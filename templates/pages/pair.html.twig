@@ -170,12 +170,24 @@
                                 :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
+                                {% if tradeInfo %}
+                                :sold-on-market-prop="{{ tradeInfo.soldOnMarket }}"
+                                :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
+                                :token-withdrawn-prop="{{ tradeInfo.withdrawn }}"
+                                :token-exchange-prop="{{ tradeInfo.tokenExchange ?? 0 }}"
+                                :sell-summary="{{ tradeInfo.sellSummary }}"
+                                :stats-prop="{{ tradeInfo.lockIn | json_encode }}"
+                                {% endif %}
                             >
                             </token-introduction-statistics>
                         </div>
                         <div class="row">
                             <top-holders
                                 class="col-12 mt-3"
+                                {% if tradeInfo %}
+                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
+                                {% endif %}
+                                :token-name="{{ market.quote.symbol | json_encode }}">
                                 :token-name="{{ market.quote.symbol | json_encode }}"
                                 websocket-url="{{ global_websocket_url }}"
                             >
