@@ -144,7 +144,7 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/posts/{slug}", name="new_show_post", options={"expose"=true})
      */
-    public function showPost(string $name, ?string $slug = null, Request $request): Response
+    public function showPost(Request $request, string $name, ?string $slug = null): Response
     {
         $token = $this->fetchToken($request, $name);
 
@@ -160,7 +160,9 @@ class TokenController extends Controller
             throw new NotFoundPostException();
         }
 
-        $tab = $post ? 'post' : 'posts';
+        $tab = $post
+            ? 'post'
+            : 'posts';
 
         $extraData = [
             'post' => $this->normalize($post),
@@ -176,7 +178,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|buy", modal="settings|created"},
+     *     requirements={"tab" = "trade|intro|buy", "modal"="settings|created"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -439,6 +441,7 @@ class TokenController extends Controller
         $tokenDecimals = $token->getDecimals();
 
         $tradeInfo = null;
+
         if ('intro' === $tab) {
             $tradeInfo = (new TradeInfoFactory(
                 $market,
