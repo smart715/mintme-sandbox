@@ -74,7 +74,7 @@ class AssetsController extends AbstractFOSRestController
 
             $assets[$this->rebrandingConverter->convert($token->getSymbol())] = [
                 'name' => strtolower($this->rebrandingConverter->convert($token->getName())),
-                'type_of_token' => strtolower($token->getCrypto()->getSymbol()),
+                'type_of_token' => $token->getCrypto() ? strtolower($token->getCrypto()->getSymbol()) : null,
                 'can_withdraw' => true,
                 'can_deposit' => true,
                 'min_withdraw' => $tokenMinWithdraw,
