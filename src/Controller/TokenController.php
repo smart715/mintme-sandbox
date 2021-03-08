@@ -176,7 +176,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|buy"},
+     *     requirements={"tab" = "trade|intro|buy", modal="settings|created"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -192,20 +192,9 @@ class TokenController extends Controller
 
         $token = $this->fetchToken($request, $name);
 
-        $tradeInfo = null;
-        if ('intro' === $tab) {
-            $tradeInfo = (new TradeInfoFactory(
-                $market,
-                $this->balanceHandler,
-                $this->marketHandler,
-                $this->parameterBag
-            ))->create();
-        }
-
         return $this->renderPairPage($token, $request, $tab, [
             'showTokenEditModal' => 'settings' === $modal,
             'showCreatedModal' => 'created' === $modal,
-            'tradeInfo' => $this->normalize($tradeInfo, ['API']),
         ]);
     }
 
@@ -449,6 +438,16 @@ class TokenController extends Controller
 
         $tokenDecimals = $token->getDecimals();
 
+        $tradeInfo = null;
+        if ('intro' === $tab) {
+            $tradeInfo = (new TradeInfoFactory(
+                $market,
+                $this->balanceHandler,
+                $this->marketHandler,
+                $this->parameterBag
+            ))->create();
+        }
+
         return $this->render(
             'pages/pair.html.twig',
             array_merge([
@@ -484,7 +483,7 @@ class TokenController extends Controller
                 'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                     ? Token::TOKEN_SUBUNIT
                     : $tokenDecimals,
-                'tradeInfo' => null,
+                'tradeInfo' => $this->normalize($tradeInfo, ['API']),
                 'post' => null,
                 'showEdit' => false,
                 'comments' => [],
