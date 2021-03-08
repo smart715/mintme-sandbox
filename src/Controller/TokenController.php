@@ -125,13 +125,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/donate",
-     *     name="token_show_donate",
-     *     defaults={"tab" = "intro"},
-     *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts"},
-     *     options={"expose"=true,"2fa_progress"=false}
-     * )
+     * @Route("/{name}/donate", name="token_show_donate")
      */
     public function donate(string $name): RedirectResponse
     {
