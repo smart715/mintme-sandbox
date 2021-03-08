@@ -23,6 +23,19 @@
                 <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
             <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
+            <b-button
+                @click="manageBackendService"
+                class="btn-sm float-right mr-4 toggle-btn"
+                :disabled="null === backendServiceStatus || managingBackendService"
+            >
+                <font-awesome-icon
+                    v-if="managingBackendService"
+                    icon="circle-notch"
+                    spin
+                    class="loading-spinner" fixed-width
+                />
+                {{ getButtonName }}
+            </b-button>
             <div class="close-btn p-sm-2" @click="close">
                 <font-awesome-icon :icon="['fas', 'times-circle']"></font-awesome-icon>
             </div>
@@ -78,6 +91,7 @@ export default {
     props: {
         username: String,
         authCode: String,
+        environment: String,
     },
     data() {
         return {
@@ -96,6 +110,8 @@ export default {
                 },
                 isTokenContractActive: false,
             },
+            backendServiceStatus: null,
+            managingBackendService: false,
             balance: {
                 WEB: null,
                 BTC: null,
@@ -105,18 +121,29 @@ export default {
             interval: null,
         };
     },
+    created() {
+        this.fetchBackendServiceStatus();
+    },
     mounted() {
         this.$axios.retry.get(this.$routing.generate('hacker_info'))
             .then((res) => {
                 this.infoData = res.data;
             });
-
         if (this.username) {
             this.fetchBalance();
             this.interval = setInterval(this.fetchBalance, 10000);
         }
     },
     computed: {
+        getButtonName: function() {
+            if (this.managingBackendService) {
+                return this.$t('info_bar.backend_service.in_progress');
+            } else if (!this.backendServiceStatus) {
+                return this.$t('info_bar.backend_service.create');
+            } else {
+                return this.$t('info_bar.backend_service.delete');
+            }
+        },
         mintmeBalance: function() {
             return this.balance.WEB ? new Decimal(this.balance.WEB.available).toFixed(8) : '-';
         },
@@ -131,6 +158,37 @@ export default {
         },
     },
     methods: {
+        manageBackendService: function() {
+           !this.backendServiceStatus ?
+                this.createBackendServices() :
+                this.deleteBackendServices();
+        },
+        fetchBackendServiceStatus: function() {
+            this.managingBackendService = true;
+            this.$axios.retry.get(this.$routing.generate('status_container'))
+                .then((res) => {
+                    this.backendServiceStatus = res.data;
+                    this.managingBackendService = false;
+                });
+        },
+        createBackendServices: function() {
+            this.managingBackendService = true;
+            this.$axios.retry.post(this.$routing.generate('create_container'))
+                .then((res) => {
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                });
+        },
+        deleteBackendServices: function() {
+            this.managingBackendService = true;
+            this.$axios.retry.post(this.$routing.generate('delete_container'))
+                .then((res) => {
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                });
+        },
         fetchBalance: function() {
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -170,7 +228,6 @@ export default {
 .circle-info-on
     @extend .circle-info
     background-color: green
-
 .resize-btn
     position: absolute
     right: 0
