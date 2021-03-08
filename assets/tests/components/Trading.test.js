@@ -99,14 +99,28 @@ describe('Trading', () => {
         expect(wrapper.html().includes('trading.no_any_token')).toBe(false);
     });
     it('show rest of token link', () => {
-        const wrapper = mockTrading();
+        const wrapper = mockTrading({page: 1});
+
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.markets = {};
+        wrapper.vm.totalRows = 0;
+        wrapper.vm.perPage = 50;
         wrapper.vm.loading = false;
         expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
+
         wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.totalRows = 1;
         expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
+
+        wrapper.vm.totalRows = 60;
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
+
+        wrapper.vm.currentPage = 2;
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
+
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
     });
     it('make sure that expected "user=1" will be sent', (done) => {
         const wrapper = mockTrading();
