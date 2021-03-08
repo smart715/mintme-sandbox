@@ -7,6 +7,7 @@
         <info-bar
             username="{{ app.user.username|default('') }}"
             auth-code="{{ app.user.EmailAuthCode|default('') }}"
+            environment="{{ app.environment() }}"
         ></info-bar>
     </div>
 {% endif %}
