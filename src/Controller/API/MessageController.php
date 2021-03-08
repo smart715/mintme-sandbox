@@ -12,6 +12,7 @@ use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MessageManagerInterface;
 use App\Manager\ThreadManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -201,7 +202,7 @@ class MessageController extends AbstractFOSRestController
             );
         }
 
-        $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
 
         if (!$webCrypto) {
             throw new ApiNotFoundException(

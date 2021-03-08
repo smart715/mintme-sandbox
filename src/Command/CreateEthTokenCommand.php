@@ -13,6 +13,7 @@ use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -114,8 +115,8 @@ class CreateEthTokenCommand extends Command
         }
 
         $profile = $this->profileManager->findByEmail($email);
-        $this->crypto = $this->cryptoManager->findBySymbol(Token::ETH_SYMBOL);
-        $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $this->crypto = $this->cryptoManager->findBySymbol(Symbols::ETH);
+        $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($tokenName)
             ?? $this->tokenManager->findByAddress($tokenAddress);
         $hasErrors = false;
@@ -183,7 +184,7 @@ class CreateEthTokenCommand extends Command
                 $token,
                 $this->moneyWrapper->parse(
                     self::INIT_BALANCE,
-                    MoneyWrapper::TOK_SYMBOL
+                    Symbols::TOK
                 )
             );
             $this->contractHandler->addToken($token, $minDeposit);
@@ -211,7 +212,7 @@ class CreateEthTokenCommand extends Command
             ->setCrypto($this->crypto)
             ->setProfile($profile)
             ->setFee(
-                $withdrawalFee ? $this->moneyWrapper->parse($withdrawalFee, MoneyWrapper::TOK_SYMBOL) : null
+                $withdrawalFee ? $this->moneyWrapper->parse($withdrawalFee, Symbols::TOK) : null
             );
 
         $this->em->persist($token);

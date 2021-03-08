@@ -3,6 +3,7 @@
 namespace App\Communications;
 
 use App\Manager\CryptoManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,7 +35,7 @@ class CryptoRatesFetcher implements CryptoRatesFetcherInterface
             return str_replace(' ', '-', $crypto->getSymbol());
         }, $cryptos));
 
-        $symbols .= ','.MoneyWrapper::USD_SYMBOL;
+        $symbols .= ','.Symbols::USD;
 
         $response = $this->rpc->send("simple/price?ids={$names}&vs_currencies={$symbols}", Request::METHOD_GET);
 

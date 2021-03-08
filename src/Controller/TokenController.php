@@ -35,6 +35,7 @@ use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -146,8 +147,8 @@ class TokenController extends Controller
         }
 
         //rebranding
-        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
-            $name = Token::WEB_SYMBOL;
+        if (Symbols::MINTME === mb_strtoupper($name)) {
+            $name = Symbols::WEB;
         }
 
         $token = $this->tokenManager->findByName($name);
@@ -158,8 +159,8 @@ class TokenController extends Controller
 
         if ($this->tokenManager->isPredefined($token)) {
             return $this->redirectToRoute('coin', [
-                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
-                    'quote'=> Token::MINTME_SYMBOL,
+                    'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
+                    'quote'=> Symbols::MINTME,
                 ], 301);
         }
 
@@ -307,7 +308,7 @@ class TokenController extends Controller
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
-                        MoneyWrapper::TOK_SYMBOL
+                        Symbols::TOK
                     )
                 );
                 $market = $this->marketManager->createUserRelated($user);

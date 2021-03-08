@@ -4,6 +4,7 @@ namespace App\Utils\Validator;
 
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Utils\Symbols;
 
 class AddressValidator implements ValidatorInterface
 {
@@ -26,7 +27,7 @@ class AddressValidator implements ValidatorInterface
     {
         $this->message = "Invalid {$this->tradable->getSymbol()} address";
 
-        return Token::BTC_SYMBOL === $this->tradable->getSymbol()
+        return Symbols::BTC === $this->tradable->getSymbol()
             ? (new BTCAddressValidator($this->address))->validate()
             : (new EthereumAddressValidator($this->address))->validate();
     }

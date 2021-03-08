@@ -15,6 +15,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\IncorrectAddressException;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -121,17 +122,17 @@ class Wallet implements WalletInterface
             $token = $tradable;
         }
 
-        $fee = $tradable->getFee() ?? new Money('0', new Currency(MoneyWrapper::TOK_SYMBOL));
+        $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
         $tokenEthFee = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_withdraw_fee'),
-            Token::ETH_SYMBOL
+            Symbols::ETH
         );
 
         if (!$crypto) {
             throw new NotFoundTokenException();
         }
 
-        if (in_array($crypto->getSymbol(), Token::WEB_ETH_SYMBOLS, true)) {
+        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB], true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
                 !$this->withdrawGateway->isContractAddress($address->getAddress(), $crypto->getSymbol())
             ) {
@@ -171,7 +172,7 @@ class Wallet implements WalletInterface
             $this->balanceHandler->withdraw(
                 $user,
                 Token::getFromCrypto($crypto),
-                Token::ETH_SYMBOL === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
+                Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
             );
         }
 
@@ -267,7 +268,7 @@ class Wallet implements WalletInterface
         $balance = $this->balanceHandler->balance($user, Token::getFromCrypto($crypto));
 
         if ($balance->getAvailable()->lessThan(
-            Token::ETH_SYMBOL === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
+            Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
         )
         ) {
             $this->logger->warning(

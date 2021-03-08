@@ -8,12 +8,13 @@ use App\Exception\ApiNotFoundException;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 
 abstract class DevApiController extends AbstractFOSRestController
 {
     private const DISALLOWED_VALUES = [
-        Token::WEB_SYMBOL,
+        Symbols::WEB,
     ];
 
     private CryptoManagerInterface $cryptoManager;

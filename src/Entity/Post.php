@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use App\Validator\Constraints\PositiveAmount;
@@ -186,7 +187,7 @@ class Post
      */
     public function getAmount(): Money
     {
-        return new Money($this->amount, new Currency(Token::TOK_SYMBOL));
+        return new Money($this->amount, new Currency(Symbols::TOK));
     }
 
     /** @Groups({"Default", "API"}) */
@@ -239,7 +240,7 @@ class Post
      */
     public function getShareReward(): Money
     {
-        return new Money($this->shareReward, new Currency(Token::TOK_SYMBOL));
+        return new Money($this->shareReward, new Currency(Symbols::TOK));
     }
 
     public function setShareReward(Money $reward): self

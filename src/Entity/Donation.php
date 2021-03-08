@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -140,7 +141,7 @@ class Donation
 
     public function getTokenAmount(): Money
     {
-        return new Money($this->tokenAmount, new Currency(Token::WEB_SYMBOL));
+        return new Money($this->tokenAmount, new Currency(Symbols::WEB));
     }
 
     public function setTokenAmount(Money $tokenAmount): self

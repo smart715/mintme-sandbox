@@ -33,6 +33,7 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifier;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -319,7 +320,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Token::TOK_SYMBOL);
+            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
             $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
 
             $lock->setAmountToRelease($amountToRelease)
@@ -430,7 +431,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ? $token->getWithdrawn()
             : 0;
 
-        return $this->view(new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        return $this->view(new Money($withdrawn, new Currency(Symbols::TOK)));
     }
 
     /**
@@ -777,7 +778,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         string $name,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($name);
 
         if (null === $crypto || null === $token) {
@@ -789,7 +790,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $soldOnMarket = $marketStatus
             ? $marketStatus->getSoldOnMarket()
-            : new Money('0', new Currency(Token::TOK_SYMBOL));
+            : new Money('0', new Currency(Symbols::TOK));
 
         return $this->view($soldOnMarket, Response::HTTP_OK);
     }

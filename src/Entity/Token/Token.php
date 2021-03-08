@@ -12,6 +12,7 @@ use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
+use App\Utils\Symbols;
 use App\Validator\Constraints as AppAssert;
 use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -320,7 +321,7 @@ class Token implements TradebleInterface, ImagineInterface
     {
         return $this->crypto
             ? $this->crypto->getSymbol()
-            : self::WEB_SYMBOL;
+            : Symbols::WEB;
     }
 
     public function setCrypto(?Crypto $crypto): self
@@ -334,7 +335,7 @@ class Token implements TradebleInterface, ImagineInterface
     {
         return $this->exchangeCrypto
             ? $this->exchangeCrypto->getSymbol()
-            : self::WEB_SYMBOL;
+            : Symbols::WEB;
     }
 
     public function setExchangeCrypto(?Crypto $crypto): self
@@ -378,7 +379,7 @@ class Token implements TradebleInterface, ImagineInterface
     public function getFee(): ?Money
     {
         return $this->fee ?
-            new Money($this->fee, new Currency(MoneyWrapper::TOK_SYMBOL))
+            new Money($this->fee, new Currency(Symbols::TOK))
             : null;
     }
 
@@ -613,14 +614,14 @@ class Token implements TradebleInterface, ImagineInterface
             return $this->image;
         }
 
-        return Token::WEB_SYMBOL === $this->getCryptoSymbol()
+        return Symbols::WEB === $this->getCryptoSymbol()
             ? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL)
             : null;
     }
 
     public function getMintedAmount(): Money
     {
-        return new Money($this->mintedAmount ?? 0, new Currency(self::TOK_SYMBOL));
+        return new Money($this->mintedAmount ?? 0, new Currency(Symbols::TOK));
     }
 
     public function setMintedAmount(Money $mintedAmount): void
@@ -670,7 +671,7 @@ class Token implements TradebleInterface, ImagineInterface
     /** @codeCoverageIgnore */
     public function getAirdropsAmount(): Money
     {
-        return new Money($this->airdropsAmount, new Currency(self::TOK_SYMBOL));
+        return new Money($this->airdropsAmount, new Currency(Symbols::TOK));
     }
 
     /** @codeCoverageIgnore */
@@ -774,7 +775,7 @@ class Token implements TradebleInterface, ImagineInterface
      */
     public function isMintmeToken(): bool
     {
-        return Token::WEB_SYMBOL === $this->getCryptoSymbol();
+        return Symbols::WEB === $this->getCryptoSymbol();
     }
 
     public function isOwner(array $ownTokens): bool

@@ -13,6 +13,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -171,7 +172,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $amount = $airdrop->getAmount();
         $participants = $this->moneyWrapper->parse(
             (string)$airdrop->getParticipants(),
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
 
         if ($amount->isZero() || !$airdrop->getParticipants()) {
@@ -184,7 +185,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         return $this->moneyWrapper->parse(
             $reward,
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
     }
 
@@ -246,7 +247,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     private function getRestOfTokens(Airdrop $airdrop): ?Money
     {
         $diffAmount = $airdrop->getLockedAmount()->subtract($airdrop->getActualAmount());
-        $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
         if ($diffAmount->greaterThan($zeroValue)) {
             return $diffAmount;

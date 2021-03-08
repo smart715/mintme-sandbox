@@ -3,6 +3,7 @@
 namespace App\Exchange\Config;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
 
@@ -32,7 +33,7 @@ class DonationConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->donationParams['minBtcAmount'] ?? 0),
-            Token::BTC_SYMBOL
+            Symbols::BTC
         );
     }
 
@@ -40,7 +41,7 @@ class DonationConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->donationParams['minMintmeAmount'] ?? 0),
-            Token::WEB_SYMBOL
+            Symbols::WEB
         );
     }
 
@@ -48,7 +49,7 @@ class DonationConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->donationParams['minEthAmount'] ?? 0),
-            Token::ETH_SYMBOL
+            Symbols::ETH
         );
     }
 
@@ -56,7 +57,7 @@ class DonationConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->donationParams['minUsdcAmount'] ?? 0),
-            Token::USDC_SYMBOL
+            Symbols::USDC
         );
     }
 
@@ -64,7 +65,7 @@ class DonationConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->donationParams['minTokensAmount'] ?? 0),
-            Token::WEB_SYMBOL
+            Symbols::WEB
         );
     }
 

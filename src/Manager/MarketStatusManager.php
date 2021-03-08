@@ -16,6 +16,7 @@ use App\Exchange\Order;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
@@ -108,7 +109,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
-                )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
+                )->setParameter('cryptoSymbol', Symbols::WEB);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
@@ -134,7 +135,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
-                )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
+                )->setParameter('cryptoSymbol', Symbols::WEB);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
@@ -412,7 +413,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 ($base instanceof Token && $base->isBlocked()) ||
                 $quote instanceof Token ||
                 $base === $quote ||
-                ($base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol()))
+                ($base instanceof Token && !(Symbols::MINTME === $quote->getSymbol() || Symbols::WEB === $quote->getSymbol()))
             );
     }
 

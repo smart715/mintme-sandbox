@@ -2,6 +2,7 @@
 
 namespace App\Entity\Token;
 
+use App\Utils\Symbols;
 use App\Validator\Constraints\GreaterThanPrevious;
 use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
@@ -78,7 +79,7 @@ class LockIn
      */
     public function getHourlyRate(): Money
     {
-        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $money = new Money($this->amountToRelease, new Currency(Symbols::TOK));
 
         return 0 === $this->releasePeriod
             ? $money
@@ -111,13 +112,13 @@ class LockIn
         if ($this->token->isDeployed()) {
             $notReleasedAtStart = $this->getAmountToRelease();
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
-            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
             return $frozenAmount->greaterThan($zeroValue)
                 ? $frozenAmount
                 : $zeroValue;
         } else {
-            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money($this->frozenAmount, new Currency(Symbols::TOK));
         }
     }
 
@@ -138,20 +139,20 @@ class LockIn
                 : $this->getAmountToRelease()
                     ->subtract($received)
                     ->add($releasedAtStart);
-            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
             return $frozenAmount->greaterThan($zeroValue)
                 ? $frozenAmount
                 : $zeroValue;
         } else {
-            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money($this->frozenAmount, new Currency(Symbols::TOK));
         }
     }
 
     /** @codeCoverageIgnore */
     public function getReleasedAtStart(): Money
     {
-        return new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->releasedAtStart, new Currency(Symbols::TOK));
     }
 
     /** @codeCoverageIgnore */
@@ -228,6 +229,6 @@ class LockIn
 
     public function getAmountToRelease(): Money
     {
-        return new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->amountToRelease, new Currency(Symbols::TOK));
     }
 }

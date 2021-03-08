@@ -8,6 +8,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -105,7 +106,7 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/marketcap/{base}", name="marketcap", options={"expose"=true})
      */
-    public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Token::BTC_SYMBOL): View
+    public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Symbols::BTC): View
     {
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);

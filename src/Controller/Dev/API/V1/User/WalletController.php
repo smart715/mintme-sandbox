@@ -18,6 +18,7 @@ use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\LockFactory;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
@@ -268,7 +269,7 @@ class WalletController extends DevApiController
                 new Address(trim((string)$address)),
                 new Amount($moneyWrapper->parse(
                     $amount,
-                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
+                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
                 $tradable
             );

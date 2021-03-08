@@ -14,6 +14,7 @@ use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -111,7 +112,7 @@ class TransactionSubscriber implements EventSubscriberInterface
     {
         $tradable = $event->getTradable();
         $user = $event->getUser();
-        $amount = $this->moneyWrapper->parse($event->getAmount(), MoneyWrapper::TOK_SYMBOL);
+        $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
 
         if (!$tradable instanceof Token
             || $user->getId() !== $tradable->getProfile()->getUser()->getId()
@@ -122,7 +123,7 @@ class TransactionSubscriber implements EventSubscriberInterface
 
         $withdrawnObj = new Money(
             $tradable->getWithdrawn(),
-            new Currency(MoneyWrapper::TOK_SYMBOL)
+            new Currency(Symbols::TOK)
         );
 
         if ($event instanceof DepositCompletedEvent) {

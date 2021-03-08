@@ -11,6 +11,7 @@ use App\Manager\MarketStatusManagerInterface;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -107,7 +108,7 @@ class CoinController extends Controller
         $upperCaseQuote = mb_strtoupper($quote);
 
         // if reversed base/quote order and web instead of mintme
-        if (Token::WEB_SYMBOL === $upperCaseBase) {
+        if (Symbols::WEB === $upperCaseBase) {
             return [
                 'base' => $upperCaseQuote,
                 'quote' => $this->rebrandingConverter->convert($upperCaseBase),
@@ -115,7 +116,7 @@ class CoinController extends Controller
         }
 
         // if right base/quote order and web instead of mintme
-        if (Token::WEB_SYMBOL === $upperCaseQuote) {
+        if (Symbols::WEB === $upperCaseQuote) {
             return [
                 'base' => $upperCaseBase,
                 'quote' => $this->rebrandingConverter->convert($upperCaseQuote),
@@ -123,7 +124,7 @@ class CoinController extends Controller
         }
 
         // if reversed base/quote order but no web instead of mintme
-        if (Token::MINTME_SYMBOL === $upperCaseBase) {
+        if (Symbols::MINTME === $upperCaseBase) {
             return [
                 'base' => $upperCaseQuote,
                 'quote' => $upperCaseBase,
