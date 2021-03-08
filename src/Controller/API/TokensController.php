@@ -609,9 +609,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $topTraders = $balanceHandler->topHolders(
             $tradable,
             $this->topHolders,
-            $this->topHolders + 5,
-            5,
-            $this->topHolders * 4
         );
 
         return $this->view($topTraders, Response::HTTP_OK);
