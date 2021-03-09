@@ -36,6 +36,8 @@ class User extends BaseUser implements
     TrustedDeviceInterface
 {
     public const ROLE_API = 'ROLE_API';
+    public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
 
     /**
      * @ORM\Id
