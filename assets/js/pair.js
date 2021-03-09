@@ -174,7 +174,7 @@ new Vue({
         window.history.replaceState(
             {},
             '',
-            url,
+            url
         );
       }
     },
@@ -212,7 +212,6 @@ new Vue({
           });
     },
     goToPosts: function() {
-      console.log('idk');
       this.tabIndex = 2;
     },
     deletePost: function(index) {
