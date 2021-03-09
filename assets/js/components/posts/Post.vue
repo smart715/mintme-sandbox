@@ -195,7 +195,7 @@ export default {
         },
         singlePageUrl() {
             return this.post.slug
-                ? this.$routing.generate('new_show_post', {tokenName: this.post.token.name, slug: this.post.slug}, true)
+                ? this.$routing.generate('new_show_post', {name: this.post.token.name, slug: this.post.slug}, true)
                 : this.$routing.generate('show_post', {id: this.post.id}, true);
         },
         twitterMessageLink() {

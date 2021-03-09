@@ -482,7 +482,7 @@ class TokenController extends Controller
                     : $tokenDecimals,
                 'tradeInfo' => $this->normalize($tradeInfo, ['API']),
                 'post' => null,
-                'showEdit' => false,
+                'showEdit' => 'false',
                 'comments' => [],
             ], $extraData)
         );

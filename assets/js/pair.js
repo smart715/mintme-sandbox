@@ -44,6 +44,8 @@ new Vue({
       posts: null,
       postFromUrl: null,
       showCreatedModal: true,
+      singlePost: null,
+      comments: null,
     };
   },
   components: {
@@ -146,11 +148,33 @@ new Vue({
     tabUpdated: function(i) {
       if (window.history.replaceState) {
         // prevents browser from storing history with each change:
-        window.history.replaceState(
-            {}, document.title, this.$routing.generate('token_show', {
+        let url = '';
+        switch (i) {
+          case 2:
+            url = this.$routing.generate('new_show_post', {
+              name: this.tokenName,
+              slug: null,
+            });
+
+            break;
+          case 4:
+            url = this.$routing.generate('new_show_post', {
+              name: this.tokenName,
+              slug: this.singlePost.slug,
+            });
+
+            break;
+          default:
+            url = this.$routing.generate('token_show', {
               name: this.tokenName,
               tab: tabs[i],
-            })
+            });
+        }
+
+        window.history.replaceState(
+            {},
+            '',
+            url,
         );
       }
     },
