@@ -287,7 +287,7 @@
                                             :post="singlePost || (singlePost = {{ post | json_encode }})"
                                             :show-edit="{{ isOwner }}"
                                             :logged-in="{{ loggedIn }}"
-                                            @delete-post="goToPosts"
+                                            @delete-post="deleteSinglePost"
                                             @go-to-trade="goToTrade"
                                             single-page
                                         ></post>

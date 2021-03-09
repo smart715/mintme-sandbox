@@ -244,6 +244,10 @@ new Vue({
         .then((res) => this.comments = res.data)
         .catch(() => this.notifyError('Error loading comments'));
     },
+    deleteSinglePost: function(index, postId) {
+      this.posts = this.posts.filter((post) => post.id !== postId);
+      this.goToPosts();
+    }
   },
   computed: {
     ...mapGetters('tradeBalance', [

@@ -244,7 +244,7 @@ export default {
             this.deleteDisabled = true;
             this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
             .then((res) => {
-               this.$emit('delete-post', this.index);
+               this.$emit('delete-post', this.index, this.post.id);
                this.notifySuccess(this.$t('post.deleted'));
             })
             .catch(() => {
