@@ -34,7 +34,7 @@ export const TOKEN_NAME_CHANGED = 'token_name_changed';
 export const GENERAL = {
     precision: 8,
     dateFormat: 'DD.MM.YYYY HH:mm:ss',
-    dateFormatWithoutTime: 'MMM Do YYYY',
+    dateFormatWithoutTime: 'MMM D, YYYY',
 };
 
 export const webSymbol = 'WEB';

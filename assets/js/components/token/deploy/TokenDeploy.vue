@@ -146,15 +146,15 @@ export default {
         formatTokenDeployedDate: function() {
             return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormatWithoutTime);
         },
-        createContractFactory: function () {
+        createContractFactory: function() {
             return this.deployed && this.isOwner && this.isMintmeToken;
         },
         contractDateAddressExistence: function() {
-            return this.tokenDeployedDate && this.tokenContractAddress
+            return this.tokenDeployedDate && this.tokenContractAddress;
         },
         isSmartContractCreated: function() {
             return this.createContractFactory && this.contractDateAddressExistence;
-        }
+        },
     },
     methods: {
         fetchBalances: function() {
@@ -202,7 +202,7 @@ export default {
             })
             .then(() => this.deploying = false);
         },
-        createContractLink: function () {
+        createContractLink: function() {
             if (this.isSmartContractCreated) {
                 this.mintmeExplorerUrl = this.mintmeExplorerUrl.concat('/tx/' + this.tokenContractAddress);
             }
