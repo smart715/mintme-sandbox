@@ -16,6 +16,7 @@ import Avatar from './components/Avatar';
 import Envelope from './components/chat/Envelope';
 import i18n from './utils/i18n/i18n';
 import TokenCreatedModal from './components/modal/TokenCreatedModal';
+import TokenDeployedModal from './components/modal/TokenDeployedModal';
 import {tabs} from './utils/constants';
 
 new Vue({
@@ -53,6 +54,7 @@ new Vue({
     Posts,
     TokenAvatar,
     TokenCreatedModal,
+    TokenDeployedModal,
     TokenIntroductionDescription,
     TokenIntroductionStatistics,
     TokenOngoingAirdropCampaign,
