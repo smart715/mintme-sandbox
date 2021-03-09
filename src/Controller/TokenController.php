@@ -160,7 +160,6 @@ class TokenController extends Controller
 
         $extraData = [
             'post' => $this->normalize($post),
-            'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
             'comments' => $post ? $this->normalize($post->getComments()) : null,
         ];
 
@@ -482,7 +481,6 @@ class TokenController extends Controller
                     : $tokenDecimals,
                 'tradeInfo' => $this->normalize($tradeInfo, ['API']),
                 'post' => null,
-                'showEdit' => 'false',
                 'comments' => [],
             ], $extraData)
         );

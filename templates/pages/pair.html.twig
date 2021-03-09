@@ -285,7 +285,7 @@
                                     <div class="card-body posts">
                                         <post
                                             :post="singlePost || (singlePost = {{ post | json_encode }})"
-                                            :show-edit="{{ showEdit }}"
+                                            :show-edit="{{ isOwner }}"
                                             :logged-in="{{ loggedIn }}"
                                             @delete-post="goToPosts"
                                             @go-to-trade="goToTrade"
