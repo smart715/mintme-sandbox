@@ -175,6 +175,10 @@
                                                 {% trans %}token.intro.statistics.donation.header{% endtrans %} <br>
                                                 {{ tradeInfo.volumeDonation | toMoney(precision, false) }}
                                             </div>
+                                            <div class="pb-1">
+                                                {% trans %}token.intro.statistics.holders.header{% endtrans %} <br>
+                                                {{ token.getHoldersCount }}
+                                            </div>
                                         </div>
                                         {% if token.isMintmeToken %}
                                         <div class="col px-1">
