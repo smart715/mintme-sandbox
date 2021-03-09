@@ -155,6 +155,7 @@
                                 @delete-post="deletePost"
                                 @go-to-trade="goToTrade"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                   @go-to-post="goToPost"
                             >
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
@@ -237,6 +238,7 @@
                                     @delete-post="deletePost"
                                     @go-to-trade="goToTrade"
                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                    @go-to-post="goToPost"
                                 />
                             </div>
                         </div>
@@ -271,11 +273,10 @@
                         </trade>
                     </b-tab>
                 {% endif %}
-                {% if isTokenPage and post is not null %}
+                {% if isTokenPage %}
                     <b-tab
-                        title="post"
-                        title-link-class=""
-                        {% if isTokenPage %} title-item-class="d-none" {% endif %}
+                        title="Post"
+                        title-item-class="d-none"
                         {% if tab == 'post' %} {{ 'active' }} {% endif %}
                     >
                         <div class="row justify-content-center">
@@ -286,13 +287,18 @@
                                             :post="singlePost || (singlePost = {{ post | json_encode }})"
                                             :show-edit="{{ showEdit }}"
                                             :logged-in="{{ loggedIn }}"
+                                            @delete-post="goToPosts"
+                                            @go-to-trade="goToTrade"
                                             single-page
                                         ></post>
                                         <comments
                                             :comments="comments || (comments = {{ comments | json_encode }})"
-                                            :post-id="{{ post.id }}"
-                                            token-name="{{ post.token.name }}"
+                                            :post-id="singlePost ? singlePost.id : {{ post ? post.id : 0 }}"
+                                            :token-name="singlePost ? singlePost.token.name : '{{ post ? post.token.name : '' }}'"
                                             :logged-in="{{ loggedIn }}"
+                                            @delete-comment="deleteComment"
+                                            @new-comment="newComment"
+                                            @cancel="goToPosts"
                                         ></comments>
                                     </div>
                                 </div>

@@ -212,6 +212,7 @@ new Vue({
           });
     },
     goToPosts: function() {
+      console.log('idk');
       this.tabIndex = 2;
     },
     deletePost: function(index) {
@@ -225,6 +226,24 @@ new Vue({
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
+    },
+    deleteComment: function(index) {
+      this.comments.splice(index, 1);
+    },
+    newComment: function(comment) {
+      this.comments.unshift(comment);
+    },
+    goToPost: function(post) {
+      this.singlePost = post;
+      this.tabIndex = 4;
+      this.comments = [];
+
+      this.loadComments(post.id);
+    },
+    loadComments: function(postId) {
+      this.$axios.single.get(this.$routing.generate('get_post_comments', {id: postId}))
+        .then((res) => this.comments = res.data)
+        .catch(() => this.notifyError('Error loading comments'));
     },
   },
   computed: {

@@ -175,6 +175,21 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{id<\d+>}/comments", name="get_post_comments", options={"expose"=true})
+     */
+    public function getComments(int $id): View
+    {
+        $post = $this->postManager->getById($id);
+
+        if (!$post) {
+            throw new ApiNotFoundException($this->translator->trans('post.not_found'));
+        }
+
+        return $this->view($post->getComments(), Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Post("/{id<\d+>}/comments/add", name="add_comment", options={"expose"=true})
      * @Rest\RequestParam(name="content", nullable=false)
      */

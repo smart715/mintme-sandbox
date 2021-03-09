@@ -4,7 +4,10 @@
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
             </h1>
-            <a v-else :href="singlePageUrl" class="text-decoration-none">
+            <a v-else :href="singlePageUrl"
+               class="text-decoration-none"
+               @click.prevent="$emit('go-to-post', post)"
+            >
                 <h2 class="post-title">
                     {{ post.title }}
                 </h2>
