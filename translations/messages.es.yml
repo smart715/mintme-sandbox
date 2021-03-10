@@ -1278,6 +1278,21 @@ mail.mintme_host.4: desarrollo.
 mail.mintme_host.btn_text: 'Compruébelo ahora en'
 mail.mintme_host.btn_mintmeHost: MINTME.host
 mail.mintme_host_subject: 'Ya está disponible el nuevo hosting de MintMe'
+mail.token_deployed.subject:
+mail.token_deployed.p_1:
+mail.token_deployed.p_1.1:
+mail.token_deployed.p_1.2:
+mail.token_deployed.p_1.3:
+mail.token_deployed.p_2:
+mail.token_deployed.p_2.1:
+mail.token_deployed.p_2.2:
+mail.token_deployed.p_2.3:
+mail.token_deployed.p_3:
+mail.token_deployed.p_3.1:
+mail.token_deployed.p_3.2:
+mail.token_deployed.p_3.3:
+mail.token_deployed.p_3.4:
+mail.token_deployed.p_3.5:
 phone.add_number.notification: 'Con el fin de utilizar plenamente su cuenta, debe añadir un número de teléfono en su <a href="%url%">perfil</a>. El número no será visible para los demás.'
 phone.country_selector.label: 'Código del país'
 phone.country_selector.error: 'Elija el país'
