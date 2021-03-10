@@ -43,6 +43,7 @@ new Vue({
       posts: null,
       postFromUrl: null,
       showCreatedModal: true,
+      showDeployedOnBoard: true,
     };
   },
   components: {
@@ -104,6 +105,10 @@ new Vue({
       'setBuyAmountInput',
       'setSubtractQuoteBalanceFromBuyAmount',
     ]),
+    closeDeployedModal: function() {
+        this.showDeployedOnBoard = false;
+        this.$axios.single.patch(this.$routing.generate('token_update_deployed_modal', {tokenName: this.tokenName}));
+    },
     fetchAddress: function() {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {

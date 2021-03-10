@@ -46,6 +46,7 @@ use Money\Money;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -831,6 +832,28 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ['blacklisted' => $this->blacklistManager->isBlacklistedToken($name)],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/update/deployed-modal/{tokenName}", name="token_update_deployed_modal", options={"expose"=true})
+     * @param string $tokenName
+     * @return View
+     */
+    public function updateShowDeployedModal(string $tokenName): View
+    {
+        $userToken = $this->tokenManager->getOwnTokenByName($tokenName);
+
+        if (!$userToken || !$userToken->isMintmeToken()) {
+            throw new AccessDeniedException();
+        }
+
+        $userToken->setShowDeployedModal(false);
+
+        $this->em->persist($userToken);
+        $this->em->flush();
+
+        return $this->view([], Response::HTTP_OK);
     }
 
     private function validateEthereumAddress(string $address): bool

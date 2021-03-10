@@ -131,6 +131,7 @@ class DeployConsumer implements ConsumerInterface
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
+                $token->setShowDeployedModal(true);
 
                 $this->setDeployCostReward($user, $token);
             }

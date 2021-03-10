@@ -326,8 +326,13 @@
         {% endif %}
 
     </div>
-{#    <token-deployed-modal>#}
-{#    </token-deployed-modal>#}
+    {% if token.mintmeToken and token.showDeployedModal %}
+        <token-deployed-modal
+            :visible="showDeployedOnBoard"
+            token-name="{{ market.quote.name }}"
+            @close="closeDeployedModal()"
+        ></token-deployed-modal>
+    {% endif %}
     {% if showCreatedModal and isOwner is same as('true') %}
         <token-created-modal
             :visible="showCreatedModal"
