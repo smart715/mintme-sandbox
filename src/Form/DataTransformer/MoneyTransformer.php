@@ -2,10 +2,8 @@
 
 namespace App\Form\DataTransformer;
 
-use App\Entity\Token\Token;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
 use Money\Money;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;

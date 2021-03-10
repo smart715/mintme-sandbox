@@ -2,7 +2,6 @@
 
 namespace App\Utils\Validator;
 
-use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Utils\Symbols;
 

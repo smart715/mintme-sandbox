@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\NotFoundPairException;
 use App\Exchange\Factory\MarketFactoryInterface;

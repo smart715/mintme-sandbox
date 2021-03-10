@@ -3,12 +3,10 @@
 namespace App\Serializer;
 
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class MoneyNormalizer implements NormalizerInterface
 {

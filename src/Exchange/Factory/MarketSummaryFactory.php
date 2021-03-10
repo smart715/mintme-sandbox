@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Factory;
 
-use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\Summary;
 use App\Utils\Converter\MarketNameConverterInterface;

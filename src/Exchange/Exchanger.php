@@ -17,7 +17,6 @@ use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;

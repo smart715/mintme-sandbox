@@ -4,7 +4,6 @@ namespace App\Entity\Token;
 
 use App\Utils\Symbols;
 use App\Validator\Constraints\GreaterThanPrevious;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;

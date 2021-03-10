@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;

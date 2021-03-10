@@ -6,7 +6,6 @@ use App\Entity\Token\Token;
 use App\Utils\Symbols;
 use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
-use App\Validator\Constraints\PositiveAmount;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

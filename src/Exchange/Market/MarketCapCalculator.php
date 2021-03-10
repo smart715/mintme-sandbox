@@ -8,7 +8,6 @@ use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Repository\MarketStatusRepository;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;

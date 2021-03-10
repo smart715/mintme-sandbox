@@ -3,9 +3,7 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
-use App\Entity\Profile;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;

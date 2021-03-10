@@ -37,7 +37,6 @@ use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;

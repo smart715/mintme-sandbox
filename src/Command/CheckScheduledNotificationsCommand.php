@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Entity\ScheduledNotification;
-use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Mailer\MailerInterface;

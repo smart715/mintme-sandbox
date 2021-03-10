@@ -2,8 +2,6 @@
 
 namespace App\Controller\Dev\API\V1;
 
-use App\Entity\Crypto;
-use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;

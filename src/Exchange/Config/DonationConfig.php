@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Config;
 
-use App\Entity\Token\Token;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;

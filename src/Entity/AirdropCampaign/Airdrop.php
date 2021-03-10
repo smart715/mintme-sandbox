@@ -4,7 +4,6 @@ namespace App\Entity\AirdropCampaign;
 
 use App\Entity\Token\Token;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

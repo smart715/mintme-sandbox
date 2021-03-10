@@ -24,7 +24,6 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;

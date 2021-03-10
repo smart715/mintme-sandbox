@@ -4,7 +4,6 @@ namespace App\Communications;
 
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use Symfony\Component\HttpFoundation\Request;
 
 class CryptoRatesFetcher implements CryptoRatesFetcherInterface

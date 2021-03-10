@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketCapCalculator;

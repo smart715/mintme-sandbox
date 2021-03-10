@@ -6,7 +6,6 @@ use App\Entity\Token\Token;
 use App\Utils\Symbols;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;

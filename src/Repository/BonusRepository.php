@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Bonus;
 use Doctrine\ORM\EntityRepository;
 
 class BonusRepository extends EntityRepository

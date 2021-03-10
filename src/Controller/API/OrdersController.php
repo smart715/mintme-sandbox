@@ -14,7 +14,6 @@ use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
 use App\Utils\Symbols;
 use App\Utils\Validator\MaxAllowedOrdersValidator;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;

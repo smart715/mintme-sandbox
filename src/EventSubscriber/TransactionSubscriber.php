@@ -2,7 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
@@ -15,7 +14,6 @@ use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;

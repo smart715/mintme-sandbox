@@ -3,7 +3,6 @@
 namespace App\Exchange\Balance\Model;
 
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;

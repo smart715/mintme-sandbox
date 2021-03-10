@@ -3,10 +3,8 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;

@@ -21,7 +21,6 @@ use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;

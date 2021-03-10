@@ -23,7 +23,6 @@ use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
