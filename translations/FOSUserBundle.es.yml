@@ -30,7 +30,7 @@ email.sent.body: 'Si el correo electrónico que introdujo coincide con el suyo, 
 email.sent.help: 'Si usted no recibe ningún mensaje, revise su carpeta de correo no deseado o inténtelo nuevamente.'
 email.register.complete: 'Para completar su registro, haga clic en el siguiente enlace:'
 register.accepting: 'Al hacer clic en registrarse, usted acepta'
-register.confirmed.header: ¡Felicitaciones!
+register.confirmed.header: Felicitaciones!
 register.confirmed.body: '¡El usuario se ha creado exitosamente!'
 register.confirmed.activated: 'su cuenta esta activa ahora'
 register.email_sent.header: '¡Active su cuenta!'
