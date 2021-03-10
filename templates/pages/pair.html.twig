@@ -187,7 +187,6 @@
                                 {% if tradeInfo %}
                                 :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
                                 {% endif %}
-                                :token-name="{{ market.quote.symbol | json_encode }}">
                                 :token-name="{{ market.quote.symbol | json_encode }}"
                                 websocket-url="{{ global_websocket_url }}"
                             >
