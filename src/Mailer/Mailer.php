@@ -485,14 +485,52 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
     {
+        $tokenSalesUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $aimingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Aiming-at-a-strong-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $ideasUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Ideas-to-promote-and-sell-your-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $stuckUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Stuck-not-knowing-what-to-do-next'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $talkingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
         $body = $this->twigEngine->render("mail/token_deployed.html.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
         ]);
 
         $textBody = $this->twigEngine->render("mail/token_deployed.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
         ]);
 
         $subject = $this->translator->trans('mail.token_deployed.subject');
