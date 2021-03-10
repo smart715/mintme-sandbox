@@ -20,7 +20,7 @@ resetting.reset.submit: 'Cambiar contraseña'
 page.login.title: 'Iniciar sesión'
 page.register.title: Regístrese
 error.credentials: 'Credenciales incorrectas.'
-login.header: null
+login.header: 'Iniciar sesión'
 resetting.header: 'Restablecer contraseña'
 request.header: 'Cambiar Contraseña'
 email.resetting.body: '¡Restableciendo su contraseña!'
