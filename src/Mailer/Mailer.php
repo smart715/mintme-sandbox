@@ -482,4 +482,26 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $this->mailer->send($msg);
     }
+
+    public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
+    {
+        $body = $this->twigEngine->render("mail/token_deployed.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_deployed.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+        ]);
+
+        $subject = $this->translator->trans('mail.token_deployed.subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
 }

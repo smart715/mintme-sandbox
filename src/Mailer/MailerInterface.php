@@ -28,4 +28,5 @@ interface MailerInterface
     public function sendKnowledgeBaseMail(User $user, Token $token): void;
     public function sendTokenMarketingTipMail(User $user, string $kbLink): void;
     public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void;
+    public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void;
 }

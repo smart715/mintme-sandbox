@@ -1336,6 +1336,7 @@ mail.mintme_host.3: 'You can even pay with <strong>MintMe coins</strong> for it,
 mail.mintme_host.btn_text: 'Check it out now at'
 mail.mintme_host.btn_mintmeHost: 'MINTME.host'
 mail.mintme_host_subject: 'New MintMe hosting now available'
+mail.token_deployed.subject: 'Your token has been deployed'
 phone.add_number.notification: 'In order to use your account fully, you need to add a phone number in your <a href="%url%">profile</a>. The number won''t be visible to others.'
 phone.country_selector.label: 'Country code'
 phone.country_selector.error: 'Choose country'
