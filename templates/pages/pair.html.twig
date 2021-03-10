@@ -32,6 +32,8 @@
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
+{% set showAirdropModal = showAirdropModal ? 'true' : 'false' %}
+
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -125,6 +127,7 @@
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
                     youtube-client-id="{{ global_youtube_client_id }}"
                     current-locale="{{ currentLocale }}"
+                    :show-airdrop-modal="{{ showAirdropModal }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
