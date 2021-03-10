@@ -8,10 +8,10 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Events\DeployCompletedEvent;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Mailer\MailerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -40,13 +40,16 @@ class DeployConsumer implements ConsumerInterface
 
     private EventDispatcherInterface $eventDispatcher;
 
+    private MailerInterface $mailer;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
         DeployCostFetcherInterface $deployCostFetcher,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MailerInterface $mailer
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
@@ -54,6 +57,7 @@ class DeployConsumer implements ConsumerInterface
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
         $this->eventDispatcher = $eventDispatcher;
+        $this->mailer = $mailer;
     }
 
     /** {@inheritdoc} */
@@ -145,15 +149,19 @@ class DeployConsumer implements ConsumerInterface
 
             return false;
         }
-
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new DeployCompletedEvent($user, $clbResult->getTokenName(), $clbResult->getTxHash()),
-            DeployCompletedEvent::NAME
-        );
+        
+        try {
+            $this->mailer->checkConnection();
+            $this->mailer->sendOwnTokenDeployedMail($user, $token->getName(), $clbResult->getTxHash());
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                "Couldn't send deploy completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}"
+            );
+        }
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::DEPLOYED);
+
 
         return true;
     }
