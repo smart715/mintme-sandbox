@@ -10,14 +10,10 @@
             <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
                 <h1>
                     {% if app.user.isBlocked %}
-                        {% trans %}page.wallet.account{% endtrans %}
+                        {% trans %}page.wallet.blocked.account{% endtrans %}
                     {% else %}
-                        {% trans %}page.wallet.token {% endtrans %}
+                        {% trans %}page.wallet.blocked.token{% endtrans %}
                     {% endif %}
-                    {% trans %}page.wallet.blocked{% endtrans %}
-                    {% if not app.user.isBlocked%}
-                        {% trans %}page.wallet.for{% endtrans %}
-                    {% endif %} {% trans %}page.wallet.unavailable{% endtrans %}
                 </h1>
             </div>
         {% endif %}
