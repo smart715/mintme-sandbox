@@ -197,7 +197,7 @@ class MarketHandler implements MarketHandlerInterface
         });
 
         if (count($orders)<$offset) {
-            $offset=0;
+            $offset = 0;
         }
 
         $orders=array_slice($orders, $offset, $limit);
