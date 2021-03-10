@@ -8,6 +8,7 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\DeployCompletedEvent;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -151,8 +152,13 @@ class DeployConsumer implements ConsumerInterface
         }
 
         /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new DeployCompletedEvent($user, $clbResult->getTokenName(), $clbResult->getTxHash()),
+            DeployCompletedEvent::NAME
+        );
+
+        /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::DEPLOYED);
-        $this->mailer->sendOwnTokenDeployedMail($user, $token->getName(), $clbResult->getTxHash());
 
         return true;
     }
