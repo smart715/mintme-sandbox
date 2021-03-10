@@ -12,7 +12,6 @@ use App\Events\DeployCompletedEvent;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Mailer\MailerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -41,16 +40,13 @@ class DeployConsumer implements ConsumerInterface
 
     private EventDispatcherInterface $eventDispatcher;
 
-    private MailerInterface $mailer;
-
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
         DeployCostFetcherInterface $deployCostFetcher,
-        EventDispatcherInterface $eventDispatcher,
-        MailerInterface $mailer
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
@@ -58,7 +54,6 @@ class DeployConsumer implements ConsumerInterface
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
         $this->eventDispatcher = $eventDispatcher;
-        $this->mailer = $mailer;
     }
 
     /** {@inheritdoc} */
