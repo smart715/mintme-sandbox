@@ -571,6 +571,10 @@ services:
         arguments:
             $mailer: '@app.instant.mailer'
 
+    App\EventSubscriber\DeploySubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
     App\Communications\CachedCryptoRatesFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
