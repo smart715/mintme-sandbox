@@ -77,7 +77,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ));
         }
 
-        if ($exception instanceof NotFoundPostException) {
+        if ($exception instanceof NotFoundPostException ||
+            'Unable to find the post' === $exception->getMessage()
+        ) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => $this->translator->trans('404.post'),
