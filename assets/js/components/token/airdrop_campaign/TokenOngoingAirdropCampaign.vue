@@ -33,11 +33,10 @@
                             </button>
                         </span>
                         <span v-else>
-                            <button
-                                @click="showModal = true"
+                            <copy-link :content-to-copy="modalTokenUrl"
                                 class="btn btn-primary">
                                 {{ $t('ongoing_airdrop.participate') }}
-                            </button>
+                            </copy-link>
                         </span>
                     </template>
                     <confirm-modal
@@ -216,6 +215,7 @@ import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
+import CopyLink from '../../CopyLink';
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -230,6 +230,7 @@ export default {
     ],
     components: {
         ConfirmModal,
+        CopyLink,
     },
     props: {
         loggedIn: Boolean,
@@ -240,6 +241,7 @@ export default {
         signupUrl: String,
         youtubeClientId: String,
         currentLocale: String,
+        showAirdropModal: Boolean,
     },
     data() {
         return {
@@ -258,6 +260,8 @@ export default {
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
+
+        this.showModal = this.showAirdropModal;
     },
     computed: {
         actionsLength() {
@@ -367,6 +371,9 @@ export default {
             return this.actionsLength > 0
                 ? Object.keys(this.airdropCampaign.actions).every((key) => this.airdropCampaign.actions[key].done)
                 : true;
+        },
+        modalTokenUrl() {
+            return this.$routing.generate('token_show', {name: this.tokenName, tab: 'intro', modal: 'airdrop'}, true);
         },
     },
     methods: {

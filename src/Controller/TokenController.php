@@ -114,7 +114,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro","modal" = "false"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup|created"},
+     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings|signup|created|airdrop"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -128,7 +128,7 @@ class TokenController extends Controller
         LimitOrderConfig $orderConfig,
         DisabledServicesConfig $disabledServicesConfig
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created)/', $request->getPathInfo())) {
+        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
@@ -196,6 +196,8 @@ class TokenController extends Controller
             ))->create();
         }
 
+        $userAlreadyClaimed = $airdropCampaignManager->checkIfUserClaimed($user, $token);
+
         return $this->render('pages/pair.html.twig', [
             'showSuccessAlert' => $request->isMethod('POST') ? true : false,
             'token' => $token,
@@ -219,8 +221,7 @@ class TokenController extends Controller
             'isTokenPage' => true,
             'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
             'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
-            'userAlreadyClaimed' => $airdropCampaignManager
-                ->checkIfUserClaimed($user, $token),
+            'userAlreadyClaimed' => $userAlreadyClaimed,
             'posts' => $this->normalize($token->getPosts()),
             'taker_fee' => $orderConfig->getTakerFeeRate(),
             'showTokenEditModal' => 'settings' === $modal,
@@ -230,6 +231,7 @@ class TokenController extends Controller
                 ? Token::TOKEN_SUBUNIT
                 : $tokenDecimals,
             'tradeInfo' => $this->normalize($tradeInfo, ['API']),
+            'showAirdropModal' => $userAlreadyClaimed ? false : 'airdrop' === $modal,
         ]);
     }
 
