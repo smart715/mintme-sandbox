@@ -2,14 +2,15 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Security;
 
 class UserVoter extends Voter
 {
-    private const AUTHENTICATED = 'authenticated';
-    private const SEMI_AUTHENTICATED = 'semi-authenticated';
+    private const AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    private const SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
     private const USER_ROLES = [
         self::AUTHENTICATED,
         self::SEMI_AUTHENTICATED,
@@ -33,12 +34,14 @@ class UserVoter extends Voter
     /**
      * {@inheritdoc}
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
-        if ($this->security->isGranted('ROLE_SUPER_ADMIN') ||
-            $this->security->isGranted('ROLE_AUTHENTICATED')
-        ) {
-            return true;
+        $user = $token->getUser();
+
+        if (!$user instanceof User) {
+            return false;
         }
+
+        return $attribute === $this->security->isGranted('ROLE_AUTHENTICATED');
     }
 }

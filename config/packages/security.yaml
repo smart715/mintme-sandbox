@@ -51,6 +51,10 @@ security:
             security:   false
 
     role_hierarchy:
+        ROLE_AUTENTICATED:
+            - ROLE_USER
+        ROLE_SEMI_AUTHENTICATED:
+            - ROLE_USER
         ROLE_ADMIN_USER_ADMIN:
             - ROLE_ADMIN_USER_LIST
             - ROLE_ADMIN_USER_VIEW
@@ -101,3 +105,4 @@ security:
         - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN, requires_channel: https}
+ #       - { path: ^(%translation_prefixes%)/api/orders/[a-zA-Z0-9]+/[a-zA-Z0-9]/place-order, role: ROLE_AUTENTICAED, requires_channel: https }

@@ -31,6 +31,9 @@ class RegistrationCompletedListener
         $this->event = null;
 
         $this->userActionLogger->info('Register ' . $event->getUser()->getEmail());
+        $user = $event->getUser();
+        $user->addRole(User::ROLE_SEMI_AUTHENTICATED);
+        $this->userManager->updateUser($user);
     }
 
     private function updateReferral(): void

@@ -124,6 +124,7 @@ class OrdersController extends AbstractFOSRestController
     ): View {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
+        $this->denyAccessUnlessGranted(User::ROLE_AUTHENTICATED);
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();

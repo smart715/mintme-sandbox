@@ -10,6 +10,7 @@ use App\Form\PhoneVerificationType;
 use App\Form\ProfileType;
 use App\Logger\UserActionLogger;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use DateTimeImmutable;
@@ -28,15 +29,18 @@ class ProfileController extends Controller
 {
     private UserActionLogger $userActionLogger;
     private PhoneNumberUtil $phoneNumberUtil;
+    private UserManagerInterface $userManager;
 
     public function __construct(
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
-        PhoneNumberUtil $phoneNumberUtil
+        PhoneNumberUtil $phoneNumberUtil,
+        UserManagerInterface $userManager
     ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
         $this->phoneNumberUtil = $phoneNumberUtil;
+        $this->userManager = $userManager;
     }
 
     /** @Route("/phone/verify", name="phone_verification") */
@@ -66,6 +70,9 @@ class ProfileController extends Controller
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($profile);
             $entityManager->flush();
+            $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
+            $user->addRole(User::ROLE_AUTHENTICATED);
+            $this->userManager->updateUser($user);
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
                     $profile->getPhoneNumber()->getPhoneNumber(),
