@@ -477,13 +477,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
 
         if (!$token || !$token->isMintmeToken()) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
-        return $this->view([
-            Token::DEPLOYED => $token->getDeploymentStatus(),
-            'showModal' => $token->isDeployed() && $token->isShowDeployedModal(),
-        ], Response::HTTP_OK);
+        return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
     }
 
     /**

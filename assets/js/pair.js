@@ -43,7 +43,7 @@ new Vue({
       posts: null,
       postFromUrl: null,
       showCreatedModal: true,
-      showDeployedOnBoard: true,
+      showDeployedOnBoard: null,
     };
   },
   components: {
@@ -127,6 +127,7 @@ new Vue({
             if (response.data.deployed === tokenDeploymentStatus.deployed) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
+                this.showDeployedOnBoard = true;
                 clearInterval(this.deployInterval);
                 this.fetchAddress();
             }
