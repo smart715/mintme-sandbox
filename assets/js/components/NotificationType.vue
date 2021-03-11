@@ -44,7 +44,7 @@ export default {
                 return {
                   tokenName: jsonData.tokenName,
                   urlToken: jsonData.hasOwnProperty('slug')
-                      ? this.$routing.generate('new_show_post', {tokenName: jsonData.tokenName, slug: jsonData.slug})
+                      ? this.$routing.generate('new_show_post', {name: jsonData.tokenName, slug: jsonData.slug})
                       : this.$routing.generate('token_show', {name: jsonData.tokenName, tab: tabs[2]}),
                 };
             }
