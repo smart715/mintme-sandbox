@@ -1310,7 +1310,7 @@ activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado
 airdrop_backend.invalid_actions: 'Acciones inválidas'
-api.airdrop.forbidden_domain: 'Dominio prohibido, por favor intente con otro'
+api.airdrop.forbidden_domain:
 api.no_enough_amount: 'Monto insuficiente'
 api.not_found: 'No se encuentra'
 api.tokens.deleted: 'Token %tokeName% fue eliminado exitosamente.'
