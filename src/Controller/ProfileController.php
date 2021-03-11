@@ -20,6 +20,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -30,17 +32,20 @@ class ProfileController extends Controller
     private UserActionLogger $userActionLogger;
     private PhoneNumberUtil $phoneNumberUtil;
     private UserManagerInterface $userManager;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
         PhoneNumberUtil $phoneNumberUtil,
-        UserManagerInterface $userManager
+        UserManagerInterface $userManager,
+        TokenStorageInterface $tokenStorage
     ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
         $this->phoneNumberUtil = $phoneNumberUtil;
         $this->userManager = $userManager;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /** @Route("/phone/verify", name="phone_verification") */
@@ -73,6 +78,13 @@ class ProfileController extends Controller
             $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
             $user->addRole(User::ROLE_AUTHENTICATED);
             $this->userManager->updateUser($user);
+            $newToken = new PostAuthenticationGuardToken(
+                $user,
+                'authenticate',
+                $user->getRoles()
+            );
+            $this->tokenStorage->setToken('authenticate', $newToken);
+
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
                     $profile->getPhoneNumber()->getPhoneNumber(),
