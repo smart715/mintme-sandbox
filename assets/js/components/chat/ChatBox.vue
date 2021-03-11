@@ -19,8 +19,13 @@
                                     class="chat-avatar rounded-circle d-block"
                                     alt="avatar">
                                 <span class="d-inline-block col">
+                                    <span class="d-block small word-break right">
+                                        {{ row.item.date }}
+                                    </span>
+                                    <br>
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
+                                        <span class="small" style="padding-bottom: 15px;">{{ row.item.time }}</span>
                                     </span>
                                     <span class="d-block small word-break">
                                         {{ row.item.body }}
@@ -71,6 +76,9 @@
 <script>
 import {mapGetters} from 'vuex';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
+import {GENERAL} from '../../utils/constants';
+import moment from 'moment';
+
 const updateMessagesMS = 3500;
 
 export default {
@@ -145,6 +153,8 @@ export default {
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
+                    date: moment(message.createdAt).format(GENERAL.dateFormatWithoutTime),
+                    time: moment(message.createdAt).format(GENERAL.time),
                 };
             });
         },

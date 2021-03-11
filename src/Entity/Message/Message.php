@@ -131,6 +131,9 @@ class Message
         return $this->metadata->toArray();
     }
 
+    /**
+     * @Groups({"API"})
+     */
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
