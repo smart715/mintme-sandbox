@@ -1323,3 +1323,4 @@ mail.withdrawal.msg: 'Su retiro ha sido completado'
 mail.withdrawal.text_link: 'Comprobar el historial de depósitos/retiros'
 ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar estas tareas %tasksAmount%:'
 phone_number.edit.limit: 'Sólo se puede editar el número de teléfono una vez al mes'
+modal.add_phone_alert:

@@ -177,7 +177,7 @@ class ProfileController extends Controller
         return $this->redirectToRoute('profile-view', [ 'nickname' => $profile->getNickname() ]);
     }
 
-    /** @Route(name="profile") */
+    /** @Route(name="profile", options={"expose"=true}) */
     public function profile(
         Request $request,
         ProfileManagerInterface $profileManager
