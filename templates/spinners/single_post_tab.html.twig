@@ -1,0 +1,72 @@
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+        <div class="card h-100 single-post-page">
+            <div class="card-body posts">
+                {% if post is not null %}
+                    <div class="post">
+                        <h1 class="post-title">
+                            {{ post.title }}
+                        </h1>
+                        <div>
+                            <a href="{{ path('profile', {nickname: post.author.nickname}) }}" class="text-white">
+                                <img src="{{ post.author.image.avatar_small }}" alt="avatar" class="rounded-circle d-inline-block">
+                                {{ post.author.nickname }}
+                            </a>
+                            <span class="text-decoration-none post-date">
+                                {{ post.createdAt | date('H:m M d, Y') }}
+                            </span>
+                        </div>
+                        <p class="post-content my-2">
+                            <div>
+                                <p class="bbcode-content">
+                                    {{ post.content | bbcode | raw }}
+                                </p>
+                            </div>
+                        </p>
+                        <span class="social-link ml-1">
+                            {{ post.commentsCount }} {% trans %}post.comments{% endtrans %}
+                        </span>
+                    </div>
+                    <div class="comments">
+                    <div class="form-group p-2">
+                        <textarea class="form-control mb-3"></textarea>
+                        <button disabled="disabled" class="btn btn-primary">
+                            {% trans %}save{% endtrans %}
+                        </button>
+                        <a href="{{ path('new_show_post', {name: token.name}) }}" class="btn btn-cancel">
+                            {% trans %}cancel{% endtrans %}
+                        </a>
+                    </div>
+                    <div class="my-3">
+                        {% if post.commentsCount > 0 and comments is not null %}
+                            <div class="my-3">
+                                {% for comment in comments %}
+                                    <div class="comment">
+                                        <div>
+                                            <a href="{{ path('profile', {nickname: comment.author.profile.nickname}) }}" class="text-white">
+                                                <img src="{{ comment.author.profile.image.avatar_small }}" alt="avatar" class="rounded-circle d-inline-block">
+                                                {{ comment.author.profile.nickname }}
+                                            </a>
+                                            <span class="comment-date">
+                                                {{ comment.createdAt | date('H:m M d, Y') }}
+                                            </span>
+                                        </div>
+                                        <p>{{ comment.content }}</p>
+                                        <span>
+                                            <span class="ml-1">{{ comment.likeCount}} {% trans %}post.likes{% endtrans %}</span>
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center w-100">
+                                {% trans %}post.no_one_commented{% endtrans %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
