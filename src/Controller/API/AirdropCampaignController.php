@@ -49,6 +49,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     private AirdropConfig $airdropConfig;
     private TranslatorInterface $translator;
     private TwitterManagerInterface $twitterManager;
+    private BlacklistManagerInterface $blacklistManager;
     private LockFactory $lockFactory;
     private EventDispatcherInterface $eventDispatcher;
 
@@ -58,6 +59,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         AirdropConfig $airdropConfig,
         TranslatorInterface $translator,
         TwitterManagerInterface $twitterManager,
+        BlacklistManagerInterface $blacklistManager,
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher
     ) {
@@ -66,8 +68,24 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->airdropConfig = $airdropConfig;
         $this->translator = $translator;
         $this->twitterManager = $twitterManager;
+        $this->blacklistManager = $blacklistManager;
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/domain-blacklist-check", name="airdrop_domain_blacklist_check", options={"expose"=true})
+     * @Rest\QueryParam(name="domain", allowBlank=false)
+     * @param ParamFetcherInterface $request
+     * @return View
+     */
+    public function checkDomainBlacklistAction(ParamFetcherInterface $request): View
+    {
+        return $this->view(
+            ['blacklisted' => $this->blacklistManager->isBlacklistedAirdropDomain($request->get('domain'))],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -294,7 +312,6 @@ class AirdropCampaignController extends AbstractFOSRestController
     public function verifyPostLinkAction(
         string $tokenName,
         ParamFetcherInterface $request,
-        BlacklistManagerInterface $blacklistManager,
         WebsiteVerifierInterface $websiteVerifier
     ): View {
         $this->fetchToken($tokenName, false, true);
@@ -309,8 +326,10 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.invalid_url'));
         }
 
-        if ($blacklistManager->isBlacklistedAirdropDomain($url)) {
-            throw new ApiBadForbiddenException($this->translator->trans('api.airdrop.forbidden_domain'));
+        if ($this->blacklistManager->isBlacklistedAirdropDomain($url)) {
+            throw new ApiBadForbiddenException($this->translator->trans('api.airdrop.forbidden_domain', [
+                '%domain%' => $url,
+            ]));
         }
 
         $verified = $websiteVerifier->verifyAirdropPostLinkAction($url, $message);
