@@ -2,13 +2,15 @@ import BalanceInit from './components/trade/BalanceInit';
 import CreatePost from './components/posts/CreatePost';
 import Donation from './components/donation/Donation';
 import Posts from './components/posts/Posts';
+import Post from './components/posts/Post';
+import Comments from './components/posts/Comments';
 import TokenIntroductionDescription from './components/token/introduction/TokenIntroductionDescription';
 import TokenIntroductionStatistics from './components/token/introduction/TokenIntroductionStatistics';
 import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
 import TokenAvatar from './components/token/TokenAvatar';
 import TopHolders from './components/trade/TopHolders';
-import {NotificationMixin} from './mixins/';
+import {NotificationMixin, LoggerMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
@@ -20,7 +22,7 @@ import {tabs} from './utils/constants';
 
 new Vue({
   el: '#token',
-  mixins: [NotificationMixin],
+  mixins: [NotificationMixin, LoggerMixin],
   i18n,
   data() {
     return {
@@ -42,6 +44,8 @@ new Vue({
       posts: null,
       postFromUrl: null,
       showCreatedModal: true,
+      singlePost: null,
+      comments: null,
     };
   },
   components: {
@@ -49,7 +53,9 @@ new Vue({
     Envelope,
     BalanceInit,
     CreatePost,
+    Comments,
     Donation,
+    Post,
     Posts,
     TokenAvatar,
     TokenCreatedModal,
@@ -142,12 +148,30 @@ new Vue({
     tabUpdated: function(i) {
       if (window.history.replaceState) {
         // prevents browser from storing history with each change:
-        window.history.replaceState(
-            {}, document.title, this.$routing.generate('token_show', {
+        let url = '';
+        switch (i) {
+          case 2:
+            url = this.$routing.generate('new_show_post', {
+              name: this.tokenName,
+              slug: null,
+            });
+
+            break;
+          case 4:
+            url = this.$routing.generate('new_show_post', {
+              name: this.tokenName,
+              slug: this.singlePost.slug,
+            });
+
+            break;
+          default:
+            url = this.$routing.generate('token_show', {
               name: this.tokenName,
               tab: tabs[i],
-            })
-        );
+            });
+        }
+
+        window.history.replaceState({}, '', url);
       }
     },
     setTokenPending: function() {
@@ -197,6 +221,31 @@ new Vue({
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
+    },
+    deleteComment: function(index) {
+      this.comments.splice(index, 1);
+    },
+    newComment: function(comment) {
+      this.comments.unshift(comment);
+    },
+    goToPost: function(post) {
+      this.singlePost = post;
+      this.tabIndex = 4;
+      this.comments = [];
+
+      this.loadComments(post.id);
+    },
+    loadComments: function(postId) {
+      this.$axios.single.get(this.$routing.generate('get_post_comments', {id: postId}))
+        .then((res) => this.comments = res.data)
+        .catch((err) => {
+          this.notifyError($t('comment.load_error'));
+          this.sendLogs('error', err);
+        });
+    },
+    deleteSinglePost: function(index, postId) {
+      this.posts = this.posts.filter((post) => post.id !== postId);
+      this.goToPosts();
     },
   },
   computed: {
