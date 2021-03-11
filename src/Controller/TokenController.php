@@ -163,7 +163,7 @@ class TokenController extends Controller
             'comments' => $post ? $this->normalize($post->getComments()) : null,
         ];
 
-        return $this->renderPairPage($token, $request, $tab, $extraData);
+        return $this->renderPairPage($token, $request, $tab, null, $extraData);
     }
 
     /**
@@ -171,7 +171,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|buy", "modal" = "settings|signup|created"},
+     *     requirements={"tab" = "trade|intro|buy", "modal" = "settings|signup|created|airdrop"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -181,16 +181,13 @@ class TokenController extends Controller
         ?string $tab,
         ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created)/', $request->getPathInfo())) {
+        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
         $token = $this->fetchToken($request, $name);
 
-        return $this->renderPairPage($token, $request, $tab, [
-            'showTokenEditModal' => 'settings' === $modal,
-            'showCreatedModal' => 'created' === $modal,
-        ]);
+        return $this->renderPairPage($token, $request, $tab, $modal);
     }
 
     /**
@@ -406,7 +403,7 @@ class TokenController extends Controller
         return count($this->tokenManager->getOwnTokens()) > 0;
     }
 
-    private function renderPairPage(Token $token, Request $request, string $tab, array $extraData = []): Response
+    private function renderPairPage(Token $token, Request $request, string $tab, ?string $modal = null, array $extraData = []): Response
     {
         $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
         $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
@@ -444,6 +441,8 @@ class TokenController extends Controller
             ))->create();
         }
 
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
         return $this->render(
             'pages/pair.html.twig',
             array_merge([
@@ -469,17 +468,17 @@ class TokenController extends Controller
                 'isTokenPage' => true,
                 'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
                 'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
-                'userAlreadyClaimed' => $this->airdropCampaignManager
-                    ->checkIfUserClaimed($user, $token),
+                'userAlreadyClaimed' => $userAlreadyClaimed,
                 'posts' => $this->normalize($token->getPosts()),
                 'taker_fee' => $this->orderConfig->getTakerFeeRate(),
-                'showTokenEditModal' => false,
+                'showTokenEditModal' => 'settings' === $modal,
                 'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
-                'showCreatedModal' => false,
+                'showCreatedModal' => 'created' === $modal,
                 'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                     ? Token::TOKEN_SUBUNIT
                     : $tokenDecimals,
                 'tradeInfo' => $this->normalize($tradeInfo, ['API']),
+                'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
                 'post' => null,
                 'comments' => [],
             ], $extraData)
