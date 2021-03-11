@@ -701,3 +701,7 @@ services:
             $mintmeHostFreeDays: '%freeDays%'
             $mintmeHostPrice: '%price%'
             $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Command\CancelOrdersForOldBlockedCommand:
+        arguments:
+            $maxActiveOrders: '%max_allowed_active_orders%'
