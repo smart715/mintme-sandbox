@@ -6,7 +6,7 @@
             :api-url="apiUrl"
             @submitted="$emit('new-comment', $event)"
             @error="notifyError('Error creating comment.')"
-            @cancel="goToPosts"
+            @cancel="$emit('cancel')"
             reset-after-submit
         />
         <div class="my-3">
@@ -53,11 +53,6 @@ export default {
         },
         apiUrl() {
             return this.$routing.generate('add_comment', {id: this.postId});
-        },
-    },
-    methods: {
-        goToPosts() {
-            location.href = this.$routing.generate('token_show', {name: this.tokenName, tab: 'posts'});
         },
     },
 };
