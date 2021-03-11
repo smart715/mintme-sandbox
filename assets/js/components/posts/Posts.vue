@@ -16,6 +16,7 @@
                           :show-edit="showEdit"
                           @go-to-trade="$emit('go-to-trade', $event)"
                           :logged-in="loggedIn"
+                          @go-to-post="$emit('go-to-post', $event)"
                     />
                 </template>
                 <div v-else :class="{ 'position-absolute top-50': tokenPage }">

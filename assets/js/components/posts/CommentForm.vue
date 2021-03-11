@@ -93,6 +93,7 @@ export default {
         cancel() {
             if (!this.loggedIn) {
                 location.href = this.loginUrl;
+                return;
             }
 
             this.content = this.propContent;
