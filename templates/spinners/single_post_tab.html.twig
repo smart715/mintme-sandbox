@@ -9,7 +9,10 @@
                         </h1>
                         <div>
                             <a href="{{ path('profile', {nickname: post.author.nickname}) }}" class="text-white">
-                                <img src="{{ post.author.image.avatar_small }}" alt="avatar" class="rounded-circle d-inline-block">
+                                <img
+                                    src="{{ post.author.image.avatar_small }}"
+                                    alt="avatar"
+                                    class="rounded-circle d-inline-block">
                                 {{ post.author.nickname }}
                             </a>
                             <span class="text-decoration-none post-date">
@@ -43,8 +46,13 @@
                                 {% for comment in comments %}
                                     <div class="comment">
                                         <div>
-                                            <a href="{{ path('profile', {nickname: comment.author.profile.nickname}) }}" class="text-white">
-                                                <img src="{{ comment.author.profile.image.avatar_small }}" alt="avatar" class="rounded-circle d-inline-block">
+                                            <a
+                                                href="{{ path('profile', {nickname: comment.author.profile.nickname}) }}"
+                                                class="text-white">
+                                                <img
+                                                    src="{{ comment.author.profile.image.avatar_small }}"
+                                                    alt="avatar"
+                                                    class="rounded-circle d-inline-block">
                                                 {{ comment.author.profile.nickname }}
                                             </a>
                                             <span class="comment-date">
@@ -53,7 +61,9 @@
                                         </div>
                                         <p>{{ comment.content }}</p>
                                         <span>
-                                            <span class="ml-1">{{ comment.likeCount}} {% trans %}post.likes{% endtrans %}</span>
+                                            <span class="ml-1">
+                                                {{ comment.likeCount}} {% trans %}post.likes{% endtrans %}
+                                            </span>
                                         </span>
                                     </div>
                                 {% endfor %}
