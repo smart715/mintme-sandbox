@@ -40,7 +40,7 @@ class PostController extends Controller
 
         if ($slug) {
             return $this->redirectToRoute('new_show_post', [
-                'tokenName' => $post->getToken()->getName(),
+                'name' => $post->getToken()->getName(),
                 'slug' => $slug,
             ]);
         }
