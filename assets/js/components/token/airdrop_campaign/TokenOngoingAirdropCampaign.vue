@@ -33,11 +33,10 @@
                             </button>
                         </span>
                         <span v-else>
-                            <button
-                                @click="showModal = true"
+                            <copy-link :content-to-copy="modalTokenUrl"
                                 class="btn btn-primary">
                                 {{ $t('ongoing_airdrop.participate') }}
-                            </button>
+                            </copy-link>
                         </span>
                     </template>
                     <confirm-modal
@@ -163,18 +162,33 @@
                                         {{ airdropCampaign.actions.postLink.done ? '1' : '0' }}/1
                                     </span>
                                 </div>
-                                <div class="d-flex my-3" v-if="airdropCampaign.actions.postLink">
-                                    <input class="form-control font-size-12"
-                                        type="text"
-                                        v-model="postLinkUrl"
-                                        :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
-                                    >
-                                    <button class="btn btn-primary text-nowrap ml-1"
-                                        :disabled="$v.postLinkUrl.$invalid"
-                                        @click="claimPostLink"
-                                    >
-                                        {{ $t('ongoing_airdrop.submit_url') }}
-                                    </button>
+                                <div class="d-flex flex-column my-3" v-if="airdropCampaign.actions.postLink">
+                                    <div class="clearfix">
+                                        <div class="float-right">
+                                            <div
+                                                v-if="blackListedDomain"
+                                                class="alert alert-danger alert-float"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                {{ $t('api.airdrop.forbidden_domain', {domain: postLinkUrl}) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <input
+                                            id="airdropDomain"
+                                            class="form-control font-size-12"
+                                            type="text"
+                                            v-model="postLinkUrl"
+                                            :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                        >
+                                        <button class="btn btn-primary text-nowrap ml-1"
+                                            :disabled="postLinkUrlDisabled"
+                                            @click="claimPostLink"
+                                        >
+                                            {{ $t('ongoing_airdrop.submit_url') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -216,6 +230,7 @@ import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
+import CopyLink from '../../CopyLink';
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -230,6 +245,7 @@ export default {
     ],
     components: {
         ConfirmModal,
+        CopyLink,
     },
     props: {
         loggedIn: Boolean,
@@ -240,6 +256,7 @@ export default {
         signupUrl: String,
         youtubeClientId: String,
         currentLocale: String,
+        showAirdropModal: Boolean,
     },
     data() {
         return {
@@ -252,12 +269,17 @@ export default {
             showDuration: true,
             postLinkUrl: '',
             showConfirmTwitterMessageModal: false,
+            checkingBlackListedDomain: false,
+            blackListedDomain: false,
+            checkDomainTimeout: null,
         };
     },
     mounted: function() {
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
+
+        this.showModal = this.showAirdropModal;
     },
     computed: {
         actionsLength() {
@@ -367,6 +389,18 @@ export default {
             return this.actionsLength > 0
                 ? Object.keys(this.airdropCampaign.actions).every((key) => this.airdropCampaign.actions[key].done)
                 : true;
+        },
+        modalTokenUrl() {
+            return this.$routing.generate('token_show', {name: this.tokenName, tab: 'intro', modal: 'airdrop'}, true);
+        },
+        postLinkUrlDisabled() {
+            return this.blackListedDomain || this.checkingBlackListedDomain || this.$v.postLinkUrl.$invalid;
+        },
+    },
+    watch: {
+        postLinkUrl: function() {
+            clearTimeout(this.checkDomainTimeout);
+            this.checkDomainTimeout = setTimeout(this.checkBlacklistedDomain, 500);
         },
     },
     methods: {
@@ -568,6 +602,21 @@ export default {
                     reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
                 });
             });
+        },
+        checkBlacklistedDomain: function() {
+            if (!this.postLinkUrl) {
+                this.blackListedDomain = false;
+                this.checkingBlackListedDomain = false;
+                return;
+            }
+
+            this.checkingBlackListedDomain = true;
+            this.$axios.retry.get(
+                this.$routing.generate('airdrop_domain_blacklist_check', {domain: this.postLinkUrl})
+            ).then(({data}) => {
+                this.blackListedDomain = data.blacklisted;
+                this.checkingBlackListedDomain = false;
+            }).catch((err) => this.sendLogs('error', 'airdrop_domain_blacklist_check', err));
         },
     },
     created() {
