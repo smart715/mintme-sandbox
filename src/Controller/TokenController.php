@@ -36,6 +36,7 @@ use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -348,37 +349,6 @@ class TokenController extends Controller
         return $this->redirectToOwnToken('intro', 'settings');
     }
 
-    private function fetchToken(Request $request, string $name): Token
-    {
-        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
-
-        if ($dashedName != $name) {
-            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName]));
-        }
-
-        //rebranding
-        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
-            $name = Token::WEB_SYMBOL;
-        }
-
-        $token = $this->tokenManager->findByName($name);
-
-        if (!$token || $token->isBlocked()) {
-            throw new NotFoundTokenException();
-        }
-
-        if ($this->tokenManager->isPredefined($token)) {
-            throw new RedirectException(
-                $this->redirectToRoute('coin', [
-                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
-                    'quote'=> Token::MINTME_SYMBOL,
-                ], 301)
-            );
-        }
-
-        return $token;
-    }
-
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
         $ownTokens = $this->tokenManager->getOwnTokens();
@@ -401,6 +371,37 @@ class TokenController extends Controller
     private function isTokenCreated(): bool
     {
         return count($this->tokenManager->getOwnTokens()) > 0;
+    }
+
+    private function fetchToken(Request $request, string $name): Token
+    {
+        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
+
+        if ($dashedName != $name) {
+            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName]));
+        }
+
+        //rebranding
+        if (Symbols::MINTME === mb_strtoupper($name)) {
+            $name = Symbols::WEB;
+        }
+
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token || $token->isBlocked()) {
+            throw new NotFoundTokenException();
+        }
+
+        if ($this->tokenManager->isPredefined($token)) {
+            throw new RedirectException(
+                $this->redirectToRoute('coin', [
+                    'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
+                    'quote'=> Symbols::MINTME,
+                ], 301)
+            );
+        }
+
+        return $token;
     }
 
     private function renderPairPage(Token $token, Request $request, string $tab, ?string $modal = null, array $extraData = []): Response

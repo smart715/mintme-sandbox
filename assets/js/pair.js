@@ -171,11 +171,7 @@ new Vue({
             });
         }
 
-        window.history.replaceState(
-            {},
-            '',
-            url
-        );
+        window.history.replaceState({}, '', url);
       }
     },
     setTokenPending: function() {
