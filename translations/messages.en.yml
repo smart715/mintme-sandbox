@@ -792,6 +792,7 @@ comment.confirm_delete: 'Are you sure you want to permanently delete this commen
 comment.deleted: 'Comment deleted.'
 comment.edited: 'Comment edited.'
 comment.liked: 'Liked comment.'
+comment.load_error: 'Error loading comments'
 like.removed: 'Like removed.'
 airdrop.end: 'End this airdrop'
 airdrop.amount_tokens: 'Amount of tokens for airdrop:'

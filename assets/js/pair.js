@@ -10,7 +10,7 @@ import TokenOngoingAirdropCampaign from './components/token/airdrop_campaign/Tok
 import TokenSocialMediaIcons from './components/token/TokenSocialMediaIcons';
 import TokenAvatar from './components/token/TokenAvatar';
 import TopHolders from './components/trade/TopHolders';
-import {NotificationMixin} from './mixins/';
+import {NotificationMixin, LoggerMixin} from './mixins/';
 import Trade from './components/trade/Trade';
 import {tokenDeploymentStatus, HTTP_OK} from './utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
@@ -22,7 +22,7 @@ import {tabs} from './utils/constants';
 
 new Vue({
   el: '#token',
-  mixins: [NotificationMixin],
+  mixins: [NotificationMixin, LoggerMixin],
   i18n,
   data() {
     return {
@@ -242,7 +242,10 @@ new Vue({
     loadComments: function(postId) {
       this.$axios.single.get(this.$routing.generate('get_post_comments', {id: postId}))
         .then((res) => this.comments = res.data)
-        .catch(() => this.notifyError('Error loading comments'));
+        .catch((err) => {
+          this.notifyError($t('comment.load_error'));
+          this.sendLogs('error', err);
+        });
     },
     deleteSinglePost: function(index, postId) {
       this.posts = this.posts.filter((post) => post.id !== postId);
