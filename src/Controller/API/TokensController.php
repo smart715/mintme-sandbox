@@ -476,7 +476,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         $token = $this->tokenManager->findByName($name);
 
-        if (!$token || !$token->isMintmeToken()) {
+        if (!$token) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
