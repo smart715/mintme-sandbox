@@ -11,13 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 class ScheduledNotificationManager implements ScheduledNotificationManagerInterface
 {
     public array $filled_intervals;
-
     public array $cancelled_intervals;
-
     public array $token_marketing_tips_intervals;
+    public array $marketing_airdrop_feature;
 
     private EntityManagerInterface $em;
-
     private ScheduledNotificationRepository $scheduledNotificationRepository;
 
     public function __construct(
@@ -33,8 +31,11 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
         return $this->scheduledNotificationRepository->findAll();
     }
 
-    public function createScheduledNotification(string $notificationType, User $user): void
-    {
+    public function createScheduledNotification(
+        string $notificationType,
+        User $user,
+        bool $flush = true
+    ): ScheduledNotification {
         $existScheduleNotifications = $this->scheduledNotificationRepository->findBy(['user' => $user->getId()]);
 
         foreach ($existScheduleNotifications as $schNotification) {
@@ -51,8 +52,12 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
             ->setDateToBeSend($this->setDate($notificationType))
             ->setTimeInterval((string)$this->{strtolower($notificationType) . '_intervals'}[0]);
 
-        $this->em->persist($scheduledNotification);
-        $this->em->flush();
+        if ($flush) {
+            $this->em->persist($scheduledNotification);
+            $this->em->flush();
+        }
+
+        return $scheduledNotification;
     }
 
     public function updateScheduledNotification(
@@ -76,6 +81,6 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
     {
         $actualDate = new DateTimeImmutable();
 
-         return $actualDate->modify('+' . $this->{strtolower($notificationType) . '_intervals'}[0]);
+        return $actualDate->modify('+' . $this->{strtolower($notificationType) . '_intervals'}[0]);
     }
 }
