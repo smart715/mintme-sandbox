@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Communications\SMS\D7NetworksCommunicator;
-use App\Communications\SMS\D7NetworksCommunicatorInterface;
 use App\Manager\ActivityManagerInterface;
 use App\Manager\MainDocumentsManagerInterfaces;
 use App\Manager\ReciprocalLinksManagerInterface;
@@ -24,9 +22,8 @@ class DefaultController extends Controller
      *     options={"expose"=true, "sitemap" = true, "2fa_progress" = false}
      * )
      */
-    public function index(ActivityManagerInterface $activityManager, D7NetworksCommunicatorInterface $d7NetworksCommunicator): Response
+    public function index(ActivityManagerInterface $activityManager): Response
     {
-        dump($d7NetworksCommunicator->getBalance());
         $activities = $activityManager->getLast(self::ACTIVITIES_AMOUNT);
 
         return $this->render('pages/index.html.twig', [
