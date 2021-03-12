@@ -151,6 +151,8 @@ parameters:
         - '10 day'
         - '15 day'
         - '21 day'
+    marketing_airdrop_feature_intervals:
+        - '7 day'
     dm_min_amount: 1
     token_withdraw_fee: 0.01
     max_allowed_active_orders: 100
