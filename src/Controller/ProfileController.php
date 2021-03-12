@@ -78,6 +78,7 @@ class ProfileController extends Controller
             $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
             $user->addRole(User::ROLE_AUTHENTICATED);
             $this->userManager->updateUser($user);
+            /** @var string $newToken */
             $newToken = new PostAuthenticationGuardToken(
                 $user,
                 'authenticate',
