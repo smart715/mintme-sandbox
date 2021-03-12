@@ -416,16 +416,19 @@ export default {
             return parseInt(this.airdropCampaignId) > 0;
         },
         btnDisabled: function() {
-            return !(this.isAmountValid &&
-                this.isParticipantsAmountValid &&
-                this.isDateEndValid) ||
-                this.$v.$invalid;
+            return !this.isAmountValid
+                || !this.isParticipantsAmountValid
+                || !this.isDateEndValid
+                || this.insufficientBalance
+                || this.$v.$invalid;
         },
         insufficientBalance: function() {
             if (this.balanceLoaded) {
                 let balance = new Decimal(this.tokenBalance);
 
-                return balance.lessThan(this.minTokensAmount);
+                let tokensAmount = new Decimal(this.tokensAmount || 0);
+
+                return balance.lessThan(this.minTokensAmount) || balance.lessThan(tokensAmount.add(this.reward.dividedBy(2)));
             }
 
             return false;
@@ -434,8 +437,7 @@ export default {
             if (this.tokensAmount > 0) {
                 let tokensAmount = new Decimal(this.tokensAmount);
 
-                return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount)
-                    && tokensAmount.lessThanOrEqualTo(this.tokenBalance);
+                return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount);
             }
 
             return false;
@@ -452,21 +454,25 @@ export default {
             return this.showEndDate && selectedDate.valueOf() > moment().valueOf();
         },
         isRewardValid: function() {
-            if (this.isAmountValid && this.isParticipantsAmountValid) {
-                let amount = new Decimal(this.tokensAmount);
-                let participants = new Decimal(this.participantsAmount);
-                let res = amount.dividedBy(participants);
-
-                return res.greaterThanOrEqualTo(this.minTokenReward);
-            }
-
-            return false;
+            return this.reward.greaterThanOrEqualTo(this.minTokenReward);
         },
         ...mapGetters('tokenStatistics', [
             'getTokenExchangeAmount',
         ]),
         tokenExchangeAmount: function() {
             return this.getTokenExchangeAmount;
+        },
+        /**
+         * @return {Decimal}
+         */
+        reward() {
+            if (this.tokensAmount > 0 && this.participantsAmount > 0) {
+                let amount = new Decimal(this.tokensAmount);
+                let participants = new Decimal(this.participantsAmount);
+                return amount.dividedBy(participants);
+            }
+
+            return new Decimal(0);
         },
     },
     methods: {
@@ -486,8 +492,8 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    if ('object' === typeof result.data) {
-                        this.airdropCampaignId = result.data.id;
+                    if (result.data.airdrop !== null) {
+                        this.airdropCampaignId = result.data.airdrop.id;
                     }
 
                     if (!this.hasAirdropCampaign) {
