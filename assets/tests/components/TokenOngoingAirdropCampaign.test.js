@@ -62,8 +62,7 @@ describe('TokenOngoingAirdropCampaign', () => {
             data() {
                 return {
                     airdropCampaign: {
-                        'amount': '450',
-                        'participants': 150,
+                        reward: '3',
                     },
                 };
             },
@@ -73,9 +72,12 @@ describe('TokenOngoingAirdropCampaign', () => {
         });
 
         expect(wrapper.vm.airdropReward).toBe(0);
+        expect(wrapper.vm.halfReward).toBe(0);
         wrapper.vm.loaded = true;
         expect(wrapper.vm.airdropReward).toBe('3');
+        expect(wrapper.vm.halfReward).toBe('1.5');
     });
+
 
     it('should format airdrop end date/time properly', () => {
         let dateNow = moment();
@@ -131,8 +133,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     loaded: true,
                     alreadyClaimed: false,
                     airdropCampaign: {
-                        'amount': '300',
-                        'participants': 100,
+                        amount: '300',
+                        participants: 100,
+                        reward: '3',
                     },
                 };
             },
@@ -191,9 +194,13 @@ describe('TokenOngoingAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                'amount': '568',
-                'participants': 120,
-                'actualParticipants': 8,
+                airdrop: {
+                    amount: '568',
+                    participants: 120,
+                    actualParticipants: 8,
+                    reward: '4',
+                },
+                referral_code: null,
             },
         });
 
@@ -203,6 +210,7 @@ describe('TokenOngoingAirdropCampaign', () => {
             expect(wrapper.vm.airdropCampaign.amount).toBe('568');
             expect(wrapper.vm.airdropCampaign.participants).toBe(120);
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(8);
+            expect(wrapper.vm.airdropCampaign.reward).toBe('4');
             expect(wrapper.vm.loaded).toBe(true);
             done();
         });
