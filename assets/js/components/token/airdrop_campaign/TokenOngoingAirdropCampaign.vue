@@ -232,6 +232,10 @@
             </p>
             <template v-slot:confirm>{{ $t('ongoing_airdrop.accept') }}</template>
         </confirm-modal>
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            @close="addPhoneModalVisible = false"
+        />
     </div>
 </template>
 
@@ -240,11 +244,12 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED} from '../../../utils/constants';
 import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
 import CopyLink from '../../CopyLink';
+import AddPhoneAlertModal from '../../modal/AddPhoneAlertModal';
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -260,6 +265,7 @@ export default {
     components: {
         ConfirmModal,
         CopyLink,
+        AddPhoneAlertModal,
     },
     props: {
         loggedIn: Boolean,
@@ -287,6 +293,7 @@ export default {
             blackListedDomain: false,
             checkDomainTimeout: null,
             referralCode: null,
+            addPhoneModalVisible: false,
         };
     },
     mounted: function() {
@@ -483,6 +490,10 @@ export default {
                     }
                 })
                 .catch((err) => {
+                    if (HTTP_UNAUTHORIZED === err.response.status) {
+                        this.addPhoneModalVisible = true;
+                        return;
+                    }
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
                         setTimeout(()=> {

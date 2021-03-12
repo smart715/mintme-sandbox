@@ -1,4 +1,4 @@
-<template>
+profile<template>
     <div>
         <modal
             :visible="visible"
@@ -34,7 +34,7 @@ export default {
     computed: {
         body: function() {
             return this.$t('modal.add_phone_alert', {
-                profileUrl: this.$routing.generate('profile'),
+                profileUrl: this.$routing.generate('profile-view'),
             });
         },
     },
