@@ -2,33 +2,25 @@
 
 namespace App\Events;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
-use Symfony\Contracts\EventDispatcher\Event;
 
-class DeployCompletedEvent extends Event
+class DeployCompletedEvent extends TokenEvent implements TokenEventInterface, UserEventInterface
 {
-    public const NAME = "deploy.completed";
-    public const TYPE = "deploy";
-
     protected User $user;
-    private string $tokenName;
     private string $txHash;
 
-    public function __construct(User $user, string $tokenName, string $txHash)
+    public function __construct(Token $token, string $txHash)
     {
-        $this->user = $user;
-        $this->tokenName = $tokenName;
+        $this->user = $token->getProfile()->getUser();
         $this->txHash = $txHash;
+
+        parent::__construct($token);
     }
 
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    public function getTokenName(): string
-    {
-        return $this->tokenName;
     }
 
     public function getTxHash(): string

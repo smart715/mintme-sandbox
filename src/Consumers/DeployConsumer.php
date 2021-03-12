@@ -148,12 +148,9 @@ class DeployConsumer implements ConsumerInterface
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new DeployCompletedEvent($user, $token->getName(), $clbResult->getTxHash()),
-            DeployCompletedEvent::NAME
+            new DeployCompletedEvent($token, $clbResult->getTxHash()),
+            TokenEvents::DEPLOYED
         );
-
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::DEPLOYED);
 
         return true;
     }

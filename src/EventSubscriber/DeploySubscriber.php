@@ -3,17 +3,17 @@
 namespace App\EventSubscriber;
 
 use App\Events\DeployCompletedEvent;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Mailer\MailerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DeploySubscriber implements EventSubscriberInterface
 {
-    /** @var MailerInterface */
-    private $mailer;
+    private MailerInterface $mailer;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         MailerInterface $mailer,
@@ -26,7 +26,7 @@ class DeploySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            DeployCompletedEvent::NAME => [
+            TokenEvents::DEPLOYED => [
                 ['sendDeployCompletedMail'],
             ],
         ];
@@ -38,11 +38,11 @@ class DeploySubscriber implements EventSubscriberInterface
 
         try {
             $this->mailer->checkConnection();
-            $this->mailer->sendOwnTokenDeployedMail($user, $event->getTokenName(), $event->getTxHash());
+            $this->mailer->sendOwnTokenDeployedMail($user, $event->getToken()->getName(), $event->getTxHash());
         } catch (\Throwable $e) {
             $this->logger->error(
                 "Couldn't send "
-                .$event::TYPE
+                .TokenEvents::DEPLOYED
                 ." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}"
             );
         }
