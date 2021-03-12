@@ -8,6 +8,7 @@ use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundProfileException;
 use App\Exception\NotFoundTokenException;
+use App\Exception\RedirectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,7 +77,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ));
         }
 
-        if ($exception instanceof NotFoundPostException) {
+        if ($exception instanceof NotFoundPostException ||
+            'Unable to find the post' === $exception->getMessage()
+        ) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => $this->translator->trans('404.post'),
@@ -92,15 +95,17 @@ class ExceptionSubscriber implements EventSubscriberInterface
             ));
         }
 
-        if ($event->getException() instanceof ApiExceptionInterface) {
-            /** @var ApiExceptionInterface $e */
-            $e = $event->getException();
+        if ($exception instanceof ApiExceptionInterface) {
             $response = new JsonResponse(
-                $e->getData(),
-                $e->getStatusCode()
+                $exception->getData(),
+                $exception->getStatusCode()
             );
             $response->headers->set('Content-Type', 'application/problem+json');
             $event->setResponse($response);
+        }
+
+        if ($exception instanceof RedirectException) {
+            $event->setResponse($exception->getResponse());
         }
     }
 }

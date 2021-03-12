@@ -32,6 +32,8 @@
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
+{% set showAirdropModal = showAirdropModal ? 'true' : 'false' %}
+
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -125,6 +127,7 @@
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
                     youtube-client-id="{{ global_youtube_client_id }}"
                     current-locale="{{ currentLocale }}"
+                    :show-airdrop-modal="{{ showAirdropModal }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
@@ -155,6 +158,7 @@
                                 @delete-post="deletePost"
                                 @go-to-trade="goToTrade"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                @go-to-post="goToPost"
                             >
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
@@ -188,7 +192,6 @@
                                 {% if tradeInfo %}
                                 :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
                                 {% endif %}
-                                :token-name="{{ market.quote.symbol | json_encode }}">
                                 :token-name="{{ market.quote.symbol | json_encode }}"
                                 websocket-url="{{ global_websocket_url }}"
                             >
@@ -239,6 +242,7 @@
                                     @delete-post="deletePost"
                                     @go-to-trade="goToTrade"
                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                    @go-to-post="goToPost"
                                 />
                             </div>
                         </div>
@@ -271,6 +275,39 @@
                             {% endif %}
                         >
                         </trade>
+                    </b-tab>
+                {% endif %}
+                {% if isTokenPage %}
+                    <b-tab
+                        title="Post"
+                        title-item-class="d-none"
+                        {% if tab == 'post' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-10 col-lg-8">
+                                <div class="card h-100 single-post-page">
+                                    <div class="card-body posts">
+                                        <post
+                                            :post="singlePost || (singlePost = {{ post | json_encode }})"
+                                            :show-edit="{{ isOwner }}"
+                                            :logged-in="{{ loggedIn }}"
+                                            @delete-post="deleteSinglePost"
+                                            @go-to-trade="goToTrade"
+                                            single-page
+                                        ></post>
+                                        <comments
+                                            :comments="comments || (comments = {{ comments | json_encode }})"
+                                            :post-id="singlePost ? singlePost.id : {{ post ? post.id : 0 }}"
+                                            :token-name="singlePost ? singlePost.token.name : '{{ post ? post.token.name : '' }}'"
+                                            :logged-in="{{ loggedIn }}"
+                                            @delete-comment="deleteComment"
+                                            @new-comment="newComment"
+                                            @cancel="goToPosts"
+                                        ></comments>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">

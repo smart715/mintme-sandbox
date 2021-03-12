@@ -37,15 +37,15 @@ form.avatar.file.label: 'Imagen:'
 form.avatar.file.valid_img: 'Por favor, suba una imagen válida'
 form.nickname.label: 'Apodo (Alias):'
 form.nickname.constraint: 'Este apodo (alias) no está permitido'
-form.change_password.current_password: null
+form.change_password.current_password: 'Contraseña actual:'
 form.change_password.plain_password: 'Nueva contraseña:'
 form.token.name: 'Nombre del token:'
 form.token.name.invalid: 'Nombre de token inválido.'
 form.token.description: 'Description:'
 form.token.initial_order: 'Coloque órdenes de venta iniciales '
 form.token.initial_order.guide: 'El 15% de sus tokens serán colocados en venta a precios que van desde 0.1 a 10 MINTME. Sí usted desmarca esta casilla, por favor asegúrese de que se agreguen órdenes de venta manualmente en la sección de Trade de su token.'
-form.token.characters_used: ''
-form.token.min: ''
+form.token.characters_used: 'Caracteres usados:'
+form.token.min: min.
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar
@@ -57,7 +57,7 @@ page.settings.api.header: API
 page.settings.api.body_1: 'Consulte la'
 page.settings.api.body_2: documentación
 page.settings.api.body_3: 'para mayor información'
-page.settings.oauth.header: null
+page.settings.oauth.header: 'Clientes para el acceso OAuth a la API'
 page.settings.oauth.body_1: 'Consulte la'
 page.settings.oauth.body_2: documentación
 page.settings.oauth.body_3: 'para mayor información'
@@ -105,14 +105,14 @@ page.news.read_more: 'Leer más'
 page.news.current: 'Leer más'
 page.index.promo.btn.register: 'Regístrese ahora'
 page.index.title: 'mintMe, financiación colectiva | cree su token para monetizarse!'
-page.index.promo.main_1: 'Cree su moneda<br/> Monetízate <br />'
-page.index.promo.main_2:
-page.index.promo.main_3:
-page.index.promo.main.word_1:
-page.index.promo.main.word_2:
-page.index.promo.main.word_3:
-page.index.promo.main.word_4:
-page.index.promo.description: 'MintMe es una plataforma de financiación colectiva<br/> donde los patrocinadores también se benefician<br/> del éxito de sus influencers favoritos.'
+page.index.promo.main_1: 'Cree una moneda'
+page.index.promo.main_2: para
+page.index.promo.main_3: su
+page.index.promo.main.word_1: idea
+page.index.promo.main.word_2: comunidad
+page.index.promo.main.word_3: proyecto
+page.index.promo.main.word_4: ' sostenibilidad'
+page.index.promo.description: 'o consiga ganancias en el comercio y el apoyo a otros tokens'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
 page.index.block_1.body: 'Cualquiera puede emitir o crear un token (moneda) que lo represente a sí mismo o a un proyecto que haya creado para que la comunidad de fans y sus seguidores lo apoyen.<br /> Lo cual contribuye a que los creadores de contenidos consigan su máximo potencial a través de una nueva e innovadora forma de financiación colectiva.<br /> También es una plataforma social donde los traders pueden interactuar con los creadores de tokens y otros traders.<br /> Los tokens son creados (acuñados) sobre nuestra blockchain descentralizada y personalizada llamada <a href="https://www.mintme.com/coin/">MintMe Coin</a>.<br /> Cuando crea una moneda o token, te haces dueño de tu propio futuro financiero. Cree un token, cree una moneda para su proyecto, para usted mismo o simplemente comercie con las monedas de otras personas.'
@@ -238,7 +238,7 @@ page.profile.form.token: 'Token:'
 page.profile.form.country_placeholder: 'Seleccione su país'
 page.profile.form.description: 'Descripción:'
 page.profile.form.trade_anonymously: 'Ocultar mi información personal'
-page.profile.form.phone_number: null
+page.profile.form.phone_number: 'Número de teléfono:'
 page.profile.error.nickname.min: 'Mínimo 2 caracteres'
 page.profile.error.nickname.letters_numbers: 'El apodo solo puede contener letras latinas y números'
 page.profile.error.fn.required: 'Debe suministrar su nombre si suministró su apellido'
@@ -402,7 +402,7 @@ page.terms.content.15.2: '15.2. Pago de Comisiones. Usted nos autoriza a Nosotro
 page.terms.content.16: '16. CONTENIDO DE TERCEROS'
 page.terms.content.16.1: 'Mientras se encuentre usando nuestra Plataforma Tecnológica usted puede visualizar Contenido de Terceros. Nosotros no controlamos, respaldamos o adoptamos (aunque sin embargo expresamente instaurado por Nosotros) cualquier Contenido de Terceros y no tendremos responsabilidad por el Contenido de Terceros, incluyendo sin limitación esencial que pueda ser desviada, incompleta, errónea, ofensiva, indecente o en caso tal cuestionable. Además, su relación de negocio o correspondencia con terceras partes son exclusivamente entre usted y terceros. Nosotros no somos responsables o sujetos por cualquier pérdida o daño de cualquier índole como resultado de tales relaciones, y usted entiende que su uso del Contenido de Terceros, y sus interacciones con terceros, están bajo su propio riesgo.'
 page.token_creation.title: 'Creación del token'
-page.token_creation.form_header: null
+page.token_creation.form_header: 'Cree su propio token'
 page.token_creation.error.taken: 'Ya existe un token con ese nombre'
 page.token_creation.error.forbidden: 'Nombre de token prohibido.'
 page.token_creation.error.contain: 'El nombre del token sólo puede contener letras, números y espacios'
@@ -412,22 +412,19 @@ page.token_creation.error.max: 'El nombre del token no puede tener más de 60 ca
 page.token_creation.error.blocked: 'El nombre del token no puede contener palabras como "token" o "coin".'
 page.token_creation.create: 'Crear un token'
 page.trading.title: Mercados
-page.unsubscribe.title: null
+page.unsubscribe.title: 'Anular la suscripción'
 page.unsubscribe.header: 'Cancelar la suscripción'
 page.unsubscribe.already: '%mail% ya se ha dado de baja.'
 page.unsubscribe.question: '¿Quiere dar de baja a %mail% de nuestra lista de correo?'
-page.unsubscribe.success: null
+page.unsubscribe.success: '%mail% se ha dado de baja con éxito'
 page.wallet.title: Billetera
-page.wallet.account: 'Su cuenta'
 page.wallet.trading_history: 'Historial de Trading'
 page.wallet.dep_with: 'Historial de Depósitos/Retiros'
 page.wallet.active_orders: 'Órdenes Activas'
 page.wallet.balance.spinner: Saldo
 page.wallet.tokens_own.spinner: 'Tokens que posee'
-page.wallet.token: 'Su Token'
-page.wallet.blocked: 'fue bloqueado.<br> Retirar o depositar'
-page.wallet.for: 'para el token'
-page.wallet.unavailable: 'no está disponible'
+page.wallet.blocked.account: 'La cuenta fue bloqueada.<br> No es posible retirar o depositar'
+page.wallet.blocked.token: 'El token fue bloqueado.<br> No está disponible los retiros o depósitos para el token'
 post.tab.bbcode.ul: '[ul]<br> [li]Uno[/li]<br> [li]Dos[/li]<br>[/ul]'
 post.tab.bbcode.ol: '[ol]<br> [li]Uno[/li]<br> [li]Dos[/li]<br>[/ol]'
 post.tab.content: 'El contenido no puede estar vacío o contener sólo bbcodes y espacios en blanco'
@@ -470,7 +467,7 @@ mail.new_investor_bought_token.msg: 'compró su token.'
 mail.new_investor_check_hostory: 'Chequee el Historial de Comercio'
 mail.new_device.login.msg: 'Nuestro sistema ha detectado un nuevo intento de acceso'
 mail.new_device.new_ip.msg: 'desde una nueva dirección IP o dispositivo'
-new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%/posts">aquí</a>'
+new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%">aquí.</a>'
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
 deployed.msg: '¡%tokenName% ha sido desplegado a la blockchain! Visítelo <a href="%urlToken%">aquí</a>.'
@@ -512,7 +509,7 @@ nickname_field.body: 'Nombre utilizado en nuestro servicio, visible para todos.'
 2fa.notification.enabled: '¡Felicidades! Usted ha habilitado la autenticación 2Fa'
 2fa.notification.disabled: 'Usted ha deshabilitado la autenticación 2Fa'
 2fa.notification.download_backup_code: 'Descargando el archivo de códigos...'
-2fa.invalid: null
+2fa.invalid: 'Código de autenticación de dos factores inválido.'
 error.csrf: 'Token CSRF inválido.'
 email.withdraw.confirm: '¡Confirme su retiro!'
 email.withdraw.body: 'Puede confirmar su retiro haciendo click en el siguiente enlace:'
@@ -615,9 +612,9 @@ info_bar.status.withdraw: 'Status of withdraw consumer'
 info_bar.status.market: 'Status of market consumer'
 info_bar.status.deploy: 'Status of deploy token consumer'
 info_bar.status.token_contract_update: 'Status of token-contract-update consumer'
-info_bar.backend_service.create: ''
-info_bar.backend_service.delete: ''
-info_bar.backend_service.in_progress: ''
+info_bar.backend_service.create: 'Create backend service'
+info_bar.backend_service.delete: 'Delete backend service'
+info_bar.backend_service.in_progress: 'in progress...'
 limited_textarea.tooltip: 'Este campo no puede exceder más de %max% caracteres'
 passwordmeter.strength_1: 'Este valor es demasiado corto. Debería tener 8 caracteres o más.'
 passwordmeter.strength_2: 'La contraseña debe contener al menos una letra mayúscula, una minúscula y un número.'
@@ -670,7 +667,7 @@ donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
 confirm_modal.cancel: Cancelar
-confirm_modal.accept_delete: null
+confirm_modal.accept_delete: 'Sí, elimínalo'
 deposit_modal.title: DEPOSITAR
 deposit_modal.min_value: 'Cantidad mínima:'
 deposit_modal.fee: 'Comisión:'
@@ -741,10 +738,11 @@ post_form.msg.title.max_length: 'El título no puede ser mayor a %maxTitleLength
 post_form.backend.no_token: 'El usuario actual no ha creado un token'
 posts.all: 'Todas las publicaciones'
 comment.created: 'Comentario creado.'
-comment.confirm_delete: null
+comment.confirm_delete: '¿Estás seguro de que quieres eliminar permanentemente este comentario?'
 comment.deleted: 'Comentario borrado.'
 comment.edited: 'Comentario editado.'
 comment.liked: 'Comentario que gustó.'
+comment.load_error:
 like.removed: 'Me gusta eliminado '
 airdrop.end: 'Finalizar este airdrop'
 airdrop.amount_tokens: 'Cantidad de tokens para el airdrop:'
@@ -878,7 +876,7 @@ token.intro.statistics.holders.guide_header:
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
 token.intro.created_modal.paragraph_2.part_1: 'Los usuarios que compren tokens a través de este enlace'
-token.intro.created_modal.paragraph_2.part_2: 'comprarlo sólo a usted, en contra de la opción de trade. Recuerda que la comercialización de su token depende de usted, así que empiece a compartir el enlace de su token ahora y buena suerte!'
+token.intro.created_modal.paragraph_2.part_2: ''
 token.intro.created_modal.paragraph_3: 'Además, consulte nuestros artículos con consejos de marketing:'
 token.intro.created_modal.list_1.item_1: 'Es hora de la venta de tokens, ¿cómo puedo hacer la diferencia?'
 token.intro.created_modal.list_1.item_2: '¿Apuntando a un token fuerte?'
@@ -1087,6 +1085,7 @@ trading.no_one_airdrop: 'Aún no hay ningún airdrop activo'
 trading.no_any_token: 'No hay tokens aún'
 trading.show_all_tokens: 'Mostrar todos los tokens'
 trading.deployed.label: 'Desplegados en MINTME'
+trading.deployed_eth.label: ''
 trading.airdrop.label: 'Airdrops activos'
 trading.all_tokens.label: 'Todos los tokens'
 trading.own_tokens.label: 'Mis tokens'
@@ -1203,7 +1202,7 @@ toasted.success.telegram.added: 'El enlace de invitación de Telegram fue regist
 toasted.success.telegram.deleted: 'El enlace de invitación de Telegram fue eliminado exitosamente'
 toasted.success.release_period_updated: 'Se ha actualizado el período de liberación.'
 toasted.success.password_updated: 'Su password fue actualizado exitosamente.'
-toasted.success.deploy_pending: null
+toasted.success.deploy_pending: 'El proceso se encuentra en estado pendiente y tardará unos minutos en realizarse.'
 api.user.no_keys_attached: 'No hay llaves enlazadas a esta cuenta'
 api.user.no_clients_attached: 'No hay clientes enlazados a esta cuenta'
 api.user.key_already_created: 'La llaves fueron creadas'
@@ -1267,7 +1266,7 @@ token.creation.disabled: 'Creación de Tokens desactivada. Inténtalo de nuevo m
 trade.page.disabled: 'La página de trader ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.page.disabled: 'La página de compra ha sido desactivada. Inténtalo de nuevo más tarde.'
 donate.disabled: 'Las compras directas están deshabilitadas'
-text.time.year:
+text.time.year: año(s)
 twitter.sign_in: 'Loguearse con Twitter'
 twitter.must_sign_in: 'Usted debe estar logueado con twitter para completar esta acción'
 mail.verification_code: 'Su código de verificación:'
@@ -1276,39 +1275,54 @@ mail.verification_code: 'Su código de verificación:'
 404.profile: 'PERFIL NO EXISTE'
 404.token: 'TOKEN NO ENCONTRADO'
 404.pair: 'PAR NO ENCONTRADO'
-mail.mintme_host.1: ''
-mail.mintme_host.2: ''
-mail.mintme_host.3: ''
-mail.mintme_host.4: ''
-mail.mintme_host.btn_text: ''
-mail.mintme_host.btn_mintmeHost: ''
-mail.mintme_host_subject: ''
-phone.add_number.notification:
-phone.country_selector.label:
-phone.country_selector.error:
-phone.phone_number.label:
-phone.example:
-phone.guide.header:
-phone.guide.body:
-phone_confirmation.title:
-phone_confirmation.header:
-phone_confirmation.form.verification_code:
-phone_confirmation.form.submit:
-phone_confirmation.send_code:
-phone_confirmation.invalid_code:
-phone_confirmation.your_verification_code:
-phone_number.wrong:
-phone_number.add.limit_daily:
-phone_number.add.limit_weekly:
-phone_number.add.limit_monthly:
-phone_number.in_use:
-activity_0_message:
-activity_1_message:
-activity_2_message:
-activity_3_message:
-activity_4_message:
-activity_5_message:
-activity_6_message:
-activity_7_message:
-activity_8_message:
-activity_9_message:
+mail.mintme_host.1: 'Puede utilizar un <strong>hosting web dedicado</strong> para sus proyectos en mintme en:'
+mail.mintme_host.2: 'Que está hecho por el <strong>equipo de mintMe</strong>, puede probarlo completamente gratis durante %freeDays% días y el precio del primer año del hosting web con tráfico ilimitado para tu proyecto es de sólo <strong>%price%</strong>.'
+mail.mintme_host.3: 'Incluso puede pagar con <strong>MintMe coins</strong> por ello, aunque también admitimos <strong>Paypal</strong> y otros métodos de pago, Todo el dinero irá directamente al'
+mail.mintme_host.4: desarrollo.
+mail.mintme_host.btn_text: 'Compruébelo ahora en'
+mail.mintme_host.btn_mintmeHost: MINTME.host
+mail.mintme_host_subject: 'Ya está disponible el nuevo hosting de MintMe'
+phone.add_number.notification: 'Con el fin de utilizar plenamente su cuenta, debe añadir un número de teléfono en su <a href="%url%">perfil</a>. El número no será visible para los demás.'
+phone.country_selector.label: 'Código del país'
+phone.country_selector.error: 'Elija el país'
+phone.phone_number.label: 'Número de teléfono'
+phone.example: 'Ejemplo:'
+phone.guide.header: 'Número de teléfono'
+phone.guide.body: 'Con el fin de tener acceso a todas las funciones en mintme, debe añadir un número de teléfono. No se mostrará en tu perfil.'
+phone_confirmation.title: 'Confirme su número de teléfono'
+phone_confirmation.header: 'Confirme su número de teléfono'
+phone_confirmation.form.verification_code: 'Código de verificación:'
+phone_confirmation.form.submit: 'Verificar el código'
+phone_confirmation.send_code: 'Enviar código'
+phone_confirmation.invalid_code: 'Código incorrecto, por favor intente de nuevo o solicite otro SMS'
+phone_confirmation.your_verification_code: 'Su código de verificación de MintMe es: %code%'
+phone_number.wrong: 'Número incorrecto'
+phone_number.add.limit_daily: 'Ha alcanzado el límite diario previsto, por favor, intente añadir el número de teléfono mañana'
+phone_number.add.limit_weekly: 'Ha alcanzado el límite semanal previsto, por favor, intente añadir el número de teléfono la próxima semana'
+phone_number.add.limit_monthly: 'Ha alcanzado el límite mensual previsto, por favor, intente añadir el número de teléfono el próximo mes'
+phone_number.in_use: 'Este número de teléfono ya está en uso'
+activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% tokens lanzado(s) a <a href="%userUrl%">%user%</a>'
+activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
+activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'
+activity_3_message: '<a href="%tokenUrl%">%token%</a> recibió una donación por valor de $%amount%'
+activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación'
+activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
+activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
+activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de $%amount%'
+activity_8_message: '<a href="%tokenUrl%">%token%</a> fue vendido por <a href="%sellerUrl%">%seller%</a> a <a href="%buyerUrl%">%buyer%</a> por un valor de $%amount%'
+activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de $%amount%'
+phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
+phone_confirmation.sent: Enviado
+airdrop_backend.invalid_actions: 'Acciones inválidas'
+api.airdrop.forbidden_domain:
+api.no_enough_amount: 'Monto insuficiente'
+api.not_found: 'No se encuentra'
+api.tokens.deleted: 'Token %tokeName% fue eliminado exitosamente.'
+donation.successfully_made: '¡Felicitaciones! La compra se ha realizado con éxito. Ha recibido %amount% tokens'
+donation.tokens_availability_changed: 'La disponibilidad de las fichas ha cambiado. Por favor, ajuste el importe de la compra.'
+knowledge_base.header.3: 'Para obtener mejores resultados, es necesario educar constantemente a las personas cuando las traigas, así que no se olvide de esto. Los tokens se pueden desplegar. Al hacerlo, obtiene nuevas características y beneficios para su token:'
+mail.deposit_complete.msg: 'Su depósito se ha completado'
+mail.withdrawal.msg: 'Su retiro ha sido completado'
+mail.withdrawal.text_link: 'Comprobar el historial de depósitos/retiros'
+ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar estas tareas %tasksAmount%:'
+phone_number.edit.limit: 'Sólo se puede editar el número de teléfono una vez al mes'

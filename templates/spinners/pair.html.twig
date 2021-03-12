@@ -288,6 +288,9 @@
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'posts' %}active{% endif %}">
                     {{ include('spinners/posts_tab.html.twig') }}
                 </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'post' %}active{% endif %}">
+                    {{ include('spinners/single_post_tab.html.twig') }}
+                </div>
             </div>
         </div>
     </div>

@@ -277,10 +277,6 @@ import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
-const DEPLOYED_FIRST = 1;
-const DEPLOYED_ONLY = 2;
-const AIRDROP_ONLY = 3;
-
 export default {
     name: 'Trading',
     mixins: [
@@ -299,6 +295,7 @@ export default {
         minimumVolumeForMarketcap: Number,
         sort: String,
         order: Boolean,
+        filterForTokens: Object,
     },
     components: {
         Guide,
@@ -339,6 +336,10 @@ export default {
                     deployed: {
                         key: 'deployed',
                         label: this.$t('trading.deployed.label'),
+                    },
+                    deployedEth: {
+                        key: 'deployedEth',
+                        label: this.$t('trading.deployed_eth.label'),
                     },
                     airdrop: {
                         key: 'airdrop',
@@ -464,10 +465,23 @@ export default {
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
         },
+        filterDeployedFirst: function() {
+            return this.filterForTokens.deployed_first || 0;
+        },
+        filterDeployedOnlyMintme: function() {
+            return this.filterForTokens.deployed_only_mintme || 0;
+        },
+        filterAirdropOnly: function() {
+            return this.filterForTokens.airdrop_only || 0;
+        },
+        filterDeployedOnlyEth: function() {
+            return this.filterForTokens.deployed_only_eth || 0;
+        },
         shouldShowAll: function() {
             const totalPages = Math.ceil(this.totalRows / this.perPage);
 
-            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+            return (this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    || this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key)
                 && this.tokens.length
                 && this.currentPage === totalPages;
         },
@@ -483,6 +497,7 @@ export default {
             let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
                 && (
                     value === this.marketFilters.options.deployed.key
+                    || value === this.marketFilters.options.deployedEth.key
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
@@ -559,13 +574,17 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.filter = DEPLOYED_ONLY;
+                    params.filter = this.filterDeployedOnlyMintme;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
+                ) {
+                    params.filter = this.filterDeployedOnlyEth;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {
-                    params.filter = AIRDROP_ONLY;
+                    params.filter = this.filterAirdropOnly;
                 } else if (deployedFirst) {
-                    params.filter = DEPLOYED_FIRST;
+                    params.filter = this.filterDeployedFirst;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
