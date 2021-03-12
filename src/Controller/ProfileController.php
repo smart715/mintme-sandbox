@@ -83,7 +83,7 @@ class ProfileController extends Controller
                 'authenticate',
                 [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
             );
-            $this->tokenStorage->setToken('authenticate', $newToken->getProviderKey());
+            $this->tokenStorage->setToken('authenticate', $newToken);
 
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
