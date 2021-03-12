@@ -229,6 +229,8 @@ parameters:
     orders_filled_intervals: [10 minutes, 1 day, 30 day]
     orders_cancelled_intervals: [1 day, 30 day]
     token_marketing_tips_intervals: [2 day, 4 day, 7 day, 10 day, 15 day, 21 day]
+    marketing_airdrop_feature_intervals: [7 day]
+
 
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
