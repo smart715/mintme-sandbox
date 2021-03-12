@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Image;
 use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
+use App\Manager\MarketStatusManager;
 use App\Repository\TokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,6 +49,7 @@ class TradingController extends Controller
             'page' => $page,
             'sort' => $request->query->get('sort'),
             'order' => 'ASC' !== $request->query->get('order'),
+            'filterForTokens'=> MarketStatusManager::FILTER_FOR_TOKENS,
         ]);
     }
 
