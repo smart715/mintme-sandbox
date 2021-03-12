@@ -190,7 +190,7 @@ class TokenController extends Controller
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
-        $token = $this->fetchToken($request, $name);
+        $token = $this->fetchToken($request, $name, $modal);
 
         return $this->renderPairPage($token, $request, $tab, $modal);
     }
@@ -409,12 +409,12 @@ class TokenController extends Controller
         return count($this->tokenManager->getOwnTokens()) > 0;
     }
 
-    private function fetchToken(Request $request, string $name): Token
+    private function fetchToken(Request $request, string $name, ?string $modal = null): Token
     {
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
-            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName]));
+            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName, 'modal' => $modal]));
         }
 
         //rebranding
