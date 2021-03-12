@@ -259,6 +259,8 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.actions_not_completed'));
         }
 
+        $this->denyAccessUnlessGranted('claim', $airdrop);
+
         $this->airdropCampaignManager->claimAirdropCampaign(
             $user,
             $token
