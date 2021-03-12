@@ -457,6 +457,37 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
+    public function sendAirdropFeatureMail(Token $token): void
+    {
+        $modalUrl = $this->urlGenerator->generate(
+            'token_show',
+            [
+                'name' => $token->getName(),
+                'modal' => 'settings',
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render('mail/airdrop_feature.html.twig', [
+            'nickname' => $token->getProfile()->getNickname(),
+            'modalUrl' => $modalUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/airdrop_feature.txt.twig', [
+            'nickname' => $token->getProfile()->getNickname(),
+            'modalUrl' => $modalUrl,
+        ]);
+
+        $subject = $this->translator->trans('mail.airdrop_feature.subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($token->getProfile()->getUser()->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
     public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void
     {
         $body = $this->twigEngine->render("mail/mintme_host.html.twig", [
