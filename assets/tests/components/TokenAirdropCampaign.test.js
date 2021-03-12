@@ -65,7 +65,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -99,7 +99,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -129,13 +129,17 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.btnDisabled).toBe(true);
         wrapper.vm.participantsAmount = 99;
         expect(wrapper.vm.btnDisabled).toBe(true);
-        wrapper.vm.participantsAmount = 101;
+        wrapper.vm.participantsAmount = 100;
         expect(wrapper.vm.btnDisabled).toBe(false);
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.tokenBalance = 0;
         expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.vm.insufficientBalance).toBe(true);
         wrapper.vm.tokenBalance = 0.01;
+        wrapper.vm.tokensAmount = 0.01;
+        expect(wrapper.vm.btnDisabled).toBe(true);
+        expect(wrapper.vm.insufficientBalance).toBe(true);
+        wrapper.vm.tokenBalance = 0.0101;
         wrapper.vm.tokensAmount = 0.01;
         expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.vm.insufficientBalance).toBe(false);
@@ -147,7 +151,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -173,9 +177,6 @@ describe('TokenAirdropCampaign', () => {
         wrapper.vm.tokensAmount = '0.0009';
         expect(wrapper.vm.isAmountValid).toBe(false);
         wrapper.vm.tokensAmount = 100;
-        expect(wrapper.vm.isAmountValid).toBe(false);
-        wrapper.vm.tokenBalance = 101;
-        wrapper.vm.tokensAmount = 101;
         expect(wrapper.vm.isAmountValid).toBe(true);
     });
 
@@ -185,7 +186,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -224,7 +225,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -267,7 +268,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -310,7 +311,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -351,7 +352,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -375,7 +376,9 @@ describe('TokenAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                id: 4,
+                airdrop: {
+                    id: 4,
+                },
             },
         });
 
@@ -396,7 +399,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -447,7 +450,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test5',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -486,6 +489,9 @@ describe('TokenAirdropCampaign', () => {
         const wrapper = shallowMount(TokenAirdropCampaign, {
             store: getStore(),
             localVue,
+            propsData: {
+                airdropParams,
+            },
             data() {
                 return {
                     airdropCampaignId: 3,
@@ -526,7 +532,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {

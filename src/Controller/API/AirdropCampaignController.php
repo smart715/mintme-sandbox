@@ -16,6 +16,7 @@ use App\Exception\InvalidTwitterTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\AirdropConfig;
 use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\AirdropReferralCodeManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\TwitterManagerInterface;
@@ -52,6 +53,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     private BlacklistManagerInterface $blacklistManager;
     private LockFactory $lockFactory;
     private EventDispatcherInterface $eventDispatcher;
+    private AirdropReferralCodeManager $arcManager;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -61,7 +63,8 @@ class AirdropCampaignController extends AbstractFOSRestController
         TwitterManagerInterface $twitterManager,
         BlacklistManagerInterface $blacklistManager,
         LockFactory $lockFactory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        AirdropReferralCodeManager $arcManager
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
@@ -71,6 +74,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->blacklistManager = $blacklistManager;
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
+        $this->arcManager = $arcManager;
     }
 
     /**
@@ -96,7 +100,20 @@ class AirdropCampaignController extends AbstractFOSRestController
     {
         $token = $this->fetchToken($tokenName);
 
-        return $this->view($token->getActiveAirdrop(), Response::HTTP_OK);
+        $airdrop = $token->getActiveAirdrop();
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        $referralCode = null;
+
+        if ($user && $airdrop && $airdrop->getToken()->getOwner()->getId() !== $user->getId()) {
+            $referralCode = $this->arcManager->getByAirdropAndUser($airdrop, $user)
+                ?? $this->arcManager->create($airdrop, $user);
+            $referralCode = $this->arcManager->encode($referralCode);
+        }
+
+        return $this->view(['airdrop' => $airdrop, "referral_code" => $referralCode], Response::HTTP_OK);
     }
 
     /**
@@ -345,7 +362,7 @@ class AirdropCampaignController extends AbstractFOSRestController
      */
     public function shareOnTwitter(string $tokenName): View
     {
-        $this->fetchToken($tokenName, false, true);
+        $token = $this->fetchToken($tokenName, false, true);
 
         $user = $this->getUser();
 
@@ -353,7 +370,12 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiUnauthorizedException();
         }
 
-        $url = $this->generateUrl('token_show', ['name' => $tokenName], UrlGeneratorInterface::ABSOLUTE_URL);
+        $airdrop = $token->getActiveAirdrop();
+
+        $arc = $this->arcManager->getByAirdropAndUser($airdrop, $user) ?? $this->arcManager->create($airdrop, $user);
+        $hash = $this->arcManager->encode($arc);
+
+        $url = $this->generateUrl('airdrop_referral', ['name' => $tokenName, 'hash' => $hash], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $message = $this->translator->trans('ongoing_airdrop.actions.message', [
             '%tokenName%' => $tokenName,
