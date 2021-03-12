@@ -81,9 +81,9 @@ class ProfileController extends Controller
             $newToken = new PostAuthenticationGuardToken(
                 $user,
                 'authenticate',
-                $user->getRoles()
+                [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
             );
-            $this->tokenStorage->setToken('authenticate', $newToken);
+            $this->tokenStorage->setToken('authenticate', $newToken->getProviderKey());
 
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
