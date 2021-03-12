@@ -12,7 +12,6 @@ form.new_password: 'Contraseña nueva:'
 form.new_password_confirmation: 'Repita la contraseña nueva:'
 form.login.submit: 'Iniciar sesión'
 form.signup.submit: Regístrese
-registration.submit: Regístrese
 registration.back: Regresar
 registration.email.subject: '¡Bienvenido %username%!'
 resetting.email.subject: 'Restablecer contraseña'
