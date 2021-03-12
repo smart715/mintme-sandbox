@@ -211,6 +211,7 @@ services:
             $filled_intervals: '%orders_filled_intervals%'
             $cancelled_intervals: '%orders_cancelled_intervals%'
             $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -682,6 +683,7 @@ services:
             filled_intervals: '%orders_filled_intervals%'
             cancelled_intervals: '%orders_cancelled_intervals%'
             token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Controller\API\WalletController:
         arguments:
