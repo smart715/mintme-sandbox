@@ -78,11 +78,10 @@ class Airdrop
     private $actualAmount = '0';
 
     /**
-     * @ORM\Column(name="actual_participants", type="integer", nullable=true)
+     * @ORM\Column(name="actual_participants", type="float", nullable=true)
      * @Groups({"API"})
-     * @var int
      */
-    private $actualParticipants = 0;
+    private float $actualParticipants = 0; // phpcs:ignore
 
     /**
      * @ORM\OneToMany(
@@ -201,21 +200,23 @@ class Airdrop
         return $this;
     }
 
-    public function getActualParticipants(): int
+    public function getActualParticipants(): float
     {
         return $this->actualParticipants;
     }
 
-    public function setActualParticipants(int $actualParticipants): self
+    public function setActualParticipants(float $actualParticipants): self
     {
         $this->actualParticipants = $actualParticipants;
 
         return $this;
     }
 
-    public function incrementActualParticipants(): int
+    public function incrementActualParticipants(bool $referrer = false): float
     {
-        return $this->actualParticipants += 1;
+        return $this->actualParticipants += $referrer
+            ? 0.5
+            : 1;
     }
 
     public function getClaimedParticipants(): Collection
@@ -254,8 +255,9 @@ class Airdrop
         return $this;
     }
 
+    /** @Groups({"API"}) */
     public function getReward(): Money
     {
-        return $this->getLockedAmount()->divide($this->getParticipants());
+        return $this->getAmount()->divide($this->getParticipants());
     }
 }
