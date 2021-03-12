@@ -33,6 +33,9 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->mockEntityManager();
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->exactly(2))->method('flush');
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
         /** @var User|MockObject */
         $user = $this->createMock(User::class);
         /** @var Profile|MockObject */
@@ -86,6 +89,9 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->mockEntityManager();
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
         /** @var BalanceHandlerInterface|MockObject */
         $bh = $this->createMock(BalanceHandlerInterface::class);
         /** @var Token|MockObject */
@@ -110,6 +116,9 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->mockEntityManager();
         $em->expects($this->once())->method('persist');
         $em->expects($this->once())->method('flush');
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
         /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
         $airdrop = new Airdrop();
@@ -142,10 +151,14 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var EntityManagerInterface|MockObject $repository */
         $em = $this->createMock(EntityManagerInterface::class);
         $em
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('getRepository')
             ->with(AirdropParticipant::class)
             ->willReturn($repository);
+
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
 
         /** @var Token|MockObject */
         $token = $this->createMock(Token::class);
@@ -172,6 +185,9 @@ class AirdropCampaignManagerTest extends TestCase
         $em = $this->mockEntityManager();
         $em->expects($this->exactly(2))->method('persist');
         $em->expects($this->once())->method('flush');
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())->method('update');
@@ -211,7 +227,15 @@ class AirdropCampaignManagerTest extends TestCase
 
     public function testGetAirdropReward(): void
     {
-        $em = $this->mockEntityManager();
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->at(0))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropParticipantRepository::class));
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
+
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
@@ -254,12 +278,15 @@ class AirdropCampaignManagerTest extends TestCase
             ->expects($this->once())
             ->method('getOutdatedAirdrops')
             ->willReturn($airdrops);
+
+        /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
         $em
             ->expects($this->at(1))
             ->method('getRepository')
             ->with(Airdrop::class)
             ->willReturn($repository);
+
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
@@ -276,7 +303,14 @@ class AirdropCampaignManagerTest extends TestCase
     {
         $airdrop = $this->createMock(Airdrop::class);
 
-        $em = $this->mockEntityManager();
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->at(0))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropParticipantRepository::class));
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
 
         $em->expects($this->exactly(8))
             ->method('persist')
@@ -310,6 +344,9 @@ class AirdropCampaignManagerTest extends TestCase
         /** @var EntityManagerInterface|MockObject $em */
         $em = $this->mockEntityManager();
         $em->expects($this->once())->method('persist')->with($action);
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
 
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
@@ -332,7 +369,15 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop = $this->createMock(Airdrop::class);
         $airdrop->method('getActions')->willReturn($actionsCollection);
 
-        $em = $this->mockEntityManager();
+        /** @var EntityManagerInterface|MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->at(0))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropParticipantRepository::class));
+        $em->expects($this->at(1))
+            ->method('getRepository')
+            ->willReturn($this->createMock(AirdropRepository::class));
+
         /** @var BalanceHandlerInterface|MockObject $bh */
         $bh = $this->createMock(BalanceHandlerInterface::class);
 
