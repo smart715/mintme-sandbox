@@ -141,9 +141,14 @@ class ProfileController extends AbstractFOSRestController
         );
 
         try {
-            $d7NetworksCommunicator->send($sms);
-            $this->userActionLogger->info('Phone number verification code requested.');
+            $response = $d7NetworksCommunicator->send($sms);
+            $this->userActionLogger->info(
+                'Phone number verification code requested.',
+                ['to' => $sms->getTo(), $response]
+            );
         } catch (\Throwable $e) {
+            $this->userActionLogger->info('Error during send phone number code verificaion'. json_encode($e));
+
             throw new \Exception($this->translator->trans('api.something_went_wrong'));
         }
 
