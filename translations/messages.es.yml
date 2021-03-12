@@ -1278,6 +1278,10 @@ mail.mintme_host.3: 'Incluso puede pagar con <strong>MintMe coins</strong> por e
 mail.mintme_host.btn_text: 'Compruébelo ahora en'
 mail.mintme_host.btn_mintmeHost: MINTME.host
 mail.mintme_host_subject: 'Ya está disponible el nuevo hosting de MintMe'
+mail.airdrop_feature.subject: ''
+mail.airdrop_feature.body1: ''
+mail.airdrop_feature.body2.html: ''
+mail.airdrop_feature.body2.txt: ''
 phone.add_number.notification: 'Con el fin de utilizar plenamente su cuenta, debe añadir un número de teléfono en su <a href="%url%">perfil</a>. El número no será visible para los demás.'
 phone.country_selector.label: 'Código del país'
 phone.country_selector.error: 'Elija el país'

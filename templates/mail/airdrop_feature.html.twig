@@ -1,0 +1,22 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    <div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+                    <img alt="Token" src="{{ absolute_url(asset('build/images/Token.png')) }}" width="120" style="width:120px;height:auto;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
+                    <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:left;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:26px;color:#0a0a0a;">
+                        {% trans from 'messages' %} hello {% endtrans %} {{ nickname }},
+                    </p>
+                    <p style="Margin:0 0 20px 0;padding:0;text-align:left;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">
+                        {% trans %}mail.airdrop_feature.body1{% endtrans %}
+                    </p>
+                    <p style="Margin:0 0 20px 0;padding:0;text-align:left;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">
+                        {% trans with {'%modalUrl%': modalUrl } %}mail.airdrop_feature.body2.html{% endtrans %}
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
+
