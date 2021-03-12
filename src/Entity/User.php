@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
@@ -213,16 +214,31 @@ class User extends BaseUser implements
      */
     protected ?string $twitterAccessTokenSecret;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
+     */
+    protected Collection $rewardClaimedPosts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="airdropReferrals")
+     */
+    protected ?User $airdropReferrerUser;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="airdropReferrerUser", fetch="EXTRA_LAZY")
+     */
+    protected Collection $airdropReferrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop")
+     */
+    protected ?Airdrop $airdropReferrer;
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
         return $this->apiKey;
     }
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
-     */
-    protected Collection $rewardClaimedPosts;
 
     /** @codeCoverageIgnore
      * @return array
@@ -592,5 +608,29 @@ class User extends BaseUser implements
     public function isSignedInWithTwitter(): bool
     {
         return null !== $this->twitterAccessToken && null !== $this->twitterAccessTokenSecret;
+    }
+
+    public function setAirdropReferrer(Airdrop $airdrop): self
+    {
+        $this->airdropReferrer = $airdrop;
+
+        return $this;
+    }
+
+    public function getAirdropReferrer(): ?Airdrop
+    {
+        return $this->airdropReferrer;
+    }
+
+    public function setAirdropReferrerUser(User $user): self
+    {
+        $this->airdropReferrerUser = $user;
+
+        return $this;
+    }
+
+    public function getAirdropReferrerUser(): ?User
+    {
+        return $this->airdropReferrerUser;
     }
 }
