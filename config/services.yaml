@@ -492,8 +492,10 @@ services:
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
 
-    logout_listner:
+    logout_listener:
         class: App\EventListener\LogoutListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     App\EventListener\ChangePasswordListener:
         tags:
