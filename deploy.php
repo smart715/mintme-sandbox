@@ -53,8 +53,6 @@ localhost()
 
 // Tasks
 
-set('hostname', 'staging');
-
 task('node-install', function () {
     run('cd {{release_path}} && npm install -d');
 });
@@ -104,7 +102,7 @@ task('change-version', function() {
 });
 
 task('rocket-notify', function() {
-     run('/usr/local/bin/rocket-notify-mintme.sh "Mintme was updated from branch {{branch}} on {{hostname}}" "#mintme"');
+     run('/usr/local/bin/rocket-notify-mintme.sh "Mintme was updated from branch {{branch}} on `hostname`" "#mintme"');
 });
 
 task('restart-consumers', function() {

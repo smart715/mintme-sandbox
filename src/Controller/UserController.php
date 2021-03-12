@@ -124,9 +124,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ? $this->redirectToRoute('token_show', ['name' => $userToken], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
-        $response->headers->setCookie(
-            new Cookie('referral-code', $referralCode)
-        );
+        $response->headers->setCookie(new Cookie('referral-code', $referralCode));
+        $response->headers->setCookie(new Cookie('referral-type', 'invite'));
 
         return $response;
     }
