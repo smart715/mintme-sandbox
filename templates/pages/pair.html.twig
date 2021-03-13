@@ -162,9 +162,20 @@
                             >
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
+                            <top-holders
+                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                {% if tradeInfo %}
+                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
+                                {% endif %}
+                                :token-name="{{ market.quote.symbol | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
+                            </top-holders>
+                        </div>
+                        <div class="row">
                             <token-introduction-statistics
                                 :is-mintme-token="{{ isMintmeToken }}"
-                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                class="col-12 mt-3"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
                                 release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
@@ -184,17 +195,6 @@
                                 {% endif %}
                             >
                             </token-introduction-statistics>
-                        </div>
-                        <div class="row">
-                            <top-holders
-                                class="col-12 mt-3"
-                                {% if tradeInfo %}
-                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
-                                {% endif %}
-                                :token-name="{{ market.quote.symbol | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                            >
-                            </top-holders>
                         </div>
                     </b-tab>
                 {% endif %}
