@@ -4,8 +4,8 @@
             {{ $t('trade.top_holders.header') }}
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <template v-if="loaded">
+            <template v-if="loaded">
+                <div class="table-responsive">
                     <b-table v-if="hasTraders"
                         ref="table"
                         :items="holders"
@@ -20,13 +20,15 @@
                             {{ $t('trade.top_holders.no_holders') }}
                         </p>
                     </div>
-                </template>
-                <template v-else>
-                    <div class="p-5 text-center">
+                </div>
+            </template>
+            <template v-else>
+                <div class="d-flex h-100 align-items-center justify-content-center">
+                    <div>
                         <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
                     </div>
-                </template>
-            </div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -60,10 +62,6 @@ export default {
                     label: this.$t('trade.top_holders.trader'),
                 },
                 {
-                    key: 'date',
-                    label: this.$t('trade.top_holders.date'),
-                },
-                {
                     key: 'amount',
                     label: this.$t('trade.top_holders.amount'),
                     formatter: formatMoney,
@@ -84,7 +82,6 @@ export default {
                     trader: row.user.profile.nickname,
                     traderAvatar: row.user.profile.image.avatar_small,
                     url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
-                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
                     amount: Math.round(row.balance),
                 };
             });
