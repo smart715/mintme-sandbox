@@ -885,6 +885,7 @@ token.intro.profile.twitter_description: 'A great way for mutual support. Check 
 token.intro.profile.contract_address: 'Token contract address:'
 token.intro.profile.contract_address.header: 'Token contract address'
 token.intro.profile.contract_address.body: 'Unique token contract address. It exists only for tokens on the blockchain.'
+token.intro.statistics.show: 'Show stats'
 token.intro.statistics.header: 'Statistics'
 token.intro.statistics.guide_header: 'Statistics'
 token.intro.statistics.guide_body.mintme_token: 'Statistics associated with %symbol%, here you can find out how token creator manages his tokens and if he set any restrictions on token release.'
