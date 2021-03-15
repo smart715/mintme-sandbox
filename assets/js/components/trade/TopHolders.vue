@@ -5,22 +5,26 @@
         </div>
         <div class="card-body p-0">
             <template v-if="loaded">
-                <div class="table-responsive">
-                    <b-table v-if="hasTraders"
-                        ref="table"
-                        :items="holders"
-                        :fields="fields"
-                    >
-                        <template v-slot:cell(trader)="row">
-                            <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
-                        </template>
-                    </b-table>
-                    <div v-else>
-                        <p class="text-center p-5">
-                            {{ $t('trade.top_holders.no_holders') }}
-                        </p>
+                <template v-if="hasTraders">
+                    <div class="table-responsive">
+                        <b-table
+                            ref="table"
+                            :items="holders"
+                            :fields="fields"
+                        >
+                            <template v-slot:cell(trader)="row">
+                                <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                            </template>
+                        </b-table>
                     </div>
-                </div>
+                </template>
+                <template v-else>
+                    <div class="d-flex h-100 align-items-center justify-content-center">
+                        <span>
+                            {{ $t('trade.top_holders.no_holders') }}
+                        </span>
+                    </div>
+                </template>
             </template>
             <template v-else>
                 <div class="d-flex h-100 align-items-center justify-content-center">

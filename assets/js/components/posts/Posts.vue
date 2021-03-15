@@ -4,25 +4,29 @@
             <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
         <div
-            class="card-body posts overflow-hidden position-relative"
+            class="card-body posts overflow-hidden"
         >
-            <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
-                <template v-if="posts.length > 0">
-                    <post v-for="(n, i) in postsCount"
-                          :post="posts[i]"
-                          :key="i"
-                          :index="i"
-                          @delete-post="$emit('delete-post', $event)"
-                          :show-edit="showEdit"
-                          @go-to-trade="$emit('go-to-trade', $event)"
-                          :logged-in="loggedIn"
-                          @go-to-post="$emit('go-to-post', $event)"
-                    />
-                </template>
-                <div v-else :class="{ 'position-absolute top-50': tokenPage }">
-                    {{ $t('post.not_any_post') }}
+            <template v-if="posts.length > 0">
+                <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
+                        <post v-for="(n, i) in postsCount"
+                              :post="posts[i]"
+                              :key="i"
+                              :index="i"
+                              @delete-post="$emit('delete-post', $event)"
+                              :show-edit="showEdit"
+                              @go-to-trade="$emit('go-to-trade', $event)"
+                              :logged-in="loggedIn"
+                              @go-to-post="$emit('go-to-post', $event)"
+                        />
                 </div>
-            </div>
+            </template>
+            <template v-else>
+                <div class="d-flex h-100 align-items-center justify-content-center">
+                    <span>
+                        {{ $t('post.not_any_post') }}
+                    </span>
+                </div>
+            </template>
             <div v-if="showReadMore" class="read-more">
                 <a
                     class="align-self-center all-posts-link"
