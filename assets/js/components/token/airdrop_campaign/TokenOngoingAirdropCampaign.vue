@@ -234,6 +234,7 @@
         </confirm-modal>
         <add-phone-alert-modal
             :visible="addPhoneModalVisible"
+            :nickname="profileNickname"
             @close="addPhoneModalVisible = false"
         />
     </div>
@@ -277,6 +278,7 @@ export default {
         youtubeClientId: String,
         currentLocale: String,
         showAirdropModal: Boolean,
+        profileNickname: String,
     },
     data() {
         return {
