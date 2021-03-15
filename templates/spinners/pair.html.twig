@@ -126,47 +126,47 @@
                                     {% trans %}trade.top_holders.header{% endtrans %}
                                 </div>
                                 <div class="card-body p-0">
-                                    <div class="table-responsive">
-                                        <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
-                                            <thead role="rowgroup">
-                                            <tr role="row">
-                                                <th role="columnheader" scope="col" aria-colindex="1">
-                                                    {% trans %}trade.top_holders.trader{% endtrans %}
-                                                </th>
-                                                <th role="columnheader" scope="col" aria-colindex="3">
-                                                    {% trans %}trade.top_holders.amount{% endtrans %}
-                                                </th>
-                                            </tr>
-                                            </thead>
-                                            <tbody role="rowgroup">
-                                                {% if tradeInfo %}
-                                                {% for holder in tradeInfo.topHolders %}
+                                    {% if tradeInfo and tradeInfo.topHolders is not empty %}
+                                        <div class="table-responsive">
+                                            <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
+                                                <thead role="rowgroup">
                                                 <tr role="row">
-                                                    <td role="cell" aria-colindex="1">
-                                                        <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                                            <img
-                                                                src="{{ holder.user.profile.image.avatar_small }}"
-                                                                alt="avatar" class="d-block rounded-circle">
-                                                            <a
-                                                                href="{{ path('profile', {nickname: holder.user.profile.nickname}) }}"
-                                                                class="holder-name mr-1 text-white">
-                                                                <div class="overflow-hidden">
-                                                                    <span>
-                                                                        {{ holder.user.profile.nickname }}
-                                                                    </span>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                    <td role="cell" aria-colindex="3">
-                                                        {{ holder.balance | toMoney(0) }}
-                                                    </td>
+                                                    <th role="columnheader" scope="col" aria-colindex="1">
+                                                        {% trans %}trade.top_holders.trader{% endtrans %}
+                                                    </th>
+                                                    <th role="columnheader" scope="col" aria-colindex="3">
+                                                        {% trans %}trade.top_holders.amount{% endtrans %}
+                                                    </th>
                                                 </tr>
-                                                {% endfor %}
-                                            {% endif %}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody role="rowgroup">
+                                                    {% for holder in tradeInfo.topHolders %}
+                                                    <tr role="row">
+                                                        <td role="cell" aria-colindex="1">
+                                                            <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                                                <img
+                                                                    src="{{ holder.user.profile.image.avatar_small }}"
+                                                                    alt="avatar" class="d-block rounded-circle">
+                                                                <a
+                                                                    href="{{ path('profile', {nickname: holder.user.profile.nickname}) }}"
+                                                                    class="holder-name mr-1 text-white">
+                                                                    <div class="overflow-hidden">
+                                                                        <span>
+                                                                            {{ holder.user.profile.nickname }}
+                                                                        </span>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                        <td role="cell" aria-colindex="3">
+                                                            {{ holder.balance | toMoney(0) }}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
