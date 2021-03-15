@@ -1340,7 +1340,7 @@ knowledge_base.header.3: 'Para obtener mejores resultados, es necesario educar c
 mail.deposit_complete.msg: 'Su depósito se ha completado'
 mail.withdrawal.msg: 'Su retiro ha sido completado'
 mail.withdrawal.text_link: 'Comprobar el historial de depósitos/retiros'
-ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar estas tareas %tasksAmount%:'
+ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar esta(s) %tasksAmount% tarea(s):'
 phone_number.edit.limit: 'Sólo se puede editar el número de teléfono una vez al mes'
 token.intro.deployed_modal.paragraph_1.head:
 token.intro.deployed_modal.paragraph_1.part_1:
