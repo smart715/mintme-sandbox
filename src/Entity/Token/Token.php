@@ -191,7 +191,9 @@ class Token implements TradebleInterface, ImagineInterface
     protected $created;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken",
+     *     mappedBy="token",
+     *     fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $users;
@@ -288,6 +290,15 @@ class Token implements TradebleInterface, ImagineInterface
         return array_map(function (UserToken $userToken) {
             return $userToken->getUser();
         }, $this->users->toArray());
+    }
+
+    /**
+     * @Groups({"Default"})
+     * @return int
+     */
+    public function getHoldersCount(): int
+    {
+        return $this->users->count();
     }
 
     /** {@inheritdoc} */

@@ -106,6 +106,16 @@
                                     </template>
                                 </guide>
                             </div>
+                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
+                                {{ $t('token.intro.statistics.holders.header') }}
+                                <br v-if="isMintmeToken">
+                                {{ holdersProp }}
+                                <guide>
+                                    <template slot="header">
+                                        {{ $t('token.intro.statistics.holders.guide_header') }}
+                                    </template>
+                                </guide>
+                            </div>
                         </div>
                         <div class="col px-1" v-if="isMintmeToken">
                             <div class="font-weight-bold pb-4">
@@ -246,6 +256,10 @@ export default {
         statsProp: {
           type: Object,
           default: null,
+        },
+        holdersProp: {
+            type: Number,
+            default: null,
         },
     },
     data() {
