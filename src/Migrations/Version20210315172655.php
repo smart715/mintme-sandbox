@@ -14,7 +14,7 @@ final class Version20210315172655 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return '';
+        return 'Modify default value for show_deployed_modal';
     }
 
     public function up(Schema $schema) : void
@@ -22,7 +22,7 @@ final class Version20210315172655 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE token ADD show_deployed_modal TINYINT(1) DEFAULT \'0\' NOT NULL');
+        $this->addSql('ALTER TABLE token MODIFY show_deployed_modal TINYINT(1) DEFAULT \'0\' NOT NULL');
     }
 
     public function down(Schema $schema) : void
@@ -30,6 +30,6 @@ final class Version20210315172655 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE token DROP show_deployed_modal');
+        $this->addSql('ALTER TABLE token MODIFY show_deployed_modal TINYINT(1) NOT NULL');
     }
 }
