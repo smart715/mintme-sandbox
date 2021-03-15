@@ -19,6 +19,8 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterf
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
 use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -634,5 +636,47 @@ class User extends BaseUser implements
     public function getAirdropReferrerUser(): ?User
     {
         return $this->airdropReferrerUser;
+    }
+
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        // Disable re-authentication user if roles were changed.
+        // $currentRoles = array_map('strval', (array) $this->getRoles());
+        // $newRoles = array_map('strval', (array) $user->getRoles());
+        // $rolesChanged = \count($currentRoles) !== \count($newRoles) ||
+        //     \count($currentRoles) !== \count(array_intersect($currentRoles, $newRoles));
+        // if ($rolesChanged) {
+        //     return false;
+        // }
+
+        if ($this->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
+            return false;
+        }
+
+        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
+            return false;
+        }
+
+        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
+            return false;
+        }
+
+        return $this->isEnabled() === $user->isEnabled();
     }
 }

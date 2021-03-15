@@ -78,14 +78,6 @@ class ProfileController extends Controller
             $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
             $user->addRole(User::ROLE_AUTHENTICATED);
             $this->userManager->updateUser($user);
-            /** @var string $newToken */
-            $newToken = new PostAuthenticationGuardToken(
-                $user,
-                'authenticate',
-                [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
-            );
-            $this->tokenStorage->setToken('authenticate', $newToken);
-
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
                     $profile->getPhoneNumber()->getPhoneNumber(),
