@@ -43,11 +43,15 @@ class SummaryController extends AbstractFOSRestController
      * @Rest\View(serializerGroups={"dev"})
      * @Rest\QueryParam(
      *     name="offset",
+     *     strict=true,
+     *     nullable=true,
      *     requirements=@Assert\Range(min="0"),
      *     default=0
      * )
      * @Rest\QueryParam(
      *     name="limit",
+     *     strict=true,
+     *     nullable=true,
      *     requirements=@Assert\Range(min="1", max="101"),
      *     default=101
      * )
