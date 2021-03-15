@@ -284,6 +284,11 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $decimals = 12;
 
+    /**
+     * @ORM\Column(type="boolean", nullable= false)
+     */
+    private bool $showDeployedModal = false; // phpcs:ignore
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -787,5 +792,17 @@ class Token implements TradebleInterface, ImagineInterface
         }
 
         return false;
+    }
+
+    public function isShowDeployedModal(): bool
+    {
+        return $this->showDeployedModal;
+    }
+
+    public function setShowDeployedModal(bool $showDeployedModal): self
+    {
+        $this->showDeployedModal = $showDeployedModal;
+
+        return $this;
     }
 }

@@ -272,3 +272,6 @@ parameters:
         attempts: 3
         # 30 days = 30D
         interval: '30D'
+
+    # mintme explorer url
+    mintme_explorer_url: 'https://mintme.com/explorer'

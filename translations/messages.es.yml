@@ -1283,6 +1283,21 @@ mail.airdrop_feature.subject: '¡Cree un airdrop hoy mismo!'
 mail.airdrop_feature.body1: 'Nos hemos dado cuenta de que usted ha creado su token hace al menos 7 días pero todavía no ha programado ningún airdrop. Los airdrops son tokens gratuitos que se dan a sus seguidores por hacer algunas acciones por usted como suscribirse a su canal de Youtube o retuitear sus mensajes o publicar enlaces de la página de su proyecto. Esta es la mejor manera de dar a conocer tus tokens a tus seguidores. Una vez que consiguen una pequeña cantidad de tokens, les anima a comprarte más.'
 mail.airdrop_feature.body2.html: 'Para crear un airdrop, ve a <a href="%modalUrl%">aquí</a> y haz clic en Airdrops.'
 mail.airdrop_feature.body2.txt: 'Para crear un airdrop, vaya a %modalUrl% y haga clic en Airdrops.'
+mail.token_deployed.subject:
+mail.token_deployed.p_1:
+mail.token_deployed.p_1.1:
+mail.token_deployed.p_1.2:
+mail.token_deployed.p_1.3:
+mail.token_deployed.p_2:
+mail.token_deployed.p_2.1:
+mail.token_deployed.p_2.2:
+mail.token_deployed.p_2.3:
+mail.token_deployed.p_3:
+mail.token_deployed.p_3.1:
+mail.token_deployed.p_3.2:
+mail.token_deployed.p_3.3:
+mail.token_deployed.p_3.4:
+mail.token_deployed.p_3.5:
 phone.add_number.notification: 'Con el fin de utilizar plenamente su cuenta, debe añadir un número de teléfono en su <a href="%url%">perfil</a>. El número no será visible para los demás.'
 phone.country_selector.label: 'Código del país'
 phone.country_selector.error: 'Elija el país'
@@ -1327,4 +1342,18 @@ mail.withdrawal.msg: 'Su retiro ha sido completado'
 mail.withdrawal.text_link: 'Comprobar el historial de depósitos/retiros'
 ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar estas tareas %tasksAmount%:'
 phone_number.edit.limit: 'Sólo se puede editar el número de teléfono una vez al mes'
+token.intro.deployed_modal.paragraph_1.head:
+token.intro.deployed_modal.paragraph_1.part_1:
+token.intro.deployed_modal.paragraph_1.part_2:
+token.intro.deployed_modal.paragraph_1.part_3:
+token.intro.deployed_modal.paragraph_2.head:
+token.intro.deployed_modal.paragraph_2.part_1:
+token.intro.deployed_modal.paragraph_2.part_2:
+token.intro.deployed_modal.paragraph_2.part_3:
+token.intro.deployed_modal.paragraph_3.head_1:
+token.intro.deployed_modal.paragraph_3.head_2:
+token.intro.deployed_modal.paragraph_3.part_1:
+token.intro.deployed_modal.paragraph_3.part_2:
+token.intro.deployed_modal.paragraph_3.part_3:
+token.intro.deployed_modal.paragraph_3.part_4:
 modal.add_phone_alert:

@@ -8,6 +8,7 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\DeployCompletedEvent;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -126,6 +127,7 @@ class DeployConsumer implements ConsumerInterface
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
+                $token->setShowDeployedModal(true);
 
                 $this->setDeployCostReward($user, $token);
             }
@@ -145,7 +147,10 @@ class DeployConsumer implements ConsumerInterface
         }
 
         /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::DEPLOYED);
+        $this->eventDispatcher->dispatch(
+            new DeployCompletedEvent($token, $clbResult->getTxHash()),
+            TokenEvents::DEPLOYED
+        );
 
         return true;
     }
