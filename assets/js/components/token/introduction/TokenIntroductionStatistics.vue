@@ -325,7 +325,7 @@ export default {
             });
         },
         showStats: function() {
-            if(!this.loaded){
+            if (!this.loaded) {
                 this.fetchAllData();
             }
 
@@ -373,7 +373,7 @@ export default {
                     this.donationVolume = result.params[0][8] || 0;
                 }
             }, null, 'TokenIntroductionStatistics');
-        }
+        },
     },
     computed: {
         statisticGuideTranslation: function() {

@@ -38,9 +38,7 @@
 </template>
 
 <script>
-import moment from 'moment';
 import {formatMoney} from '../../utils';
-import {GENERAL} from '../../utils/constants';
 import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
 import HolderName from './HolderName';
 
