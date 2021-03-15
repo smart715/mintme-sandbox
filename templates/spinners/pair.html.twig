@@ -159,7 +159,7 @@
                                             {% endif %}
                                             <div class="pb-1">
                                                 {% trans %}token.intro.statistics.active.header{% endtrans %} <br>
-                                                {{ tradeInfo.sellSummary | toMoney(precision, false) }}
+                                                {{ tradeInfo.activeOrders | toMoney(precision, false) }}
                                             </div>
                                             {% if token.isMintmeToken %}
                                             <div class="pb-1">
