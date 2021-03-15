@@ -239,7 +239,7 @@ export default {
             type: Number,
             default: null,
         },
-        sellSummary: {
+        activeOrders: {
             type: Number,
             default: null,
         },
@@ -280,7 +280,7 @@ export default {
             this.getTokenSoldOnMarket();
         }
 
-        if (!this.sellSummary) {
+        if (!this.activeOrders) {
             this.getPendingOrders();
         }
 
@@ -372,14 +372,14 @@ export default {
         },
         loaded: function() {
             return (!this.isMintmeToken || this.tokenExchangeAmount !== null)
-                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.sellSummary !== null);
+                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.activeOrders !== null);
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            if (this.sellSummary) {
-                return this.sellSummary;
+            if (this.activeOrders) {
+                return this.activeOrders;
             }
 
             let sum = new Decimal(0);

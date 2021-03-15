@@ -179,7 +179,7 @@
                                 :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
                                 :token-withdrawn-prop="{{ tradeInfo.withdrawn }}"
                                 :token-exchange-prop="{{ tradeInfo.tokenExchange ?? 0 }}"
-                                :sell-summary="{{ tradeInfo.sellSummary }}"
+                                :active-orders="{{ tradeInfo.activeOrders }}"
                                 :stats-prop="{{ tradeInfo.lockIn | json_encode }}"
                                 {% endif %}
                             >
