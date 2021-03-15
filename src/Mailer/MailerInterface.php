@@ -3,11 +3,11 @@
 namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
-use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
+use Money\Money;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 
 interface MailerInterface
@@ -30,4 +30,10 @@ interface MailerInterface
     public function sendAirdropFeatureMail(Token $token): void;
     public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void;
     public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void;
+    public function sendAirdropClaimedMail(
+        User $user,
+        Token $token,
+        Money $airdropReward,
+        string $airdropReferralCode
+    ): void;
 }
