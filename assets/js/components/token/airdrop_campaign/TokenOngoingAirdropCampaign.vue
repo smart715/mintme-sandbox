@@ -486,7 +486,12 @@ export default {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
             }))
-                .then(() => {
+                .then((response) => {
+                    if (response.data.hasOwnProperty('error')) {
+                        this.addPhoneModalVisible = true;
+                        return;
+                    }
+
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
