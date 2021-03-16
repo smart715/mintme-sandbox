@@ -36,13 +36,13 @@ security:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
             two_factor:
                 provider: fos_userbundle
                 auth_form_path: 2fa_login
                 check_path: 2fa_login_check
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
                 multi_factor: true
                 csrf_token_generator: security.csrf.token_manager
                 authentication_required_handler: two_factor.auth_require_handler
