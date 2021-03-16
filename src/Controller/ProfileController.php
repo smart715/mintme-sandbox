@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -78,6 +78,13 @@ class ProfileController extends Controller
             $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
             $user->addRole(User::ROLE_AUTHENTICATED);
             $this->userManager->updateUser($user);
+            $newToken = new PostAuthenticationGuardToken(
+                $user,
+                'main',
+                [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
+            );
+            $this->tokenStorage->setToken($newToken);
+
             $this->userActionLogger->info(
                 'Phone number '.$this->phoneNumberUtil->format(
                     $profile->getPhoneNumber()->getPhoneNumber(),

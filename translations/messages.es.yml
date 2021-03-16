@@ -1361,4 +1361,4 @@ mail.airdrop_claimed.subject: ''
 mail.airdrop_claimed.message_1: ''
 mail.airdrop_claimed.message_2: ''
 mail.airdrop_claimed.message_3: ''
-modal.add_phone_alert:
+modal.add_phone_alert.airdrop:
