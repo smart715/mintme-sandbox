@@ -34,7 +34,7 @@ export const TOKEN_NAME_CHANGED = 'token_name_changed';
 export const GENERAL = {
     precision: 8,
     dateFormat: 'DD.MM.YYYY HH:mm:ss',
-    time: 'HH:mm',
+    timeFormat: 'HH:mm',
     dateFormatWithoutTime: 'MMM D, YYYY',
 };
 

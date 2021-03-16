@@ -19,13 +19,15 @@
                                     class="chat-avatar rounded-circle d-block"
                                     alt="avatar">
                                 <span class="d-inline-block col">
-                                    <span class="d-block small word-break right">
+                                    <span class="d-block small word-break toast-text text-bold">
                                         {{ row.item.date }}
                                     </span>
                                     <br>
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
-                                        <span class="small" style="padding-bottom: 15px;">{{ row.item.time }}</span>
+                                        <span class="small">
+                                            {{ row.item.time }}
+                                        </span>
                                     </span>
                                     <span class="d-block small word-break">
                                         {{ row.item.body }}
@@ -154,7 +156,7 @@ export default {
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
                     date: moment(message.createdAt).format(GENERAL.dateFormatWithoutTime),
-                    time: moment(message.createdAt).format(GENERAL.time),
+                    time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });
         },
