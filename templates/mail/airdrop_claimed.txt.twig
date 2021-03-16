@@ -1,0 +1,17 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %}
+
+{{ username }}
+
+{% trans with {'%tokenName%': tokenName, '%airdropReward%': airdropReward | number_format(tokenSubunit) | trim("0", "right") | trim(".")} %} mail.airdrop_claimed.message_1 {% endtrans %}
+
+{% trans with{'%airdropReferralLink%': airdropReferralLink} %} mail.airdrop_claimed.message_2 {% endtrans %},
+
+{% trans with{'%tokenPostsLink%': tokenPostsLink} %} mail.airdrop_claimed.message_3 {% endtrans%}
+
+{% trans %} mail.airdrop_claimed.message_4 {% endtrans %}
+
+
+{% endblock %}
