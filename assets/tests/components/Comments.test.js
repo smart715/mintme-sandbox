@@ -69,7 +69,7 @@ const testPost = {
             nickname: 'John',
         },
     },
-}
+};
 
 describe('Comments', () => {
     it('shows no one commented yet if there are no comments', () => {
