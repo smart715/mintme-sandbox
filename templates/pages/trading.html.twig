@@ -18,6 +18,7 @@
                         :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
                         sort="{{ sort }}"
                         :order="{{ order ? 'true' : 'false' }}"
+                        :filter-for-tokens="{{ filterForTokens | json_encode() }}"
                 >
                 </trading>
             </div>

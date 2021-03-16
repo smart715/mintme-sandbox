@@ -107,6 +107,16 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
+                                    <b-list-group-item class="flex-1 odd-item-bg" >
+                                        {{ $t('token.intro.statistics.holders.header') }}
+                                        <br v-if="isMintmeToken">
+                                        {{ holdersProp }}
+                                        <guide>
+                                            <template slot="header">
+                                                {{ $t('token.intro.statistics.holders.guide_header') }}
+                                            </template>
+                                        </guide>
+                                    </b-list-group-item>
                                 </b-list-group>
                             </div>
                             <div class="pt-3" v-if="isMintmeToken">
@@ -257,6 +267,10 @@ export default {
         statsProp: {
           type: Object,
           default: null,
+        },
+        holdersProp: {
+            type: Number,
+            default: null,
         },
     },
     data() {
