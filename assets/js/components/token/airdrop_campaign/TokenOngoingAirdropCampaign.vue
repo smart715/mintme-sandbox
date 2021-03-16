@@ -162,18 +162,47 @@
                                         {{ airdropCampaign.actions.postLink.done ? '1' : '0' }}/1
                                     </span>
                                 </div>
-                                <div class="d-flex my-3" v-if="airdropCampaign.actions.postLink">
-                                    <input class="form-control font-size-12"
-                                        type="text"
-                                        v-model="postLinkUrl"
-                                        :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                <div class="d-flex flex-column my-3" v-if="airdropCampaign.actions.postLink">
+                                    <div class="clearfix">
+                                        <div class="float-right">
+                                            <div
+                                                v-if="blackListedDomain"
+                                                class="alert alert-danger alert-float"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                {{ $t('api.airdrop.forbidden_domain', {domain: postLinkUrl}) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <input
+                                            id="airdropDomain"
+                                            class="form-control font-size-12"
+                                            type="text"
+                                            v-model="postLinkUrl"
+                                            :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                        >
+                                        <button class="btn btn-primary text-nowrap ml-1"
+                                            :disabled="postLinkUrlDisabled"
+                                            @click="claimPostLink"
+                                        >
+                                            {{ $t('ongoing_airdrop.submit_url') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
+                                <div>
+                                    {{ $t('ongoing_airdrop.referral', {tokenName, halfReward}) }}
+                                </div>
+                                <div>
+                                    <a :href="referralLink">{{ referralLink }}</a>
+                                    <copy-link
+                                        class="c-pointer"
+                                        :content-to-copy="referralLink"
                                     >
-                                    <button class="btn btn-primary text-nowrap ml-1"
-                                        :disabled="$v.postLinkUrl.$invalid"
-                                        @click="claimPostLink"
-                                    >
-                                        {{ $t('ongoing_airdrop.submit_url') }}
-                                    </button>
+                                        <font-awesome-icon :icon="['far', 'copy']" class="icon-default"/>
+                                    </copy-link>
                                 </div>
                             </div>
                         </div>
@@ -254,6 +283,10 @@ export default {
             showDuration: true,
             postLinkUrl: '',
             showConfirmTwitterMessageModal: false,
+            checkingBlackListedDomain: false,
+            blackListedDomain: false,
+            checkDomainTimeout: null,
+            referralCode: null,
         };
     },
     mounted: function() {
@@ -268,14 +301,18 @@ export default {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
         },
         actualParticipants: function() {
-            return this.airdropCampaign.actualParticipants || 0;
+            return Math.ceil(this.airdropCampaign.actualParticipants || 0);
         },
         airdropReward: function() {
             if (this.loaded) {
-                let airdropReward = new Decimal(this.airdropCampaign.amount)
-                    .dividedBy(new Decimal(this.airdropCampaign.participants));
+                return toMoney(this.airdropCampaign.reward, TOK.subunit);
+            }
 
-                return toMoney(airdropReward, TOK.subunit);
+            return 0;
+        },
+        halfReward: function() {
+            if (this.loaded) {
+                return toMoney(Decimal.div(this.airdropCampaign.reward, 2), TOK.subunit);
             }
 
             return 0;
@@ -349,7 +386,7 @@ export default {
         actionMessage() {
             return this.$t('ongoing_airdrop.actions.message', {
                 tokenName: this.tokenName,
-                tokenUrl: this.tokenUrl,
+                tokenUrl: this.referralLink,
             });
         },
         tokenUrl() {
@@ -372,8 +409,27 @@ export default {
                 ? Object.keys(this.airdropCampaign.actions).every((key) => this.airdropCampaign.actions[key].done)
                 : true;
         },
+        referralLink() {
+            return this.$routing.generate(
+                'airdrop_referral',
+                {
+                    name: this.tokenName,
+                    hash: this.referralCode,
+                },
+                true
+            );
+        },
         modalTokenUrl() {
             return this.$routing.generate('token_show', {name: this.tokenName, tab: 'intro', modal: 'airdrop'}, true);
+        },
+        postLinkUrlDisabled() {
+            return this.blackListedDomain || this.checkingBlackListedDomain || this.$v.postLinkUrl.$invalid;
+        },
+    },
+    watch: {
+        postLinkUrl: function() {
+            clearTimeout(this.checkDomainTimeout);
+            this.checkDomainTimeout = setTimeout(this.checkBlacklistedDomain, 500);
         },
     },
     methods: {
@@ -394,7 +450,8 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaign = result.data;
+                    this.airdropCampaign = result.data.airdrop;
+                    this.referralCode = result.data.referral_code;
                     this.loaded = true;
                     this.showCountdown();
                     this.countdownInterval();
@@ -575,6 +632,21 @@ export default {
                     reject(new Error(this.$t('ongoing_airdrop.subscription_error')));
                 });
             });
+        },
+        checkBlacklistedDomain: function() {
+            if (!this.postLinkUrl) {
+                this.blackListedDomain = false;
+                this.checkingBlackListedDomain = false;
+                return;
+            }
+
+            this.checkingBlackListedDomain = true;
+            this.$axios.retry.get(
+                this.$routing.generate('airdrop_domain_blacklist_check', {domain: this.postLinkUrl})
+            ).then(({data}) => {
+                this.blackListedDomain = data.blacklisted;
+                this.checkingBlackListedDomain = false;
+            }).catch((err) => this.sendLogs('error', 'airdrop_domain_blacklist_check', err));
         },
     },
     created() {

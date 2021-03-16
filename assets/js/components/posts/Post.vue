@@ -4,7 +4,10 @@
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
             </h1>
-            <a v-else :href="singlePageUrl" class="text-decoration-none">
+            <a v-else :href="singlePageUrl"
+               class="text-decoration-none"
+               @click.prevent="$emit('go-to-post', post)"
+            >
                 <h2 class="post-title">
                     {{ post.title }}
                 </h2>
@@ -195,7 +198,7 @@ export default {
         },
         singlePageUrl() {
             return this.post.slug
-                ? this.$routing.generate('new_show_post', {tokenName: this.post.token.name, slug: this.post.slug}, true)
+                ? this.$routing.generate('new_show_post', {name: this.post.token.name, slug: this.post.slug}, true)
                 : this.$routing.generate('show_post', {id: this.post.id}, true);
         },
         twitterMessageLink() {
@@ -241,7 +244,7 @@ export default {
             this.deleteDisabled = true;
             this.$axios.single.post(this.$routing.generate('delete_post', {id: this.post.id}))
             .then((res) => {
-               this.$emit('delete-post', this.index);
+               this.$emit('delete-post', this.index, this.post.id);
                this.notifySuccess(this.$t('post.deleted'));
             })
             .catch(() => {

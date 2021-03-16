@@ -12,7 +12,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameExists"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.taken') }}
@@ -21,7 +21,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameInBlacklist"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.forbidden') }}
