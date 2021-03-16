@@ -19,10 +19,7 @@
                           @go-to-post="$emit('go-to-post', $event)"
                     />
                 </template>
-                <div v-else
-                    :class="{ 'position-absolute top-50': tokenPage }"
-                    style="transform: translateY(-50%);"
-                >
+                <div v-else class="absolute-center">
                     {{ $t('post.not_any_post') }}
                 </div>
             </div>
