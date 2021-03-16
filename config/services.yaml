@@ -211,6 +211,7 @@ services:
             $filled_intervals: '%orders_filled_intervals%'
             $cancelled_intervals: '%orders_cancelled_intervals%'
             $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -571,6 +572,10 @@ services:
         arguments:
             $mailer: '@app.instant.mailer'
 
+    App\EventSubscriber\DeploySubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
     App\Communications\CachedCryptoRatesFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
@@ -678,6 +683,7 @@ services:
             filled_intervals: '%orders_filled_intervals%'
             cancelled_intervals: '%orders_cancelled_intervals%'
             token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Controller\API\WalletController:
         arguments:
