@@ -261,6 +261,8 @@ parameters:
     # api for sending SMS
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+    # If true - sending sms will be disabled and verification code will be returned to user instead of sending to mobile phone
+    disable_sms: false
 
     # Limits for adding and editing phone number (max attempts)
     adding_phone_attempts_limit:
