@@ -35,6 +35,7 @@ trait RefererTrait
     public function validRefererRoutes(): array
     {
         return [
+            'coin',
             'token_show',
             'show_post',
         ];

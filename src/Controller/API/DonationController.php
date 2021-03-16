@@ -77,7 +77,7 @@ class DonationController extends AbstractFOSRestController
             );
 
             $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
-            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
+            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
             $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary, $currency);
 
             return $this->view([
@@ -138,7 +138,7 @@ class DonationController extends AbstractFOSRestController
         }
 
         try {
-            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market);
+            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
 
             $donation = $this->donationHandler->makeDonation(
                 $market,

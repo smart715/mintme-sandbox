@@ -12,6 +12,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
@@ -561,7 +562,7 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getSellOrdersSummary(Market $market): string
+    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult
     {
         $offset = 0;
         $limit = 100;
@@ -584,7 +585,16 @@ class MarketHandler implements MarketHandlerInterface
             )->add($sum);
         }, $zeroDepth);
 
-        return $this->moneyWrapper->format($sellOrdersSum);
+        $sellOrdersSum = $this->moneyWrapper->format($sellOrdersSum);
+
+        /** @var Money $quoteAmountSummary */
+        $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getAmount()->add($sum);
+        }, $zeroDepth);
+
+        $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
+
+        return new SellOrdersSummaryResult($sellOrdersSum, $quoteAmountSummary);
     }
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array

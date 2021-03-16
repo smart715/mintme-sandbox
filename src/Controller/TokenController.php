@@ -456,10 +456,10 @@ class TokenController extends Controller
                 $tokenDescription
             );
             $tokenDescription = str_replace("\n", " ", $tokenDescription);
-            $defaultActivated = true;
+            $defaultActivated = false;
         } else {
             $tokenDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
-            $defaultActivated = false;
+            $defaultActivated = true;
         }
 
         /** @var  User|null $user */

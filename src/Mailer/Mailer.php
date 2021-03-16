@@ -2,11 +2,15 @@
 
 namespace App\Mailer;
 
+use App\Entity\AirdropCampaign\AirdropReferralCode;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
+use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Money;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Swift_Mailer;
@@ -32,18 +36,22 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     private TranslatorInterface $translator;
 
+    private MoneyWrapperInterface $moneyWrapper;
+
     public function __construct(
         string $mail,
         Swift_Mailer $mailer,
         EngineInterface $twigEngine,
         UrlGeneratorInterface $urlGenerator,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->mail = $mail;
         $this->mailer = $mailer;
         $this->twigEngine = $twigEngine;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
@@ -505,6 +513,117 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         ]);
 
         $subject = $this->translator->trans('mail.mintme_host_subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendAirdropClaimedMail(
+        User $user,
+        Token $token,
+        Money $airdropReward,
+        string $airdropReferralCode
+    ): void {
+        $tokenPostsLink = $this->urlGenerator->generate(
+            'new_show_post',
+            [
+                'name' => $token->getName(),
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $AirdropReferralLink = $this->urlGenerator->generate(
+            'airdrop_referral',
+            [
+                'name' => $token->getName(),
+                'hash' => $airdropReferralCode,
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/airdrop_claimed.html.twig", [
+            'username' => $user->getUsername(),
+            'airdropReward' => $this->moneyWrapper->format($airdropReward),
+            'tokenName' => $token->getName(),
+            'tokenPostsLink' => $tokenPostsLink,
+            'airdropReferralLink' => $AirdropReferralLink,
+            'tokenSubunit' => Token::TOKEN_SUBUNIT,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/airdrop_claimed.txt.twig", [
+            'username' => $user->getUsername(),
+            'airdropReward' => $this->moneyWrapper->format($airdropReward),
+            'tokenName' => $token->getName(),
+            'tokenPostsLink' => $tokenPostsLink,
+            'airdropReferralLink' => $AirdropReferralLink,
+            'tokenSubunit' => Token::TOKEN_SUBUNIT,
+        ]);
+
+        $subject = $this->translator->trans('mail.airdrop_claimed.subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
+    {
+        $tokenSalesUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $aimingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Aiming-at-a-strong-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $ideasUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Ideas-to-promote-and-sell-your-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $stuckUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Stuck-not-knowing-what-to-do-next'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $talkingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/token_deployed.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_deployed.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+        ]);
+
+        $subject = $this->translator->trans('mail.token_deployed.subject');
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
