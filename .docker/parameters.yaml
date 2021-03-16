@@ -151,6 +151,8 @@ parameters:
         - '10 day'
         - '15 day'
         - '21 day'
+    marketing_airdrop_feature_intervals:
+        - '7 day'
     dm_min_amount: 1
     token_withdraw_fee: 0.01
     max_allowed_active_orders: 100
@@ -168,6 +170,7 @@ parameters:
         - MintmeHost
     d7_networks_url: 'https://rest-api.d7networks.com/secure/'
     d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
+    disable_sms: true
     adding_phone_attempts_limit:
         daily: 3
         weekly: 10
@@ -176,3 +179,4 @@ parameters:
     edit_phone:
         attempts: 3
         interval: 30D
+    mintme_explorer_url: 'https://mintme.com/explorer'

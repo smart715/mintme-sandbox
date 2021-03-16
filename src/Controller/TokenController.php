@@ -22,6 +22,7 @@ use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -37,6 +38,7 @@ use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
+use App\Utils\Validator\AirdropReferralCodeHashValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -45,10 +47,12 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -186,7 +190,7 @@ class TokenController extends Controller
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
-        $token = $this->fetchToken($request, $name);
+        $token = $this->fetchToken($request, $name, $modal);
 
         return $this->renderPairPage($token, $request, $tab, $modal);
     }
@@ -349,6 +353,38 @@ class TokenController extends Controller
         return $this->redirectToOwnToken('intro', 'settings');
     }
 
+    /**
+     * @Route("/{name}/r/{hash}",
+     *     name="airdrop_referral",
+     *     options={"expose"=true}
+     * )
+     */
+    public function airdropReferral(
+        string $name,
+        string $hash,
+        AirdropReferralCodeManagerInterface $arcManager
+    ): Response {
+        $user = $this->getUser();
+        $validHash = (new AirdropReferralCodeHashValidator($hash))->validate();
+
+        if ($user || !$validHash) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        $arc = $arcManager->decode($hash);
+
+        if (!$arc || $arc->getAirdrop()->getToken()->getName() !== $name || !$arc->getAirdrop()->isActive()) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        $response = $this->redirectToRoute('token_show', ['name' => $name, 'tab' => 'intro', 'modal' => 'airdrop']);
+
+        $response->headers->setCookie(new Cookie('referral-code', $hash));
+        $response->headers->setCookie(new Cookie('referral-type', 'airdrop'));
+
+        return $response;
+    }
+
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
         $ownTokens = $this->tokenManager->getOwnTokens();
@@ -373,12 +409,12 @@ class TokenController extends Controller
         return count($this->tokenManager->getOwnTokens()) > 0;
     }
 
-    private function fetchToken(Request $request, string $name): Token
+    private function fetchToken(Request $request, string $name, ?string $modal = null): Token
     {
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
         if ($dashedName != $name) {
-            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName]));
+            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName, 'modal' => $modal]));
         }
 
         //rebranding
@@ -420,10 +456,10 @@ class TokenController extends Controller
                 $tokenDescription
             );
             $tokenDescription = str_replace("\n", " ", $tokenDescription);
-            $defaultActivated = true;
+            $defaultActivated = false;
         } else {
             $tokenDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
-            $defaultActivated = false;
+            $defaultActivated = true;
         }
 
         /** @var  User|null $user */

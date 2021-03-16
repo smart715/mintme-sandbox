@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
@@ -110,7 +111,7 @@ interface MarketHandlerInterface
 
     public function getBuyDepth(Market $market): string;
 
-    public function getSellOrdersSummary(Market $market): string;
+    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult;
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array;
 

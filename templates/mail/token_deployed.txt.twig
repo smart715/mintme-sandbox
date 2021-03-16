@@ -1,0 +1,19 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+{% set explorerUrl = global_mintme_explorer_url ~ '/tx/' ~ txHash %}
+{% trans with {'%explorerUrl%': explorerUrl} %}mail.token_deployed.p_1{% endtrans %}
+{% trans %}mail.token_deployed.p_1.1{% endtrans %}
+{% trans %}mail.token_deployed.p_1.2{% endtrans %}
+{% trans %}mail.token_deployed.p_1.3{% endtrans %}
+{% trans %}mail.token_deployed.p_2{% endtrans %}
+{% trans %}mail.token_deployed.p_2.1{% endtrans %}</li>
+{% trans %}mail.token_deployed.p_2.2{% endtrans %}
+{% trans %}mail.token_deployed.p_2.3{% endtrans %}
+{% trans %}mail.token_deployed.p_3{% endtrans %}
+{{ tokenSalesUrl }}
+{{ aimingUrl }}
+{{ ideasUrl }}
+{{ stuckUrl }}
+{{ talkingUrl }}
+{% endblock %}
+

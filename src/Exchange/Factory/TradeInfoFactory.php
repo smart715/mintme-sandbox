@@ -39,13 +39,13 @@ class TradeInfoFactory implements TradeFactoryInterface
 
         $soldOnMarket = $this->marketHandler->getMarketInfo($this->market)->getSoldOnMarket();
         $volumeDonation = $this->marketHandler->getMarketStatus($this->market)['volumeDonation'];
-        $sellSummary = $this->marketHandler->getSellOrdersSummary($this->market);
+        $activeOrders = $this->marketHandler->getSellOrdersSummary($this->market)->getQuoteAmount();
 
         $tradeInfo = new TradeInfo(
             $topHolders,
             $volumeDonation,
             $soldOnMarket,
-            $sellSummary
+            $activeOrders
         );
 
         if ($token instanceof Token && $token->isMintmeToken()) {
