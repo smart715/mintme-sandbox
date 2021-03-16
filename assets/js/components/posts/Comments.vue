@@ -1,5 +1,5 @@
 <template>
-    <div class="comments">
+    <div v-if="post.content" class="comments">
         <comment-form
             class="p-2"
             :logged-in="loggedIn"
@@ -25,6 +25,9 @@
             </div>
         </div>
     </div>
+    <p v-else>
+        {{ $t('comment.logged_in.1', {token : post.token.name, amount: post.amount | toMoney | formatMoney}) }}
+    </p>
 </template>
 
 <script>
@@ -43,16 +46,15 @@ export default {
     },
     props: {
         comments: Array,
-        postId: Number,
         loggedIn: Boolean,
-        tokenName: String,
+        post: Object,
     },
     computed: {
         commentsCount() {
             return this.comments.length;
         },
         apiUrl() {
-            return this.$routing.generate('add_comment', {id: this.postId});
+            return this.$routing.generate('add_comment', {id: this.post.id});
         },
     },
 };
