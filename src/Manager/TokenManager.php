@@ -251,4 +251,9 @@ class TokenManager implements TokenManagerInterface
     {
         return $this->repository->findAllTokensWithEmptyDescription($param);
     }
+
+    public function getTokensWithoutAirdrops(): array
+    {
+        return $this->repository->getTokensWithoutAirdrops();
+    }
 }

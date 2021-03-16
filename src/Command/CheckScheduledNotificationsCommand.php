@@ -9,6 +9,7 @@ use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\MarketingAirdropFeatureNotificationStrategy;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\OrderNotificationStrategy;
 use App\Notifications\Strategy\TokenMarketingTipsNotificationStrategy;
@@ -24,21 +25,15 @@ class CheckScheduledNotificationsCommand extends Command
     protected static $defaultName = 'app:check-scheduled-notifications';
 
     public array $filled_intervals;
-
     public array $cancelled_intervals;
-
     public array $token_marketing_tips_intervals;
-
+    public array $marketing_airdrop_feature_intervals;
     public array $kbLinks;
 
     private ScheduledNotificationManagerInterface $scheduledNotificationManager;
-
     private UserNotificationManagerInterface $userNotificationManager;
-
     private MarketHandlerInterface $marketHandler;
-
     private CryptoManagerInterface $cryptoManager;
-
     private MailerInterface $mailer;
 
     public function __construct(
@@ -50,7 +45,8 @@ class CheckScheduledNotificationsCommand extends Command
         array $kbLinks,
         array $filled_intervals,
         array $cancelled_intervals,
-        array $token_marketing_tips_intervals
+        array $token_marketing_tips_intervals,
+        array $marketing_airdrop_feature_intervals
     ) {
         $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->marketHandler = $marketHandler;
@@ -61,6 +57,7 @@ class CheckScheduledNotificationsCommand extends Command
         $this->filled_intervals = $filled_intervals;
         $this->cancelled_intervals = $cancelled_intervals;
         $this->token_marketing_tips_intervals = $token_marketing_tips_intervals;
+        $this->marketing_airdrop_feature_intervals = $marketing_airdrop_feature_intervals;
 
         parent::__construct();
     }
@@ -84,8 +81,8 @@ class CheckScheduledNotificationsCommand extends Command
                 continue;
             }
 
-            if (NotificationTypes::TOKEN_MARKETING_TIPS === $notificationType) {
-                $this->scheduleTokenMarketingTip($scheduledNotification);
+            if (in_array($notificationType, NotificationTypes::MARKETING_TYPES)) {
+                $this->scheduleMarketingNotification($scheduledNotification);
             }
         }
 
@@ -148,16 +145,15 @@ class CheckScheduledNotificationsCommand extends Command
         }
     }
 
-    private function scheduleTokenMarketingTip(ScheduledNotification $scheduledNotification): void
+    private function scheduleMarketingNotification(ScheduledNotification $scheduledNotification): void
     {
         $notificationType = $scheduledNotification->getType();
         $timeInterval = $scheduledNotification->getTimeInterval();
         $dateToBeSend = $scheduledNotification->getDateToBeSend();
         $user = $scheduledNotification->getUser();
-        $quoteToken = $user->getProfile()->getMintmeToken();
         $arrayOfIntervals = $this->{strtolower($notificationType) . '_intervals'};
 
-        if (!$quoteToken) {
+        if (0 === count($user->getTokens())) {
             $this->scheduledNotificationManager->removeScheduledNotification($scheduledNotification->getId());
 
             return;
@@ -169,14 +165,31 @@ class CheckScheduledNotificationsCommand extends Command
             return;
         }
 
-        $strategy = new TokenMarketingTipsNotificationStrategy(
-            $this->userNotificationManager,
-            $this->mailer,
-            $notificationType,
-            $timeInterval,
-            $this->kbLinks,
-            $arrayOfIntervals,
-        );
+        switch ($notificationType) {
+            case NotificationTypes::TOKEN_MARKETING_TIPS:
+                $strategy = new TokenMarketingTipsNotificationStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer,
+                    $notificationType,
+                    $timeInterval,
+                    $this->kbLinks,
+                    $arrayOfIntervals
+                );
+
+                break;
+            case NotificationTypes::MARKETING_AIRDROP_FEATURE:
+                $strategy = new MarketingAirdropFeatureNotificationStrategy(
+                    $this->userNotificationManager,
+                    $this->mailer
+                );
+
+                break;
+        }
+
+        if (!isset($strategy)) {
+            return;
+        }
+
         $notificationContext = new NotificationContext($strategy);
         $notificationContext->sendNotification($user);
 
@@ -217,6 +230,7 @@ class CheckScheduledNotificationsCommand extends Command
             $newTimeToBeSend
         );
     }
+
     private function checkForTokensDeletions(ScheduledNotification $scheduledNotification): void
     {
         $notificationType = $scheduledNotification->getType();

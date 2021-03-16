@@ -11,9 +11,11 @@ use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Utils\Symbols;
+use App\Utils\NotificationTypes;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -34,6 +36,7 @@ class CreateEthTokenCommand extends Command
     private ProfileManagerInterface $profileManager;
     private CryptoManagerInterface $cryptoManager;
     private TokenManagerInterface $tokenManager;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
     private BalanceHandlerInterface $balanceHandler;
     private MoneyWrapperInterface $moneyWrapper;
     private MarketFactoryInterface $marketManager;
@@ -48,6 +51,7 @@ class CreateEthTokenCommand extends Command
         ProfileManagerInterface $profileManager,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         MarketFactoryInterface $marketManager,
@@ -59,6 +63,7 @@ class CreateEthTokenCommand extends Command
         $this->profileManager = $profileManager;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->marketManager = $marketManager;
@@ -194,6 +199,12 @@ class CreateEthTokenCommand extends Command
 
         $market = $this->marketManager->createUserRelated($profile->getUser());
         $this->marketStatusManager->createMarketStatus($market);
+
+        $this->scheduledNotificationManager->createScheduledNotification(
+            NotificationTypes::MARKETING_AIRDROP_FEATURE,
+            $token->getOwner()
+        );
+
         $this->em->commit();
         $this->logger->info('Create eth token', ['name' => $token->getName(), 'id' => $token->getId()]);
 

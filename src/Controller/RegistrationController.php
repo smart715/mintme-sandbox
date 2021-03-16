@@ -8,6 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Mailer\MailerInterface;
+use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
@@ -37,40 +38,20 @@ class RegistrationController extends FOSRegistrationController
 
     use RefererTrait;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var FactoryInterface */
-    private $formFactory;
-
-    /** @var UserManagerInterface */
-    private $userManager;
-
-    /** @var BonusManagerInterface */
-    private $bonusManager;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var UserNotificationConfigManagerInterface */
+    private EventDispatcherInterface $eventDispatcher;
+    private FactoryInterface $formFactory;
+    private UserManagerInterface $userManager;
+    private BonusManagerInterface $bonusManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoManagerInterface $cryptoManager;
+    private EntityManagerInterface $em;
     private UserNotificationConfigManagerInterface $userNotificationConfigManager;
-
     private MailerInterface $mailer;
-
     private string $mintmeHostFreeDays;
-
     private string $mintmeHostPrice;
-
     private string $mintmeHostPath;
+    private AirdropReferralCodeManagerInterface $arcManager;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -86,7 +67,8 @@ class RegistrationController extends FOSRegistrationController
         MailerInterface $mailer,
         string $mintmeHostFreeDays,
         string $mintmeHostPrice,
-        string $mintmeHostPath
+        string $mintmeHostPath,
+        AirdropReferralCodeManagerInterface $arcManager
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -101,6 +83,8 @@ class RegistrationController extends FOSRegistrationController
         $this->mintmeHostFreeDays = $mintmeHostFreeDays;
         $this->mintmeHostPrice =$mintmeHostPrice;
         $this->mintmeHostPath = $mintmeHostPath;
+        $this->arcManager = $arcManager;
+
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
     }
 
@@ -303,10 +287,26 @@ class RegistrationController extends FOSRegistrationController
             return $this->redirect($referer);
         }
 
-        $refCode = $request->cookies->get('referral-code');
+        $referralCode = $request->cookies->get('referral-code');
+        $referralType = $request->cookies->get('referral-type');
 
-        if (!is_null($refCode)) {
-            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getMintmeToken();
+        if (null !== $referralCode) {
+            switch ($referralType) {
+                case 'invite':
+                    $referrerUser = $this->userManager->findByReferralCode($referralCode);
+                    $token = $referrerUser
+                        ? $user->getProfile()->getMintmeToken()
+                        : null;
+
+                    break;
+                case 'airdrop':
+                    $arc = $this->arcManager->decode($referralCode);
+                    $token = $arc
+                        ? $arc->getAirdrop()->getToken()
+                        : null;
+
+                    break;
+            }
         }
 
         if (isset($token)) {

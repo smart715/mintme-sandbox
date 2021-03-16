@@ -191,7 +191,9 @@ class Token implements TradebleInterface, ImagineInterface
     protected $created;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken",
+     *     mappedBy="token",
+     *     fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $users;
@@ -277,6 +279,11 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $decimals = 12;
 
+    /**
+     * @ORM\Column(type="boolean", nullable= false)
+     */
+    private bool $showDeployedModal = false; // phpcs:ignore
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -288,6 +295,15 @@ class Token implements TradebleInterface, ImagineInterface
         return array_map(function (UserToken $userToken) {
             return $userToken->getUser();
         }, $this->users->toArray());
+    }
+
+    /**
+     * @Groups({"Default"})
+     * @return int
+     */
+    public function getHoldersCount(): int
+    {
+        return $this->users->count();
     }
 
     /** {@inheritdoc} */
@@ -780,5 +796,17 @@ class Token implements TradebleInterface, ImagineInterface
         }
 
         return false;
+    }
+
+    public function isShowDeployedModal(): bool
+    {
+        return $this->showDeployedModal;
+    }
+
+    public function setShowDeployedModal(bool $showDeployedModal): self
+    {
+        $this->showDeployedModal = $showDeployedModal;
+
+        return $this;
     }
 }

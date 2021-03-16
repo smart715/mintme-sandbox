@@ -140,11 +140,20 @@ class ProfileController extends AbstractFOSRestController
             )
         );
 
-        try {
-            $d7NetworksCommunicator->send($sms);
-            $this->userActionLogger->info('Phone number verification code requested.');
-        } catch (\Throwable $e) {
-            throw new \Exception($this->translator->trans('api.something_went_wrong'));
+        $isSmsDisabled = $this->getParameter('disable_sms');
+
+        if (!$isSmsDisabled) {
+            try {
+                $response = $d7NetworksCommunicator->send($sms);
+                $this->userActionLogger->info(
+                    'Phone number verification code requested.',
+                    ['to' => $sms->getTo(), $response]
+                );
+            } catch (\Throwable $e) {
+                $this->userActionLogger->info('Error during send phone number code verificaion'. json_encode($e));
+
+                throw new \Exception($this->translator->trans('api.something_went_wrong'));
+            }
         }
 
         if (!$phoneNumber->getEditDate()) {
@@ -156,6 +165,11 @@ class ProfileController extends AbstractFOSRestController
         $this->entityManager->persist($phoneNumber);
         $this->entityManager->flush();
 
-        return $this->view([], Response::HTTP_OK);
+        return $this->view(
+            $isSmsDisabled
+                ? ['code' => $phoneNumber->getVerificationCode()]
+                : [],
+            Response::HTTP_OK
+        );
     }
 }

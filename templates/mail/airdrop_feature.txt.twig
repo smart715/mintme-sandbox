@@ -1,0 +1,7 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+{% trans %}hello{% endtrans %} {{ nickname }},
+{% trans %}mail.airdrop_feature.body1{% endtrans %}
+
+{% trans with {'%modalUrl%': modalUrl } %}mail.airdrop_feature.body2.txt{% endtrans %}
+{% endblock %}

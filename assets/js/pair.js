@@ -18,6 +18,7 @@ import Avatar from './components/Avatar';
 import Envelope from './components/chat/Envelope';
 import i18n from './utils/i18n/i18n';
 import TokenCreatedModal from './components/modal/TokenCreatedModal';
+import TokenDeployedModal from './components/modal/TokenDeployedModal';
 import {tabs} from './utils/constants';
 
 new Vue({
@@ -46,6 +47,7 @@ new Vue({
       showCreatedModal: true,
       singlePost: null,
       comments: null,
+      showDeployedOnBoard: null,
     };
   },
   components: {
@@ -59,6 +61,7 @@ new Vue({
     Posts,
     TokenAvatar,
     TokenCreatedModal,
+    TokenDeployedModal,
     TokenIntroductionDescription,
     TokenIntroductionStatistics,
     TokenOngoingAirdropCampaign,
@@ -108,6 +111,10 @@ new Vue({
       'setBuyAmountInput',
       'setSubtractQuoteBalanceFromBuyAmount',
     ]),
+    closeDeployedModal: function() {
+        this.showDeployedOnBoard = false;
+        this.$axios.single.patch(this.$routing.generate('token_update_deployed_modal', {tokenName: this.tokenName}));
+    },
     fetchAddress: function() {
         this.$axios.single.get(this.$routing.generate('token_address', {name: this.tokenName}))
         .then((response) => {
@@ -126,6 +133,7 @@ new Vue({
             if (response.data.deployed === tokenDeploymentStatus.deployed) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
+                this.showDeployedOnBoard = true;
                 clearInterval(this.deployInterval);
                 this.fetchAddress();
             }

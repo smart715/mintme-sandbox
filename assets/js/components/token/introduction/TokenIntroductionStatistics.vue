@@ -106,6 +106,16 @@
                                     </template>
                                 </guide>
                             </div>
+                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
+                                {{ $t('token.intro.statistics.holders.header') }}
+                                <br v-if="isMintmeToken">
+                                {{ holdersProp }}
+                                <guide>
+                                    <template slot="header">
+                                        {{ $t('token.intro.statistics.holders.guide_header') }}
+                                    </template>
+                                </guide>
+                            </div>
                         </div>
                         <div class="col px-1" v-if="isMintmeToken">
                             <div class="font-weight-bold pb-4">
@@ -239,13 +249,17 @@ export default {
             type: Number,
             default: null,
         },
-        sellSummary: {
+        activeOrders: {
             type: Number,
             default: null,
         },
         statsProp: {
           type: Object,
           default: null,
+        },
+        holdersProp: {
+            type: Number,
+            default: null,
         },
     },
     data() {
@@ -280,7 +294,7 @@ export default {
             this.getTokenSoldOnMarket();
         }
 
-        if (!this.sellSummary) {
+        if (!this.activeOrders) {
             this.getPendingOrders();
         }
 
@@ -372,14 +386,14 @@ export default {
         },
         loaded: function() {
             return (!this.isMintmeToken || this.tokenExchangeAmount !== null)
-                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.sellSummary !== null);
+                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.activeOrders !== null);
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            if (this.sellSummary) {
-                return this.sellSummary;
+            if (this.activeOrders) {
+                return this.activeOrders;
             }
 
             let sum = new Decimal(0);
