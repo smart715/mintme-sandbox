@@ -41,7 +41,7 @@
                 :disabled-services-config="disabledServicesConfig"
                 :current-locale="currentLocale"
                 :token-deployed-date="tokenDeployedDate"
-                :token-contract-address="tokenContractAddress"
+                :token-tx-hash-address="tokenTxHashAddress"
                 :mintme-explorer-url="mintmeExplorerUrl"
             />
             <token-deploy-icon
@@ -108,7 +108,10 @@ export default {
         tokenName: String,
         currentLocale: String,
         tokenDeployedDate: Object,
-        tokenContractAddress: String,
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
         mintmeExplorerUrl: String,
     },
     components: {

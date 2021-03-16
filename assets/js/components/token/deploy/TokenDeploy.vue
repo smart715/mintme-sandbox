@@ -68,7 +68,7 @@
                     {{ $t('token.deploy.deployed') }}
                 </p>
                 <br>
-                <a v-if="isSmartContractCreated"
+                <a v-if="createContractLink"
                     :href="mintmeExplorerUrl"
                     target="_blank"
                 >{{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: formatTokenDeployedDate}) }}</a>
@@ -103,8 +103,14 @@ export default {
         statusProp: String,
         disabledServicesConfig: String,
         currentLocale: String,
-        tokenDeployedDate: Object,
-        tokenContractAddress: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress:  {
+            type: String,
+            default: null,
+        },
         mintmeExplorerUrl: String,
         isMintmeToken: Boolean,
     },
@@ -150,10 +156,10 @@ export default {
             return this.deployed && this.isOwner && this.isMintmeToken;
         },
         contractDateAddressExistence: function() {
-            return this.tokenDeployedDate && this.tokenContractAddress;
+            return this.tokenDeployedDate;
         },
         isSmartContractCreated: function() {
-            return this.createContractFactory && this.contractDateAddressExistence;
+            return this.createContractFactory && this.contractDateAddressExistence && this.tokenTxHashAddress;
         },
     },
     methods: {
@@ -204,8 +210,12 @@ export default {
         },
         createContractLink: function() {
             if (this.isSmartContractCreated) {
-                this.mintmeExplorerUrl = this.mintmeExplorerUrl.concat('/tx/' + this.tokenContractAddress);
+                this.mintmeExplorerUrl = this.mintmeExplorerUrl.concat('/tx/' + this.tokenTxHashAddress);
+
+                return true;
             }
+
+            return false;
         },
     },
     mounted() {
@@ -213,7 +223,7 @@ export default {
             moment.locale(this.currentLocale);
         }
 
-        this.createContractLink();
+        alert(this.tokenTxHashAddress);
 
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();

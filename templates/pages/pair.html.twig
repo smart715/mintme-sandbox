@@ -33,6 +33,8 @@
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
 {% set tokenDeployedDate = isTokenPage and token.isDeployed ? token.getDeployed | json_encode : 'null' %}
+{% set tokenTxHash = isTokenPage and token.txHash ? token.txHash : 'null' %}
+{% set showAirdropModal = showAirdropModal ? 'true' : 'false' %}
 
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
@@ -92,7 +94,7 @@
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                 current-locale="{{ currentLocale }}"
                 :token-deployed-date="{{ tokenDeployedDate }}"
-                :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                :token-tx-hash-address="{{ tokenTxHash | json_encode }}"
                 mintme-explorer-url="{{ global_mintme_explorer_url }}"
             ></token-avatar>
             <token-social-media-icons

@@ -110,6 +110,7 @@ class DeployConsumer implements ConsumerInterface
                     );
 
                     $token->setAddress('');
+                    $token->setTxHash('');
                     $token->setDeployCost(null);
                     $token->setDeployed(null);
 
@@ -128,6 +129,7 @@ class DeployConsumer implements ConsumerInterface
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
                 $token->setShowDeployedModal(true);
+                $token->setTxHash($clbResult->getTxHash());
 
                 $this->setDeployCostReward($user, $token);
             }
