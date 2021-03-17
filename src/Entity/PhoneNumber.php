@@ -48,6 +48,11 @@ class PhoneNumber
     /**
      * @ORM\Column(type="integer")
      */
+    private int $failedAttempts = 0; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     private int $dailyAttempts = 0; // phpcs:ignore
 
     /**
@@ -124,6 +129,25 @@ class PhoneNumber
     public function setVerified(bool $verified): self
     {
         $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getFailedAttempts(): int
+    {
+        return $this->failedAttempts;
+    }
+
+    public function incrementFailedAttempts(): self
+    {
+        $this->failedAttempts++;
+
+        return $this;
+    }
+
+    public function setFailedAttempts(int $failedAttempts): self
+    {
+        $this->failedAttempts = $failedAttempts;
 
         return $this;
     }

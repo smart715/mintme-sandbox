@@ -123,6 +123,7 @@ class ProfileController extends AbstractFOSRestController
         }
 
         $phoneNumber->setVerificationCode($randomNumber->generateVerificationCode());
+        $phoneNumber->setFailedAttempts(0);
 
         $addPhoneNumberConstraint = new AddPhoneNumber();
         $errors = $validator->validate($phoneNumber->getPhoneNumber(), $addPhoneNumberConstraint);
