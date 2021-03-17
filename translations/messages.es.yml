@@ -1293,7 +1293,7 @@ mail.token_deployed.p_2: 'También estamos planeando las siguientes cosas, ¡que
 mail.token_deployed.p_2.1: 'Invitación de referencia directamente a su token'
 mail.token_deployed.p_2.2: 'Trade para invitados con metamask'
 mail.token_deployed.p_2.3: 'Programa de afiliación'
-mail.token_deployed.p_3: 'El dinero que ha empleado en el despliegue del token en realidad se retira de la oferta en circulación de MintMe Coin durante 5 años. Eso significa que cuantos más tokens se desplieguen, más probable será que la moneda MintMe aumente de precio.<br>Recuerde educar a la gente mientras usted se da a mostrar. Aquí hay algunos consejos sobre el marketing:'
+mail.token_deployed.p_3: 'El dinero que ha empleado en el despliegue del token en realidad se retira de la oferta en circulación de MintMe Coin durante 5 años. Eso significa que cuantos más tokens se desplieguen, más probable será que MintMe coin aumente de precio.<br>Recuerde educar a la gente mientras usted se da a mostrar. Aquí hay algunos consejos sobre el marketing:'
 mail.token_deployed.p_3.1: 'Es el momento de la venta del token, ¿cómo puedo marcar la diferencia?'
 mail.token_deployed.p_3.2: '¿Apuntando a un token fuerte?'
 mail.token_deployed.p_3.3: 'Ideas para promocionar y vender su token'
