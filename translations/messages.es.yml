@@ -1098,7 +1098,7 @@ trading.market_cap.label: 'Capitalización de mercados'
 trading.market_cap.help: 'La capitalización del mercado basada en el último precio multiplicado por el número de tokens vendidos en el mercado'
 trading.buy_depth.label: Demanda
 trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra reflejada en MINTME para cada mercado. Esto puede representar mejor el tamaño del token que la capitalización de mercados.'
-trading.fields.pair: Mercado
+trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
 wallet.balance: Balance
