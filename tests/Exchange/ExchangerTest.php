@@ -20,6 +20,7 @@ use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
 use App\Tests\MockMoneyWrapper;
+use App\Utils\Symbols;
 use App\Utils\Validator\ValidatorInterface;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
@@ -38,7 +39,7 @@ class ExchangerTest extends TestCase
     public function testPlaceOrderInsufficientBalance(): void
     {
         $user = $this->mockUser();
-        $tok = $this->mockToken(MoneyWrapper::TOK_SYMBOL, $user);
+        $tok = $this->mockToken(Symbols::TOK, $user);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -65,7 +66,7 @@ class ExchangerTest extends TestCase
     public function testPlaceOrderSmallAmount(): void
     {
         $user = $this->mockUser();
-        $tok = $this->mockToken(MoneyWrapper::TOK_SYMBOL, $user);
+        $tok = $this->mockToken(Symbols::TOK, $user);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -92,7 +93,7 @@ class ExchangerTest extends TestCase
     public function testPlaceOrderSuccess(): void
     {
         $user = $this->mockUser();
-        $tok = $this->mockToken(MoneyWrapper::TOK_SYMBOL, $user);
+        $tok = $this->mockToken(Symbols::TOK, $user);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -119,7 +120,7 @@ class ExchangerTest extends TestCase
     public function testPlaceOrderSuccessMarketPrice(): void
     {
         $user = $this->mockUser();
-        $tok = $this->mockToken(MoneyWrapper::TOK_SYMBOL, $user);
+        $tok = $this->mockToken(Symbols::TOK, $user);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -155,7 +156,7 @@ class ExchangerTest extends TestCase
 
     private function money(int $amount): Money
     {
-        return new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($amount, new Currency(Symbols::TOK));
     }
 
     private function mockTrader(TradeResult $result): TraderInterface

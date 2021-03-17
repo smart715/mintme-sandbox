@@ -2,8 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\AirdropCampaign\Airdrop;
-use App\Entity\Profile;
 use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
 

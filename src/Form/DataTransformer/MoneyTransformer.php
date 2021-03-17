@@ -2,9 +2,8 @@
 
 namespace App\Form\DataTransformer;
 
-use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Currency;
 use Money\Money;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -40,7 +39,7 @@ class MoneyTransformer implements DataTransformerInterface
     public function reverseTransform($value): Money
     {
         try {
-            return $this->moneyWrapper->parse($value, $this->symbol ?? Token::TOK_SYMBOL);
+            return $this->moneyWrapper->parse($value, $this->symbol ?? Symbols::TOK);
         } catch (\Throwable $e) {
             throw new TransformationFailedException();
         }

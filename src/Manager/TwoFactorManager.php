@@ -8,7 +8,6 @@ use App\Repository\GoogleAuthenticatorEntryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PragmaRX\Random\Random;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class TwoFactorManager implements TwoFactorManagerInterface

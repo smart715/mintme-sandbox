@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Symbols;
 
 class MarketFactory implements MarketFactoryInterface
 {
@@ -76,7 +77,7 @@ class MarketFactory implements MarketFactoryInterface
         $markets = [];
 
         $bases = $this->getTradableCryptos();
-        $quote = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $quote = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
         if (!$quote) {
             return $markets;
