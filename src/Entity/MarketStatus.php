@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -206,7 +207,7 @@ class MarketStatus
     {
         return new Money(
             $this->soldOnMarket,
-            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Token::TOK_SYMBOL)
+            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Symbols::TOK)
         );
     }
 

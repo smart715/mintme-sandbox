@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
@@ -99,7 +99,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return new Amount(
             new Money(
                 $this->amount,
-                new Currency(MoneyWrapper::TOK_SYMBOL)
+                new Currency(Symbols::TOK)
             )
         );
     }

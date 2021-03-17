@@ -15,8 +15,8 @@ use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -214,7 +214,7 @@ class Exchanger implements ExchangerInterface
     private function getSymbol(TradebleInterface $tradeble): string
     {
         return $tradeble instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradeble->getSymbol();
     }
 
@@ -241,7 +241,7 @@ class Exchanger implements ExchangerInterface
             )[$token->getSymbol()];
 
             return $this->mw
-                ->parse($amount, MoneyWrapper::TOK_SYMBOL)
+                ->parse($amount, Symbols::TOK)
                 ->greaterThan($balanceViewer->getAvailable());
         }
 

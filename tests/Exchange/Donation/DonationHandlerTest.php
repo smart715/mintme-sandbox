@@ -15,6 +15,7 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -38,7 +39,7 @@ class DonationHandlerTest extends TestCase
     public function testCheckDonation(): void
     {
         $base = $this->mockCrypto();
-        $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
+        $base->method('getSymbol')->willReturn(Symbols::WEB);
 
         /** @var User|MockObject $ownerUser */
         $ownerUser = $this->createMock(User::class);
@@ -91,17 +92,17 @@ class DonationHandlerTest extends TestCase
 
         $this->assertEquals(
             '5',
-            $donationHandler->checkDonation($market, Token::WEB_SYMBOL, '75', $donorUser)
+            $donationHandler->checkDonation($market, Symbols::WEB, '75', $donorUser)
         );
     }
 
     public function testMakeDonation(): void
     {
         $webCrypto = $this->mockCrypto();
-        $webCrypto->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
+        $webCrypto->method('getSymbol')->willReturn(Symbols::WEB);
 
         $base = $this->mockCrypto();
-        $base->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
+        $base->method('getSymbol')->willReturn(Symbols::WEB);
 
         /** @var User|MockObject $ownerUser */
         $ownerUser = $this->createMock(User::class);
@@ -141,8 +142,8 @@ class DonationHandlerTest extends TestCase
             ->method('findAllIndexed')
             ->with('symbol')
             ->willReturn([
-                Token::WEB_SYMBOL => $this->mockCrypto(),
-                Token::BTC_SYMBOL => $this->mockCrypto(),
+                Symbols::WEB => $this->mockCrypto(),
+                Symbols::BTC => $this->mockCrypto(),
             ]);
 
         /** @var EntityManagerInterface|MockObject $em */
@@ -162,7 +163,7 @@ class DonationHandlerTest extends TestCase
             $em
         );
 
-        $donationHandler->makeDonation($market, Token::BTC_SYMBOL, '30000', '20000', $donorUser, '0');
+        $donationHandler->makeDonation($market, Symbols::BTC, '30000', '20000', $donorUser, '0');
         $this->assertTrue(true);
     }
 
@@ -184,8 +185,8 @@ class DonationHandlerTest extends TestCase
         $crf = $this->createMock(CryptoRatesFetcherInterface::class);
 
         $crf->method('fetch')->willReturn([
-            Token::WEB_SYMBOL => [
-                Token::BTC_SYMBOL => 0.00000008,
+            Symbols::WEB => [
+                Symbols::BTC => 0.00000008,
             ],
         ]);
 

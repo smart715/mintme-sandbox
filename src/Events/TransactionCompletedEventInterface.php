@@ -3,8 +3,6 @@
 namespace App\Events;
 
 use App\Entity\TradebleInterface;
-use App\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 
 interface TransactionCompletedEventInterface extends UserEventInterface
 {

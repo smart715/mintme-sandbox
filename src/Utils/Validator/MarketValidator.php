@@ -5,6 +5,7 @@ namespace App\Utils\Validator;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Market;
+use App\Utils\Symbols;
 
 class MarketValidator implements ValidatorInterface
 {
@@ -25,9 +26,9 @@ class MarketValidator implements ValidatorInterface
 
         return $base instanceof Crypto && $base->getSymbol() !== $quote->getSymbol()
             && (
-                Token::WEB_SYMBOL === $quote->getSymbol()
+                Symbols::WEB === $quote->getSymbol()
                 ||
-                ($quote instanceof Token && Token::WEB_SYMBOL === $base->getSymbol())
+                ($quote instanceof Token && Symbols::WEB === $base->getSymbol())
             );
     }
 

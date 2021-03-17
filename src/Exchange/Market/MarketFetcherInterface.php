@@ -2,8 +2,6 @@
 
 namespace App\Exchange\Market;
 
-use App\Exchange\Market;
-
 interface MarketFetcherInterface
 {
     public function getPendingOrders(string $market, int $offset, int $limit, int $side): array;

@@ -11,6 +11,7 @@ use App\Exchange\Config\Config;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcher;
 use App\Exchange\Order;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Money\Currency;
 use Money\Money;
@@ -370,7 +371,7 @@ class MarketFetcherTest extends TestCase
         $market = $this->createMock(Market::class);
 
         $token = $this->createMock(Token::class);
-        $token->method('getSymbol')->willReturn(MoneyWrapper::TOK_SYMBOL);
+        $token->method('getSymbol')->willReturn(Symbols::TOK);
 
         $market->method('getQuote')->willReturn($token);
 
@@ -379,7 +380,7 @@ class MarketFetcherTest extends TestCase
 
     private function createMoney(int $value): Money
     {
-        return new Money($value, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($value, new Currency(Symbols::TOK));
     }
 
     private function getUserPendingResult(int $id): array

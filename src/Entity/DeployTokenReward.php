@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -48,7 +49,7 @@ class DeployTokenReward
 
     public function getReward(): Money
     {
-        return new Money($this->reward, new Currency(Token::WEB_SYMBOL));
+        return new Money($this->reward, new Currency(Symbols::WEB));
     }
 
     public function getUser(): User

@@ -3,9 +3,6 @@
 namespace App\Serializer;
 
 use App\Entity\Image;
-use App\Entity\Token\Token;
-use App\Exchange\Market;
-use App\Utils\Converter\MarketNameConverterInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;

@@ -13,6 +13,7 @@ use App\Manager\AirdropCampaignManager;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
 use App\Tests\MockMoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -53,10 +54,10 @@ class AirdropCampaignManagerTest extends TestCase
         $bh
             ->method('exchangeBalance')
             ->with($user, $token)
-            ->willReturn(new Money(100000000000, new Currency(Token::TOK_SYMBOL)));
+            ->willReturn(new Money(100000000000, new Currency(Symbols::TOK)));
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh, $this->mockEventDispatcher());
-        $amount = new Money(500, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $amount = new Money(500, new Currency(Symbols::TOK));
 
         $airdrop = $airdropManager->createAirdrop(
             $token,
@@ -69,7 +70,7 @@ class AirdropCampaignManagerTest extends TestCase
         $this->assertEquals(150, $airdrop->getParticipants());
         $this->assertEquals(null, $airdrop->getEndDate());
 
-        $amount = new Money(700, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $amount = new Money(700, new Currency(Symbols::TOK));
         $endDate = new \DateTimeImmutable('+2 days');
         $airdrop = $airdropManager->createAirdrop(
             $token,
@@ -100,9 +101,9 @@ class AirdropCampaignManagerTest extends TestCase
         $airdrop = new Airdrop();
         $airdrop
             ->setToken($token)
-            ->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setActualAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setLockedAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setAmount(new Money(0, new Currency(Symbols::TOK)))
+            ->setActualAmount(new Money(0, new Currency(Symbols::TOK)))
+            ->setLockedAmount(new Money(0, new Currency(Symbols::TOK)))
             ->setStatus(Airdrop::STATUS_ACTIVE);
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh, $this->mockEventDispatcher());
@@ -123,9 +124,9 @@ class AirdropCampaignManagerTest extends TestCase
         $token = $this->createMock(Token::class);
         $airdrop = new Airdrop();
         $airdrop
-            ->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setActualAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
-            ->setLockedAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)))
+            ->setAmount(new Money(0, new Currency(Symbols::TOK)))
+            ->setActualAmount(new Money(0, new Currency(Symbols::TOK)))
+            ->setLockedAmount(new Money(0, new Currency(Symbols::TOK)))
             ->setStatus(Airdrop::STATUS_ACTIVE)
             ->setToken($token);
 
@@ -208,14 +209,14 @@ class AirdropCampaignManagerTest extends TestCase
         $bh
             ->method('exchangeBalance')
             ->with($user, $token)
-            ->willReturn(new Money(100000000000, new Currency(Token::TOK_SYMBOL)));
+            ->willReturn(new Money(100000000000, new Currency(Symbols::TOK)));
 
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh, $this->mockEventDispatcher());
 
         $airdrop = new Airdrop();
-        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $airdrop->setAmount(new Money(100, new Currency(Symbols::TOK)));
         $airdrop->setParticipants(100);
-        $airdrop->setLockedAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $airdrop->setLockedAmount(new Money(100, new Currency(Symbols::TOK)));
 
         $token->expects($this->once())->method('getActiveAirdrop')->willReturn($airdrop);
 
@@ -242,21 +243,21 @@ class AirdropCampaignManagerTest extends TestCase
         $airdropManager = new AirdropCampaignManager($em, $this->mockMoneyWrapper(), $bh, $this->mockEventDispatcher());
 
         $airdrop = new Airdrop();
-        $airdrop->setAmount(new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $airdrop->setAmount(new Money(0, new Currency(Symbols::TOK)));
         $airdrop->setParticipants(10);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Airdrop reward calculation failed.');
         $airdropManager->getAirdropReward($airdrop);
 
-        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $airdrop->setAmount(new Money(100, new Currency(Symbols::TOK)));
         $airdrop->setParticipants(0);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Airdrop reward calculation failed.');
         $airdropManager->getAirdropReward($airdrop);
 
-        $airdrop->setAmount(new Money(100, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $airdrop->setAmount(new Money(100, new Currency(Symbols::TOK)));
         $airdrop->setParticipants(100);
 
         $reward = $airdropManager->getAirdropReward($airdrop);
