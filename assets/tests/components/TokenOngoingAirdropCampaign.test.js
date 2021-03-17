@@ -239,6 +239,9 @@ describe('TokenOngoingAirdropCampaign', () => {
 
         moxios.stubRequest('claim_airdrop_campaign', {
             status: 200,
+            response: {
+                data: {},
+            },
         });
 
         wrapper.vm.airdropCampaign = {
