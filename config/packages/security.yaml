@@ -51,6 +51,10 @@ security:
             security:   false
 
     role_hierarchy:
+        ROLE_AUTENTICATED:
+            - ROLE_USER
+        ROLE_SEMI_AUTHENTICATED:
+            - ROLE_USER
         ROLE_ADMIN_USER_ADMIN:
             - ROLE_ADMIN_USER_LIST
             - ROLE_ADMIN_USER_VIEW
