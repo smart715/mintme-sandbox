@@ -234,7 +234,7 @@
         </confirm-modal>
         <add-phone-alert-modal
             :visible="addPhoneModalVisible"
-            :message="addPhoneModalMessage"
+            :nickname="profileNickname"
             @close="addPhoneModalVisible = false"
         />
     </div>
@@ -306,14 +306,6 @@ export default {
         this.showModal = this.showAirdropModal;
     },
     computed: {
-        addPhoneModalMessage: function() {
-            return this.$t('modal.add_phone_alert.airdrop', {
-                profileUrl: this.$routing.generate('profile-view', {
-                  nickname: this.profileNickname,
-                  edit: 1,
-                }),
-            });
-        },
         actionsLength() {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
         },
