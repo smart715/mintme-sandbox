@@ -137,7 +137,7 @@
                             </template>
                             <template slot="body">
                                 <token-delete
-                                    :is-token-exchanged="isTokenExchanged"
+                                    :is-token-over-sold-limit="isTokenOverSoldLimit"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
@@ -204,13 +204,22 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         disabledServicesConfig: String,
+        tokenDeleteSoldLimit: String,
     },
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
             tokenDeployKey: 0,
             maxLengthToTruncate: 49,
+            tokensSoldOnMarket: null
         };
+    },
+    mounted: function () {
+        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.currentName}))
+            .then((res) => this.tokensSoldOnMarket = res.data)
+            .catch((err) => {
+              this.sendLogs('error', 'Can not get tokens in curculation', err);
+            });
     },
     beforeUpdate: function() {
         if (this.isTokenDeployed) {
@@ -218,6 +227,9 @@ export default {
         }
     },
     computed: {
+        isTokenOverSoldLimit: function () {
+            return this.tokensSoldOnMarket >= this.tokenDeleteSoldLimit;
+        },
         shouldTruncate: function() {
             return this.currentName.length > this.maxLengthToTruncate;
         },

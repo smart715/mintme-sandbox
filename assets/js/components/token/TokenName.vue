@@ -26,6 +26,7 @@
                 :youtube-channel-id="youtubeChannelId"
                 :airdrop-params="airdropParams"
                 :disabled-services-config="disabledServicesConfig"
+                :token-delete-sold-limit="tokenDeleteSoldLimit"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
                 @update-release-address="updateReleaseAddress"
@@ -88,6 +89,7 @@ export default {
         youtubeChannelId: String,
         showTokenEditModalProp: Boolean,
         disabledServicesConfig: String,
+        tokenDeleteSoldLimit: String,
     },
     components: {
         FontAwesomeIcon,

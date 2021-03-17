@@ -9,7 +9,7 @@
                     {{ $t('token.delete.header') }}
                 </template>
                 <template slot="body">
-                    <p v-if="isTokenExchanged">
+                    <p v-if="isTokenOverSoldLimit">
                         {{ $t('token.delete.body.all_tokens') }}
                     </p>
                     <p v-else-if="!isTokenNotDeployed">
@@ -44,7 +44,7 @@ export default {
     name: 'TokenDelete',
     mixins: [NotificationMixin, LoggerMixin],
     props: {
-        isTokenExchanged: Boolean,
+        isTokenOverSoldLimit: Boolean,
         isTokenNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
@@ -57,11 +57,12 @@ export default {
         return {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
+            loading: true
         };
     },
     computed: {
         btnDisabled: function() {
-            return this.isTokenExchanged || !this.isTokenNotDeployed;
+            return this.isTokenOverSoldLimit || !this.isTokenNotDeployed;
         },
     },
     methods: {
@@ -78,7 +79,7 @@ export default {
             this.sendConfirmCode();
         },
         doDeleteToken: function(code = '') {
-            if (this.isTokenExchanged) {
+            if (this.isTokenOverSoldLimit) {
                 this.notifyError(this.$t('token.delete.body.all_tokens'));
                 return;
             } else if (!this.isTokenNotDeployed) {

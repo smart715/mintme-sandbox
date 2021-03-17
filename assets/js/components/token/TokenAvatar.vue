@@ -38,6 +38,7 @@
                 @updated-discord="$emit('updated-discord')"
                 @updated-telegram="$emit('updated-telegram')"
                 :show-token-edit-modal-prop="showTokenEditModal"
+                :token-delete-sold-limit="tokenDeleteSoldLimit"
                 :disabled-services-config="disabledServicesConfig"
             />
             <token-deploy-icon
@@ -102,6 +103,7 @@ export default {
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
         tokenName: String,
+        tokenDeleteSoldLimit: String,
     },
     components: {
         Avatar,
