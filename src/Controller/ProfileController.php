@@ -65,37 +65,47 @@ class ProfileController extends Controller
         $form = $this->createForm(PhoneVerificationType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() &&
-            $form->isValid()
-        ) {
-            $profile->getPhoneNumber()->setVerified(true);
-            $profile->getPhoneNumber()->setVerificationCode(null);
-            $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
-            $profile->getPhoneNumber()->setEditAttempts(0);
+        if ($form->isSubmitted()) {
             $entityManager = $this->getDoctrine()->getManager();
+
+            if ($form->isValid()) {
+                $profile->getPhoneNumber()->setVerified(true);
+                $profile->getPhoneNumber()->setVerificationCode(null);
+                $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
+                $profile->getPhoneNumber()->setEditAttempts(0);
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($profile);
+                $entityManager->flush();
+                $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
+                $user->addRole(User::ROLE_AUTHENTICATED);
+                $this->userManager->updateUser($user);
+                $newToken = new PostAuthenticationGuardToken(
+                    $user,
+                    'authenticate',
+                    [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
+                );
+                $this->tokenStorage->setToken($newToken);
+
+                $this->userActionLogger->info(
+                    'Phone number '.$this->phoneNumberUtil->format(
+                        $profile->getPhoneNumber()->getPhoneNumber(),
+                        PhoneNumberFormat::E164
+                    ).' verified.'
+                );
+
+                return $this->redirectToRoute('profile');
+            }
+
+            $profile->getPhoneNumber()->incrementFailedAttempts();
             $entityManager->persist($profile);
             $entityManager->flush();
-            $user->removeRole(User::ROLE_SEMI_AUTHENTICATED);
-            $user->addRole(User::ROLE_AUTHENTICATED);
-            $this->userManager->updateUser($user);
-            $newToken = new PostAuthenticationGuardToken(
-                $user,
-                'authenticate',
-                [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
-            );
-            $this->tokenStorage->setToken($newToken);
-
-            $this->userActionLogger->info(
-                'Phone number '.$this->phoneNumberUtil->format(
-                    $profile->getPhoneNumber()->getPhoneNumber(),
-                    PhoneNumberFormat::E164
-                ).' verified.'
-            );
-
-            return $this->redirectToRoute('profile');
         }
 
+        $failedAttempts = $totalLimit = $this->getParameter('adding_phone_attempts_limit')['failed'];
+
         return $this->render('pages/phone_verification.html.twig', [
+            'failedAttempts' => $failedAttempts,
+            'limitReached' => $profile->getPhoneNumber()->getFailedAttempts() >= $failedAttempts,
             'form' => $form->createView(),
         ]);
     }

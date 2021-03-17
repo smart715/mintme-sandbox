@@ -1310,7 +1310,9 @@ phone_confirmation.title: 'Confirme su número de teléfono'
 phone_confirmation.header: 'Confirme su número de teléfono'
 phone_confirmation.form.verification_code: 'Código de verificación:'
 phone_confirmation.form.submit: 'Verificar el código'
-phone_confirmation.send_code: 'Enviar código'
+phone_confirmation.send_code_again:
+phone_confirmation.limit_reached:
+phone_confirmation.msg:
 phone_confirmation.invalid_code: 'Código incorrecto, por favor intente de nuevo o solicite otro SMS'
 phone_confirmation.your_verification_code: 'Su código de verificación de MintMe es: %code%'
 phone_number.wrong: 'Número incorrecto'
