@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Entity\TradebleInterface;
 use App\Exchange\Order;
 use Symfony\Contracts\EventDispatcher\Event;
 

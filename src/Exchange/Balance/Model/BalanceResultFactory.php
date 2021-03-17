@@ -2,7 +2,7 @@
 
 namespace App\Exchange\Balance\Model;
 
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
@@ -40,7 +40,7 @@ class BalanceResultFactory
     private function getMoney(string $value, string $symbol): Money
     {
         if (!$this->moneyWrapper->getRepository()->contains(new Currency($symbol))) {
-            $symbol = MoneyWrapper::TOK_SYMBOL;
+            $symbol = Symbols::TOK;
         }
 
         return $this->moneyWrapper->parse($value, $symbol);

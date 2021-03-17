@@ -4,6 +4,7 @@ namespace App\Exchange;
 
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -100,7 +101,7 @@ class TradeInfo
     {
         return new Money(
             $this->token ? $this->token->getWithdrawn() : '0',
-            new Currency(Token::TOK_SYMBOL)
+            new Currency(Symbols::TOK)
         );
     }
 }

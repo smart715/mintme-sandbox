@@ -2,12 +2,11 @@
 
 namespace App\Serializer;
 
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class MoneyNormalizer implements NormalizerInterface
 {
@@ -27,7 +26,7 @@ class MoneyNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = array()): string
     {
         if (!$this->moneyWrapper->getRepository()->contains($object->getCurrency())) {
-            $object = new Money($object->getAmount(), new Currency(MoneyWrapper::TOK_SYMBOL));
+            $object = new Money($object->getAmount(), new Currency(Symbols::TOK));
         }
 
         return $this->moneyWrapper->format($object);

@@ -2,9 +2,6 @@
 
 namespace App\TwigExtension;
 
-use App\Admin\Traits\CheckContentLinksTrait;
-use HTMLPurifier;
-use HTMLPurifier_Config;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

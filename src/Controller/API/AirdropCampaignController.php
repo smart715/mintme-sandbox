@@ -22,9 +22,9 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\TwitterManagerInterface;
 use App\Utils\AirdropCampaignActions;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -162,7 +162,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.already_has_active_airdrop'));
         }
 
-        $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
+        $amount = $moneyWrapper->parse((string)$request->get('amount'), Symbols::TOK);
         $participants = (int)$request->get('participants');
         $endDateTimestamp = (int)$request->get('endDate');
         $balance = $balanceHandler->exchangeBalance(

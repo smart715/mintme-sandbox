@@ -5,6 +5,7 @@ namespace App\Utils\Converter;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Exchange\Market;
+use App\Utils\Symbols;
 
 class MarketNameConverter implements MarketNameConverterInterface
 {
@@ -20,7 +21,7 @@ class MarketNameConverter implements MarketNameConverterInterface
     {
         $quote = $this->convertTradable($market->getQuote());
         $base = $market->getQuote() instanceof Token
-            ? Token::WEB_SYMBOL
+            ? Symbols::WEB
             : $this->convertTradable($market->getBase());
 
         return strtoupper($baseFirst ? $base . $quote : $quote . $base);

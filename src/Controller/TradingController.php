@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManager;
 use App\Repository\TokenRepository;
+use App\Utils\Symbols;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -38,8 +39,8 @@ class TradingController extends Controller
         Request $request,
         CryptoManagerInterface $cryptoManager
     ): Response {
-        $btcCrypto = $cryptoManager->findBySymbol(Token::BTC_SYMBOL);
-        $webCrypto = $cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $btcCrypto = $cryptoManager->findBySymbol(Symbols::BTC);
+        $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
 
         return $this->render('pages/trading.html.twig', [
             'tokensCount' => $this->getTokenRepository()->count(['isBlocked' => false]),

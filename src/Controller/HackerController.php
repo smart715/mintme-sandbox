@@ -10,6 +10,7 @@ use App\Form\QuickRegistrationType;
 use App\Form\RegistrationType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
@@ -31,8 +32,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class HackerController extends AbstractController
 {
-    public const BTC_SYMBOL = 'BTC';
-
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -68,9 +67,9 @@ class HackerController extends AbstractController
 
         $symbol = $crypto->getSymbol();
 
-        $amount = self::BTC_SYMBOL === $symbol
+        $amount = Symbols::BTC === $symbol
             ? '0.001'
-            : (Token::ETH_SYMBOL === $symbol ? '0.05' :  (Token::USDC_SYMBOL === $symbol ? '10' : '100'));
+            : (Symbols::ETH === $symbol ? '0.05' :  (Symbols::USDC === $symbol ? '10' : '100'));
 
         /** @var User $user*/
         $user = $this->getUser();
