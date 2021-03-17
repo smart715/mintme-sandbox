@@ -80,7 +80,7 @@ class ProfileController extends Controller
             $this->userManager->updateUser($user);
             $newToken = new PostAuthenticationGuardToken(
                 $user,
-                'main',
+                'authenticate',
                 [User::ROLE_AUTHENTICATED, User::ROLE_DEFAULT]
             );
             $this->tokenStorage->setToken($newToken);
