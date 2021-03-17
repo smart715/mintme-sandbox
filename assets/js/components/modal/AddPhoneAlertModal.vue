@@ -30,16 +30,11 @@ export default {
     },
     props: {
         visible: Boolean,
-        nickname: String,
+        message: String,
     },
     computed: {
         body: function() {
-            return this.$t('modal.add_phone_alert.airdrop', {
-                profileUrl: this.$routing.generate('profile-view', {
-                    nickname: this.nickname,
-                    edit: 1,
-                }),
-            });
+            return this.message;
         },
     },
     methods: {
