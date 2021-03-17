@@ -6,7 +6,7 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 
@@ -43,7 +43,7 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         $this->balanceHandler->deposit(
             $user,
             $token,
-            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
+            $this->moneyWrapper->parse($amount, Symbols::TOK)
         );
     }
 

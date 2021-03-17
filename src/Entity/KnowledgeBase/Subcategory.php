@@ -4,7 +4,6 @@ namespace App\Entity\KnowledgeBase;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="knowledge_base_subcategory")

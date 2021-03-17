@@ -13,6 +13,7 @@ use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationConfigManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -246,7 +247,7 @@ class RegistrationController extends FOSRegistrationController
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
             Bonus::SIGN_UP_TYPE === $user->getBonus()->getType()) {
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+            $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
             if (!$crypto) {
                 return parent::confirmedAction($request);

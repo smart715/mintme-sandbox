@@ -3,7 +3,6 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use App\Communications\Factory\HttpClientFactory;
 use App\Communications\Factory\HttpClientFactoryInterface;
 use Exception;
 use GuzzleHttp\ClientInterface;

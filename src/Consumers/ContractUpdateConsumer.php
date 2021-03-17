@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\SmartContract\Model\ChangeMintDestinationCallbackMessage;
 use App\SmartContract\Model\ContractUpdateCallbackMessage;
 use App\SmartContract\Model\UpdateMintedAmountCallbackMessage;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
@@ -131,7 +132,7 @@ class ContractUpdateConsumer implements ConsumerInterface
                 return true;
             }
 
-            $minted = $this->moneyWrapper->parse($clbResult->getValue(), Token::TOK_SYMBOL);
+            $minted = $this->moneyWrapper->parse($clbResult->getValue(), Symbols::TOK);
 
             $token->setMintedAmount($token->getMintedAmount()->add($minted));
 
