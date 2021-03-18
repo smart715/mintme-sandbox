@@ -7,7 +7,6 @@ use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
 use App\Wallet\RowsFetcherInterface;
-use Money\Money;
 
 interface DepositGatewayCommunicatorInterface extends RowsFetcherInterface
 {

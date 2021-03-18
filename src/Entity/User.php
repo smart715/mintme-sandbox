@@ -7,7 +7,6 @@ use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,6 +18,7 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterf
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
 use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -37,6 +37,8 @@ class User extends BaseUser implements
     TrustedDeviceInterface
 {
     public const ROLE_API = 'ROLE_API';
+    public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
 
     /**
      * @ORM\Id

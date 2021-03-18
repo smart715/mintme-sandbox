@@ -4,7 +4,6 @@ namespace App\Communications;
 
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
-use App\Exchange\Config\CoinifyConfig;
 use Symfony\Component\HttpFoundation\Request;
 
 class CoinifyCommunicator

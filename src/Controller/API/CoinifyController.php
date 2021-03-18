@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Communications\CoinifyCommunicator;
-use App\Communications\CoinifyRegister;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;

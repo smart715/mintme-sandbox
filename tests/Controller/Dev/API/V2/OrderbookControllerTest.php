@@ -4,6 +4,7 @@ namespace App\Tests\Controller\Dev\API\V2;
 
 use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
+use App\Utils\Symbols;
 
 class OrderbookControllerTest extends WebTestCase
 {
@@ -12,8 +13,8 @@ class OrderbookControllerTest extends WebTestCase
     public function testGetOrderbook(): void
     {
         $markets = [
-            Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL,
-            Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL,
+            Symbols::MINTME . '_' . Symbols::BTC,
+            Symbols::MINTME . '_' . Symbols::ETH,
         ];
 
         foreach ($markets as $market) {

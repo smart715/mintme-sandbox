@@ -15,6 +15,7 @@ use App\Manager\TokenManager;
 use App\Repository\DeployTokenRewardRepository;
 use App\Repository\TokenRepository;
 use App\Utils\Fetcher\ProfileFetcherInterface;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -253,8 +254,8 @@ class TokenManagerTest extends TestCase
             ->method('findBy')
             ->with(['user' => $user])
             ->willReturn([
-                new DeployTokenReward($user, new Money(5, new Currency(Token::WEB_SYMBOL))),
-                new DeployTokenReward($user, new Money(5, new Currency(Token::WEB_SYMBOL))),
+                new DeployTokenReward($user, new Money(5, new Currency(Symbols::WEB))),
+                new DeployTokenReward($user, new Money(5, new Currency(Symbols::WEB))),
             ]);
 
         $em = $this->createMock(EntityManagerInterface::class);
@@ -274,7 +275,7 @@ class TokenManagerTest extends TestCase
         $referralReward = $tokenManager->getUserDeployTokensReward($user);
 
         $this->assertEquals('10', $referralReward->getAmount());
-        $this->assertEquals(Token::WEB_SYMBOL, $referralReward->getCurrency());
+        $this->assertEquals(Symbols::WEB, $referralReward->getCurrency());
     }
 
     private function mockToken(string $name, ?LockIn $lockIn = null, ?User $user = null, bool $deployed = false): Token
@@ -354,6 +355,6 @@ class TokenManagerTest extends TestCase
 
     private function mockMoney(int $amount, ?string $symbol = null): Money
     {
-        return new Money($amount, new Currency($symbol ?? Token::TOK_SYMBOL));
+        return new Money($amount, new Currency($symbol ?? Symbols::TOK));
     }
 }

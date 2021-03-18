@@ -40,7 +40,6 @@ use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
 use App\Utils\Validator\AirdropReferralCodeHashValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
@@ -269,7 +268,7 @@ class TokenController extends Controller
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
-                        MoneyWrapper::TOK_SYMBOL
+                        Symbols::TOK
                     )
                 );
                 $market = $this->marketManager->createUserRelated($user);

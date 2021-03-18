@@ -11,6 +11,7 @@ use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +20,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Throwable;
 
 /* Cron job added to DB. */
 class UpdatePendingWithdrawals extends Command
@@ -133,10 +133,10 @@ class UpdatePendingWithdrawals extends Command
             $items = $this->getPendingTokenWithdrawRepository()->findAll();
             $itemsCount = count($items);
             $pendingCount = 0;
-            $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+            $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
             $ethTokenFeeInCrypto = $this->moneyWrapper->parse(
                 (string)$this->parameterBag->get('token_withdraw_fee'),
-                Token::ETH_SYMBOL
+                Symbols::ETH
             );
 
             /** @var PendingTokenWithdraw $item */

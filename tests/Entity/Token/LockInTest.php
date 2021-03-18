@@ -4,6 +4,7 @@ namespace App\Tests\Entity\Token;
 
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Money\Currency;
 use Money\Money;
@@ -17,7 +18,7 @@ class LockInTest extends TestCase
         $li = new LockIn($this->mockToken());
 
         $this->assertEquals('0', $li->getHourlyRate()->getAmount());
-        $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $li->setAmountToRelease(new Money(10000000000, new Currency(Symbols::TOK)));
         $this->assertEquals('1141553', $li->getHourlyRate()->getAmount());
         $li->setReleasePeriod(10);
         $this->assertEquals('114155', $li->getHourlyRate()->getAmount());
@@ -28,7 +29,7 @@ class LockInTest extends TestCase
         $li = new LockIn($this->mockToken());
 
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
-        $li->setAmountToRelease(new Money(10000000000, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $li->setAmountToRelease(new Money(10000000000, new Currency(Symbols::TOK)));
         $this->assertEquals('0', $li->getReleasedAmount()->getAmount());
         $li->setReleasedAtStart('1000000');
         $this->assertEquals('1000000', $li->getReleasedAmount()->getAmount());
@@ -50,7 +51,7 @@ class LockInTest extends TestCase
             ->method('getDeployed')
             ->willReturn((new \DateTimeImmutable())->add(new \DateInterval('P1D')));
 
-        $releasedAtStartObj = new Money($releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $releasedAtStartObj = new Money($releasedAtStart, new Currency(Symbols::TOK));
         $li->setReleasedAtStart($releasedAtStart);
 
         $this->assertEquals(
@@ -62,7 +63,7 @@ class LockInTest extends TestCase
     public function testUpdateFrozenAmount(): void
     {
         $li = new LockIn($this->mockToken());
-        $amountToRelease = new Money('9000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+        $amountToRelease = new Money('9000000', new Currency(Symbols::TOK));
 
         $li
             ->setAmountToRelease($amountToRelease)
@@ -80,7 +81,7 @@ class LockInTest extends TestCase
         $token = $this->mockToken();
         $li = new LockIn($token);
         $initialAmount = '1000000';
-        $amountToRelease = new Money(9000000, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $amountToRelease = new Money(9000000, new Currency(Symbols::TOK));
 
         $token
             ->expects($this->any())

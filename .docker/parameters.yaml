@@ -173,6 +173,7 @@ parameters:
     d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
     disable_sms: true
     adding_phone_attempts_limit:
+        failed: 5
         daily: 3
         weekly: 10
         monthly: 20

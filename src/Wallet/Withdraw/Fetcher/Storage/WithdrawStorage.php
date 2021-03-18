@@ -3,7 +3,6 @@
 namespace App\Wallet\Withdraw\Fetcher\Storage;
 
 use App\Communications\JsonRpcInterface;
-use Dompdf\Exception;
 
 class WithdrawStorage implements StorageAdapterInterface
 {

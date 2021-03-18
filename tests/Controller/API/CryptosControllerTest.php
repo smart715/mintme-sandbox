@@ -4,6 +4,7 @@ namespace App\Tests\Controller\API;
 
 use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
+use App\Utils\Symbols;
 
 class CryptosControllerTest extends WebTestCase
 {
@@ -34,7 +35,7 @@ class CryptosControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertEquals('133.000000000000000000', $res);
 
-        $this->deposit($email, '150000', Token::BTC_SYMBOL);
+        $this->deposit($email, '150000', Symbols::BTC);
         $this->client->request('GET', '/api/cryptos/BTC/balance');
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 

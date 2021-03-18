@@ -21,7 +21,7 @@ api.page.body.1: 'Todas las solicitudes debe ser enviadas con claves API únicas
 api.page.body.2: 'o con el OAuth token.'
 api.page.body.3: 'Debe proveer las claves API con cada solicitud en el encabezado HTTP como los parámetros'
 api.page.body.4: '(pública) y'
-api.page.body.5: '(privado) o pasar un token OAuth con cada petición en los encabezados como el parámetro'
+api.page.body.5: '(privada) o pasar un token OAuth con cada petición en los encabezados como el parámetro'
 api.page.body.6: .
 api.page.body.7: 'Puede obtener el token OAuth enviando una solicitud de autorización a la dirección de la API de OAuth:'
 api.page.body.8: 'El token expira luego de cierto tiempo, puede generar un token nuevo luego de su vencimiento.'
@@ -375,7 +375,7 @@ page.terms.content.12.1: '12.1. Es necesario pasar por el proceso de registro y 
 page.terms.content.12.2: '12.2. MintMe se reserva el derecho, a su entera discreción, de limitar la cantidad de cuentas MintMe que usted pudiera tener, mantener o crear. Las cuentas de MintMe no pueden ser asignadas a ningún tercero.'
 page.terms.content.12.3: '12.3. Cuando usted crea una cuenta en MintMe, usted se compromete a: '
 page.terms.content.12.3a: '(a) Crear una contraseña fuerte que usted no use en ningún otro sitio web, servicios en línea y fuera de línea; '
-page.terms.content.12.3b: '(b) Proporcionar información precisa y veraz. Por favor revise nuestra <a target="_blank" href="%privacy_policy%">Política de privacidad</a> y <a target="_blank" href="%aml_policy%">Política de AML</a> para información de como recopilamos, usamos y compartimos su información personal; '
+page.terms.content.12.3b: '(b) Proporcionar información precisa y veraz. Por favor revise nuestra <a target="_blank" href="%privacy_policy%">Política de privacidad</a> y <a target="_blank" href="%aml_policy%">Política contra el blanqueo de capitales</a> para información de como recopilamos, usamos y compartimos su información personal; '
 page.terms.content.12.3c: '(c) Asumir la responsabilidad de todas las actividades que ocurren en su cuenta MintMe y aceptar todos los riesgos de cualquier acceso autorizado o ilegal  a su cuenta MintMe, hasta donde la ley lo permita.'
 page.terms.content.13: '13. DEPÓSITO/RETIROS DE CRIPTOACTIVOS A UNA CUENTA MINTME'
 page.terms.content.13.1: '13.1. Nuestra Plataforma Tecnológica permite a los Usuarios enviar criptoactivos a una Cuenta MintMe desde un servicio externo de un tercero y viceversa exceptuando ciertas condiciones, el cual puede ser actualizado cada cierto tiempo.'
@@ -447,7 +447,7 @@ img.tok_easy_icon_3: 'Socialice con creadores y otros traders en Mintme'
 img.tok_easy_icon_4: 'Recibe ganancias con el programa de referidos de Mintme'
 img.webchain_graph: 'gráficos mintme coin'
 img.webchain: 'mintme coin'
-deposit.msg: 'Su depósito de %amount% %symbol% fue completado. Puede verlo disponible en su cuenta.'
+deposit.msg: 'Su depósito se ha completado. Compruebe el historial de <a href="%urlWallet%">depósitos/retiros</a>.'
 deposit_completed.msg.available: 'Puede verlo disponible en su cuenta.'
 profile_reminder.msg.add_description: 'Por favor agregue una descripción a su perfil %name% para que otros puedan conocerle mejor.'
 profile_reminder.msg.what_to_do: '<a href="%url%/%profile%">Visite su perfil</a> y haga clic en el icono de edición para agregar su descripción.'
@@ -549,7 +549,7 @@ avatar: avatar
 or: o
 and: 'y'
 buy: Compra
-settings: settings
+settings: ajustes
 sell: Venta
 mintme: MINTME
 btc: BTC
@@ -822,7 +822,7 @@ token.intro.description.plan: 'Por favor describa las metas, objetivos, planes y
 token.intro.description.plan.header: 'Sobre su plan:'
 token.intro.description.plan.guide_header: 'Sobre su plan:'
 token.intro.description.plan.guide_body: 'Escriba aquí sus planes, metas, pruebas de su identidad y todo lo que pueda interesar a los compradores.'
-token.intro.description.min_length: 'La descripción del token debe tener más de un carácter'
+token.intro.description.min_length: 'La descripción del token debe tener más de %minDescriptionLength%  caracteres'
 token.intro.description.max_length: 'La descripción del token debe ser menor a %maxDescriptionLength% caracteres '
 token.intro.description.submit: Guardar
 token.intro.description.cancel: Cancelar
@@ -868,7 +868,7 @@ token.intro.statistics.hourly.guide_body: 'Cantidad de tokens liberados por hora
 token.intro.statistics.already_released.header: 'Ya liberado:'
 token.intro.statistics.already_released.guide_header: 'Ya liberado'
 token.intro.statistics.already_released.guide_body: 'La cantidad de unidades de tokens liberados al creador del token al momento de su creación.'
-token.intro.statistics.not_yet_released.header: 'No liberadas aún:'
+token.intro.statistics.not_yet_released.header: 'No liberados aún:'
 token.intro.statistics.not_yet_released.guide_header: 'No liberados aún'
 token.intro.statistics.not_yet_released.guide_body: 'Número de tokens que aún no han sido entregados al creador del token o vendidos en el mercado'
 token.intro.statistics.created: 'Creado el:'
@@ -897,7 +897,7 @@ token.release_period.amount: 'Cantidad liberada al principio: %released%%'
 token.release_period.time: 'Tiempo necesario para desbloquear todos los tokens: %currentPeriod% años'
 token.release_period.submit: Guardar
 token.release_period.cancel: Cancelar
-token.release_period.for_rest_years: 'Periodo de liberación para el resto: %releasePeriod% year(s)'
+token.release_period.for_rest_years: 'Periodo de liberación para el resto: %releasePeriod% año(s)'
 token.facebook.confirmation_title: 'Confirmación de la página de Facebook'
 token.facebook.view_label: 'Facebook:'
 token.facebook.select_label: 'Seleccione la página de Facebook a mostrar:'
@@ -1098,7 +1098,7 @@ trading.market_cap.label: 'Capitalización de mercados'
 trading.market_cap.help: 'La capitalización del mercado basada en el último precio multiplicado por el número de tokens vendidos en el mercado'
 trading.buy_depth.label: Demanda
 trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra reflejada en MINTME para cada mercado. Esto puede representar mejor el tamaño del token que la capitalización de mercados.'
-trading.fields.pair: Mercado
+trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
 wallet.balance: Balance
@@ -1287,21 +1287,21 @@ mail.airdrop_feature.subject: '¡Cree un airdrop hoy mismo!'
 mail.airdrop_feature.body1: 'Nos hemos dado cuenta de que usted ha creado su token hace al menos 7 días pero todavía no ha programado ningún airdrop. Los airdrops son tokens gratuitos que se dan a sus seguidores por hacer algunas acciones por usted como suscribirse a su canal de Youtube o retuitear sus mensajes o publicar enlaces de la página de su proyecto. Esta es la mejor manera de dar a conocer tus tokens a tus seguidores. Una vez que consiguen una pequeña cantidad de tokens, les anima a comprarte más.'
 mail.airdrop_feature.body2.html: 'Para crear un airdrop, ve a <a href="%modalUrl%">aquí</a> y haz clic en Airdrops.'
 mail.airdrop_feature.body2.txt: 'Para crear un airdrop, vaya a %modalUrl% y haga clic en Airdrops.'
-mail.token_deployed.subject:
-mail.token_deployed.p_1:
-mail.token_deployed.p_1.1:
-mail.token_deployed.p_1.2:
-mail.token_deployed.p_1.3:
-mail.token_deployed.p_2:
-mail.token_deployed.p_2.1:
-mail.token_deployed.p_2.2:
-mail.token_deployed.p_2.3:
-mail.token_deployed.p_3:
-mail.token_deployed.p_3.1:
-mail.token_deployed.p_3.2:
-mail.token_deployed.p_3.3:
-mail.token_deployed.p_3.4:
-mail.token_deployed.p_3.5:
+mail.token_deployed.subject: 'Su token ha sido desplegado'
+mail.token_deployed.p_1: 'Enhorabuena, por haber desplegado su token en la blockchain, <a href="%explorerUrl%">%explorerUrl%</a>. Hay algunas funciones nuevas para su token:'
+mail.token_deployed.p_1.1: 'Se puede retirar y depositar'
+mail.token_deployed.p_1.2: 'Los invitados pueden hacer donaciones con metamask y recibir sus tokens'
+mail.token_deployed.p_1.3: 'Direcciones de depósito especiales que funcionan como donaciones incluyendo tokens en recompensa.'
+mail.token_deployed.p_2: 'También estamos planeando las siguientes cosas, ¡que podrían estar ya activas!'
+mail.token_deployed.p_2.1: 'Invitación de referencia directamente a su token'
+mail.token_deployed.p_2.2: 'Trade para invitados con metamask'
+mail.token_deployed.p_2.3: 'Programa de afiliación'
+mail.token_deployed.p_3: 'El dinero que ha empleado en el despliegue del token en realidad se retira de la oferta en circulación de MintMe Coin durante 5 años. Eso significa que cuantos más tokens se desplieguen, más probable será que MintMe coin aumente de precio.<br>Recuerde educar a la gente mientras usted se da a mostrar. Aquí hay algunos consejos sobre el marketing:'
+mail.token_deployed.p_3.1: 'Es el momento de la venta del token, ¿cómo puedo marcar la diferencia?'
+mail.token_deployed.p_3.2: '¿Apuntando a un token fuerte?'
+mail.token_deployed.p_3.3: 'Ideas para promocionar y vender su token'
+mail.token_deployed.p_3.4: '¿Atascado sin saber qué hacer a continuación?'
+mail.token_deployed.p_3.5: '¿Hablando con sus seguidores sobre MintMe? ¡Tenemos algunas ideas!'
 phone.add_number.notification: 'Con el fin de utilizar plenamente su cuenta, debe añadir un número de teléfono en su <a href="%url%">perfil</a>. El número no será visible para los demás.'
 phone.country_selector.label: 'Código del país'
 phone.country_selector.error: 'Elija el país'
@@ -1313,7 +1313,9 @@ phone_confirmation.title: 'Confirme su número de teléfono'
 phone_confirmation.header: 'Confirme su número de teléfono'
 phone_confirmation.form.verification_code: 'Código de verificación:'
 phone_confirmation.form.submit: 'Verificar el código'
-phone_confirmation.send_code: 'Enviar código'
+phone_confirmation.send_code_again: 'Volver a enviar el código'
+phone_confirmation.limit_reached: 'Ha introducido un código incorrecto %limit% veces, intente solicitar otro código'
+phone_confirmation.msg: 'En breve le llegará un SMS. En caso de que no le llegue intente solicitarlo de nuevo'
 phone_confirmation.invalid_code: 'Código incorrecto, por favor intente de nuevo o solicite otro SMS'
 phone_confirmation.your_verification_code: 'Su código de verificación de MintMe es: %code%'
 phone_number.wrong: 'Número incorrecto'
@@ -1344,23 +1346,24 @@ knowledge_base.header.3: 'Para obtener mejores resultados, es necesario educar c
 mail.deposit_complete.msg: 'Su depósito se ha completado'
 mail.withdrawal.msg: 'Su retiro ha sido completado'
 mail.withdrawal.text_link: 'Comprobar el historial de depósitos/retiros'
-ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar estas tareas %tasksAmount%:'
+ongoing_airdrop.actions_message: 'Para reclamar %airdropReward% %tokenName% necesitas completar esta(s) %tasksAmount% tarea(s):'
 phone_number.edit.limit: 'Sólo se puede editar el número de teléfono una vez al mes'
-token.intro.deployed_modal.paragraph_1.head:
-token.intro.deployed_modal.paragraph_1.part_1:
-token.intro.deployed_modal.paragraph_1.part_2:
-token.intro.deployed_modal.paragraph_1.part_3:
-token.intro.deployed_modal.paragraph_2.head:
-token.intro.deployed_modal.paragraph_2.part_1:
-token.intro.deployed_modal.paragraph_2.part_2:
-token.intro.deployed_modal.paragraph_2.part_3:
-token.intro.deployed_modal.paragraph_3.head_1:
-token.intro.deployed_modal.paragraph_3.head_2:
-token.intro.deployed_modal.paragraph_3.part_1:
-token.intro.deployed_modal.paragraph_3.part_2:
-token.intro.deployed_modal.paragraph_3.part_3:
-token.intro.deployed_modal.paragraph_3.part_4:
-mail.airdrop_claimed.subject: ''
-mail.airdrop_claimed.message_1: ''
-mail.airdrop_claimed.message_2: ''
-mail.airdrop_claimed.message_3: ''
+token.intro.deployed_modal.paragraph_1.head: 'Hay algunas funciones nuevas para su token:'
+token.intro.deployed_modal.paragraph_1.part_1: 'Se puede retirar y depositar'
+token.intro.deployed_modal.paragraph_1.part_2: 'Los invitados pueden hacer donaciones con metamask y recibir sus tokens'
+token.intro.deployed_modal.paragraph_1.part_3: 'Direcciones de depósito especiales que funcionan como donaciones incluyendo tokens en recompensa.'
+token.intro.deployed_modal.paragraph_2.head: 'También estamos planeando las siguientes cosas, ¡que podrían estar ya activas!'
+token.intro.deployed_modal.paragraph_2.part_1: 'Invitación de referencia directamente a su token'
+token.intro.deployed_modal.paragraph_2.part_2: 'Trade para invitados con metamask'
+token.intro.deployed_modal.paragraph_2.part_3: 'Programa de afiliación'
+token.intro.deployed_modal.paragraph_3.head_1: 'El dinero que ha empleado en el despliegue del token en realidad se retira de la oferta en circulación de MintMe Coin durante 5 años. Eso significa que cuantos más tokens se desplieguen, más probable será que MintMe coin aumente de precio.'
+token.intro.deployed_modal.paragraph_3.head_2: 'Recuerde educar a la gente mientras usted se da a mostrar. Aquí hay algunos consejos sobre el marketing:'
+token.intro.deployed_modal.paragraph_3.part_1: 'Es el momento de la venta del token, ¿cómo puedo marcar la diferencia?'
+token.intro.deployed_modal.paragraph_3.part_2: '¿Apuntando a un token fuerte?'
+token.intro.deployed_modal.paragraph_3.part_3: 'Ideas para promocionar y vender su token'
+token.intro.deployed_modal.paragraph_3.part_4: '¿Hablando con sus seguidores sobre MintMe? ¡Tenemos algunas ideas!'
+mail.airdrop_claimed.subject: '¡Gane más con el airdrop!'
+mail.airdrop_claimed.message_1: 'Ha recibido <strong>%airdropReward%</strong> %tokenName% del airdrop. ¿Quiere más?'
+mail.airdrop_claimed.message_2: 'Utilice un enlace de referencia del airdrop y gane más por cada persona que se registre y complete con éxito la reclamación del airdrop. <a href="%airdropReferralLink%">%airdropReferralLink%</a>'
+mail.airdrop_claimed.message_3: 'También puede ganar compartiendo las <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family: Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">publicaciones</a> con una recompensa establecida.'
+modal.add_phone_alert.airdrop: 'Para obtener la recompensa es necesario que agregue un número de teléfono en su <a href="%profileUrl%">perfil</a>.'

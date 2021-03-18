@@ -40,7 +40,7 @@ const ADDRESS_CHANGED_EVENT = 'trade.receive-account-changed';
 const RECEIVED_ACCOUNT_CONFIRMED_EVENT = 'trade.receive-account-confirmed';
 
 export default {
-    name: 'TokenEditModal',
+    name: 'BuyCryptoModal',
     components: {
         FaqItem,
         Modal,
