@@ -11,7 +11,7 @@
                     </template>
                     <template slot="body">
                         <p v-if="isTokenOverSoldLimit">
-                            {{ $t('token.delete.body.all_tokens') }}
+                        {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
                         </p>
                         <p v-else-if="!isTokenNotDeployed">
                             {{ $t('token.delete.body.deploying_or_deployed') }}
@@ -58,6 +58,7 @@ export default {
     props: {
         isTokenOverSoldLimit: Boolean,
         isTokenNotDeployed: Boolean,
+        tokenDeleteSoldLimit: Number,
         tokenName: String,
         twofa: Boolean,
         loaded: Boolean,
@@ -93,7 +94,7 @@ export default {
         },
         doDeleteToken: function(code = '') {
             if (this.isTokenOverSoldLimit) {
-                this.notifyError(this.$t('token.delete.body.all_tokens'));
+                this.notifyError(this.$t('token.delete.body.over_limit', {limit: this.tokenDeleteSoldLimit}));
                 return;
             } else if (!this.isTokenNotDeployed) {
                 this.notifyError(this.$t('token.delete.body.deploying_or_deployed'));

@@ -139,6 +139,7 @@
                                 <token-delete
                                     :is-token-over-sold-limit="isTokenOverSoldLimit"
                                     :is-token-not-deployed="isTokenNotDeployed"
+                                    :token-delete-sold-limit="tokenDeleteSoldLimit"
                                     :loaded="loaded"
                                     :token-name="currentName"
                                     :twofa="twofa"
