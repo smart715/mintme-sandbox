@@ -196,7 +196,7 @@ class MarketHandler implements MarketHandlerInterface
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
         });
 
-        if (count($orders)<$offset) {
+        if (count($orders) < $offset) {
             $offset = 0;
         }
 
