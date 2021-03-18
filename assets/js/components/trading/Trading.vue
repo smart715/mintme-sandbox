@@ -657,7 +657,7 @@ export default {
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.deal),
+                parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 monthVolume,
                 supply,
                 marketPrecision,
@@ -679,7 +679,7 @@ export default {
                 ...market,
                 openPrice: marketInfo.open,
                 lastPrice: marketInfo.last,
-                dayVolume: marketInfo.deal,
+                dayVolume: parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
             };
         },
         getSanitizedMarket: function(
@@ -834,7 +834,7 @@ export default {
                 ),
                 market.lastPrice,
                 market.dayVolume,
-                market.monthVolume = marketInfo.deal,
+                market.monthVolume = parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 market.supply,
                 market.base.subunit,
                 tokenized,
