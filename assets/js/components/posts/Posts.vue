@@ -6,8 +6,13 @@
         <div
             class="card-body posts overflow-hidden position-relative"
         >
-            <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
-                <template v-if="posts.length > 0">
+            <div 
+                id="posts-container"
+                ref="postsContainer"
+                class="w-100 d-flex flex-column align-items-center"
+                :class="!hasPosts ? 'h-100 justify-content-center' : ''"
+            >
+                <template v-if="hasPosts">
                     <post v-for="(n, i) in postsCount"
                           :post="posts[i]"
                           :key="i"
@@ -76,6 +81,9 @@ export default {
     computed: {
         postsCount() {
             return Math.min(this.posts.length, this.max || Infinity);
+        },
+        hasPosts() {
+            return this.posts.length > 0;
         },
         showReadMore() {
             return !!(this.max && this.posts.length > this.max) || this.readMore;
