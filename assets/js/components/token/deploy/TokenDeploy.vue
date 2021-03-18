@@ -107,7 +107,7 @@ export default {
             type: Object,
             default: null,
         },
-        tokenTxHashAddress:  {
+        tokenTxHashAddress: {
             type: String,
             default: null,
         },

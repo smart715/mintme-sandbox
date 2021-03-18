@@ -23,7 +23,7 @@ class UpdateDeployedTokenCommand extends Command
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         LockFactory $lockFactory
-    ){
+    ) {
         $this->logger = $logger;
         $this->lockFactory = $lockFactory;
         $this->em = $entityManager;
@@ -39,11 +39,6 @@ class UpdateDeployedTokenCommand extends Command
             ->setHelp('This command updates all token\'s tx_hash that were deployed');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $lock = $this->lockFactory->createLock('update-token-release');
@@ -58,10 +53,10 @@ class UpdateDeployedTokenCommand extends Command
         $deployed = $this->getTokenRepository()->getDeployedTokens();
 
         foreach ($deployed as $item) {
-            //
+            $item->setTxHash(null);
         }
 
-        $updateMessage = count($deployed) . ' tokens were updated. Saving to DB..';
+        $updateMessage = count($deployed) . ' tokensg were updated. Saving to DB..';
 
         $this->logger->info('[release] '.$updateMessage);
         $output->writeln($updateMessage);
@@ -75,9 +70,6 @@ class UpdateDeployedTokenCommand extends Command
         return 0;
     }
 
-    /**
-     * @return TokenRepository
-     */
     private function getTokenRepository(): TokenRepository
     {
         return $this->em->getRepository(Token::class);
