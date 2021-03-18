@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
 use App\Controller\TwoFactorAuthenticatedInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -88,6 +89,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    /** @var MarketStatusManagerInterface */
+    private MarketStatusManagerInterface $marketStatusManager;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -97,6 +101,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         TranslatorInterface $translator,
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
+        MarketStatusManagerInterface $marketStatusManager,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -110,6 +115,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->translator = $translator;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
+        $this->marketStatusManager = $marketStatusManager;
     }
 
     /**
@@ -514,8 +520,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
         $token = $this->tokenManager->findByName($name);
+        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
-        if (null === $token || !$token->isMintmeToken()) {
+        if (null === $token || null === $crypto || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -525,8 +532,14 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException('Token is deploying or deployed.');
         }
 
-        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to delete token');
+        $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
+        $tokenDeleteSoldLimit = new Money(
+            $this->getParameter('token_delete_sold_limit'),
+            $soldOnMarket->getCurrency()
+        );
+
+        if ($soldOnMarket->greaterThanOrEqual($tokenDeleteSoldLimit)) {
+            throw new ApiBadRequestException('You have sold more than 100.000 tokens');
         }
 
         /** @var User $user */
@@ -770,14 +783,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
      * @param string $name
-     * @param MarketStatusManagerInterface $marketStatusManager
      * @return View
      * @throws ApiNotFoundException
      */
-    public function soldOnMarket(
-        string $name,
-        MarketStatusManagerInterface $marketStatusManager
-    ): View {
+    public function soldOnMarket(string $name): View
+    {
         $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($name);
 
@@ -785,14 +795,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        // todo: use marketStats.soldOnMarket instead of calling different gateway.
-        $marketStatus = $marketStatusManager->getMarketStatus(new Market($crypto, $token));
-
-        $soldOnMarket = $marketStatus
-            ? $marketStatus->getSoldOnMarket()
-            : new Money('0', new Currency(Symbols::TOK));
-
-        return $this->view($soldOnMarket, Response::HTTP_OK);
+        return $this->view($this->getSoldOnMarket($token, $crypto), Response::HTTP_OK);
     }
 
     /**
@@ -854,6 +857,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->em->flush();
 
         return $this->view([], Response::HTTP_OK);
+    }
+
+    private function getSoldOnMarket(Token $token, Crypto $crypto): Money
+    {
+        // todo: use marketStats.soldOnMarket instead of calling different gateway.
+        $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($crypto, $token));
+
+        return $marketStatus
+            ? $marketStatus->getSoldOnMarket()
+            : new Money('0', new Currency(Symbols::TOK));
     }
 
     private function validateEthereumAddress(string $address): bool
