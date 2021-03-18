@@ -89,7 +89,7 @@ export default {
         youtubeChannelId: String,
         showTokenEditModalProp: Boolean,
         disabledServicesConfig: String,
-        tokenDeleteSoldLimit: String,
+        tokenDeleteSoldLimit: Number,
     },
     components: {
         FontAwesomeIcon,

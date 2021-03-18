@@ -205,7 +205,7 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         disabledServicesConfig: String,
-        tokenDeleteSoldLimit: String,
+        tokenDeleteSoldLimit: Number,
     },
     data() {
         return {
@@ -229,7 +229,9 @@ export default {
     },
     computed: {
         isTokenOverSoldLimit: function () {
-            return this.tokensSoldOnMarket >= this.tokenDeleteSoldLimit;
+            const limit = new Decimal(this.tokenDeleteSoldLimit);
+
+            return limit.greaterThanOrEqualTo(this.tokensSoldOnMarket);
         },
         loaded: function () {
             return this.tokensSoldOnMarket !== null;

@@ -103,7 +103,7 @@ export default {
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
         tokenName: String,
-        tokenDeleteSoldLimit: String,
+        tokenDeleteSoldLimit: Number,
     },
     components: {
         Avatar,
