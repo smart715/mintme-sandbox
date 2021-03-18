@@ -34,6 +34,11 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
         return $this->entityRepository->findOneBy(['phoneNumber' => $phoneNumber]);
     }
 
+    public function findVerifiedPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber
+    {
+        return $this->entityRepository->findOneBy(['phoneNumber' => $phoneNumber, 'verified' => true]);
+    }
+
     public function findByCode(string $code): ?PhoneNumber
     {
         return $this->entityRepository->findOneBy(['verificationCode' => $code]);

@@ -30,7 +30,7 @@ class PhoneNumber
     private Profile $profile;
 
     /**
-     * @ORM\Column(type="phone_number", unique=true)
+     * @ORM\Column(type="phone_number", unique=false)
      * @AssertPhoneNumber(type="mobile")
      */
     private \libphonenumber\PhoneNumber $phoneNumber;

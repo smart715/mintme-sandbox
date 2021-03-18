@@ -11,6 +11,8 @@ interface PhoneNumberManagerInterface
 
     public function findByPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
 
+    public function findVerifiedPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
+
     public function findByCode(string $code): ?PhoneNumber;
 
     public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): PhoneNumber;
