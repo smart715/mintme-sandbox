@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Communications\Exception\FetchException;
 use App\Entity\User;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;

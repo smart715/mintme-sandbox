@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
@@ -38,7 +39,7 @@ class MarketStatusRepository extends EntityRepository
             ->leftJoin('m.quoteToken', 'qt')
             ->where('qt IS NOT NULL')
             ->andWhere('c.symbol = :web')
-            ->setParameter('web', Token::WEB_SYMBOL)
+            ->setParameter('web', Symbols::WEB)
             ->getQuery()
             ->getResult();
     }
@@ -72,7 +73,7 @@ class MarketStatusRepository extends EntityRepository
             ->orWhere('qt.address IS NOT NULL AND qt.address != :pending AND qt.isBlocked = false')
             ->orWhere('qt_crypto.symbol IS NOT NULL AND qt_crypto.symbol = :ethSymbol')
             ->setParameter('pending', Token::PENDING_ADDR)
-            ->setParameter('ethSymbol', Token::ETH_SYMBOL)
+            ->setParameter('ethSymbol', Symbols::ETH)
             ->orderBy('ms.lastPrice', Criteria::DESC);
 
         if (null !== $offset) {

@@ -3,9 +3,8 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -48,9 +47,9 @@ class DeployCostFetcher implements DeployCostFetcherInterface
 
         return $this->moneyWrapper->convert(
             Money::USD($this->deployCostConfig->getDeployCost()),
-            new Currency(Token::WEB_SYMBOL),
+            new Currency(Symbols::WEB),
             new FixedExchange([
-                MoneyWrapper::USD_SYMBOL => [ Token::WEB_SYMBOL => 1 / $response['webchain']['usd'] ],
+                Symbols::USD => [ Symbols::WEB => 1 / $response['webchain']['usd'] ],
             ])
         );
     }
@@ -64,6 +63,6 @@ class DeployCostFetcher implements DeployCostFetcherInterface
             return $deployWebCost->multiply($deployCostReward);
         }
 
-        return new Money(0, new Currency(Token::WEB_SYMBOL));
+        return new Money(0, new Currency(Symbols::WEB));
     }
 }

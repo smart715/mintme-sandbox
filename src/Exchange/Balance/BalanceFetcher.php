@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResultContainer;

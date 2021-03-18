@@ -14,7 +14,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -234,7 +234,7 @@ class Trader implements TraderInterface
     private function getSymbol(TradebleInterface $tradeble): string
     {
         return $tradeble instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradeble->getSymbol();
     }
 }

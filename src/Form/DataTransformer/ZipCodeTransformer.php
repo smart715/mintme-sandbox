@@ -2,8 +2,6 @@
 
 namespace App\Form\DataTransformer;
 
-use App\Utils\Converter\String\ParseStringStrategy;
-use App\Utils\Converter\String\StringConverter;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class ZipCodeTransformer implements DataTransformerInterface

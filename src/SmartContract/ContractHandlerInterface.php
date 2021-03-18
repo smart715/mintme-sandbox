@@ -5,7 +5,6 @@ namespace App\SmartContract;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
-use App\SmartContract\Model\TokenDeployResult;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\WalletInterface;
 use Exception;

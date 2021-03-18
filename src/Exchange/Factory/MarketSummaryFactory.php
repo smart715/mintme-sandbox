@@ -2,10 +2,10 @@
 
 namespace App\Exchange\Factory;
 
-use App\Entity\Token\Token;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\Summary;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 /** @codeCoverageIgnore */
@@ -37,7 +37,7 @@ class MarketSummaryFactory implements MarketSummaryFactoryInterface
             $market = $this->getMarket($item['name']);
 
             $symbol = $market->isTokenMarket()
-                ? Token::TOK_SYMBOL
+                ? Symbols::TOK
                 : $market->getQuote()->getSymbol();
 
             return new Summary(

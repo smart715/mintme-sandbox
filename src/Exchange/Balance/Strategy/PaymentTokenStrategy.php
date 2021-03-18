@@ -8,7 +8,7 @@ use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -46,7 +46,7 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
 
     private function depositTokens(User $user, Token $token, string $amount): void
     {
-        $fullAmount = $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+        $fullAmount = $this->moneyWrapper->parse($amount, Symbols::TOK);
         $tokenFee = $token->getFee();
 
         if ($tokenFee) {
@@ -68,10 +68,10 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
             throw new NotFoundTokenException();
         }
 
-        $fee = Token::ETH_SYMBOL === $crypto->getSymbol()
+        $fee = Symbols::ETH === $crypto->getSymbol()
             ? $this->moneyWrapper->parse(
                 (string)$this->parameterBag->get('token_withdraw_fee'),
-                Token::ETH_SYMBOL
+                Symbols::ETH
             ) : $crypto->getFee();
 
         if (!$token->getFee()) {

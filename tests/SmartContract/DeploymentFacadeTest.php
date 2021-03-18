@@ -10,6 +10,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacade;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManager;
 use Money\Currency;
 use Money\Money;
@@ -45,7 +46,7 @@ class DeploymentFacadeTest extends TestCase
     {
         $balanceResult = $this->createMock(BalanceResult::class);
         $balanceResult->method('getAvailable')->willReturn(
-            new Money($balance, new Currency(Token::WEB_SYMBOL))
+            new Money($balance, new Currency(Symbols::WEB))
         );
 
         $balanceHandler = $this->createMock(BalanceHandlerInterface::class);
@@ -59,7 +60,7 @@ class DeploymentFacadeTest extends TestCase
     {
         $costFetcher = $this->createMock(DeployCostFetcherInterface::class);
         $costFetcher->method('getDeployWebCost')
-            ->willReturn(new Money($balance, new Currency(Token::WEB_SYMBOL)));
+            ->willReturn(new Money($balance, new Currency(Symbols::WEB)));
 
         return $costFetcher;
     }
