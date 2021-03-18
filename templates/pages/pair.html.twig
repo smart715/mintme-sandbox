@@ -134,6 +134,7 @@
                     youtube-client-id="{{ global_youtube_client_id }}"
                     current-locale="{{ currentLocale }}"
                     :show-airdrop-modal="{{ showAirdropModal }}"
+                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
