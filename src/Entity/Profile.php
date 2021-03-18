@@ -351,7 +351,7 @@ class Profile implements ImagineInterface
 
     public function getFirstToken(): ?Token
     {
-        if (count($this->hasTokens()) > 0) {
+        if ($this->hasTokens()) {
             return $this->tokens[0];
         }
 
