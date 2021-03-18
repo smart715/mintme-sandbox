@@ -31,6 +31,8 @@ class RegistrationCompletedListener
         $request = $event->getRequest();
 
         $this->userActionLogger->info('Register ' . $event->getUser()->getEmail());
+        $user->addRole(User::ROLE_SEMI_AUTHENTICATED);
+        $this->userManager->updateUser($user);
 
         $referralType = $request->cookies->get('referral-type');
 
