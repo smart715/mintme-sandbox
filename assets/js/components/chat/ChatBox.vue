@@ -25,7 +25,7 @@
                                     <br>
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
-                                        <span class="small">
+                                        <span class="small text-bold">
                                             {{ row.item.time }}
                                         </span>
                                     </span>
@@ -155,7 +155,7 @@ export default {
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
-                    date: moment(message.createdAt).format(GENERAL.dateFormatWithoutTime),
+                    date: moment(message.createdAt).format(GENERAL.dateFormat),
                     time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });

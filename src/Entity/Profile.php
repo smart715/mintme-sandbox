@@ -350,6 +350,15 @@ class Profile implements ImagineInterface
         return null;
     }
 
+    public function getFirstToken(): ?Token
+    {
+        if (count($this->getTokens()) > 0) {
+            return $this->tokens[0];
+        }
+
+        return null;
+    }
+
     public function getTokens(): array
     {
         return null !== $this->tokens
