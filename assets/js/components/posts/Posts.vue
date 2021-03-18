@@ -6,7 +6,7 @@
         <div
             class="card-body posts overflow-hidden position-relative"
         >
-            <div 
+            <div
                 id="posts-container"
                 ref="postsContainer"
                 class="w-100 d-flex flex-column align-items-center"
