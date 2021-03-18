@@ -36,7 +36,7 @@ class UserFixturesFactory extends AbstractFixturesFactory
             ->setUsername($this->getFaker()->userName)
             ->setEmail(self::DEFAULT_NAME . ++self::$counter . '@mail.org')
             ->setPlainPassword(self::DEFAULT_PASSWORD)
-            ->setRoles([User::ROLE_DEFAULT])
+            ->setRoles([User::ROLE_DEFAULT, User::ROLE_SEMI_AUTHENTICATED])
             ->setEnabled(true);
 
         $this->userManager->updateUser($user);

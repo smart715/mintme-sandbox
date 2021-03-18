@@ -34,7 +34,7 @@ class Post
      * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
-     *     max = 500,
+     *     max = 1000,
      * )
      */
     protected string $content = ''; // phpcs:ignore -- for some reason, if the variable has a type and default value, phpcs says it's not used (but it is)
