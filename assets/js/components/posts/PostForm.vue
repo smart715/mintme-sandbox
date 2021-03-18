@@ -141,7 +141,7 @@ export default {
             title: this.post.title,
             shareReward: toMoney(this.post.shareReward),
             minContentLength: 2,
-            maxContentLength: 500,
+            maxContentLength: 1000,
             maxDecimals: 4,
             maxAmount: 999999.9999,
             maxShareReward: 100,
