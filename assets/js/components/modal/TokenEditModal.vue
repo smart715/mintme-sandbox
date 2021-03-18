@@ -139,6 +139,7 @@
                                 <token-delete
                                     :is-token-over-sold-limit="isTokenOverSoldLimit"
                                     :is-token-not-deployed="isTokenNotDeployed"
+                                    :loaded="loaded"
                                     :token-name="currentName"
                                     :twofa="twofa"
                                 />
@@ -229,6 +230,9 @@ export default {
     computed: {
         isTokenOverSoldLimit: function () {
             return this.tokensSoldOnMarket >= this.tokenDeleteSoldLimit;
+        },
+        loaded: function () {
+            return this.tokensSoldOnMarket !== null;
         },
         shouldTruncate: function() {
             return this.currentName.length > this.maxLengthToTruncate;
