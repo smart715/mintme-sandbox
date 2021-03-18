@@ -3,6 +3,7 @@ import {HTTP_OK} from './utils/constants';
 import {NotificationMixin} from './mixins/';
 import {minLength, maxLength} from 'vuelidate/lib/validators';
 import {phoneVerificationCode} from './utils/constants';
+const disabledResendFor = 1000 * 60;
 
 new Vue({
     el: '#phone-verification',
@@ -11,9 +12,34 @@ new Vue({
     data() {
         return {
             code: '',
+            resendCodeDisabled: false,
         };
     },
     mounted() {
+        const errorsCount = parseInt(
+            this.$refs.resendCode.getAttribute('data-errors-count')
+        );
+
+        const limitReached = parseInt(
+            this.$refs.resendCode.getAttribute('data-limit-reached')
+        );
+
+        const failedAttempts = parseInt(
+            this.$refs.resendCode.getAttribute('data-failed-attempts')
+        );
+
+        if (limitReached && errorsCount) {
+            this.notifyError(this.$t('phone_confirmation.limit_reached', {
+                limit: failedAttempts,
+            }));
+
+            return;
+        }
+
+        if (!errorsCount) {
+            this.sendVerificationCode();
+        }
+
         this.code = this.$refs.code.getAttribute('value');
     },
     computed: {
@@ -23,18 +49,23 @@ new Vue({
     },
     methods: {
         sendVerificationCode: function() {
+            if (this.resendCodeDisabled) {
+                return;
+            }
+
+            this.resendCodeDisabled = true;
             this.$axios.single.get(this.$routing.generate('send_phone_verification_code'))
                 .then((response) => {
-                    if (HTTP_OK === response.status && response.data.hasOwnProperty('error')) {
+                    if (HTTP_OK === response.status && response.data.hasOwnProperty('code')) {
+                        this.notifySuccess(response.data.code);
+                    } else if (HTTP_OK === response.status && response.data.hasOwnProperty('error')) {
                         this.notifyError(response.data.error);
-                    }
-
-                    if (HTTP_OK === response.status && !response.data.hasOwnProperty('error')) {
+                    } else if (HTTP_OK === response.status && !response.data.hasOwnProperty('error')) {
                         this.notifySuccess(this.$t('phone_confirmation.sent'));
                     }
                 }, () => {
                     this.notifyError(this.$t('toasted.error.try_later'));
-                });
+                }).then(() => setTimeout(() => this.resendCodeDisabled = false, disabledResendFor));
         },
     },
     validations() {

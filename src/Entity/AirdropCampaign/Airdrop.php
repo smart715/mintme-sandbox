@@ -3,7 +3,7 @@
 namespace App\Entity\AirdropCampaign;
 
 use App\Entity\Token\Token;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -78,11 +78,10 @@ class Airdrop
     private $actualAmount = '0';
 
     /**
-     * @ORM\Column(name="actual_participants", type="integer", nullable=true)
+     * @ORM\Column(name="actual_participants", type="float", nullable=true)
      * @Groups({"API"})
-     * @var int
      */
-    private $actualParticipants = 0;
+    private float $actualParticipants = 0; // phpcs:ignore
 
     /**
      * @ORM\OneToMany(
@@ -143,7 +142,7 @@ class Airdrop
 
     public function getAmount(): Money
     {
-        return new Money($this->amount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->amount, new Currency(Symbols::TOK));
     }
 
     public function setAmount(Money $amount): self
@@ -155,7 +154,7 @@ class Airdrop
 
     public function getLockedAmount(): Money
     {
-        return new Money($this->lockedAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->lockedAmount, new Currency(Symbols::TOK));
     }
 
     public function setLockedAmount(Money $lockedAmount): self
@@ -191,7 +190,7 @@ class Airdrop
 
     public function getActualAmount(): Money
     {
-        return new Money($this->actualAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->actualAmount, new Currency(Symbols::TOK));
     }
 
     public function setActualAmount(Money $actualAmount): self
@@ -201,21 +200,23 @@ class Airdrop
         return $this;
     }
 
-    public function getActualParticipants(): int
+    public function getActualParticipants(): float
     {
         return $this->actualParticipants;
     }
 
-    public function setActualParticipants(int $actualParticipants): self
+    public function setActualParticipants(float $actualParticipants): self
     {
         $this->actualParticipants = $actualParticipants;
 
         return $this;
     }
 
-    public function incrementActualParticipants(): int
+    public function incrementActualParticipants(bool $referrer = false): float
     {
-        return $this->actualParticipants += 1;
+        return $this->actualParticipants += $referrer
+            ? 0.5
+            : 1;
     }
 
     public function getClaimedParticipants(): Collection
@@ -254,8 +255,9 @@ class Airdrop
         return $this;
     }
 
+    /** @Groups({"API"}) */
     public function getReward(): Money
     {
-        return $this->getLockedAmount()->divide($this->getParticipants());
+        return $this->getAmount()->divide($this->getParticipants());
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Profile;
 use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
 
@@ -90,5 +89,19 @@ class TokenRepository extends EntityRepository
             ->setParameter('nextReminderDate', \Date('Y-m-d'));
 
         return $query->getQuery()->getResult();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getTokensWithoutAirdrops(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t, a')
+            ->leftJoin('t.airdrops', 'a')
+            ->where('a.id IS NULL')
+            ->getQuery()
+            ->getResult();
     }
 }

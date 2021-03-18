@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Manager\ActivityManagerInterface;
 use App\Manager\MainDocumentsManagerInterfaces;
 use App\Manager\ReciprocalLinksManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;

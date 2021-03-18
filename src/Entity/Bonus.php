@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\UserInterface;
-use Sonata\FormatterBundle\Validator\Constraints\Formatter;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BonusRepository")

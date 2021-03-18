@@ -11,7 +11,7 @@ use App\Exchange\Factory\OrdersFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -108,7 +108,7 @@ class InitialSellOrdersCommand extends Command
         return !$balance
             ->getAvailable()
             ->lessThan(
-                $this->moneyWrapper->parse((string)OrdersFactory::INIT_TOKENS_AMOUNT, MoneyWrapper::TOK_SYMBOL)
+                $this->moneyWrapper->parse((string)OrdersFactory::INIT_TOKENS_AMOUNT, Symbols::TOK)
             );
     }
 

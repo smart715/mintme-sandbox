@@ -12,8 +12,8 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
+use App\Utils\Symbols;
 use App\Utils\Validator\MaxAllowedOrdersValidator;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -127,8 +127,8 @@ class OrdersController extends AbstractFOSRestController
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
-        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
-        $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
+        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
+        $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 

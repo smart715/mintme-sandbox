@@ -33,8 +33,8 @@ use App\SmartContract\DeploymentFacadeInterface;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Verify\WebsiteVerifier;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -46,6 +46,7 @@ use Money\Money;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -319,7 +320,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Token::TOK_SYMBOL);
+            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
             $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
 
             $lock->setAmountToRelease($amountToRelease)
@@ -430,7 +431,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ? $token->getWithdrawn()
             : 0;
 
-        return $this->view(new Money($withdrawn, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        return $this->view(new Money($withdrawn, new Currency(Symbols::TOK)));
     }
 
     /**
@@ -469,14 +470,14 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{name}/is_deployed", name="is_token_deployed", options={"expose"=true})
+     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
      */
     public function isTokenDeployed(string $name): View
     {
         $token = $this->tokenManager->findByName($name);
 
         if (!$token) {
-            throw $this->createNotFoundException('Token does not exist');
+            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
@@ -777,7 +778,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         string $name,
         MarketStatusManagerInterface $marketStatusManager
     ): View {
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($name);
 
         if (null === $crypto || null === $token) {
@@ -789,7 +790,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $soldOnMarket = $marketStatus
             ? $marketStatus->getSoldOnMarket()
-            : new Money('0', new Currency(Token::TOK_SYMBOL));
+            : new Money('0', new Currency(Symbols::TOK));
 
         return $this->view($soldOnMarket, Response::HTTP_OK);
     }
@@ -831,6 +832,28 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ['blacklisted' => $this->blacklistManager->isBlacklistedToken($name)],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/update/deployed-modal/{tokenName}", name="token_update_deployed_modal", options={"expose"=true})
+     * @param string $tokenName
+     * @return View
+     */
+    public function updateShowDeployedModal(string $tokenName): View
+    {
+        $userToken = $this->tokenManager->getOwnTokenByName($tokenName);
+
+        if (!$userToken || !$userToken->isMintmeToken()) {
+            throw new AccessDeniedException();
+        }
+
+        $userToken->setShowDeployedModal(false);
+
+        $this->em->persist($userToken);
+        $this->em->flush();
+
+        return $this->view([], Response::HTTP_OK);
     }
 
     private function validateEthereumAddress(string $address): bool

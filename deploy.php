@@ -6,7 +6,8 @@ require 'recipe/composer.php';
 
 // Project name
 set('application', 'mintme_panel');
-
+//timeout for commands
+set('default_timeout', 600);
 // Project repository
 set('repository', 'ssh://git@gitlab.abchosting.org:2279/abc-hosting/cryptocurrencies/mintme/panel.git');
 //prevent to clone submodules
@@ -15,13 +16,13 @@ set('git_recursive', false);
 set('branch', 'master');
 
 // [Optional] Allocate tty for git clone. Default value is false.
-set('git_tty', true);
+//set('git_tty', true);
 
 set('writable_mode', 'chown');
 set('http_user', "mintme:www-data");
 
 
-set('bin/console', '{{bin/php}} {{release_path}}/bin/console');
+set('bin/console', '{{release_path}}/bin/console');
 
 // Shared files/dirs between deploys
 add('shared_files', [
@@ -52,8 +53,6 @@ localhost()
 
 // Tasks
 
-set('hostname', 'staging');
-
 task('node-install', function () {
     run('cd {{release_path}} && npm install -d');
 });
@@ -72,6 +71,10 @@ task('cache-clear', function() {
 
 task('cache-warmup', function() {
      run('cd {{release_path}} && export $(grep -v "^#" .env | xargs) && bin/console cache:warmup');
+});
+
+task('database-migrate', function() {
+     run('cd {{release_path}} && export $(grep -v "^#" .env | xargs) && bin/console doctrine:migrations:migrate --env=prod --no-interaction');
 });
 
 task('cache-move', function() {
@@ -99,7 +102,7 @@ task('change-version', function() {
 });
 
 task('rocket-notify', function() {
-     run('/usr/local/bin/rocket-notify-mintme.sh "Mintme was updated from branch {{branch}} on {{hostname}}" "#mintme"');
+     run('/usr/local/bin/rocket-notify-mintme.sh "Mintme was updated from branch {{branch}} on `hostname`" "#mintme"');
 });
 
 task('restart-consumers', function() {
@@ -137,12 +140,10 @@ task('deploy', [
     'node-install',
     'node-build',
     'deploy:writable',
-    'database:migrate',
+    'database-migrate',
     'change-version',
-    'cache-move',
     'cache-warmup',
     'cache-clear',
-    'cache-delete',
     'php-fpm-reload',
 //second clearing cache
     'cache-move',

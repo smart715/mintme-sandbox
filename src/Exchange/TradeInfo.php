@@ -4,6 +4,7 @@ namespace App\Exchange;
 
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -13,7 +14,7 @@ class TradeInfo
     private array $topHolders;
     private string $volumeDonation;
     private Money $soldOnMarket;
-    private string $sellSummary;
+    private string $activeOrders;
     private ?Money $tokenExchange = null; // phpcs:ignore
     private ?Token $token = null; // phpcs:ignore
 
@@ -21,12 +22,12 @@ class TradeInfo
         array $topHolders,
         string $volumeDonation,
         Money $soldOnMarket,
-        string $sellSummary
+        string $activeOrders
     ) {
         $this->topHolders = $topHolders;
         $this->volumeDonation = $volumeDonation;
         $this->soldOnMarket = $soldOnMarket;
-        $this->sellSummary = $sellSummary;
+        $this->activeOrders = $activeOrders;
     }
 
     public function setTokenExchange(Money $tokenExchange): self
@@ -70,9 +71,9 @@ class TradeInfo
     /**
      * @Groups({"API"})
      */
-    public function getSellSummary(): string
+    public function getActiveOrders(): string
     {
-        return $this->sellSummary;
+        return $this->activeOrders;
     }
 
     /**
@@ -100,7 +101,7 @@ class TradeInfo
     {
         return new Money(
             $this->token ? $this->token->getWithdrawn() : '0',
-            new Currency(Token::TOK_SYMBOL)
+            new Currency(Symbols::TOK)
         );
     }
 }

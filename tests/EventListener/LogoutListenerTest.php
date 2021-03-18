@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -21,13 +22,15 @@ class LogoutListenerTest extends TestCase
         $checker = $this->createMock(AuthorizationCheckerInterface::class);
         $logger = $this->createMock(UserActionLogger::class);
         $session = $this->createMock(SessionInterface::class);
+        $route = $this->createMock(UrlGeneratorInterface::class);
 
         $checker->method('isGranted')->with('IS_AUTHENTICATED_REMEMBERED')->willReturn(true);
 
         $listener = new LogoutListener(
             $logger,
             $checker,
-            $session
+            $session,
+            $route
         );
 
         $event = $this->createMock(FilterUserResponseEvent::class);
@@ -59,13 +62,15 @@ class LogoutListenerTest extends TestCase
         $checker = $this->createMock(AuthorizationCheckerInterface::class);
         $logger = $this->createMock(UserActionLogger::class);
         $session = $this->createMock(SessionInterface::class);
+        $route = $this->createMock(UrlGeneratorInterface::class);
 
         $checker->method('isGranted')->with('IS_AUTHENTICATED_REMEMBERED')->willReturn(false);
 
         $listener = new LogoutListener(
             $logger,
             $checker,
-            $session
+            $session,
+            $route
         );
 
         $event = $this->createMock(FilterUserResponseEvent::class);

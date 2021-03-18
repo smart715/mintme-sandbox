@@ -25,7 +25,7 @@ security:
         main:
             pattern: ^/
             logout:
-                handlers: [logout_listner]
+                handlers: [logout_listener]
                 target: logout_success
                 path: fos_user_security_logout
                 csrf_token_generator: security.csrf.token_manager
@@ -36,13 +36,13 @@ security:
                 provider: fos_userbundle
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
             two_factor:
                 provider: fos_userbundle
                 auth_form_path: 2fa_login
                 check_path: 2fa_login_check
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
                 multi_factor: true
                 csrf_token_generator: security.csrf.token_manager
                 authentication_required_handler: two_factor.auth_require_handler
@@ -51,6 +51,10 @@ security:
             security:   false
 
     role_hierarchy:
+        ROLE_AUTENTICATED:
+            - ROLE_USER
+        ROLE_SEMI_AUTHENTICATED:
+            - ROLE_USER
         ROLE_ADMIN_USER_ADMIN:
             - ROLE_ADMIN_USER_LIST
             - ROLE_ADMIN_USER_VIEW

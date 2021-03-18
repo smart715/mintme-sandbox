@@ -2,7 +2,7 @@
 
 namespace App\Exchange\Config;
 
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
 
@@ -25,7 +25,7 @@ class AirdropConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->airdropParams['min_tokens_amount'] ?? 0),
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
     }
 
@@ -33,7 +33,7 @@ class AirdropConfig
     {
         return $this->moneyWrapper->parse(
             (string)($this->airdropParams['min_token_reward'] ?? 0),
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
     }
 

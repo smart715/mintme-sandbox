@@ -4,7 +4,6 @@ namespace App\Manager;
 
 use App\Entity\GoogleAuthenticatorEntry;
 use App\Entity\User;
-use Symfony\Component\Form\FormInterface;
 
 interface TwoFactorManagerInterface
 {

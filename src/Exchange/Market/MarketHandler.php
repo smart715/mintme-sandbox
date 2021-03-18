@@ -12,6 +12,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
@@ -20,7 +21,7 @@ use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
@@ -526,7 +527,7 @@ class MarketHandler implements MarketHandlerInterface
     private function getSymbol(TradebleInterface $tradable): string
     {
         return $tradable instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradable->getSymbol();
     }
 
@@ -547,7 +548,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
-            $market->isTokenMarket() ? Token::TOK_SYMBOL : $market->getQuote()->getSymbol()
+            $market->isTokenMarket() ? Symbols::TOK : $market->getQuote()->getSymbol()
         );
 
         /** @var Money $depthAmount */
@@ -561,7 +562,7 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getSellOrdersSummary(Market $market): string
+    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult
     {
         $offset = 0;
         $limit = 100;
@@ -575,7 +576,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $orders = array_merge([], ...$paginatedOrders);
 
-        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        $zeroDepth = $this->moneyWrapper->parse('0', Symbols::TOK);
 
         /** @var Money $sellOrdersSum */
         $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
@@ -584,7 +585,16 @@ class MarketHandler implements MarketHandlerInterface
             )->add($sum);
         }, $zeroDepth);
 
-        return $this->moneyWrapper->format($sellOrdersSum);
+        $sellOrdersSum = $this->moneyWrapper->format($sellOrdersSum);
+
+        /** @var Money $quoteAmountSummary */
+        $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getAmount()->add($sum);
+        }, $zeroDepth);
+
+        $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
+
+        return new SellOrdersSummaryResult($sellOrdersSum, $quoteAmountSummary);
     }
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array
@@ -645,12 +655,12 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $market = new Market($token->getCrypto() ?? $mintmeCrypto, $token);
         $available = $this->balanceHandler->balance($token->getProfile()->getUser(), $token)->getAvailable();
         $init = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_quantity'),
-            Token::TOK_SYMBOL
+            Symbols::TOK
         );
         $ownPendingOrders = $this->getPendingOrdersByUser($token->getOwner(), [$market]);
 

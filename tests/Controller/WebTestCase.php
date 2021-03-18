@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -56,14 +57,14 @@ class WebTestCase extends BaseWebTestCase
         $this->deposit(
             $email,
             $amount,
-            Token::WEB_SYMBOL
+            Symbols::WEB
         );
     }
 
     protected function deposit(
         string $email,
         string $amount = '100000000000000000000',
-        string $currency = Token::WEB_SYMBOL
+        string $currency = Symbols::WEB
     ): void {
         $balanceHandler = self::$container->get('balancer');
 

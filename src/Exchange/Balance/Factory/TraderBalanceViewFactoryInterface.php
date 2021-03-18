@@ -2,9 +2,7 @@
 
 namespace App\Exchange\Balance\Factory;
 
-use App\Entity\TradebleInterface;
 use App\Entity\UserTradebleInterface;
-use App\Exchange\Balance\BalanceHandlerInterface;
 
 interface TraderBalanceViewFactoryInterface
 {

@@ -14,6 +14,7 @@ use App\Repository\TokenRepository;
 use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Fetcher\ProfileFetcherInterface;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -67,8 +68,8 @@ class TokenManager implements TokenManagerInterface
 
     public function findByName(string $name): ?Token
     {
-        $name = Token::MINTME_SYMBOL === strtoupper($name)
-            ? Token::WEB_SYMBOL
+        $name = Symbols::MINTME === strtoupper($name)
+            ? Symbols::WEB
             : strtoupper($name);
 
         if (!in_array(strtoupper($name), array_map(
@@ -101,7 +102,7 @@ class TokenManager implements TokenManagerInterface
 
     public function findByNameMintme(string $name): ?Token
     {
-        return $this->findByNameCrypto($name, Token::WEB_SYMBOL);
+        return $this->findByNameCrypto($name, Symbols::WEB);
     }
 
     public function findByAddress(string $address): ?Token
@@ -219,7 +220,7 @@ class TokenManager implements TokenManagerInterface
 
     public function getUserDeployTokensReward(User $user): Money
     {
-        $rewardZero = new Money(0, new Currency(Token::WEB_SYMBOL));
+        $rewardZero = new Money(0, new Currency(Symbols::WEB));
         $rewards = $this->deployTokenRewardRepository->findBy([
             'user' => $user,
         ]);
@@ -249,5 +250,10 @@ class TokenManager implements TokenManagerInterface
     public function findAllTokensWithEmptyDescription(int $param = 14): ?array
     {
         return $this->repository->findAllTokensWithEmptyDescription($param);
+    }
+
+    public function getTokensWithoutAirdrops(): array
+    {
+        return $this->repository->getTokensWithoutAirdrops();
     }
 }
