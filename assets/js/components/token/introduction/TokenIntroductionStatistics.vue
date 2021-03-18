@@ -46,7 +46,7 @@
                                     {{ $t('token.intro.statistics.balance') }}
                                 </div>
                                 <b-list-group class="flex-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item class="flex-1 odd-item-bg" v-if="isMintmeToken">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1 odd-item-bg">
                                         {{ $t('token.intro.statistics.exchange.header') }} <br>
                                         {{ walletBalance | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -70,7 +70,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg" v-if="isMintmeToken">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1 odd-item-bg">
                                         {{ $t('token.intro.statistics.withdraw.header') }} <br v-if="isMintmeToken">
                                         {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -118,7 +118,7 @@
                                     </b-list-group-item>
                                 </b-list-group>
                             </div>
-                            <div class="pt-3" v-if="isMintmeToken">
+                            <div v-if="isMintmeToken" class="pt-3">
                                 <div class="font-weight-bold px-3 pb-1">
                                     {{ $t('token.intro.statistics.token_release.header') }}
                                     <guide>
