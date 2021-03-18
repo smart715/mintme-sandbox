@@ -34,7 +34,7 @@ class RegistrationCompletedListenerTest extends TestCase
 
         $um = $this->createMock(UserManagerInterface::class);
         $um->method('findByReferralCode')->willReturn($this->createMock(User::class));
-        $um->expects($this->once())->method('updateUser')->with($u);
+        $um->expects($this->exactly(2))->method('updateUser')->with($u);
 
         $listener = new RegistrationCompletedListener(
             $um,
@@ -62,7 +62,7 @@ class RegistrationCompletedListenerTest extends TestCase
         $event->method('getRequest')->willReturn($request);
 
         $um = $this->createMock(UserManagerInterface::class);
-        $um->expects($this->once())->method('updateUser')->with($u);
+        $um->expects($this->exactly(2))->method('updateUser')->with($u);
 
         $arc = $this->createMock(AirdropReferralCode::class);
         $arc->method('getUser')->willReturn($this->createMock(User::class));
@@ -96,7 +96,7 @@ class RegistrationCompletedListenerTest extends TestCase
         $event->method('getRequest')->willReturn($request);
 
         $um = $this->createMock(UserManagerInterface::class);
-        $um->expects($this->never())->method('updateUser')->with($u);
+        $um->expects($this->once())->method('updateUser')->with($u);
 
         $listener = new RegistrationCompletedListener(
             $um,
