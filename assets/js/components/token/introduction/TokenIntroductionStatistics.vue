@@ -9,8 +9,7 @@
                             <h5 class="font-bold">{{ $t('token.intro.statistics.guide_header') }}</h5>
                         </div>
                         <template slot="body">
-                            <span v-html="this.statisticGuideTranslation">
-                            </span>
+                            {{ statisticGuideTranslation }}
                         </template>
                     </guide>
                 </div>
