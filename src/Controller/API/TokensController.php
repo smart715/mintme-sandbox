@@ -535,7 +535,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
         $tokenDeleteSoldLimit = new Money(
             $this->getParameter('token_delete_sold_limit'),
-            $soldOnMarket->getCurrency()
+            Symbols::TOK
         );
 
         if ($soldOnMarket->greaterThanOrEqual($tokenDeleteSoldLimit)) {
