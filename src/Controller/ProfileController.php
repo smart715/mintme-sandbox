@@ -19,6 +19,7 @@ use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
@@ -33,19 +34,22 @@ class ProfileController extends Controller
     private PhoneNumberUtil $phoneNumberUtil;
     private UserManagerInterface $userManager;
     private TokenStorageInterface $tokenStorage;
+    private SessionInterface $session;
 
     public function __construct(
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
         PhoneNumberUtil $phoneNumberUtil,
         UserManagerInterface $userManager,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        SessionInterface $session
     ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
         $this->phoneNumberUtil = $phoneNumberUtil;
         $this->userManager = $userManager;
         $this->tokenStorage = $tokenStorage;
+        $this->session = $session;
     }
 
     /** @Route("/phone/verify", name="phone_verification") */
@@ -102,11 +106,18 @@ class ProfileController extends Controller
         }
 
         $failedAttempts = $totalLimit = $this->getParameter('adding_phone_attempts_limit')['failed'];
+        $sendCode = false;
+
+        if ($this->session->get('send_verification_code')) {
+            $this->session->remove('send_verification_code');
+            $sendCode = true;
+        }
 
         return $this->render('pages/phone_verification.html.twig', [
             'failedAttempts' => $failedAttempts,
             'limitReached' => $profile->getPhoneNumber()->getFailedAttempts() >= $failedAttempts,
             'form' => $form->createView(),
+            'sendCode' => $sendCode,
         ]);
     }
 
@@ -193,6 +204,8 @@ class ProfileController extends Controller
         }
 
         if ($verifyPhone) {
+            $this->session->set('send_verification_code', true);
+
             return $this->redirectToRoute('phone_verification');
         }
 

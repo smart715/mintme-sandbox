@@ -13,9 +13,12 @@ new Vue({
         return {
             code: '',
             resendCodeDisabled: false,
+            sendCode: false,
         };
     },
     mounted() {
+        this.sendCode = !!this.$refs.sendCode.value;
+
         const errorsCount = parseInt(
             this.$refs.resendCode.getAttribute('data-errors-count')
         );
@@ -36,7 +39,7 @@ new Vue({
             return;
         }
 
-        if (!errorsCount) {
+        if (!errorsCount && this.sendCode) {
             this.sendVerificationCode();
         }
 
