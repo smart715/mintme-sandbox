@@ -533,17 +533,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->denyAccessUnlessGranted('delete', $token);
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-            throw new ApiBadRequestException('Token is deploying or deployed.');
+            throw new ApiBadRequestException(
+                $this->translator->trans('token.delete.body.deploying_or_deployed')
+            );
         }
 
         $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
-        $tokenDeleteSoldLimit = $this->moneyWrapper->parse(
+        $soldLimit = $this->moneyWrapper->parse(
             (string)$this->getParameter('token_delete_sold_limit'),
             Symbols::TOK
         );
 
-        if ($soldOnMarket->greaterThanOrEqual($tokenDeleteSoldLimit)) {
-            throw new ApiBadRequestException('You have sold more than 100.000 tokens');
+        if ($soldOnMarket->greaterThanOrEqual($soldLimit)) {
+            throw new ApiBadRequestException(
+                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $soldLimit->getAmount()])
+            );
         }
 
         /** @var User $user */
