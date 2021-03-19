@@ -12,7 +12,7 @@ new Vue({
     data() {
         return {
             code: '',
-            resendCodeDisabled: false,
+            resendCodeDisabled: true,
             sendCode: false,
         };
     },
@@ -39,7 +39,21 @@ new Vue({
             return;
         }
 
-        if (!errorsCount && this.sendCode) {
+        if (!this.sendCode) {
+            this.$axios.single.get(this.$routing.generate('is_able_send_code_disabled'))
+                .then((response) => {
+                    let sendCodeDiffModel = response.data;
+                    this.resendCodeDisabled = !sendCodeDiffModel.sendCodeEnabled;
+
+                    if (sendCodeDiffModel.sendCodeDiff >= 0 ) {
+                        setTimeout(
+                            () => this.resendCodeDisabled = false,
+                            sendCodeDiffModel.sendCodeDiff * 1000
+                        );
+                    }
+                });
+        } else if (!errorsCount) {
+            this.resendCodeDisabled = false;
             this.sendVerificationCode();
         }
 

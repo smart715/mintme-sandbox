@@ -106,11 +106,18 @@ class ProfileController extends AbstractFOSRestController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        if (!$user || !$user->getProfile()->getPhoneNumber()) {
+        if (!$user) {
             throw $this->createAccessDeniedException();
         }
 
         $phoneNumber = $user->getProfile()->getPhoneNumber();
+
+        if (!$phoneNumber || $phoneNumber->getSendCodeDate() &&
+            !$phoneNumberManager->isPhoneNumberAbleToSendCode($phoneNumber)->isSendCodeEnabled()
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+
         $totalLimit = $this->getParameter('adding_phone_attempts_limit')['overall'];
 
         if ($totalLimit <= $phoneNumber->getTotalAttempts()) {
@@ -151,13 +158,14 @@ class ProfileController extends AbstractFOSRestController
                     'Phone number verification code requested.',
                     ['to' => $sms->getTo(), $response]
                 );
-                $phoneNumber->setSendCodeDate(new DateTimeImmutable());
             } catch (\Throwable $e) {
                 $this->userActionLogger->info('Error during send phone number code verificaion'. json_encode($e));
 
                 throw new \Exception($this->translator->trans('api.something_went_wrong'));
             }
         }
+
+        $phoneNumber->setSendCodeDate(new DateTimeImmutable());
 
         if (!$phoneNumber->getEditDate()) {
             $phoneNumber = $phoneNumberManager->updateNumberAndAddingAttempts($phoneNumber);
@@ -174,5 +182,27 @@ class ProfileController extends AbstractFOSRestController
                 : [],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/is-able-to-send-code", name="is_able_send_code_disabled", options={"expose"=true})
+     * @return View
+     */
+    public function isSendCodeDisabled(PhoneNumberManagerInterface $phoneNumberManager): View
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user ||
+            !$user->getProfile()->getPhoneNumber() ||
+            !$user->getProfile()->getPhoneNumber()->getSendCodeDate()
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $phoneNumber = $user->getProfile()->getPhoneNumber();
+
+        return $this->view($phoneNumberManager->isPhoneNumberAbleToSendCode($phoneNumber), Response::HTTP_OK);
     }
 }

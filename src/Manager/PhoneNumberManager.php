@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\PhoneNumber;
 use App\Entity\Profile;
+use App\Manager\Model\SendCodeDiffModel;
 use App\Repository\PhoneNumberRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,15 +14,13 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
 {
     private PhoneNumberRepository $entityRepository;
     private EntityManagerInterface $entityManager;
-    private ParameterBagInterface $parameterBag;
 
-    public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $parameterBag)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         /** @var PhoneNumberRepository */
         $objRepo = $entityManager->getRepository(PhoneNumber::class);
         $this->entityRepository = $objRepo;
         $this->entityManager = $entityManager;
-        $this->parameterBag = $parameterBag;
     }
 
     public function getPhoneNumber(Profile $profile): ?PhoneNumber
@@ -76,5 +75,16 @@ class PhoneNumberManager implements PhoneNumberManagerInterface
         $phoneNumber->setAttemptsDate(new DateTimeImmutable());
 
         return $phoneNumber;
+    }
+
+    public function isPhoneNumberAbleToSendCode(PhoneNumber $phoneNumber): SendCodeDiffModel
+    {
+        $now = new DateTimeImmutable();
+        $timeWhenUserIsAbleToSend = $phoneNumber->getSendCodeDate()->add(new \DateInterval('PT60S'));
+
+        return new SendCodeDiffModel(
+            $now >= $timeWhenUserIsAbleToSend,
+            $timeWhenUserIsAbleToSend->getTimestamp() - $now->getTimestamp()
+        );
     }
 }
