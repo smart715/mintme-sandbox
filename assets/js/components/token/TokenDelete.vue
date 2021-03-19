@@ -56,12 +56,12 @@ export default {
     name: 'TokenDelete',
     mixins: [NotificationMixin, LoggerMixin],
     props: {
-        isTokenOverSoldLimit: Boolean,
         isTokenNotDeployed: Boolean,
+        isTokenOverSoldLimit: Boolean,
         tokenDeleteSoldLimit: Number,
+        loaded: Boolean,
         tokenName: String,
         twofa: Boolean,
-        loaded: Boolean,
     },
     components: {
         Guide,
@@ -71,7 +71,6 @@ export default {
         return {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
-            loading: true
         };
     },
     computed: {

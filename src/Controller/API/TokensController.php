@@ -515,6 +515,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
         MailerInterface $mailer,
+        MoneyWrapperInterface $moneyWrapper,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -533,8 +534,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
-        $tokenDeleteSoldLimit = new Money(
-            $this->getParameter('token_delete_sold_limit'),
+        $tokenDeleteSoldLimit = $moneyWrapper->parse(
+            (string)$this->getParameter('token_delete_sold_limit'),
             Symbols::TOK
         );
 
@@ -569,6 +570,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ['message' => $this->translator->trans('api.tokens.delete_successfull')],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/delete-sold-limit", name="token_delete_sold_limit", options={"expose"=true})
+     */
+    public function deleteSoldLimit(): View
+    {
+        return $this->view($this->getParameter('token_delete_sold_limit'), Response::HTTP_OK);
     }
 
     /**

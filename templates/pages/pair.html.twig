@@ -89,7 +89,6 @@
                 :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
                 :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
-                :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
             ></token-avatar>
             <token-social-media-icons

@@ -137,9 +137,9 @@
                             </template>
                             <template slot="body">
                                 <token-delete
-                                    :is-token-over-sold-limit="isTokenOverSoldLimit"
                                     :is-token-not-deployed="isTokenNotDeployed"
-                                    :token-delete-sold-limit="tokenDeleteSoldLimit"
+                                    :is-token-over-sold-limit="isTokenOverSoldLimit"
+                                    :tokenDeleteSoldLimit="tokenDeleteSoldLimit"
                                     :loaded="loaded"
                                     :token-name="currentName"
                                     :twofa="twofa"
@@ -166,9 +166,12 @@ import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
 import {tokenDeploymentStatus} from '../../utils/constants';
+import Decimal from 'decimal.js';
+import {LoggerMixin} from '../../mixins';
 
 export default {
     name: 'TokenEditModal',
+    mixins: [LoggerMixin],
     components: {
         FaqItem,
         Guide,
@@ -206,21 +209,27 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         disabledServicesConfig: String,
-        tokenDeleteSoldLimit: Number,
     },
     data() {
         return {
             hasReleasePeriod: this.hasReleasePeriodProp,
             tokenDeployKey: 0,
             maxLengthToTruncate: 49,
-            tokensSoldOnMarket: null
+            tokenDeleteSoldLimit: null,
+            soldOnMarket: null,
         };
     },
-    mounted: function () {
+    mounted() {
         this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.currentName}))
-            .then((res) => this.tokensSoldOnMarket = res.data)
+            .then((res) => this.soldOnMarket = res.data)
             .catch((err) => {
               this.sendLogs('error', 'Can not get tokens in curculation', err);
+            });
+
+        this.$axios.retry.get(this.$routing.generate('token_delete_sold_limit'))
+            .then((res) => this.tokenDeleteSoldLimit = res.data)
+            .catch((err) => {
+              this.sendLogs('error', 'Can not get tokens delete limit', err);
             });
     },
     beforeUpdate: function() {
@@ -229,13 +238,18 @@ export default {
         }
     },
     computed: {
-        isTokenOverSoldLimit: function () {
-            const limit = new Decimal(this.tokenDeleteSoldLimit);
+        isTokenOverSoldLimit: function() {
+            if(!this.loaded) {
+                return true;
+            }
 
-            return limit.greaterThanOrEqualTo(this.tokensSoldOnMarket);
+            const sold = new Decimal(this.soldOnMarket);
+
+            return sold.greaterThanOrEqualTo(this.tokenDeleteSoldLimit);
         },
-        loaded: function () {
-            return this.tokensSoldOnMarket !== null;
+        loaded: function() {
+            return null !== this.tokenDeleteSoldLimit &&
+                null !== this.soldOnMarket;
         },
         shouldTruncate: function() {
             return this.currentName.length > this.maxLengthToTruncate;
