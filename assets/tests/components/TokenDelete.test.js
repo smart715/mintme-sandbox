@@ -35,21 +35,28 @@ describe('TokenDelete', () => {
     it('renders correctly with assigned props', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
+            propsData: {
+                loaded: false,
+            },
         });
 
-        wrapper.setProps({isTokenExchanged: true});
+        expect(wrapper.find('span').classes('text-muted')).toBe(true);
+
+        wrapper.setProps({loaded: true});
+
+        wrapper.setProps({isTokenOverSoldLimit: true});
         wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenExchanged: true});
+        wrapper.setProps({isTokenOverSoldLimit: true});
         wrapper.setProps({isTokenNotDeployed: true});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenOverSoldLimit: false});
         wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setProps({isTokenOverSoldLimit: false});
         wrapper.setProps({isTokenNotDeployed: true});
         expect(wrapper.find('span').classes('text-muted')).toBe(false);
     });
@@ -58,8 +65,9 @@ describe('TokenDelete', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
             propsData: {
-                isTokenExchanged: false,
+                isTokenOverSoldLimit: false,
                 isTokenNotDeployed: true,
+                loaded: true,
             },
         });
         wrapper.find('span').trigger('click');
@@ -69,7 +77,10 @@ describe('TokenDelete', () => {
     it('do not need to send auth code when 2fa enabled', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: true},
+            propsData: {
+                twofa: true,
+                loaded: true,
+            },
         });
         expect(wrapper.vm.needToSendCode).toBe(false);
     });
@@ -77,7 +88,10 @@ describe('TokenDelete', () => {
     it('need to send auth code whe 2fa disabled', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: false},
+            propsData: {
+                twofa: false,
+                loaded: true,
+            },
         });
         expect(wrapper.vm.needToSendCode).toBe(true);
     });
@@ -85,7 +99,10 @@ describe('TokenDelete', () => {
     it('do not need send auth code when it already sent', (done) => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: false},
+            propsData: {
+                twofa: false,
+                loaded: true
+            },
         });
 
         wrapper.vm.sendConfirmCode();
