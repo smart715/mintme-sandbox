@@ -165,8 +165,8 @@
                             </posts>
                             <top-holders
                                 class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
-                                {% if tradeInfo %}
-                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
+                                {% if topHolders %}
+                                :traders-prop="{{ topHolders | json_encode }}"
                                 {% endif %}
                                 :token-name="{{ market.quote.symbol | json_encode }}"
                                 websocket-url="{{ global_websocket_url }}"
@@ -187,14 +187,6 @@
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
                                 :holders-prop="{{ token.getHoldersCount }}"
-                                {% if tradeInfo %}
-                                :sold-on-market-prop="{{ tradeInfo.soldOnMarket }}"
-                                :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
-                                :token-withdrawn-prop="{{ tradeInfo.withdrawn }}"
-                                :token-exchange-prop="{{ tradeInfo.tokenExchange ?? 0 }}"
-                                :active-orders="{{ tradeInfo.activeOrders }}"
-                                :stats-prop="{{ tradeInfo.lockIn | json_encode }}"
-                                {% endif %}
                             >
                             </token-introduction-statistics>
                         </div>

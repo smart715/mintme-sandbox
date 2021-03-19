@@ -126,7 +126,7 @@
                                     {% trans %}trade.top_holders.header{% endtrans %}
                                 </div>
                                 <div class="card-body p-0">
-                                    {% if tradeInfo and tradeInfo.topHolders is not empty %}
+                                    {% if topHolders %}
                                         <div class="table-responsive">
                                             <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
                                                 <thead role="rowgroup">
@@ -140,7 +140,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody role="rowgroup">
-                                                    {% for holder in tradeInfo.topHolders %}
+                                                    {% for holder in topHolders %}
                                                     <tr role="row">
                                                         <td role="cell" aria-colindex="1">
                                                             <div class="d-flex flex-row flex-nowrap justify-content-between w-100">

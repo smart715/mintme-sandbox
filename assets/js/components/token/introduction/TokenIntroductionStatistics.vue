@@ -243,30 +243,6 @@ export default {
         tokenContractAddress: String,
         tokenCreated: String,
         websocketUrl: String,
-        soldOnMarketProp: {
-            type: Number,
-            default: null,
-        },
-        donationVolumeProp: {
-            type: Number,
-            default: null,
-        },
-        tokenWithdrawnProp: {
-            type: Number,
-            default: null,
-        },
-        tokenExchangeProp: {
-            type: Number,
-            default: null,
-        },
-        activeOrders: {
-            type: Number,
-            default: null,
-        },
-        statsProp: {
-          type: Object,
-          default: null,
-        },
         holdersProp: {
             type: Number,
             default: null,
@@ -275,10 +251,10 @@ export default {
     data() {
         return {
             pendingSellOrders: null,
-            soldOnMarket: this.soldOnMarketProp,
+            soldOnMarket: null,
             defaultValue: defaultValue,
-            tokenWithdrawn: this.tokenWithdrawnProp,
-            donationVolume: this.donationVolumeProp,
+            tokenWithdrawn: null,
+            donationVolume: null,
             shouldShowStats: false,
         };
     },
@@ -346,20 +322,16 @@ export default {
         },
         fetchAllData: function() {
             if (this.isMintmeToken) {
-                if (null === this.tokenWithdrawnProp) {
+                if (null === this.tokenWithdrawn) {
                     this.getTokenWithdrawn();
                 }
 
-                if (!this.statsProp) {
+                if (!this.stats) {
                     this.getLockPeriod();
-                } else {
-                    this.stats = this.statsProp;
                 }
 
-                if (null === this.tokenExchangeProp) {
+                if (null === this.tokenExchangeAmount) {
                     this.getTokExchangeAmount();
-                } else {
-                    this.tokenExchangeAmount = this.tokenExchangeProp;
                 }
             }
 
@@ -367,7 +339,7 @@ export default {
                 this.getTokenSoldOnMarket();
             }
 
-            if (!this.activeOrders) {
+            if (!this.pendingSellOrders) {
                 this.getPendingOrders();
             }
 
@@ -403,17 +375,17 @@ export default {
             };
         },
         loaded: function() {
-            return (!this.isMintmeToken || this.tokenExchangeAmount !== null)
-                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.activeOrders !== null);
+            return (!this.isMintmeToken || null !== this.tokenExchangeAmount) &&
+                null !== this.soldOnMarket &&
+                null !== this.pendingSellOrders &&
+                null !== this.stats &&
+                null !== this.donationVolume &&
+                null !== this.tokenWithdrawn;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            if (this.activeOrders) {
-                return this.activeOrders;
-            }
-
             let sum = new Decimal(0);
             for (let key in this.pendingSellOrders) {
                 if (this.pendingSellOrders.hasOwnProperty(key)) {
