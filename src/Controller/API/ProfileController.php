@@ -10,6 +10,7 @@ use App\Logger\UserActionLogger;
 use App\Manager\PhoneNumberManagerInterface;
 use App\Utils\RandomNumberInterface;
 use App\Validator\Constraints\AddPhoneNumber;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -150,6 +151,7 @@ class ProfileController extends AbstractFOSRestController
                     'Phone number verification code requested.',
                     ['to' => $sms->getTo(), $response]
                 );
+                $phoneNumber->setSendCodeDate(new DateTimeImmutable());
             } catch (\Throwable $e) {
                 $this->userActionLogger->info('Error during send phone number code verificaion'. json_encode($e));
 

@@ -41,6 +41,11 @@ class PhoneNumber
     private ?string $verificationCode;
 
     /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private ?DateTimeImmutable $sendCodeDate = null; // phpcs:ignore
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private bool $verified = false; // phpcs:ignore
@@ -232,6 +237,18 @@ class PhoneNumber
     public function setEditDate(?DateTimeImmutable $editDate): self
     {
         $this->editDate = $editDate;
+
+        return $this;
+    }
+
+    public function getSendCodeDate(): ?DateTimeImmutable
+    {
+        return $this->sendCodeDate;
+    }
+
+    public function setSendCodeDate(?DateTimeImmutable $sendCodeDate): self
+    {
+        $this->sendCodeDate = $sendCodeDate;
 
         return $this;
     }
