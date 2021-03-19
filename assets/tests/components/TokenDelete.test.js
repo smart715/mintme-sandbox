@@ -101,7 +101,7 @@ describe('TokenDelete', () => {
             localVue: mockVue(),
             propsData: {
                 twofa: false,
-                loaded: true
+                loaded: true,
             },
         });
 
