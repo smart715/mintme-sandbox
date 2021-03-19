@@ -1,48 +1,36 @@
 <template>
     <div>
-        <template v-if="loaded">
-            <template v-if="btnDisabled">
-                <span class="btn-cancel px-0 m-1 text-muted">
-                    {{ $t('token.delete.delete_token') }}
-                </span>
-                <guide>
-                    <template slot="header">
-                        {{ $t('token.delete.header') }}
-                    </template>
-                    <template slot="body">
-                        <p v-if="isTokenOverSoldLimit">
-                        {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
-                        </p>
-                        <p v-else-if="!isTokenNotDeployed">
-                            {{ $t('token.delete.body.deploying_or_deployed') }}
-                        </p>
-                    </template>
-                </guide>
-            </template>
-            <span
-                v-else
-                class="btn-cancel px-0 c-pointer m-1"
-                @click="deleteToken"
-            >
-                {{ $t('token.delete.delete_token') }}
-            </span>
-            <two-factor-modal
-                :visible="showTwoFactorModal"
-                :twofa="twofa"
-                @verify="doDeleteToken"
-                @close="closeTwoFactorModal"
-            />
-        </template>
-        <template v-else>
+        <template v-if="btnDisabled">
             <span class="btn-cancel px-0 m-1 text-muted">
                 {{ $t('token.delete.delete_token') }}
             </span>
-            <font-awesome-icon
-                icon="circle-notch"
-                spin class="loading-spinner"
-                fixed-width
-            />
+            <guide>
+                <template slot="header">
+                    {{ $t('token.delete.header') }}
+                </template>
+                <template slot="body">
+                    <p v-if="isTokenOverSoldLimit">
+                    {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
+                    </p>
+                    <p v-else-if="!isTokenNotDeployed">
+                        {{ $t('token.delete.body.deploying_or_deployed') }}
+                    </p>
+                </template>
+            </guide>
         </template>
+        <span
+            v-else
+            class="btn-cancel px-0 c-pointer m-1"
+            @click="deleteToken"
+        >
+            {{ $t('token.delete.delete_token') }}
+        </span>
+        <two-factor-modal
+            :visible="showTwoFactorModal"
+            :twofa="twofa"
+            @verify="doDeleteToken"
+            @close="closeTwoFactorModal"
+        />
     </div>
 </template>
 
@@ -59,7 +47,6 @@ export default {
         isTokenNotDeployed: Boolean,
         isTokenOverSoldLimit: Boolean,
         tokenDeleteSoldLimit: Number,
-        loaded: Boolean,
         tokenName: String,
         twofa: Boolean,
     },

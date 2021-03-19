@@ -136,14 +136,27 @@
                                 {{ $t('token_edit_modal.delete') }}
                             </template>
                             <template slot="body">
-                                <token-delete
-                                    :is-token-not-deployed="isTokenNotDeployed"
-                                    :is-token-over-sold-limit="isTokenOverSoldLimit"
-                                    :tokenDeleteSoldLimit="tokenDeleteSoldLimit"
-                                    :loaded="loaded"
-                                    :token-name="currentName"
-                                    :twofa="twofa"
-                                />
+                                <template v-if="isInfoLoaded">
+                                    <token-delete
+                                        :is-token-not-deployed="isTokenNotDeployed"
+                                        :is-token-over-sold-limit="isTokenOverSoldLimit"
+                                        :tokenDeleteSoldLimit="tokenDeleteSoldLimit"
+                                        :token-name="currentName"
+                                        :twofa="twofa"
+                                    />
+                                </template>
+                                <template v-else>
+                                    <div>
+                                        <span class="btn-cancel px-0 m-1 text-muted">
+                                            {{ $t('token.delete.delete_token') }}
+                                        </span>
+                                        <font-awesome-icon
+                                            icon="circle-notch"
+                                            spin class="loading-spinner"
+                                            fixed-width
+                                        />
+                                    </div>
+                                </template>
                             </template>
                         </faq-item>
                     </div>
@@ -239,7 +252,7 @@ export default {
     },
     computed: {
         isTokenOverSoldLimit: function() {
-            if (!this.loaded) {
+            if (!this.isInfoLoaded) {
                 return true;
             }
 
@@ -247,7 +260,7 @@ export default {
 
             return sold.greaterThanOrEqualTo(this.tokenDeleteSoldLimit);
         },
-        loaded: function() {
+        isInfoLoaded: function() {
             return null !== this.tokenDeleteSoldLimit &&
                 null !== this.soldOnMarket;
         },
