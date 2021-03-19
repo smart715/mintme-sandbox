@@ -89,10 +89,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
-    /** @var MarketStatusManagerInterface */
     private MarketStatusManagerInterface $marketStatusManager;
 
-    /** @var MoneyWrapperInterface */
     private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
@@ -330,7 +328,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $tokenQuantity = $this->moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
+            $tokenQuantity = $this->moneyWrapper->parse(
+                (string)$this->getParameter('token_quantity'),
+                Symbols::TOK
+            );
             $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
 
             $lock->setAmountToRelease($amountToRelease)
@@ -526,7 +527,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $token = $this->tokenManager->findByName($name);
         $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
-        if (null === $token || null === $crypto || !$token->isMintmeToken()) {
+        if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
