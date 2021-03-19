@@ -92,6 +92,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var MarketStatusManagerInterface */
     private MarketStatusManagerInterface $marketStatusManager;
 
+    /** @var MoneyWrapperInterface */
+    private MoneyWrapperInterface $moneyWrapper;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -102,6 +105,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
         MarketStatusManagerInterface $marketStatusManager,
+        MoneyWrapperInterface $moneyWrapper,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -116,6 +120,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
         $this->marketStatusManager = $marketStatusManager;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
@@ -281,8 +286,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -326,7 +330,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
+            $tokenQuantity = $this->moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
             $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
 
             $lock->setAmountToRelease($amountToRelease)
@@ -515,7 +519,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
         MailerInterface $mailer,
-        MoneyWrapperInterface $moneyWrapper,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -534,7 +537,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
-        $tokenDeleteSoldLimit = $moneyWrapper->parse(
+        $tokenDeleteSoldLimit = $this->moneyWrapper->parse(
             (string)$this->getParameter('token_delete_sold_limit'),
             Symbols::TOK
         );
@@ -876,7 +879,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         return $marketStatus
             ? $marketStatus->getSoldOnMarket()
-            : new Money('0', new Currency(Symbols::TOK));
+            : $this->moneyWrapper->parse('0', Symbols::TOK);
     }
 
     private function validateEthereumAddress(string $address): bool
