@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Repository\TokenRepository;
+use App\SmartContract\ContractHandlerInterface;
 use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -19,7 +20,10 @@ class UpdateDeployedTokenCommand extends Command
 
     private LockFactory $lockFactory;
 
+    private ContractHandlerInterface $contractHandler;
+
     public function __construct(
+        ContractHandlerInterface $contractHandler,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         LockFactory $lockFactory
@@ -27,6 +31,7 @@ class UpdateDeployedTokenCommand extends Command
         $this->logger = $logger;
         $this->lockFactory = $lockFactory;
         $this->em = $entityManager;
+        $this->contractHandler = $contractHandler;
 
         parent::__construct();
     }
@@ -53,7 +58,9 @@ class UpdateDeployedTokenCommand extends Command
         $deployed = $this->getTokenRepository()->getDeployedTokens();
 
         foreach ($deployed as $item) {
-            $item->setTxHash(null);
+            if (!$item->getTxHash()) {
+                $item->setTxHash($this->contractHandler->getTxHash($item->getName()));
+            }
         }
 
         $updateMessage = count($deployed) . ' tokensg were updated. Saving to DB..';

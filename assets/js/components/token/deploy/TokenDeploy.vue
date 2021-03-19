@@ -223,8 +223,6 @@ export default {
             moment.locale(this.currentLocale);
         }
 
-        alert(this.tokenTxHashAddress);
-
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
