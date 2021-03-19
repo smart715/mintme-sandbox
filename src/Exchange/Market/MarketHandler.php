@@ -459,6 +459,21 @@ class MarketHandler implements MarketHandlerInterface
             $expires = null;
         }
 
+        $volumeDonation =  $this->moneyWrapper->parse(
+            $result['volumeDonation'],
+            $this->getSymbol($market->getQuote())
+        );
+
+        $dealDonationDay =  $this->moneyWrapper->parse(
+            $result['dealDonation'],
+            $this->getSymbol($market->getBase())
+        );
+
+        $dealDonationMonth =  $this->moneyWrapper->parse(
+            $monthResult['dealDonation'],
+            $this->getSymbol($market->getBase())
+        );
+
         return new MarketInfo(
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol(),
@@ -469,7 +484,7 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $result['volume'],
                 $this->getSymbol($market->getQuote())
-            ),
+            )->add($volumeDonation),
             $this->moneyWrapper->parse(
                 $result['open'],
                 $this->getSymbol($market->getBase())
@@ -489,11 +504,11 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $result['deal'],
                 $this->getSymbol($market->getBase())
-            ),
+            )->add($dealDonationDay),
             $this->moneyWrapper->parse(
                 $monthResult['deal'],
                 $this->getSymbol($market->getBase())
-            ),
+            )->add($dealDonationMonth),
             $this->moneyWrapper->parse(
                 $buyDepth,
                 $this->getSymbol($market->getBase())
