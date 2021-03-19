@@ -185,7 +185,7 @@ class PostsController extends AbstractFOSRestController
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
-        return $this->view($post->getComments(), Response::HTTP_OK);
+        return $this->view($post->getContent() ? $post->getComments() : [], Response::HTTP_OK);
     }
 
     /**
