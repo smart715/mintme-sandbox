@@ -239,7 +239,7 @@ export default {
     },
     computed: {
         isTokenOverSoldLimit: function() {
-            if(!this.loaded) {
+            if (!this.loaded) {
                 return true;
             }
 
