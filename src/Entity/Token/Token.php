@@ -280,7 +280,7 @@ class Token implements TradebleInterface, ImagineInterface
     private $decimals = 12;
 
     /**
-     * @ORM\Column(type="boolean", nullable= false)
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
      */
     private bool $showDeployedModal = false; // phpcs:ignore
 

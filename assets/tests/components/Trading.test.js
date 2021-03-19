@@ -236,8 +236,9 @@ describe('Trading', () => {
                                 close: '789',
                                 high: '0',
                                 low: '0',
-                                volume: '0',
+                                volumeDonation: '0',
                                 deal: '321',
+                                dealDonation: '321',
                             },
                         ],
                         id: null,
@@ -246,7 +247,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '321 MINTME'},
+                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
                             ]);
                             done();
                         });
@@ -266,7 +267,9 @@ describe('Trading', () => {
                                 high: '0',
                                 low: '0',
                                 volume: '0',
+                                volumeDonation: '0',
                                 deal: '32',
+                                dealDonation: '32',
                         },
                         ],
                         id: null,
@@ -275,7 +278,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.sanitizedMarketsOnTop).toMatchObject([
-                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
+                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '64 BTC'},
                             ]);
                             done();
                         });
@@ -295,7 +298,9 @@ describe('Trading', () => {
                                 high: '0',
                                 low: '0',
                                 volume: '0',
+                                volumeDonation: '0',
                                 deal: '3210',
+                                dealDonation: '3210',
                         },
                         ],
                         id: null,
@@ -304,8 +309,8 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '321 MINTME'},
-                                {pair: 'tok2', change: '-73%', lastPrice: '1230 MINTME', dayVolume: '3210 MINTME'},
+                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
+                                {pair: 'tok2', change: '-73%', lastPrice: '1230 MINTME', dayVolume: '6420 MINTME'},
                             ]);
                             done();
                         });
