@@ -19,7 +19,7 @@
                                     class="chat-avatar rounded-circle d-block"
                                     alt="avatar">
                                 <span class="d-inline-block col">
-                                    <span class="d-block small word-break toast-text text-bold">
+                                    <span v-if="row.item.date" class="d-block small word-break toast-text text-bold align-text-top">
                                         {{ row.item.date }}
                                     </span>
                                     <br>
@@ -110,6 +110,7 @@ export default {
                 },
             ],
             updaterId: null,
+            repeatedDate: [],
         };
     },
     computed: {
@@ -150,12 +151,14 @@ export default {
         },
         messagesList: function() {
             return (this.messages || []).map((message) => {
+                let date = message.createdAt ? moment(message.createdAt).format(GENERAL.dateFormat) : null;
+
                 return {
                     id: message.id,
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
-                    date: moment(message.createdAt).format(GENERAL.dateFormat),
+                    date: date,
                     time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });
@@ -174,6 +177,15 @@ export default {
         },
     },
     methods: {
+        generateMessages: function() {
+            for (const index in this.messages) {
+                if (this.repeatedDate.indexOf(this.messages[index].createdAt) === -1) {
+                    this.repeatedDate.push(this.messages[index].createdAt);
+                } else {
+                    this.messages[index].createdAt = null;
+                }
+            }
+        },
         addMessageToQueue: function() {
             if (!this.messageBody) {
                 return;
@@ -229,6 +241,7 @@ export default {
             .then((res) => {
                 if (this.messagesUrl === res.config.url) {
                     this.messages = res.data;
+                    this.generateMessages();
                     this.updateMessagesInterval();
                 }
             })
@@ -244,6 +257,7 @@ export default {
                 .then((res) => {
                     if (this.messagesLoaded && this.newMessagesUrl === res.config.url) {
                         this.messages.push(...res.data);
+                        this.generateMessages();
                     }
                 })
                 .catch((error) => this.sendLogs('error', 'update messages response error', error));
