@@ -68,10 +68,9 @@
                     {{ $t('token.deploy.deployed') }}
                 </p>
                 <br>
-                <a v-if="createContractLink"
-                    :href="mintmeExplorerUrl"
-                    target="_blank"
-                >{{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: formatTokenDeployedDate}) }}</a>
+                <a v-if="tokenHasContractLink" :href="mintmeExplorerUrl" target="_blank">
+                    {{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: deployedDate}) }}
+                </a>
             </div>
         </template>
         <div
@@ -149,17 +148,11 @@ export default {
         costExceed: function() {
             return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
         },
-        formatTokenDeployedDate: function() {
-            return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormatWithoutTime);
+        deployedDate: function() {
+            return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormat);
         },
-        createContractFactory: function() {
-            return this.deployed && this.isOwner && this.isMintmeToken;
-        },
-        contractDateAddressExistence: function() {
-            return this.tokenDeployedDate;
-        },
-        isSmartContractCreated: function() {
-            return this.createContractFactory && this.contractDateAddressExistence && this.tokenTxHashAddress;
+        isMintmeDeployed: function() {
+            return this.tokenDeployedDate && this.deployed && this.isOwner && this.isMintmeToken;
         },
     },
     methods: {
@@ -208,8 +201,8 @@ export default {
             })
             .then(() => this.deploying = false);
         },
-        createContractLink: function() {
-            if (this.isSmartContractCreated) {
+        tokenHasContractLink: function() {
+            if (this.isMintmeDeployed) {
                 this.mintmeExplorerUrl = this.mintmeExplorerUrl.concat('/tx/' + this.tokenTxHashAddress);
 
                 return true;

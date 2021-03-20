@@ -813,7 +813,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
-    public function setTxHash(string $txHash): self
+    public function setTxHash(?string $txHash): self
     {
         $this->txHash = $txHash;
 

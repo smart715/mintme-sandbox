@@ -7,15 +7,12 @@ use App\Repository\TokenRepository;
 use App\SmartContract\ContractHandlerInterface;
 use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateDeployedTokenCommand extends Command
 {
-    private LoggerInterface $logger;
-
     private EntityManagerInterface $em;
 
     private LockFactory $lockFactory;
@@ -24,11 +21,9 @@ class UpdateDeployedTokenCommand extends Command
 
     public function __construct(
         ContractHandlerInterface $contractHandler,
-        LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         LockFactory $lockFactory
     ) {
-        $this->logger = $logger;
         $this->lockFactory = $lockFactory;
         $this->em = $entityManager;
         $this->contractHandler = $contractHandler;
@@ -52,26 +47,19 @@ class UpdateDeployedTokenCommand extends Command
             return 0;
         }
 
-        $this->logger->info('[release] Update job started..');
-
         /** @var Token[] $deployed */
         $deployed = $this->getTokenRepository()->getDeployedTokens();
 
-        foreach ($deployed as $item) {
-            if (!$item->getTxHash()) {
-                $item->setTxHash($this->contractHandler->getTxHash($item->getName()));
+        foreach ($deployed as $token) {
+            if (!$token->getTxHash() && $token->isMintmeToken()) {
+                $token->setTxHash($this->contractHandler->getTxHash($token->getName()));
+                $this->em->persist($token);
             }
         }
 
-        $updateMessage = count($deployed) . ' tokensg were updated. Saving to DB..';
-
-        $this->logger->info('[release] '.$updateMessage);
+        $updateMessage = count($deployed) . ' tokens were updated. Saving to DB..';
         $output->writeln($updateMessage);
-
         $this->em->flush();
-
-        $this->logger->info('[release] Finished.');
-
         $lock->release();
 
         return 0;

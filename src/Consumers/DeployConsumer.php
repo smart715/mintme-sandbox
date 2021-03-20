@@ -110,7 +110,7 @@ class DeployConsumer implements ConsumerInterface
                     );
 
                     $token->setAddress('');
-                    $token->setTxHash('');
+                    $token->setTxHash(null);
                     $token->setDeployCost(null);
                     $token->setDeployed(null);
 
