@@ -46,7 +46,7 @@
                                     {{ $t('token.intro.statistics.balance') }}
                                 </div>
                                 <b-list-group class="flex-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1 odd-item-bg">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.exchange.header') }} <br>
                                         {{ walletBalance | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -58,7 +58,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.active.header') }} <br v-if="isMintmeToken">
                                         {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -70,7 +70,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1 odd-item-bg">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.withdraw.header') }} <br v-if="isMintmeToken">
                                         {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -82,7 +82,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg" >
+                                    <b-list-group-item class="flex-fill odd-item-bg" >
                                         {{ $t('token.intro.statistics.sold.header') }} <br v-if="isMintmeToken">
                                         {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -94,7 +94,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg" >
+                                    <b-list-group-item class="flex-fill odd-item-bg" >
                                         {{ $t('token.intro.statistics.donation.header') }} <br v-if="isMintmeToken">
                                         {{ donationVolume }}
                                         <guide>
@@ -106,7 +106,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg" >
+                                    <b-list-group-item class="flex-fill odd-item-bg" >
                                         {{ $t('token.intro.statistics.holders.header') }}
                                         <br v-if="isMintmeToken">
                                         {{ holdersProp }}
@@ -131,7 +131,7 @@
                                     </guide>
                                 </div>
                                 <b-list-group class="flex-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.period.header') }} <br>
                                         {{ stats.releasePeriod }}
                                         <template v-if="stats.releasePeriod !== defaultValue">
@@ -146,7 +146,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.hourly.header') }} <br>
                                         {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -158,7 +158,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.already_released.header') }} <br>
                                         {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -170,7 +170,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.not_yet_released.header') }} <br>
                                         {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
                                         <guide>
@@ -182,7 +182,7 @@
                                             </template>
                                         </guide>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1 odd-item-bg">
+                                    <b-list-group-item class="flex-fill odd-item-bg">
                                         {{ $t('token.intro.statistics.created') }} <br>
                                         {{ tokenCreated }}
                                     </b-list-group-item>
