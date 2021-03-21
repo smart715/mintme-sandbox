@@ -5,6 +5,7 @@ namespace App\Tests\EventSubscriber;
 use App\Entity\User;
 use App\EventSubscriber\KernelSubscriber;
 use App\Manager\ProfileManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->once()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockEntityManage(null),
         );
 
         $sub->onRequest(
@@ -37,7 +39,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true)
+            $this->mockCsrfTokenManager(true),
+            $this->mockEntityManage(null),
         );
 
         $event = $this->mockEvent(null, '/foo/bar', true, true);
@@ -52,7 +55,8 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(false)
+            $this->mockCsrfTokenManager(false),
+            $this->mockEntityManage(null),
         );
 
         $event = $this->mockEvent('foo', '/api/bar', true, true);
@@ -114,5 +118,14 @@ class KernelSubscriberTest extends TestCase
         $ctm->method('isTokenValid')->willReturn($isValid);
 
         return $ctm;
+    }
+
+    /** @return EntityManagerInterface|MockObject */
+    private function mockEntityManage(?int $isNull): EntityManagerInterface
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('flush')->willReturn($isNull);
+
+        return $em;
     }
 }
