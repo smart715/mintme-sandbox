@@ -12,19 +12,17 @@
                 class="w-100 d-flex flex-column align-items-center"
                 :class="{'h-100 justify-content-center' : !hasPosts}"
             >
-                <template v-if="hasPosts">
-                    <post v-for="(n, i) in postsCount"
-                          :post="posts[i]"
-                          :key="i"
-                          :index="i"
-                          @delete-post="$emit('delete-post', $event)"
-                          :show-edit="showEdit"
-                          @go-to-trade="$emit('go-to-trade', $event)"
-                          :logged-in="loggedIn"
-                          @go-to-post="$emit('go-to-post', $event)"
-                    />
-                </template>
-                <div v-else class="absolute-center">
+                <post v-for="(n, i) in postsCount"
+                      :post="posts[i]"
+                      :key="i"
+                      :index="i"
+                      @delete-post="$emit('delete-post', $event)"
+                      :show-edit="showEdit"
+                      @go-to-trade="$emit('go-to-trade', $event)"
+                      :logged-in="loggedIn"
+                      @go-to-post="$emit('go-to-post', $event)"
+                />
+                <div v-if="!hasPosts" class="absolute-center">
                     {{ $t('post.not_any_post') }}
                 </div>
             </div>
