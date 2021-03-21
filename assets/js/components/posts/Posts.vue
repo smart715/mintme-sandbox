@@ -10,7 +10,7 @@
                 id="posts-container"
                 ref="postsContainer"
                 class="w-100 d-flex flex-column align-items-center"
-                :class="!hasPosts ? 'h-100 justify-content-center' : ''"
+                :class="{'h-100 justify-content-center' : !hasPosts}"
             >
                 <template v-if="hasPosts">
                     <post v-for="(n, i) in postsCount"
