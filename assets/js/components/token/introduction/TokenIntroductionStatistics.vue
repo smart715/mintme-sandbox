@@ -322,30 +322,14 @@ export default {
         },
         fetchAllData: function() {
             if (this.isMintmeToken) {
-                if (null === this.tokenWithdrawn) {
-                    this.getTokenWithdrawn();
-                }
-
-                if (!this.stats) {
-                    this.getLockPeriod();
-                }
-
-                if (null === this.tokenExchangeAmount) {
-                    this.getTokExchangeAmount();
-                }
+                this.getTokenWithdrawn();
+                this.getLockPeriod();
+                this.getTokExchangeAmount();
             }
 
-            if (null === this.soldOnMarket) {
-                this.getTokenSoldOnMarket();
-            }
-
-            if (!this.pendingSellOrders) {
-                this.getPendingOrders();
-            }
-
-            if (null === this.donationVolume) {
-                this.getMarketStatus();
-            }
+            this.getTokenSoldOnMarket();
+            this.getPendingOrders();
+            this.getMarketStatus();
 
             this.sendMessage(JSON.stringify({
                 method: 'kline.subscribe',
