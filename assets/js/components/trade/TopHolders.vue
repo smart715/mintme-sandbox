@@ -18,21 +18,13 @@
                         </b-table>
                     </div>
                 </template>
-                <template v-else>
-                    <div class="d-flex h-100 align-items-center justify-content-center">
-                        <span>
-                            {{ $t('trade.top_holders.no_holders') }}
-                        </span>
-                    </div>
-                </template>
-            </template>
-            <template v-else>
-                <div class="d-flex h-100 align-items-center justify-content-center">
-                    <div>
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                    </div>
+                <div v-else class="d-flex h-100 align-items-center justify-content-center">
+                        {{ $t('trade.top_holders.no_holders') }}
                 </div>
             </template>
+            <div v-else class="d-flex h-100 align-items-center justify-content-center">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
         </div>
     </div>
 </template>
