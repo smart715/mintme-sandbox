@@ -1,8 +1,6 @@
 import '../scss/main.sass';
 import Vue from 'vue';
 import VueBootstrap from 'bootstrap-vue';
-import Countdown from './components/Countdown.vue';
-import FaqItem from './components/FaqItem';
 import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import {faCog, fas, faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import {library, dom} from '@fortawesome/fontawesome-svg-core';
@@ -102,15 +100,4 @@ new Vue({
         },
     },
 });
-
-if (document.getElementById('description')) {
-    new Vue({
-        el: '#description',
-        i18n,
-        components: {
-            Countdown,
-            FaqItem,
-        },
-    });
-}
 
