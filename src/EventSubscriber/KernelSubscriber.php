@@ -5,7 +5,6 @@ namespace App\EventSubscriber;
 use App\Entity\Profile;
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,20 +29,16 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @var bool */
     private $isAuth;
 
-    private EntityManagerInterface $em;
-
     public function __construct(
         bool $isAuth,
         ProfileManagerInterface $profileManager,
         TokenStorageInterface $tokenStorage,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        EntityManagerInterface $entityManager
+        CsrfTokenManagerInterface $csrfTokenManager
     ) {
         $this->isAuth = $isAuth;
         $this->profileManager = $profileManager;
         $this->tokenStorage = $tokenStorage;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->em = $entityManager;
     }
 
     /** @codeCoverageIgnore */
@@ -87,19 +82,6 @@ class KernelSubscriber implements EventSubscriberInterface
              * @psalm-suppress UndefinedDocblockClass
              */
             $user = $this->tokenStorage->getToken()->getUser();
-
-            /**
-             * @var Profile $profile
-             * @psalm-suppress UndefinedDocblockClass
-             */
-            $profile = $user->getProfile();
-
-            if ('' === $profile->getNickname()) {
-                $nickname = explode('@', $profile->getUserEmail())[0];
-                $profile->setNickname($nickname);
-                $this->em->persist($profile);
-                $this->em->flush();
-            }
 
             if (!$user->getHash()) {
                 $this->profileManager->createHash($user, true, $this->isAuth);

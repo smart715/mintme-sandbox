@@ -3,7 +3,9 @@
 namespace App\Admin;
 
 use App\Admin\Form\PasswordGeneratorButtonType;
+use App\Entity\Profile;
 use App\Entity\User;
+use App\Manager\ProfileManagerInterface;
 use Exception;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -13,6 +15,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
 use Sonata\AdminBundle\Show\ShowMapper;
+use Sonata\Form\Validator\ErrorElement;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -20,6 +23,8 @@ class UserAdmin extends AbstractAdmin
 {
     /** @var UserManagerInterface */
     private $userManager;
+
+    private ProfileManagerInterface $profileManager;
 
     protected function configureRoutes(RouteCollection $collection): void
     {
@@ -34,6 +39,16 @@ class UserAdmin extends AbstractAdmin
         if ('create' == $this->getFormAction()) {
             $formMapper
                 ->add('email', null, ['attr' => ['placeholder' => 'Email']])
+                ->add('nickname', TextType::class, [
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'form-input',
+                        'placeholder' => 'Nickname',
+                        'max' => 30,
+                        'min' => 2,
+                        'pattern' => '[A-Za-z\d]+',
+                    ],
+                ])
                 ->add('plainPassword', TextType::class, [
                     'attr' => [
                         'class' => 'password-generator-input',
@@ -111,9 +126,35 @@ class UserAdmin extends AbstractAdmin
             ->add('roles');
     }
 
-    public function init(UserManagerInterface $userManager): void
+    public function init(UserManagerInterface $userManager, ProfileManagerInterface $profileManager): void
     {
         $this->setUserManager($userManager);
+        $this->profileManager = $profileManager;
+    }
+
+    /** {@inheritdoc} */
+    public function validate(ErrorElement $errorElement, $object)
+    {
+        $errorElement
+            ->with('nickname')
+            ->assertLength(array('max' => 30, 'min' => 2))
+            ->assertNotBlank()
+            ->end();
+
+        $nickname = $this->getForm()->get('nickname')->getData();
+        preg_match('/[A-Za-z\d]+/', $nickname, $match);
+
+        if (!$match) {
+            $errorElement->with('nickname')->addViolation('Nickname can contain only latin letters and numbers')->end();
+        }
+
+        /** @var Profile|null $profile */
+        $profile = $this->profileManager->findByNickname($nickname);
+
+        if ($profile) {
+            $error = 'Nickname already exist';
+            $errorElement->with('nickname')->addViolation($error)->end();
+        }
     }
 
     /** {@inheritdoc} */
