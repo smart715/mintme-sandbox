@@ -23,7 +23,7 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->once()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true),
+            $this->mockCsrfTokenManager(true)
         );
 
         $sub->onRequest(
@@ -37,7 +37,7 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(true),
+            $this->mockCsrfTokenManager(true)
         );
 
         $event = $this->mockEvent(null, '/foo/bar', true, true);
@@ -52,7 +52,7 @@ class KernelSubscriberTest extends TestCase
             true,
             $this->mockProfileManager($this->never()),
             $this->mockTokenStorage($this->mockToken($this->createMock(User::class))),
-            $this->mockCsrfTokenManager(false),
+            $this->mockCsrfTokenManager(false)
         );
 
         $event = $this->mockEvent('foo', '/api/bar', true, true);

@@ -2,7 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Profile;
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
