@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\RefererTrait;
 use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -13,6 +12,7 @@ use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationConfigManagerInterface;
+use App\Security\Request\RefererRequestHandlerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -34,9 +34,6 @@ use Throwable;
 
 class RegistrationController extends FOSRegistrationController
 {
-
-    use RefererTrait;
-
     private EventDispatcherInterface $eventDispatcher;
     private FactoryInterface $formFactory;
     private UserManagerInterface $userManager;
@@ -51,6 +48,7 @@ class RegistrationController extends FOSRegistrationController
     private string $mintmeHostPrice;
     private string $mintmeHostPath;
     private AirdropReferralCodeManagerInterface $arcManager;
+    private RefererRequestHandlerInterface $refererRequestHandler;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -67,7 +65,8 @@ class RegistrationController extends FOSRegistrationController
         string $mintmeHostFreeDays,
         string $mintmeHostPrice,
         string $mintmeHostPath,
-        AirdropReferralCodeManagerInterface $arcManager
+        AirdropReferralCodeManagerInterface $arcManager,
+        RefererRequestHandlerInterface $refererRequestHandler
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -85,6 +84,7 @@ class RegistrationController extends FOSRegistrationController
         $this->arcManager = $arcManager;
 
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
+        $this->refererRequestHandler = $refererRequestHandler;
     }
 
     /**
@@ -133,7 +133,7 @@ class RegistrationController extends FOSRegistrationController
 
         $refers = $request->headers->get('Referer');
 
-        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
+        if ($refers && !in_array($refers, $this->refererRequestHandler->refererUrlsToSkip(), true)) {
             $this->get('session')->set('register_referer', $refers);
         }
 
@@ -274,10 +274,10 @@ class RegistrationController extends FOSRegistrationController
         $session = $this->get('session');
         $referer = $session->get('register_referer');
 
-        if ($referer && $this->isRefererValid($referer)) {
+        if ($referer && $this->refererRequestHandler->isRefererValid($referer)) {
             $session->remove('register_referer');
 
-            $path = $this->getRefererPathData();
+            $path = $this->refererRequestHandler->getRefererPathData();
 
             if ('token_show' === $path['_route'] && 'buy' === $path['tab'] && 'signup' === $path['modal']) {
                 return $this->redirectToRoute('wallet');
