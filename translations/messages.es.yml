@@ -642,7 +642,7 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.header.logged: Comprar
+donation.header.logged: 'Comprar %token%'
 donation.header.not_logged: 'Para comprar tokens, tiene que registrarse o ingresar'
 donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no deseas apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>'
 donation.currency: Moneda

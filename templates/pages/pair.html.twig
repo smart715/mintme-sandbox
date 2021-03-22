@@ -137,6 +137,20 @@
                         {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
                         {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
                     >
+                        {% if showDonation %}
+                            <div class="row">
+                                <donation
+                                    class="col-12 mb-3"
+                                    :market="{{ market | json_encode }}"
+                                    :logged-in="{{ loggedIn }}"
+                                    :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                                    :donation-params="{{ donation_params | json_encode }}"
+                                    websocket-url="{{ global_websocket_url }}"
+                                    disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                                >
+                                </donation>
+                            </div>
+                        {% endif %}
                         <div class="row">
                             {% if showDescription %}
                                 <token-introduction-description
@@ -197,25 +211,6 @@
                                 websocket-url="{{ global_websocket_url }}"
                             >
                             </top-holders>
-                        </div>
-                    </b-tab>
-                {% endif %}
-                {% if showDonation %}
-                    <b-tab
-                        title="{% trans %}page.pair.buy_title{% endtrans %}"
-                        title-link-class="token-buy-tab-link"
-                        {% if tab == 'donate' or tab == 'buy' %} {{ 'active' }} {% endif %}
-                    >
-                        <div class="container-fluid px-0">
-                            <donation
-                                :market="{{ market | json_encode }}"
-                                :logged-in="{{ loggedIn }}"
-                                :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                                :donation-params="{{ donation_params | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                            >
-                            </donation>
                         </div>
                     </b-tab>
                 {% endif %}
