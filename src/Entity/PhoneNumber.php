@@ -30,7 +30,7 @@ class PhoneNumber
     private Profile $profile;
 
     /**
-     * @ORM\Column(type="phone_number", unique=true)
+     * @ORM\Column(type="phone_number", unique=false)
      * @AssertPhoneNumber(type="mobile")
      */
     private \libphonenumber\PhoneNumber $phoneNumber;
@@ -39,6 +39,11 @@ class PhoneNumber
      * @ORM\Column(type="string", length=RandomNumber::CODE_LENGTH, nullable=true)
      */
     private ?string $verificationCode;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
+    private ?DateTimeImmutable $sendCodeDate = null; // phpcs:ignore
 
     /**
      * @ORM\Column(type="boolean")
@@ -232,6 +237,18 @@ class PhoneNumber
     public function setEditDate(?DateTimeImmutable $editDate): self
     {
         $this->editDate = $editDate;
+
+        return $this;
+    }
+
+    public function getSendCodeDate(): ?DateTimeImmutable
+    {
+        return $this->sendCodeDate;
+    }
+
+    public function setSendCodeDate(?DateTimeImmutable $sendCodeDate): self
+    {
+        $this->sendCodeDate = $sendCodeDate;
 
         return $this;
     }
