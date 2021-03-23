@@ -96,12 +96,10 @@ new Vue({
       document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
         introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[0]});
-        let donateLink = document.querySelectorAll('a.token-buy-tab-link')[0];
-        donateLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[1]});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[2]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[1]});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[3]});
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[2]});
       });
     }
   },
