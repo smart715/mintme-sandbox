@@ -78,7 +78,7 @@
                     </div>
                     {% else %}
                     <p>
-                        {% trans with {'%amount%': post.amount | toMoney(0, false), '%token%':  post.token.name } %} comment.logged_in.1{% endtrans %}
+                        {% trans with {'%amount%': post.amount | toMoney(0), '%token%':  post.token.name } %} comment.min_amount{% endtrans %}
                     </p>
                     {% endif %}
                 {% endif %}

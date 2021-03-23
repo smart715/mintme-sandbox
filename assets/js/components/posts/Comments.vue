@@ -26,7 +26,7 @@
         </div>
     </div>
     <p v-else>
-        {{ $t('comment.logged_in.1', {token : post.token.name, amount: post.amount | toMoney | formatMoney}) }}
+        {{ $t('comment.min_amount', {token : post.token.name, amount: post.amount | toMoney | formatMoney}) }}
     </p>
 </template>
 
@@ -57,5 +57,8 @@ export default {
             return this.$routing.generate('add_comment', {id: this.post.id});
         },
     },
+    mounted() {
+       alert(this.post.content);
+    }
 };
 </script>
