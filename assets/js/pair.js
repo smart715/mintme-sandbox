@@ -48,6 +48,8 @@ new Vue({
       singlePost: null,
       comments: null,
       showDeployedOnBoard: null,
+      tokenDeployedDate: null,
+      tokenTxHashAddress: null,
     };
   },
   components: {
@@ -125,6 +127,28 @@ new Vue({
             this.notifyError(this.$t('toasted.error.try_later'));
         });
     },
+    getTxHash: function() {
+      this.$axios.retry.get(this.$routing.generate('token_tx_hash', {
+        name: this.tokenName,
+      }))
+          .then(({data}) => {
+            this.tokenTxHashAddress = data.txHash;
+          }).catch((err) => {
+        this.sendLogs('error', 'Can not get token tx_hash', err);
+      });
+    },
+    getDeployedDate: function() {
+      this.$axios.retry.get(this.$routing.generate('token_deployed_date', {
+        name: this.tokenName,
+      }))
+          .then(({data}) => {
+            this.tokenDeployedDate = {
+                date: data.deployedDate,
+            };
+          }).catch((err) => {
+        this.sendLogs('error', 'Can not get token deployed date', err);
+      });
+    },
     checkTokenDeployment: function() {
       clearInterval(this.deployInterval);
       this.deployInterval = setInterval(() => {
@@ -134,8 +158,10 @@ new Vue({
                 this.tokenDeployed = true;
                 this.tokenPending = false;
                 this.showDeployedOnBoard = true;
-                clearInterval(this.deployInterval);
                 this.fetchAddress();
+                this.getTxHash();
+                this.getDeployedDate();
+                clearInterval(this.deployInterval);
             }
             this.retryCount++;
             if (this.retryCount >= this.retryCountLimit) {
