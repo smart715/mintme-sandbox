@@ -511,6 +511,36 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
+     * @Rest\Get("/{name}/tx_hash", name="token_tx_hash", options={"expose"=true})
+     */
+    public function getTokenTxHash(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['txHash' => $token->getTxHash()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/deployed_date", name="token_deployed_date", options={"expose"=true})
+     */
+    public function getDeployedDate(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token does not exist');
+        }
+
+        return $this->view(['deployedDate' => $token->getDeployed()], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
      * @Rest\Post("/{name}/delete", name="token_delete", options={"2fa"="optional", "expose"=true})
      * @Rest\RequestParam(name="name", nullable=true)
      * @Rest\RequestParam(name="code", nullable=true)

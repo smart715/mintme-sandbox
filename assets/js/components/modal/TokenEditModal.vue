@@ -74,6 +74,11 @@
                                     @pending="$emit('token-deploy-pending')"
                                     :key="tokenDeployKey"
                                     :disabled-services-config="disabledServicesConfig"
+                                    :current-locale="currentLocale"
+                                    :token-deployed-date="tokenDeployedDate"
+                                    :token-tx-hash-address="tokenTxHashAddress"
+                                    :mintme-explorer-url-prop="mintmeExplorerUrl"
+                                    :is-mintme-token="isMintmeToken"
                                 />
                             </template>
                         </faq-item>
@@ -222,6 +227,16 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
     },
     data() {
         return {

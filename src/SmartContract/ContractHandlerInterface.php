@@ -33,4 +33,6 @@ interface ContractHandlerInterface
     public function ping(): bool;
 
     public function getDecimalsContract(string $tokenAddress): int;
+
+    public function getTxHash(string $tokenName): string;
 }

@@ -1,12 +1,20 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller\Traits;
+namespace App\Security\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-trait RefererTrait
+class RefererRequestHandler implements RefererRequestHandlerInterface
 {
+    private RouterInterface $router;
+
+    public function __construct(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
     private array $refererPathData;
 
     public function getRefererPathData(): array
@@ -17,27 +25,28 @@ trait RefererTrait
     public function isRefererValid(string $pathInfo): bool
     {
         $refererRequest = Request::create($pathInfo);
-        $router = $this->get('router');
-        $this->refererPathData = $router->match($refererRequest->getPathInfo());
+        $this->refererPathData = $this->router->match($refererRequest->getPathInfo());
         $routeName = $this->refererPathData['_route'] ?? null;
 
-        return in_array($routeName, $this->validRefererRoutes());
+        return !in_array($routeName, $this->routesToSkip());
     }
 
-    private function refererUrlsToSkip(): array
+    private function routesToSkip(): array
     {
         return [
-            $this->generateUrl('login', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $this->generateUrl('fos_user_registration_register', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'fos_user_registration_register',
+            'login_success',
+            'login',
+            null,
         ];
     }
 
-    public function validRefererRoutes(): array
+    public function refererUrlsToSkip(): array
     {
         return [
-            'coin',
-            'token_show',
-            'show_post',
+            $this->router->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $this->router->generate('fos_user_registration_register', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $this->router->generate('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
     }
 
