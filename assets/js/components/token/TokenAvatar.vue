@@ -39,6 +39,10 @@
                 @updated-telegram="$emit('updated-telegram')"
                 :show-token-edit-modal-prop="showTokenEditModal"
                 :disabled-services-config="disabledServicesConfig"
+                :current-locale="currentLocale"
+                :token-deployed-date="tokenDeployedDate"
+                :token-tx-hash-address="tokenTxHashAddress"
+                :mintme-explorer-url="mintmeExplorerUrl"
             />
             <token-deploy-icon
                 :is-mintme="isMintmeToken"
@@ -102,6 +106,16 @@ export default {
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
         tokenName: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
     },
     components: {
         Avatar,

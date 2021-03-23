@@ -22,8 +22,8 @@ const tableSortPlugin = {
             return a < b ? -1 : (a > b ? 1 : 0);
         },
         Vue.prototype.$dateCompare = function(a, b) {
-            a = moment(a, GENERAL.dateFormat).unix();
-            b = moment(b, GENERAL.dateFormat).unix();
+            a = moment(a, GENERAL.dateTimeFormat).unix();
+            b = moment(b, GENERAL.dateTimeFormat).unix();
 
             return Vue.prototype.$numericCompare(a, b);
         };
