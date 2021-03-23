@@ -293,8 +293,8 @@ export default {
             const marketInfo = marketData.params[1];
             const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
-            const marketVolume = parseFloat(marketInfo.volume);
-            const marketAmount = parseFloat(marketInfo.deal);
+            const marketVolume = parseFloat(marketInfo.volume) + parseFloat(marketInfo.volumeDonation);
+            const marketAmount = parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
@@ -320,8 +320,8 @@ export default {
         updateMonthMarketData: function(marketData) {
             const marketOpenPrice = parseFloat(marketData.open);
             const marketLastPrice = parseFloat(marketData.last);
-            const marketVolume = parseFloat(marketData.volume);
-            const marketAmount = parseFloat(marketData.deal);
+            const marketVolume = parseFloat(marketData.volume) + parseFloat(marketData.volumeDonation);
+            const marketAmount = parseFloat(marketData.deal) + parseFloat(marketData.dealDonation);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
             const monthInfo = {

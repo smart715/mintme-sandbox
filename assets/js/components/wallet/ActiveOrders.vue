@@ -194,7 +194,7 @@ export default {
         history: function() {
             return this.tableData.map((order) => {
                 return {
-                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    date: moment.unix(order.timestamp).format(GENERAL.dateTimeFormat),
                     type: this.getSideByType(order.side),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(order.market.base),
