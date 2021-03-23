@@ -93,7 +93,10 @@ export default {
         showTokenEditModalProp: Boolean,
         disabledServicesConfig: String,
         currentLocale: String,
-        tokenDeployedDate: Object,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
         tokenTxHashAddress: {
             type: String,
             default: null,

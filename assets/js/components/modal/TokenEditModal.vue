@@ -77,7 +77,7 @@
                                     :current-locale="currentLocale"
                                     :token-deployed-date="tokenDeployedDate"
                                     :token-tx-hash-address="tokenTxHashAddress"
-                                    :mintme-explorer-url="mintmeExplorerUrl"
+                                    :mintme-explorer-url-prop="mintmeExplorerUrl"
                                     :is-mintme-token="isMintmeToken"
                                 />
                             </template>
@@ -210,7 +210,10 @@ export default {
         youtubeChannelId: String,
         disabledServicesConfig: String,
         currentLocale: String,
-        tokenDeployedDate: Object,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
         tokenTxHashAddress: {
             type: String,
             default: null,
