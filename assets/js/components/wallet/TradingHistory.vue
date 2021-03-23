@@ -155,7 +155,7 @@ export default {
                 let isDonationOrder = 0 === history.orderId || 0 === history.dealOrderId;
 
                 return {
-                    date: moment.unix(history.timestamp).format(GENERAL.dateFormat),
+                    date: moment.unix(history.timestamp).format(GENERAL.dateTimeFormat),
                     side: this.getSideByType(history.side, isDonationOrder),
                     name: isDonationOrder ? this.rebrandingFunc(history.market.quote) : this.pairNameFunc(
                         this.rebrandingFunc(history.market.base),

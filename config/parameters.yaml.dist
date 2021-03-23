@@ -251,7 +251,7 @@ parameters:
 
     # MintMe.host promotion mail
     freeDays: 7
-    price: 100
+    price: 3.99
     mintmeHostPath: https://www.mintme.host
 
     # mails available to send via app:sendCustomMail

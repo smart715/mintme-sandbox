@@ -177,7 +177,7 @@ export default {
             historyData.forEach((item) => {
                 item['url'] = this.generatePairUrl(item.tradable);
                 item['date'] = item.date
-                    ? moment(item.date).format(GENERAL.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateTimeFormat)
                     : null;
                 item['fee'] = item.fee
                     ? toMoney(item.fee, item.tradable.subunit)
