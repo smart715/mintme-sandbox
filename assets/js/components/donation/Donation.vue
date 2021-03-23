@@ -6,7 +6,7 @@
                 </div>
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
-                        <div class="col-lg-8 col-xl-5 pr-lg-0">
+                        <div class="col-lg-8 col-xl-5">
                             <div class="d-sm-flex">
                                 <b-dropdown
                                     id="donation_currency"
@@ -106,7 +106,7 @@
                         </div>
                         <div
                             v-if="isCurrencySelected && loggedIn"
-                            class="col-lg-4 col-xl-3 mt-3 mt-lg-0"
+                            class="col-lg-4 col-xl-3 mt-3 mt-lg-0 pl-lg-0"
                             id="show-balance"
                         >
                             <p class="m-0">
