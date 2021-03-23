@@ -5,6 +5,7 @@ namespace App\Admin;
 use App\Admin\Form\PasswordGeneratorButtonType;
 use App\Entity\Profile;
 use App\Entity\User;
+use App\Form\Type\NicknameType;
 use App\Manager\ProfileManagerInterface;
 use Exception;
 use FOS\UserBundle\Model\UserInterface;
@@ -39,16 +40,7 @@ class UserAdmin extends AbstractAdmin
         if ('create' == $this->getFormAction()) {
             $formMapper
                 ->add('email', null, ['attr' => ['placeholder' => 'Email']])
-                ->add('nickname', TextType::class, [
-                    'required' => true,
-                    'attr' => [
-                        'class' => 'form-input',
-                        'placeholder' => 'Nickname',
-                        'max' => 30,
-                        'min' => 2,
-                        'pattern' => '[A-Za-z\d]+',
-                    ],
-                ])
+                ->add('nickname', NicknameType::class, [])
                 ->add('plainPassword', TextType::class, [
                     'attr' => [
                         'class' => 'password-generator-input',
@@ -130,31 +122,6 @@ class UserAdmin extends AbstractAdmin
     {
         $this->setUserManager($userManager);
         $this->profileManager = $profileManager;
-    }
-
-    /** {@inheritdoc} */
-    public function validate(ErrorElement $errorElement, $object)
-    {
-        $errorElement
-            ->with('nickname')
-            ->assertLength(array('max' => 30, 'min' => 2))
-            ->assertNotBlank()
-            ->end();
-
-        $nickname = $this->getForm()->get('nickname')->getData();
-        preg_match('/[A-Za-z\d]+/', $nickname, $match);
-
-        if (!$match) {
-            $errorElement->with('nickname')->addViolation('Nickname can contain only latin letters and numbers')->end();
-        }
-
-        /** @var Profile|null $profile */
-        $profile = $this->profileManager->findByNickname($nickname);
-
-        if ($profile) {
-            $error = 'Nickname already exist';
-            $errorElement->with('nickname')->addViolation($error)->end();
-        }
     }
 
     /** {@inheritdoc} */
