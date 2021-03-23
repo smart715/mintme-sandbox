@@ -1,6 +1,6 @@
 import i18n from './utils/i18n/i18n';
 import {HTTP_OK} from './utils/constants';
-import {NotificationMixin} from './mixins/';
+import {NotificationMixin, LoggerMixin} from './mixins/';
 import {minLength, maxLength} from 'vuelidate/lib/validators';
 import {phoneVerificationCode} from './utils/constants';
 const disabledResendFor = 1000 * 60;
@@ -8,7 +8,10 @@ const disabledResendFor = 1000 * 60;
 new Vue({
     el: '#phone-verification',
     i18n,
-    mixins: [NotificationMixin],
+    mixins: [
+        NotificationMixin,
+        LoggerMixin,
+    ],
     data() {
         return {
             code: '',
@@ -40,18 +43,7 @@ new Vue({
         }
 
         if (!this.sendCode) {
-            this.$axios.single.get(this.$routing.generate('is_able_send_code_disabled'))
-                .then((response) => {
-                    let sendCodeDiffModel = response.data;
-                    this.resendCodeDisabled = !sendCodeDiffModel.sendCodeEnabled;
-
-                    if (sendCodeDiffModel.sendCodeDiff >= 0 ) {
-                        setTimeout(
-                            () => this.resendCodeDisabled = false,
-                            sendCodeDiffModel.sendCodeDiff * 1000
-                        );
-                    }
-                });
+            this.handleResendCodeDesabled();
         } else if (!errorsCount) {
             this.resendCodeDisabled = false;
             this.sendVerificationCode();
@@ -83,6 +75,21 @@ new Vue({
                 }, () => {
                     this.notifyError(this.$t('toasted.error.try_later'));
                 }).then(() => setTimeout(() => this.resendCodeDisabled = false, disabledResendFor));
+        },
+        handleResendCodeDesabled: function() {
+            this.$axios.single.get(this.$routing.generate('is_able_send_code_disabled'))
+                .then((response) => {
+                    let sendCodeDiffModel = response.data;
+                    this.resendCodeDisabled = !sendCodeDiffModel.sendCodeEnabled;
+
+                    if (sendCodeDiffModel.sendCodeDiff >= 0 ) {
+                        setTimeout(
+                            () => this.resendCodeDisabled = false,
+                            sendCodeDiffModel.sendCodeDiff * 1000
+                        );
+                    }
+                })
+                .catch((error) => this.sendLogs('error', 'Can not load crypto balance.', error));
         },
     },
     validations() {
