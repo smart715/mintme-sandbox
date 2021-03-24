@@ -19,6 +19,8 @@ final class Version20210316081433 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+
         $this->addSql('ALTER TABLE token ADD tx_hash VARCHAR(255) DEFAULT NULL');
     }
 
@@ -26,6 +28,7 @@ final class Version20210316081433 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        
         $this->addSql('ALTER TABLE token DROP tx_hash');
     }
 }
