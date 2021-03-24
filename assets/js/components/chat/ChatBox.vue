@@ -111,7 +111,6 @@ export default {
                 },
             ],
             updaterId: null,
-            repeatedDate: [],
         };
     },
     computed: {
@@ -151,14 +150,24 @@ export default {
             });
         },
         messagesList: function() {
+            let repeatedDate = [];
+
             return (this.messages || []).map((message) => {
+                message.date = moment(message.createdAt).format(GENERAL.dateFormat);
+
+                if (repeatedDate.indexOf(message.date) === -1) {
+                  repeatedDate.push(message.date);
+                } else {
+                  message.date = null;
+                }
+
                 return {
                     id: message.id,
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
                     date: message.date,
-                    time: message.time,
+                    time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });
         },
@@ -176,22 +185,6 @@ export default {
         },
     },
     methods: {
-        generateMessages: function() {
-            for (let index = 0; index < this.messages.length; index++) {
-                let date = moment(this.messages[index].createdAt).format(GENERAL.dateFormat);
-                let time = moment(this.messages[index].createdAt).format(GENERAL.timeFormat);
-                this.messages[index].date = date;
-                this.messages[index].time = time;
-
-                if (this.repeatedDate.indexOf(this.messages[index].date) === -1) {
-                    this.repeatedDate.push(date);
-                } else {
-                    this.messages[index].date = null;
-                }
-            }
-
-            this.repeatedDate = [];
-        },
         addMessageToQueue: function() {
             if (!this.messageBody) {
                 return;
@@ -247,7 +240,6 @@ export default {
             .then((res) => {
                 if (this.messagesUrl === res.config.url) {
                     this.messages = res.data;
-                    this.generateMessages();
                     this.updateMessagesInterval();
                 }
             })
@@ -263,7 +255,6 @@ export default {
                 .then((res) => {
                     if (this.messagesLoaded && this.newMessagesUrl === res.config.url) {
                         this.messages.push(...res.data);
-                        this.generateMessages();
                     }
                 })
                 .catch((error) => this.sendLogs('error', 'update messages response error', error));
