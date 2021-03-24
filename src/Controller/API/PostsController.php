@@ -21,6 +21,7 @@ use App\Manager\TwitterManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\TokenPostNotificationStrategy;
+use App\Serializer\MoneyNormalizer;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -182,7 +183,7 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{id<\d+>}/comments", name="get_post_comments", options={"expose"=true})
      */
-    public function getComments(int $id): View
+    public function getComments(int $id, BalanceHandlerInterface $balanceHandler): View
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -193,19 +194,12 @@ class PostsController extends AbstractFOSRestController
         }
 
         $isOwner = $user->getId() === $post->getAuthor()->getUser()->getId();
-        $hasTokenAmount = false;
-        $userTokens = $user->getTokens();
+        $tokenUserBalance = $balanceHandler->balance($user, $post->getToken())->getAvailable();
+        $userHasPostAmount = $tokenUserBalance->greaterThanOrEqual($post->getAmount());
+        $postWithoutAmount = $post->getAmount()->isZero();
+        $commentsCanBeShown = $isOwner || $userHasPostAmount || $postWithoutAmount;
 
-        foreach ($userTokens as $token) {
-            if ($token->getName() === $post->getToken()->getName()
-            ) {
-                $hasTokenAmount = true;
-            }
-        }
-
-        $post->getAuthor()->getTokens();
-
-        return $this->view($isOwner || $hasTokenAmount ? $post->getComments() : [], Response::HTTP_OK);
+        return $this->view($commentsCanBeShown ? $post->getComments() : [], Response::HTTP_OK);
     }
 
     /**

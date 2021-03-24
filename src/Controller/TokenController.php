@@ -164,7 +164,7 @@ class TokenController extends Controller
 
         $extraData = [
             'post' => $this->normalize($post),
-            'comments' => $post && $post->getContent() ? $this->normalize($post->getComments()) : null,
+            'comments' => $this->normalize($post->getComments()),
         ];
 
         return $this->renderPairPage($token, $request, $tab, null, $extraData);
