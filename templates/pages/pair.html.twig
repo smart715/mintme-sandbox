@@ -91,6 +91,10 @@
                 :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                 :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
+                current-locale="{{ currentLocale }}"
+                :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.getDeployed | json_encode}})"
+                :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
+                mintme-explorer-url="{{ global_mintme_explorer_url }}"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
@@ -366,7 +370,9 @@
             <input
                     type="hidden"
                     v-model="showDeployedOnBoard"
-                    :set-value="showDeployedOnBoard = null !== showDeployedOnBoard ? showDeployedOnBoard : {{ token.showDeployedModal ? 'true' : 'false' }}" />
+                    :set-value="showDeployedOnBoard = null !== showDeployedOnBoard
+                        ? showDeployedOnBoard
+                        : {{ isOwner is same as ('true') and token.showDeployedModal ? 'true' : 'false' }}" />
         {% endif %}
 
     </div>

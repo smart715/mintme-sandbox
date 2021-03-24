@@ -8,14 +8,13 @@ use App\Exchange\Market\MarketHandlerInterface;
 
 class MaxAllowedOrdersValidator implements ValidatorInterface
 {
-    private int $maxAllowedOrders;
+    private const MAX_PENDING_ORDERS = 100;
 
+    private int $maxAllowedOrders;
     private string $message;
 
     private User $user;
-
     private MarketHandlerInterface $marketHandler;
-
     private MarketFactoryInterface $marketFactory;
 
     public function __construct(
@@ -34,14 +33,24 @@ class MaxAllowedOrdersValidator implements ValidatorInterface
     {
         $this->message = 'You can have maximum of ' . $this->maxAllowedOrders . ' active orders';
 
-        $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
-            $this->user,
-            $this->marketFactory->createUserRelated($this->user),
-            0,
-            $this->maxAllowedOrders
-        );
+        $leftRequests = ceil($this->maxAllowedOrders / self::MAX_PENDING_ORDERS);
+        $offset = 0;
+        $pendingOrdersCount = 0;
 
-        return count($userPendingOrders) !== $this->maxAllowedOrders;
+        do {
+            $pendingOrders = $this->marketHandler->getPendingOrdersByUser(
+                $this->user,
+                $this->marketFactory->createUserRelated($this->user),
+                $offset,
+                self::MAX_PENDING_ORDERS
+            );
+
+            $pendingOrdersCount += count($pendingOrders);
+            $leftRequests--;
+            $offset += self::MAX_PENDING_ORDERS;
+        } while ($pendingOrdersCount >= self::MAX_PENDING_ORDERS && $leftRequests);
+
+        return $pendingOrdersCount < $this->maxAllowedOrders;
     }
 
     public function getMessage(): string
