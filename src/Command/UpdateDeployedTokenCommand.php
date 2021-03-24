@@ -49,15 +49,17 @@ class UpdateDeployedTokenCommand extends Command
 
         /** @var Token[] $deployed */
         $deployed = $this->getTokenRepository()->getDeployedTokens();
+        $count = 0;
 
         foreach ($deployed as $token) {
-            if (!$token->getTxHash() && $token->isMintmeToken()) {
+            if (!$token->getTxHash() && $token->isMintmeToken() && !$token->isBlocked()) {
                 $token->setTxHash($this->contractHandler->getTxHash($token->getName()));
                 $this->em->persist($token);
+                $count += 1;
             }
         }
 
-        $updateMessage = count($deployed) . ' tokens were updated. Saving to DB..';
+        $updateMessage = $count. ' tokens were updated. Saving to DB..';
         $output->writeln($updateMessage);
         $this->em->flush();
         $lock->release();
