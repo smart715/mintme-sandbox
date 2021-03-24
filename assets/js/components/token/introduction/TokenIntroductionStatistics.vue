@@ -359,12 +359,17 @@ export default {
             };
         },
         loaded: function() {
-            return (!this.isMintmeToken || null !== this.tokenExchangeAmount) &&
-                null !== this.soldOnMarket &&
+            if (
+                this.isMintmeToken &&
+                null === this.tokenWithdrawn &&
+                null === this.tokenExchangeAmount
+            ) {
+                return false;
+            }
+
+            return null !== this.soldOnMarket &&
                 null !== this.pendingSellOrders &&
-                null !== this.stats &&
-                null !== this.donationVolume &&
-                null !== this.tokenWithdrawn;
+                null !== this.donationVolume;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
