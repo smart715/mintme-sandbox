@@ -70,5 +70,4 @@ class UpdateDeployedTokenCommand extends Command
     {
         return $this->em->getRepository(Token::class);
     }
-
 }
