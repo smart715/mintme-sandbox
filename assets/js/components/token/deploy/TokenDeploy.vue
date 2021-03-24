@@ -67,6 +67,10 @@
                 <p class="bg-info m-0 py-1 px-3">
                     {{ $t('token.deploy.deployed') }}
                 </p>
+                <br>
+                <a v-if="isMintmeDeployed" :href="showContractUrl" target="_blank">
+                    {{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: deployedDate}) }}
+                </a>
             </div>
         </template>
         <div
@@ -84,7 +88,8 @@
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol} from '../../../utils/constants';
+import {tokenDeploymentStatus, webSymbol, GENERAL} from '../../../utils/constants';
+import moment from 'moment';
 
 export default {
     name: 'TokenDeploy',
@@ -96,6 +101,17 @@ export default {
         precision: Number,
         statusProp: String,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrlProp: String,
+        isMintmeToken: Boolean,
     },
     data() {
         return {
@@ -103,6 +119,7 @@ export default {
             deploying: false,
             status: this.statusProp,
             webCost: null,
+            mintmeExplorerUrl: this.mintmeExplorerUrlProp,
         };
     },
     computed: {
@@ -131,6 +148,15 @@ export default {
         },
         costExceed: function() {
             return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
+        },
+        deployedDate: function() {
+            return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormat);
+        },
+        isMintmeDeployed: function() {
+            return this.deployed && this.isOwner && this.isMintmeToken && this.tokenDeployedDate;
+        },
+        showContractUrl: function() {
+            return this.mintmeExplorerUrl.concat('/tx/' + this.tokenTxHashAddress);
         },
     },
     methods: {
@@ -181,6 +207,10 @@ export default {
         },
     },
     mounted() {
+        if (this.currentLocale) {
+            moment.locale(this.currentLocale);
+        }
+
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
