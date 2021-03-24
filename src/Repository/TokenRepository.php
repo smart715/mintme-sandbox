@@ -106,4 +106,18 @@ class TokenRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getTokensWithAirdrops(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t, a')
+            ->leftJoin('t.airdrops', 'a')
+            ->where('a.id IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
 }
