@@ -3,10 +3,8 @@
 namespace App\Admin;
 
 use App\Admin\Form\PasswordGeneratorButtonType;
-use App\Entity\Profile;
 use App\Entity\User;
 use App\Form\Type\NicknameType;
-use App\Manager\ProfileManagerInterface;
 use Exception;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -24,8 +22,6 @@ class UserAdmin extends AbstractAdmin
 {
     /** @var UserManagerInterface */
     private $userManager;
-
-    private ProfileManagerInterface $profileManager;
 
     protected function configureRoutes(RouteCollection $collection): void
     {
