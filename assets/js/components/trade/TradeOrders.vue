@@ -87,6 +87,7 @@ export default {
     data() {
         return {
             removeOrders: [],
+            removedOrders: [],
             confirmModal: false,
             fields: [
                 {
@@ -157,10 +158,8 @@ export default {
                     a[price] = [];
                 }
 
-                if (e.hasOwnProperty('accounted')) {
+                if (-1 === accounted.indexOf(e.id) && -1 === this.removedOrders.indexOf(e.id)) {
                     accounted.push(e.id);
-                    a[price].push(e);
-                } else if (-1 === accounted.indexOf(e.id)) {
                     a[price].push(e);
                 }
 
@@ -194,22 +193,28 @@ export default {
             let isSellSide = WSAPI.order.type.SELL === row.side;
             let orders = isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
+            let accounted = [];
 
             this.clone(orders).forEach((order) => {
                 if (toMoney(order.price, this.market.base.subunit) === row.price && order.maker.id === this.userId) {
                     order.price = toMoney(order.price, this.market.base.subunit);
                     order.amount = toMoney(order.amount, this.market.quote.subunit);
-                    this.removeOrders.push(order);
+                    if (-1 === accounted.indexOf(order.id) && -1 === this.removedOrders.indexOf(order.id)) {
+                        accounted.push(order.id);
+                        this.removeOrders.push(order);
+                    }
                 }
             });
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
+            let removeNow = this.removeOrders.map((order) => order.id);
+            this.removedOrders = [...this.removedOrders, ...removeNow];
             let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
             });
-            this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
+            this.$axios.single.post(deleteOrdersUrl, {'orderData': removeNow})
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.service_unavailable'));
                     this.sendLogs('error', 'Remove order service unavailable', err);
