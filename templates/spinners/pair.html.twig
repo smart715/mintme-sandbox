@@ -152,7 +152,7 @@
                                                                     class="holder-name mr-1 text-white">
                                                                     <div class="overflow-hidden">
                                                                         <span>
-                                                                            {{ holder.user.profile.nickname }}
+                                                                            {{ holder.user.profile.nickname|truncate(12) }}
                                                                         </span>
                                                                     </div>
                                                                 </a>
