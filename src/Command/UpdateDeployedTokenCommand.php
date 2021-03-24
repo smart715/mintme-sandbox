@@ -64,9 +64,4 @@ class UpdateDeployedTokenCommand extends Command
 
         return 0;
     }
-
-    private function getTokenRepository(): TokenRepository
-    {
-        return $this->em->getRepository(Token::class);
-    }
 }
