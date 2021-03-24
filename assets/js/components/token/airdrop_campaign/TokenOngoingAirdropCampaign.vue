@@ -33,10 +33,13 @@
                             </button>
                         </span>
                         <span v-else>
-                            <copy-link :content-to-copy="modalTokenUrl"
+                            <copy-link  v-if="isOwner" :content-to-copy="modalTokenUrl"
                                 class="btn btn-primary">
                                 {{ $t('ongoing_airdrop.participate') }}
                             </copy-link>
+                            <a v-else :href="modalTokenUrl">
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </a>
                         </span>
                     </template>
                     <confirm-modal
