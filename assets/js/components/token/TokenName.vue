@@ -34,6 +34,10 @@
                 @updated-youtube="$emit('updated-youtube', $event)"
                 @updated-discord="$emit('updated-discord', $event)"
                 @updated-telegram="$emit('updated-telegram', $event)"
+                :current-locale="currentLocale"
+                :token-deployed-date="tokenDeployedDate"
+                :token-tx-hash-address="tokenTxHashAddress"
+                :mintme-explorer-url="mintmeExplorerUrl"
             />
             <font-awesome-icon
                 class="icon-default c-pointer align-middle token-edit-icon"
@@ -88,6 +92,16 @@ export default {
         youtubeChannelId: String,
         showTokenEditModalProp: Boolean,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
     },
     components: {
         FontAwesomeIcon,
