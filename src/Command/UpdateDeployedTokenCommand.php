@@ -47,6 +47,7 @@ class UpdateDeployedTokenCommand extends Command
             return 0;
         }
 
+        /** @var Token[] $deployed */
         $deployed = $this->getTokenRepository()->getDeployedTokens();
         $count = 0;
 
