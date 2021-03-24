@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Entity\Comment;
 use App\Entity\Post;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\PostEvent;
 use App\Events\TokenEvents;
@@ -183,15 +184,28 @@ class PostsController extends AbstractFOSRestController
      */
     public function getComments(int $id): View
     {
+        /** @var User|null $user */
+        $user = $this->getUser();
         $post = $this->postManager->getById($id);
 
         if (!$post) {
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
-        $postToArray = $this->normalizer->normalize($post, null, ['groups' => ['Default']]);
+        $isOwner = $user->getId() === $post->getAuthor()->getUser()->getId();
+        $hasTokenAmount = false;
+        $userTokens = $user->getTokens();
 
-        return $this->view($postToArray['content'] ? $post->getComments() : [], Response::HTTP_OK);
+        foreach ($userTokens as $token) {
+            if ($token->getName() === $post->getToken()->getName()
+            ) {
+                $hasTokenAmount = true;
+            }
+        }
+
+        $post->getAuthor()->getTokens();
+
+        return $this->view($isOwner || $hasTokenAmount ? $post->getComments() : [], Response::HTTP_OK);
     }
 
     /**
