@@ -114,10 +114,9 @@ class UserAdmin extends AbstractAdmin
             ->add('roles');
     }
 
-    public function init(UserManagerInterface $userManager, ProfileManagerInterface $profileManager): void
+    public function init(UserManagerInterface $userManager): void
     {
         $this->setUserManager($userManager);
-        $this->profileManager = $profileManager;
     }
 
     /** {@inheritdoc} */
