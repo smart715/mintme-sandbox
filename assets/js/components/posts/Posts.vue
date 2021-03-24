@@ -3,14 +3,11 @@
         <div class="card-header">
             <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
-        <div
-            class="card-body posts overflow-hidden position-relative"
-        >
+        <div v-if="hasPosts" class="card-body posts overflow-hidden position-relative">
             <div
                 id="posts-container"
                 ref="postsContainer"
-                class="w-100 d-flex flex-column align-items-center"
-                :class="{'h-100 justify-content-center' : !hasPosts}"
+                class="w-100"
             >
                 <post v-for="(n, i) in postsCount"
                       :post="posts[i]"
@@ -22,9 +19,6 @@
                       :logged-in="loggedIn"
                       @go-to-post="$emit('go-to-post', $event)"
                 />
-                <div v-if="!hasPosts" class="absolute-center">
-                    {{ $t('post.not_any_post') }}
-                </div>
             </div>
             <div v-if="showReadMore" class="read-more">
                 <a
@@ -35,6 +29,11 @@
                     {{ $t('posts.all') }}
                 </a>
             </div>
+        </div>
+        <div v-else class="card-body h-100 d-flex align-items-center justify-content-center">
+            <span class="text-center py-4 ">
+                {{ $t('post.not_any_post') }}
+            </span>
         </div>
     </div>
 </template>
@@ -73,8 +72,10 @@ export default {
         };
     },
     mounted() {
-        this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
-        this.resizeObserver.observe(this.$refs.postsContainer);
+        if (this.hasPosts) {
+            this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
+            this.resizeObserver.observe(this.$refs.postsContainer);
+        }
     },
     computed: {
         postsCount() {

@@ -3,28 +3,26 @@
         <div class="card-header">
             {{ $t('trade.top_holders.header') }}
         </div>
-        <div class="card-body p-0">
-            <template v-if="loaded">
-                <template v-if="hasTraders">
-                    <div class="table-responsive">
-                        <b-table
-                            ref="table"
-                            :items="holders"
-                            :fields="fields"
-                        >
-                            <template v-slot:cell(trader)="row">
-                                <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
-                            </template>
-                        </b-table>
-                    </div>
-                </template>
-                <div v-else class="d-flex h-100 align-items-center justify-content-center">
-                        {{ $t('trade.top_holders.no_holders') }}
-                </div>
-            </template>
-            <div v-else class="d-flex h-100 align-items-center justify-content-center">
-                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        <div v-if="loaded && hasTraders" class="card-body p-0">
+            <div class="table-responsive">
+                <b-table
+                    ref="table"
+                    :items="holders"
+                    :fields="fields"
+                >
+                    <template v-slot:cell(trader)="row">
+                        <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                    </template>
+                </b-table>
             </div>
+        </div>
+        <div v-else class="card-body h-100 d-flex align-items-center justify-content-center">
+            <span v-if="loaded" class="text-center py-4">
+                {{ $t('trade.top_holders.no_holders') }}
+            </span>
+            <span v-else class="py-4">
+                <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </span>
         </div>
     </div>
 </template>
