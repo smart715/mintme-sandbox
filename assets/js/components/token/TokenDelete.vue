@@ -1,10 +1,10 @@
 <template>
     <div>
-        <template v-if="btnDisabled">
+        <template v-if="btnDisabled || !loaded">
             <span class="btn-cancel px-0 m-1 text-muted">
                 {{ $t('token.delete.delete_token') }}
             </span>
-            <guide>
+            <guide v-if="btnDisabled">
                 <template slot="header">
                     {{ $t('token.delete.header') }}
                 </template>
@@ -17,6 +17,16 @@
                     </p>
                 </template>
             </guide>
+            <div v-else>
+                <span class="btn-cancel px-0 m-1 text-muted">
+                    {{ $t('token.delete.delete_token') }}
+                </span>
+                <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                />
+            </div>
         </template>
         <span
             v-else
@@ -39,14 +49,14 @@ import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
+import {mapGetters} from 'vuex';
+import Decimal from 'decimal.js';
 
 export default {
     name: 'TokenDelete',
     mixins: [NotificationMixin, LoggerMixin],
     props: {
         isTokenNotDeployed: Boolean,
-        isTokenOverSoldLimit: Boolean,
-        tokenDeleteSoldLimit: Number,
         tokenName: String,
         twofa: Boolean,
     },
@@ -58,11 +68,35 @@ export default {
         return {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
+            soldOnMarket: null,
         };
     },
+    mounted() {
+        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.currentName}))
+            .then((res) => this.soldOnMarket = res.data)
+            .catch((err) => {
+              this.sendLogs('error', 'Can not get tokens in curculation', err);
+            });
+    },
     computed: {
+        ...mapGetters('tokenStatistics', {
+            tokenDeleteSoldLimit: 'getTokenDeleteSoldLimit',
+        }),
         btnDisabled: function() {
             return this.isTokenOverSoldLimit || !this.isTokenNotDeployed;
+        },
+        isTokenOverSoldLimit: function() {
+            if (!this.loaded) {
+                return true;
+            }
+
+            const sold = new Decimal(this.soldOnMarket);
+
+            return sold.greaterThanOrEqualTo(this.tokenDeleteSoldLimit);
+        },
+        loaded: function() {
+            return null !== this.tokenDeleteSoldLimit &&
+                null !== this.soldOnMarket;
         },
     },
     methods: {

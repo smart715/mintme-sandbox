@@ -136,27 +136,11 @@
                                 {{ $t('token_edit_modal.delete') }}
                             </template>
                             <template slot="body">
-                                <template v-if="isInfoLoaded">
-                                    <token-delete
-                                        :is-token-not-deployed="isTokenNotDeployed"
-                                        :is-token-over-sold-limit="isTokenOverSoldLimit"
-                                        :tokenDeleteSoldLimit="tokenDeleteSoldLimit"
-                                        :token-name="currentName"
-                                        :twofa="twofa"
-                                    />
-                                </template>
-                                <template v-else>
-                                    <div>
-                                        <span class="btn-cancel px-0 m-1 text-muted">
-                                            {{ $t('token.delete.delete_token') }}
-                                        </span>
-                                        <font-awesome-icon
-                                            icon="circle-notch"
-                                            spin class="loading-spinner"
-                                            fixed-width
-                                        />
-                                    </div>
-                                </template>
+                                <token-delete
+                                    :is-token-not-deployed="isTokenNotDeployed"
+                                    :token-name="currentName"
+                                    :twofa="twofa"
+                                />
                             </template>
                         </faq-item>
                     </div>
@@ -179,12 +163,9 @@ import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import TwoFactorModal from './TwoFactorModal';
 import {tokenDeploymentStatus} from '../../utils/constants';
-import Decimal from 'decimal.js';
-import {LoggerMixin} from '../../mixins';
 
 export default {
     name: 'TokenEditModal',
-    mixins: [LoggerMixin],
     components: {
         FaqItem,
         Guide,
@@ -228,22 +209,8 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
             tokenDeployKey: 0,
             maxLengthToTruncate: 49,
-            tokenDeleteSoldLimit: null,
             soldOnMarket: null,
         };
-    },
-    mounted() {
-        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.currentName}))
-            .then((res) => this.soldOnMarket = res.data)
-            .catch((err) => {
-              this.sendLogs('error', 'Can not get tokens in curculation', err);
-            });
-
-        this.$axios.retry.get(this.$routing.generate('token_delete_sold_limit'))
-            .then((res) => this.tokenDeleteSoldLimit = res.data)
-            .catch((err) => {
-              this.sendLogs('error', 'Can not get tokens delete limit', err);
-            });
     },
     beforeUpdate: function() {
         if (this.isTokenDeployed) {
@@ -251,19 +218,6 @@ export default {
         }
     },
     computed: {
-        isTokenOverSoldLimit: function() {
-            if (!this.isInfoLoaded) {
-                return true;
-            }
-
-            const sold = new Decimal(this.soldOnMarket);
-
-            return sold.greaterThanOrEqualTo(this.tokenDeleteSoldLimit);
-        },
-        isInfoLoaded: function() {
-            return null !== this.tokenDeleteSoldLimit &&
-                null !== this.soldOnMarket;
-        },
         shouldTruncate: function() {
             return this.currentName.length > this.maxLengthToTruncate;
         },
