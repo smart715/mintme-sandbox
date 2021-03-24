@@ -4,7 +4,6 @@ namespace App\Controller\API;
 
 use App\Entity\Comment;
 use App\Entity\Post;
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Events\PostEvent;
 use App\Events\TokenEvents;
@@ -21,7 +20,6 @@ use App\Manager\TwitterManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\TokenPostNotificationStrategy;
-use App\Serializer\MoneyNormalizer;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -33,7 +31,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -54,7 +51,6 @@ class PostsController extends AbstractFOSRestController
     private AsciiSlugger $slugger;
     private TwitterManagerInterface $twitterManager;
     private EventDispatcherInterface $eventDispatcher;
-    private NormalizerInterface $normalizer;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -65,8 +61,7 @@ class PostsController extends AbstractFOSRestController
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
         TwitterManagerInterface $twitterManager,
-        EventDispatcherInterface $eventDispatcher,
-        NormalizerInterface $normalizer
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
@@ -78,7 +73,6 @@ class PostsController extends AbstractFOSRestController
         $this->slugger = new AsciiSlugger();
         $this->twitterManager = $twitterManager;
         $this->eventDispatcher = $eventDispatcher;
-        $this->normalizer = $normalizer;
     }
 
     /**
