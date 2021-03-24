@@ -671,13 +671,27 @@ class MarketHandler implements MarketHandlerInterface
             (string)$this->parameterBag->get('token_quantity'),
             Symbols::TOK
         );
-        $ownPendingOrders = $this->getPendingOrdersByUser($token->getOwner(), [$market]);
 
-        foreach ($ownPendingOrders as $order) {
-            if (Order::SELL_SIDE === $order->getSide()) {
-                $available = $available->add($order->getAmount());
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $ownPendingOrders = $this->getPendingOrdersByUser(
+                $token->getOwner(),
+                [$market],
+                $offset,
+                $limit
+            );
+
+            foreach ($ownPendingOrders as $order) {
+                if (Order::SELL_SIDE === $order->getSide()) {
+                    $available = $available->add($order->getAmount());
+                }
             }
-        }
+
+            $ordersCount = count($ownPendingOrders);
+            $offset += $limit;
+        } while ($ordersCount >= $limit);
 
         return $init->subtract($available);
     }
