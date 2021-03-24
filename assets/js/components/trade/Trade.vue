@@ -288,7 +288,6 @@ export default {
                         id: data.id,
                     }))
                     .then((res) => {
-                        res.data.accounted = true;
                         orders.push(res.data);
                         this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
