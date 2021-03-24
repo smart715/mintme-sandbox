@@ -71,6 +71,13 @@ class Token implements TradebleInterface, ImagineInterface
     protected $address;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API", "API_TOK"})
+     * @var string|null
+     */
+    protected $txHash;
+
+    /**
      * @ORM\Column(type="bigint",nullable=true)
      */
     protected ?string $fee = null; // phpcs:ignore
@@ -808,5 +815,17 @@ class Token implements TradebleInterface, ImagineInterface
         $this->showDeployedModal = $showDeployedModal;
 
         return $this;
+    }
+
+    public function setTxHash(?string $txHash): self
+    {
+        $this->txHash = $txHash;
+
+        return $this;
+    }
+
+    public function getTxHash(): ?string
+    {
+        return $this->txHash;
     }
 }

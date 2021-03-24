@@ -13,16 +13,20 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\StringConverter;
+use App\Validator\Constraints\EditPhoneNumber;
 use DateTimeImmutable;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/profile")
@@ -33,23 +37,26 @@ class ProfileController extends Controller
     private PhoneNumberUtil $phoneNumberUtil;
     private UserManagerInterface $userManager;
     private TokenStorageInterface $tokenStorage;
+    private SessionInterface $session;
 
     public function __construct(
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
         PhoneNumberUtil $phoneNumberUtil,
         UserManagerInterface $userManager,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        SessionInterface $session
     ) {
         parent::__construct($normalizer);
         $this->userActionLogger = $userActionLogger;
         $this->phoneNumberUtil = $phoneNumberUtil;
         $this->userManager = $userManager;
         $this->tokenStorage = $tokenStorage;
+        $this->session = $session;
     }
 
     /** @Route("/phone/verify", name="phone_verification") */
-    public function phoneConfirmation(Request $request): Response
+    public function phoneConfirmation(Request $request, ValidatorInterface $validator): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -68,7 +75,9 @@ class ProfileController extends Controller
         if ($form->isSubmitted()) {
             $entityManager = $this->getDoctrine()->getManager();
 
-            if ($form->isValid()) {
+            $errors = $validator->validate($profile->getPhoneNumber()->getPhoneNumber(), new EditPhoneNumber());
+
+            if ($form->isValid() && 0 === count($errors)) {
                 $profile->getPhoneNumber()->setVerified(true);
                 $profile->getPhoneNumber()->setVerificationCode(null);
                 $profile->getPhoneNumber()->setEditDate(new DateTimeImmutable());
@@ -94,6 +103,8 @@ class ProfileController extends Controller
                 );
 
                 return $this->redirectToRoute('profile');
+            } elseif (0 !== count($errors)) {
+                $form->get('verificationCode')->addError(new FormError($errors[0]->getMessage()));
             }
 
             $profile->getPhoneNumber()->incrementFailedAttempts();
@@ -102,11 +113,18 @@ class ProfileController extends Controller
         }
 
         $failedAttempts = $totalLimit = $this->getParameter('adding_phone_attempts_limit')['failed'];
+        $sendCode = false;
+
+        if ($this->session->get('send_verification_code')) {
+            $this->session->remove('send_verification_code');
+            $sendCode = true;
+        }
 
         return $this->render('pages/phone_verification.html.twig', [
             'failedAttempts' => $failedAttempts,
             'limitReached' => $profile->getPhoneNumber()->getFailedAttempts() >= $failedAttempts,
             'form' => $form->createView(),
+            'sendCode' => $sendCode,
         ]);
     }
 
@@ -193,6 +211,8 @@ class ProfileController extends Controller
         }
 
         if ($verifyPhone) {
+            $this->session->set('send_verification_code', true);
+
             return $this->redirectToRoute('phone_verification');
         }
 

@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Entity\PhoneNumber;
 use App\Entity\Profile;
+use App\Manager\Model\SendCodeDiffModel;
 
 interface PhoneNumberManagerInterface
 {
@@ -11,7 +12,11 @@ interface PhoneNumberManagerInterface
 
     public function findByPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
 
+    public function findVerifiedPhoneNumber(\libphonenumber\PhoneNumber $phoneNumber): ?PhoneNumber;
+
     public function findByCode(string $code): ?PhoneNumber;
 
     public function updateNumberAndAddingAttempts(PhoneNumber $phoneNumber): PhoneNumber;
+
+    public function isPhoneNumberAbleToSendCode(PhoneNumber $phoneNumber): SendCodeDiffModel;
 }
