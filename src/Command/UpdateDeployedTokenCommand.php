@@ -47,6 +47,7 @@ class UpdateDeployedTokenCommand extends Command
             return 0;
         }
 
+        $deployed = $this->getTokenRepository()->getDeployedTokens();
         $count = 0;
 
         foreach ($deployed as $token) {
@@ -64,4 +65,10 @@ class UpdateDeployedTokenCommand extends Command
 
         return 0;
     }
+
+    private function getTokenRepository(): TokenRepository
+    {
+        return $this->em->getRepository(Token::class);
+    }
+
 }
