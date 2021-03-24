@@ -31,6 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -51,6 +52,7 @@ class PostsController extends AbstractFOSRestController
     private AsciiSlugger $slugger;
     private TwitterManagerInterface $twitterManager;
     private EventDispatcherInterface $eventDispatcher;
+    private NormalizerInterface $normalizer;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -61,7 +63,8 @@ class PostsController extends AbstractFOSRestController
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
         TwitterManagerInterface $twitterManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        NormalizerInterface $normalizer
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
@@ -73,6 +76,7 @@ class PostsController extends AbstractFOSRestController
         $this->slugger = new AsciiSlugger();
         $this->twitterManager = $twitterManager;
         $this->eventDispatcher = $eventDispatcher;
+        $this->normalizer = $normalizer;
     }
 
     /**
@@ -185,7 +189,9 @@ class PostsController extends AbstractFOSRestController
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
-        return $this->view($post->getContent() ? $post->getComments() : [], Response::HTTP_OK);
+        $postToArray = $this->normalizer->normalize($post, null, ['groups' => ['Default']]);
+
+        return $this->view($postToArray['content'] ? $post->getComments() : [], Response::HTTP_OK);
     }
 
     /**

@@ -57,8 +57,5 @@ export default {
             return this.$routing.generate('add_comment', {id: this.post.id});
         },
     },
-    mounted() {
-       alert(this.post.content);
-    }
 };
 </script>
