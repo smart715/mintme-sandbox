@@ -35,6 +35,7 @@ export const GENERAL = {
     precision: 8,
     dateTimeFormat: 'DD.MM.YYYY HH:mm:ss',
     dateFormat: 'MMM D, YYYY',
+    timeFormat: 'HH:mm',
 };
 
 export const webSymbol = 'WEB';

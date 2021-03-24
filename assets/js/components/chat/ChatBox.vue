@@ -13,16 +13,17 @@
                         :items="messagesList"
                         :fields="fields">
                         <template v-slot:cell(trader)="row">
+                            <diV v-if="row.item.date">
+                                <span class="d-block small word-break toast-text text-bold align-text-top">
+                                    {{ row.item.date }}
+                                </span>
+                            </diV>
                             <div class="d-flex c-pointer flex-row flex-nowrap justify-content-between align-items-start w-100 pb-2 text-white">
                                 <img
                                     :src="row.item.avatar"
                                     class="chat-avatar rounded-circle d-block"
                                     alt="avatar">
                                 <span class="d-inline-block col">
-                                    <span v-if="row.item.date" class="d-block small word-break toast-text text-bold align-text-top">
-                                        {{ row.item.date }}
-                                    </span>
-                                    <br>
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
                                         <span class="small text-bold">
@@ -151,15 +152,13 @@ export default {
         },
         messagesList: function() {
             return (this.messages || []).map((message) => {
-                let date = message.createdAt ? moment(message.createdAt).format(GENERAL.dateFormat) : null;
-
                 return {
                     id: message.id,
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
-                    date: date,
-                    time: moment(message.createdAt).format(GENERAL.timeFormat),
+                    date: message.date,
+                    time: message.time,
                 };
             });
         },
@@ -178,13 +177,20 @@ export default {
     },
     methods: {
         generateMessages: function() {
-            for (const index in this.messages) {
-                if (this.repeatedDate.indexOf(this.messages[index].createdAt) === -1) {
-                    this.repeatedDate.push(this.messages[index].createdAt);
+            for (let index = 0; index < this.messages.length; index++) {
+                let date = moment(this.messages[index].createdAt).format(GENERAL.dateFormat);
+                let time = moment(this.messages[index].createdAt).format(GENERAL.timeFormat);
+                this.messages[index].date = date;
+                this.messages[index].time = time;
+
+                if (this.repeatedDate.indexOf(this.messages[index].date) === -1) {
+                    this.repeatedDate.push(date);
                 } else {
-                    this.messages[index].createdAt = null;
+                    this.messages[index].date = null;
                 }
             }
+
+            this.repeatedDate = [];
         },
         addMessageToQueue: function() {
             if (!this.messageBody) {
