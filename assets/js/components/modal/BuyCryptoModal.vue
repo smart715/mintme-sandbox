@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import FaqItem from '../FaqItem';
 import Modal from './Modal';
 import {primaryColor} from '../../utils/constants';
 
@@ -42,7 +41,6 @@ const RECEIVED_ACCOUNT_CONFIRMED_EVENT = 'trade.receive-account-confirmed';
 export default {
     name: 'BuyCryptoModal',
     components: {
-        FaqItem,
         Modal,
     },
     props: {

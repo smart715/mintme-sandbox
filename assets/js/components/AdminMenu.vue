@@ -118,35 +118,46 @@ export default {
 };
 </script>
 
-<style lang="sass">
-    @import '../../scss/variables'
+<style lang="scss">
+    @import '../../scss/variables';
 
-    .v-sidebar-menu
-        background: $secondary !important
+    .v-sidebar-menu {
+        background: $secondary !important;
+    }
 
-    .v-sidebar-menu .vsm-dropdown>.vsm-list
-        background: $primary !important
+    .v-sidebar-menu .vsm-dropdown>.vsm-list {
+        background: $primary !important;
+    }
 
-    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon
-        background: transparent !important
+    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon {
+        background: transparent !important;
+    }
 
-    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link
-        background: $primary-light !important
+    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link {
+        background: $primary-light !important;
+    }
 
-    .v-sidebar-menu.vsm-collapsed
-        background: none !important
+    .v-sidebar-menu.vsm-collapsed {
+        background: none !important;
 
-        & > *:not(button)
-            display: none !important
+        & > *:not(button) {
+            display: none !important;
+        }
+    }
 
-    .v-sidebar-menu .vsm-arrow:after
-        content: "↓" !important
+    .v-sidebar-menu .vsm-arrow:after {
+        content: "↓" !important;
+    }
 
-    .v-sidebar-menu .collapse-btn:after
-        content: ">" !important
+    .v-sidebar-menu .collapse-btn:after {
+        content: ">" !important;
+    }
 
-    .vsm-collapsed
-        width: 10px !important
-        .collapse-btn
-            width: 30px !important
+    .vsm-collapsed {
+        width: 10px !important;
+
+        .collapse-btn {
+            width: 30px !important;
+        }
+    }
 </style>

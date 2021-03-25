@@ -4,6 +4,7 @@ namespace App\Admin;
 
 use App\Admin\Form\PasswordGeneratorButtonType;
 use App\Entity\User;
+use App\Form\Type\NicknameType;
 use Exception;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -34,6 +35,7 @@ class UserAdmin extends AbstractAdmin
         if ('create' == $this->getFormAction()) {
             $formMapper
                 ->add('email', null, ['attr' => ['placeholder' => 'Email']])
+                ->add('nickname', NicknameType::class, [])
                 ->add('plainPassword', TextType::class, [
                     'attr' => [
                         'class' => 'password-generator-input',

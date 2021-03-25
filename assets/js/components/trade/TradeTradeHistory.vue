@@ -24,7 +24,7 @@
                             :items="ordersList"
                             :fields="fields">
 
-                            <template v-slot:head(pricePerQuote)="row">
+                            <template v-slot:head(pricePerQuote)>
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
                                     {{ $t('trade.history.price_per') }} {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
                                 </span>
@@ -33,7 +33,7 @@
                                 </span>
                             </template>
 
-                            <template v-slot:head(quoteAmount)="row">
+                            <template v-slot:head(quoteAmount)>
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
                                     {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} {{ $t('trade.history.amount') }}
                                 </span>

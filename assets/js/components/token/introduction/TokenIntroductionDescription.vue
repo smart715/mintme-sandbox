@@ -96,7 +96,6 @@ import Guide from '../../Guide';
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import BbcodeView from '../../bbcode/BbcodeView';
-import LimitedTextarea from '../../LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {descriptionLength} from '../../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
@@ -118,7 +117,6 @@ export default {
         BbcodeView,
         FontAwesomeIcon,
         Guide,
-        LimitedTextarea,
     },
     data() {
         return {
@@ -232,8 +230,9 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
-    p
-        white-space: pre-line
-        word-break: break-word
+<style lang="scss" scoped>
+    p {
+        white-space: pre-line;
+        word-break: break-word;
+    }
 </style>
