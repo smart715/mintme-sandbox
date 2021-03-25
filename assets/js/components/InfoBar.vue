@@ -208,37 +208,44 @@ export default {
 };
 </script>
 
-<style lang="sass">
-@import '../../scss/variables'
+<style lang="scss">
+@import '../../scss/variables';
 
-#info-panel
-    background-color: #01579B
-    line-height: 18px
+#info-panel {
+    background-color: #01579B;
+    line-height: 18px;
+}
 
-.circle-info
-    height: 10px
-    width: 10px
-    background-color: $grey-light
-    border-radius: 50%
-    display: inline-block
+.circle-info {
+    height: 10px;
+    width: 10px;
+    background-color: $grey-light;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-.circle-info-off
-    @extend .circle-info
-    background-color: red
+.circle-info-off {
+    @extend .circle-info;
+    background-color: red;
+}
 
-.circle-info-on
-    @extend .circle-info
-    background-color: green
-.resize-btn
-    position: absolute
-    right: 0
-    bottom: 0
+.circle-info-on {
+    @extend .circle-info;
+    background-color: green;
+}
+.resize-btn {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
 
-.toggle-btn
-    line-height: 13px
+.toggle-btn {
+    line-height: 13px;
+}
 
-.close-btn
-    position: absolute
-    right: 9px
-    top: 2px
+.close-btn {
+    position: absolute;
+    right: 9px;
+    top: 2px;
+}
 </style>
