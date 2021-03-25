@@ -197,7 +197,7 @@ class MarketHandler implements MarketHandlerInterface
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
         });
 
-        $orders=array_slice($orders, 0, $limit);
+        $orders = array_slice($orders, 0, $limit);
 
         return $orders;
     }
