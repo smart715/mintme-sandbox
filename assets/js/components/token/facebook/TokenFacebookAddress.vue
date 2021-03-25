@@ -89,7 +89,6 @@ import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
-import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
 import {HTTP_OK} from '../../../utils/constants';
 
@@ -103,7 +102,6 @@ export default {
     },
     components: {
         FontAwesomeIcon,
-        Guide,
         Modal,
     },
     mixins: [

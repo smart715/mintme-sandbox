@@ -188,6 +188,8 @@ export default {
             this.showTokenEditModal = true;
         },
         updateReleaseAddress: function() {
+            // todo: don't mutate prop
+            // eslint-disable-next-line
             this.releaseAddress = '0x';
         },
     },

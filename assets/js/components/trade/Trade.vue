@@ -83,7 +83,6 @@ import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
-import OrderModal from '../modal/OrderModal';
 import {
     CheckInputMixin,
     LoggerMixin,
@@ -109,7 +108,6 @@ export default {
         TradeChart,
         TradeOrders,
         TradeTradeHistory,
-        OrderModal,
     },
     props: {
         websocketUrl: String,
