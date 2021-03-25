@@ -288,6 +288,8 @@ export default {
             this.$axios.single.post(this.$routing.generate('share_post', {id: this.post.id}))
                 .then(
                     () => {
+                        // todo: don't mutate prop
+                        // eslint-disable-next-line
                         this.post.isUserAlreadyRewarded = true;
                         this.notifySuccess(this.$t('post.share.success', this.translationContext));
                     },
