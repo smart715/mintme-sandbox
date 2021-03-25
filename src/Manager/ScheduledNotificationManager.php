@@ -77,6 +77,11 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
         return $this->scheduledNotificationRepository->deleteScheduledNotification($scheduledNotificationId);
     }
 
+    public function removeByTypeForUser(string $type, User $user): int
+    {
+        return $this->scheduledNotificationRepository->removeByTypeForUser($type, $user);
+    }
+
     private function setDate(string $notificationType): \DateTimeImmutable
     {
         $actualDate = new DateTimeImmutable();
