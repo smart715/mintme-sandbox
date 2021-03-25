@@ -19,4 +19,5 @@ interface ScheduledNotificationManagerInterface
         \DateTimeImmutable $newTimeToBeSend
     ): void;
     public function removeScheduledNotification(int $scheduledNotificationId): int;
+    public function removeByTypeForUser(string $type, User $user): int;
 }
