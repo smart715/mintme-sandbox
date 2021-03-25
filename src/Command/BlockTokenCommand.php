@@ -253,9 +253,7 @@ class BlockTokenCommand extends Command
                 ? $this->marketHandler->getPendingSellOrders($market, 0, self::ORDERS_LIMIT)
                 : $this->marketHandler->getPendingBuyOrders($market, 0, self::ORDERS_LIMIT);
 
-            foreach ($orders as $order) {
-                $this->exchanger->cancelOrder($order->getMarket(), $order);
-            }
+            $this->cancelOrdersList($orders);
         } while (count($orders) >= self::ORDERS_LIMIT);
     }
 
@@ -269,9 +267,14 @@ class BlockTokenCommand extends Command
                 self::ORDERS_LIMIT
             );
 
-            foreach ($orders as $order) {
-                $this->exchanger->cancelOrder($order->getMarket(), $order);
-            }
+            $this->cancelOrdersList($orders);
         } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    private function cancelOrdersList(array $orders): void
+    {
+        foreach ($orders as $order) {
+            $this->exchanger->cancelOrder($order->getMarket(), $order);
+        }
     }
 }
