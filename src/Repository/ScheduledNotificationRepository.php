@@ -36,4 +36,16 @@ class ScheduledNotificationRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['user' => $user]);
     }
+
+    public function removeByTypeForUser(string $type, User $user): int
+    {
+        return $this->createQueryBuilder('sn')
+            ->delete()
+            ->where('sn.user = :user')
+            ->andWhere('sn.type = :type')
+            ->setParameter('user', $user)
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->execute();
+    }
 }

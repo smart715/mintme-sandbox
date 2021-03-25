@@ -47,4 +47,7 @@ interface TokenManagerInterface
 
     /** @return Token[] */
     public function getTokensWithoutAirdrops(): array;
+
+    /** @return Token[] */
+    public function getTokensWithAirdrops(): array;
 }

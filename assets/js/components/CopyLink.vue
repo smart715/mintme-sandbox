@@ -1,6 +1,7 @@
 <template>
     <a
         v-clipboard:copy="contentToCopy"
+        @click.prevent=""
         :title="tooltipMessage"
         v-tippy="tooltipOptions"
         v-clipboard:success="onCopy"
