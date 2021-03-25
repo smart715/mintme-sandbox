@@ -76,6 +76,7 @@
         "symfony/templating": "^4.4",
         "symfony/translation": "^4.4",
         "symfony/twig-bundle": "^4.4",
+        "symfony/webpack-encore-bundle": "^1.11",
         "symfony/yaml": "^4.4",
         "twig/cssinliner-extra": "^3",
         "vasek-purchart/doctrine-date-time-immutable-types": "^1.0"

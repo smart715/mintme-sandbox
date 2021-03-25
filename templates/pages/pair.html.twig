@@ -396,10 +396,10 @@
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     {% if not app.user %}
-        <script src="https://www.google.com/recaptcha/api.js"></script>
+        <script defer src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
-    <script src="{{ asset('build/pair.js') }}"></script>
-    <script>
+    {{ encore_entry_script_tags('pair') }}
+    <script defer>
         window.fbAsyncInit = () => {
             FB.init({
                 appId: '{{ global_facebook_app_id }}',
