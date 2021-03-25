@@ -6,7 +6,9 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -18,11 +20,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\ErrorHandler\Debug;
 
 class BlockTokenCommand extends Command
 {
-    private const MAX_PENDING_ORDERS = 100;
+    private const ORDERS_LIMIT = 100;
 
     /** @var string */
     protected static $defaultName = 'app:block';
@@ -236,47 +237,41 @@ class BlockTokenCommand extends Command
         );
 
         if ((!$userOption && $tokenOption) || (!$userOption && !$tokenOption)) {
-            do {
-                $tokenPendingSellOrders = $this->marketHandler->getPendingSellOrders(
-                    $tokenMarket,
-                    0,
-                    self::MAX_PENDING_ORDERS
-                );
-                $tokenPendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
-                    $tokenMarket,
-                    0,
-                    self::MAX_PENDING_ORDERS
-                );
-
-                foreach (array_merge($tokenPendingSellOrders, $tokenPendingBuyOrders) as $tokenPendingSellOrder) {
-                    $market = $tokenPendingSellOrder->getMarket();
-                    $this->exchanger->cancelOrder($market, $tokenPendingSellOrder);
-                }
-            } while (count($tokenPendingSellOrders) >= self::MAX_PENDING_ORDERS ||
-                count($tokenPendingBuyOrders) >= self::MAX_PENDING_ORDERS
-            );
+            $this->cancelTokenOrders($tokenMarket, Order::SELL_SIDE);
+            $this->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);
         }
 
         if (($userOption && !$tokenOption)|| (!$userOption && !$tokenOption)) {
-            $leftRequests = ceil($this->maxActiveOrders / self::MAX_PENDING_ORDERS);
-            $pendingOrdersCount = 0;
-
-            do {
-                $pendingOrders = $this->marketHandler->getPendingOrdersByUser(
-                    $user,
-                    $coinMarkets,
-                    0,
-                    self::MAX_PENDING_ORDERS
-                );
-
-                foreach ($pendingOrders as $order) {
-                    $market = $order->getMarket();
-                    $this->exchanger->cancelOrder($market, $order);
-                }
-
-                $pendingOrdersCount += count($pendingOrders);
-                $leftRequests--;
-            } while ($pendingOrdersCount >= self::MAX_PENDING_ORDERS && $leftRequests);
+            $this->cancelCoinOrders($user, $coinMarkets);
         }
+    }
+
+    private function cancelTokenOrders(Market $market, int $side): void
+    {
+        do {
+            $orders = Order::SELL_SIDE === $side
+                ? $this->marketHandler->getPendingSellOrders($market, 0, self::ORDERS_LIMIT)
+                : $this->marketHandler->getPendingBuyOrders($market, 0, self::ORDERS_LIMIT);
+
+            foreach ($orders as $order) {
+                $this->exchanger->cancelOrder($order->getMarket(), $order);
+            }
+        } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    private function cancelCoinOrders(User $user, array $markets): void
+    {
+        do {
+            $orders = $this->marketHandler->getPendingOrdersByUser(
+                $user,
+                $markets,
+                0,
+                self::ORDERS_LIMIT
+            );
+
+            foreach ($orders as $order) {
+                $this->exchanger->cancelOrder($order->getMarket(), $order);
+            }
+        } while (count($orders) >= self::ORDERS_LIMIT);
     }
 }
