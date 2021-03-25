@@ -13,6 +13,11 @@
                         :items="messagesList"
                         :fields="fields">
                         <template v-slot:cell(trader)="row">
+                            <diV v-if="row.item.date">
+                                <span class="d-block small word-break toast-text text-bold align-text-top">
+                                    {{ row.item.date }}
+                                </span>
+                            </diV>
                             <div class="d-flex c-pointer flex-row flex-nowrap justify-content-between align-items-start w-100 pb-2 text-white">
                                 <img
                                     :src="row.item.avatar"
@@ -21,6 +26,9 @@
                                 <span class="d-inline-block col">
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
+                                        <span class="small text-bold">
+                                            {{ row.item.time }}
+                                        </span>
                                     </span>
                                     <span class="d-block small word-break">
                                         {{ row.item.body }}
@@ -71,6 +79,9 @@
 <script>
 import {mapGetters} from 'vuex';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
+import {GENERAL} from '../../utils/constants';
+import moment from 'moment';
+
 const updateMessagesMS = 3500;
 
 export default {
@@ -139,12 +150,24 @@ export default {
             });
         },
         messagesList: function() {
+            let repeatedDate = [];
+
             return (this.messages || []).map((message) => {
+                message.date = moment(message.createdAt).format(GENERAL.dateFormat);
+
+                if (repeatedDate.indexOf(message.date) === -1) {
+                  repeatedDate.push(message.date);
+                } else {
+                  message.date = null;
+                }
+
                 return {
                     id: message.id,
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
+                    date: message.date,
+                    time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });
         },
