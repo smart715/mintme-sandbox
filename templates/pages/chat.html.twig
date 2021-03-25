@@ -8,7 +8,7 @@
             :threads="{{ threads | json_encode }}"
             :thread-id-prop="{{ threadId }}"
             :d-m-min-amount="{{ dMMinAmount }}"
-            user-token-name="{{ app.user.profile.token ? app.user.profile.token.name : '' }}"
+            user-token-name="{{ app.user.profile.hasTokens ? app.user.profile.firstToken.name : '' }}"
             :token-precision="{{ precision }}"
             websocket-url="{{ global_websocket_url }}"
             user-hash="{{ hash }}"
