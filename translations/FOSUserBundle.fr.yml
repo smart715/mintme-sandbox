@@ -32,7 +32,7 @@ email.sent.body: ''
 email.sent.help: ''
 email.register.complete: ''
 register.accepting: ''
-register.confirmed.header: ''
+register.confirmed.header: Congrats!
 register.confirmed.body: ''
 register.confirmed.activated: ''
 register.email_sent.header: ''
