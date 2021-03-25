@@ -33,10 +33,19 @@
                             </button>
                         </span>
                         <span v-else>
-                            <copy-link :content-to-copy="modalTokenUrl"
-                                class="btn btn-primary">
+                            <copy-link
+                                v-if="isOwner" :href="modalTokenUrl"
+                                :content-to-copy="modalTokenUrl"
+                                class="btn btn-primary"
+                            >
                                 {{ $t('ongoing_airdrop.participate') }}
                             </copy-link>
+                            <a v-else :href="modalTokenUrl"
+                                @click.prevent="showModalOnClick"
+                                class="btn btn-primary"
+                            >
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </a>
                         </span>
                     </template>
                     <confirm-modal
@@ -450,6 +459,9 @@ export default {
         },
     },
     methods: {
+        showModalOnClick: function() {
+            this.showModal = !this.isOwner;
+        },
         showCountdown: function() {
             this.duration = moment.duration(this.duration - 1000, 'milliseconds');
             if (this.duration.asMilliseconds() <= 0) {

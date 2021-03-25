@@ -6,8 +6,9 @@
 <html lang="en">
     <head>
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('build/base_main.css') }}">
-            {% block pagestyles %}{% endblock %}
+            {% block pagestyles %}
+                {{ encore_entry_link_tags('base_main') }}
+            {% endblock %}
         {% endblock %}
         {% block head %}{% endblock %}
         {% block metaDescription %}

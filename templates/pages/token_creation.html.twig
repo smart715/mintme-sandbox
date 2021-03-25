@@ -145,5 +145,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/token_creation.js') }}"></script>
+    {{ encore_entry_script_tags('token_creation') }}
 {% endblock %}

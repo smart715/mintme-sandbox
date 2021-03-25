@@ -49,7 +49,7 @@ class EditPhoneNumberValidator extends ConstraintValidator
     {
         $oldPhoneNumber = $this->user->getProfile()->getPhoneNumber();
 
-        $newPhoneEntity = $this->phoneNumberManager->findByPhoneNumber($value);
+        $newPhoneEntity = $this->phoneNumberManager->findVerifiedPhoneNumber($value);
 
         if ($newPhoneEntity && $oldPhoneNumber !== $newPhoneEntity) {
             $this->context->buildViolation($constraint->message)

@@ -84,7 +84,7 @@ export default {
                     trader: row.user.profile.nickname,
                     traderAvatar: row.user.profile.image.avatar_small,
                     url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
-                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
+                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateTimeFormat) : '-',
                     amount: Math.round(row.balance),
                 };
             });

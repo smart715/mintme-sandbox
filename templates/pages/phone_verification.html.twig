@@ -55,6 +55,7 @@
                                 </div>
                                 {{ form_end(form) }}
                             {% endblock %}
+                            <input type="hidden" ref="sendCode" value="{{ sendCode }}"/>
                         </div>
                     </div>
                 </div>
@@ -64,5 +65,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/phone_verification.js') }}"></script>
+    {{ encore_entry_script_tags('phone_verification') }}
 {%  endblock %}

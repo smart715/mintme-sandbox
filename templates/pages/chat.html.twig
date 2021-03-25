@@ -8,7 +8,7 @@
             :threads="{{ threads | json_encode }}"
             :thread-id-prop="{{ threadId }}"
             :d-m-min-amount="{{ dMMinAmount }}"
-            user-token-name="{{ app.user.profile.token ? app.user.profile.token.name : '' }}"
+            user-token-name="{{ app.user.profile.hasTokens ? app.user.profile.firstToken.name : '' }}"
             :token-precision="{{ precision }}"
             websocket-url="{{ global_websocket_url }}"
             user-hash="{{ hash }}"
@@ -17,5 +17,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/chat.js') }}"></script>
+    {{ encore_entry_script_tags('chat') }}
 {% endblock %}
