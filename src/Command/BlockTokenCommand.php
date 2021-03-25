@@ -235,7 +235,7 @@ class BlockTokenCommand extends Command
             $token
         );
 
-        if (!$userOption && $tokenOption) {
+        if ((!$userOption && $tokenOption) || (!$userOption && !$tokenOption)) {
             do {
                 $tokenPendingSellOrders = $this->marketHandler->getPendingSellOrders(
                     $tokenMarket,
@@ -257,7 +257,7 @@ class BlockTokenCommand extends Command
             );
         }
 
-        if ($userOption && !$tokenOption) {
+        if (($userOption && !$tokenOption)|| (!$userOption && !$tokenOption)) {
             $leftRequests = ceil($this->maxActiveOrders / self::MAX_PENDING_ORDERS);
             $pendingOrdersCount = 0;
 
