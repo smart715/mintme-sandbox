@@ -12,6 +12,7 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\ClockInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -233,7 +234,7 @@ class DepositConsumerTest extends TestCase
     {
         $wallet = $this->createMock(WalletInterface::class);
         $wallet->method('getFee')->willReturn(
-            new Money('10000000000', new Currency(MoneyWrapper::TOK_SYMBOL))
+            new Money('10000000000', new Currency(Symbols::TOK))
         );
 
         return $wallet;

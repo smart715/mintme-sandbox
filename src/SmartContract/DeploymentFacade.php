@@ -6,7 +6,6 @@ use App\Communications\DeployCostFetcherInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Balance\Exception\BalanceException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DeploymentFacade implements DeploymentFacadeInterface

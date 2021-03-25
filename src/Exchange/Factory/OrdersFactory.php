@@ -10,7 +10,7 @@ use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -57,7 +57,7 @@ class OrdersFactory implements OrdersFactoryInterface
         $this->userLogger = $userLogger;
         $this->moneyWrapper = $moneyWrapper;
         $this->tokenManager = $tokenManager;
-        $this->currentStep = $this->moneyWrapper->parse((string)self::INIT_TOKEN_PRICE, MoneyWrapper::TOK_SYMBOL);
+        $this->currentStep = $this->moneyWrapper->parse((string)self::INIT_TOKEN_PRICE, Symbols::TOK);
     }
 
     public function createInitOrders(Token $token): void
@@ -70,7 +70,7 @@ class OrdersFactory implements OrdersFactoryInterface
 
         $market = $this->getMintmeMarketForToken($token);
         $amount = $this->getStepAmount();
-        $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), MoneyWrapper::TOK_SYMBOL);
+        $fee = $this->moneyWrapper->parse((string)$this->bag->get('maker_fee_rate'), Symbols::TOK);
 
         $price = null;
 
@@ -105,7 +105,7 @@ class OrdersFactory implements OrdersFactoryInterface
         );
 
         if (!$currentPrice) {
-            return $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+            return $this->moneyWrapper->parse($amount, Symbols::TOK);
         }
 
         $this->currentStep = $this->currentStep->subtract($this->currentStep->multiply(self::STEP));
@@ -121,13 +121,13 @@ class OrdersFactory implements OrdersFactoryInterface
             RoundingMode::HALF_DOWN
         );
 
-        return $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL);
+        return $this->moneyWrapper->parse($amount, Symbols::TOK);
     }
 
     private function getMintmeMarketForToken(Token $token): Market
     {
         /** @var Crypto $mintmeCrypto */
-        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
         return $this->marketFactory->create($mintmeCrypto, $token);
     }

@@ -15,6 +15,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
@@ -156,8 +157,8 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL))),
-            $this->mockCrypto(Token::WEB_SYMBOL)
+            $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
@@ -182,8 +183,8 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL))),
-            $this->mockCrypto(Token::WEB_SYMBOL)
+            $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
+            $this->mockCrypto(Symbols::WEB)
         );
     }
 
@@ -210,7 +211,7 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
+            $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
             $this->mockToken()
         );
     }
@@ -240,7 +241,7 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
+            $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
             $this->mockToken()
         );
     }
@@ -270,7 +271,7 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
+            $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
             $this->mockToken()
         );
     }
@@ -300,7 +301,7 @@ class WalletTest extends TestCase
         $wallet->withdrawInit(
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
-            $this->mockAmount(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL))),
+            $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
             $this->mockToken()
         );
     }
@@ -368,11 +369,11 @@ class WalletTest extends TestCase
     {
         $amountMock = $this->createMock(Amount::class);
         $amountMock->method('getAmount')->willReturn(
-            new Money($amount, new Currency(Token::WEB_SYMBOL))
+            new Money($amount, new Currency(Symbols::WEB))
         );
 
         $pending = $this->createMock(PendingWithdraw::class);
-        $pending->method('getCrypto')->willReturn($this->mockCrypto(Token::WEB_SYMBOL));
+        $pending->method('getCrypto')->willReturn($this->mockCrypto(Symbols::WEB));
         $pending->method('getAmount')->willReturn($amountMock);
 
         return $pending;
@@ -382,7 +383,7 @@ class WalletTest extends TestCase
     {
         $amountMock = $this->createMock(Amount::class);
         $amountMock->method('getAmount')->willReturn(
-            new Money($amount, new Currency(MoneyWrapper::TOK_SYMBOL))
+            new Money($amount, new Currency(Symbols::TOK))
         );
 
         $pending = $this->createMock(PendingTokenWithdraw::class);
@@ -442,7 +443,7 @@ class WalletTest extends TestCase
         ;
         $withdrawGatewayMock
             ->method('getBalance')
-            ->willReturn(new Money($available, new Currency(Token::WEB_SYMBOL)));
+            ->willReturn(new Money($available, new Currency(Symbols::WEB)));
         $withdrawGatewayMock
             ->method('address')
             ->willReturn(true);
@@ -461,17 +462,17 @@ class WalletTest extends TestCase
     ): BalanceHandlerInterface {
         $balanceResultCrypto = $this->createMock(BalanceResult::class);
         $balanceResultCrypto->method('getAvailable')
-            ->willReturn(new Money($available, new Currency(Token::WEB_SYMBOL)));
+            ->willReturn(new Money($available, new Currency(Symbols::WEB)));
 
         $balanceResultToken = $this->createMock(BalanceResult::class);
         $balanceResultToken->method('getAvailable')
-            ->willReturn(new Money($availableToken, new Currency(MoneyWrapper::TOK_SYMBOL)));
+            ->willReturn(new Money($availableToken, new Currency(Symbols::TOK)));
 
         $handler = $this->createMock(BalanceHandlerInterface::class);
         $handler->method('balance')
             ->will($this->returnCallback(
                 function (User $user, TradebleInterface $tradable) use ($balanceResultCrypto, $balanceResultToken) {
-                    return Token::WEB_SYMBOL === $tradable->getSymbol()
+                    return Symbols::WEB === $tradable->getSymbol()
                         ? $balanceResultCrypto
                         : $balanceResultToken;
                 }
@@ -539,8 +540,8 @@ class WalletTest extends TestCase
         } else {
             $manager->expects($inv ?? $this->never())
                 ->method('findBySymbol')
-                ->with(Token::WEB_SYMBOL)
-                ->willReturn($this->mockCrypto(Token::WEB_SYMBOL));
+                ->with(Symbols::WEB)
+                ->willReturn($this->mockCrypto(Symbols::WEB));
         }
 
         return $manager;

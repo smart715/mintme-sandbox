@@ -2,8 +2,6 @@
 
 namespace App\Events;
 
-use App\Entity\TradebleInterface;
-use App\Entity\User;
 use App\Exchange\Order;
 
 interface OrderEventInterface

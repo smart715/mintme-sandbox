@@ -16,6 +16,7 @@ use App\Exchange\Order;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +30,14 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_DEPLOYED_FIRST = 1;
     public const FILTER_DEPLOYED_ONLY_MINTME = 2;
     public const FILTER_AIRDROP_ONLY = 3;
+    public const FILTER_DEPLOYED_ONLY_ETH = 4;
     public const FILTER_AIRDROP_ACTIVE = true;
+    public const FILTER_FOR_TOKENS = [
+            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
+            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
+            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
+            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
+        ];
 
     public const SORT_LAST_PRICE = 'lastPrice';
     public const SORT_MONTH_VOLUME = 'monthVolume';
@@ -108,7 +116,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
-                )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
+                )->setParameter('cryptoSymbol', Symbols::WEB);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
@@ -134,7 +142,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_DEPLOYED_ONLY_MINTME:
                 $queryBuilder->andWhere(
                     "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND (qt.crypto IS NULL OR c.symbol = :cryptoSymbol)"
-                )->setParameter('cryptoSymbol', Token::WEB_SYMBOL);
+                )->setParameter('cryptoSymbol', Symbols::WEB);
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_ETH:
+                $queryBuilder->andWhere(
+                    "qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' AND c.symbol = :cryptoSymbol"
+                )->setParameter('cryptoSymbol', Symbols::ETH);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
@@ -412,7 +426,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 ($base instanceof Token && $base->isBlocked()) ||
                 $quote instanceof Token ||
                 $base === $quote ||
-                ($base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol()))
+                ($base instanceof Token && !(Symbols::MINTME === $quote->getSymbol() || Symbols::WEB === $quote->getSymbol()))
             );
     }
 

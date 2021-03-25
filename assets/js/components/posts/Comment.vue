@@ -102,7 +102,10 @@ export default {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
-        isConfirmVisible: false,
+        isConfirmVisible: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -138,6 +141,8 @@ export default {
                 });
         },
         editComment(comment) {
+            // todo: don't mutate prop
+            // eslint-disable-next-line
             this.comment.content = comment.content;
             this.cancelEditing();
         },
@@ -155,7 +160,11 @@ export default {
             this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {commentId: this.comment.id}))
                 .then((res) => {
+                    // todo: don't mutate prop
+                    // eslint-disable-next-line
                     this.comment.likeCount += this.comment.liked ? -1 : 1;
+                    // todo: don't mutate prop
+                    // eslint-disable-next-line
                     this.comment.liked = !this.comment.liked;
                 })
                 .catch(() => {
@@ -164,9 +173,13 @@ export default {
                 .finally(() => this.liking = false);
         },
         showConfirm() {
+            // todo: don't mutate prop
+            // eslint-disable-next-line
             this.isConfirmVisible = true;
         },
         closeConfirm() {
+            // todo: don't mutate prop
+            // eslint-disable-next-line
             this.isConfirmVisible = false;
         },
     },

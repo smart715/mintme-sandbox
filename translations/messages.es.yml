@@ -873,6 +873,8 @@ token.intro.statistics.not_yet_released.header: 'No liberados aún:'
 token.intro.statistics.not_yet_released.guide_header: 'No liberados aún'
 token.intro.statistics.not_yet_released.guide_body: 'Número de tokens que aún no han sido entregados al creador del token o vendidos en el mercado'
 token.intro.statistics.created: 'Creado el:'
+token.intro.statistics.holders.header:
+token.intro.statistics.holders.guide_header:
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
 token.intro.created_modal.paragraph_2.part_1: 'Los usuarios que compren tokens a través de este enlace'
@@ -1085,6 +1087,7 @@ trading.no_one_airdrop: 'Aún no hay ningún airdrop activo'
 trading.no_any_token: 'No hay tokens aún'
 trading.show_all_tokens: 'Mostrar todos los tokens'
 trading.deployed.label: 'Desplegados en MINTME'
+trading.deployed_eth.label: ''
 trading.airdrop.label: 'Airdrops activos'
 trading.all_tokens.label: 'Todos los tokens'
 trading.own_tokens.label: 'Mis tokens'
@@ -1096,7 +1099,7 @@ trading.market_cap.label: 'Capitalización de mercados'
 trading.market_cap.help: 'La capitalización del mercado basada en el último precio multiplicado por el número de tokens vendidos en el mercado'
 trading.buy_depth.label: Demanda
 trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra reflejada en MINTME para cada mercado. Esto puede representar mejor el tamaño del token que la capitalización de mercados.'
-trading.fields.pair: Mercado
+trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
 wallet.balance: Balance

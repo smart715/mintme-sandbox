@@ -4,7 +4,6 @@ namespace App\Mailer;
 
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
 use Money\Money;

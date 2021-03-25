@@ -7,6 +7,7 @@ use App\Communications\Exception\FetchException;
 use App\Communications\RestRpcInterface;
 use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
@@ -65,14 +66,14 @@ class DeployCostFetcherTest extends TestCase
         ))->getDeployCostReferralReward();
 
         $this->assertEquals('150000000000000000', $deployCostReferralReward->getAmount());
-        $this->assertEquals(Token::WEB_SYMBOL, $deployCostReferralReward->getCurrency());
+        $this->assertEquals(Symbols::WEB, $deployCostReferralReward->getCurrency());
     }
 
     private function mockMoneyWrapper(Invocation $invocation): MoneyWrapperInterface
     {
         $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
         $moneyWrapper->expects($invocation)->method('convert')
-            ->willReturn(new Money('1000000000000000000', new Currency(Token::WEB_SYMBOL)));
+            ->willReturn(new Money('1000000000000000000', new Currency(Symbols::WEB)));
 
         return $moneyWrapper;
     }

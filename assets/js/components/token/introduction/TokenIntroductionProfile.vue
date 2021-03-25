@@ -207,7 +207,6 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
-import Modal from '../../modal/Modal';
 import CopyLink from '../../CopyLink';
 import {tokenDeploymentStatus} from '../../../utils/constants';
 
@@ -240,7 +239,6 @@ export default {
         CopyLink,
         FontAwesomeIcon,
         Guide,
-        Modal,
         TokenDiscordChannel,
         TokenFacebookAddress,
         TokenFacebookAddressView,

@@ -13,7 +13,7 @@ use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -78,7 +78,7 @@ class DonationHandler implements DonationHandlerInterface
 
         $this->checkAmount($donorUser, $amountObj, $currency, false);
 
-        if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency || Token::USDC_SYMBOL === $currency) {
+        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
             $amountObj = $this->getCryptoWorthInMintme($amountObj, $currency);
         }
 
@@ -110,15 +110,15 @@ class DonationHandler implements DonationHandlerInterface
         $tokenCreator = $token->getProfile()->getUser();
 
         // Summary in MINTME of all sell orders
-        $sellOrdersSummary = $this->moneyWrapper->parse($sellOrdersSummary, Token::WEB_SYMBOL);
+        $sellOrdersSummary = $this->moneyWrapper->parse($sellOrdersSummary, Symbols::WEB);
 
         // Amount of tokens which user receive after donation
-        $expectedAmount = $this->moneyWrapper->parse($expectedTokensAmount, Token::WEB_SYMBOL);
+        $expectedAmount = $this->moneyWrapper->parse($expectedTokensAmount, Symbols::WEB);
         $minTokensAmount = $this->donationConfig->getMinTokensAmount();
 
         $donationAmount = $amountInCrypto;
 
-        if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency || Token::USDC_SYMBOL === $currency) {
+        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
             // Convert sum of donation in any Crypto to MINTME
             $donationAmount = $this->getCryptoWorthInMintme($donationAmount, $currency);
         }
@@ -133,12 +133,12 @@ class DonationHandler implements DonationHandlerInterface
 
         $currentExpectedAmount = $this->moneyWrapper->parse(
             $checkDonationResult->getExpectedTokens(),
-            Token::WEB_SYMBOL
+            Symbols::WEB
         );
 
         $tokensWorthInMintme = $this->moneyWrapper->parse(
             $checkDonationResult->getTokensWorth(),
-            Token::WEB_SYMBOL
+            Symbols::WEB
         );
         $tokensWorthInMintmeWithFee = $tokensWorthInMintme->divide(1 + floatval($this->donationConfig->getFee()));
 
@@ -150,7 +150,7 @@ class DonationHandler implements DonationHandlerInterface
         $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationAmount);
 
-        $isDonationInMintme = Token::WEB_SYMBOL === $currency;
+        $isDonationInMintme = Symbols::WEB === $currency;
 
         if ($expectedAmount->greaterThanOrEqual($minTokensAmount) &&
             $sellOrdersSummary->greaterThanOrEqual($donationAmount)
@@ -165,7 +165,7 @@ class DonationHandler implements DonationHandlerInterface
                     // Sum of donation in MINTME
                     $tokensWorthInMintme,
                     $currency,
-                    Token::WEB_SYMBOL
+                    Symbols::WEB
                 );
             }
 
@@ -184,7 +184,7 @@ class DonationHandler implements DonationHandlerInterface
                     $tokensWorthInMintmeWithFee,
                     $tokenCreator,
                     $this->getMintmeWorthInCrypto($tokensWorthInMintmeWithFee, $currency),
-                    Token::WEB_SYMBOL,
+                    Symbols::WEB,
                     $currency
                 );
             }
@@ -198,7 +198,7 @@ class DonationHandler implements DonationHandlerInterface
                 $donorUser,
                 $tokensWorthInMintme,
                 $currency,
-                Token::WEB_SYMBOL
+                Symbols::WEB
             );
 
             $this->donationFetcher->makeDonation(
@@ -227,7 +227,7 @@ class DonationHandler implements DonationHandlerInterface
                 $sellOrdersSummary,
                 $tokenCreator,
                 $this->getMintmeWorthInCrypto($sellOrdersSummary, $currency),
-                Token::WEB_SYMBOL,
+                Symbols::WEB,
                 $currency
             );
         } elseif ($isDonationInMintme && $twoWayDonation) {
@@ -275,8 +275,8 @@ class DonationHandler implements DonationHandlerInterface
 
     public function getTokensWorth(string $tokensWorth, string $currency): string
     {
-        if (Token::BTC_SYMBOL === $currency || Token::ETH_SYMBOL === $currency || Token::USDC_SYMBOL === $currency) {
-            $tokensWorth = $this->moneyWrapper->parse($tokensWorth, Token::WEB_SYMBOL);
+        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
+            $tokensWorth = $this->moneyWrapper->parse($tokensWorth, Symbols::WEB);
             $tokensWorthInCrypto = $this->getMintmeWorthInCrypto($tokensWorth, $currency);
 
             return $this->moneyWrapper->format($tokensWorthInCrypto);
@@ -338,10 +338,10 @@ class DonationHandler implements DonationHandlerInterface
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
-        if (Token::USDC_SYMBOL === $cryptoSymbol) {
-            $usdcRate = 1 / $rates[Token::USDC_SYMBOL][MoneyWrapper::USD_SYMBOL]
-                * $rates[Token::WEB_SYMBOL][MoneyWrapper::USD_SYMBOL];
-            $rates[Token::WEB_SYMBOL][$cryptoSymbol] = $usdcRate;
+        if (Symbols::USDC === $cryptoSymbol) {
+            $usdcRate = 1 / $rates[Symbols::USDC][Symbols::USD]
+                * $rates[Symbols::WEB][Symbols::USD];
+            $rates[Symbols::WEB][$cryptoSymbol] = $usdcRate;
         }
 
         return $this->moneyWrapper->convert(
@@ -355,17 +355,17 @@ class DonationHandler implements DonationHandlerInterface
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
-        if (Token::USDC_SYMBOL === $cryptoSymbol) {
-            $usdcRate = 1 / $rates[Token::USDC_SYMBOL][MoneyWrapper::USD_SYMBOL]
-                * $rates[Token::WEB_SYMBOL][MoneyWrapper::USD_SYMBOL];
-            $rates[$cryptoSymbol][Token::WEB_SYMBOL] = 1 / $usdcRate;
+        if (Symbols::USDC === $cryptoSymbol) {
+            $usdcRate = 1 / $rates[Symbols::USDC][Symbols::USD]
+                * $rates[Symbols::WEB][Symbols::USD];
+            $rates[$cryptoSymbol][Symbols::WEB] = 1 / $usdcRate;
         } else {
-            $rates[$cryptoSymbol][Token::WEB_SYMBOL] = 1 / $rates[Token::WEB_SYMBOL][$cryptoSymbol];
+            $rates[$cryptoSymbol][Symbols::WEB] = 1 / $rates[Symbols::WEB][$cryptoSymbol];
         }
 
         return $this->moneyWrapper->convert(
             $amount,
-            new Currency(Token::WEB_SYMBOL),
+            new Currency(Symbols::WEB),
             new FixedExchange($rates)
         );
     }
@@ -384,19 +384,19 @@ class DonationHandler implements DonationHandlerInterface
             )->getAvailable()
             : null;
 
-        if (Token::BTC_SYMBOL === $currency) {
+        if (Symbols::BTC === $currency) {
             $minBtcAmount = $this->donationConfig->getMinBtcAmount();
 
             if ($amount->lessThan($minBtcAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
-        } elseif (Token::WEB_SYMBOL === $currency) {
+        } elseif (Symbols::WEB === $currency) {
             $minMintmeAmount = $this->donationConfig->getMinMintmeAmount();
 
             if ($amount->lessThan($minMintmeAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
-        } elseif (Token::ETH_SYMBOL === $currency) {
+        } elseif (Symbols::ETH === $currency) {
             $minEthAmount = $this->donationConfig->getMinEthAmount();
 
             if ($amount->lessThan($minEthAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {

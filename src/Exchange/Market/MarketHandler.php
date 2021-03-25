@@ -21,7 +21,7 @@ use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
@@ -536,7 +536,7 @@ class MarketHandler implements MarketHandlerInterface
     private function getSymbol(TradebleInterface $tradable): string
     {
         return $tradable instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradable->getSymbol();
     }
 
@@ -557,7 +557,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
-            $market->isTokenMarket() ? Token::TOK_SYMBOL : $market->getQuote()->getSymbol()
+            $market->isTokenMarket() ? Symbols::TOK : $market->getQuote()->getSymbol()
         );
 
         /** @var Money $depthAmount */
@@ -585,7 +585,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $orders = array_merge([], ...$paginatedOrders);
 
-        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        $zeroDepth = $this->moneyWrapper->parse('0', Symbols::TOK);
 
         /** @var Money $sellOrdersSum */
         $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
@@ -664,12 +664,12 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $market = new Market($token->getCrypto() ?? $mintmeCrypto, $token);
         $available = $this->balanceHandler->balance($token->getProfile()->getUser(), $token)->getAvailable();
         $init = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_quantity'),
-            Token::TOK_SYMBOL
+            Symbols::TOK
         );
 
         $offset = 0;

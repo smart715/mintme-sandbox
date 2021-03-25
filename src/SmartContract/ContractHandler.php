@@ -10,11 +10,11 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Exception;
@@ -83,7 +83,7 @@ class ContractHandler implements ContractHandlerInterface
             [
                 'name' => $token->getName(),
                 'decimals' =>
-                    $this->moneyWrapper->getRepository()->subunitFor(new Currency(MoneyWrapper::TOK_SYMBOL)),
+                    $this->moneyWrapper->getRepository()->subunitFor(new Currency(Symbols::TOK)),
                 'releasedAtCreation' => $token->getLockIn()->getReleasedAmount()->getAmount(),
                 'releasePeriod' => $token->getLockIn()->getReleasePeriod(),
                 'userId' => $token->getProfile()->getUser()->getId(),
@@ -229,7 +229,7 @@ class ContractHandler implements ContractHandlerInterface
     private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
     {
         if (!$tradeble) {
-            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+            return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 
         if (self::DEPOSIT_TYPE === $type) {
@@ -241,10 +241,10 @@ class ContractHandler implements ContractHandlerInterface
         }
 
         /** @var Token $tradeble */
-        return Token::ETH_SYMBOL === $tradeble->getCryptoSymbol()
+        return Symbols::ETH === $tradeble->getCryptoSymbol()
             ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
                 (string)$this->parameterBag->get('token_withdraw_fee'),
-                Token::ETH_SYMBOL
+                Symbols::ETH
             ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
     }
 
@@ -270,7 +270,7 @@ class ContractHandler implements ContractHandlerInterface
                 $transaction['to'],
                 new Money(
                     $transaction['amount'],
-                    new Currency($cryptoToken ? $cryptoToken->getSymbol() : MoneyWrapper::TOK_SYMBOL)
+                    new Currency($cryptoToken ? $cryptoToken->getSymbol() : Symbols::TOK)
                 ),
                 $this->getFee(
                     $tradeble,
@@ -307,8 +307,8 @@ class ContractHandler implements ContractHandlerInterface
         $result = $response->getResult();
 
         return new DepositInfo(
-            new Money($result['fee'], new Currency(MoneyWrapper::TOK_SYMBOL)),
-            new Money($result['minDeposit'], new Currency(MoneyWrapper::TOK_SYMBOL))
+            new Money($result['fee'], new Currency(Symbols::TOK)),
+            new Money($result['minDeposit'], new Currency(Symbols::TOK))
         );
     }
 

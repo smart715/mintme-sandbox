@@ -179,6 +179,7 @@
                                 :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
+                                :holders-prop="{{ token.getHoldersCount }}"
                                 {% if tradeInfo %}
                                 :sold-on-market-prop="{{ tradeInfo.soldOnMarket }}"
                                 :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
@@ -395,10 +396,10 @@
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     {% if not app.user %}
-        <script src="https://www.google.com/recaptcha/api.js"></script>
+        <script defer src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
-    <script src="{{ asset('build/pair.js') }}"></script>
-    <script>
+    {{ encore_entry_script_tags('pair') }}
+    <script defer>
         window.fbAsyncInit = () => {
             FB.init({
                 appId: '{{ global_facebook_app_id }}',

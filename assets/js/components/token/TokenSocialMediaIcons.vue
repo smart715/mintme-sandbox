@@ -118,14 +118,8 @@
 </template>
 
 <script>
-import TokenDiscordChannel from './TokenDiscordChannel';
-import TokenFacebookAddressView from './facebook/TokenFacebookAddressView';
-import TokenTelegramChannel from './TokenTelegramChannel';
-import TokenWebsiteAddressView from './website/TokenWebsiteAddressView';
-import TokenYoutubeAddressView from './youtube/TokenYoutubeAddressView';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {directive as onClickaway} from 'vue-clickaway';
-import Guide from '../Guide';
 
 let SocialSharing = require('vue-social-sharing');
 
@@ -149,12 +143,6 @@ export default {
     },
     components: {
         FontAwesomeIcon,
-        Guide,
-        TokenDiscordChannel,
-        TokenFacebookAddressView,
-        TokenTelegramChannel,
-        TokenYoutubeAddressView,
-        TokenWebsiteAddressView,
     },
     data() {
         return {
