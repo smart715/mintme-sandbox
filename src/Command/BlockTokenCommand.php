@@ -236,47 +236,36 @@ class BlockTokenCommand extends Command
         );
 
         if (!$userOption && $tokenOption) {
-            $offset = 0;
-            $pendingSellOrdersCount = 0;
-            $pendingBuyOrdersCount = 0;
-
             do {
                 $tokenPendingSellOrders = $this->marketHandler->getPendingSellOrders(
                     $tokenMarket,
-                    $offset,
+                    0,
                     self::MAX_PENDING_ORDERS
                 );
-
                 $tokenPendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
                     $tokenMarket,
-                    $offset,
+                    0,
                     self::MAX_PENDING_ORDERS
                 );
-                $tokenPendingOrders = array_merge($tokenPendingBuyOrders, $tokenPendingSellOrders);
 
-                foreach ($tokenPendingOrders as $order) {
-                    $market = $order->getMarket();
-                    $this->exchanger->cancelOrder($market, $order);
+                foreach (array_merge($tokenPendingSellOrders, $tokenPendingBuyOrders) as $tokenPendingSellOrder) {
+                    $market = $tokenPendingSellOrder->getMarket();
+                    $this->exchanger->cancelOrder($market, $tokenPendingSellOrder);
                 }
-
-                $pendingSellOrdersCount += count($tokenPendingSellOrders);
-                $pendingBuyOrdersCount += count($tokenPendingBuyOrders);
-                $offset += self::MAX_PENDING_ORDERS;
-            } while ($pendingSellOrdersCount >= self::MAX_PENDING_ORDERS &&
-                $pendingBuyOrdersCount >= self::MAX_PENDING_ORDERS
+            } while (count($tokenPendingSellOrders) >= self::MAX_PENDING_ORDERS ||
+                count($tokenPendingBuyOrders) >= self::MAX_PENDING_ORDERS
             );
         }
 
         if ($userOption && !$tokenOption) {
             $leftRequests = ceil($this->maxActiveOrders / self::MAX_PENDING_ORDERS);
-            $offset = 0;
             $pendingOrdersCount = 0;
 
             do {
                 $pendingOrders = $this->marketHandler->getPendingOrdersByUser(
                     $user,
                     $coinMarkets,
-                    $offset,
+                    0,
                     self::MAX_PENDING_ORDERS
                 );
 
@@ -287,7 +276,6 @@ class BlockTokenCommand extends Command
 
                 $pendingOrdersCount += count($pendingOrders);
                 $leftRequests--;
-                $offset += self::MAX_PENDING_ORDERS;
             } while ($pendingOrdersCount >= self::MAX_PENDING_ORDERS && $leftRequests);
         }
     }
