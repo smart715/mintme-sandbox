@@ -18,9 +18,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\ErrorHandler\Debug;
 
 class BlockTokenCommand extends Command
 {
+    private const MAX_PENDING_ORDERS = 100;
+
     /** @var string */
     protected static $defaultName = 'app:block';
 
@@ -176,7 +179,7 @@ class BlockTokenCommand extends Command
             );
 
         if (!$unblock) {
-            $this->cancelOrders($token, $tokenOption, $userOption);
+            $this->cancelOrders($token, $tokenOption, $userOption, $io);
         }
 
         $this->em->persist($user);
@@ -222,7 +225,7 @@ class BlockTokenCommand extends Command
         return false;
     }
 
-    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption): void
+    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption, SymfonyStyle $io): void
     {
         /** @var User $user */
         $user = $token->getOwner();
@@ -232,39 +235,60 @@ class BlockTokenCommand extends Command
             $token
         );
 
-        $tokenPendingOrders = array_merge(
-            $this->marketHandler->getPendingSellOrders(
-                $tokenMarket,
-                0,
-                $this->maxActiveOrders
-            ),
-            $this->marketHandler->getPendingBuyOrders(
-                $tokenMarket,
-                0,
-                $this->maxActiveOrders
-            )
-        );
-
-        $userPendingOrders = $this->marketHandler->getPendingOrdersByUser(
-            $user,
-            $coinMarkets,
-            0,
-            $this->maxActiveOrders
-        );
-
-        $ordersToCancel = array_merge($tokenPendingOrders, $userPendingOrders);
-
         if (!$userOption && $tokenOption) {
-            $ordersToCancel = $tokenPendingOrders;
+            $offset = 0;
+            $pendingSellOrdersCount = 0;
+            $pendingBuyOrdersCount = 0;
+
+            do {
+                $tokenPendingSellOrders = $this->marketHandler->getPendingSellOrders(
+                    $tokenMarket,
+                    $offset,
+                    self::MAX_PENDING_ORDERS
+                );
+
+                $tokenPendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
+                    $tokenMarket,
+                    $offset,
+                    self::MAX_PENDING_ORDERS
+                );
+                $tokenPendingOrders = array_merge($tokenPendingBuyOrders, $tokenPendingSellOrders);
+
+                foreach ($tokenPendingOrders as $order) {
+                    $market = $order->getMarket();
+                    $this->exchanger->cancelOrder($market, $order);
+                }
+
+                $pendingSellOrdersCount += count($tokenPendingSellOrders);
+                $pendingBuyOrdersCount += count($tokenPendingBuyOrders);
+                $offset += self::MAX_PENDING_ORDERS;
+            } while ($pendingSellOrdersCount >= self::MAX_PENDING_ORDERS &&
+                $pendingBuyOrdersCount >= self::MAX_PENDING_ORDERS
+            );
         }
 
         if ($userOption && !$tokenOption) {
-            $ordersToCancel = $userPendingOrders;
-        }
+            $leftRequests = ceil($this->maxActiveOrders / self::MAX_PENDING_ORDERS);
+            $offset = 0;
+            $pendingOrdersCount = 0;
 
-        foreach ($ordersToCancel as $order) {
-            $market = $order->getMarket();
-            $this->exchanger->cancelOrder($market, $order);
+            do {
+                $pendingOrders = $this->marketHandler->getPendingOrdersByUser(
+                    $user,
+                    $coinMarkets,
+                    $offset,
+                    self::MAX_PENDING_ORDERS
+                );
+
+                foreach ($pendingOrders as $order) {
+                    $market = $order->getMarket();
+                    $this->exchanger->cancelOrder($market, $order);
+                }
+
+                $pendingOrdersCount += count($pendingOrders);
+                $leftRequests--;
+                $offset += self::MAX_PENDING_ORDERS;
+            } while ($pendingOrdersCount >= self::MAX_PENDING_ORDERS && $leftRequests);
         }
     }
 }
