@@ -233,9 +233,8 @@ class CreateEthTokenCommand extends Command
 
     private function checkDecimals(string $numericString, int $contractDecimals): bool
     {
-        $ignoreTrailingZeros = (float)$numericString;
-        $explodeDigits = explode('.', (string)$ignoreTrailingZeros);
+        $explodeDigits = explode('.', $numericString);
 
-        return !(isset($explodeDigits[1]) && $contractDecimals < strlen((string)$explodeDigits[1]));
+        return !(isset($explodeDigits[1]) && $contractDecimals < strlen(rtrim($explodeDigits[1], '0')));
     }
 }
