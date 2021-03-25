@@ -66,8 +66,7 @@
                             </template>
                             <template>
                                 <b-dropdown-item
-                                        v-for="filter in marketFilters.options"
-                                        v-if="'user' !== filter.key || 'user' === filter.key && userId"
+                                        v-for="filter in marketFiltersOptions"
                                         :key="filter.key"
                                         :value="filter.label"
                                         @click="toggleFilter(filter.key)"
@@ -484,6 +483,10 @@ export default {
                     || this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key)
                 && this.tokens.length
                 && this.currentPage === totalPages;
+        },
+        marketFiltersOptions: function() {
+            return Object.values(this.marketFilters.options)
+                .filter((filter) => 'user' !== filter.key || 'user' === filter.key && this.userId);
         },
     },
     mounted() {

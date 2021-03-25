@@ -74,7 +74,6 @@
 <script>
 import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
-import Guide from '../Guide';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 import {mapMutations} from 'vuex';
@@ -97,7 +96,6 @@ export default {
     },
     components: {
         vueSlider,
-        Guide,
     },
     computed: {
         showAreaUnlockedTokens: function() {
@@ -182,10 +180,12 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
-    b
-        white-space: nowrap
+<style lang="scss" scoped>
+    b {
+        white-space: nowrap;
+    }
 
-    .statistic-description
-        font-size: 1.2rem
+    .statistic-description {
+        font-size: 1.2rem;
+    }
 </style>
