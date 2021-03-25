@@ -17,5 +17,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/chat.js') }}"></script>
+    {{ encore_entry_script_tags('chat') }}
 {% endblock %}

@@ -29,18 +29,19 @@
               ref="notificationsScroll"
               :ops="scrollOps"
               @handle-scroll="handleScroll"
-              v-bind:class="setClass"
+              v-bind:class="scrollClass"
           >
               <div class="notification-container">
                   <template v-if="loaded">
-                      <div
-                          v-if="hasNotifications"
-                          class="notification-body"
-                          v-for="notification in userNotificationsFiltered"
-                          :key="notification.id"
-                      >
-                          <NotificationType :notification="notification"/>
-                      </div>
+                      <template v-if="hasNotifications">
+                          <div
+                              v-for="notification in userNotificationsFiltered"
+                              :key="notification.id"
+                              class="notification-body"
+                          >
+                              <NotificationType :notification="notification"/>
+                          </div>
+                      </template>
                       <div v-if="!hasNotifications" class="text-center notification-body">
                           {{ $t('userNotification.no_notifications_yet') }}
                       </div>
@@ -149,10 +150,10 @@ export default {
             return this.userNotifications ?
                this.userNotifications.filter((item) => !item.viewed).length : 0;
         },
-        setClass: function() {
-            if (!this.userNotificationsFiltered.length) {
-                return `static-container-notification`;
-            }
+        scrollClass: function() {
+            return this.userNotificationsFiltered.length
+                ? ''
+                : 'static-container-notification';
         },
     },
 };
