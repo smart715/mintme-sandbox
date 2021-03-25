@@ -218,6 +218,8 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
+                        // todo: don't mutate prop
+                        // eslint-disable-next-line
                         this.currentName = response.data['tokenName'];
                         this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 

@@ -43,7 +43,6 @@ import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
-import Guide from '../../Guide';
 import {HTTP_OK} from '../../../utils/constants';
 
 library.add(faTimes, faYoutubeSquare);
@@ -61,7 +60,6 @@ export default {
     },
     components: {
         FontAwesomeIcon,
-        Guide,
     },
     mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     created: function() {
