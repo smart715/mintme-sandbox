@@ -16,8 +16,11 @@
                             </b-card-text>
                         </b-card>
                     </div>
-                    <template v-if="!loading && config.show" v-for="config in userConfigModel">
-                        <div class="row faq-block mx-0 border-bottom border-top" :key="config.text">
+                    <template v-if="!loading">
+                        <div
+                            v-for="config in userConfigModelFiltered"
+                            :key="config.text"
+                            class="row faq-block mx-0 border-bottom border-top">
                             <faq-item>
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
@@ -93,6 +96,12 @@ export default {
             userConfig: {},
             userConfigModel: {},
         };
+    },
+    computed: {
+        userConfigModelFiltered: function() {
+            return Object.values(this.userConfigModel)
+                .filter((config) => config.show);
+        },
     },
     mounted() {
         this.fetchUserNotificationsConfig();

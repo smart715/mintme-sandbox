@@ -157,7 +157,6 @@
 
 <script>
 import FaqItem from '../FaqItem';
-import Guide from '../Guide';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenAirdropCampaign from '../token/airdrop_campaign/TokenAirdropCampaign';
@@ -166,14 +165,12 @@ import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenSocialMediaEdit from '../token/TokenSocialMediaEdit';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
-import TwoFactorModal from './TwoFactorModal';
 import {tokenDeploymentStatus} from '../../utils/constants';
 
 export default {
     name: 'TokenEditModal',
     components: {
         FaqItem,
-        Guide,
         Modal,
         TokenChangeName,
         TokenAirdropCampaign,
@@ -182,7 +179,6 @@ export default {
         TokenReleaseAddress,
         TokenReleasePeriod,
         TokenSocialMediaEdit,
-        TwoFactorModal,
     },
     props: {
         currentName: String,
