@@ -1,5 +1,5 @@
 <template>
-    <div v-if="post.content" class="comments">
+    <div class="comments">
         <comment-form
             class="p-2"
             :logged-in="loggedIn"
@@ -25,9 +25,6 @@
             </div>
         </div>
     </div>
-    <p v-else>
-        {{ $t('comment.min_amount', {token : post.token.name, amount: post.amount | toMoney | formatMoney}) }}
-    </p>
 </template>
 
 <script>

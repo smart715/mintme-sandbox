@@ -179,21 +179,15 @@ class PostsController extends AbstractFOSRestController
      */
     public function getComments(int $id, BalanceHandlerInterface $balanceHandler): View
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
         $post = $this->postManager->getById($id);
 
         if (!$post) {
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
-        $isOwner = $user->getId() === $post->getAuthor()->getUser()->getId();
-        $tokenUserBalance = $balanceHandler->balance($user, $post->getToken())->getAvailable();
-        $userHasPostAmount = $tokenUserBalance->greaterThanOrEqual($post->getAmount());
-        $postWithoutAmount = $post->getAmount()->isZero();
-        $commentsCanBeShown = $isOwner || $userHasPostAmount || $postWithoutAmount;
+        $this->denyAccessUnlessGranted('view', $post);
 
-        return $this->view($commentsCanBeShown ? $post->getComments() : [], Response::HTTP_OK);
+        return $this->view($post->getComments(), Response::HTTP_OK);
     }
 
     /**

@@ -69,6 +69,9 @@
         <a href="#" @click="sharePost">
             {{ shareText }}
         </a>
+        <p v-if="!post.content && singlePage" class="text-center">
+            {{ commentsRestriction }}
+        </p>
         <confirm-modal
             :visible="isModalVisible"
             @confirm="deletePost"
@@ -143,7 +146,7 @@ import {MoneyFilterMixin, NotificationMixin, TwitterMixin, FiltersMixin} from '.
 import ConfirmModal from '../modal/ConfirmModal';
 import Modal from '../modal/Modal';
 import CopyLink from '../CopyLink';
-import {openPopup, toMoney} from '../../utils';
+import {formatMoney, openPopup, toMoney} from '../../utils';
 import {mapGetters} from 'vuex';
 
 library.add(faEdit);
@@ -221,6 +224,9 @@ export default {
         },
         reward() {
             return toMoney(this.post.shareReward);
+        },
+        commentsRestriction() {
+          return this.$t('comment.min_amount', {token: this.post.token.name, amount: formatMoney(toMoney(this.post.amount))});
         },
         shareText() {
             return this.hasReward && !this.post.isUserAlreadyRewarded
