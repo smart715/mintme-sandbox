@@ -694,16 +694,8 @@ services:
             $consumerKey: '%env(TWITTER_API_KEY)%'
             $consumerSecret: '%env(TWITTER_API_SECRET)%'
 
-    App\Command\BlockTokenCommand:
-        arguments:
-            $maxActiveOrders: '%max_allowed_active_orders%'
-
     App\Command\SendCustomMailCommand:
         arguments:
             $mintmeHostFreeDays: '%freeDays%'
             $mintmeHostPrice: '%price%'
             $mintmeHostPath: '%mintmeHostPath%'
-
-    App\Command\CancelOrdersForOldBlockedCommand:
-        arguments:
-            $maxActiveOrders: '%max_allowed_active_orders%'

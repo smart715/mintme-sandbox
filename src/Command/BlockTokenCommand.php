@@ -52,8 +52,6 @@ class BlockTokenCommand extends Command
     /** @var ExchangerInterface */
     private $exchanger;
 
-    private int $maxActiveOrders;
-
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
@@ -62,8 +60,7 @@ class BlockTokenCommand extends Command
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketFactory,
         CryptoManagerInterface $cryptoManager,
-        ExchangerInterface $exchanger,
-        int $maxActiveOrders
+        ExchangerInterface $exchanger
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
@@ -73,7 +70,6 @@ class BlockTokenCommand extends Command
         $this->cryptoManager = $cryptoManager;
         $this->marketFactory = $marketFactory;
         $this->exchanger = $exchanger;
-        $this->maxActiveOrders = $maxActiveOrders;
         parent::__construct();
     }
 
@@ -241,12 +237,12 @@ class BlockTokenCommand extends Command
             $this->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);
         }
 
-        if (($userOption && !$tokenOption)|| (!$userOption && !$tokenOption)) {
+        if (($userOption && !$tokenOption) || (!$userOption && !$tokenOption)) {
             $this->cancelCoinOrders($user, $coinMarkets);
         }
     }
 
-    private function cancelTokenOrders(Market $market, int $side): void
+    public function cancelTokenOrders(Market $market, int $side): void
     {
         do {
             $orders = Order::SELL_SIDE === $side
@@ -257,7 +253,7 @@ class BlockTokenCommand extends Command
         } while (count($orders) >= self::ORDERS_LIMIT);
     }
 
-    private function cancelCoinOrders(User $user, array $markets): void
+    public function cancelCoinOrders(User $user, array $markets): void
     {
         do {
             $orders = $this->marketHandler->getPendingOrdersByUser(
@@ -271,7 +267,7 @@ class BlockTokenCommand extends Command
         } while (count($orders) >= self::ORDERS_LIMIT);
     }
 
-    private function cancelOrdersList(array $orders): void
+    public function cancelOrdersList(array $orders): void
     {
         foreach ($orders as $order) {
             $this->exchanger->cancelOrder($order->getMarket(), $order);
