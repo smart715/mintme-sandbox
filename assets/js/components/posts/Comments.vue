@@ -43,16 +43,15 @@ export default {
     },
     props: {
         comments: Array,
-        postId: Number,
         loggedIn: Boolean,
-        tokenName: String,
+        post: Object,
     },
     computed: {
         commentsCount() {
             return this.comments.length;
         },
         apiUrl() {
-            return this.$routing.generate('add_comment', {id: this.postId});
+            return this.$routing.generate('add_comment', {id: this.post.id});
         },
     },
 };
