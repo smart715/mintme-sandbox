@@ -177,13 +177,15 @@ class PostsController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{id<\d+>}/comments", name="get_post_comments", options={"expose"=true})
      */
-    public function getComments(int $id): View
+    public function getComments(int $id, BalanceHandlerInterface $balanceHandler): View
     {
         $post = $this->postManager->getById($id);
 
         if (!$post) {
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
+
+        $this->denyAccessUnlessGranted('view', $post);
 
         return $this->view($post->getComments(), Response::HTTP_OK);
     }
