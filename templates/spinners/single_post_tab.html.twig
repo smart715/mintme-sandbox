@@ -30,51 +30,57 @@
                             {{ post.commentsCount }} {% trans %}post.comments{% endtrans %}
                         </span>
                     </div>
+                    {% if post.content %}
                     <div class="comments">
-                    <div class="form-group p-2">
-                        <textarea class="form-control mb-3"></textarea>
-                        <button disabled="disabled" class="btn btn-primary">
-                            {% trans %}save{% endtrans %}
-                        </button>
-                        <a href="{{ path('new_show_post', {name: token.name}) }}" class="btn btn-cancel">
-                            {% trans %}cancel{% endtrans %}
-                        </a>
-                    </div>
-                    <div class="my-3">
-                        {% if post.commentsCount > 0 and comments is not null %}
-                            <div class="my-3">
-                                {% for comment in comments %}
-                                    <div class="comment">
-                                        <div>
-                                            <a
-                                                href="{{ path('profile', {nickname: comment.author.profile.nickname}) }}"
-                                                class="text-white">
-                                                <img
-                                                    src="{{ comment.author.profile.image.avatar_small }}"
-                                                    alt="avatar"
-                                                    class="rounded-circle d-inline-block">
-                                                {{ comment.author.profile.nickname }}
-                                            </a>
-                                            <span class="comment-date">
-                                                {{ comment.createdAt | date('H:m M d, Y') }}
+                        <div class="form-group p-2">
+                            <textarea class="form-control mb-3"></textarea>
+                            <button disabled="disabled" class="btn btn-primary">
+                                {% trans %}save{% endtrans %}
+                            </button>
+                            <a href="{{ path('new_show_post', {name: token.name}) }}" class="btn btn-cancel">
+                                {% trans %}cancel{% endtrans %}
+                            </a>
+                        </div>
+                        <div class="my-3">
+                            {% if post.commentsCount > 0 and comments is not null %}
+                                <div class="my-3">
+                                    {% for comment in comments %}
+                                        <div class="comment">
+                                            <div>
+                                                <a
+                                                    href="{{ path('profile', {nickname: comment.author.profile.nickname}) }}"
+                                                    class="text-white">
+                                                    <img
+                                                        src="{{ comment.author.profile.image.avatar_small }}"
+                                                        alt="avatar"
+                                                        class="rounded-circle d-inline-block">
+                                                    {{ comment.author.profile.nickname }}
+                                                </a>
+                                                <span class="comment-date">
+                                                    {{ comment.createdAt | date('H:m M d, Y') }}
+                                                </span>
+                                            </div>
+                                            <p>{{ comment.content }}</p>
+                                            <span>
+                                                <span class="ml-1">
+                                                    {{ comment.likeCount}} {% trans %}post.likes{% endtrans %}
+                                                </span>
                                             </span>
                                         </div>
-                                        <p>{{ comment.content }}</p>
-                                        <span>
-                                            <span class="ml-1">
-                                                {{ comment.likeCount}} {% trans %}post.likes{% endtrans %}
-                                            </span>
-                                        </span>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center w-100">
-                                {% trans %}post.no_one_commented{% endtrans %}
-                            </div>
-                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center w-100">
+                                    {% trans %}post.no_one_commented{% endtrans %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
+                    {% else %}
+                    <p>
+                        {% trans with {'%amount%': post.amount | toMoney(0), '%token%':  post.token.name } %} comment.min_amount{% endtrans %}
+                    </p>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
