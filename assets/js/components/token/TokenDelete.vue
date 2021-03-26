@@ -1,10 +1,17 @@
 <template>
     <div>
-        <template v-if="btnDisabled || !loaded">
+        <template v-if="!loaded || btnDisabled">
             <span class="btn-cancel px-0 m-1 text-muted">
                 {{ $t('token.delete.delete_token') }}
             </span>
-            <guide v-if="btnDisabled">
+            <span v-if="!loaded">
+                <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                />
+            </span>
+            <guide v-else>
                 <template slot="header">
                     {{ $t('token.delete.header') }}
                 </template>
@@ -17,16 +24,6 @@
                     </p>
                 </template>
             </guide>
-            <div v-else>
-                <span class="btn-cancel px-0 m-1 text-muted">
-                    {{ $t('token.delete.delete_token') }}
-                </span>
-                <font-awesome-icon
-                    icon="circle-notch"
-                    spin class="loading-spinner"
-                    fixed-width
-                />
-            </div>
         </template>
         <span
             v-else
@@ -72,7 +69,7 @@ export default {
         };
     },
     mounted() {
-        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.currentName}))
+        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.tokenName}))
             .then((res) => this.soldOnMarket = res.data)
             .catch((err) => {
               this.sendLogs('error', 'Can not get tokens in curculation', err);
