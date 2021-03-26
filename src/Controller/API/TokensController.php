@@ -570,14 +570,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
+        $soldLimitParam = (string)$this->getParameter('token_delete_sold_limit');
         $soldLimit = $this->moneyWrapper->parse(
-            (string)$this->getParameter('token_delete_sold_limit'),
+            $soldLimitParam,
             Symbols::TOK
         );
 
         if ($soldOnMarket->greaterThanOrEqual($soldLimit)) {
             throw new ApiBadRequestException(
-                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $soldLimit->getAmount()])
+                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $soldLimitParam])
             );
         }
 
