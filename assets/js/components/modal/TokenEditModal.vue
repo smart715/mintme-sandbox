@@ -220,7 +220,6 @@ export default {
             hasReleasePeriod: this.hasReleasePeriodProp,
             tokenDeployKey: 0,
             maxLengthToTruncate: 49,
-            soldOnMarket: null,
         };
     },
     beforeUpdate: function() {
