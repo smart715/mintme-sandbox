@@ -5,8 +5,12 @@ import Toasted from 'vue-toasted';
 import TokenDelete from '../../js/components/token/TokenDelete';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
+import tokenStatistics from '../../js/storage/modules/token_statistics';
+
 Vue.use(Vuelidate);
 Vue.use(Toasted);
+Vue.use(Vuex);
 
 /**
  * @return {Wrapper<Vue>}
@@ -23,6 +27,17 @@ function mockVue() {
     return localVue;
 }
 
+const store = new Vuex.Store({
+    modules: {
+        tokenStatistics: {
+            ...tokenStatistics,
+            state: {
+                tokenDeleteSoldLimit: 100000,
+            },
+        },
+    },
+});
+
 describe('TokenDelete', () => {
     beforeEach(() => {
         moxios.install();
@@ -35,40 +50,45 @@ describe('TokenDelete', () => {
     it('renders correctly with assigned props', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
+            data: () => ({
+                soldOnMarket: null,
+            }),
             propsData: {
-                loaded: false,
+                isTokenNotDeployed: false,
             },
+            store,
         });
 
+        expect(wrapper.vm.loaded).toBe(false);
+        expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({loaded: true});
-
-        wrapper.setProps({isTokenOverSoldLimit: true});
+        wrapper.setData({soldOnMarket: 120000});
         wrapper.setProps({isTokenNotDeployed: false});
+        expect(wrapper.vm.loaded).toBe(true);
+        expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenOverSoldLimit: true});
-        wrapper.setProps({isTokenNotDeployed: true});
-        expect(wrapper.find('span').classes('text-muted')).toBe(true);
-
-        wrapper.setProps({isTokenOverSoldLimit: false});
+        wrapper.setData({soldOnMarket: 2500});
         wrapper.setProps({isTokenNotDeployed: false});
+        expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenOverSoldLimit: false});
         wrapper.setProps({isTokenNotDeployed: true});
+        expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.find('span').classes('text-muted')).toBe(false);
     });
 
     it('open TwoFactorModal for token deletion', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
+            data: () => ({
+                soldOnMarket: 0,
+            }),
             propsData: {
-                isTokenOverSoldLimit: false,
                 isTokenNotDeployed: true,
-                loaded: true,
             },
+            store,
         });
         wrapper.find('span').trigger('click');
         expect(wrapper.vm.showTwoFactorModal).toBe(true);
@@ -79,8 +99,8 @@ describe('TokenDelete', () => {
             localVue: mockVue(),
             propsData: {
                 twofa: true,
-                loaded: true,
             },
+            store,
         });
         expect(wrapper.vm.needToSendCode).toBe(false);
     });
@@ -90,8 +110,8 @@ describe('TokenDelete', () => {
             localVue: mockVue(),
             propsData: {
                 twofa: false,
-                loaded: true,
             },
+            store,
         });
         expect(wrapper.vm.needToSendCode).toBe(true);
     });
@@ -101,8 +121,8 @@ describe('TokenDelete', () => {
             localVue: mockVue(),
             propsData: {
                 twofa: false,
-                loaded: true,
             },
+            store,
         });
 
         wrapper.vm.sendConfirmCode();
