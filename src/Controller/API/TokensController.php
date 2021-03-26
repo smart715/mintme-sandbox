@@ -612,15 +612,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Get("/delete-sold-limit", name="token_delete_sold_limit", options={"expose"=true})
-     */
-    public function deleteSoldLimit(): View
-    {
-        return $this->view($this->getParameter('token_delete_sold_limit'), Response::HTTP_OK);
-    }
-
-    /**
-     * @Rest\View()
      * @Rest\Post("/{name}/send-code", name="token_send_code", options={"expose"=true})
      */
     public function sendCode(
