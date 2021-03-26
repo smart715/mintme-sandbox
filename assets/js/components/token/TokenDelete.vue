@@ -48,6 +48,7 @@ import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
 import {mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 export default {
     name: 'TokenDelete',
@@ -60,6 +61,7 @@ export default {
     components: {
         Guide,
         TwoFactorModal,
+        FontAwesomeIcon,
     },
     data() {
         return {
