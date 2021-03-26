@@ -301,15 +301,18 @@
                                             @go-to-trade="goToTrade"
                                             single-page
                                         ></post>
-                                        <comments
-                                            :comments="comments || (comments = {{ comments | json_encode }})"
-                                            :post-id="singlePost ? singlePost.id : {{ post ? post.id : 0 }}"
-                                            :token-name="singlePost ? singlePost.token.name : '{{ post ? post.token.name : '' }}'"
-                                            :logged-in="{{ loggedIn }}"
-                                            @delete-comment="deleteComment"
-                                            @new-comment="newComment"
-                                            @cancel="goToPosts"
-                                        ></comments>
+                                        {% if post %}
+                                            {% if post.content %}
+                                            <comments
+                                                :comments="comments || (comments = {{ comments | json_encode }})"
+                                                :logged-in="{{ loggedIn }}"
+                                                @delete-comment="deleteComment"
+                                                @new-comment="newComment"
+                                                @cancel="goToPosts"
+                                                :post="singlePost ? singlePost : {{ post | json_encode }}"
+                                            ></comments>
+                                            {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
