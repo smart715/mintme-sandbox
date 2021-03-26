@@ -1,13 +1,9 @@
 import Vue from 'vue';
 import {shallowMount} from '@vue/test-utils';
 import TokenEditModal from '../../js/components/modal/TokenEditModal';
-import axios from 'axios';
-
 Vue.use({
     install(Vue, options) {
         Vue.prototype.$t = (val) => val;
-        Vue.prototype.$axios = {retry: axios};
-        Vue.prototype.$routing = {generate: (val) => val};
     },
 });
 
