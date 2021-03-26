@@ -235,7 +235,7 @@ class MarketHandlerTest extends TestCase
     {
         $fetcher = $this->mockMarketFetcher();
         $fetcher->method('getPendingOrdersByUser')
-            ->with(1, 'convertedmarket', 4, 100)
+            ->with(1, 'convertedmarket', 4)
             ->willReturn(
                 $this->getPendingOrders()
             );
@@ -256,11 +256,10 @@ class MarketHandlerTest extends TestCase
             $this->mockBalanceHandler(),
             $this->mockParameterBag()
         );
-
         $orders = $mh->getPendingOrdersByUser(
             $this->mockUser(1),
             [$this->mockMarket('FOO', 'BAR')],
-            4
+            4,
         );
 
         $this->assertEquals($this->getPendingOrders(), array_map(function (Order $order) {
