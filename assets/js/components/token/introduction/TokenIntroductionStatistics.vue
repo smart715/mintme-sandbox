@@ -46,7 +46,7 @@
                                     {{ $t('token.intro.statistics.balance') }}
                                 </div>
                                 <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-fill">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.exchange.header') }}
                                         </div>
@@ -62,7 +62,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.active.header') }}
                                         </div>
@@ -78,7 +78,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-fill">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.withdraw.header') }}
                                         </div>
@@ -94,7 +94,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill" >
+                                    <b-list-group-item class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.sold.header') }}
                                         </div>
@@ -110,7 +110,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill" >
+                                    <b-list-group-item class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.donation.header') }}
                                         </div>
@@ -126,7 +126,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill" >
+                                    <b-list-group-item class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.holders.header') }}
                                         </div>
@@ -154,7 +154,7 @@
                                     </guide>
                                 </div>
                                 <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.period.header') }}
                                         </div>
@@ -173,7 +173,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.hourly.header') }}
                                         </div>
@@ -189,7 +189,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.already_released.header') }}
                                         </div>
@@ -205,7 +205,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.not_yet_released.header') }}
                                         </div>
@@ -221,7 +221,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-fill">
+                                    <b-list-group-item class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.created') }}
                                         </div>
