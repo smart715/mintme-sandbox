@@ -412,16 +412,12 @@ class TokenController extends Controller
     {
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
-        if ($dashedName != $name) {
-            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName, 'modal' => $modal]));
-        }
-
         //rebranding
-        if (Symbols::MINTME === mb_strtoupper($name)) {
-            $name = Symbols::WEB;
+        if (Symbols::MINTME === mb_strtoupper($dashedName)) {
+            $dashedName = Symbols::WEB;
         }
 
-        $token = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByName($dashedName);
 
         if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
