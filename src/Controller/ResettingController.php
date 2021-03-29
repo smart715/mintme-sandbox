@@ -98,7 +98,7 @@ class ResettingController extends FOSResettingController
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
 
-            $response = $this->redirectToRoute('fos_user_security_login', [], 301);
+            $response = $this->redirectToRoute('fos_user_security_login');
 
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
