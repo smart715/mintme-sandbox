@@ -69,11 +69,13 @@
                 </ul>
             </div>
             <div class="tab-content">
+                {% if showDonation %}
+                    <div class="row">
+                        {{ include('spinners/donation.html.twig') }}
+                    </div>
+                {% endif %}
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'intro' %}active{% endif %}">
                     <div class="row">
-                        <div class="col-12 mb-3">
-                            {{ include('spinners/donation.html.twig') }}
-                        </div>
                         <div class="col-12 pb-3">
                             <div class="card h-100">
                                 <div class="card-header">
