@@ -1,5 +1,26 @@
 <template>
     <div :id="post.id" class="post">
+        <button v-if="showEdit"
+                class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showModal"
+        >
+            <font-awesome-icon
+                class="icon-default c-pointer align-middle"
+                icon="trash"
+                transform="shrink-4 up-1.5"
+            />
+        </button>
+        <a v-if="showEdit"
+           class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
+           :href="$routing.generate('edit_post_page', {id: post.id})"
+        >
+            <font-awesome-icon
+                class="icon-default c-pointer align-middle"
+                icon="edit"
+                transform="shrink-4 up-1.5"
+            />
+        </a>
         <template v-if="post.title">
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
@@ -28,27 +49,6 @@
             <copy-link :content-to-copy="link" class="c-pointer ml-1">
               <font-awesome-icon :icon="['far', 'copy']"/>
             </copy-link>
-            <button v-if="showEdit"
-                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                    :disabled="deleteDisabled"
-                    @click="showModal"
-            >
-                <font-awesome-icon
-                    class="icon-default c-pointer align-middle"
-                    icon="trash"
-                    transform="shrink-4 up-1.5"
-                />
-            </button>
-            <a v-if="showEdit"
-               class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-               :href="$routing.generate('edit_post_page', {id: post.id})"
-            >
-                <font-awesome-icon
-                    class="icon-default c-pointer align-middle"
-                    icon="edit"
-                    transform="shrink-4 up-1.5"
-                />
-            </a>
         </div>
         <template>
             <p v-if="post.content" class="post-content my-2">
