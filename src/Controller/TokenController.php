@@ -432,7 +432,7 @@ class TokenController extends Controller
                 $this->redirectToRoute('coin', [
                     'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
                     'quote'=> Symbols::MINTME,
-                ], 301)
+                ])
             );
         }
 

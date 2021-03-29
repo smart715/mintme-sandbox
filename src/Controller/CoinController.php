@@ -79,7 +79,7 @@ class CoinController extends Controller
             return $this->redirectToRoute('coin', [
                 'base' => $convertedOldUrl['base'],
                 'quote' => $convertedOldUrl['quote'],
-            ], 301);
+            ]);
         }
 
         /** @var  User|null $user */
