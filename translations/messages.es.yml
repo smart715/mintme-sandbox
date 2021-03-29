@@ -1335,8 +1335,8 @@ activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado
 airdrop_backend.invalid_actions: 'Acciones inválidas'
-api.airdrop.invalid_url:
-api.airdrop.url_start_with:
+api.airdrop.invalid_url: 'URL invalida'
+api.airdrop.url_start_with: 'La URL debe empezar con http:// o https://'
 api.airdrop.forbidden_domain: '%domain% no puede ser utilizado para esta tarea, por favor intente con otro.'
 api.no_enough_amount: 'Monto insuficiente'
 api.not_found: 'No se encuentra'
