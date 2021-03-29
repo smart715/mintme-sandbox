@@ -35,6 +35,9 @@ final class Version20200317135539 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
+        $this->addSql('ALTER TABLE airdrop_participants DROP FOREIGN KEY FK_BC712FC513543E34');
+        $this->addSql('ALTER TABLE airdrop_participants DROP FOREIGN KEY FK_BC712FC5A76ED395');
+
         $this->addSql('DROP TABLE airdrop_participants');
     }
 }

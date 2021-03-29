@@ -87,6 +87,7 @@ class Airdrop
      * @ORM\OneToMany(
      *     targetEntity="App\Entity\AirdropCampaign\AirdropParticipant",
      *     mappedBy="airdrop",
+     *     cascade="remove",
      *     orphanRemoval=true,
      *     fetch="EXTRA_LAZY"
      * )
@@ -95,7 +96,7 @@ class Airdrop
     private $claimedParticipants;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction", mappedBy="airdrop")
+     * @ORM\OneToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction", mappedBy="airdrop", cascade="remove")
      * @var ArrayCollection
      */
     private $actions;
