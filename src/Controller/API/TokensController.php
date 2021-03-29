@@ -464,26 +464,9 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{name}/is-not_deployed", name="is_token_not_deployed", options={"expose"=true})
+     * @Rest\Get("/{name}/deployment-status", name="token_deployment_status", options={"expose"=true})
      */
-    public function isTokenNotDeployed(string $name): View
-    {
-        $token = $this->tokenManager->findByName($name);
-
-        if (null === $token) {
-            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
-        }
-
-        return $this->view(
-            Token::NOT_DEPLOYED === $token->getDeploymentStatus()
-        );
-    }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get("/{name}/is-deployed", name="is_token_deployed", options={"expose"=true})
-     */
-    public function isTokenDeployed(string $name): View
+    public function getDeploymentStatus(string $name): View
     {
         $token = $this->tokenManager->findByName($name);
 
@@ -491,7 +474,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
-        return $this->view([Token::DEPLOYED => $token->getDeploymentStatus()], Response::HTTP_OK);
+        return $this->view(['status' => $token->getDeploymentStatus()], Response::HTTP_OK);
     }
 
     /**
