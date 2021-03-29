@@ -664,35 +664,18 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $market = new Market($token->getCrypto() ?? $mintmeCrypto, $token);
-        $available = $this->balanceHandler->balance($token->getProfile()->getUser(), $token)->getAvailable();
+        if (!$token->isMintmeToken()) {
+            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        }
+
         $init = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_quantity'),
             Token::TOK_SYMBOL
         );
 
-        $offset = 0;
-        $limit = 100;
+        $balanceView = $this->balanceHandler->balance($token->getOwner(), $token);
 
-        do {
-            $ownPendingOrders = $this->getPendingOrdersByUser(
-                $token->getOwner(),
-                [$market],
-                $offset,
-                $limit
-            );
-
-            foreach ($ownPendingOrders as $order) {
-                if (Order::SELL_SIDE === $order->getSide()) {
-                    $available = $available->add($order->getAmount());
-                }
-            }
-
-            $ordersCount = count($ownPendingOrders);
-            $offset += $limit;
-        } while ($ordersCount >= $limit);
-
-        return $init->subtract($available);
+        return $init->subtract($balanceView->getAvailable())
+            ->subtract($balanceView->getFreeze());
     }
 }
