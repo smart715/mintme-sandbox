@@ -121,19 +121,6 @@
                 class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
                 v-model="tabIndex"
             >
-                <token-ongoing-airdrop-campaign
-                    v-if="{{ showAirdropCampaign }}"
-                    :logged-in="{{ loggedIn }}"
-                    :is-owner="{{ isOwner }}"
-                    :token-name="'{{ token.name | default }}'"
-                    :user-already-claimed="{{ userAlreadyClaimed }}"
-                    login-url="{{ absolute_url(path('fos_user_security_login')) }}"
-                    signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
-                    youtube-client-id="{{ global_youtube_client_id }}"
-                    current-locale="{{ currentLocale }}"
-                    :show-airdrop-modal="{{ showAirdropModal }}"
-                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-                ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage and showDonation %}
                     <div class="row">
                         <donation
@@ -148,6 +135,19 @@
                         </donation>
                     </div>
                 {% endif %}
+                <token-ongoing-airdrop-campaign
+                    v-if="{{ showAirdropCampaign }}"
+                    :logged-in="{{ loggedIn }}"
+                    :is-owner="{{ isOwner }}"
+                    :token-name="'{{ token.name | default }}'"
+                    :user-already-claimed="{{ userAlreadyClaimed }}"
+                    login-url="{{ absolute_url(path('fos_user_security_login')) }}"
+                    signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
+                    youtube-client-id="{{ global_youtube_client_id }}"
+                    current-locale="{{ currentLocale }}"
+                    :show-airdrop-modal="{{ showAirdropModal }}"
+                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
                         title="{% trans %}page.pair.tab.introduction{% endtrans %}"
