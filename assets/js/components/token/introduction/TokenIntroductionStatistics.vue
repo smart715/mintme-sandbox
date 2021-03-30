@@ -82,8 +82,8 @@
                                     </template>
                                 </guide>
                             </div>
-                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
-                                {{ $t('token.intro.statistics.sold.header') }} <br v-if="isMintmeToken">
+                            <div v-if="isMintmeToken" class="pb-1">
+                                {{ $t('token.intro.statistics.sold.header') }} <br>
                                 {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
