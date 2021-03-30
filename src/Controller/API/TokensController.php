@@ -538,7 +538,6 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
         $token = $this->tokenManager->findByName($name);
-        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
         if (null === $token || !$token->isMintmeToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
@@ -552,7 +551,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             );
         }
 
-        $soldOnMarket = $this->getSoldOnMarket($token, $crypto);
+        $soldOnMarket = $this->getSoldOnMarket($token);
         $soldLimitParam = (string)$this->getParameter('token_delete_sold_limit');
         $soldLimit = $this->moneyWrapper->parse(
             $soldLimitParam,
@@ -811,14 +810,13 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      */
     public function soldOnMarket(string $name): View
     {
-        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $crypto || null === $token) {
+        if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        return $this->view($this->getSoldOnMarket($token, $crypto), Response::HTTP_OK);
+        return $this->view($this->getSoldOnMarket($token), Response::HTTP_OK);
     }
 
     /**
@@ -882,7 +880,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         return $this->view([], Response::HTTP_OK);
     }
 
-    private function getSoldOnMarket(Token $token, Crypto $crypto): Money
+    private function getSoldOnMarket(Token $token): Money
     {
         return $this->marketHandler->soldOnMarket($token);
     }
