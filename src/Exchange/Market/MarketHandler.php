@@ -667,7 +667,7 @@ class MarketHandler implements MarketHandlerInterface
     public function soldOnMarket(Token $token): Money
     {
         if (!$token->isMintmeToken()) {
-            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+            return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 
         $init = $this->moneyWrapper->parse(
