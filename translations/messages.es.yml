@@ -877,8 +877,7 @@ token.intro.statistics.holders.header:
 token.intro.statistics.holders.guide_header:
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
-token.intro.created_modal.paragraph_2.part_1: 'Los usuarios que compren tokens a través de este enlace'
-token.intro.created_modal.paragraph_2.part_2: 'comprarlo sólo a usted, al contrario de la opción de comercio. Recuerde que la comercialización de su token depende de usted y la mejor manera de atraer a los participantes es haciendo lanzamientos  de su token utilizando la función incorporada de airdrop. Así que empiece a compartir el enlace de su token ahora y ¡buena suerte!'
+token.intro.created_modal.paragraph_2:
 token.intro.created_modal.paragraph_3: 'Además, consulte nuestros artículos con consejos de marketing:'
 token.intro.created_modal.list_1.item_1: 'Es hora de la venta de tokens, ¿cómo puedo hacer la diferencia?'
 token.intro.created_modal.list_1.item_2: '¿Apuntando a un token fuerte?'
