@@ -138,7 +138,7 @@
                             <p class="info m-0" v-html="$sanitize(nonrefundHtml)"></p>
                         </div>
                     </div>
-                    <div v-if="!loggedIn">
+                    <div v-if="!loggedIn" class="d-flex justify-content-center">
                         <login-signup-switcher
                             v-show="showForms"
                             :google-recaptcha-site-key="googleRecaptchaSiteKey"
