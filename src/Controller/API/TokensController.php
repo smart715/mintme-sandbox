@@ -17,6 +17,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -24,7 +25,6 @@ use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
-use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
@@ -89,7 +89,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
-    private MarketStatusManagerInterface $marketStatusManager;
+    private MarketHandlerInterface $marketHandler;
 
     private MoneyWrapperInterface $moneyWrapper;
 
@@ -102,7 +102,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         TranslatorInterface $translator,
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
-        MarketStatusManagerInterface $marketStatusManager,
+        MarketHandlerInterface $marketHandler,
         MoneyWrapperInterface $moneyWrapper,
         int $topHolders = 10,
         int $expirationTime = 60
@@ -117,7 +117,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->translator = $translator;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
-        $this->marketStatusManager = $marketStatusManager;
+        $this->marketHandler = $marketHandler;
         $this->moneyWrapper = $moneyWrapper;
     }
 
@@ -884,12 +884,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
     private function getSoldOnMarket(Token $token, Crypto $crypto): Money
     {
-        // todo: use marketStats.soldOnMarket instead of calling different gateway.
-        $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($crypto, $token));
-
-        return $marketStatus
-            ? $marketStatus->getSoldOnMarket()
-            : $this->moneyWrapper->parse('0', Symbols::TOK);
+        return $this->marketHandler->soldOnMarket($token);
     }
 
     private function validateEthereumAddress(string $address): bool
