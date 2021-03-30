@@ -12,6 +12,7 @@ class DonationFetcher implements DonationFetcherInterface
 {
     private const CHECK_DONATION_METHOD = 'order.check_donation';
     private const MAKE_DONATION_METHOD = 'order.make_donation';
+    private const PLACE_DONATION_METHOD = 'order.put_donation';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -40,6 +41,33 @@ class DonationFetcher implements DonationFetcherInterface
 
         $this->checkResponseForError($response);
         /** @var array<string> $result */
+        $result = $response->getResult();
+
+        return new CheckDonationResult(
+            $result[0] ?? '0',
+            $result[1] ?? '0'
+        );
+    }
+
+    public function placeDonation(
+        int $userId,
+        string $market,
+        string $amount,
+        string $maxPrice,
+        string $fee,
+        int $tokenCreatorId
+    ): CheckDonationResult {
+        $response = $this->jsonRpc->send(self::PLACE_DONATION_METHOD, [
+            $userId + $this->config->getOffset(),
+            $market,
+            $maxPrice,
+            $amount,
+            $fee,
+            $tokenCreatorId + $this->config->getOffset(),
+        ]);
+
+        $this->checkResponseForError($response);
+
         $result = $response->getResult();
 
         return new CheckDonationResult(
