@@ -159,11 +159,11 @@
                                                 {% trans %}token.intro.statistics.withdraw.header{% endtrans %} <br>
                                                 {{ tradeInfo.withdrawn | toMoney(precision, false) }}
                                             </div>
-                                            {% endif %}
                                             <div class="pb-1">
                                                 {% trans %}token.intro.statistics.sold.header{% endtrans %} <br>
                                                 {{ tradeInfo.soldOnMarket | toMoney(precision, false) }}
                                             </div>
+                                            {% endif %}
                                             <div class="pb-1">
                                                 {% trans %}token.intro.statistics.donation.header{% endtrans %} <br>
                                                 {{ tradeInfo.volumeDonation | toMoney(precision, false) }}

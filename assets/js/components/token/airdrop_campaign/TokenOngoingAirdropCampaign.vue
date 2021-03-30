@@ -165,7 +165,10 @@
                                     </font-awesome-layers>
                                     <div class="ml-4 pl-2 d-flex flex-column align-items-start w-75">
                                         <span>{{ $t('airdrop.actions.post_link') }}</span>
-                                        <a :href="tokenUrl" class="truncate-name w-100">{{ tokenUrl }}</a>
+                                        <copy-link :content-to-copy="tokenUrl" class="c-pointer row mr-0 w-100">
+                                            <a href="#" class="col truncate-name pr-2">{{ tokenUrl }}</a>
+                                            <font-awesome-icon :icon="['far', 'copy']"/>
+                                        </copy-link>
                                     </div>
                                     <span class="ml-auto">
                                         {{ airdropCampaign.actions.postLink.done ? '1' : '0' }}/1
@@ -173,13 +176,13 @@
                                 </div>
                                 <div class="d-flex flex-column my-3" v-if="airdropCampaign.actions.postLink">
                                     <div class="clearfix">
-                                        <div class="float-right">
+                                        <div class="float-left">
                                             <div
-                                                v-if="blackListedDomain"
+                                                v-if="domainErrorMessage"
                                                 class="alert alert-danger alert-float"
                                             >
                                                 <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
-                                                {{ $t('api.airdrop.forbidden_domain', {domain: postLinkUrl}) }}
+                                                {{ domainErrorMessage }}
                                             </div>
                                         </div>
                                     </div>
@@ -300,7 +303,7 @@ export default {
             showDuration: true,
             postLinkUrl: '',
             showConfirmTwitterMessageModal: false,
-            checkingBlackListedDomain: false,
+            checkingBlackListedDomain: true,
             blackListedDomain: false,
             checkDomainTimeout: null,
             referralCode: null,
@@ -449,12 +452,33 @@ export default {
             return this.$routing.generate('token_show', {name: this.tokenName, tab: 'intro', modal: 'airdrop'}, true);
         },
         postLinkUrlDisabled() {
-            return this.blackListedDomain || this.checkingBlackListedDomain || this.$v.postLinkUrl.$invalid;
+            return this.checkingBlackListedDomain
+                || this.blackListedDomain
+                || this.$v.postLinkUrl.$invalid;
+        },
+        domainErrorMessage() {
+            if (this.$v.postLinkUrl.required && !this.$v.postLinkUrl.startsWith) {
+                return this.$t('api.airdrop.url_start_with');
+            }
+
+            if (!this.$v.postLinkUrl.url) {
+                return this.$t('api.airdrop.invalid_url');
+            }
+
+            if (this.blackListedDomain) {
+                return this.$t('api.airdrop.forbidden_domain', {
+                    domain: (new URL(this.postLinkUrl)).hostname,
+                });
+            }
+
+            return '';
         },
     },
     watch: {
         postLinkUrl: function() {
             clearTimeout(this.checkDomainTimeout);
+            this.checkingBlackListedDomain = true;
+            this.blackListedDomain = false;
             this.checkDomainTimeout = setTimeout(this.checkBlacklistedDomain, 500);
         },
     },
@@ -672,13 +696,12 @@ export default {
             });
         },
         checkBlacklistedDomain: function() {
-            if (!this.postLinkUrl) {
+            if (this.$v.postLinkUrl.$invalid) {
                 this.blackListedDomain = false;
                 this.checkingBlackListedDomain = false;
                 return;
             }
 
-            this.checkingBlackListedDomain = true;
             this.$axios.retry.get(
                 this.$routing.generate('airdrop_domain_blacklist_check', {domain: this.postLinkUrl})
             ).then(({data}) => {
@@ -695,6 +718,7 @@ export default {
         return {
             postLinkUrl: {
                 required: (val) => required(val.trim()),
+                startsWith: (val) => /^https?:\/\//.test(val),
                 url,
             },
         };

@@ -150,9 +150,9 @@ new Vue({
     checkTokenDeployment: function() {
       clearInterval(this.deployInterval);
       this.deployInterval = setInterval(() => {
-          this.$axios.single.get(this.$routing.generate('is_token_deployed', {name: this.tokenName}))
+          this.$axios.single.get(this.$routing.generate('token_deployment_status', {name: this.tokenName}))
           .then((response) => {
-            if (response.data.deployed === tokenDeploymentStatus.deployed) {
+            if (response.data.status === tokenDeploymentStatus.deployed) {
                 this.tokenDeployed = true;
                 this.tokenPending = false;
                 this.showDeployedOnBoard = true;
