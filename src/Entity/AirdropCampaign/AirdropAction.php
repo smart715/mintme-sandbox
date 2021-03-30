@@ -45,8 +45,8 @@ class AirdropAction
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\User")
      * @ORM\JoinTable(name="airdrop_action_user",
-     *      joinColumns={@ORM\JoinColumn(name="airdrop_action_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="airdrop_action_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
      *      )
      * @var ArrayCollection
      */
