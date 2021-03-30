@@ -78,7 +78,7 @@ build_mintme_sites:
   script:
     - SRC=$(pwd)
     - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
-    - php bin/console app:load-translations-ui
+    - make generate_translations
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
@@ -90,7 +90,7 @@ staging_release:
   stage: build-sites
   script:
     - sudo /root/update-staging.sh $CI_COMMIT_REF_NAME
-    - php bin/console app:load-translations-ui
+    - make generate_translations
   tags:
     # This job only will be executed by this runner:
     - staging
