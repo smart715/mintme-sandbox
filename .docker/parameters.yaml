@@ -181,3 +181,4 @@ parameters:
         attempts: 3
         interval: 30D
     mintme_explorer_url: 'https://mintme.com/explorer'
+    minimum_order_value: 0.1

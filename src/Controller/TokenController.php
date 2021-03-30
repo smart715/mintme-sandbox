@@ -513,6 +513,7 @@ class TokenController extends Controller
                 'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
                 'post' => null,
                 'comments' => [],
+                'minimumOrderValue' => $this->getParameter('minimum_order_value'),
             ], $extraData)
         );
     }
