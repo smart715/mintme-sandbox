@@ -280,8 +280,14 @@ class ProfileController extends Controller
 
         $token = $profile->getMintmeToken();
 
+        if ($token) {
+            $token = $token->isBlocked()
+                ? null
+                : $token;
+        }
+
         return $this->render('pages/profile.html.twig', [
-            'token' => $token->isBlocked() ? null : $token,
+            'token' => $token,
             'profile' => $profile,
             'savedNickname' => $clonedProfile->getNickname(),
             'profileDescription' => substr($profileDescription, 0, 200),
