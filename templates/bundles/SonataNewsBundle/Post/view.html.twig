@@ -3,18 +3,20 @@
 {% if post.image is not null %}
     {% set metaImage %}{% path post.image, 'reference' %}{% endset %}
 {% endif %}
-{% set metaTitle = post.title ~ ' | mintMe' %}
-{% set metaImageAlt = post.title %}
+{% set title = post|translateArticle('title') %}
+{% set abstract = post|translateArticle('abstract') %}
+{% set metaTitle = title ~ ' | mintMe' %}
+{% set metaImageAlt = title %}
 
 {% block title %}
 {% spaceless %}
-    {{ post.title }} | mintMe
+    {{ title }} | mintMe
 {% endspaceless %}
 {% endblock %}
 
 {% block metaDescription %}
-    <meta property="og:description" content="{{ post.abstract }}">
-    <meta name="description" content="{{ post.abstract }}">
+    <meta property="og:description" content="{{ abstract }}">
+    <meta name="description" content="{{ abstract }}">
 {% endblock %}
 
 {% block contentClass %}blog{% endblock %}
