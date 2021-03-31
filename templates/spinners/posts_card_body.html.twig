@@ -22,20 +22,14 @@
                     <p class="bbcode-content">{{ post.content | bbcode | raw }}</p>
                     <a
                             href="{{ path('show_post', {id: post.id}) }}"
-                            class="text-decoration-none post-date">
-                        {{ post.createdAt | date('H:m M d, Y') }}
+                            class="hover-icon text-decoration-none text-white">
+                                                        <span class="social-link ml-1">
+                                                            {{ post.commentsCount }} {% trans %}post.comments{% endtrans %}
+                                                        </span>
                     </a>
                 </div>
-                <p class="bbcode-content">{{ post.content | bbcode | raw }}</p>
-                <a
-                        href="{{ path('show_post', {id: post.id}) }}"
-                        class="hover-icon text-decoration-none text-white">
-                                                    <span class="social-link ml-1">
-                                                        {{ post.commentsCount }} {% trans %}post.comments{% endtrans %}
-                                                    </span>
-                </a>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 {% else %}
     <div class="card-body h-100 d-flex align-items-center justify-content-center">
