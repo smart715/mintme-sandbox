@@ -29,7 +29,29 @@ class KnowledgeBaseSubcategoryAdmin extends AbstractAdmin
 
     protected function configureFormFields(FormMapper $form): void
     {
-        $form->add('name', TextType::class);
+        $form
+            ->add('name', TextType::class)
+            ->add('esName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('arName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('frName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('plName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('ptName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('ruName', TextType::class, [
+                'required' => false,
+            ])
+            ->add('uaName', TextType::class, [
+                'required' => false,
+            ]);
     }
 
     protected function configureListFields(ListMapper $listMapper): void
