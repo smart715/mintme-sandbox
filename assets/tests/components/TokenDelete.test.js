@@ -51,7 +51,7 @@ describe('TokenDelete', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
             data: () => ({
-                soldOnMarket: null,
+                isTokenOverDeleteLimit: null,
             }),
             propsData: {
                 isTokenNotDeployed: false,
@@ -63,13 +63,13 @@ describe('TokenDelete', () => {
         expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setData({soldOnMarket: 120000});
+        wrapper.setData({isTokenOverDeleteLimit: true});
         wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.vm.loaded).toBe(true);
         expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setData({soldOnMarket: 2500});
+        wrapper.setData({isTokenOverDeleteLimit: false});
         wrapper.setProps({isTokenNotDeployed: false});
         expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
@@ -83,7 +83,7 @@ describe('TokenDelete', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
             data: () => ({
-                soldOnMarket: 0,
+                isTokenOverDeleteLimit: false,
             }),
             propsData: {
                 isTokenNotDeployed: true,
