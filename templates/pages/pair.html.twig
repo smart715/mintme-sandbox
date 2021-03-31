@@ -32,7 +32,7 @@
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
-{% set showAirdropModal = showAirdropModal ? 'true' : 'false' %}
+{% set showAirdropModal = showAirdropModal is defined ? 'true' : 'false' %}
 
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}

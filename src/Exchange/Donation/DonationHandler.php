@@ -267,10 +267,39 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         $feeAmount = $this->calculateFee($amountInCrypto);
-        $donation = $this->saveDonation($donorUser, $tokenCreator, $currency, $amountInCrypto, $feeAmount, $expectedAmount, $token);
+        $donation = $this->saveDonation(
+            $donorUser,
+            $tokenCreator,
+            $currency,
+            $amountInCrypto,
+            $feeAmount,
+            $expectedAmount,
+            $token
+        );
+
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
 
         return $donation;
+    }
+
+    private function placeDonationOrders(
+        Market $market,
+        User $donor,
+        Money $expectedAmount,
+        Money $maxPrice,
+        string $fee,
+        User $tokenCreator
+    ): void {
+        $marketName = $this->marketNameConverter->convert($market);
+
+        $this->donationFetcher->placeDonation(
+            $donor->getId(),
+            $marketName,
+            $this->moneyWrapper->format($expectedAmount),
+            $this->moneyWrapper->format($maxPrice),
+            $fee,
+            $tokenCreator->getId()
+        );
     }
 
     public function getTokensWorth(string $tokensWorth, string $currency): string
