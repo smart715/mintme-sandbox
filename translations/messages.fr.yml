@@ -115,15 +115,15 @@ page.index.promo.description: ''
 page.index.promo.btn.register: ''
 page.index.promo.btn.trade: 'Echanger maintenant'
 page.index.block_1.header: 'COMMENT CELA FONCTIONNE?'
-page.index.block_1.body: ''
-page.index.block_2.section_1.header: ''
-page.index.block_2.section_1.body: ''
-page.index.block_2.section_2.header: ''
-page.index.block_2.section_2.body: ''
-page.index.block_3.header: ''
-page.index.block_3.section_1: ''
-page.index.block_3.section_2: ''
-page.index.block_3.section_3: ''
+page.index.block_1.body: 'Tout le monde peut frapper ou créer un jeton (pièce) qui le représente ou qui représente un projet qu''il a créé pour ses fans et ses supporters pour les soutenir. <br /> Cela aide les créateurs de contenu à réaliser leur potentiel maximum grâce à une nouvelle méthode innovante de financement participatif. C''est aussi une plate-forme sociale où les commerçants <br /> peuvent interagir avec les créateurs de jetons et d''autres commerçants. Les jetons sont créés (frappés) au-dessus de notre blockchain décentralisée personnalisée appelée <a href="https://www.mintme.com/coin/"> MintMe Coin </a>. <br /> Lorsque vous créez des pièces ou créez jeton, vous devenez propriétaire de votre propre avenir financier. Créez un jeton, créez une pièce pour votre projet ou pour vous-même ou échangez simplement des pièces d''autres personnes.'
+page.index.block_2.section_1.header: 'Si vous êtes un créateur de contenu'
+page.index.block_2.section_1.body: 'Créez votre jeton/pièce en quelques clics <br/> Créez un ordre et le vendre sur le marché <br/> Encouragez vos abonnés à acheter votre jeton'
+page.index.block_2.section_2.header: 'Si vous êtes un trader'
+page.index.block_2.section_2.body: 'Recherchez un créateur de contenu talentueux possédant un potentiel de croissance <br/> Achetez son jeton pour le soutenir <br/> Échangez ce jeton une fois que la valeur du Créateur a augmenté'
+page.index.block_3.header: 'C''est très facile!'
+page.index.block_3.section_1: 'Frappez/Créez votre jeton (pièce) gratuitement et encouragez les autres à vous soutenir'
+page.index.block_3.section_2: 'Gagnez et aidez en soutenant vos créateurs favoris'
+page.index.block_3.section_3: 'Socialisez avec les créateurs et autres traders directement sur la plateforme'
 page.index.block_3.section_4: ''
 page.index.block_4.btn.register: 'S''enregistrer maintenant'
 page.index.block_4.btn.trade: 'Echanger maintenant'
@@ -480,19 +480,19 @@ token_marketing_tips.msg: 'Consulter cet article <a href="%url%">%title%</a>'
 mail.token_marketing_tips.msg: 'Consulter cet article'
 userNotification.title: Notifications
 userNotification.no_notifications_yet: 'Aucune notification pour l''instant.'
-userNotification.config.settings: ''
-userNotification.config.receive_not_about: ''
-userNotification.config.title: ''
-userNotification.config.manage: ''
-userNotification.config.updated: ''
-userNotification.type.deposit: ''
-userNotification.type.withdrawal: ''
-userNotification.type.new_investor: ''
-userNotification.type.new_post: ''
+userNotification.config.settings: 'Paramètres de notification'
+userNotification.config.receive_not_about: 'Recevoir les notifications à propos:'
+userNotification.config.title: Notifications
+userNotification.config.manage: 'Gérer les notifications'
+userNotification.config.updated: 'Configuration mise à jour avec succès'
+userNotification.type.deposit: Dépôts
+userNotification.type.withdrawal: Retraits
+userNotification.type.new_investor: 'Nouveaux Investisseurs'
+userNotification.type.new_post: 'Post lié à votre jeton'
 userNotification.type.deployed: 'Jetons détenus nouvellement déployés'
-userNotification.type.order_filled: ''
-userNotification.type.order_cancelled: ''
-userNotification.type.token_marketing_tips: ''
+userNotification.type.order_filled: 'Ordres complétés'
+userNotification.type.order_cancelled: 'Ordres annulés'
+userNotification.type.token_marketing_tips: 'Actuces marketing du jeton'
 password_reset.reseted: 'Votre mot de passe a été %action%.'
 token_deleted.finished.1: 'Votre requête de suppression du jeton <strong>%tokenName%</strong> de '
 token_deleted.finished.2: 'a été terminée avec succès'
@@ -535,7 +535,7 @@ log_out: Déconnexion
 rights_reserved: ''
 terms_of_service: ''
 privacy_policy: 'Politique de &nbsp;Confidentialité'
-'yes': ''
+'yes': Oui
 'no': Non
 anonymous: Anonyme
 hello: Salut
@@ -691,22 +691,22 @@ token_edit_modal.delete: 'Supprimer le jeton'
 2fa_modal.submit: 'Code de vérification'
 2fa_modal.cancel: Annuler
 2fa_modal.require: 'Code requis'
-withdraw_modal.title: ''
-withdraw_modal.address: ''
-withdraw_modal.wrong_address: ''
-withdraw_modal.amount: ''
-withdraw_modal.all: ''
+withdraw_modal.title: RETRATI
+withdraw_modal.address: 'Adresse:'
+withdraw_modal.wrong_address: 'Adresse erronée'
+withdraw_modal.amount: 'Montant (solde):'
+withdraw_modal.all: Tout
 withdraw_modal.do_not_have: ''
 withdraw_modal.min_withdraw: ''
-withdraw_modal.invalid_amount: ''
+withdraw_modal.invalid_amount: 'Montant invalide.'
 withdraw_modal.twofa_code: ''
-withdraw_modal.fee: ''
-withdraw_modal.total: ''
-withdraw_modal.submit: ''
-withdraw_modal.cancel: ''
+withdraw_modal.fee: 'Frais de retrait:'
+withdraw_modal.total: 'Total à retirer:'
+withdraw_modal.submit: Retrait
+withdraw_modal.cancel: Annuler
 withdraw_modal.confirmation_sent: ''
 withdraw_modal.length: ''
-withdraw_modal.invalid_addr: ''
+withdraw_modal.invalid_addr: 'Adresse du portefeuille invalide'
 post.logged_in.1: ''
 post.logged_in.2: ''
 post.not_logged: ''
@@ -826,7 +826,7 @@ token.deploy_icon.img_alt.not_deployed: non-déployé
 token.deploy_icon.doesnt_exist_on_blockchain: ''
 token.intro.description.header: Description
 token.intro.description.guide_header: Description
-token.intro.description.guide_body: ''
+token.intro.description.guide_body: 'Description de vos objectifs, plans et promesses. Tout ce dont vous devez savoir avant d''acheter %name%.'
 token.intro.description.plan: 'Veuillez décrire les objectifs, plans et promesses'
 token.intro.description.plan.header: 'A propos de votre plan:'
 token.intro.description.plan.guide_header: 'A propos de votre plan:'
@@ -838,7 +838,7 @@ token.intro.description.cancel: Annuler
 token.intro.profile.visit: 'Visiter le profil du créateur du jeton'
 token.intro.profile.spread: 'Voulez-vous aider le créateur du jeton? Faire connaître!'
 token.intro.profile.join_us: 'Rejoignez-nous sur:'
-token.intro.profile.twitter_description: ''
+token.intro.profile.twitter_description: 'Un bon moyen pour le support mutuel. Consultez ce jeton et analysez l''évolution de l''idée:'
 token.intro.profile.contract_address: 'L''adresse du contrat du jeton:'
 token.intro.profile.contract_address.header: 'L''adresse du contrat du jeton'
 token.intro.profile.contract_address.body: 'Unique adresse du contrat du jeton. Cela existe uniquement pour les jetons présents sur la chaîne de blocs.'
@@ -887,14 +887,14 @@ token.intro.created_modal.paragraph_1.part_1: 'Féliciations '
 token.intro.created_modal.paragraph_1.part_2: ''
 token.intro.created_modal.paragraph_2.part_1: ''
 token.intro.created_modal.paragraph_2.part_2: ''
-token.intro.created_modal.paragraph_3: ''
+token.intro.created_modal.paragraph_3: 'Consultez également nos articles ayant des actuces marketing:'
 token.intro.created_modal.list_1.item_1: 'Temps de la vente des jetons, comment puis-je faire la différence?'
 token.intro.created_modal.list_1.item_2: 'Vous visez un jeton fort?'
 token.intro.created_modal.list_1.item_3: 'Idées pour promouvoir et vendre votre jeton'
 token.intro.created_modal.list_1.item_4: 'Bloqué ne savant pas quoi faire après?'
 token.intro.created_modal.list_1.item_5: 'Parler de MintMe à vos abonnés? Nos avons des idées!'
-token.intro.created_modal.paragraph_4: ''
-token.intro.created_modal.paragraph_5: ''
+token.intro.created_modal.paragraph_4: 'Pour de meilleurs résultats, vous devez constamment éduquer les gens lorsque vous les invitez, alors n''oubliez pas cela!'
+token.intro.created_modal.paragraph_5: 'Considérez déployer votre jeton pour lequel vous obtiendrez les bénéfices suivants:'
 token.intro.created_modal.list_2.item_1: 'Cela peut être retiré et déposé'
 token.intro.created_modal.list_2.item_2: 'Meilleure position sur la page d''échange'
 token.intro.created_modal.paragraph_6.part_1: Lire
@@ -915,22 +915,22 @@ token.facebook.cancel: Annuler
 token.facebook.guide_header: Facebook
 token.facebook.guide_body: 'Lien à la page Facebook du créateur du jeton. Avant l''ajout, nous vérifions la propriété'
 token.facebook.empty_address: 'Ajouter l''adresse Facebook'
-token.website.label: ''
-token.website.invalid_url: ''
-token.website.save: ''
-token.website.more_info: ''
-token.website.ok: ''
+token.website.label: 'Adresse du site internet:'
+token.website.invalid_url: 'Fournir une URL valide'
+token.website.save: Sauvegarder
+token.website.more_info: 'Plus d''information à propos des codes d''état HTTP.'
+token.website.ok: OK
 token.website.cancel: ''
 token.website.confirmation_title: ''
 token.website.download_1: ''
 token.website.download_2: ''
-token.website.submit: ''
-token.website.upload: ''
+token.website.submit: Confirmer
+token.website.upload: 'Téléverser le fichier vers %parsedWebsite%'
 token.website.check: ''
 token.website.click: ''
-token.website.empty_address: ''
+token.website.empty_address: 'Ajouter un site internet'
 token.website.view_label: 'Web:'
-token.website.guide_header: ''
+token.website.guide_header: Web
 token.website.guide_body: 'Lien au site internet du créateur du jeton. Avant l''ajout, nous vérifions la propriété'
 token.youtube.empty_address: 'Ajouter une chaîne Youtube'
 token.youtube.view_label: 'Youtube:'
@@ -952,9 +952,9 @@ token.social_media.email: ''
 token.social_media.facebook: ''
 token.social_media.linkedin: ''
 token.social_media.reddit: ''
-token.social_media.telegram: ''
-token.social_media.twitter: ''
-token.social_media.twitter_description: ''
+token.social_media.telegram: Telegram
+token.social_media.twitter: Twitter
+token.social_media.twitter_description: 'Un bon moyen pour le support mutuel. Consultez ce jeton et analysez l''évolution de l''idée:'
 token.social_media.hashtags: ''
 token.discord.label: 'Adresse Discord:'
 token.discord.invalid_url: 'Fournir une URL valide'
@@ -962,10 +962,10 @@ token.discord.empty_address: 'Ajouter le lien d''invitation Discord'
 token.discord.submit: Sauvegarder
 token.discord.cancel: Annuler
 token.telegram.label: ''
-token.telegram.invalid_url: ''
-token.telegram.empty_address: ''
+token.telegram.invalid_url: 'Fournir une URL valide.'
+token.telegram.empty_address: 'Ajouter le lien d''invitation Telegram'
 token.telegram.submit: ''
-token.telegram.cancel: ''
+token.telegram.cancel: Annuler
 token.searcher.placeholder: ''
 token_reminder.msg.description: 'Bien vouloir ajouter un description à votre <strong>%tokenName%,</strong>'
 token_reminder.msg.description.2: 'cela augmentera considérablement ses chances de réussite'
@@ -976,7 +976,7 @@ trade.top_holders.header: 'Principaux détenteurs'
 trade.top_holders.no_holders: 'Aucun détenteur pour l''instant'
 trade.top_holders.trader: Trader
 trade.top_holders.date: Date
-trade.top_holders.amount: ''
+trade.top_holders.amount: Montant
 trade.buy_orders.header: 'Ordres d''achat'
 trade.buy_orders.header_total: 'Total:'
 trade.buy_orders.guide_header: 'Ordres d''achat'
@@ -1008,7 +1008,7 @@ trade.chart.market_cap.body: 'Capitalisation du marché:'
 trade.chart.market_cap.info: ''
 trade.chart.change.header: 'échange sur 24h/30j:'
 trade.chart.change.guide_header: 'échange sur 24h/30j'
-trade.chart.change.guide_body: ''
+trade.chart.change.guide_body: 'Evolution des prix ces dernières 24 heures et ces 30 derniers jours.'
 trade.chart.volume_token.header: 'Volume en 24h/30j:'
 trade.chart.volume_token.guide_header: 'Volume en 24h/30j'
 trade.chart.volume_token.guide_body: 'Quantitié de %quoteSymbol% ayant été échangée ces dernières 24 heures et ces 30 derniers jours.'
@@ -1035,17 +1035,17 @@ trade.history.time: 'Date et heure'
 trade.orders.disabled: 'Echanges désactivés'
 trade.buy_order.header: 'Ordre d''achat'
 trade.buy_order.guide_header: 'Ordre d''achat'
-trade.buy_order.guide_body: ''
+trade.buy_order.guide_body: 'Formulaire utilisé pour créer un ordre afin que vous puissiez acheter %baseSymbol% ou faire une offre.'
 trade.buy_order.your.header: Votre
 trade.buy_order.your.guide_header: 'Votre %baseSymbol%'
 trade.buy_order.your.guide_body: 'Votre solde %baseSymbol%'
 trade.buy_order.deposit_more: 'Déposer plus'
-trade.buy_order.market_price.header: ''
-trade.buy_order.market_price.guide_header: ''
-trade.buy_order.market_price.guide_body: ''
+trade.buy_order.market_price.header: 'Prix du marché'
+trade.buy_order.market_price.guide_header: 'Prix du marché'
+trade.buy_order.market_price.guide_body: 'Cochez cette case pour obtenir le meilleur prix du marché actuel pour lequel vous pouvez acheter %rebrandedQuoteSymbol%.'
 trade.buy_order.price_in.header: 'Prix en %baseSymbol%:'
 trade.buy_order.price_in.guide_header: 'Prix en %baseSymbol%:'
-trade.buy_order.price_in.guide_body: ''
+trade.buy_order.price_in.guide_body: 'Prix auquel vous souhaitez acheter un %quoteSymbol%'
 trade.buy_order.total_price.header: 'Prix Total:'
 trade.buy_order.total_price.guide_header: 'Prix Total:'
 trade.buy_order.total_price.guide_body: 'Montant total à payer, incluant les frais d''échange.'
@@ -1074,15 +1074,15 @@ trade.sell_order.submit: 'Créer un ordre de vente'
 trading.crypto.header: Crypto
 trading.crypto.spinner: '0 jetons | Capitalisation du marché: 0 BTC'
 trading.header: 'Principaux jetons %tokensCount%'
-trading.i_own: 'Jetons possédés'
+trading.i_own: 'Mes jetons'
 trading.header_24h: 'Volume en 24h'
 trading.body_24h: 'Quantité de cryptos échangée ces dernières 24 heures.'
 trading.header_30d: 'Volume en 30j'
 trading.body_30d: 'Quantité de cryptos échangée ces 30 derniers jours.'
-trading.table.pair: ''
-trading.table.change: ''
+trading.table.pair: Paire
+trading.table.change: Echanger
 trading.table.last_price: 'Dernier prix'
-trading.table.volume_24h: ''
+trading.table.volume_24h: 'Volume en 24 heures'
 trading.table.volume_30d: 'Volume en 30j'
 trading.mintme_markets: 'Marchés MINTME'
 trading.tokens: Jetons
@@ -1090,15 +1090,15 @@ trading.currency.usd: USD
 trading.currency.crypto: Crypto
 trading.tokens_and_market_cap: 'jetons | Capitalisation du marché:'
 trading.exist_on_blockchain_guide: 'Ce jeton existe sur la chaîne de blocs'
-trading.no_one_deployed: ''
-trading.no_one_airdrop: ''
+trading.no_one_deployed: 'Aucun jeton déployé'
+trading.no_one_airdrop: 'Aucun airdrop de jetons actif'
 trading.no_any_token: 'Aucun jeton pour l''instant'
-trading.show_all_tokens: ''
+trading.show_all_tokens: 'Afficher tous les jetons'
 trading.deployed.label: 'Déployé sur MINTME'
 trading.deployed_eth.label: 'Déployé sur ETH'
 trading.airdrop.label: 'Airdrop de jetons actif'
 trading.all_tokens.label: 'Tous les jetons'
-trading.own_tokens.label: ''
+trading.own_tokens.label: 'Mes jetons'
 trading.day_volume.label: 'Volume en 24 heures'
 trading.day_volume.help: 'Quantité de cryptos échangée ces dernières 24 heures.'
 trading.month_volume.label: 'Volume en 30 jours'
@@ -1110,49 +1110,49 @@ trading.buy_depth.help: 'La demande est le montant d''ordres d''achat sur MINTME
 trading.fields.pair: Nom
 trading.fields.change: Echange
 trading.fields.last_price: 'Dernier prix'
-wallet.balance: ''
-wallet.deposit: ''
+wallet.balance: Solde
+wallet.deposit: Dépôt
 wallet.withdraw: Retrait
 wallet.own_tokens: 'Jetons détenus'
-wallet.name: ''
-wallet.amount: ''
-wallet.create_token_1: ''
-wallet.create_token_2: ''
+wallet.name: Nom
+wallet.amount: Quantité
+wallet.create_token_1: Créer
+wallet.create_token_2: 'votre propre jeton'
 wallet.no_tokens_1: ''
-wallet.no_tokens_2: ''
-wallet.no_tokens_3: ''
+wallet.no_tokens_2: 'page d''échange'
+wallet.no_tokens_3: 'Débutez l''échange maintenant.'
 wallet.table.name: Nom
-wallet.table.available: ''
+wallet.table.available: Quantité
 wallet.table.action: Actions
-wallet.loading: ''
+wallet.loading: Chargement...
 wallet.send_to_address: 'Envoyer %currency% à l''adresse ci-dessus.'
-wallet.active_orders.no_order: ''
-wallet.active_orders.confirm_body: ''
-wallet.active_orders.table.date: ''
-wallet.active_orders.table.type: ''
-wallet.active_orders.table.name: ''
-wallet.active_orders.table.amount: ''
-wallet.active_orders.table.price: ''
-wallet.active_orders.table.total_cost: ''
-wallet.active_orders.table.fee: ''
-wallet.active_orders.table.action: ''
-wallet.history.no_transactions: ''
-wallet.history.date: ''
-wallet.history.type: ''
-wallet.history.symbol: ''
-wallet.history.to_address: ''
-wallet.history.amount: ''
-wallet.history.status: ''
-wallet.history.fee: ''
+wallet.active_orders.no_order: 'Aucun ordre ajouté'
+wallet.active_orders.confirm_body: 'Voulez-vous vraiment retirer %name% ayant cette quantité %amount% et ce prix %price%'
+wallet.active_orders.table.date: Date
+wallet.active_orders.table.type: Type
+wallet.active_orders.table.name: Nom
+wallet.active_orders.table.amount: Quantité
+wallet.active_orders.table.price: Prix
+wallet.active_orders.table.total_cost: 'Coût total'
+wallet.active_orders.table.fee: Frais
+wallet.active_orders.table.action: Action
+wallet.history.no_transactions: 'Aucune transaction ajoutée'
+wallet.history.date: Date
+wallet.history.type: Type
+wallet.history.symbol: Nom
+wallet.history.to_address: Adresse
+wallet.history.amount: Quantité
+wallet.history.status: Statut
+wallet.history.fee: Frais
 wallet.trading_history.no_deals: 'Aucune transaction n''a encore été éffectuée'
-wallet.trading_history.table.date: ''
+wallet.trading_history.table.date: Date
 wallet.trading_history.table.type: Type
-wallet.trading_history.table.name: ''
-wallet.trading_history.table.amount: ''
+wallet.trading_history.table.name: Nom
+wallet.trading_history.table.amount: Quantité
 wallet.trading_history.table.price: Prix
 wallet.trading_history.table.total_cost: 'Coût total'
-wallet.trading_history.table.fee: ''
-wallet.buy_crypto: ''
+wallet.trading_history.table.fee: Frais
+wallet.buy_crypto: 'Acheter crypto'
 chat.chat_widget.direct_messages: 'Messages directs'
 chat.chat_contacts.select_contact: 'Selectionner un contact'
 chat.chat_contacts.no_contacts: 'Aucun contact'
@@ -1170,19 +1170,19 @@ place_order.too_small: ''
 mixin.websocket.hash_not_set: 'Hash non spécifié. Ne peut autoriser l''utilisateur'
 mixin.websocket.authorize_failed: 'Echec d''authorisation de l''utilisateur actuel. Echec de la réponse du serveur'
 mixin.websocket.server_not_respond: 'Aucune réponse du serveur'
-utils.markitup.link: ''
-utils.markitup.picture: ''
-utils.markitup.headings: ''
-utils.markitup.heading_level: ''
-utils.markitup.bold: ''
-utils.markitup.italic: ''
-utils.markitup.underline: ''
-utils.markitup.strikethrough: ''
-utils.markitup.unordered_list: ''
-utils.markitup.ordered_list: ''
-utils.markitup.list_item: ''
-utils.markitup.paragraph: ''
-utils.markitup.youtube: ''
+utils.markitup.link: Lien
+utils.markitup.picture: Image
+utils.markitup.headings: Entêtes
+utils.markitup.heading_level: 'Niveau entête %level%'
+utils.markitup.bold: Gras
+utils.markitup.italic: Italique
+utils.markitup.underline: Souligné
+utils.markitup.strikethrough: Barré
+utils.markitup.unordered_list: 'Liste non-numérotée'
+utils.markitup.ordered_list: 'Liste numérotée'
+utils.markitup.list_item: 'Liste des éléments'
+utils.markitup.paragraph: Paragraphe
+utils.markitup.youtube: Youtube
 toasted.info.operation_canceled: ''
 toasted.info.enable_2fa_before: ''
 toasted.error.network: ''
@@ -1280,8 +1280,8 @@ token.creation.disabled: ''
 trade.page.disabled: 'La page d''échange a été désactivée. Réessayez plus tard.'
 donate.page.disabled: 'Page d''achat désactivée. Essayer plus tard.'
 donate.disabled: 'Achats directs désactivés'
-twitter.sign_in: ''
-twitter.must_sign_in: ''
+twitter.sign_in: 'Connectez-vous avec Twitter'
+twitter.must_sign_in: 'Connectez-vous avec twitter pour terminer cette action.'
 mail.verification_code: 'Votre code de vérification:'
 404.post: 'Post introuvable'
 404.article: 'Article introuvable'
