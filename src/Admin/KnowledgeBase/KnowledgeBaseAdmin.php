@@ -51,8 +51,22 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('category', null)
             ->add('subcategory', null)
             ->add('title')
+            ->add('esTitle')
+            ->add('arTitle')
+            ->add('frTitle')
+            ->add('plTitle')
+            ->add('ptTitle')
+            ->add('ruTitle')
+            ->add('uaTitle')
             ->add('url')
-            ->add('description');
+            ->add('description')
+            ->add('esDescription')
+            ->add('arDescription')
+            ->add('frDescription')
+            ->add('plDescription')
+            ->add('ptDescription')
+            ->add('ruDescription')
+            ->add('uaDescription');
     }
 
     protected function configureFormFields(FormMapper $form): void
@@ -66,7 +80,99 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('url', TextType::class)
             ->add('description', CKEditorType::class, [
                 'label' => 'Description (allow HTML tags)',
-            ]);
+            ])
+            ->end()
+            ->with('spanish', [
+                'class' => 'col-md-12',
+                'label' => 'Spanish translation',
+            ])
+            ->add('esTitle', TextType::class, [
+                'required' => false,
+                'label' => 'ES Title',
+            ])
+            ->add('esDescription', CKEditorType::class, [
+                'label' => 'ES Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('arabic', [
+                'class' => 'col-md-12',
+                'label' => 'Arabic translation',
+            ])
+            ->add('arTitle', TextType::class, [
+                'required' => false,
+                'label' => 'AR Title',
+            ])
+            ->add('arDescription', CKEditorType::class, [
+                'label' => 'AR Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('french', [
+                'class' => 'col-md-12',
+                'label' => 'French translation',
+            ])
+            ->add('frTitle', TextType::class, [
+                'required' => false,
+                'label' => 'FR Title',
+            ])
+            ->add('frDescription', CKEditorType::class, [
+                'label' => 'FR Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('polish', [
+                'class' => 'col-md-12',
+                'label' => 'Polish translation',
+            ])
+            ->add('plTitle', TextType::class, [
+                'required' => false,
+                'label' => 'PL Title',
+            ])
+            ->add('plDescription', CKEditorType::class, [
+                'label' => 'PL Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('portugal', [
+                'class' => 'col-md-12',
+                'label' => 'Portuguese translation',
+            ])
+            ->add('ptTitle', TextType::class, [
+                'required' => false,
+                'label' => 'PT Title',
+            ])
+            ->add('ptDescription', CKEditorType::class, [
+                'label' => 'PT Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('russian', [
+                'class' => 'col-md-12',
+                'label' => 'Russian translation',
+            ])
+            ->add('ruTitle', TextType::class, [
+                'required' => false,
+                'label' => 'RU Title',
+            ])
+            ->add('ruDescription', CKEditorType::class, [
+                'label' => 'RU Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end()
+            ->with('ukrainian', [
+                'class' => 'col-md-12',
+                'label' => 'Ukrainian translation',
+            ])
+            ->add('uaTitle', TextType::class, [
+                'required' => false,
+                'label' => 'UA Title',
+            ])
+            ->add('uaDescription', CKEditorType::class, [
+                'label' => 'UA Description (allow HTML tags)',
+                'required' => false,
+            ])
+            ->end();
     }
 
     protected function configureListFields(ListMapper $listMapper): void
@@ -95,8 +201,22 @@ final class KnowledgeBaseAdmin extends AbstractAdmin
             ->add('category')
             ->add('subcategory')
             ->add('title')
+            ->add('esTitle')
+            ->add('arTitle')
+            ->add('frTitle')
+            ->add('plTitle')
+            ->add('ptTitle')
+            ->add('ruTitle')
+            ->add('uaTitle')
             ->add('url')
             ->add('description', null, ['safe' => true])
+            ->add('esDescription', null, ['safe' => true])
+            ->add('arDescription', null, ['safe' => true])
+            ->add('frDescription', null, ['safe' => true])
+            ->add('plDescription', null, ['safe' => true])
+            ->add('ptDescription', null, ['safe' => true])
+            ->add('ruDescription', null, ['safe' => true])
+            ->add('uaDescription', null, ['safe' => true])
         ;
     }
 
