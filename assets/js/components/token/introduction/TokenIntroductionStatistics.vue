@@ -94,7 +94,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item class="flex-1" >
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.sold.header') }}
                                         </div>
