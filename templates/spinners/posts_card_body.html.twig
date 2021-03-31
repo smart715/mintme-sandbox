@@ -14,7 +14,7 @@
                             {{ post.author.nickname }}
                         </a>
                         <a
-                                href="https://localhost/token/token/uo22/posts/test1"
+                                href="{{ path('show_post', {id: post.id}) }}"
                                 class="text-decoration-none post-date">
                             {{ post.createdAt | date('H:m M d, Y') }}
                         </a>
