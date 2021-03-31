@@ -551,16 +551,11 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             );
         }
 
-        $soldOnMarket = $this->getSoldOnMarket($token);
-        $soldLimitParam = (string)$this->getParameter('token_delete_sold_limit');
-        $soldLimit = $this->moneyWrapper->parse(
-            $soldLimitParam,
-            Symbols::TOK
-        );
+        if ($this->isTokenOverDeleteLimit($token)) {
+            $limit = (string)$this->getParameter('token_delete_sold_limit');
 
-        if ($soldOnMarket->greaterThanOrEqual($soldLimit)) {
             throw new ApiBadRequestException(
-                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $soldLimitParam])
+                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $limit])
             );
         }
 
@@ -591,6 +586,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ['message' => $this->translator->trans('api.tokens.delete_successfull')],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/over-delete-limit", name="token_over_delete_limit", options={"expose"=true})
+     */
+    public function overDeleteLimit(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        return $this->view($this->isTokenOverDeleteLimit($token), Response::HTTP_OK);
     }
 
     /**
@@ -816,7 +826,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        return $this->view($this->getSoldOnMarket($token), Response::HTTP_OK);
+        return $this->view($this->marketHandler->soldOnMarket($token), Response::HTTP_OK);
     }
 
     /**
@@ -880,9 +890,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         return $this->view([], Response::HTTP_OK);
     }
 
-    private function getSoldOnMarket(Token $token): Money
+    private function isTokenOverDeleteLimit(Token $token): bool
     {
-        return $this->marketHandler->soldOnMarket($token);
+        $soldOnMarket = $this->marketHandler->soldOnMarket($token);
+
+        $saleLimit = $this->moneyWrapper->parse(
+            (string)$this->getParameter('token_delete_sold_limit'),
+            Symbols::TOK
+        );
+
+        return $soldOnMarket->greaterThanOrEqual($saleLimit);
     }
 
     private function validateEthereumAddress(string $address): bool

@@ -16,7 +16,7 @@
                     {{ $t('token.delete.header') }}
                 </template>
                 <template slot="body">
-                    <p v-if="isTokenOverSoldLimit">
+                    <p v-if="isTokenOverDeleteLimit">
                     {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
                     </p>
                     <p v-else-if="!isTokenNotDeployed">
@@ -47,7 +47,6 @@ import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
 import {mapGetters} from 'vuex';
-import Decimal from 'decimal.js';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 export default {
@@ -68,11 +67,12 @@ export default {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
             soldOnMarket: null,
+            isTokenOverDeleteLimit: null,
         };
     },
     mounted() {
-        this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {name: this.tokenName}))
-            .then((res) => this.soldOnMarket = res.data)
+        this.$axios.retry.get(this.$routing.generate('token_over_delete_limit', {name: this.tokenName}))
+            .then((res) => this.isTokenOverDeleteLimit = res.data)
             .catch((err) => {
               this.sendLogs('error', 'Can not get tokens in curculation', err);
             });
@@ -82,20 +82,11 @@ export default {
             tokenDeleteSoldLimit: 'getTokenDeleteSoldLimit',
         }),
         btnDisabled: function() {
-            return this.isTokenOverSoldLimit || !this.isTokenNotDeployed;
-        },
-        isTokenOverSoldLimit: function() {
-            if (!this.loaded) {
-                return true;
-            }
-
-            const sold = new Decimal(this.soldOnMarket);
-
-            return sold.greaterThanOrEqualTo(this.tokenDeleteSoldLimit);
+            return this.isTokenOverDeleteLimit || !this.isTokenNotDeployed;
         },
         loaded: function() {
             return null !== this.tokenDeleteSoldLimit &&
-                null !== this.soldOnMarket;
+                null !== this.isTokenOverDeleteLimit;
         },
     },
     methods: {
@@ -112,7 +103,7 @@ export default {
             this.sendConfirmCode();
         },
         doDeleteToken: function(code = '') {
-            if (this.isTokenOverSoldLimit) {
+            if (this.isTokenOverDeleteLimit) {
                 this.notifyError(this.$t('token.delete.body.over_limit', {limit: this.tokenDeleteSoldLimit}));
                 return;
             } else if (!this.isTokenNotDeployed) {
