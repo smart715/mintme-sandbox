@@ -1,7 +1,7 @@
 <template>
     <div>
         <template v-if="!loaded || btnDisabled">
-            <span class="btn-cancel px-0 m-1 text-muted">
+            <span class="btn-cancel px-0 m-1 text-muted pointer-events-none">
                 {{ $t('token.delete.delete_token') }}
             </span>
             <span v-if="!loaded">
