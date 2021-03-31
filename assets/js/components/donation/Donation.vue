@@ -2,7 +2,9 @@
     <div v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled">
         <div class="card h-100">
                 <div class="card-header">
-                    <span>{{ $t('donation.header.logged', {token: market.quote.name}) }}</span>
+                    <span>
+                        {{ $t('donation.header.logged', {token: market.quote.name}) }}
+                    </span>
                 </div>
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
@@ -42,7 +44,9 @@
                                             @click="all"
                                             class="btn btn-primary all-button"
                                             type="button"
-                                        >{{ $t('donation.button_all') }}</button>
+                                        >
+                                            {{ $t('donation.button_all') }}
+                                        </button>
                                     </div>
                                 </div>
                                 <div>
@@ -63,7 +67,7 @@
                                         @close="showModal = false">
                                         <p class="text-white modal-title pt-2 pb-4">
                                             {{ $t('donation.modal.1') }}
-                                            <br />
+                                            <br>
                                             {{ $t('donation.modal.2', translationsContext) }}
                                         </p>
                                         <template v-slot:confirm>Continue</template>
