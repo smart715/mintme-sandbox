@@ -42,21 +42,88 @@ class KnowledgeBase
 
     /**
      * @ORM\Column(type="string")
-     * @var string
      */
-    protected $title;
+    protected ?string $title;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $esTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $arTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $frTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $plTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $ptTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $ruTitle;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $uaTitle;
 
     /**
      * @ORM\Column(type="string", unique=true, nullable=false)
-     * @var string
      */
-    protected $url;
+    protected ?string $url;
 
     /**
      * @ORM\Column(type="text")
-     * @var string
      */
-    protected $description;
+    protected ?string $description;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $esDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $arDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $frDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $plDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $ptDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $ruDescription;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected ?string $uaDescription;
 
     /**
      * @Gedmo\SortablePosition
@@ -134,6 +201,174 @@ class KnowledgeBase
     public function setPosition(int $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getEsDescription(): string
+    {
+        return $this->esDescription ?? '';
+    }
+
+    public function setEsDescription(?string $esDescription): self
+    {
+        $this->esDescription = $esDescription;
+
+        return $this;
+    }
+
+    public function getEsTitle(): string
+    {
+        return $this->esTitle ?? '';
+    }
+
+    public function setEsTitle(?string $esTitle): self
+    {
+        $this->esTitle = $esTitle;
+
+        return $this;
+    }
+
+    public function getArTitle(): string
+    {
+        return $this->arTitle ?? '';
+    }
+
+    public function setArTitle(?string $arTitle): self
+    {
+        $this->arTitle = $arTitle;
+
+        return $this;
+    }
+
+    public function getFrTitle(): string
+    {
+        return $this->frTitle ?? '';
+    }
+
+    public function setFrTitle(?string $frTitle): self
+    {
+        $this->frTitle = $frTitle;
+
+        return $this;
+    }
+
+    public function getPlTitle(): string
+    {
+        return $this->plTitle ?? '';
+    }
+
+    public function setPlTitle(?string $plTitle): self
+    {
+        $this->plTitle = $plTitle;
+
+        return $this;
+    }
+
+    public function getPtTitle(): string
+    {
+        return $this->ptTitle ?? '';
+    }
+
+    public function setPtTitle(?string $ptTitle): self
+    {
+        $this->ptTitle = $ptTitle;
+
+        return $this;
+    }
+
+    public function getRuTitle(): string
+    {
+        return $this->ruTitle ?? '';
+    }
+
+    public function setRuTitle(?string $ruTitle): self
+    {
+        $this->ruTitle = $ruTitle;
+
+        return $this;
+    }
+
+    public function getUaTitle(): string
+    {
+        return $this->uaTitle ?? '';
+    }
+
+    public function setUaTitle(?string $uaTitle): self
+    {
+        $this->uaTitle = $uaTitle;
+
+        return $this;
+    }
+
+    public function getArDescription(): string
+    {
+        return $this->arDescription ?? '';
+    }
+
+    public function setArDescription(?string $arDescription): self
+    {
+        $this->arDescription = $arDescription;
+
+        return $this;
+    }
+
+    public function getFrDescription(): string
+    {
+        return $this->frDescription ?? '';
+    }
+
+    public function setFrDescription(?string $frDescription): self
+    {
+        $this->frDescription = $frDescription;
+
+        return $this;
+    }
+
+    public function getPlDescription(): string
+    {
+        return $this->plDescription ?? '';
+    }
+
+    public function setPlDescription(?string $plDescription): self
+    {
+        $this->plDescription = $plDescription;
+
+        return $this;
+    }
+
+    public function getPtDescription(): string
+    {
+        return $this->ptDescription ?? '';
+    }
+
+    public function setPtDescription(?string $ptDescription): self
+    {
+        $this->ptDescription = $ptDescription;
+
+        return $this;
+    }
+
+    public function getRuDescription(): string
+    {
+        return $this->ruDescription ?? '';
+    }
+
+    public function setRuDescription(?string $ruDescription): self
+    {
+        $this->ruDescription = $ruDescription;
+
+        return $this;
+    }
+
+    public function getUaDescription(): string
+    {
+        return $this->uaDescription ?? '';
+    }
+
+    public function setUaDescription(?string $uaDescription): self
+    {
+        $this->uaDescription = $uaDescription;
 
         return $this;
     }
