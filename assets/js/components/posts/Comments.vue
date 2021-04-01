@@ -12,8 +12,9 @@
         <div class="my-3">
             <template v-if="commentsCount > 0">
                 <comment
-                    v-for="(n, i) in commentsCount"
-                    :comment="comments[i]"
+                    v-for="(c, i) in comments"
+                    :comment="c"
+                    @update-comment="updateComment($event, i)"
                     :key="i"
                     :index="i"
                     :logged-in="loggedIn"
@@ -52,6 +53,11 @@ export default {
         },
         apiUrl() {
             return this.$routing.generate('add_comment', {id: this.post.id});
+        },
+    },
+    methods: {
+        updateComment(comment, i) {
+            this.$emit('update-comment', {comment, i});
         },
     },
 };

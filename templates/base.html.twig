@@ -41,7 +41,7 @@
                                 <div id="notifications" class="text-center {% block messageClass %}{% endblock %}">
                                     {% for label, messages in app.flashes %}
                                         {% for message in messages %}
-                                            <notification type="{{ label }}" class="d-none">
+                                            <notification type-prop="{{ label }}" class="d-none">
                                                 {{ message }}
                                             </notification>
                                         {% endfor %}
