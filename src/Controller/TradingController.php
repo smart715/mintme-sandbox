@@ -6,20 +6,25 @@ use App\Entity\Image;
 use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManager;
+use App\Manager\MarketStatusManagerInterface;
 use App\Repository\TokenRepository;
 use App\Utils\Symbols;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 
 class TradingController extends Controller
 {
-    public function __construct(
-        NormalizerInterface $normalizer
-    ) {
+    private const TOKENS_ON_PAGE = 50;
 
+    public function __construct(
+        NormalizerInterface $normalizer,
+        RebrandingConverterInterface $rebranding
+    ) {
         parent::__construct($normalizer);
+        $this->rebranding = $rebranding;
     }
 
     /**
@@ -33,14 +38,33 @@ class TradingController extends Controller
      *     }
      * )
      */
-
     public function trading(
         string $page,
         Request $request,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MarketStatusManagerInterface $marketStatusManager
     ): Response {
         $btcCrypto = $cryptoManager->findBySymbol(Symbols::BTC);
         $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
+
+        $sort = MarketStatusManager::SORT_MONTH_VOLUME;
+        $order = 'DESC';
+        $filter = MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME;
+
+        $markets = $marketStatusManager->getMarketsInfo(
+            self::TOKENS_ON_PAGE * ($page - 1),
+            self::TOKENS_ON_PAGE,
+            'monthVolume',
+            'DESC',
+            $filter,
+            null
+        );
+
+        foreach ($markets as $name => $market) {
+            $market = $this->rebranding->convertMarketStatus($market);
+            $market = $this->normalize($market, ['Default','API']);
+            $markets[$name] = $market;
+        }
 
         return $this->render('pages/trading.html.twig', [
             'tokensCount' => $this->getTokenRepository()->count(['isBlocked' => false]),
@@ -48,9 +72,13 @@ class TradingController extends Controller
             'mintmeImage' => $webCrypto->getImage(),
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
             'page' => $page,
-            'sort' => $request->query->get('sort'),
-            'order' => 'ASC' !== $request->query->get('order'),
+            'sort' => $sort,
+            'order' => $order,
+            'filter'=> $filter,
             'filterForTokens'=> MarketStatusManager::FILTER_FOR_TOKENS,
+            'markets' => $markets['markets'] ?? $markets,
+            'rows' => $marketStatusManager->getMarketsCount($filter),
+            'limit' => self::TOKENS_ON_PAGE,
         ]);
     }
 
