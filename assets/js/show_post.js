@@ -13,6 +13,7 @@ new Vue({
     },
     data() {
         return {
+            post: null,
             comments: null,
         };
     },
@@ -22,6 +23,9 @@ new Vue({
         },
         newComment(comment) {
             this.comments.unshift(comment);
+        },
+        updateComment: function({comment, i}) {
+            this.$set(this.comments, i, comment);
         },
     },
 });
