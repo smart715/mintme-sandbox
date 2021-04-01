@@ -4,8 +4,7 @@ liip_imagine:
       default:
         filesystem:
           data_root:
-            - "%kernel.project_dir%/public"
-            - "/home/mintme/panel_deployer/shared/public"
+            - "%liip_data_root%"
     # valid drivers options include "gd" or "gmagick" or "imagick"
     driver: "gd"
 
