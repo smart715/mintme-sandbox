@@ -4,7 +4,6 @@ namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
 use App\Controller\TwoFactorAuthenticatedInterface;
-use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;

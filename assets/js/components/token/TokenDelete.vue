@@ -17,7 +17,7 @@
                 </template>
                 <template slot="body">
                     <p v-if="isTokenOverDeleteLimit">
-                    {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
+                        {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
                     </p>
                     <p v-else-if="!isTokenNotDeployed">
                         {{ $t('token.delete.body.deploying_or_deployed') }}
@@ -85,8 +85,8 @@ export default {
             return this.isTokenOverDeleteLimit || !this.isTokenNotDeployed;
         },
         loaded: function() {
-            return null !== this.tokenDeleteSoldLimit &&
-                null !== this.isTokenOverDeleteLimit;
+            return null !== this.tokenDeleteSoldLimit
+                && null !== this.isTokenOverDeleteLimit;
         },
     },
     methods: {
