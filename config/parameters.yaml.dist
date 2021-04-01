@@ -278,3 +278,6 @@ parameters:
 
     # mintme explorer url
     mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'
