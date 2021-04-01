@@ -155,6 +155,7 @@
                         <div class="row token-info-container position-relative">
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
+                                @update-post="updatePost($event)"
                                 :max="3"
                                 token-name="{{ token.name }}"
                                 token-page
@@ -243,6 +244,7 @@
                             <div class="row mt-3 justify-content-center">
                                 <posts class="col-12 col-md-10 col-lg-8"
                                     :posts="posts || (posts = {{posts | json_encode}})"
+                                    @update-post="updatePost($event)"
                                     :show-edit="{{ isOwner }}"
                                     @delete-post="deletePost"
                                     @go-to-trade="goToTrade"
@@ -294,6 +296,7 @@
                                     <div class="card-body posts">
                                         <post
                                             :post="singlePost || (singlePost = {{ post | json_encode }})"
+                                            @update-post="singlePost = $event"
                                             :show-edit="{{ isOwner }}"
                                             :logged-in="{{ loggedIn }}"
                                             @delete-post="deleteSinglePost"
@@ -304,6 +307,7 @@
                                             {% if post.content %}
                                             <comments
                                                 :comments="comments || (comments = {{ comments | json_encode }})"
+                                                @update-comment="updateComment($event)"
                                                 :logged-in="{{ loggedIn }}"
                                                 @delete-comment="deleteComment"
                                                 @new-comment="newComment"

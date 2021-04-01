@@ -125,8 +125,8 @@ describe('Comments', () => {
         moxios.stubRequest('like_comment', {status: 200});
 
         moxios.wait(() => {
-            expect(wrapper.vm.comment.likeCount).toBe(1);
-            expect(wrapper.vm.comment.liked).toBe(true);
+            expect(wrapper.emitted('update-comment')[0][0].likeCount).toBe(1);
+            expect(wrapper.emitted('update-comment')[0][0].liked).toBe(true);
             done();
         });
     });
@@ -149,8 +149,8 @@ describe('Comments', () => {
         moxios.stubRequest('like_comment', {status: 200});
 
         moxios.wait(() => {
-            expect(wrapper.vm.comment.likeCount).toBe(0);
-            expect(wrapper.vm.comment.liked).toBe(false);
+            expect(wrapper.emitted('update-comment')[0][0].likeCount).toBe(0);
+            expect(wrapper.emitted('update-comment')[0][0].liked).toBe(false);
             done();
         });
     });

@@ -232,6 +232,12 @@ new Vue({
     telegramUpdated: function(val) {
       this.tokenTelegram = val;
     },
+    updatePost: function({post, i}) {
+      this.$set(this.posts, i, post);
+    },
+    updateComment: function({comment, i}) {
+      this.$set(this.comments, i, comment);
+    },
     updatePosts: function() {
       if (!this.tokenName) {
         return;
