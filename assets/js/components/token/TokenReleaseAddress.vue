@@ -95,7 +95,6 @@ export default {
         },
         setUpdatingState: function() {
             this.currentAddress = '0x';
-            this.$emit('update-release-address');
         },
         cancelEditingMode: function() {
             if (!this.showTwoFactorModal) {
