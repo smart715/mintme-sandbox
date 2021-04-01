@@ -102,16 +102,13 @@ export default {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
-        isConfirmVisible: {
-            type: Boolean,
-            default: false,
-        },
     },
     data() {
         return {
             deleteDisabled: false,
             editing: false,
             liking: false,
+            isConfirmVisible: false,
         };
     },
     computed: {
@@ -141,9 +138,7 @@ export default {
                 });
         },
         editComment(comment) {
-            // todo: don't mutate prop
-            // eslint-disable-next-line
-            this.comment.content = comment.content;
+            this.$emit('update-comment', {...this.comment, content: comment.content});
             this.cancelEditing();
         },
         cancelEditing() {
@@ -159,13 +154,12 @@ export default {
             }
             this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {commentId: this.comment.id}))
-                .then((res) => {
-                    // todo: don't mutate prop
-                    // eslint-disable-next-line
-                    this.comment.likeCount += this.comment.liked ? -1 : 1;
-                    // todo: don't mutate prop
-                    // eslint-disable-next-line
-                    this.comment.liked = !this.comment.liked;
+                .then(() => {
+                    this.$emit('update-comment', {
+                        ...this.comment,
+                        likeCount: this.comment.likeCount + (this.comment.liked ? -1 : 1),
+                        liked: !this.comment.liked,
+                    });
                 })
                 .catch(() => {
                     this.notifyError('Error liking comment.');
@@ -173,13 +167,9 @@ export default {
                 .finally(() => this.liking = false);
         },
         showConfirm() {
-            // todo: don't mutate prop
-            // eslint-disable-next-line
             this.isConfirmVisible = true;
         },
         closeConfirm() {
-            // todo: don't mutate prop
-            // eslint-disable-next-line
             this.isConfirmVisible = false;
         },
     },
