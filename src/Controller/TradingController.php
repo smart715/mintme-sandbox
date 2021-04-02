@@ -34,7 +34,7 @@ class TradingController extends Controller
      * )
      */
     public function trading(
-        string $page,
+        int $page,
         Request $request,
         CryptoManagerInterface $cryptoManager,
         MarketStatusManagerInterface $marketStatusManager
