@@ -64,6 +64,7 @@ parameters:
     quick_registration_password: blockchaincrowdfunding
     front_end_logs_cut_headers: true
     minimum_volume_for_marketcap: 100000
+    tokens_on_page: 50
     top_holders: 10
     images_path: /uploads/images
     airdrop_params:

@@ -17,14 +17,10 @@ use App\Utils\Converter\RebrandingConverterInterface;
 
 class TradingController extends Controller
 {
-    private const TOKENS_ON_PAGE = 50;
-
     public function __construct(
-        NormalizerInterface $normalizer,
-        RebrandingConverterInterface $rebranding
+        NormalizerInterface $normalizer
     ) {
         parent::__construct($normalizer);
-        $this->rebranding = $rebranding;
     }
 
     /**
@@ -50,10 +46,11 @@ class TradingController extends Controller
         $sort = MarketStatusManager::SORT_MONTH_VOLUME;
         $order = 'DESC';
         $filter = MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME;
+        $tokensOnPage = (int)$this->getParameter('tokens_on_page');
 
         $markets = $marketStatusManager->getMarketsInfo(
-            self::TOKENS_ON_PAGE * ($page - 1),
-            self::TOKENS_ON_PAGE,
+            $tokensOnPage * ($page - 1),
+            $tokensOnPage,
             'monthVolume',
             'DESC',
             $filter,
@@ -61,7 +58,6 @@ class TradingController extends Controller
         );
 
         foreach ($markets as $name => $market) {
-            $market = $this->rebranding->convertMarketStatus($market);
             $market = $this->normalize($market, ['Default','API']);
             $markets[$name] = $market;
         }
@@ -74,11 +70,10 @@ class TradingController extends Controller
             'page' => $page,
             'sort' => $sort,
             'order' => $order,
-            'filter'=> $filter,
             'filterForTokens'=> MarketStatusManager::FILTER_FOR_TOKENS,
             'markets' => $markets['markets'] ?? $markets,
             'rows' => $marketStatusManager->getMarketsCount($filter),
-            'limit' => self::TOKENS_ON_PAGE,
+            'perPage' => $tokensOnPage,
         ]);
     }
 
