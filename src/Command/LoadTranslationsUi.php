@@ -37,23 +37,7 @@ class LoadTranslationsUi extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $translations = $this->getTranslations();
-
-        $words = [
-//            'confirm_modal.confirm',
-//            '2fa_modal.label.2fa',
-//            '2fa_modal.label.email',
-//            'confirm_modal.accept_delete',
-//            'toasted.success.facebook.added',
-//            'toasted.success.facebook.deleted',
-//            'toasted.success.youtube.added',
-//            'toasted.success.youtube.deleted',
-//            'toasted.success.discord.added',
-//            'toasted.success.discord.deleted',
-//            'toasted.success.telegram.added',
-//            'toasted.success.telegram.deleted',
-//            'trading.currency.usd',
-//            'trading.currency.crypto',
-        ];
+        $words = [];
         $paths = [$this->jsPath, $this->twigPath];
 
         foreach ($paths as $path) {
