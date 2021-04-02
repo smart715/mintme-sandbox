@@ -1,4 +1,4 @@
-<div class="trading">
+<div class="trading" v-if="false">
     <div class="card card-fixed-large mx-auto mb-3">
         <div class="card-body p-0">
             <div class="card-header">
@@ -36,6 +36,7 @@
             <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
                 <span class="float-left">
                     {{ tokensCount }} {% trans %} trading.tokens_and_market_cap {% endtrans %}
+                    <span class="vld-icon"></span>
                 </span>
             </div>
             <div class="trading-table table-responsive text-nowrap">
@@ -122,16 +123,19 @@
                                  </div>
                               </td>
                               <td aria-colindex="2" role="cell" class="">
-                                  ...
+                                    <span class="vld-icon ml-2"></span>
                               </td>
                               <td aria-colindex="3" role="cell" class="">
-                                  {{ market.lastPrice|toMoney(8, false) }} {{ market.base.symbol }}
+                                  {# {{ market.lastPrice|toMoney(8, false) }} {{ market.base.symbol }} #}
+                                    <span class="vld-icon ml-2"></span>
                               </td>
                               <td aria-colindex="4" role="cell" class="">
-                                  {{ market.monthVolume|toMoney(8, false) }} {{ market.base.symbol }}
+                                  {# {{ market.monthVolume|toMoney(8, false) }} {{ market.base.symbol }} #}
+                                    <span class="vld-icon ml-2"></span>
                               </td>
                               <td aria-colindex="5" role="cell" class="">
-                                  {{ market.buyDepth|toMoney(8, false) }} {{ market.base.symbol }}
+                                  {# {{ market.buyDepth|toMoney(8, false) }} {{ market.base.symbol }} #}
+                                    <span class="vld-icon ml-2"></span>
                               </td>
                            </tr>
                         {% endfor %}
