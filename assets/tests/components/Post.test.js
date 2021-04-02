@@ -285,7 +285,7 @@ describe('Post', () => {
             wrapper.vm.doSharePost();
 
             moxios.wait(() => {
-                expect(wrapper.vm.post.isUserAlreadyRewarded).toBe(true);
+                expect(wrapper.emitted('update-post')[0][0].isUserAlreadyRewarded).toBe(true);
                 done();
             });
         });

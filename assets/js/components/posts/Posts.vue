@@ -10,6 +10,7 @@
                 <template v-if="posts.length > 0">
                     <post v-for="(n, i) in postsCount"
                           :post="posts[i]"
+                          @update-post="updatePost($event, i)"
                           :key="i"
                           :index="i"
                           @delete-post="$emit('delete-post', $event)"
@@ -93,6 +94,9 @@ export default {
             let posts = document.querySelector('.posts');
             let postsContainer = document.querySelector('#posts-container');
             this.readMore = postsContainer.clientHeight > posts.clientHeight;
+        },
+        updatePost(post, i) {
+            this.$emit('update-post', {post, i});
         },
     },
     beforeDestroy() {
