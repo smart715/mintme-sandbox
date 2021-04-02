@@ -15,7 +15,9 @@
                         <div class="news-box p-4 mb-5" data-aos="fade-up">
                             <header>
                                 <h2 class="word-break">
-                                    <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{{ post.title }}</a>
+                                    <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
+                                        {{ post|translateArticle('title') }}
+                                    </a>
                                 </h2>
 
                                 <div>{{ post.publicationDateStart | format_date }}</div>
@@ -31,7 +33,7 @@
                                     </div>
                                 {% endif %}
                                 <p class="mt-4 mb-1 col-12 word-break">
-                                    {{ post.abstract }}
+                                    {{ post|translateArticle('abstract') }}
                                 </p>
                                 <div class="col-12 pt-3 read-more">
                                     <a class="py-1 undraggable float-right" href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">{% trans %}page.news.read_more{% endtrans %}</a>

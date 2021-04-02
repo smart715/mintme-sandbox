@@ -279,6 +279,9 @@ parameters:
     # mintme explorer url
     mintme_explorer_url: 'https://mintme.com/explorer'
 
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'
+
     # minimum order value (USD) to make buy/sell orders
     minimum_order_value: 0.1
 
