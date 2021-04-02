@@ -935,7 +935,7 @@ token.change_name.must_own_all: 'Debe tener todos sus tokens para poder cambiar 
 token.change_name.changed_successfully: 'El nombre del Token se ha cambiado exitosamente'
 token.delete.delete_token: 'Eliminar Token'
 token.delete.header: 'Eliminar Token'
-token.delete.body.all_tokens: 'Debe tener todos sus tokens para luego eliminarlo.'
+token.delete.body.over_limit:
 token.delete.body.deploying_or_deployed: 'El token está siendo desplegado o ya ha sido desplegado.'
 token.progress.body: 'Mientras más información suministre sobre su token y perfil, mayor será este número. Además obtendrá un incremento significativo si despliega su token en la blockchain. '
 token.release.new_address: 'Nueva dirección:'
