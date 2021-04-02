@@ -19,7 +19,7 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public const TOK_SYMBOL = 'TOK';
     private const TOK_SUBUNIT = 12;
     public const USD_SYMBOL = 'USD';
-    private const USD_SUBUNIT = 2;
+    private const USD_SUBUNIT = 0;
 
     /** @var CryptoManagerInterface */
     private $cryptoManager;
