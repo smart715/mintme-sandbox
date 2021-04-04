@@ -39,6 +39,9 @@ parameters:
     # Permanent quantity of each token asset
     token_quantity: 10000000
 
+    # Max sold on market amount for a token to be delete
+    token_delete_sold_limit: 100000
+
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
     donation:
@@ -278,3 +281,6 @@ parameters:
 
     # mintme explorer url
     mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'

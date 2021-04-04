@@ -141,7 +141,6 @@
                             </template>
                             <template slot="body">
                                 <token-delete
-                                    :is-token-exchanged="isTokenExchanged"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
