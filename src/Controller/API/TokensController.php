@@ -16,6 +16,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
@@ -23,7 +24,6 @@ use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\EmailAuthManagerInterface;
-use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
@@ -88,6 +88,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     /** @var MailerInterface */
     private MailerInterface $mailer;
 
+    private MarketHandlerInterface $marketHandler;
+
+    private MoneyWrapperInterface $moneyWrapper;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TokenManagerInterface $tokenManager,
@@ -97,6 +101,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         TranslatorInterface $translator,
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
+        MarketHandlerInterface $marketHandler,
+        MoneyWrapperInterface $moneyWrapper,
         int $topHolders = 10,
         int $expirationTime = 60
     ) {
@@ -110,6 +116,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->translator = $translator;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
+        $this->marketHandler = $marketHandler;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
@@ -275,8 +283,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     public function setTokenReleasePeriod(
         string $name,
         ParamFetcherInterface $request,
-        BalanceHandlerInterface $balanceHandler,
-        MoneyWrapperInterface $moneyWrapper
+        BalanceHandlerInterface $balanceHandler
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -320,7 +327,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             }
 
             $releasedAmount = $balance->getAvailable()->divide(100)->multiply($request->get('released'));
-            $tokenQuantity = $moneyWrapper->parse((string)$this->getParameter('token_quantity'), Symbols::TOK);
+            $tokenQuantity = $this->moneyWrapper->parse(
+                (string)$this->getParameter('token_quantity'),
+                Symbols::TOK
+            );
             $amountToRelease = $balance->getAvailable()->subtract($releasedAmount);
 
             $lock->setAmountToRelease($amountToRelease)
@@ -535,11 +545,17 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->denyAccessUnlessGranted('delete', $token);
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
-            throw new ApiBadRequestException('Token is deploying or deployed.');
+            throw new ApiBadRequestException(
+                $this->translator->trans('token.delete.body.deploying_or_deployed')
+            );
         }
 
-        if (!$balanceHandler->isNotExchanged($token, $this->getParameter('token_quantity'))) {
-            throw new ApiBadRequestException('You need all your tokens to delete token');
+        if ($this->isTokenOverDeleteLimit($token)) {
+            $limit = (string)$this->getParameter('token_delete_sold_limit');
+
+            throw new ApiBadRequestException(
+                $this->translator->trans('token.delete.body.over_limit', ['%limit%' => $limit])
+            );
         }
 
         /** @var User $user */
@@ -569,6 +585,21 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             ['message' => $this->translator->trans('api.tokens.delete_successfull')],
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{name}/over-delete-limit", name="token_over_delete_limit", options={"expose"=true})
+     */
+    public function overDeleteLimit(string $name): View
+    {
+        $token = $this->tokenManager->findByName($name);
+
+        if (null === $token) {
+            throw new ApiNotFoundException('Token does not exist');
+        }
+
+        return $this->view($this->isTokenOverDeleteLimit($token), Response::HTTP_OK);
     }
 
     /**
@@ -783,29 +814,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/{name}/sold", name="token_sold_on_market", options={"expose"=true})
      * @param string $name
-     * @param MarketStatusManagerInterface $marketStatusManager
      * @return View
      * @throws ApiNotFoundException
      */
-    public function soldOnMarket(
-        string $name,
-        MarketStatusManagerInterface $marketStatusManager
-    ): View {
-        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
+    public function soldOnMarket(string $name): View
+    {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $crypto || null === $token) {
+        if (null === $token) {
             throw new ApiNotFoundException('Token does not exist');
         }
 
-        // todo: use marketStats.soldOnMarket instead of calling different gateway.
-        $marketStatus = $marketStatusManager->getMarketStatus(new Market($crypto, $token));
-
-        $soldOnMarket = $marketStatus
-            ? $marketStatus->getSoldOnMarket()
-            : new Money('0', new Currency(Symbols::TOK));
-
-        return $this->view($soldOnMarket, Response::HTTP_OK);
+        return $this->view($this->marketHandler->soldOnMarket($token), Response::HTTP_OK);
     }
 
     /**
@@ -867,6 +887,18 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $this->em->flush();
 
         return $this->view([], Response::HTTP_OK);
+    }
+
+    private function isTokenOverDeleteLimit(Token $token): bool
+    {
+        $soldOnMarket = $this->marketHandler->soldOnMarket($token);
+
+        $saleLimit = $this->moneyWrapper->parse(
+            (string)$this->getParameter('token_delete_sold_limit'),
+            Symbols::TOK
+        );
+
+        return $soldOnMarket->greaterThanOrEqual($saleLimit);
     }
 
     private function validateEthereumAddress(string $address): bool

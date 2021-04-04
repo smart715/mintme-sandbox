@@ -986,7 +986,7 @@ token.change_name.must_own_all: 'You must own all your tokens in order to change
 token.change_name.changed_successfully: 'Token''s name changed successfully'
 token.delete.delete_token: 'Delete this token'
 token.delete.header: 'Delete this token'
-token.delete.body.all_tokens: 'You need all your tokens to delete token.'
+token.delete.body.over_limit: 'You have sold over %limit% tokens.'
 token.delete.body.deploying_or_deployed: 'Token is deploying or deployed.'
 token.progress.body: 'The more information you provide about your token and profile, the higher this number will be. Also you get big boost if you deploy your token to blockchain.'
 token.release.new_address: 'New address:'

@@ -1,16 +1,23 @@
 <template>
     <div>
-        <template v-if="btnDisabled">
-            <span class="btn-cancel px-0 m-1 text-muted">
+        <template v-if="!loaded || btnDisabled">
+            <span class="btn-cancel px-0 m-1 text-muted pointer-events-none">
                 {{ $t('token.delete.delete_token') }}
             </span>
-            <guide>
+            <span v-if="!loaded">
+                <font-awesome-icon
+                    icon="circle-notch"
+                    spin class="loading-spinner"
+                    fixed-width
+                />
+            </span>
+            <guide v-else>
                 <template slot="header">
                     {{ $t('token.delete.header') }}
                 </template>
                 <template slot="body">
-                    <p v-if="isTokenExchanged">
-                        {{ $t('token.delete.body.all_tokens') }}
+                    <p v-if="isTokenOverDeleteLimit">
+                        {{ $t('token.delete.body.over_limit', {limit: tokenDeleteSoldLimit}) }}
                     </p>
                     <p v-else-if="!isTokenNotDeployed">
                         {{ $t('token.delete.body.deploying_or_deployed') }}
@@ -39,12 +46,13 @@ import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
+import {mapGetters} from 'vuex';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 export default {
     name: 'TokenDelete',
     mixins: [NotificationMixin, LoggerMixin],
     props: {
-        isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
         tokenName: String,
         twofa: Boolean,
@@ -52,16 +60,33 @@ export default {
     components: {
         Guide,
         TwoFactorModal,
+        FontAwesomeIcon,
     },
     data() {
         return {
             needToSendCode: !this.twofa,
             showTwoFactorModal: false,
+            soldOnMarket: null,
+            isTokenOverDeleteLimit: null,
         };
     },
+    mounted() {
+        this.$axios.retry.get(this.$routing.generate('token_over_delete_limit', {name: this.tokenName}))
+            .then((res) => this.isTokenOverDeleteLimit = res.data)
+            .catch((err) => {
+              this.sendLogs('error', 'Can not get tokens in curculation', err);
+            });
+    },
     computed: {
+        ...mapGetters('tokenStatistics', {
+            tokenDeleteSoldLimit: 'getTokenDeleteSoldLimit',
+        }),
         btnDisabled: function() {
-            return this.isTokenExchanged || !this.isTokenNotDeployed;
+            return this.isTokenOverDeleteLimit || !this.isTokenNotDeployed;
+        },
+        loaded: function() {
+            return null !== this.tokenDeleteSoldLimit
+                && null !== this.isTokenOverDeleteLimit;
         },
     },
     methods: {
@@ -78,8 +103,8 @@ export default {
             this.sendConfirmCode();
         },
         doDeleteToken: function(code = '') {
-            if (this.isTokenExchanged) {
-                this.notifyError(this.$t('token.delete.body.all_tokens'));
+            if (this.isTokenOverDeleteLimit) {
+                this.notifyError(this.$t('token.delete.body.over_limit', {limit: this.tokenDeleteSoldLimit}));
                 return;
             } else if (!this.isTokenNotDeployed) {
                 this.notifyError(this.$t('token.delete.body.deploying_or_deployed'));

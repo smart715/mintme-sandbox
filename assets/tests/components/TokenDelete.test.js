@@ -5,8 +5,12 @@ import Toasted from 'vue-toasted';
 import TokenDelete from '../../js/components/token/TokenDelete';
 import moxios from 'moxios';
 import axios from 'axios';
+import Vuex from 'vuex';
+import tokenStatistics from '../../js/storage/modules/token_statistics';
+
 Vue.use(Vuelidate);
 Vue.use(Toasted);
+Vue.use(Vuex);
 
 /**
  * @return {Wrapper<Vue>}
@@ -23,6 +27,17 @@ function mockVue() {
     return localVue;
 }
 
+const store = new Vuex.Store({
+    modules: {
+        tokenStatistics: {
+            ...tokenStatistics,
+            state: {
+                tokenDeleteSoldLimit: 100000,
+            },
+        },
+    },
+});
+
 describe('TokenDelete', () => {
     beforeEach(() => {
         moxios.install();
@@ -35,32 +50,45 @@ describe('TokenDelete', () => {
     it('renders correctly with assigned props', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
+            data: () => ({
+                isTokenOverDeleteLimit: null,
+            }),
+            propsData: {
+                isTokenNotDeployed: false,
+            },
+            store,
         });
 
-        wrapper.setProps({isTokenExchanged: true});
+        expect(wrapper.vm.loaded).toBe(false);
+        expect(wrapper.vm.btnDisabled).toBe(true);
+        expect(wrapper.find('span').classes('text-muted')).toBe(true);
+
+        wrapper.setData({isTokenOverDeleteLimit: true});
         wrapper.setProps({isTokenNotDeployed: false});
+        expect(wrapper.vm.loaded).toBe(true);
+        expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenExchanged: true});
-        wrapper.setProps({isTokenNotDeployed: true});
-        expect(wrapper.find('span').classes('text-muted')).toBe(true);
-
-        wrapper.setProps({isTokenExchanged: false});
+        wrapper.setData({isTokenOverDeleteLimit: false});
         wrapper.setProps({isTokenNotDeployed: false});
+        expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.find('span').classes('text-muted')).toBe(true);
 
-        wrapper.setProps({isTokenExchanged: false});
         wrapper.setProps({isTokenNotDeployed: true});
+        expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.find('span').classes('text-muted')).toBe(false);
     });
 
     it('open TwoFactorModal for token deletion', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
+            data: () => ({
+                isTokenOverDeleteLimit: false,
+            }),
             propsData: {
-                isTokenExchanged: false,
                 isTokenNotDeployed: true,
             },
+            store,
         });
         wrapper.find('span').trigger('click');
         expect(wrapper.vm.showTwoFactorModal).toBe(true);
@@ -69,7 +97,10 @@ describe('TokenDelete', () => {
     it('do not need to send auth code when 2fa enabled', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: true},
+            propsData: {
+                twofa: true,
+            },
+            store,
         });
         expect(wrapper.vm.needToSendCode).toBe(false);
     });
@@ -77,7 +108,10 @@ describe('TokenDelete', () => {
     it('need to send auth code whe 2fa disabled', () => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: false},
+            propsData: {
+                twofa: false,
+            },
+            store,
         });
         expect(wrapper.vm.needToSendCode).toBe(true);
     });
@@ -85,7 +119,10 @@ describe('TokenDelete', () => {
     it('do not need send auth code when it already sent', (done) => {
         const wrapper = shallowMount(TokenDelete, {
             localVue: mockVue(),
-            propsData: {twofa: false},
+            propsData: {
+                twofa: false,
+            },
+            store,
         });
 
         wrapper.vm.sendConfirmCode();
