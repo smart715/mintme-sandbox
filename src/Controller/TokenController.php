@@ -508,6 +508,7 @@ class TokenController extends Controller
                     : $tokenDecimals,
                 'topHolders' => $this->normalize($topHolders, ['API']),
                 'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
+                'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
             ], $extraData)
