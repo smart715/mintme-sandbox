@@ -87,7 +87,7 @@ class LoadTranslationsUi extends Command
 
         foreach ($filesToCheck as $filePath) {
             $file = file_get_contents($filePath, true);
-            preg_match_all('/\$t\([\'"]([A-Za-z0-9\._]+)[\'"],?\s*\)?/m', (string) $file, $matches);
+            preg_match_all('/\$t\([\'"]([A-Za-z0-9\._]+)[\'"]/m', (string) $file, $matches);
 
             if ($matches) {
                 foreach ($matches[1] as $word) {
