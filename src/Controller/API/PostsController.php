@@ -33,6 +33,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use function GuzzleHttp\Promise\queue;
 
 /**
  * @Rest\Route("/api/posts")
@@ -415,5 +416,73 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->flush();
 
         return $this->view(["message" => $message, "comment" => $comment], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/recent_posts/{nextPage}", name="recent_posts", options={"expose"=true})
+     */
+    public function getRecentPosts(int $nextPage): view
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $token = $this->tokenManager->findByName($user->getProfile()->getFirstToken()->getName());
+
+        if (!$token) {
+            throw new ApiNotFoundException();
+        }
+
+        $postsData = [];
+        $posts = $token->getPosts(); // will be generate by using page
+
+        foreach ($posts as $post) {
+            $postsData[] = [
+                'token' => $post->getToken()->getName(),
+                'tokenImageUrl' => $post->getToken()->getImage(),
+                'author' => $post->getAuthor()->getNickname(),
+                'authorImage' => $post->getAuthor()->getImage(),
+                'createdAt' => $post->getCreatedAt(),
+                'title' => $post->getTitle(),
+                'content' => $post->getContent(),
+                'commentCount' => $post->getCommentsCount(),
+                'postLink' => $this->generateUrl(
+                    'new_show_post',
+                    [
+                        'name' => $post->getToken()->getName(),
+                        'slug' => $post->getSlug(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'tokenLink' => $this->generateUrl(
+                    'token_show',
+                    [
+                        'name' => $post->getToken()->getName(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'authorLink' => $this->generateUrl(
+                    'profile-view',
+                    [
+                        'nickname' => $post->getAuthor()->getNickname(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'HashTagLink' => $this->generateUrl(
+                    'token_show',
+                    [
+                        'name' => $post->getToken()->getName(),
+                        'tab' => 'posts',
+                        '_fragment' => $post->getId(),
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+            ];
+        }
+
+        return $this->view(
+            ['posts' => $postsData, 'count' => count($postsData), 'nextPage' => $nextPage + 1],
+            Response::HTTP_OK
+        );
     }
 }

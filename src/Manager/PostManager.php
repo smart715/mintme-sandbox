@@ -27,4 +27,9 @@ class PostManager implements PostManagerInterface
     {
         return $this->repository->findOneBy(['slug' => $slug]);
     }
+
+    public function getRecentPost(): array
+    {
+        return $this->repository->findAll();
+    }
 }
