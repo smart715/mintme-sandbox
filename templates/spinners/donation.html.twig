@@ -8,7 +8,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-lg-8 col-xl-5">
+                <div class="{% if loggedIn == 'true'%}'col-lg-8'{% else %}'col-lg-12'{% endif %} col-xl-5">
                    <div class="d-sm-flex">
                       <div id="donation_currency" class="dropdown btn-group b-dropdown mr-2">
                          <button 
@@ -54,14 +54,14 @@
                     </div>
                 </div>
                 {% if loggedIn == 'true' %}
-                    <div id="show-balance" class="col-lg-4 col-xl-3 mt-3 mt-lg-0">
+                    <div id="show-balance" class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0">
                         <p class="m-0">
                             <span>{% trans %} donation.balance {% endtrans%}</span>
                             <span class="vld-icon"></span>
                         </p>
                     </div>
                 {% endif %}
-                <div class="col-xl-4 mt-3 mt-xl-0 pl-xl-0">
+                <div class="col mt-3 mt-xl-0 pl-xl-0">
                     <p class="info m-0">
                         {% trans %} donation.nonrefund {% endtrans %}
                     </p>

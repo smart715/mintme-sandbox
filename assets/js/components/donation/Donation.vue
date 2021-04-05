@@ -8,7 +8,10 @@
                 </div>
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
-                        <div class="col-lg-8 col-xl-5">
+                        <div
+                            class="col-xl-5"
+                            :class="isCurrencySelected && loggedIn ? 'col-lg-8' : 'col-lg-12'"
+                        >
                             <div class="d-sm-flex">
                                 <b-dropdown
                                     id="donation_currency"
@@ -110,7 +113,7 @@
                         </div>
                         <div
                             v-if="isCurrencySelected && loggedIn"
-                            class="col-lg-4 col-xl-3 mt-3 mt-lg-0 pl-lg-0"
+                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
                             id="show-balance"
                         >
                             <p class="m-0">
@@ -138,7 +141,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="col-xl-4 mt-3 mt-xl-0 pl-xl-0">
+                        <div class="col mt-3 mt-xl-0 pl-xl-0">
                             <p class="info m-0" v-html="$sanitize(nonrefundHtml)"></p>
                         </div>
                     </div>

@@ -404,42 +404,9 @@ a
   &.currency-container
     min-height: 95px
 
-  .donation
-    background: none
-    position: relative
-    color: $card-text-color
-    border: none
-    border-radius: 0
-
-    .donation-header
-      border: none
-      background: $donation-header-bg
-      color: $dark-white
-      padding: .2rem 1.25rem
-
-      @include font-scale(md)
-
-    .donation-body
-      background: $donation-body-bg
-
-      p.info
-        line-height: 1 !important
-        margin-bottom: 2rem !important
-
-      .input-group-append
-        button.all-button
-          z-index: 4
-
-      @media (max-width: 550px)
-        p.text-nowrap
-          white-space: unset !important
-
-    &.transparent
-      background-color: transparent
-
-      > .donation-header
-        background-color: $dark-white
-        color: inherit
+  .col-donation-balance
+    @include media-breakpoint-up(lg)
+      min-width: 197px
 
 .btn-primary
   color: $dark-white !important
