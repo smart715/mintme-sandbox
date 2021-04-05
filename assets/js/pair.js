@@ -182,14 +182,14 @@ new Vue({
         // prevents browser from storing history with each change:
         let url = '';
         switch (i) {
-          case 2:
+          case 1:
             url = this.$routing.generate('new_show_post', {
               name: this.tokenName,
               slug: null,
             });
 
             break;
-          case 4:
+          case 3:
             url = this.$routing.generate('new_show_post', {
               name: this.tokenName,
               slug: this.singlePost.slug,
@@ -246,7 +246,7 @@ new Vue({
           });
     },
     goToPosts: function() {
-      this.tabIndex = 2;
+      this.tabIndex = 1;
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
@@ -255,7 +255,7 @@ new Vue({
       return null !== a ? a : b;
     },
     goToTrade: function(amount) {
-      this.tabIndex= 3;
+      this.tabIndex= 2;
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
@@ -268,7 +268,7 @@ new Vue({
     },
     goToPost: function(post) {
       this.singlePost = post;
-      this.tabIndex = 4;
+      this.tabIndex = 3;
       this.comments = [];
 
       this.loadComments(post.id);
