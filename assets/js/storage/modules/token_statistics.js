@@ -10,6 +10,7 @@ const storage = {
             releasedAmount: '-',
             frozenAmount: '-',
         },
+        tokenDeleteSoldLimit: null,
     },
     getters: {
         getTokenExchangeAmount: function(state) {
@@ -21,6 +22,9 @@ const storage = {
         getReleasePeriod: function(state) {
             return state.stats.releasePeriod;
         },
+        getTokenDeleteSoldLimit: function(state) {
+            return state.tokenDeleteSoldLimit;
+        },
     },
     mutations: {
         setTokenExchangeAmount: function(state, n) {
@@ -28,6 +32,9 @@ const storage = {
         },
         setStats: function(state, n) {
             state.stats = n;
+        },
+        setTokenDeleteSoldLimit: function(state, n) {
+            state.tokenDeleteSoldLimit = n;
         },
     },
 };
