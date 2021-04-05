@@ -144,6 +144,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $response->headers->setCookie(
             new Cookie('referral-code', $code)
         );
+        $response->headers->setCookie(new Cookie('referral-type', 'invite'));
 
         return $response;
     }
