@@ -48,7 +48,7 @@ class DeployCostFetcher implements DeployCostFetcherInterface
 
         return $this->moneyWrapper->convert(
             $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployCost(), Symbols::USD),
-            new Currency(Token::WEB_SYMBOL),
+            new Currency(Symbols::WEB),
             new FixedExchange([
                 Symbols::USD => [ Symbols::WEB => 1 / $response['webchain']['usd'] ],
             ])
