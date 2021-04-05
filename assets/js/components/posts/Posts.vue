@@ -107,7 +107,9 @@ export default {
         },
     },
     beforeDestroy() {
-        this.resizeObserver.disconnect();
+        if (null !== resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
     },
 };
 </script>
