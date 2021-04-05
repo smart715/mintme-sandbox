@@ -107,7 +107,7 @@ export default {
         },
     },
     beforeDestroy() {
-        if (null !== resizeObserver) {
+        if (null !== this.resizeObserver) {
             this.resizeObserver.disconnect();
         }
     },
