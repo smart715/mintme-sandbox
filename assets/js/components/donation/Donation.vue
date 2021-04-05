@@ -461,7 +461,7 @@ export default {
                     window.history.replaceState(
                         {}, document.title, this.$routing.generate('token_show', {
                             name: this.market.quote.symbol,
-                            tab: 'buy',
+                            tab: 'intro',
                             modal: 'signup',
                         })
                     );
