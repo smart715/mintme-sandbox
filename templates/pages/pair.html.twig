@@ -32,7 +32,7 @@
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
-{% set showAirdropModal = showAirdropModal is defined ? 'true' : 'false' %}
+{% set showAirdropModal = showAirdropModal is defined and showAirdropModal ? 'true' : 'false' %}
 
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
@@ -90,6 +90,7 @@
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
                 :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
                 current-locale="{{ currentLocale }}"
                 :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.getDeployed | json_encode}})"
                 :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
@@ -155,6 +156,7 @@
                         <div class="row token-info-container position-relative">
                             <posts class="col-12 col-lg-7 pr-lg-1"
                                 :posts="posts || (posts = {{ posts | json_encode }})"
+                                @update-post="updatePost($event)"
                                 :max="3"
                                 token-name="{{ token.name }}"
                                 token-page
@@ -167,9 +169,20 @@
                             >
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
+                            <top-holders
+                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                {% if topHolders %}
+                                :traders-prop="{{ topHolders | json_encode }}"
+                                {% endif %}
+                                :token-name="{{ market.quote.symbol | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
+                            </top-holders>
+                        </div>
+                        <div class="row">
                             <token-introduction-statistics
                                 :is-mintme-token="{{ isMintmeToken }}"
-                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                class="col-12 mt-3"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
                                 release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
@@ -180,27 +193,8 @@
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
                                 :holders-prop="{{ token.getHoldersCount }}"
-                                {% if tradeInfo %}
-                                :sold-on-market-prop="{{ tradeInfo.soldOnMarket }}"
-                                :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
-                                :token-withdrawn-prop="{{ tradeInfo.withdrawn }}"
-                                :token-exchange-prop="{{ tradeInfo.tokenExchange ?? 0 }}"
-                                :active-orders="{{ tradeInfo.activeOrders }}"
-                                :stats-prop="{{ tradeInfo.lockIn | json_encode }}"
-                                {% endif %}
                             >
                             </token-introduction-statistics>
-                        </div>
-                        <div class="row">
-                            <top-holders
-                                class="col-12 mt-3"
-                                {% if tradeInfo %}
-                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
-                                {% endif %}
-                                :token-name="{{ market.quote.symbol | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                            >
-                            </top-holders>
                         </div>
                     </b-tab>
                 {% endif %}
@@ -243,6 +237,7 @@
                             <div class="row mt-3 justify-content-center">
                                 <posts class="col-12 col-md-10 col-lg-8"
                                     :posts="posts || (posts = {{posts | json_encode}})"
+                                    @update-post="updatePost($event)"
                                     :show-edit="{{ isOwner }}"
                                     @delete-post="deletePost"
                                     @go-to-trade="goToTrade"
@@ -294,6 +289,7 @@
                                     <div class="card-body posts">
                                         <post
                                             :post="singlePost || (singlePost = {{ post | json_encode }})"
+                                            @update-post="singlePost = $event"
                                             :show-edit="{{ isOwner }}"
                                             :logged-in="{{ loggedIn }}"
                                             @delete-post="deleteSinglePost"
@@ -304,6 +300,7 @@
                                             {% if post.content %}
                                             <comments
                                                 :comments="comments || (comments = {{ comments | json_encode }})"
+                                                @update-comment="updateComment($event)"
                                                 :logged-in="{{ loggedIn }}"
                                                 @delete-comment="deleteComment"
                                                 @new-comment="newComment"

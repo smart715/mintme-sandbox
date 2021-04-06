@@ -218,16 +218,13 @@ export default {
             })
                 .then((response) => {
                     if (response.status === HTTP_OK) {
-                        // todo: don't mutate prop
-                        // eslint-disable-next-line
-                        this.currentName = response.data['tokenName'];
                         this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 
                         this.showTwoFactorModal = false;
                         this.closeModal();
 
                         location.href = this.$routing.generate('token_show', {
-                            name: this.currentName,
+                            name: response.data['tokenName'],
                         });
                     }
                 }, (error) => {

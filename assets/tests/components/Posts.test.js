@@ -33,7 +33,7 @@ const testPost = {
 };
 
 describe('Post', () => {
-    it('shows nothings here if posts is empty', () => {
+    it('shows nothing here if posts is empty', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(Posts, {
             localVue,
@@ -42,8 +42,9 @@ describe('Post', () => {
             },
         });
 
+        expect(wrapper.vm.hasPosts).toBe(false);
         expect(wrapper.findAll('post-stub').length).toBe(0);
-        expect(wrapper.find('.posts').html()).toContain('post.not_any_post');
+        expect(wrapper.html()).toContain('post.not_any_post');
     });
 
     it('shows posts if posts is not empty', () => {
@@ -56,6 +57,7 @@ describe('Post', () => {
             },
         });
 
+        expect(wrapper.vm.hasPosts).toBe(true);
         expect(wrapper.find('post-stub').exists()).toBe(true);
     });
 

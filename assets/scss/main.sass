@@ -614,7 +614,7 @@ a
         color: inherit
 
       &:nth-child(odd)
-        background-color: #00334E
+        background-color: $odd-item-color
         border: none
 
   &, tbody
@@ -1061,7 +1061,7 @@ meter
     right: 1rem
 
   .token-info-container
-    min-height: 370px
+    height: 410px
 
     .posts-container
       position: absolute
@@ -1400,3 +1400,12 @@ li.trade-tab
 
   .custom-control-label::after
     background-color: $white !important
+
+.odd-item-bg
+  background-color: $odd-item-color
+
+.flex-1
+  flex: 1 !important
+
+.list-group-item
+  background: inherit

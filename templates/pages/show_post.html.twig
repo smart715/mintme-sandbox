@@ -11,7 +11,8 @@
                         <div class="card h-100 single-post-page">
                             <div class="card-body posts">
                                 <post
-                                    :post="{{ post | json_encode }}"
+                                    :post="post || (post = {{ post | json_encode }})"
+                                    @update-post="post = $event"
                                     @delete-post="$emit('delete-post', $event)"
                                     :show-edit="{{ showEdit }}"
                                     @go-to-trade="$emit('go-to-trade', $event)"
@@ -20,6 +21,7 @@
                                 ></post>
                                 <comments
                                     :comments="comments || (comments = {{ comments | json_encode }})"
+                                    @update-comment="updateComment($event)"
                                     :post-id="{{ post.id }}"
                                     token-name="{{ post.token.name }}"
                                     :logged-in="{{ loggedIn }}"

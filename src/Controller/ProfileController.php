@@ -278,8 +278,16 @@ class ProfileController extends Controller
         ) ?? '';
         $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
+        $token = $profile->getFirstToken();
+
+        if ($token) {
+            $token = $token->isBlocked()
+                ? null
+                : $token;
+        }
+
         return $this->render('pages/profile.html.twig', [
-            'token' => $profile->getMintmeToken(),
+            'token' => $token,
             'profile' => $profile,
             'savedNickname' => $clonedProfile->getNickname(),
             'profileDescription' => substr($profileDescription, 0, 200),

@@ -130,7 +130,6 @@
                                     :release-address="releaseAddress"
                                     :token-name="currentName"
                                     :twofa="twofa"
-                                    @update-release-address="$emit('update-release-address')"
                                 />
                             </template>
                         </faq-item>
@@ -142,7 +141,6 @@
                             </template>
                             <template slot="body">
                                 <token-delete
-                                    :is-token-exchanged="isTokenExchanged"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
