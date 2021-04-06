@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\User;
 use App\Events\OrderEvent;
 use App\Exchange\ExchangerInterface;
@@ -20,6 +21,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
+use Money\Exchange\FixedExchange;
 use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,18 +52,23 @@ class OrdersController extends AbstractFOSRestController
     /** @var TranslatorInterface */
     private $translations;
 
+    /** @var CryptoRatesFetcherInterface */
+    private $cryptoRatesFetcher;
+
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translations
+        TranslatorInterface $translations,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->translations = $translations;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     /**
@@ -129,6 +136,20 @@ class OrdersController extends AbstractFOSRestController
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
         $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
+
+        $rates = $this->cryptoRatesFetcher->fetch();
+dd($rates);
+        $minimun = $moneyWrapper->convert(
+            $moneyWrapper->parse((string)$this->getParameter('minimum_order_value'), Symbols::USD),
+            new Currency(Symbols::WEB),
+            new FixedExchange([
+                Symbols::USD => [
+                    Symbols::WEB => 1,
+                ]
+            ])
+
+        );
+        dd($minimun);
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 

@@ -254,8 +254,6 @@ export default {
             );
         },
         placeOrder: function() {
-            console.log(this.minimumOrderValue);
-            return;
             if (this.tradeDisabled) {
               this.notifyError(this.$t('trade.orders.disabled'));
               return;
