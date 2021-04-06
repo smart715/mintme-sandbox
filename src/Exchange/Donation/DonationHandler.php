@@ -11,6 +11,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
@@ -22,29 +23,15 @@ use Money\Money;
 
 class DonationHandler implements DonationHandlerInterface
 {
-    /** @var DonationFetcherInterface */
-    private $donationFetcher;
-
-    /** @var MarketNameConverterInterface */
-    private $marketNameConverter;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var CryptoRatesFetcherInterface */
-    private $cryptoRatesFetcher;
-
-    /** @var CryptoManagerInterface */
-    protected $cryptoManager;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var DonationConfig */
-    private $donationConfig;
-
-    /** @var EntityManagerInterface */
-    private $em;
+    private DonationFetcherInterface $donationFetcher;
+    private MarketNameConverterInterface $marketNameConverter;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
+    protected CryptoManagerInterface $cryptoManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private DonationConfig $donationConfig;
+    private EntityManagerInterface $em;
+    private MarketHandlerInterface $marketHandler;
 
     public function __construct(
         DonationFetcherInterface $donationFetcher,
@@ -54,7 +41,8 @@ class DonationHandler implements DonationHandlerInterface
         CryptoManagerInterface $cryptoManager,
         BalanceHandlerInterface $balanceHandler,
         DonationConfig $donationConfig,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MarketHandlerInterface $marketHandler
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -64,6 +52,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->balanceHandler = $balanceHandler;
         $this->donationConfig = $donationConfig;
         $this->em = $em;
+        $this->marketHandler = $marketHandler;
     }
 
     public function checkDonation(
@@ -282,26 +271,6 @@ class DonationHandler implements DonationHandlerInterface
         return $donation;
     }
 
-    private function placeDonationOrders(
-        Market $market,
-        User $donor,
-        Money $expectedAmount,
-        Money $maxPrice,
-        string $fee,
-        User $tokenCreator
-    ): void {
-        $marketName = $this->marketNameConverter->convert($market);
-
-        $this->donationFetcher->placeDonation(
-            $donor->getId(),
-            $marketName,
-            $this->moneyWrapper->format($expectedAmount),
-            $this->moneyWrapper->format($maxPrice),
-            $fee,
-            $tokenCreator->getId()
-        );
-    }
-
     public function getTokensWorth(string $tokensWorth, string $currency): string
     {
         if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
@@ -382,21 +351,18 @@ class DonationHandler implements DonationHandlerInterface
 
     private function getCryptoWorthInMintme(Money $amount, string $cryptoSymbol): Money
     {
-        $rates = $this->cryptoRatesFetcher->fetch();
-
-        if (Symbols::USDC === $cryptoSymbol) {
-            $usdcRate = 1 / $rates[Symbols::USDC][Symbols::USD]
-                * $rates[Symbols::WEB][Symbols::USD];
-            $rates[$cryptoSymbol][Symbols::WEB] = 1 / $usdcRate;
-        } else {
-            $rates[$cryptoSymbol][Symbols::WEB] = 1 / $rates[Symbols::WEB][$cryptoSymbol];
-        }
-
-        return $this->moneyWrapper->convert(
-            $amount,
-            new Currency(Symbols::WEB),
-            new FixedExchange($rates)
+        $market = new Market(
+            $this->cryptoManager->findBySymbol($cryptoSymbol),
+            $this->cryptoManager->findBySymbol(Symbols::WEB)
         );
+
+        $pendingSellOrders = $this->marketHandler->getPendingSellOrders(
+            $market,
+            0,
+            100
+        );
+
+        return $amount;
     }
 
     private function calculateFee(Money $amount): Money
