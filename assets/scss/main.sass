@@ -8,6 +8,7 @@
 @import url('https://fonts.googleapis.com/css?family=Lato')
 @import '~aos/dist/aos.css'
 @import '../fonts/AlphaCloud/AlphaCloud.css'
+@import '~maz-ui/lib/css/index.css'
 @import 'topnav'
 @import 'header'
 @import 'footer'
@@ -167,6 +168,53 @@ a
   &:hover
     color: $color-link-hover
     text-decoration: underline
+
+
+.btn-disabled
+  &, &:hover
+    color: $grey
+    text-decoration: none
+
+.alert
+  &.alert-danger
+    border-color: $toast-error-bg
+    background-color: $toast-error-bg
+    color: $toast-error-text
+
+  &.alert-success
+    border-color: $toast-success-bg
+    background-color: $toast-success-bg
+    color: $toast-success-text
+
+  &.alert-primary, &.alert-info
+    border-color: $toast-info-bg
+    background-color: $toast-info-bg
+    color: $toast-info-text
+
+  &.alert-warning
+    border-color: $toast-warning-bg
+    background-color: $toast-warning-bg
+    color: $toast-warning-text
+
+  font-size: 20px
+  padding: 6px 15px
+  border-radius: 2px
+
+.alert, .toast
+  i
+    margin-right: 15px
+
+.add-phone-notification
+  width: 100%
+  margin: 0 auto
+  text-align: center
+  a
+    color: $secondary-dark
+    text-decoration: underline
+  a:hover
+    color: $primary-light
+  .alert
+    border-radius: 0
 
 .faq-block
   a:hover
@@ -423,7 +471,7 @@ a
 .btn-big
   @include media-breakpoint-up(lg)
     font-size: 1.4rem
-  @include media-breakpoint-up(xl)
+  @include media-breakpoint-up(xxl)
     font-size: 2rem
 
 .btn-transparent
@@ -852,31 +900,6 @@ nav.top-navbar
 .modal-dialog
   @extend .modal-dialog-centered
 
-.alert
-  &.alert-danger
-    border-color: $toast-error-bg
-    background-color: $toast-error-bg
-    color: $toast-error-text
-
-  &.alert-success
-    border-color: $toast-success-bg
-    background-color: $toast-success-bg
-    color: $toast-success-text
-
-  &.alert-primary, &.alert-info
-    border-color: $toast-info-bg
-    background-color: $toast-info-bg
-    color: $toast-info-text
-
-  &.alert-warning
-    border-color: $toast-warning-bg
-    background-color: $toast-warning-bg
-    color: $toast-warning-text
-
-  font-size: 20px
-  padding: 6px 15px
-  border-radius: 2px
-
 .empty-table
   .b-table-has-details
     display: none
@@ -955,10 +978,6 @@ nav.top-navbar
 .tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
-
-.alert, .toast
-  i
-    margin-right: 15px
 
 .toast
   &.toasted-primary
@@ -1057,7 +1076,7 @@ meter
       width: 100%
       text-align: center
 
-#token, #profile
+#token, #profile, #phone-verification
   [v-cloak]
     display: none
 
@@ -1157,7 +1176,7 @@ input[type=search]::-webkit-search-cancel-button
 .form-control-btn.is-invalid
   background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
 
-.form-control:focus
+.form-control:focus, .maz-input__input:focus
   border-style: solid
   border-width: thin
   border-color: $pale-gray
@@ -1373,8 +1392,11 @@ li.trade-tab
     padding-left: 0px
 
 .custom-switch
+  .custom-control-input:checked + label.custom-control-label::before
+    background-color: $blue !important
+
   .custom-control-label::before
-    border-color: gray !important
+    border-color: $white !important
 
   .custom-control-label::after
-    background-color: gray !important
+    background-color: $white !important

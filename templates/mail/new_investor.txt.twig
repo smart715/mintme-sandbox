@@ -1,7 +1,13 @@
-{% extends('mail/new_layout.txt.twig') %}
+{% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
-{% trans %}mail.new_investor.msg{% endtrans %}
-{% trans %}mail.new_investor_bought_token.msg{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans %} mail.new_investor.msg {% endtrans %}
+
+
+{{ investorProfile }} {% trans %} mail.new_investor_bought_token.msg {% endtrans %}
+
+{{ absolute_url(path('profile-view', {'nickname': investorProfile})) }}
+
 {% endblock %}
+

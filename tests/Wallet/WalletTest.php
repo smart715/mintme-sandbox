@@ -443,6 +443,9 @@ class WalletTest extends TestCase
         $withdrawGatewayMock
             ->method('getBalance')
             ->willReturn(new Money($available, new Currency(Token::WEB_SYMBOL)));
+        $withdrawGatewayMock
+            ->method('address')
+            ->willReturn(true);
 
         $withdrawGatewayMock
             ->expects($withdrawInv ?? $this->never())

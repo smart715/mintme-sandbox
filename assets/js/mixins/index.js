@@ -9,6 +9,7 @@ import PairNameMixin from './pair_name';
 import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';
 import TraderHoveredMixin from './trader_hovered';
+import TwitterMixin from './twitter';
 import WebSocketMixin from './websocket';
 import {
     MoneyFilterMixin,
@@ -31,5 +32,6 @@ export {
     PricePositionMixin,
     RebrandingFilterMixin,
     TraderHoveredMixin,
+    TwitterMixin,
     WebSocketMixin,
 };

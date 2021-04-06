@@ -210,6 +210,8 @@ parameters:
     translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
     translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # add more languages to the array if you want to auto translate the page based on browser language.
+    translation_auto_detect: [es]
     # Flag value should be in ISO 3166-1-alpha-2 code of a country.
     # Check this https://www.iso.org/obp/ui/#search/code/
     # To disable language selector menu you need to remove all languages except en or just set this var to ~
@@ -224,10 +226,58 @@ parameters:
         fr: {label: Française, flag: fr}
 
     #time Interval for scheduled notifications
-    time_intervals: [10, 1440, 43200]
+    orders_filled_intervals: [10 minutes, 1 day, 30 day]
+    orders_cancelled_intervals: [1 day, 30 day]
+    token_marketing_tips_intervals: [2 day, 4 day, 7 day, 10 day, 15 day, 21 day]
+    marketing_airdrop_feature_intervals: [7 day]
+
 
     # min amount of a specific tokens to start DM the owner
     dm_min_amount: 100
 
     # token withdraw fee in ETH (0.003, 0.1 etc)
     token_withdraw_fee: 0.01
+    #max amount of active orders allowed per user
+    max_allowed_active_orders: 100
+
+    # kb links
+    kb_links:
+        - 'Quickstart-Guide-to-MintMe'
+        - 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'
+        - 'Time-for-token-sales-how-can-I-make-a-difference'
+        - 'Ideas-to-promote-and-sell-your-token'
+        - 'Aiming-at-a-strong-token'
+        - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
+
+    # MintMe.host promotion mail
+    freeDays: 7
+    price: 3.99
+    mintmeHostPath: https://www.mintme.host
+
+    # mails available to send via app:sendCustomMail
+    available_mails:
+        - 'MintmeHost'
+
+    # api for sending SMS
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+    # If true - sending sms will be disabled and verification code will be returned to user instead of sending to mobile phone
+    disable_sms: false
+
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        failed: 5
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        # 30 days = 30D
+        interval: '30D'
+
+    # mintme explorer url
+    mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'

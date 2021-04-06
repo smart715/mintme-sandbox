@@ -8,6 +8,12 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
+    private const TOKEN_NAME_APPEND = [
+        'token',
+        'coin',
+        '-',
+    ];
+
     /** @var BlacklistRepository */
     private $repository;
 
@@ -139,7 +145,6 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatches(string $name, string $val): bool
     {
-        return false !== stripos($name, $val)
-            && (strlen($name) - strlen($val)) <= 1;
+        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', mb_strtolower($name));
     }
 }

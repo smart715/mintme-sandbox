@@ -7,47 +7,48 @@
         <info-bar
             username="{{ app.user.username|default('') }}"
             auth-code="{{ app.user.EmailAuthCode|default('') }}"
+            environment="{{ app.environment() }}"
         ></info-bar>
     </div>
 {% endif %}
 <nav class="navbar top-navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ path('homepage') }}">
+        <a class="order-first navbar-brand" href="{{ path('homepage') }}">
             {% if is_beta_version %}
                 <div class="badge">{% trans %}beta{% endtrans %}</div>
             {% endif %}
-            <img
-                {% if is_beta_version %}
-                    class="ml-3 ml-lg-0 mintme-logo"
-                {% else %}
-                    class="mintme-logo"
-                {% endif %}
-                src="{{ asset('build/images/logo.svg') }}"
-                alt="mintMe"
-            >
+                <img
+                    {% if is_beta_version %}
+                        class="ml-3 ml-lg-0 mintme-logo"
+                    {% else %}
+                        class="mintme-logo"
+                    {% endif %}
+                    src="{{ asset('build/images/logo.svg') }}"
+                    alt="mintMe"
+                >
         </a>
-        <div>
+        <div class="order-1 order-lg-3">
             {% if show_links %}
-                <div class="d-lg-none float-left d-flex align-items-center">
-                    <user-notification class="small-bell mx-xs-1 mx-sm-2"></user-notification>
-                    <nav-envelope class="mx-xs-1 mx-sm-2" href="{{ path('chat') }}"></nav-envelope>
+                <div class="float-left d-flex align-items-center m-lg-0">
+                    <user-notification class="small-bell mx-xs-1 mx-sm-2 m-lg-0"></user-notification>
+                    <nav-envelope class="mx-xs-1 mx-sm-2 m-lg-0 pr-sm-1" href="{{ path('chat') }}"></nav-envelope>
                 </div>
             {% endif %}
-            <button
+                <button
                     class="navbar-toggler"
                     :class="{ 'collapsed': !showNavbarMenu }"
                     type="button"
                     :aria-expanded="showNavbarMenu"
                     aria-label="Toggle navigation"
                     @click="toggleNavbarMenu"
-            >
+                >
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
-        <div class="collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
+        <div class="order-2 collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
             <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-auto">
                 <token-searcher
-                    class="justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
+                    class="flex-nowrap justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
                     search-url="{{ path('token_search') }}"
                 ></token-searcher>
                 <div class="v-cloak--flex justify-content-center align-items-center ml-1">
@@ -109,14 +110,6 @@
                         {% trans %}navbar.help{% endtrans %}
                     </a>
                 </li>
-                {% if show_links %}
-                    <li class="align-self-center c-pointer desktop-notification-bell">
-                        <user-notification></user-notification>
-                    </li>
-                    <li class="align-self-center c-pointer d-none d-lg-flex">
-                        <nav-envelope href="{{ path('chat') }}"></nav-envelope>
-                    </li>
-                {% endif %}
                 {% if not app.user %}
                     <li class="nav-item align-self-center {{ route == 'fos_user_security_login' ? 'active' : '' }}">
                         <a href="{{ path('fos_user_security_login') }}" class="nav-link">
@@ -162,86 +155,24 @@
                             <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token"/>
                                 <button
-                                        class="logout-link"
-                                        type="submit"
-                                        id="_submit"
-                                        name="_submit"
+                                    class="logout-link"
+                                    type="submit"
+                                    id="_submit"
+                                    name="_submit"
                                 >
                                     {% trans %}log_out{% endtrans %}
                                 </button>
                             </form>
-                        </li>
-                        <li class="nav-item d-none d-lg-block">
-                            <div id="nav-profile" class="dropdown" :class="{ 'show': showProfileMenu }">
-                                <a
-                                    class="nav-link dropdown-toggle c-pointer"
-                                    aria-haspopup="true"
-                                    :aria-expanded="showProfileMenu"
-                                    @click="toggleProfileMenu"
-                                    v-on-clickaway="hideProfileMenu"
-                                    tabindex="0"
-                                    @keyup.enter="toggleProfileMenu"
-                                >
-                                    <avatar
-                                        class="{% if app.user.profile.image.url == "/media/default_profile.png" %}default-user-avatar-topnav{% endif %}"
-                                        size="middle"
-                                        type="profile"
-                                        image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
-                                    ></avatar>
-                                </a>
-                                <div
-                                    class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
-                                    :class="{ 'show': showProfileMenu }"
-                                >
-                                    <a class="dropdown-item {{ route == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
-                                        <span class="icon-wallet float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        {% trans %}navbar.wallet{% endtrans %}
-                                    </a>
-                                    <a
-                                        class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
-                                        href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
-                                        tabindex="0"
-                                    >
-                                        <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        {% trans %}navbar.profile{% endtrans %}
-                                    </a>
-                                    <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
-                                        <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                        {% trans %}navbar.settings{% endtrans %}
-                                    </a>
-                                    {% if app.user.profile.hasTokens %}
-                                        <a class="dropdown-item" href="{{ path('token_show_modal') }}">
-                                            <span class="icon-token-drop-down float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                            {% trans %}navbar.token_show_modal{% endtrans %}
-                                        </a>
-                                    {% endif %}
-                                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
-                                        <span class="dropdown-item">
-                                            <button
-                                                    class="logout"
-                                                    type="submit"
-                                                    id="_submit_lg"
-                                                    name="_submit"
-                                                    tabindex="0"
-                                            >
-                                                <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
-                                                {% trans %}log_out{% endtrans %}
-                                            </button>
-                                        </span>
-                                    </form>
-                                </div>
-                            </div>
                         </li>
                     {% else %}
                         <li class="align-self-center">
                             <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
                                 <button
-                                        class="logout-link"
-                                        type="submit"
-                                        id="_submit_lg"
-                                        name="_submit"
+                                    class="logout-link"
+                                    type="submit"
+                                    id="_submit_lg"
+                                    name="_submit"
                                 >
                                     {% trans %}log_out{% endtrans %}
                                 </button>
@@ -251,8 +182,85 @@
                 {% endif %}
             </ul>
         </div>
+        {% if show_links %}
+            <div class="order-last pr-0 dropdown d-none d-lg-block float-right" :class="{ 'show': showProfileMenu }" id="nav-profile">
+                <a
+                    class="nav-link pl-3 pr-0 dropdown-toggle c-pointer"
+                    aria-haspopup="true"
+                    :aria-expanded="showProfileMenu"
+                    @click="toggleProfileMenu"
+                    v-on-clickaway="hideProfileMenu"
+                    tabindex="0"
+                    @keyup.enter="toggleProfileMenu"
+                >
+                    <avatar
+                        class="{% if app.user.profile.image.url == '/media/default_profile.png' %}default-user-avatar-topnav{% endif %}"
+                        size="middle"
+                        type="profile"
+                        image="{{ app.user.profile.image.url | imagine_filter('avatar_middle') }}"
+                    ></avatar>
+                </a>
+                <div
+                    class="dropdown-menu dropdown-menu-right align-self-end align-self-lg-center profile-menu"
+                    :class="{ 'show': showProfileMenu }"
+                >
+                    <a class="dropdown-item {{ route == 'wallet' ? 'active' : '' }}" href="{{ path('wallet') }}">
+                        <span class="icon-wallet float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                        {% trans %}navbar.wallet{% endtrans %}
+                    </a>
+                    <a
+                        class="dropdown-item {{ route starts with 'profile' ? 'active' : '' }}"
+                        href="{{ path('profile') }}/{{ app.user.profile.nickname }}"
+                        tabindex="0"
+                    >
+                        <span class="icon-profile float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                        {% trans %}navbar.profile{% endtrans %}
+                    </a>
+                    <a class="dropdown-item {{ route == 'settings' or route == 'two_factor_auth' ? 'active' : '' }}" href="{{ path('settings') }}">
+                        <span class="icon-settings float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                        {% trans %}navbar.settings{% endtrans %}
+                    </a>
+                    {% if app.user.profile.hasTokens %}
+                        <a class="dropdown-item" href="{{ path('token_show_modal') }}">
+                            <span class="icon-token-drop-down float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                            {% trans %}navbar.token_show_modal{% endtrans %}
+                        </a>
+                    {% endif %}
+                    <form action="{{ path('fos_user_security_logout') }}" method="post" id="form-button-logout-lg">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" id="csrf-token-lg"/>
+                        <span class="dropdown-item">
+                            <button
+                                class="logout"
+                                type="submit"
+                                id="_submit_lg"
+                                name="_submit"
+                                tabindex="0"
+                            >
+                                <span class="icon-logout float-left mt-1 mr-2 d-none d-lg-inline"></span>
+                                {% trans %}log_out{% endtrans %}
+                            </button>
+                        </span>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
     </div>
     {% if is_hacker_allowed %}
         <admin-menu :is-user-logged="{{ app.user ? 'true' : 'false' }}"></admin-menu>
     {% endif %}
 </nav>
+{% if app.request.attributes.get('_route') != 'homepage' and
+    app.request.attributes.get('_route') != '2fa_login' and
+    app.request.attributes.get('_route') != 'phone_verification' and
+    app.user is not null and
+    (app.user.profile.phoneNumber is null or
+    not app.user.profile.phoneNumber.verified)
+%}
+        <div class="add-phone-notification">
+            <div class="alert alert-primary" role="alert">
+                {% trans with {'%url%': path('profile-view', {'nickname': app.user.profile.nickname, 'edit': true}) } %}
+                    phone.add_number.notification
+                {% endtrans %}
+            </div>
+        </div>
+{% endif %}

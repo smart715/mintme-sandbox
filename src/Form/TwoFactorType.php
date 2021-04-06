@@ -16,6 +16,8 @@ class TwoFactorType extends AbstractType
     {
         $builder
             ->add('code', TextType::class, [
+                'translation_domain' => 'messages',
+                'label' => '2fa.code',
                 'required' => true,
                 'constraints' => [ new NotBlank(), new TwoFactorAuth() ],
             ])

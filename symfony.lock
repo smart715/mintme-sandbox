@@ -1,4 +1,7 @@
 {
+    "abraham/twitteroauth": {
+        "version": "1.2.0"
+    },
     "amphp/amp": {
         "version": "v2.4.4"
     },
@@ -211,6 +214,12 @@
     "gedmo/doctrine-extensions": {
         "version": "v2.4.41"
     },
+    "giggsey/libphonenumber-for-php": {
+        "version": "8.12.16"
+    },
+    "giggsey/locale": {
+        "version": "1.9"
+    },
     "google/recaptcha": {
         "version": "1.1",
         "recipe": {
@@ -279,6 +288,9 @@
     },
     "incenteev/composer-parameter-handler": {
         "version": "v2.1.4"
+    },
+    "jbbcode/jbbcode": {
+        "version": "v1.4.2"
     },
     "jms/i18n-routing-bundle": {
         "version": "3.0.4"
@@ -406,6 +418,18 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.8.0"
+    },
+    "odolbeau/phone-number-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "4388686329b81291918a948cd42891829fb1de71"
+        },
+        "files": [
+            "config/packages/misd_phone_number.yaml"
+        ]
     },
     "openlss/lib-array2xml": {
         "version": "1.0.0"
@@ -792,6 +816,12 @@
             "src/Kernel.php"
         ]
     },
+    "symfony/http-client": {
+        "version": "v4.4.19"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.4.10"
     },
@@ -815,6 +845,21 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure": {
+        "version": "v0.4.1"
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "0.2",
+            "ref": "a37d3438e4bd4f9f924c516996bc29e25f66b07e"
+        },
+        "files": [
+            "config/packages/mercure.yaml"
+        ]
     },
     "symfony/mime": {
         "version": "v4.4.10"

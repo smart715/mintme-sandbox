@@ -35,7 +35,7 @@
                                             <div
                                                 v-cloak="$v.tokenName"
                                                 v-if="tokenNameExists"
-                                                class="alert alert-danger alert-token-name-exists"
+                                                class="alert alert-danger alert-float"
                                             >
                                                 <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                                                 {% trans %}page.token_creation.error.taken{% endtrans %}
@@ -45,7 +45,7 @@
                                             <div
                                                 v-cloak="$v.tokenName"
                                                 v-if="tokenNameInBlacklist"
-                                                class="alert alert-danger alert-token-name-exists"
+                                                class="alert alert-danger alert-float"
                                             >
                                                 <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                                                 {% trans %}page.token_creation.error.forbidden{% endtrans %}
@@ -53,10 +53,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col py-2">
+                                <div class="col-12 py-2">
                                     {{ form_widget(form.name, {'attr': {
                                         'v-model': '$v.tokenName.$model',
-                                        'class' : 'form-control',
+                                        'class': 'form-control',
+                                        '@invalid': 'tokenInvalid',
+                                        '@change': 'tokenChange',
+                                        '@input': 'tokenInput'
                                     }}) }}
                                 </div>
                                 <div class="col-12">
@@ -83,10 +86,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-12">
                                     <div class="description">
                                         {{ form_widget(form.description, {'attr': {
-                                            'v-model': '$v.description.$model',
+                                            'v-model': '$v.description.$model'
                                         }}) }}
                                     </div>
                                 </div>
@@ -99,19 +102,38 @@
                                         ${ $t('token.intro.description.max_length', translationsContext) }
                                     </div>
                                 </div>
+                                <div class="col-12">
+                                    {{ form_widget(form.initial_orders, {
+                                        'attr': {
+                                            'class': 'align-middle'
+                                        }
+                                    })}}
+                                    {{ form_label(form.initial_orders, null, {'label_attr': {'class': 'pl-1 pb-0'}}) }}
+                                    <guide>
+                                        <template slot="body">
+                                            {% trans %}form.token.initial_order.guide{% endtrans %}
+                                        </template>
+                                    </guide>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
                                 <input
                                     type="submit"
-                                    :disabled="saveBtnDisabled"
-                                    @click="createToken"
                                     class="btn btn-primary submit-creation"
                                     :class="{'input-disabled': !tokenCreation}"
+                                    :disabled="saveBtnDisabled"
+                                    @click="createToken"
                                     value="{% trans %}page.token_creation.create{% endtrans %}"
                                 />
-                                <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
+                                <input
+                                    type="reset"
+                                    class="btn btn-cancel ml-3"
+                                    style="text-transform: capitalize;"
+                                    @click="$goBack"
+                                    value="{% trans %}cancel{% endtrans %}"
+                                />
                             </div>
                         </div>
                         {{ form_end(form) }}
@@ -124,12 +146,4 @@
 
 {% block pagescripts %}
     <script src="{{ asset('build/token_creation.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let tokenCreateName = document.getElementById('token_create_name');
-            tokenCreateName.addEventListener('invalid', tokenCreateName.setCustomValidity("Invalid token name."));
-            tokenCreateName.addEventListener('change', tokenCreateName.setCustomValidity(""));
-            tokenCreateName.addEventListener('input', tokenCreateName.setCustomValidity(""));
-        });
-    </script>
 {% endblock %}

@@ -1,8 +1,16 @@
-{% extends('mail/new_layout.txt.twig') %}
+{% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %} hello {% endtrans %}
-{{username}},
-{% trans with {'%name%': profile_name} %}mail.profile_reminder.msg.add_description{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+
+{% trans with {'%name%': profile_name} %} mail.profile_reminder.msg.add_description {% endtrans %}
+
 {% trans %} mail.profile_reminder.msg.others {% endtrans %}
+
+
 {% trans %} mail.profile_reminder.msg.to_do_that {% endtrans%}  {% trans %} mail.profile_reminder.msg.go_gere {% endtrans %} {% trans %} mail.profile_reminder.msg.click_edit {% endtrans %}
+
+{{ absolute_url(path('profile')) }}/{{ profile_name }}
+
 {% endblock %}
+

@@ -1,0 +1,32 @@
+<div class="card-body posts overflow-hidden position-relative">
+    <div id="posts-container" class="w-100 d-flex flex-column align-items-center">
+        {% for post in posts %}
+            <div class="post">
+                <a href="{{ path('show_post', {id: post.id}) }}" class="text-decoration-none">
+                    <h2 class="post-title">{{ post.title }}</h2>
+                </a>
+                <div>
+                    <a href="{{ path('profile', {nickname: post.author.nickname}) }}" class="text-white">
+                        <img
+                                src="{{ post.author.image.avatar_small }}" alt="avatar"
+                                class="rounded-circle d-inline-block">
+                        {{ post.author.nickname }}
+                    </a>
+                    <a
+                            href="{{ path('show_post', {id: post.id}) }}"
+                            class="text-decoration-none post-date">
+                        {{ post.createdAt | date('H:m M d, Y') }}
+                    </a>
+                </div>
+                <p class="bbcode-content">{{ post.content | bbcode | raw }}</p>
+                <a
+                        href="{{ path('show_post', {id: post.id}) }}"
+                        class="hover-icon text-decoration-none text-white">
+                                                    <span class="social-link ml-1">
+                                                        {{ post.commentsCount }} {% trans %}post.comments{% endtrans %}
+                                                    </span>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>

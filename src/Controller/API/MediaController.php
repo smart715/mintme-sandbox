@@ -104,6 +104,6 @@ class MediaController extends AbstractFOSRestController
 
         $this->em->flush();
 
-        return $this->view(['image' => $image->getUrl()], Response::HTTP_ACCEPTED);
+        return $this->view(['image' => $image->getUrl()], Response::HTTP_OK);
     }
 }

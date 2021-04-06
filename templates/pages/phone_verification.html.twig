@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}phone_confirmation.title{% endtrans %} | mintMe{% endblock %}
+
+{% set formHeader = 'phone_confirmation.header'|trans %}
+
+{% block content %}
+    <div id="phone-verification">
+        <div class="container">
+            <div class="row pt-4 justify-content-center">
+                <div class="col-12">
+                    <div class="card card-fixed-small mx-auto">
+                        <div class="card-header">
+                            {{ formHeader }}
+                        </div>
+                        <div class="card-body py-3">
+                            {% block formBody %}
+                                {{ form_start(form) }}
+                                <div class="pb-3">
+                                    <p>
+                                        {% trans %}phone_confirmation.msg{% endtrans %}
+                                    </p>
+                                    {{ form_label(form.verificationCode) }}
+                                    {{ form_errors(form.verificationCode) }}
+                                    <div class="d-flex flex-column">
+                                        {{ form_widget(form.verificationCode, {'attr':
+                                            {
+                                                'v-model.trim': '$v.code.$model',
+                                                'ref': 'code'
+                                            }})
+                                        }}
+                                        <span
+                                            v-cloak
+                                            ref="resendCode"
+                                            class="btn-cancel px-0 c-pointer"
+                                            :class="{'btn-disabled': resendCodeDisabled}"
+                                            data-failed-attempts="{{ failedAttempts }}"
+                                            data-limit-reached="{{ limitReached }}"
+                                            data-errors-count="{{ form.verificationCode.vars.errors | length }}"
+                                            @click="sendVerificationCode"
+                                        >
+                                            {% trans %}phone_confirmation.send_code_again{% endtrans %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="pb-1">
+                                    <div v-cloak="$v.code" v-if="!$v.code.minLength || !$v.code.maxLength || !$v.code.helpers" class="text-danger text-center">
+                                        {% trans %}phone_confirmation.incorrect_code{% endtrans %}
+                                    </div>
+                                    {{ form_row(form.submit, {
+                                        'attr': {
+                                            ':disabled': 'disableSave'
+                                        }
+                                    }) }}
+                                </div>
+                                {{ form_end(form) }}
+                            {% endblock %}
+                            <input type="hidden" ref="sendCode" value="{{ sendCode }}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="{{ asset('build/phone_verification.js') }}"></script>
+{%  endblock %}

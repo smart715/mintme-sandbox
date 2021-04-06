@@ -10,7 +10,7 @@
             <currency-mode-switcher></currency-mode-switcher>
         </div>
         <div class="col-md-12 text-center">
-            <a href="{{ path('terms_of_service') }}">{% trans %}terms_of_service{% endtrans %}</a> | <a href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a> | <a href="{{ path('app.swagger_ui', {'area': 'v2'}) }}">API</a> | <a {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %} href="{{ path('press_kit') }}">Press Kit</a> | <a href="https://www.mintme.com/coin/">MintMe Coin</a> | <a href="https://www.mintme.com/web-wallet/">Web Wallet</a> <br/>
+            <a href="{{ path('terms_of_service') }}">{% trans %}terms_of_service{% endtrans %}</a> | <a href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a> | <a href="{{ path('app.swagger_ui', {'area': 'v2'}) }}">API</a> | <a {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %} href="{{ path('press_kit') }}">Press Kit</a> | <a href="https://www.mintme.com/coin/">MintMe Coin</a> | <a href="https://www.mintme.com/web-wallet/">Web Wallet</a> | <a href="https://www.mintme.com/explorer" target="_blank">{% trans %}footer.explorer{% endtrans %}</a> | <a href="https://www.mintme.com/pool" target="_blank">{% trans %}footer.pool{% endtrans %}</a> <br/>
             {{ version }} | {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
             <span class="justify-content-center d-inline cookies-term"> <span class="separator">-</span> <font-awesome-icon icon="cookie-bite"></font-awesome-icon>{% trans %}footer.cookies{% endtrans %}</span>
         </div>

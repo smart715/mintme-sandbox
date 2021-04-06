@@ -22,4 +22,9 @@ class PostManager implements PostManagerInterface
     {
         return $this->repository->find($id);
     }
+
+    public function getBySlug(string $slug): ?Post
+    {
+        return $this->repository->findOneBy(['slug' => $slug]);
+    }
 }

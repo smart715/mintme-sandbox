@@ -5,17 +5,17 @@ namespace App\Manager;
 use App\Entity\ScheduledNotification;
 use App\Entity\User;
 use App\Repository\ScheduledNotificationRepository;
-use App\Utils\NotificationTypes;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ScheduledNotificationManager implements ScheduledNotificationManagerInterface
 {
-    /** @var array  */
-    public array $timeIntervals;
+    public array $filled_intervals;
+    public array $cancelled_intervals;
+    public array $token_marketing_tips_intervals;
+    public array $marketing_airdrop_feature;
 
     private EntityManagerInterface $em;
-
     private ScheduledNotificationRepository $scheduledNotificationRepository;
 
     public function __construct(
@@ -31,38 +31,44 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
         return $this->scheduledNotificationRepository->findAll();
     }
 
-    public function createScheduledNotification(String $notificationType, User $user): void
-    {
-        $existScheduleNotification = $this->scheduledNotificationRepository->findByUser($user);
+    public function createScheduledNotification(
+        string $notificationType,
+        User $user,
+        bool $flush = true
+    ): ScheduledNotification {
+        $existScheduleNotifications = $this->scheduledNotificationRepository->findBy(['user' => $user->getId()]);
 
-        if ($existScheduleNotification) {
-            $this->removeScheduledNotification($existScheduleNotification->getId());
+        foreach ($existScheduleNotifications as $schNotification) {
+            $type = $schNotification->getType();
+
+            if ($type === $notificationType) {
+                $this->removeScheduledNotification($schNotification->getId());
+            }
         }
 
         $scheduledNotification = (new ScheduledNotification())
             ->setType($notificationType)
             ->setUser($user)
-            ->setDateToBeSend($this->dateToBeSendFactory($notificationType));
+            ->setDateToBeSend($this->setDate($notificationType))
+            ->setTimeInterval((string)$this->{strtolower($notificationType) . '_intervals'}[0]);
 
-        if (NotificationTypes::ORDER_CANCELLED === $notificationType) {
-            $scheduledNotification->setTimeInterval((string)$this->timeIntervals[1]); // 24 hrs
-        } else {
-            $scheduledNotification->setTimeInterval((string)$this->timeIntervals[0]); // 10min
+        if ($flush) {
+            $this->em->persist($scheduledNotification);
+            $this->em->flush();
         }
 
-        $this->em->persist($scheduledNotification);
-        $this->em->flush();
+        return $scheduledNotification;
     }
 
     public function updateScheduledNotification(
-        ScheduledNotification $scheduledUserNotification,
-        String $newTimeInterval,
+        ScheduledNotification $scheduledNotification,
+        string $newTimeInterval,
         \DateTimeImmutable $newTimeToBeSend
     ): void {
-        $scheduledUserNotification->setTimeInterval($newTimeInterval)
+        $scheduledNotification->setTimeInterval($newTimeInterval)
             ->setDateToBeSend($newTimeToBeSend);
 
-        $this->em->persist($scheduledUserNotification);
+        $this->em->persist($scheduledNotification);
         $this->em->flush();
     }
 
@@ -71,12 +77,15 @@ class ScheduledNotificationManager implements ScheduledNotificationManagerInterf
         return $this->scheduledNotificationRepository->deleteScheduledNotification($scheduledNotificationId);
     }
 
-    private function dateToBeSendFactory(string $orderExecutionType): \DateTimeImmutable
+    public function removeByTypeForUser(string $type, User $user): int
+    {
+        return $this->scheduledNotificationRepository->removeByTypeForUser($type, $user);
+    }
+
+    private function setDate(string $notificationType): \DateTimeImmutable
     {
         $actualDate = new DateTimeImmutable();
 
-        return NotificationTypes::ORDER_CANCELLED === $orderExecutionType ?
-             $actualDate->modify('+'.$this->timeIntervals[1].' minutes') :  // one day
-             $actualDate->modify('+'.$this->timeIntervals[0].' minutes');  // 10 min
+        return $actualDate->modify('+' . $this->{strtolower($notificationType) . '_intervals'}[0]);
     }
 }

@@ -2,17 +2,22 @@
 
 namespace App\Mailer;
 
+use App\Entity\AirdropCampaign\AirdropReferralCode;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
+use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Money;
 use Scheb\TwoFactorBundle\Mailer\AuthCodeMailerInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore */
 class Mailer implements MailerInterface, AuthCodeMailerInterface
@@ -29,16 +34,24 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
+    private TranslatorInterface $translator;
+
+    private MoneyWrapperInterface $moneyWrapper;
+
     public function __construct(
         string $mail,
         Swift_Mailer $mailer,
         EngineInterface $twigEngine,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->mail = $mail;
         $this->mailer = $mailer;
         $this->twigEngine = $twigEngine;
         $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
@@ -59,7 +72,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'confirmationUrl' => $confirmLink,
         ]);
 
-        $msg = (new Swift_Message('Confirm withdraw'))
+        $subject = $this->translator->trans('email.confirm_withdraw');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -71,8 +85,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     public function sendAuthCode(TwoFactorInterface $user): void
     {
         $this->sendAuthCodeToMail(
-            'Confirm authentication',
-            'You verification code:',
+            $this->translator->trans('email.confirm_authentication'),
+            $this->translator->trans('email.verification_code'),
             $user
         );
     }
@@ -93,7 +107,6 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'email' => $user->getEmailAuthRecipient(),
             'code' => $user->getEmailAuthCode(),
         ]);
-
 
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
@@ -122,7 +135,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'urlWallet' => $confirmLink,
         ]);
 
-        $msg = (new Swift_Message(ucfirst($transactionType)." Completed"))
+        $subject = ucfirst($transactionType).' '.$this->translator->trans('email.completed');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -143,7 +157,15 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'resetting' => $resetting,
         ]);
 
-        $msg = (new Swift_Message("Your password has been ".($resetting ? "reset" : "changed")))
+        $subject = 'email.password_changed';
+
+        if ($resetting) {
+            $subject = 'email.password_reset';
+        }
+
+        $subject = $this->translator->trans($subject);
+
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -176,7 +198,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $token->getName(),
         ]);
 
-        $msg = (new Swift_Message("Token Deleted"))
+        $subject = $this->translator->trans('email.token_deleted');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -187,7 +210,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
     public function sendNewDeviceDetectedMail(User $user, UserLoginInfo $userDeviceInfo): void
     {
-        $message = 'Our system has detected a new login attempt from a new IP address or device.';
+        $message = $this->translator->trans('new_device.detected.msg');
+
         $body = $this->twigEngine->render('mail/new_device_detected.html.twig', [
             'message' => $message,
             'username' => $user->getUsername(),
@@ -200,8 +224,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'user_device_info' => $userDeviceInfo,
         ]);
 
-        $subjectMsg = 'New login attempt from a new IP address or device';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.new_login_from_new_ip');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -222,8 +246,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'profile_name' => $user->getProfile()->getNickname(),
         ]);
 
-        $subjectMsg = 'Mintme Reminder';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.mintme_reminder');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -243,8 +267,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $token->getName(),
         ]);
 
-        $subjectMsg = 'Mintme Reminder';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.mintme_reminder');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
@@ -266,7 +290,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'userTokenName' => $token->getName(),
         ]);
 
-        $msg = (new Swift_Message('New Investor'))
+        $subject = $this->translator->trans('email.new_investor');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($token->getOwner()->getEmail())
             ->setBody($body, 'text/html')
@@ -275,19 +300,22 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendNewPostMail(User $user, String $tokenName): void
+    public function sendNewPostMail(User $user, String $tokenName, String $slug): void
     {
         $body = $this->twigEngine->render("mail/new_post.html.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
         $textBody = $this->twigEngine->render("mail/new_post.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $tokenName,
+            'slug' => $slug,
         ]);
 
-        $msg = (new Swift_Message('New Post'))
+        $subject = $this->translator->trans('email.new_post');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -308,7 +336,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $tokenName,
         ]);
 
-        $msg = (new Swift_Message('New Token Deployed'))
+        $subject = $this->translator->trans('email.new_token_deployed');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -329,7 +358,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'tokenName' => $tokenName,
         ]);
 
-        $msg = (new Swift_Message('Orders'))
+        $subject = $this->translator->trans('email.orders');
+        $msg = (new Swift_Message($subject))
         ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
@@ -385,10 +415,216 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $textBody = $this->twigEngine->render("mail/knowledge_base_suggestions.txt.twig", [
             'username' => $user->getUsername(),
             'tokenName' => $token->getName(),
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+            'deployUrl' => $deployUrl,
         ]);
 
-        $subjectMsg = 'What Now?';
-        $msg = (new Swift_Message($subjectMsg))
+        $subject = $this->translator->trans('email.what_now');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendTokenMarketingTipMail(User $user, String $kbLink): void
+    {
+        $pieces = explode('-', $kbLink);
+        $title = implode(' ', $pieces);
+
+        $url = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => $kbLink],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/token_marketing_tips.html.twig", [
+            'username' => $user->getUsername(),
+            'url' => $url,
+            'title' => $title,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_marketing_tips.txt.twig", [
+            'username' => $user->getUsername(),
+            'url' => $url,
+            'title' => $title,
+        ]);
+        $subject = $this->translator->trans('userNotification.type.token_marketing_tips');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendAirdropFeatureMail(Token $token): void
+    {
+        $modalUrl = $this->urlGenerator->generate(
+            'token_show',
+            [
+                'name' => $token->getName(),
+                'modal' => 'settings',
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render('mail/airdrop_feature.html.twig', [
+            'nickname' => $token->getProfile()->getNickname(),
+            'modalUrl' => $modalUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render('mail/airdrop_feature.txt.twig', [
+            'nickname' => $token->getProfile()->getNickname(),
+            'modalUrl' => $modalUrl,
+        ]);
+
+        $subject = $this->translator->trans('mail.airdrop_feature.subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($token->getProfile()->getUser()->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void
+    {
+        $body = $this->twigEngine->render("mail/mintme_host.html.twig", [
+            'username' => $user->getUsername(),
+            'freeDays' => $freeDays,
+            'price' => $price,
+            'mintmeHostPath' => $mintmeHostPath,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/mintme_host.txt.twig", [
+            'username' => $user->getUsername(),
+            'freeDays' => $freeDays,
+            'price' => $price,
+            'mintmeHostPath' => $mintmeHostPath,
+        ]);
+
+        $subject = $this->translator->trans('mail.mintme_host_subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendAirdropClaimedMail(
+        User $user,
+        Token $token,
+        Money $airdropReward,
+        string $airdropReferralCode
+    ): void {
+        $tokenPostsLink = $this->urlGenerator->generate(
+            'new_show_post',
+            [
+                'name' => $token->getName(),
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $AirdropReferralLink = $this->urlGenerator->generate(
+            'airdrop_referral',
+            [
+                'name' => $token->getName(),
+                'hash' => $airdropReferralCode,
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/airdrop_claimed.html.twig", [
+            'username' => $user->getUsername(),
+            'airdropReward' => $this->moneyWrapper->format($airdropReward),
+            'tokenName' => $token->getName(),
+            'tokenPostsLink' => $tokenPostsLink,
+            'airdropReferralLink' => $AirdropReferralLink,
+            'tokenSubunit' => Token::TOKEN_SUBUNIT,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/airdrop_claimed.txt.twig", [
+            'username' => $user->getUsername(),
+            'airdropReward' => $this->moneyWrapper->format($airdropReward),
+            'tokenName' => $token->getName(),
+            'tokenPostsLink' => $tokenPostsLink,
+            'airdropReferralLink' => $AirdropReferralLink,
+            'tokenSubunit' => Token::TOKEN_SUBUNIT,
+        ]);
+
+        $subject = $this->translator->trans('mail.airdrop_claimed.subject');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
+    {
+        $tokenSalesUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $aimingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Aiming-at-a-strong-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $ideasUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Ideas-to-promote-and-sell-your-token'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $stuckUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Stuck-not-knowing-what-to-do-next'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        $talkingUrl = $this->urlGenerator->generate(
+            'kb_show',
+            ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $body = $this->twigEngine->render("mail/token_deployed.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/token_deployed.txt.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+            'txHash' => $txHash,
+            'tokenSalesUrl' => $tokenSalesUrl,
+            'aimingUrl' => $aimingUrl,
+            'ideasUrl' => $ideasUrl,
+            'stuckUrl' => $stuckUrl,
+            'talkingUrl' => $talkingUrl,
+        ]);
+
+        $subject = $this->translator->trans('mail.token_deployed.subject');
+        $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())
             ->setBody($body, 'text/html')

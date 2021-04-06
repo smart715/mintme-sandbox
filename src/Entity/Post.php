@@ -7,6 +7,7 @@ use App\Validator\Constraints\Between;
 use App\Validator\Constraints\NotEmptyWithoutBbcodes;
 use App\Validator\Constraints\PositiveAmount;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -24,9 +25,8 @@ class Post
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=60000)
@@ -34,43 +34,72 @@ class Post
      * @NotEmptyWithoutBbcodes
      * @Assert\Length(
      *     min = 2,
-     *     max = 500,
+     *     max = 1000,
      * )
-     * @var string
      */
-    protected $content = '';
+    protected string $content = ''; // phpcs:ignore -- for some reason, if the variable has a type and default value, phpcs says it's not used (but it is)
 
     /**
      * @ORM\Column(type="datetime_immutable")
-     * @var \DateTimeImmutable
      */
-    protected $createdAt;
+    protected \DateTimeImmutable $createdAt;
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
-     * @var \DateTimeImmutable|null
      */
-    protected $updatedAt;
+    protected ?\DateTimeImmutable $updatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="posts")
      * @ORM\JoinColumn(name="token_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @var Token
      */
-    protected $token;
+    protected Token $token;
 
     /**
      * @ORM\Column(type="string")
-     * @var string
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 1,
+     *     max = 100,
+     * )
      */
-    protected $amount = '0';
+    protected string $amount = '0'; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected string $title = ''; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected string $shareReward = '0'; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $slug = null; // phpcs:ignore
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"likeCount" = "DESC"})
-     * @var ArrayCollection
      */
-    protected $comments;
+    protected Collection $comments;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="rewardClaimedPosts", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="post_users_share_reward",
+     *     joinColumns={@ORM\JoinColumn(name="post_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id",  onDelete="CASCADE")}
+     *     )
+     */
+    protected Collection $rewardedUsers;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+        $this->rewardedUsers = new ArrayCollection();
+    }
 
     /**
      * @Groups({"Default", "API"})
@@ -182,6 +211,72 @@ class Post
     public function addComment(Comment $comment): self
     {
         $this->comments->add($comment);
+
+        return $this;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @Between(
+     *     min = 0,
+     *     max = 100
+     * )
+     * @Groups({"Default", "API"});
+     */
+    public function getShareReward(): Money
+    {
+        return new Money($this->shareReward, new Currency(Token::TOK_SYMBOL));
+    }
+
+    public function setShareReward(Money $reward): self
+    {
+        $this->shareReward = $reward->getAmount();
+
+        return $this;
+    }
+
+    public function addRewardedUser(User $user): self
+    {
+        $this->rewardedUsers->add($user);
+
+        return $this;
+    }
+
+    public function getRewardedUsers(): Collection
+    {
+        return $this->getRewardedUsers();
+    }
+
+    public function isUserAlreadyRewarded(User $user): bool
+    {
+        return $this->rewardedUsers->contains($user);
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

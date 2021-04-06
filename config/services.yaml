@@ -61,6 +61,14 @@ services:
             $url: '%origin_to_disposable_email_domains%'
             $timeoutSeconds: '%disposable_domains_timeout_seconds%'
 
+    d7_networks.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%d7_networks_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -110,6 +118,10 @@ services:
         arguments:
             $rpc: '@coinify.rest_rpc'
             $partnerId: '%coinify_partner_id%'
+
+    App\Communications\SMS\D7NetworksCommunicator:
+        arguments:
+            $rpc: '@d7_networks.rest_rpc'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -193,9 +205,13 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Command\CheckUserSellOrdersCommand:
-        properties:
-            timeIntervals: '%time_intervals%'
+    App\Command\CheckScheduledNotificationsCommand:
+        arguments:
+            $kbLinks: '%kb_links%'
+            $filled_intervals: '%orders_filled_intervals%'
+            $cancelled_intervals: '%orders_cancelled_intervals%'
+            $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -394,6 +410,9 @@ services:
             $formFactory: '@fos_user.registration.form.factory'
             $userManager: '@fos_user.user_manager'
             $tokenStorage: '@security.token_storage'
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
 
     App\Exchange\Config\Config:
         arguments:
@@ -509,6 +528,8 @@ services:
     App\EventSubscriber\LocaleSubscriber:
         arguments:
             $defaultLocale: '%locale%'
+            $transLocales: '%translation_locales%'
+            $transAuto: '%translation_auto_detect%'
 
     App\Communications\DisposableEmailCommunicator:
         arguments:
@@ -548,6 +569,10 @@ services:
             $showFullDataInProfile: '%show_full_data_in_profile%'
 
     App\EventSubscriber\TransactionSubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
+    App\EventSubscriber\DeploySubscriber:
         arguments:
             $mailer: '@app.instant.mailer'
 
@@ -655,8 +680,22 @@ services:
 
     App\Manager\ScheduledNotificationManager:
         properties:
-            timeIntervals: '%time_intervals%'
+            filled_intervals: '%orders_filled_intervals%'
+            cancelled_intervals: '%orders_cancelled_intervals%'
+            token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Controller\API\WalletController:
         arguments:
             $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
+
+    Abraham\TwitterOAuth\TwitterOAuth:
+        arguments:
+            $consumerKey: '%env(TWITTER_API_KEY)%'
+            $consumerSecret: '%env(TWITTER_API_SECRET)%'
+
+    App\Command\SendCustomMailCommand:
+        arguments:
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'

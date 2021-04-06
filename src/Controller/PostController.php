@@ -36,6 +36,15 @@ class PostController extends Controller
             throw new NotFoundPostException();
         }
 
+        $slug = $post->getSlug();
+
+        if ($slug) {
+            return $this->redirectToRoute('new_show_post', [
+                'name' => $post->getToken()->getName(),
+                'slug' => $slug,
+            ]);
+        }
+
         return $this->render('pages/show_post.html.twig', [
             'post' => $this->normalize($post),
             'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',

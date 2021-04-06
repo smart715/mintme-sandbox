@@ -422,7 +422,7 @@ describe('Donation', () => {
         });
 
         moxios.stubRequest('check_donation', {
-            status: 202,
+            status: 200,
             response: {
                 amountToReceive: '2.5674',
             },
@@ -470,7 +470,7 @@ describe('Donation', () => {
         });
 
         moxios.stubRequest('make_donation', {
-            status: 202,
+            status: 200,
         });
 
         wrapper.vm.makeDonation();

@@ -176,6 +176,23 @@ function currencyConversion(amount, rate, symbol, subunit = 2) {
     return currencySymbol + toMoney(amount, subunit);
 }
 
+/**
+ * @param {string} link
+ * @return {Promise}
+ */
+function openPopup(link) {
+    return new Promise((resolve) => {
+        let popup = window.open(link, 'popup', 'width=600,height=600');
+
+        let interval = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000);
+    });
+}
+
 export {
     isValidUrl,
     isValidTelegramUrl,
@@ -191,4 +208,5 @@ export {
     getBreakPoint,
     removeSpaces,
     currencyConversion,
+    openPopup,
 };

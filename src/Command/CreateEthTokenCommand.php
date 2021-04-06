@@ -11,8 +11,10 @@ use App\Logger\UserActionLogger;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\NotificationTypes;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,6 +37,7 @@ class CreateEthTokenCommand extends Command
     private ProfileManagerInterface $profileManager;
     private CryptoManagerInterface $cryptoManager;
     private TokenManagerInterface $tokenManager;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
     private BalanceHandlerInterface $balanceHandler;
     private MoneyWrapperInterface $moneyWrapper;
     private MarketFactoryInterface $marketManager;
@@ -49,6 +52,7 @@ class CreateEthTokenCommand extends Command
         ProfileManagerInterface $profileManager,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         MarketFactoryInterface $marketManager,
@@ -60,6 +64,7 @@ class CreateEthTokenCommand extends Command
         $this->profileManager = $profileManager;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->scheduledNotificationManager = $scheduledNotificationManager;
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->marketManager = $marketManager;
@@ -140,6 +145,18 @@ class CreateEthTokenCommand extends Command
             $io->error('User with provided email has already created a token');
         }
 
+        $contractDecimals = (int)$this->contractHandler->getDecimalsContract($tokenAddress);
+
+        if ($minDeposit && !$this->checkDecimals($minDeposit, $contractDecimals)) {
+            $hasErrors = true;
+            $io->error('Min deposit with more decimals than allowed for eth token. Allowed: '.$contractDecimals);
+        }
+
+        if ($withdrawalFee && !$this->checkDecimals($withdrawalFee, $contractDecimals)) {
+            $hasErrors = true;
+            $io->error('Withdraw fee with more decimals than allowed for eth token. Allowed: '.$contractDecimals);
+        }
+
         if ($hasErrors) {
             return 1;
         }
@@ -183,6 +200,12 @@ class CreateEthTokenCommand extends Command
 
         $market = $this->marketManager->createUserRelated($profile->getUser());
         $this->marketStatusManager->createMarketStatus($market);
+
+        $this->scheduledNotificationManager->createScheduledNotification(
+            NotificationTypes::MARKETING_AIRDROP_FEATURE,
+            $token->getOwner()
+        );
+
         $this->em->commit();
         $this->logger->info('Create eth token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
@@ -206,5 +229,12 @@ class CreateEthTokenCommand extends Command
         $this->em->flush();
 
         return $token;
+    }
+
+    private function checkDecimals(string $numericString, int $contractDecimals): bool
+    {
+        $explodeDigits = explode('.', $numericString);
+
+        return !(isset($explodeDigits[1]) && $contractDecimals < strlen(rtrim($explodeDigits[1], '0')));
     }
 }

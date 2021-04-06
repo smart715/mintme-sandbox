@@ -8,6 +8,9 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\DeployCompletedEvent;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +19,7 @@ use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DeployConsumer implements ConsumerInterface
 {
@@ -34,18 +38,22 @@ class DeployConsumer implements ConsumerInterface
     /** @var DeployCostFetcherInterface */
     private $deployCostFetcher;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
-        DeployCostFetcherInterface $deployCostFetcher
+        DeployCostFetcherInterface $deployCostFetcher,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritdoc} */
@@ -93,7 +101,7 @@ class DeployConsumer implements ConsumerInterface
 
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
-                    $amount = new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
+                    $amount = new Money($token->getDeployCost(), new Currency($token->getCryptoSymbol()));
 
                     $this->balanceHandler->deposit(
                         $user,
@@ -102,6 +110,7 @@ class DeployConsumer implements ConsumerInterface
                     );
 
                     $token->setAddress('');
+                    $token->setTxHash(null);
                     $token->setDeployCost(null);
                     $token->setDeployed(null);
 
@@ -119,6 +128,8 @@ class DeployConsumer implements ConsumerInterface
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
                 $token->setDeployed(new \DateTimeImmutable());
                 $token->setAddress($clbResult->getAddress());
+                $token->setShowDeployedModal(true);
+                $token->setTxHash($clbResult->getTxHash());
 
                 $this->setDeployCostReward($user, $token);
             }
@@ -136,6 +147,12 @@ class DeployConsumer implements ConsumerInterface
 
             return false;
         }
+
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new DeployCompletedEvent($token, $clbResult->getTxHash()),
+            TokenEvents::DEPLOYED
+        );
 
         return true;
     }

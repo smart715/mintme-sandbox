@@ -24,20 +24,30 @@
                     </span>
                 </div>
                 <div class="d-inline-block col-lg-2 col-md-12 pl-lg-0 text-lg-right align-self-center">
-                    <span v-if="alreadyClaimed">
-                        <button
+                    <template v-if="!timeElapsed">
+                        <span v-if="alreadyClaimed">
+                            <button
                                 :disabled="true"
                                 class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.claimed') }}
-                        </button>
-                    </span>
-                    <span v-else>
-                        <button
-                                @click="showModal = true"
-                                class="btn btn-primary">
-                            {{ $t('ongoing_airdrop.participate') }}
-                        </button>
-                    </span>
+                                {{ $t('ongoing_airdrop.claimed') }}
+                            </button>
+                        </span>
+                        <span v-else>
+                            <copy-link
+                                v-if="isOwner" :href="modalTokenUrl"
+                                :content-to-copy="modalTokenUrl"
+                                class="btn btn-primary"
+                            >
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </copy-link>
+                            <a v-else :href="modalTokenUrl"
+                                @click.prevent="showModalOnClick"
+                                class="btn btn-primary"
+                            >
+                                {{ $t('ongoing_airdrop.participate') }}
+                            </a>
+                        </span>
+                    </template>
                     <confirm-modal
                         :visible="showModal"
                         :button-disabled="loggedIn && !isOwner && !userAlreadyClaimed && !actionsCompleted"
@@ -155,24 +165,56 @@
                                     </font-awesome-layers>
                                     <div class="ml-4 pl-2 d-flex flex-column align-items-start w-75">
                                         <span>{{ $t('airdrop.actions.post_link') }}</span>
-                                        <a :href="tokenUrl" class="truncate-name w-100">{{ tokenUrl }}</a>
+                                        <copy-link :content-to-copy="tokenUrl" class="c-pointer row mr-0 w-100">
+                                            <a href="#" class="col truncate-name pr-2">{{ tokenUrl }}</a>
+                                            <font-awesome-icon :icon="['far', 'copy']"/>
+                                        </copy-link>
                                     </div>
                                     <span class="ml-auto">
                                         {{ airdropCampaign.actions.postLink.done ? '1' : '0' }}/1
                                     </span>
                                 </div>
-                                <div class="d-flex my-3" v-if="airdropCampaign.actions.postLink">
-                                    <input class="form-control font-size-12"
-                                        type="text"
-                                        v-model="postLinkUrl"
-                                        :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                <div class="d-flex flex-column my-3" v-if="airdropCampaign.actions.postLink">
+                                    <div class="clearfix">
+                                        <div class="float-left">
+                                            <div
+                                                v-if="domainErrorMessage"
+                                                class="alert alert-danger alert-float"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                {{ domainErrorMessage }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <input
+                                            id="airdropDomain"
+                                            class="form-control font-size-12"
+                                            type="text"
+                                            v-model="postLinkUrl"
+                                            :placeholder="$t('ongoing_airdrop.post_link_placeholder')"
+                                        >
+                                        <button class="btn btn-primary text-nowrap ml-1"
+                                            :disabled="postLinkUrlDisabled"
+                                            @click="claimPostLink"
+                                        >
+                                            {{ $t('ongoing_airdrop.submit_url') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
+                                <div>
+                                    {{ $t('ongoing_airdrop.referral', {tokenName, halfReward}) }}
+                                </div>
+                                <div>
+                                    <a :href="referralLink">{{ referralLink }}</a>
+                                    <copy-link
+                                        class="c-pointer"
+                                        :content-to-copy="referralLink"
                                     >
-                                    <button class="btn btn-primary text-nowrap ml-1"
-                                        :disabled="$v.postLinkUrl.$invalid"
-                                        @click="claimPostLink"
-                                    >
-                                        {{ $t('ongoing_airdrop.submit_url') }}
-                                    </button>
+                                        <font-awesome-icon :icon="['far', 'copy']" class="icon-default"/>
+                                    </copy-link>
                                 </div>
                             </div>
                         </div>
@@ -187,6 +229,26 @@
         <div v-else class="text-center py-1">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
         </div>
+        <confirm-modal
+            :visible="showConfirmTwitterMessageModal"
+            :show-image="false"
+            @confirm="doClaimTwitterMessage"
+            @cancel="showConfirmTwitterMessageModal = false"
+            @close="showConfirmTwitterMessageModal = false"
+        >
+            <p>
+                {{ $t('ongoing_airdrop.twitter_message.confirm') }}
+            </p>
+            <p>
+                "{{ actionMessage }}"
+            </p>
+            <template v-slot:confirm>{{ $t('ongoing_airdrop.accept') }}</template>
+        </confirm-modal>
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            @close="addPhoneModalVisible = false"
+        />
     </div>
 </template>
 
@@ -194,11 +256,13 @@
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
-import {LoggerMixin, NotificationMixin, FiltersMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
-import {toMoney} from '../../../utils';
+import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin} from '../../../mixins';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED} from '../../../utils/constants';
+import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
+import CopyLink from '../../CopyLink';
+import AddPhoneAlertModal from '../../modal/AddPhoneAlertModal';
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -209,9 +273,12 @@ export default {
         NotificationMixin,
         LoggerMixin,
         FiltersMixin,
+        TwitterMixin,
     ],
     components: {
         ConfirmModal,
+        CopyLink,
+        AddPhoneAlertModal,
     },
     props: {
         loggedIn: Boolean,
@@ -221,6 +288,9 @@ export default {
         loginUrl: String,
         signupUrl: String,
         youtubeClientId: String,
+        currentLocale: String,
+        showAirdropModal: Boolean,
+        profileNickname: String,
     },
     data() {
         return {
@@ -232,24 +302,46 @@ export default {
             timeElapsed: false,
             showDuration: true,
             postLinkUrl: '',
+            showConfirmTwitterMessageModal: false,
+            checkingBlackListedDomain: true,
+            blackListedDomain: false,
+            checkDomainTimeout: null,
+            referralCode: null,
+            addPhoneModalVisible: false,
         };
     },
     mounted: function() {
-        this.getAirdropCampaign();
+        if (null !== this.currentLocale) {
+            moment.locale(this.currentLocale);
+        }
+
+        this.showModal = this.showAirdropModal;
     },
     computed: {
+        addPhoneModalMessage: function() {
+            return this.$t('modal.add_phone_alert.airdrop', {
+                profileUrl: this.$routing.generate('profile-view', {
+                  nickname: this.profileNickname,
+                  edit: 1,
+                }),
+            });
+        },
         actionsLength() {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
         },
         actualParticipants: function() {
-            return this.airdropCampaign.actualParticipants || 0;
+            return Math.ceil(this.airdropCampaign.actualParticipants || 0);
         },
         airdropReward: function() {
             if (this.loaded) {
-                let airdropReward = new Decimal(this.airdropCampaign.amount)
-                    .dividedBy(new Decimal(this.airdropCampaign.participants));
+                return toMoney(this.airdropCampaign.reward, TOK.subunit);
+            }
 
-                return toMoney(airdropReward, TOK.subunit);
+            return 0;
+        },
+        halfReward: function() {
+            if (this.loaded) {
+                return toMoney(Decimal.div(this.airdropCampaign.reward, 2), TOK.subunit);
             }
 
             return 0;
@@ -269,9 +361,10 @@ export default {
         duration: {
             get: function() {
                 let now = moment();
-                return moment.duration(moment(this.endsDateTime).diff(moment(now))).asMilliseconds() <= 0
+                let format = 'D MMMM YYYY HH:mm:ss';
+                return moment.duration(moment(this.endsDateTime, format).diff(moment(now, format))).asMilliseconds() <= 0
                     ? moment.duration(0)
-                    : moment.duration(moment(this.endsDateTime).diff(moment(now)));
+                    : moment.duration(moment(this.endsDateTime, format).diff(moment(now, format)));
             },
             set: function(newDuration) {
                 return newDuration;
@@ -322,7 +415,7 @@ export default {
         actionMessage() {
             return this.$t('ongoing_airdrop.actions.message', {
                 tokenName: this.tokenName,
-                tokenUrl: this.tokenUrl,
+                tokenUrl: this.referralLink,
             });
         },
         tokenUrl() {
@@ -345,15 +438,64 @@ export default {
                 ? Object.keys(this.airdropCampaign.actions).every((key) => this.airdropCampaign.actions[key].done)
                 : true;
         },
+        referralLink() {
+            return this.$routing.generate(
+                'airdrop_referral',
+                {
+                    name: this.tokenName,
+                    hash: this.referralCode,
+                },
+                true
+            );
+        },
+        modalTokenUrl() {
+            return this.$routing.generate('token_show', {name: this.tokenName, tab: 'intro', modal: 'airdrop'}, true);
+        },
+        postLinkUrlDisabled() {
+            return this.checkingBlackListedDomain
+                || this.blackListedDomain
+                || this.$v.postLinkUrl.$invalid;
+        },
+        domainErrorMessage() {
+            if (this.$v.postLinkUrl.required && !this.$v.postLinkUrl.startsWith) {
+                return this.$t('api.airdrop.url_start_with');
+            }
+
+            if (!this.$v.postLinkUrl.url) {
+                return this.$t('api.airdrop.invalid_url');
+            }
+
+            if (this.blackListedDomain) {
+                return this.$t('api.airdrop.forbidden_domain', {
+                    domain: (new URL(this.postLinkUrl)).hostname,
+                });
+            }
+
+            return '';
+        },
+    },
+    watch: {
+        postLinkUrl: function() {
+            clearTimeout(this.checkDomainTimeout);
+            this.checkingBlackListedDomain = true;
+            this.blackListedDomain = false;
+            this.checkDomainTimeout = setTimeout(this.checkBlacklistedDomain, 500);
+        },
     },
     methods: {
+        showModalOnClick: function() {
+            this.showModal = !this.isOwner;
+        },
         showCountdown: function() {
+            this.duration = moment.duration(this.duration - 1000, 'milliseconds');
+            if (this.duration.asMilliseconds() <= 0) {
+                this.timeElapsed = true;
+                this.showDuration = false;
+            }
+        },
+        countdownInterval: function() {
             return setInterval(() => {
-                this.duration = moment.duration(this.duration - 1000, 'milliseconds');
-                if (this.duration.asMilliseconds() <= 0) {
-                    this.timeElapsed = true;
-                    this.showDuration = false;
-                }
+                this.showCountdown;
             }, 1000);
         },
         getAirdropCampaign: function() {
@@ -361,9 +503,11 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    this.airdropCampaign = result.data;
+                    this.airdropCampaign = result.data.airdrop;
+                    this.referralCode = result.data.referral_code;
                     this.loaded = true;
                     this.showCountdown();
+                    this.countdownInterval();
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_reload'));
@@ -380,17 +524,27 @@ export default {
                 return;
             }
 
+            this.alreadyClaimed = true;
+
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
             }))
-                .then(() => {
+                .then((response) => {
+                    if (response.data.hasOwnProperty('error')) {
+                        this.addPhoneModalVisible = true;
+                        return;
+                    }
+
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
-                    this.alreadyClaimed = true;
                 })
                 .catch((err) => {
+                    if (HTTP_UNAUTHORIZED === err.response.status) {
+                        this.addPhoneModalVisible = true;
+                        return;
+                    }
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
                         setTimeout(()=> {
@@ -399,6 +553,7 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
+                        this.alreadyClaimed = false;
                         this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
@@ -408,19 +563,6 @@ export default {
         modalOnCancel: function() {
             if (!this.loggedIn) {
                 window.location.replace(this.signupUrl);
-            }
-        },
-        openPopup(link, callback = null) {
-            let popup = window.open(link, 'popup', 'width=600,height=600');
-
-            // this is for giving the points after the popup is closed, but it doesn't work with twitter
-            if (callback) {
-                let interval = setInterval(() => {
-                    if (popup.closed) {
-                        clearInterval(interval);
-                        callback();
-                    }
-                }, 1000);
             }
         },
         claimAction(action) {
@@ -439,12 +581,50 @@ export default {
             });
         },
         claimTwitterMessage() {
-            this.openPopup(this.twitterMessageLink);
-            this.claimAction(this.airdropCampaign.actions.twitterMessage);
+            if (this.airdropCampaign.actions.twitterMessage.done) {
+                return openPopup(this.twitterMessageLink);
+            }
+
+            if (!this.isSignedInWithTwitter) {
+                return this.signInWithTwitter().then(this.claimTwitterMessage, (err) => this.notifyError(err.message));
+            }
+
+            this.showConfirmTwitterMessageModal = true;
+        },
+        doClaimTwitterMessage() {
+            this.$axios.single.post(this.$routing.generate('airdrop_share_twitter', {
+                tokenName: this.tokenName,
+            })).then(() => {
+                this.claimAction(this.airdropCampaign.actions.twitterMessage);
+            }).catch((err) => {
+                if (err.response.data.message === 'invalid twitter token') {
+                    return this.signInWithTwitter().then(this.claimTwitterMessage, (err) => this.notifyError(err.message));
+                }
+                this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                this.sendLogs('error', 'Error claiming twitter message action', err);
+            });
         },
         claimTwitterRetweet() {
-            this.openPopup(this.twitterRetweetLink);
-            this.claimAction(this.airdropCampaign.actions.twitterRetweet);
+            if (this.airdropCampaign.actions.twitterRetweet.done) {
+                return openPopup(this.twitterRetweetLink);
+            }
+
+            if (!this.isSignedInWithTwitter) {
+                return this.signInWithTwitter().then(this.claimTwitterRetweet, (err) => this.notifyError(err.message));
+            }
+
+            this.$axios.single.post(this.$routing.generate('retweet_action', {
+                tokenName: this.tokenName,
+                id: this.airdropCampaign.actions.twitterRetweet.id,
+            })).then(() => {
+                this.claimAction(this.airdropCampaign.actions.twitterRetweet);
+            }).catch((err) => {
+                if (err.response.data.message === 'invalid twitter token') {
+                    return this.signInWithTwitter().then(this.claimTwitterRetweet, (err) => this.notifyError(err.message));
+                }
+                this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                this.sendLogs('error', 'Error claiming twitter retweet action', err);
+            });
         },
         openFacebookMessage() {
             FB.ui({
@@ -453,10 +633,10 @@ export default {
             }, () => this.claimAction(this.airdropCampaign.actions.facebookMessage));
         },
         claimLinkedin() {
-            this.openPopup(this.linkedinLink, () => this.claimAction(this.airdropCampaign.actions.linkedinMessage));
+            openPopup(this.linkedinLink).then(() => this.claimAction(this.airdropCampaign.actions.linkedinMessage));
         },
         claimYoutube() {
-            this.openPopup(this.youtubeLink, () => {
+            openPopup(this.youtubeLink).then(() => {
                 this.signInYoutube()
                 .then(this.checkIfSubscribed, () => Promise.reject(new Error(this.$t('ongoing_airdrop.youtube_authentication_required'))))
                 .then(() => this.claimAction(this.airdropCampaign.actions.youtubeSubscribe), (err) => this.notifyError(err.message));
@@ -515,14 +695,30 @@ export default {
                 });
             });
         },
+        checkBlacklistedDomain: function() {
+            if (this.$v.postLinkUrl.$invalid) {
+                this.blackListedDomain = false;
+                this.checkingBlackListedDomain = false;
+                return;
+            }
+
+            this.$axios.retry.get(
+                this.$routing.generate('airdrop_domain_blacklist_check', {domain: this.postLinkUrl})
+            ).then(({data}) => {
+                this.blackListedDomain = data.blacklisted;
+                this.checkingBlackListedDomain = false;
+            }).catch((err) => this.sendLogs('error', 'airdrop_domain_blacklist_check', err));
+        },
     },
     created() {
+        this.getAirdropCampaign();
         this.loadYoutubeClient();
     },
     validations() {
         return {
             postLinkUrl: {
                 required: (val) => required(val.trim()),
+                startsWith: (val) => /^https?:\/\//.test(val),
                 url,
             },
         };

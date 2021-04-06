@@ -38,6 +38,7 @@ nelmio_security:
                 - 'https://mintme.com'
                 - 'https://*.tawk.to'
                 - 'wss://*.tawk.to'
+                - '%env(MERCURE_PUBLISH_URL)%'
             img-src:
                 - 'data:'
                 - '*'
@@ -85,3 +86,8 @@ nelmio_security:
                 '/^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)*/': '*'
                 'maxcdn.bootstrapcdn.com': '*'
                 'www.gstatic.com': ['media-src', 'img-src']
+    forced_ssl:
+        hsts_max_age: 31536000 # 30 days
+        hsts_subdomains: true
+        hsts_preload: true
+

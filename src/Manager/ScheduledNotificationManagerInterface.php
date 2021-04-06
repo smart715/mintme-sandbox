@@ -8,11 +8,16 @@ use App\Entity\User;
 interface ScheduledNotificationManagerInterface
 {
     public function getScheduledNotifications(): ?array;
-    public function createScheduledNotification(String $notificationType, User $user): void;
+    public function createScheduledNotification(
+        String $notificationType,
+        User $user,
+        bool $flush = true
+    ): ScheduledNotification;
     public function updateScheduledNotification(
         ScheduledNotification $scheduledNotification,
         String $newTimeInterval,
         \DateTimeImmutable $newTimeToBeSend
     ): void;
     public function removeScheduledNotification(int $scheduledNotificationId): int;
+    public function removeByTypeForUser(string $type, User $user): int;
 }

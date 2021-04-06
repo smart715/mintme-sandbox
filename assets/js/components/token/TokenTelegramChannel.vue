@@ -82,7 +82,7 @@ import {faTelegram} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
-import {HTTP_ACCEPTED} from '../../utils/constants';
+import {HTTP_OK} from '../../utils/constants';
 
 library.add(faTelegram, faTimes);
 
@@ -148,7 +148,7 @@ export default {
                 telegramUrl: this.newTelegram,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         let state = this.newTelegram ? 'added' : 'deleted';
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';

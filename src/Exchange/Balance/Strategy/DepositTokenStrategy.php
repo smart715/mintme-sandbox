@@ -49,10 +49,16 @@ class DepositTokenStrategy implements BalanceStrategyInterface
 
     private function withdrawBaseFee(User $user, Token $token): void
     {
+        $tokenDepositFee = $this->wallet->getDepositInfo($token)->getFee();
+
+        if ($tokenDepositFee->isNegative() || $tokenDepositFee->isZero()) {
+            return;
+        }
+
         $this->balanceHandler->withdraw(
             $user,
             Token::getFromSymbol($token->getCryptoSymbol()),
-            $this->wallet->getDepositInfo($token)->getFee()
+            $tokenDepositFee
         );
     }
 }

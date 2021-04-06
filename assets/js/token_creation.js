@@ -1,5 +1,6 @@
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import LimitedTextarea from './components/LimitedTextarea';
+import Guide from './components/Guide';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {NotificationMixin} from './mixins/';
 import i18n from './utils/i18n/i18n';
@@ -10,9 +11,9 @@ import {
     tokenValidLastChars,
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
-    HTTP_ACCEPTED,
     descriptionLength,
 } from './utils/constants';
+
 new Vue({
     el: '#token',
     i18n,
@@ -33,6 +34,7 @@ new Vue({
     components: {
         LimitedTextarea,
         FontAwesomeIcon,
+        Guide,
     },
     computed: {
         saveBtnDisabled: function() {
@@ -100,7 +102,7 @@ new Vue({
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
                 .then((res) => {
-                    if (res.status === HTTP_ACCEPTED) {
+                    if (res.status === HTTP_OK) {
                         frm.action = this.$routing.generate('token_show', {
                             name: this.tokenName,
                             tab: 'intro',
@@ -109,6 +111,18 @@ new Vue({
                         frm.submit();
                     }
                 }, (err) => this.notifyError(err.response.data.message));
+        },
+        tokenInvalid: function(e) {
+            e.target.setCustomValidity('Invalid token name.');
+            e.target.title = 'Invalid token name.';
+        },
+        tokenChange: function(e) {
+            e.target.setCustomValidity('');
+            e.target.title = '';
+        },
+        tokenInput: function(e) {
+            e.target.setCustomValidity('');
+            e.target.title = '';
         },
     },
     mounted: function() {

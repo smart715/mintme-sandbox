@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
@@ -17,6 +19,7 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterf
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
 use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -35,6 +38,8 @@ class User extends BaseUser implements
     TrustedDeviceInterface
 {
     public const ROLE_API = 'ROLE_API';
+    public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
 
     /**
      * @ORM\Id
@@ -185,7 +190,7 @@ class User extends BaseUser implements
     protected $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likes", fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $likes;
@@ -201,6 +206,36 @@ class User extends BaseUser implements
      * @var ArrayCollection
      */
     protected $airdropActions;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessToken;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessTokenSecret;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
+     */
+    protected Collection $rewardClaimedPosts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="airdropReferrals")
+     */
+    protected ?User $airdropReferrerUser;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="airdropReferrerUser", fetch="EXTRA_LAZY")
+     */
+    protected Collection $airdropReferrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop")
+     */
+    protected ?Airdrop $airdropReferrer;
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
@@ -544,5 +579,61 @@ class User extends BaseUser implements
     public function getAirdropActions(): ArrayCollection
     {
         return $this->airdropActions;
+    }
+
+    public function setTwitterAccessToken(?string $token): self
+    {
+        $this->twitterAccessToken = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessToken(): ?string
+    {
+        return $this->twitterAccessToken;
+    }
+
+    public function setTwitterAccessTokenSecret(?string $token): self
+    {
+        $this->twitterAccessTokenSecret = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessTokenSecret(): ?string
+    {
+        return $this->twitterAccessTokenSecret;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isSignedInWithTwitter(): bool
+    {
+        return null !== $this->twitterAccessToken && null !== $this->twitterAccessTokenSecret;
+    }
+
+    public function setAirdropReferrer(Airdrop $airdrop): self
+    {
+        $this->airdropReferrer = $airdrop;
+
+        return $this;
+    }
+
+    public function getAirdropReferrer(): ?Airdrop
+    {
+        return $this->airdropReferrer;
+    }
+
+    public function setAirdropReferrerUser(User $user): self
+    {
+        $this->airdropReferrerUser = $user;
+
+        return $this;
+    }
+
+    public function getAirdropReferrerUser(): ?User
+    {
+        return $this->airdropReferrerUser;
     }
 }

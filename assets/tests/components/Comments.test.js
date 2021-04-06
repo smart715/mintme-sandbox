@@ -9,6 +9,7 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -55,7 +56,7 @@ describe('Comments', () => {
         });
 
         expect(wrapper.findAll('comment-stub').length).toBe(0);
-        expect(wrapper.find('.comments').html()).toContain('No one commented yet.');
+        expect(wrapper.find('.comments').html()).toContain('post.no_one_commented');
     });
 
     it('shows comments if comments is not empty', () => {

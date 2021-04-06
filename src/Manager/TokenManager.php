@@ -229,6 +229,21 @@ class TokenManager implements TokenManagerInterface
         }, $rewardZero);
     }
 
+    public function findAllTokensWithEmptyDescription(int $param = 14): ?array
+    {
+        return $this->repository->findAllTokensWithEmptyDescription($param);
+    }
+
+    public function getTokensWithoutAirdrops(): array
+    {
+        return $this->repository->getTokensWithoutAirdrops();
+    }
+
+    public function getTokensWithAirdrops(): array
+    {
+        return $this->repository->getTokensWithAirdrops();
+    }
+
     private function getProfile(): ?Profile
     {
         return $this->profileFetcher->fetchProfile();
@@ -243,11 +258,5 @@ class TokenManager implements TokenManagerInterface
         return $token
             ? $token->getUser()
             : null;
-    }
-
-
-    public function findAllTokensWithEmptyDescription(int $param = 14): ?array
-    {
-        return $this->repository->findAllTokensWithEmptyDescription($param);
     }
 }

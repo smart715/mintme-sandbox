@@ -7,4 +7,5 @@ use App\Entity\Post;
 interface PostManagerInterface
 {
     public function getById(int $id): ?Post;
+    public function getBySlug(string $slug): ?Post;
 }

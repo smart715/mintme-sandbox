@@ -8,7 +8,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
-use App\Events\OrderCompletedEvent;
+use App\Events\OrderEvent;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
@@ -74,7 +74,7 @@ class Trader implements TraderInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function placeOrder(Order $order): TradeResult
+    public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
     {
         $result = $this->fetcher->placeOrder(
             $order->getMaker()->getId(),
@@ -92,18 +92,14 @@ class Trader implements TraderInterface
 
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new OrderCompletedEvent(
-                    $order,
-                    $quote
-                ),
-                OrderCompletedEvent::CREATED
-            );
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
-            if ($quote instanceof Token) {
-                $this->updateUserTokenReferencer($order->getMaker(), $quote);
-            } elseif ($quote instanceof Crypto) {
-                $this->updateUserCrypto($order->getMaker(), $quote);
+            if ($updateTokenOrCrypto) {
+                if ($quote instanceof Token) {
+                    $this->updateUserTokenReferencer($order->getMaker(), $quote);
+                } elseif ($quote instanceof Crypto) {
+                    $this->updateUserCrypto($order->getMaker(), $quote);
+                }
             }
         }
 
@@ -231,7 +227,7 @@ class Trader implements TraderInterface
             ),
             $status,
             null,
-            $orderData['mtime']
+            $orderData['mtime'] ?? null,
         );
     }
 

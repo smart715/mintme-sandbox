@@ -71,7 +71,7 @@
 <script>
 import {mapGetters} from 'vuex';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
-const updateMessagesMS = 1000;
+const updateMessagesMS = 3500;
 
 export default {
     name: 'ChatBox',
@@ -99,6 +99,7 @@ export default {
                     label: 'messages:',
                 },
             ],
+            updaterId: null,
         };
     },
     computed: {
@@ -236,7 +237,10 @@ export default {
                 .catch((error) => this.sendLogs('error', 'update messages response error', error));
         },
         updateMessagesInterval: function() {
-            setInterval(() => {
+            if (this.updaterId) {
+                clearInterval(this.updaterId);
+            }
+            this.updaterId = setInterval(() => {
                 this.updateMessages();
             }, updateMessagesMS);
         },
@@ -257,4 +261,3 @@ export default {
     },
 };
 </script>
-

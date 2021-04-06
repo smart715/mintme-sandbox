@@ -10,7 +10,7 @@ security:
 
     firewalls:
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern: ^(%translation_prefixes%)?/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
             anonymous: ~
@@ -42,7 +42,7 @@ security:
                 auth_form_path: 2fa_login
                 check_path: 2fa_login_check
                 default_target_path: login_success
-                always_use_default_target_path: false
+                always_use_default_target_path: true
                 multi_factor: true
                 csrf_token_generator: security.csrf.token_manager
                 authentication_required_handler: two_factor.auth_require_handler
@@ -51,6 +51,10 @@ security:
             security:   false
 
     role_hierarchy:
+        ROLE_AUTENTICATED:
+            - ROLE_USER
+        ROLE_SEMI_AUTHENTICATED:
+            - ROLE_USER
         ROLE_ADMIN_USER_ADMIN:
             - ROLE_ADMIN_USER_LIST
             - ROLE_ADMIN_USER_VIEW
@@ -74,28 +78,30 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ADMIN_USER_SUPER, ROLE_COPYWRITER]
 
     access_control:
-        - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API }
-        - { path: ^(%translation_prefixes%)/api/media/upload,                                role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/send-code$,              role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/deploy,                  role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/contract/update,         role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/users,                                       role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/message,                                          role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/token$,                                          role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/chat,                                            role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/wallet,                                          role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/notifications,                               role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/api/wallet,                                      role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER }
-        - { path: ^(%translation_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS] }
-        - { path: ^(%translation_prefixes%)/api,                                             role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^(%translation_prefixes%)/dev/api/v2/open,                                 role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^(%translation_prefixes%)/register,                                        role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^(%translation_prefixes%)/resetting,                                       role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
-        - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN }
-        - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN }
+        - { path: ^(%translation_prefixes%)/dev/api/(v1|v2/auth),                            role: ROLE_API, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/media/upload,                                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/send-code$,              role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/deploy,                  role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/contract/update,         role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/posts/comments/delete/[0-9]+,               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/users,                                       role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/message,                                          role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/token$,                                          role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/chat,                                            role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/profile/phone/verify,                            role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/wallet,                                          role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/notifications,                               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/wallet,                                      role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/referral-program,                                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/logout$,                                         roles: [ROLE_USER, IS_AUTHENTICATED_2FA_IN_PROGRESS], requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api,                                             role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/dev/api/v2/open,                                 role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/register,                                        role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/resetting,                                       role: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN, requires_channel: https}

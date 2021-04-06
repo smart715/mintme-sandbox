@@ -1,7 +1,13 @@
-{% extends('mail/new_layout.txt.twig') %}
+{% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
-{% trans with {'%tokenName%': tokenName} %}mail.deployed.msg{% endtrans %}
-{% trans %}mail.deployed.text_link{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans with {'%tokenName%': tokenName} %} mail.deployed.msg {% endtrans %}
+
+
+{% trans %} mail.deployed.text_link {% endtrans %}
+
+{{ absolute_url(path('token_show', {'name': tokenName })) }}
+
 {% endblock %}
+

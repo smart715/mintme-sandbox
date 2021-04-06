@@ -236,8 +236,7 @@
                                 <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
                             </div>
                         </template>
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        && tokens.length">
+                        <template v-if="shouldShowAll">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
@@ -465,6 +464,13 @@ export default {
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
         },
+        shouldShowAll: function() {
+            const totalPages = Math.ceil(this.totalRows / this.perPage);
+
+            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                && this.tokens.length
+                && this.currentPage === totalPages;
+        },
     },
     mounted() {
         this.initialLoad();
@@ -651,7 +657,7 @@ export default {
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.deal),
+                parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 monthVolume,
                 supply,
                 marketPrecision,
@@ -673,7 +679,7 @@ export default {
                 ...market,
                 openPrice: marketInfo.open,
                 lastPrice: marketInfo.last,
-                dayVolume: marketInfo.deal,
+                dayVolume: parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
             };
         },
         getSanitizedMarket: function(
@@ -828,7 +834,7 @@ export default {
                 ),
                 market.lastPrice,
                 market.dayVolume,
-                market.monthVolume = marketInfo.deal,
+                market.monthVolume = parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 market.supply,
                 market.base.subunit,
                 tokenized,

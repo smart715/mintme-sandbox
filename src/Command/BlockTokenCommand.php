@@ -4,7 +4,13 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\ExchangerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +23,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class BlockTokenCommand extends Command
 {
+    private const ORDERS_LIMIT = 100;
+
     /** @var string */
     protected static $defaultName = 'app:block';
 
@@ -32,16 +40,36 @@ class BlockTokenCommand extends Command
     /** @var UserActionLogger */
     private $logger;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var MarketFactoryInterface */
+    private $marketFactory;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var ExchangerInterface */
+    private $exchanger;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
         EntityManagerInterface $em,
-        UserActionLogger $logger
+        UserActionLogger $logger,
+        MarketHandlerInterface $marketHandler,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager,
+        ExchangerInterface $exchanger
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
         $this->em = $em;
         $this->logger = $logger;
+        $this->marketHandler = $marketHandler;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
+        $this->exchanger = $exchanger;
         parent::__construct();
     }
 
@@ -147,6 +175,10 @@ class BlockTokenCommand extends Command
                 : 'Token '.$token->getName().' and User '.$user->getUsername()
             );
 
+        if (!$unblock) {
+            $this->cancelOrders($token, $tokenOption, $userOption, $io);
+        }
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -188,5 +220,57 @@ class BlockTokenCommand extends Command
         }
 
         return false;
+    }
+
+    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption, SymfonyStyle $io): void
+    {
+        /** @var User $user */
+        $user = $token->getOwner();
+        $coinMarkets = $this->marketFactory->getCoinMarkets();
+        $tokenMarket = $this->marketFactory->create(
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+            $token
+        );
+
+        if ((!$userOption && $tokenOption) || (!$userOption && !$tokenOption)) {
+            $this->cancelTokenOrders($tokenMarket, Order::SELL_SIDE);
+            $this->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);
+        }
+
+        if (($userOption && !$tokenOption) || (!$userOption && !$tokenOption)) {
+            $this->cancelCoinOrders($user, $coinMarkets);
+        }
+    }
+
+    public function cancelTokenOrders(Market $market, int $side): void
+    {
+        do {
+            $orders = Order::SELL_SIDE === $side
+                ? $this->marketHandler->getPendingSellOrders($market, 0, self::ORDERS_LIMIT)
+                : $this->marketHandler->getPendingBuyOrders($market, 0, self::ORDERS_LIMIT);
+
+            $this->cancelOrdersList($orders);
+        } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    public function cancelCoinOrders(User $user, array $markets): void
+    {
+        do {
+            $orders = $this->marketHandler->getPendingOrdersByUser(
+                $user,
+                $markets,
+                0,
+                self::ORDERS_LIMIT
+            );
+
+            $this->cancelOrdersList($orders);
+        } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    public function cancelOrdersList(array $orders): void
+    {
+        foreach ($orders as $order) {
+            $this->exchanger->cancelOrder($order->getMarket(), $order);
+        }
     }
 }

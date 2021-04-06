@@ -82,8 +82,8 @@
                                     </template>
                                 </guide>
                             </div>
-                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
-                                {{ $t('token.intro.statistics.sold.header') }} <br v-if="isMintmeToken">
+                            <div v-if="isMintmeToken" class="pb-1">
+                                {{ $t('token.intro.statistics.sold.header') }} <br>
                                 {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
                                 <guide>
                                     <template slot="header">
@@ -122,7 +122,9 @@
                             <div class="pb-1">
                                 {{ $t('token.intro.statistics.period.header') }} <br>
                                 {{ stats.releasePeriod }}
-                                <template v-if="stats.releasePeriod !== defaultValue">year(s)</template>
+                                <template v-if="stats.releasePeriod !== defaultValue">
+                                    {{ $t('text.time.year') }}
+                                </template>
                                 <guide>
                                     <template slot="header">
                                         {{ $t('token.intro.statistics.period.guide_header') }}
@@ -221,28 +223,70 @@ export default {
         tokenContractAddress: String,
         tokenCreated: String,
         websocketUrl: String,
+        soldOnMarketProp: {
+            type: Number,
+            default: null,
+        },
+        donationVolumeProp: {
+            type: Number,
+            default: null,
+        },
+        tokenWithdrawnProp: {
+            type: Number,
+            default: null,
+        },
+        tokenExchangeProp: {
+            type: Number,
+            default: null,
+        },
+        activeOrders: {
+            type: Number,
+            default: null,
+        },
+        statsProp: {
+          type: Object,
+          default: null,
+        },
     },
     data() {
         return {
             pendingSellOrders: null,
-            soldOnMarket: null,
-            isTokenExchanged: true,
+            soldOnMarket: this.soldOnMarketProp,
             defaultValue: defaultValue,
-            tokenWithdrawn: 0,
-            donationVolume: 0,
+            tokenWithdrawn: this.tokenWithdrawnProp,
+            donationVolume: this.donationVolumeProp,
         };
     },
     mounted: function() {
         if (this.isMintmeToken) {
-            this.getTokenWithdrawn();
-            this.getLockPeriod();
-            this.getTokExchangeAmount();
+            if (null === this.tokenWithdrawnProp) {
+                this.getTokenWithdrawn();
+            }
+
+            if (!this.statsProp) {
+                this.getLockPeriod();
+            } else {
+                this.stats = this.statsProp;
+            }
+
+            if (null === this.tokenExchangeProp) {
+                this.getTokExchangeAmount();
+            } else {
+                this.tokenExchangeAmount = this.tokenExchangeProp;
+            }
         }
 
-        this.getIsTokenExchanged();
-        this.getTokenSoldOnMarket();
-        this.getPendingOrders();
-        this.getMarketStatus();
+        if (null === this.soldOnMarket) {
+            this.getTokenSoldOnMarket();
+        }
+
+        if (!this.activeOrders) {
+            this.getPendingOrders();
+        }
+
+        if (null === this.donationVolume) {
+            this.getMarketStatus();
+        }
 
         this.sendMessage(JSON.stringify({
             method: 'kline.subscribe',
@@ -280,13 +324,6 @@ export default {
                 .then((res) => this.tokenExchangeAmount = res.data)
                 .catch((err) => {
                   this.sendLogs('error', 'Can not load statistic data', err);
-                });
-        },
-        getIsTokenExchanged: function() {
-            this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {name: this.market.quote.symbol}))
-                .then((res) => this.isTokenExchanged = res.data)
-                .catch((err) => {
-                  this.sendLogs('error', 'Can not load token data', err);
                 });
         },
         getTokenSoldOnMarket: function() {
@@ -334,14 +371,17 @@ export default {
             };
         },
         loaded: function() {
-            return this.isMintmeToken
-                ? this.tokenExchangeAmount !== null && this.pendingSellOrders !== null && this.soldOnMarket !== null
-                : this.pendingSellOrders !== null && this.soldOnMarket !== null;
+            return (!this.isMintmeToken || this.tokenExchangeAmount !== null)
+                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.activeOrders !== null);
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
+            if (this.activeOrders) {
+                return this.activeOrders;
+            }
+
             let sum = new Decimal(0);
             for (let key in this.pendingSellOrders) {
                 if (this.pendingSellOrders.hasOwnProperty(key)) {

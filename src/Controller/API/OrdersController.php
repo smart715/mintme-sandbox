@@ -3,7 +3,7 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
-use App\Events\OrderCompletedEvent;
+use App\Events\OrderEvent;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -12,6 +12,7 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
+use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -23,6 +24,7 @@ use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/orders")
@@ -45,16 +47,21 @@ class OrdersController extends AbstractFOSRestController
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var TranslatorInterface */
+    private $translations;
+
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translations
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translations = $translations;
     }
 
     /**
@@ -94,16 +101,8 @@ class OrdersController extends AbstractFOSRestController
             $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
 
-            $quote = $market->getQuote();
-
             /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new OrderCompletedEvent(
-                    $order,
-                    $quote
-                ),
-                OrderCompletedEvent::CANCELLED
-            );
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
 
         return $this->view(Response::HTTP_OK);
@@ -133,11 +132,29 @@ class OrdersController extends AbstractFOSRestController
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
+        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+        $maxAllowedValidator = new MaxAllowedOrdersValidator(
+            $maxAllowedOrders,
+            $currentUser,
+            $this->marketHandler,
+            $this->marketManager
+        );
+
+        if (!$maxAllowedValidator->validate()) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => $this->translations->trans(
+                    'api.orders.max_allowed_active_orders',
+                    ['%maxAllowed%' => $maxAllowedOrders],
+                ),
+            ], Response::HTTP_OK);
+        }
+
         if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
                 'result' => TradeResult::FAILED,
                 'message' => 'Invalid price quantity',
-            ], Response::HTTP_ACCEPTED);
+            ], Response::HTTP_OK);
         }
 
         $tradeResult = $exchanger->placeOrder(
@@ -152,7 +169,7 @@ class OrdersController extends AbstractFOSRestController
         return $this->view([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**

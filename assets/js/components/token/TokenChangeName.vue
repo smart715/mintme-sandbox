@@ -12,7 +12,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameExists"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.taken') }}
@@ -21,7 +21,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameInBlacklist"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.forbidden') }}
@@ -87,7 +87,6 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_OK,
-    HTTP_ACCEPTED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
@@ -218,7 +217,7 @@ export default {
                 code: code,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         this.currentName = response.data['tokenName'];
                         this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 

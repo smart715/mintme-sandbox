@@ -8,7 +8,7 @@
                 <template v-if="loaded">
                     <b-table v-if="hasTraders"
                         ref="table"
-                        :items="traders"
+                        :items="holders"
                         :fields="fields"
                     >
                         <template v-slot:cell(trader)="row">
@@ -35,21 +35,25 @@
 import moment from 'moment';
 import {formatMoney} from '../../utils';
 import {GENERAL} from '../../utils/constants';
-import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins';
+import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
 import HolderName from './HolderName';
 
 export default {
     name: 'TopHolders',
-    mixins: [FiltersMixin, LoggerMixin, NotificationMixin],
+    mixins: [FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin],
     components: {
         HolderName,
     },
     props: {
-      tokenName: String,
+        tokenName: String,
+        tradersProp: {
+            type: Array,
+            default: () => null,
+        },
     },
     data() {
         return {
-            traders: null,
+            traders: this.tradersProp,
             fields: [
                 {
                     key: 'trader',
@@ -74,6 +78,17 @@ export default {
         hasTraders: function() {
             return this.traders.length > 0;
         },
+        holders: function() {
+            return this.traders.map((row) => {
+                return {
+                    trader: row.user.profile.nickname,
+                    traderAvatar: row.user.profile.image.avatar_small,
+                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
+                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateTimeFormat) : '-',
+                    amount: Math.round(row.balance),
+                };
+            });
+        },
     },
     methods: {
         scrollDown: function() {
@@ -81,26 +96,32 @@ export default {
             parentDiv.scrollTop = parentDiv.scrollHeight;
         },
         getTraders: function() {
-            this.$axios.single.get(this.$routing.generate('top_holders', {
-                name: this.tokenName,
-            }))
-            .then(({data}) => this.traders = data.map((row) => {
-                return {
-                    trader: row.user.profile.nickname,
-                    traderAvatar: row.user.profile.image.avatar_small,
-                    url: this.$routing.generate('profile-view', {nickname: row.user.profile.nickname}),
-                    date: row.timestamp ? moment.unix(row.timestamp).format(GENERAL.dateFormat) : '-',
-                    amount: Math.round(row.balance),
-                };
-            })).catch((err) => {
-                this.sendLogs('error', 'Can not get top holders', err)
-                .then(() => {}, () => {});
+            return new Promise((resolve, reject) => {
+                this.$axios.retry.get(this.$routing.generate('top_holders', {
+                    name: this.tokenName,
+                }))
+                    .then(({data}) => {
+                        this.traders = data;
+                        resolve(data);
+                    })
+                    .catch((err) => reject(
+                        this.sendLogs('error', 'Can not get top holders', err)
+                    ));
             });
         },
     },
     mounted: function() {
-        this.getTraders();
-        setInterval(() => this.getTraders(), 20 * 1000);
+        if (!this.traders) {
+            this.getTraders();
+        }
+
+        this.getTraders().then(() => {
+            this.addMessageHandler((response) => {
+                if ('deals.update' === response.method) {
+                    this.getTraders();
+                }
+            }, 'update-top-holders', 'TopHolders');
+        });
     },
 };
 </script>

@@ -91,7 +91,7 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
-import {HTTP_ACCEPTED} from '../../../utils/constants';
+import {HTTP_OK} from '../../../utils/constants';
 
 library.add(faFacebookSquare, faTimes);
 
@@ -163,8 +163,8 @@ export default {
                 facebookUrl: this.selectedUrl,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
+                    if (response.status === HTTP_OK) {
+                        let state = this.selectedUrl ? `added` : 'deleted';
                         this.notifySuccess(this.$t(
                             'toasted.success.facebook.' + state,
                             {address: this.selectedUrl}

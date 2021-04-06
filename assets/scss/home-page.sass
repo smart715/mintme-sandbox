@@ -3,6 +3,8 @@
 @import "mixins"
 
 .homepage
+  font-size: 16px
+
   nav
     position: relative
 
@@ -19,42 +21,103 @@
     @include media-breakpoint-up(sm)
       position: absolute
 
-  .text-responsive
-    font-size: calc(1em + 3vw)
-
-    @include media-breakpoint-down(md)
-      font-size: calc(1em + 1.7vw)
-
-    @include media-breakpoint-down(xs)
-      font-size: 3rem
-
   #top-showcase
-    margin-top: 6.9%
+    margin-top: 0
+    background: linear-gradient(#345385, #152138 30%)
+    font-size: 14px
 
-    @include media-breakpoint-down(sm)
-      margin-top: 0
-      background: linear-gradient(#345385, #152138)
+    @include media-breakpoint-up(md)
+      margin-top: 5%
+      background: none
+      font-size: 16px
 
-    // To fix chrome display issue
-    .h-100
+    .h-100 // To fix chrome display issue
       @include media-breakpoint-down(sm)
         height: auto !important
 
+    .container
+      @media screen and (min-width: 1400px)
+        padding-left: 0 !important
+        padding-right: 0 !important
+
     .title
       font-family: $concord-font
-      line-height: 1.1
-      font-size: 1em
+      font-size: 3.1em
+      min-height: 3.3em
 
-      @include media-breakpoint-down(md)
-        font-size: 2rem
+      @media screen and (min-width: 320px)
+        font-size: 3.59em
 
-      @include media-breakpoint-down(sm)
-        font-size: 3rem
+      @include media-breakpoint-up(sm)
+        font-size: 4.6em
+        min-height: 0
+
+      @include media-breakpoint-up(md)
+        font-size: 2.6em
+
+      @include media-breakpoint-up(lg)
+        font-size: 3.6em
+
+      @include media-breakpoint-up(xl)
+        font-size: 4.4em
+
+      @media screen and (min-width: 1400px)
+        font-size: 5.4em
+
+      #typed
+        br
+          @include media-breakpoint-up(sm)
+            display: none
+
+    .subtitle
+      font-size: 1.58em
+
+      @include media-breakpoint-up(md)
+        font-size: 1.3em
+        margin-top: 10%
+
+      @include media-breakpoint-up(xl)
+        font-size: 1.44em
+
+      @media screen and (min-width: 1400px)
+        font-size: 2em
 
     .tip
       display: inline-block
       font-size: 0.5em
       line-height: 1.25
+
+    .feed-container
+      width: 100%
+
+      @include media-breakpoint-up(lg)
+        width: 75%
+
+      .feed
+        border-radius: 1em
+        border: 1px solid #ffffff
+        overflow: hidden
+
+        .feed-row
+          background-color: #194276
+
+          &:nth-of-type(2n)
+            background-color: #1e5496
+
+          .feed-cell
+            padding: 0.3em
+
+            &:first-child
+              padding-left: 1em
+              word-break: break-all
+
+            &:last-child
+              padding-right: 1em
+              white-space: nowrap
+              text-align: center
+
+            a
+              color: $dark-white
 
   .btn-register
     text-transform: uppercase
@@ -71,11 +134,10 @@
       background: $dark-white !important
       color: $primary !important
 
-  .btn-big
-    @include media-breakpoint-up(lg)
-      font-size: 1.4rem
-    @include media-breakpoint-up(xl)
-      font-size: 2rem
+  .homepage-action-button
+    @media screen and (min-width: 1400px)
+      font-size: 2em
+      padding: 0.3em 0.8em
 
   .btn-ghost
     border-color: $dark-white
@@ -95,9 +157,7 @@
         color: $primary-light
 
   #description
-    margin-top: 30.7%
-    @include media-breakpoint-down(sm)
-      margin-top: 0
+    margin-top: 0
 
     .countdown
       border: $ghost-light solid 2px
@@ -148,6 +208,8 @@
         .card-header
           background: transparent
 
+          /* stylelint-disable no-descending-specificity */
           a
             text-decoration: none
             white-space: normal
+          /* stylelint-enable no-descending-specificity */

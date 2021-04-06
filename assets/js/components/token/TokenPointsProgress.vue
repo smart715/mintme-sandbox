@@ -33,28 +33,18 @@ export default {
         tokenYoutube: String,
         tokenWebsite: String,
         tokenStatus: String,
+        isMintmeToken: Boolean,
     },
     components: {
         CircleProgress,
         Guide,
-    },
-    data() {
-        return {
-            tokenReleasePeriodPoint: 0,
-        };
-    },
-    watch: {
-        tokenReleasePeriodSet(value) {
-            this.tokenReleasePeriodPoint = value;
-        },
     },
     computed: {
         ...mapGetters('tokenStatistics', {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            if (typeof this.releasePeriod === 'number') return 4;
-            return 0;
+            return (typeof this.releasePeriod === 'number') || !this.isMintmeToken ? 4 : 0;
         },
         tokenDescriptionSet: function() {
             return this.tokenDescription ? 4 : 0;
@@ -77,7 +67,7 @@ export default {
             return 0;
         },
         tokenPointsGained: function() {
-            return this.tokenReleasePeriodPoint +
+            return this.tokenReleasePeriodSet +
                 this.tokenDescriptionSet +
                 this.socialMediaSet +
                 this.tokenDeployedSet +

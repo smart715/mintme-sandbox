@@ -44,4 +44,10 @@ interface TokenManagerInterface
     public function getDeployedTokens(?int $offset = null, ?int $limit = null): array;
 
     public function getUserDeployTokensReward(User $user): Money;
+
+    /** @return Token[] */
+    public function getTokensWithoutAirdrops(): array;
+
+    /** @return Token[] */
+    public function getTokensWithAirdrops(): array;
 }

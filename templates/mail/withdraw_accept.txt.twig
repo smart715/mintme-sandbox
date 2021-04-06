@@ -1,8 +1,13 @@
-{% extends('mail/new_layout.txt.twig') %}
+{% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{user.userName}}
-{% trans %}email.withdraw.confirm{% endtrans %}
-{% trans %}email.withdraw.body{% endtrans %}
-{{confirmationUrl}}
+
+{% trans %} hello {% endtrans %}, {{ user.userName }}!
+{% trans %} email.withdraw.confirm {% endtrans %}
+
+
+{% trans %} email.withdraw.body {% endtrans %}
+
+{{ confirmationUrl }}
+
 {% endblock %}
+

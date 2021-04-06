@@ -59,8 +59,9 @@ let propsForTestCorrectlyRenders = {
     disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
-const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};
-const expectData = [{name: 'foo'}, {name: 'bar'}];
+const assertData = {foo: {name: 'foo', available: 1}, bar: {name: 'bar', available: 1}, baz: {name: 'baz', available: 0}};
+const expectData = [{name: 'foo', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
+const expectedTokenData = [{name: 'foo', available: 1}, {name: 'bar', available: 1}];
 
 let assertTokens = {};
 assertTokens['oTokenName'] = {};
@@ -132,7 +133,7 @@ describe('Wallet', () => {
         wrapper.vm.tokens = null;
         expect(wrapper.vm.items).toEqual([]);
         wrapper.vm.tokens = assertData;
-        expect(wrapper.vm.items).toMatchObject(expectData);
+        expect(wrapper.vm.items).toMatchObject(expectedTokenData);
     });
 
     it('should compute showLoadingIconP correctly', () => {

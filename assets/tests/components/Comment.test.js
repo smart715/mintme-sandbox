@@ -12,6 +12,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -72,6 +73,7 @@ describe('Comments', () => {
         const localVue = mockVue();
         let comment = Object.assign({}, testComment);
         comment.editable = true;
+        comment.deletable = true;
         const wrapper = shallowMount(Comment, {
             localVue,
             propsData: {
@@ -162,6 +164,7 @@ describe('Comments', () => {
             install(Vue, options) {
                 Vue.prototype.$routing = {generate: (val) => val};
                 Vue.prototype.$axios = {retry: mockAxios, single: mockAxios};
+                Vue.prototype.$t = (val) => val;
             },
         });
 

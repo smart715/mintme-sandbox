@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    {% if app.user %}
+    {% if app.user and isTokenPage and  isOwner is same as ('true') %}
         <div class="row justify-content-center">
             <div class="card h-100 col-12 col-md-10 col-lg-8">
                 <div class="card-header">
@@ -595,11 +595,7 @@
             <div class="card-header">
                 {% trans %}page.pair.posts_title{% endtrans %}
             </div>
-            <div class="card-body posts">
-                <div>
-                    {% trans %}post.not_any_post{% endtrans %}
-                </div>
-            </div>
+            {% include 'spinners/posts_card_body.html.twig' %}
         </div>
     </div>
 </div>

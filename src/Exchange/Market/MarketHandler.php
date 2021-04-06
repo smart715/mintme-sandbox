@@ -12,6 +12,7 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
@@ -322,7 +323,7 @@ class MarketHandler implements MarketHandlerInterface
                 Order::SIDE_MAP[$orderData['type']],
                 $this->moneyWrapper->parse(
                     $orderData['price'],
-                    $this->getSymbol($market->getQuote())
+                    $this->getSymbol($market->getBase())
                 ),
                 Order::FINISHED_STATUS,
                 $this->moneyWrapper->parse(
@@ -452,6 +453,21 @@ class MarketHandler implements MarketHandlerInterface
             $expires = null;
         }
 
+        $volumeDonation =  $this->moneyWrapper->parse(
+            $result['volumeDonation'],
+            $this->getSymbol($market->getQuote())
+        );
+
+        $dealDonationDay =  $this->moneyWrapper->parse(
+            $result['dealDonation'],
+            $this->getSymbol($market->getBase())
+        );
+
+        $dealDonationMonth =  $this->moneyWrapper->parse(
+            $monthResult['dealDonation'],
+            $this->getSymbol($market->getBase())
+        );
+
         return new MarketInfo(
             $market->getBase()->getSymbol(),
             $market->getQuote()->getSymbol(),
@@ -462,7 +478,7 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $result['volume'],
                 $this->getSymbol($market->getQuote())
-            ),
+            )->add($volumeDonation),
             $this->moneyWrapper->parse(
                 $result['open'],
                 $this->getSymbol($market->getBase())
@@ -482,11 +498,11 @@ class MarketHandler implements MarketHandlerInterface
             $this->moneyWrapper->parse(
                 $result['deal'],
                 $this->getSymbol($market->getBase())
-            ),
+            )->add($dealDonationDay),
             $this->moneyWrapper->parse(
                 $monthResult['deal'],
                 $this->getSymbol($market->getBase())
-            ),
+            )->add($dealDonationMonth),
             $this->moneyWrapper->parse(
                 $buyDepth,
                 $this->getSymbol($market->getBase())
@@ -555,7 +571,7 @@ class MarketHandler implements MarketHandlerInterface
     }
 
     /** {@inheritdoc} */
-    public function getSellOrdersSummary(Market $market): string
+    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult
     {
         $offset = 0;
         $limit = 100;
@@ -578,7 +594,16 @@ class MarketHandler implements MarketHandlerInterface
             )->add($sum);
         }, $zeroDepth);
 
-        return $this->moneyWrapper->format($sellOrdersSum);
+        $sellOrdersSum = $this->moneyWrapper->format($sellOrdersSum);
+
+        /** @var Money $quoteAmountSummary */
+        $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getAmount()->add($sum);
+        }, $zeroDepth);
+
+        $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
+
+        return new SellOrdersSummaryResult($sellOrdersSum, $quoteAmountSummary);
     }
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array
@@ -639,21 +664,18 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        $mintmeCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $market = new Market($token->getCrypto() ?? $mintmeCrypto, $token);
-        $available = $this->balanceHandler->balance($token->getProfile()->getUser(), $token)->getAvailable();
+        if (!$token->isMintmeToken()) {
+            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        }
+
         $init = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_quantity'),
             Token::TOK_SYMBOL
         );
-        $ownPendingOrders = $this->getPendingOrdersByUser($token->getOwner(), [$market]);
 
-        foreach ($ownPendingOrders as $order) {
-            if (Order::SELL_SIDE === $order->getSide()) {
-                $available = $available->add($order->getAmount());
-            }
-        }
+        $balanceView = $this->balanceHandler->balance($token->getOwner(), $token);
 
-        return $init->subtract($available);
+        return $init->subtract($balanceView->getAvailable())
+            ->subtract($balanceView->getFreeze());
     }
 }

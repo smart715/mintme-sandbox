@@ -12,6 +12,7 @@ export const tokenValidLastChars = helpers.regex('lastChars', /[\s]+$/u);
 export const tokenNoSpaceBetweenDashes = helpers.regex('spaceBetweenDashes', /-+\s+-+/u);
 export const tokenNameValidChars = helpers.regex('validChars', /^[\sA-Za-z0-9]+$/u);
 export const twoFACode = helpers.regex('numberInput', /^\d{6}$|^[A-Za-z\d]{12}$/);
+export const phoneVerificationCode = helpers.regex('code', /^\d{6}$/);
 export const nickname = helpers.regex('nickname', /^[A-Za-z\d]+$/u);
 export const names = helpers.regex('names', /^[A-Za-z]+[A-Za-z\s'‘’`´-]*$/u);
 export const allNames = helpers.regex('allNames', /^[A-Za-z\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f-\s'‘’`´-]+$/u);
@@ -32,7 +33,8 @@ export const TOKEN_NAME_CHANGED = 'token_name_changed';
 
 export const GENERAL = {
     precision: 8,
-    dateFormat: 'DD.MM.YYYY HH:mm:ss',
+    dateTimeFormat: 'DD.MM.YYYY HH:mm:ss',
+    dateFormat: 'MMM D, YYYY',
 };
 
 export const webSymbol = 'WEB';
@@ -142,8 +144,10 @@ export const notificationTypes = {
     deployed: 'deployed',
     newPost: 'new_post',
     newInvestor: 'new_investor',
+    tokenMarketingTips: 'token_marketing_tips',
 };
 
+export const tabs = ['intro', 'buy', 'posts', 'trade', 'post'];
 
 export const descriptionLength = {
     min: 200,

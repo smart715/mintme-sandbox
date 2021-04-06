@@ -7,7 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserLoginInfoRepository")
- * @ORM\Table(name="user_login_info")
+ * @ORM\Table(name="user_login_info",
+ *    uniqueConstraints={
+ *        @ORM\UniqueConstraint(name="user_ip_unique",
+ *            columns={"user_id", "ip_address"})
+ *    }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */

@@ -38,7 +38,7 @@
 import Guide from '../Guide';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
-import {HTTP_ACCEPTED} from '../../utils/constants';
+import {HTTP_OK} from '../../utils/constants';
 
 export default {
     name: 'TokenDelete',
@@ -92,7 +92,7 @@ export default {
                     code: code,
                 })
                 .then((response) => {
-                    if (HTTP_ACCEPTED === response.status) {
+                    if (HTTP_OK === response.status) {
                         this.notifySuccess(response.data.message);
                         this.showTwoFactorModal = false;
                         location.href = this.$routing.generate('homepage');
@@ -123,7 +123,7 @@ export default {
                     name: this.tokenName,
                 }))
                 .then((response) => {
-                    if (HTTP_ACCEPTED === response.status && null !== response.data.message) {
+                    if (HTTP_OK === response.status && null !== response.data.message) {
                         this.notifySuccess(response.data.message);
                         this.needToSendCode = false;
                     }

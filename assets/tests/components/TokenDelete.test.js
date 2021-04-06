@@ -91,7 +91,7 @@ describe('TokenDelete', () => {
         wrapper.vm.sendConfirmCode();
 
         moxios.stubRequest('token_send_code', {
-            status: 202,
+            status: 200,
             response: {message: 'message'},
         });
 

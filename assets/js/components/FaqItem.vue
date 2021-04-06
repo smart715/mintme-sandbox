@@ -7,7 +7,7 @@
             </b-btn>
         </b-card-header>
         <b-collapse @show="switchIcon" @hide="switchIcon" :id="identifier" :accordion="groupName" role="tabpanel">
-            <b-card-body>
+            <b-card-body class="pt-1 pb-1">
                 <p class="card-text">
                     <slot name="body">
                         {{ $t('faq_item.body.1') }} <code>{{ $t('faq_item.body.2') }}</code> {{ $t('faq_item.body.3') }} <code>{{ $t('faq_item.body.4') }}</code>

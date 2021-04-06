@@ -20,6 +20,14 @@
         </title>
     </head>
     <body class="{% block bodyclass %}{% endblock %}">
+        <div id="user-init">
+            {% if app.user %}
+                <user-init
+                    :is-signed-in-with-twitter="{{ app.user.isSignedInWithTwitter | json_encode }}"
+                    :user-id="{{ app.user.id }}"
+                ></user-init>
+            {% endif %}
+        </div>
         {% block body %}
             <div class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
                 {% block header %}

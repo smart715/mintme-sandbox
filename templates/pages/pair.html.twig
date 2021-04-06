@@ -31,6 +31,9 @@
 {% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
+{% set currentLocale = app.session.get('_locale') %}
+{% set showAirdropModal = showAirdropModal ? 'true' : 'false' %}
+
 <div id="token" class="container">
     {{ include('spinners/pair.html.twig') }}
 
@@ -87,6 +90,10 @@
                 :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
                 :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
                 disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                current-locale="{{ currentLocale }}"
+                :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.getDeployed | json_encode}})"
+                :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
+                mintme-explorer-url="{{ global_mintme_explorer_url }}"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
@@ -123,6 +130,9 @@
                     login-url="{{ absolute_url(path('fos_user_security_login')) }}"
                     signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
                     youtube-client-id="{{ global_youtube_client_id }}"
+                    current-locale="{{ currentLocale }}"
+                    :show-airdrop-modal="{{ showAirdropModal }}"
+                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
@@ -153,6 +163,7 @@
                                 @delete-post="deletePost"
                                 @go-to-trade="goToTrade"
                                 :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                @go-to-post="goToPost"
                             >
                                 <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
                             </posts>
@@ -168,13 +179,26 @@
                                 :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                                 :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
                                 websocket-url="{{ global_websocket_url }}"
+                                {% if tradeInfo %}
+                                :sold-on-market-prop="{{ tradeInfo.soldOnMarket }}"
+                                :donation-volume-prop="{{ tradeInfo.volumeDonation }}"
+                                :token-withdrawn-prop="{{ tradeInfo.withdrawn }}"
+                                :token-exchange-prop="{{ tradeInfo.tokenExchange ?? 0 }}"
+                                :active-orders="{{ tradeInfo.activeOrders }}"
+                                :stats-prop="{{ tradeInfo.lockIn | json_encode }}"
+                                {% endif %}
                             >
                             </token-introduction-statistics>
                         </div>
                         <div class="row">
                             <top-holders
-                                    class="col-12 mt-3"
-                                    :token-name="{{ market.quote.symbol | json_encode }}">
+                                class="col-12 mt-3"
+                                {% if tradeInfo %}
+                                :traders-prop="{{ tradeInfo.topHolders | json_encode }}"
+                                {% endif %}
+                                :token-name="{{ market.quote.symbol | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
                             </top-holders>
                         </div>
                     </b-tab>
@@ -222,6 +246,7 @@
                                     @delete-post="deletePost"
                                     @go-to-trade="goToTrade"
                                     :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                    @go-to-post="goToPost"
                                 />
                             </div>
                         </div>
@@ -229,55 +254,88 @@
                 {% endif %}
                 {% if showTrade %}
                     <b-tab
-                            title="{% trans %}page.pair.tab.trade{% endtrans %}"
-                            title-link-class="token-trade-tab-link"
-                            {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
-                            {% if tab == 'trade' %} {{ 'active' }} {% endif %}
+                        title="{% trans %}page.pair.tab.trade{% endtrans %}"
+                        title-link-class="token-trade-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
                     >
                         <trade
-                                :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                                :is-mintme-token="{{ isMintmeToken }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                hash="{{ hash }}"
-                                login-url="{{ path('fos_user_security_login') }}"
-                                signup-url="{{ path('fos_user_registration_register') }}"
-                                :market="{{ market | json_encode }}"
-                                :logged-in="{{ loggedIn }}"
-                                :is-owner="{{ isOwner }}"
-                                :precision="{{ precision }}"
-                                :user-id="{{ app.user ? app.user.id : 0 }}"
-                                mintme-supply-url="{{ mintme_supply }}"
-                                :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
-                                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                                {% if isTokenPage %}
-                                    :taker-fee="{{ taker_fee }}"
-                                {% endif %}
+                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                            :is-mintme-token="{{ isMintmeToken }}"
+                            websocket-url="{{ global_websocket_url }}"
+                            hash="{{ hash }}"
+                            login-url="{{ path('fos_user_security_login') }}"
+                            signup-url="{{ path('fos_user_registration_register') }}"
+                            :market="{{ market | json_encode }}"
+                            :logged-in="{{ loggedIn }}"
+                            :is-owner="{{ isOwner }}"
+                            :precision="{{ precision }}"
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            {% if isTokenPage %}
+                                :taker-fee="{{ taker_fee }}"
+                            {% endif %}
                         >
                         </trade>
+                    </b-tab>
+                {% endif %}
+                {% if isTokenPage %}
+                    <b-tab
+                        title="Post"
+                        title-item-class="d-none"
+                        {% if tab == 'post' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-10 col-lg-8">
+                                <div class="card h-100 single-post-page">
+                                    <div class="card-body posts">
+                                        <post
+                                            :post="singlePost || (singlePost = {{ post | json_encode }})"
+                                            :show-edit="{{ isOwner }}"
+                                            :logged-in="{{ loggedIn }}"
+                                            @delete-post="deleteSinglePost"
+                                            @go-to-trade="goToTrade"
+                                            single-page
+                                        ></post>
+                                        <comments
+                                            :comments="comments || (comments = {{ comments | json_encode }})"
+                                            :post-id="singlePost ? singlePost.id : {{ post ? post.id : 0 }}"
+                                            :token-name="singlePost ? singlePost.token.name : '{{ post ? post.token.name : '' }}'"
+                                            :logged-in="{{ loggedIn }}"
+                                            @delete-comment="deleteComment"
+                                            @new-comment="newComment"
+                                            @cancel="goToPosts"
+                                        ></comments>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}
                         <li class="nav-item ml-auto my-2 my-lg-0">
                             <div class="d-flex align-items-center h-100">
-                                <a
-                                    v-if="getQuoteBalance >= {{ dMMinAmount }} || {{ isOwner }}"
-                                    href="{{ isOwner == 'true' ? path('chat') : path('new_dm_message', {'tokenName': token.name}) }}"
-                                    class="chat-envelope d-block text-white pl-2 pr-2">
-                                    <font-awesome-icon icon="envelope" size="lg" />
-                                </a>
+                                <envelope
+                                    :logged-in="{{ loggedIn }}"
+                                    :is-owner="{{ isOwner }}"
+                                    :dm-min-amount="{{ dMMinAmount }}"
+                                    token-name="{{ token.name }}"
+                                ></envelope>
                                 <div class="div-container-avatar">
-                                <a
-                                    href="{{ path('profile') }}/{{ profile.nickname }}"
-                                >
-                                    <avatar
-                                        class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
-                                        size="small"
-                                        type="profile"
-                                        image="{{ profile.image.url | imagine_filter('avatar_small') }}"
-                                    ></avatar>
-                                </a>
-                            </div>
+                                    <a
+                                        href="{{ path('profile') }}/{{ profile.nickname }}"
+                                    >
+                                        <avatar
+                                            class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
+                                            size="small"
+                                            type="profile"
+                                            image="{{ profile.image.url | imagine_filter('avatar_small') }}"
+                                        ></avatar>
+                                    </a>
+                                </div>
                             </div>
                         </li>
                     {% endif %}
@@ -307,8 +365,20 @@
         {% if token|default %}
             <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
+            <input
+                    type="hidden"
+                    v-model="showDeployedOnBoard"
+                    :set-value="showDeployedOnBoard = null !== showDeployedOnBoard
+                        ? showDeployedOnBoard
+                        : {{ isOwner is same as ('true') and token.showDeployedModal ? 'true' : 'false' }}" />
         {% endif %}
+
     </div>
+    <token-deployed-modal
+        :visible="showDeployedOnBoard"
+        token-name="{{ market.quote.name }}"
+        @close="closeDeployedModal()"
+    ></token-deployed-modal>
     {% if showCreatedModal and isOwner is same as('true') %}
         <token-created-modal
             :visible="showCreatedModal"

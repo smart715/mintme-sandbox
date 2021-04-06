@@ -80,7 +80,7 @@ import {faDiscord} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidDiscordUrl} from '../../utils';
-import {HTTP_ACCEPTED} from '../../utils/constants';
+import {HTTP_OK} from '../../utils/constants';
 
 library.add(faDiscord, faTimes);
 
@@ -145,7 +145,7 @@ export default {
                 discordUrl: this.newDiscord,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                        let state = this.newDiscord ? 'added' : 'deleted';
                        this.$emit('saveDiscord', this.newDiscord);
                        this.newDiscord = this.newDiscord || 'https://discord.gg/';

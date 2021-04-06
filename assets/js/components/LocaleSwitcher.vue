@@ -28,7 +28,7 @@
 
 <script>
 import {directive as onClickaway} from 'vue-clickaway';
-import {HTTP_ACCEPTED} from '../utils/constants';
+import {HTTP_OK} from '../utils/constants';
 
 export default {
     name: 'LocaleSwitcher',
@@ -73,7 +73,7 @@ export default {
                 locale,
             }))
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         let hrefWithLocale = '';
                         let href = location.href;
 

@@ -6,6 +6,7 @@
             :api-url="apiUrl"
             @submitted="$emit('new-comment', $event)"
             @error="notifyError('Error creating comment.')"
+            @cancel="$emit('cancel')"
             reset-after-submit
         />
         <div class="my-3">
@@ -20,7 +21,7 @@
                 />
             </template>
             <div v-else class="text-center w-100">
-                No one commented yet.
+              {{ $t('post.no_one_commented') }}
             </div>
         </div>
     </div>
@@ -44,6 +45,7 @@ export default {
         comments: Array,
         postId: Number,
         loggedIn: Boolean,
+        tokenName: String,
     },
     computed: {
         commentsCount() {

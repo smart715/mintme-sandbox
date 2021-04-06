@@ -1,8 +1,13 @@
-{% extends('mail/new_layout.txt.twig') %}
+{% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %} hello {% endtrans %}
-{{username}},
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+
 {% trans with {'%tokenName%': tokenName} %} token_reminder.msg.description {% endtrans %}
-{% trans %} token_reminder.msg.description.2 {% endtrans %}
-{% trans %} token_reminder.msg.description.to_do_that {% endtrans%} {% trans %} token_reminder.msg.go_here {% endtrans %} {% trans %} token_reminder.msg.click_edit {% endtrans %}
+
+{% trans %} token_reminder.msg.description.2 {% endtrans %},
+{% trans %} token_reminder.msg.description.to_do_that {% endtrans%} {% trans %} token_reminder.msg.go_here {% endtrans %} {% trans %} token_reminder.msg.click_edit {% endtrans %}:
+{{ absolute_url(path('token_create')) }}/{{ tokenName }}
+
 {% endblock %}
+

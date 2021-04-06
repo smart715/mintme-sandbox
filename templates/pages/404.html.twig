@@ -11,7 +11,9 @@
         <div class="row justify-content-center align-content-center text-center text-white h-100">
             <div class="col-12 py-5">
                 <div class="error-code">404</div>
-                <div class="error-text text-uppercase">{% trans %}page.error.404.header{% endtrans %}</div>
+                <div class="error-text text-uppercase">
+                    {{ error_message | default('page.error.404.header') | trans }}
+                </div>
                 <p class="error-msg">
                     {% trans %}page.error.404.body{% endtrans %} {% trans %}or{% endtrans %}
                     <a href="{{ path('homepage') }}" class="backlink">{% trans %}return_homepage_2{% endtrans %}</a>.

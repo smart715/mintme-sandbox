@@ -4,7 +4,6 @@ namespace App\Controller\Dev\API\V2;
 
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Exception\ApiNotFoundException;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -12,8 +11,10 @@ use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Rest\Route("/dev/api/v2/open/ticker")
@@ -42,6 +43,22 @@ class TickerController extends AbstractFOSRestController
      *
      * @Rest\Get("/")
      * @Rest\View(serializerGroups={"dev"})
+     * @Rest\QueryParam(
+     *     name="offset",
+     *     strict=true,
+     *     nullable=true,
+     *     requirements=@Assert\Range(min="0"),
+     *     default=0
+     * )
+     * @Rest\QueryParam(
+     *     name="limit",
+     *     strict=true,
+     *     nullable=true,
+     *     requirements=@Assert\Range(min="1", max="101"),
+     *     default=101
+     * )
+     * @SWG\Parameter(name="offset", in="query", type="integer", description="Results offset [>=0]")
+     * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Response(
      *     response="200",
      *     description="Returns 24-hour pricing and volume summary for each market pair with crypto and deployed tokens available on the exchange."
@@ -50,10 +67,13 @@ class TickerController extends AbstractFOSRestController
      * @SWG\Tag(name="Open")
      * @Security(name="")
      */
-    public function getTicker(): array
+    public function getTicker(ParamFetcherInterface $request): array
     {
+        $offset = (int)$request->get('offset');
+        $limit = (int)$request->get('limit');
+
         $assets = [];
-        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo();
+        $marketStatuses = $this->marketStatusManager->getCryptoAndDeployedMarketsInfo($offset, $limit);
 
         return array_map(
             function ($marketStatus) use ($assets) {

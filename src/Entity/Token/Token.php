@@ -47,6 +47,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
     public const PENDING_ADDR = '0x';
+    public const WEB_ETH_SYMBOLS = [self::ETH_SYMBOL, self::WEB_SYMBOL];
 
     /**
      * @ORM\Id()
@@ -75,6 +76,13 @@ class Token implements TradebleInterface, ImagineInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API", "API_TOK"})
+     * @var string|null
+     */
+    protected $txHash;
 
     /**
      * @ORM\Column(type="bigint",nullable=true)
@@ -176,14 +184,14 @@ class Token implements TradebleInterface, ImagineInterface
     protected $lockIn;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
      * @ORM\JoinColumn(nullable=true)
      * @var Crypto|null
      */
     protected $crypto;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", inversedBy="tokens", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
      * @ORM\JoinColumn(nullable=true)
      * @var Crypto|null
      */
@@ -282,6 +290,11 @@ class Token implements TradebleInterface, ImagineInterface
      * @var int|null
      */
     private $decimals = 12;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $showDeployedModal = false; // phpcs:ignore
 
     public function __construct()
     {
@@ -547,6 +560,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getTelegramUrl(): ?string
     {
         return $this->telegramUrl;
@@ -559,6 +573,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getDiscordUrl(): ?string
     {
         return $this->discordUrl;
@@ -708,6 +723,16 @@ class Token implements TradebleInterface, ImagineInterface
             : null;
     }
 
+    /** @Groups({"Default", "API"}) */
+    public function getOwnerId(): ?int
+    {
+        $owner = $this->getOwner();
+
+        return $owner
+            ? $owner->getId()
+            : null;
+    }
+
     public function getNumberOfReminder(): ?int
     {
         return $this->numberOfReminder;
@@ -774,5 +799,29 @@ class Token implements TradebleInterface, ImagineInterface
         }
 
         return false;
+    }
+
+    public function isShowDeployedModal(): bool
+    {
+        return $this->showDeployedModal;
+    }
+
+    public function setShowDeployedModal(bool $showDeployedModal): self
+    {
+        $this->showDeployedModal = $showDeployedModal;
+
+        return $this;
+    }
+
+    public function setTxHash(?string $txHash): self
+    {
+        $this->txHash = $txHash;
+
+        return $this;
+    }
+
+    public function getTxHash(): ?string
+    {
+        return $this->txHash;
     }
 }
