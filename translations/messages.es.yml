@@ -666,6 +666,7 @@ donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
+confirm_modal.continue: 'Continuar'
 confirm_modal.cancel: Cancelar
 confirm_modal.accept_delete: 'Sí, elimínalo'
 deposit_modal.title: DEPOSITAR

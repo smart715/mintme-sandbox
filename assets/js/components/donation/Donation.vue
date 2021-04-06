@@ -73,7 +73,9 @@
                                             <br>
                                             {{ $t('donation.modal.2', translationsContext) }}
                                         </p>
-                                        <template v-slot:confirm>Continue</template>
+                                        <template v-slot:confirm>
+                                            {{ $t('confirm_modal.continue') }}
+                                        </template>
                                     </confirm-modal>
                                 </div>
                             </div>
