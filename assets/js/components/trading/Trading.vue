@@ -292,9 +292,12 @@ export default {
         coinbaseUrl: String,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        marketsProp: Object,
         sort: String,
         order: Boolean,
         filterForTokens: Object,
+        perPage: Number,
+        rowsProp: Number,
     },
     components: {
         Guide,
@@ -305,11 +308,9 @@ export default {
             MINTME: MINTME,
             deployedFirst: ('' === this.sort),
             tableLoading: false,
-            markets: null,
+            markets: this.marketsProp,
             currentPage: this.page,
-            perPage: 25,
-            totalRows: 25,
-            loading: false,
+            totalRows: this.rowsProp,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             currencyModes,
@@ -418,7 +419,7 @@ export default {
             return tokens;
         },
         loaded: function() {
-            return this.markets !== null && !this.loading;
+            return this.markets !== null;
         },
         marketsOnTopIsLoaded: function() {
             return this.sanitizedMarketsOnTop.length;
@@ -512,25 +513,18 @@ export default {
             this.updateMarkets(page, true);
         },
         initialLoad: function() {
-            this.loading = true;
             this.fetchGlobalMarketCap();
-            let updateDataPromise = this.updateRawMarkets(this.currentPage, this.deployedFirst);
-            let conversionRatesPromise = this.fetchConversionRates();
+            this.updateSanitizedMarkets();
+            this.fetchConversionRates().catch((e) => e);
 
-            Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
-                .then((res) => {
-                    this.updateSanitizedMarkets();
-                    this.loading = false;
-
-                    this.addMessageHandler((result) => {
-                        if ('state.update' === result.method) {
-                            this.sanitizeMarket(result);
-                            this.requestMonthInfo(result.params[0]);
-                        } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                            this.updateMonthVolume(result.id, result.result);
-                        }
-                    }, null, 'Trading');
-                });
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                    this.requestMonthInfo(result.params[0]);
+                } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                    this.updateMonthVolume(result.id, result.result);
+                }
+            }, null, 'Trading');
         },
         sortCompare: function(a, b, key) {
             let pair = false;
@@ -616,7 +610,6 @@ export default {
                         this.deployedFirst = deployedFirst;
                         this.currentPage = page;
                         this.markets = res.data.markets;
-                        this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
 
                         if (window.history.replaceState) {
