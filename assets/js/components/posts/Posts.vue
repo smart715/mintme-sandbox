@@ -3,26 +3,23 @@
         <div class="card-header">
             <slot name="title">{{ $t('page.pair.posts_title') }}</slot>
         </div>
-        <div
-            class="card-body posts overflow-hidden position-relative"
-        >
-            <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
-                <template v-if="posts.length > 0">
-                    <post v-for="(n, i) in postsCount"
-                          :post="posts[i]"
-                          @update-post="updatePost($event, i)"
-                          :key="i"
-                          :index="i"
-                          @delete-post="$emit('delete-post', $event)"
-                          :show-edit="showEdit"
-                          @go-to-trade="$emit('go-to-trade', $event)"
-                          :logged-in="loggedIn"
-                          @go-to-post="$emit('go-to-post', $event)"
-                    />
-                </template>
-                <div v-else :class="{ 'position-absolute top-50': tokenPage }">
-                    {{ $t('post.not_any_post') }}
-                </div>
+        <div v-if="hasPosts" class="card-body posts overflow-hidden position-relative">
+            <div
+                id="posts-container"
+                ref="postsContainer"
+                class="w-100"
+            >
+                <post v-for="(n, i) in postsCount"
+                      :post="posts[i]"
+                      @update-post="updatePost($event, i)"
+                      :key="i"
+                      :index="i"
+                      @delete-post="$emit('delete-post', $event)"
+                      :show-edit="showEdit"
+                      @go-to-trade="$emit('go-to-trade', $event)"
+                      :logged-in="loggedIn"
+                      @go-to-post="$emit('go-to-post', $event)"
+                />
             </div>
             <div v-if="showReadMore" class="read-more">
                 <a
@@ -33,6 +30,11 @@
                     {{ $t('posts.all') }}
                 </a>
             </div>
+        </div>
+        <div v-else class="card-body h-100 d-flex align-items-center justify-content-center">
+            <span class="text-center py-4 ">
+                {{ $t('post.not_any_post') }}
+            </span>
         </div>
     </div>
 </template>
@@ -71,12 +73,17 @@ export default {
         };
     },
     mounted() {
-        this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
-        this.resizeObserver.observe(this.$refs.postsContainer);
+        if (this.hasPosts) {
+            this.resizeObserver = new ResizeObserver(this.updateReadMore.bind(this));
+            this.resizeObserver.observe(this.$refs.postsContainer);
+        }
     },
     computed: {
         postsCount() {
             return Math.min(this.posts.length, this.max || Infinity);
+        },
+        hasPosts() {
+            return this.posts.length > 0;
         },
         showReadMore() {
             return !!(this.max && this.posts.length > this.max) || this.readMore;
@@ -100,7 +107,9 @@ export default {
         },
     },
     beforeDestroy() {
-        this.resizeObserver.disconnect();
+        if (null !== this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
     },
 };
 </script>

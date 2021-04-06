@@ -5,6 +5,7 @@ namespace App\Communications;
 use App\Communications\Exception\FetchException;
 use App\Exchange\Config\DeployCostConfig;
 use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -46,7 +47,7 @@ class DeployCostFetcher implements DeployCostFetcherInterface
         }
 
         return $this->moneyWrapper->convert(
-            Money::USD($this->deployCostConfig->getDeployCost()),
+            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployCost(), Symbols::USD),
             new Currency(Symbols::WEB),
             new FixedExchange([
                 Symbols::USD => [ Symbols::WEB => 1 / $response['webchain']['usd'] ],

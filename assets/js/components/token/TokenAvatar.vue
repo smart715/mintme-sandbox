@@ -73,6 +73,7 @@ import Avatar from '../Avatar';
 import TokenName from './TokenName';
 import TokenDeployIcon from './deploy/TokenDeployIcon';
 import TokenPointsProgress from './TokenPointsProgress';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenAvatar',
@@ -106,6 +107,7 @@ export default {
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
         tokenName: String,
+        tokenDeleteSoldLimit: Number,
         currentLocale: String,
         tokenDeployedDate: {
             type: Object,
@@ -122,6 +124,14 @@ export default {
         TokenName,
         TokenDeployIcon,
         TokenPointsProgress,
+    },
+    mounted() {
+        this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
+    },
+    methods: {
+        ...mapMutations('tokenStatistics', [
+            'setTokenDeleteSoldLimit',
+        ]),
     },
 };
 </script>

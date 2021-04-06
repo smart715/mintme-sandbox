@@ -295,7 +295,7 @@ class RegistrationController extends FOSRegistrationController
                 case 'invite':
                     $referrerUser = $this->userManager->findByReferralCode($referralCode);
                     $token = $referrerUser
-                        ? $user->getProfile()->getMintmeToken()
+                        ? $referrerUser->getProfile()->getFirstToken()
                         : null;
 
                     break;

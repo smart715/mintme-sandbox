@@ -278,7 +278,7 @@ class ProfileController extends Controller
         ) ?? '';
         $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
-        $token = $profile->getMintmeToken();
+        $token = $profile->getFirstToken();
 
         if ($token) {
             $token = $token->isBlocked()
