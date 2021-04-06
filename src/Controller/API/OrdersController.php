@@ -137,19 +137,12 @@ class OrdersController extends AbstractFOSRestController
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
         $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
 
-        $rates = $this->cryptoRatesFetcher->fetch();
-dd($rates);
-        $minimun = $moneyWrapper->convert(
-            $moneyWrapper->parse((string)$this->getParameter('minimum_order_value'), Symbols::USD),
-            new Currency(Symbols::WEB),
-            new FixedExchange([
-                Symbols::USD => [
-                    Symbols::WEB => 1,
-                ]
-            ])
-
-        );
-        dd($minimun);
+        if ($this->checkMinimumOrderValue($priceInput, $moneyWrapper)) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => 'Minimum order value needs to be worth ',
+            ], Response::HTTP_OK);
+        }
 
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
@@ -306,5 +299,26 @@ dd($rates);
             ($page - 1) * self::WALLET_OFFSET,
             self::WALLET_OFFSET
         );
+    }
+
+    private function checkMinimumOrderValue(Money $priceInput, MoneyWrapperInterface $moneyWrapper): bool
+    {
+        $minimumInUsd = $moneyWrapper->parse(
+            (string)$this->getParameter('minimum_order_value'),
+            Symbols::USD
+        );
+        $rates = $this->cryptoRatesFetcher->fetch();
+        $minimumInMintme = $moneyWrapper->convert(
+            $minimumInUsd,
+            new Currency(Symbols::WEB),
+            new FixedExchange([
+                Symbols::USD => [
+                    Symbols::WEB => 1 / $rates[Symbols::WEB][Symbols::USD],
+                ],
+            ])
+        );
+        dd($minimumInMintme, $priceInput, $minimumInUsd);
+
+        return !$priceInput->greaterThanOrEqual($minimumInMintme);
     }
 }
