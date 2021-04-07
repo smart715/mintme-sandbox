@@ -98,15 +98,19 @@ class TraderFetcher implements TraderFetcherInterface
         int $limit,
         int $side
     ): array {
-        $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
-            $userId + $this->config->getOffset(),
-            $marketName,
-            $startTime,
-            $endTime,
-            $offset,
-            $limit,
-            $side,
-        ]);
+        try {
+            $response = $this->jsonRpc->send(self::FINISHED_ORDERS_METHOD, [
+                $userId + $this->config->getOffset(),
+                $marketName,
+                $startTime,
+                $endTime,
+                $offset,
+                $limit,
+                $side,
+            ]);
+        } catch (FetchException $e) {
+            return new TradeResult(TradeResult::FAILED, $this->translator);
+        }
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
@@ -117,13 +121,17 @@ class TraderFetcher implements TraderFetcherInterface
 
     public function getPendingOrders(int $userId, string $marketName, int $offset, int $limit, int $side): array
     {
-        $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
-            $userId + $this->config->getOffset(),
-            $marketName,
-            $offset,
-            $limit,
-            $side,
-        ]);
+        try {
+            $response = $this->jsonRpc->send(self::PENDING_ORDERS_METHOD, [
+                $userId + $this->config->getOffset(),
+                $marketName,
+                $offset,
+                $limit,
+                $side,
+            ]);
+        } catch (FetchException $e) {
+            return new TradeResult(TradeResult::FAILED, $this->translator);
+        }
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');
