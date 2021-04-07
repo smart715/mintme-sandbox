@@ -109,7 +109,7 @@ class TraderFetcher implements TraderFetcherInterface
                 $side,
             ]);
         } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED, $this->translator);
+            throw new FetchException($this->translator->trans(TradeResult::FAILED));
         }
 
         if ($response->hasError()) {
@@ -130,7 +130,7 @@ class TraderFetcher implements TraderFetcherInterface
                 $side,
             ]);
         } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED, $this->translator);
+            throw new FetchException($this->translator->trans(TradeResult::FAILED));
         }
 
         if ($response->hasError()) {
