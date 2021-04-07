@@ -53,7 +53,7 @@
                         </div>
                     </div>
                 </div>
-                {% if loggedIn == 'true' %}
+                {% if loggedIn is same as('true') %}
                     <div id="show-balance" class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0">
                         <p class="m-0">
                             <span>{% trans %} donation.balance {% endtrans%}</span>
@@ -63,7 +63,9 @@
                 {% endif %}
                 <div class="col mt-3 mt-xl-0 pl-xl-0">
                     <p class="info m-0">
-                        {% trans %} donation.nonrefund {% endtrans %}
+                        {% trans with {'%path%': path('token_show', {name: token.name, tab: 'trade'})} %}
+                            donation.nonrefund
+                        {% endtrans %}
                     </p>
                 </div>
             </div>
