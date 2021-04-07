@@ -426,16 +426,11 @@ class PostsController extends AbstractFOSRestController
     {
         /** @var User $user */
         $user = $this->getUser();
-
-        $token = $this->tokenManager->findByName($user->getProfile()->getFirstToken()->getName());
-
-        if (!$token) {
-            throw new ApiNotFoundException();
-        }
-
+        $tokens = $user->getTokens();
+        $posts = $this->postManager->getRecentPost($tokens, $nextPage);
         $postsData = [];
-        $posts = $token->getPosts(); // will be generate by using page
 
+        /** @var Post $post */
         foreach ($posts as $post) {
             $postsData[] = [
                 'token' => $post->getToken()->getName(),
@@ -444,7 +439,7 @@ class PostsController extends AbstractFOSRestController
                 'authorImage' => $post->getAuthor()->getImage(),
                 'createdAt' => $post->getCreatedAt(),
                 'title' => $post->getTitle(),
-                'content' => $post->getContent(),
+                'content' => $this->isGranted('view', $post) ? $post->getContent() : null,
                 'commentCount' => $post->getCommentsCount(),
                 'postLink' => $this->generateUrl(
                     'new_show_post',
@@ -481,7 +476,7 @@ class PostsController extends AbstractFOSRestController
         }
 
         return $this->view(
-            ['posts' => $postsData, 'count' => count($postsData), 'nextPage' => $nextPage + 1],
+            ['posts' => $postsData, 'count' => count($postsData)],
             Response::HTTP_OK
         );
     }

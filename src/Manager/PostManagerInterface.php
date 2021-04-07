@@ -8,5 +8,5 @@ interface PostManagerInterface
 {
     public function getById(int $id): ?Post;
     public function getBySlug(string $slug): ?Post;
-    public function getRecentPost(): array;
+    public function getRecentPost(array $tokens, int $page): array;
 }

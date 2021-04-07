@@ -476,6 +476,7 @@ post.tab.content : 'Content can''t be empty or contain only bbcodes and whitespa
 post.required: 'Required amount of tokens:'
 post.not_any_post: 'The token creator has not added any posts yet.'
 post.created: 'Post created.'
+post.no_recent_posts: 'There are no more posts to show right now.'
 post.comments: 'Comments'
 post.no_one_commented: 'No one commented yet.'
 post.likes: 'Likes'
