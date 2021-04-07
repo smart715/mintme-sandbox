@@ -836,7 +836,7 @@ token.intro.profile.twitter_description: 'Una gran forma de apoyo mutuo. Revisa 
 token.intro.profile.contract_address: 'Dirección de contrato del token:'
 token.intro.profile.contract_address.header: 'Dirección de contrato del token'
 token.intro.profile.contract_address.body: 'Dirección de contrato única del token, creada cuando el token se despliega en la blockchain. Es necesaria cuando se añade el token a la aplicación MintMe Wallet.'
-token.intro.statistics.show:
+token.intro.statistics.show: 'Mostrar estadísticas'
 token.intro.statistics.header: Estadísticas
 token.intro.statistics.guide_header: Estadísticas
 token.intro.statistics.guide_body.mintme_token: 'Estadísticas asociadas con %symbol%. Aquí usted puede descubrir cómo el creador del token maneja sus tokens y si establece alguna restricción en la liberación del token.'
