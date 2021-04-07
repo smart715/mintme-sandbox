@@ -46,3 +46,6 @@ correct:
 all:
 	make correct
 	make validate
+
+generate_translations:
+	php bin/console app:load-translations-ui
