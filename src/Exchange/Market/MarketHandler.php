@@ -272,7 +272,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['side'],
                 $this->moneyWrapper->parse(
                     (string)$orderData['price'],
-                    $this->getSymbol($market->getQuote())
+                    $this->getSymbol($market->getBase())
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(

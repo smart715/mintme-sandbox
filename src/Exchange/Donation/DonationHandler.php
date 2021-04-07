@@ -371,7 +371,7 @@ class DonationHandler implements DonationHandlerInterface
                 break;
             }
 
-            $sellOrdersAmount = $sellOrdersPrice->add(
+            $sellOrdersPrice = $sellOrdersPrice->add(
                 $sellOrder->getPrice()->multiply(
                     $this->moneyWrapper->format($sellOrder->getAmount())
                 )
@@ -380,7 +380,7 @@ class DonationHandler implements DonationHandlerInterface
             $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
         }
 
-        if ($sellOrdersAmount->lessThan($amount)) {
+        if ($sellOrdersPrice->lessThan($amount)) {
             throw new ApiBadRequestException('Market doesn\'t have enough orders.');
         }
 
