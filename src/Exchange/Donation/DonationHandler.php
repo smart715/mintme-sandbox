@@ -12,6 +12,7 @@ use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
@@ -362,7 +363,28 @@ class DonationHandler implements DonationHandlerInterface
             100
         );
 
-        return $amount;
+        $sellOrdersPrice = new Money(0, new Currency($cryptoSymbol));
+        $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
+
+        foreach ($pendingSellOrders as $sellOrder) {
+            if ($sellOrdersPrice->greaterThanOrEqual($amount)) {
+                break;
+            }
+
+            $sellOrdersAmount = $sellOrdersPrice->add(
+                $sellOrder->getPrice()->multiply(
+                    $this->moneyWrapper->format($sellOrder->getAmount())
+                )
+            );
+
+            $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
+        }
+
+        if ($sellOrdersAmount->lessThan($amount)) {
+            throw new ApiBadRequestException('Market doesn\'t have enough orders.');
+        }
+
+        return $mintmeWorth;
     }
 
     private function calculateFee(Money $amount): Money
