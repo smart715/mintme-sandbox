@@ -280,6 +280,9 @@ class TraderFetcherTest extends TestCase
 
     private function mockTranslator(): TranslatorInterface
     {
-        return $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->with('place_order.failed')->willReturn('Order failed');
+
+        return $translator;
     }
 }
