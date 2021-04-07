@@ -128,6 +128,14 @@ class TokenController extends Controller
     }
 
     /**
+     * @Route("/{name}/donate", name="token_show_donate")
+     */
+    public function donate(string $name): RedirectResponse
+    {
+        return $this->redirectToRoute('token_show', ['name' => $name]);
+    }
+
+    /**
      * @Route("/{name}/posts/{slug}", name="new_show_post", options={"expose"=true})
      */
     public function showPost(Request $request, string $name, ?string $slug = null): Response
@@ -163,7 +171,7 @@ class TokenController extends Controller
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro", "modal" = "settings|signup|created|airdrop"},
+     *     requirements={"tab" = "trade|intro|buy", "modal" = "settings|signup|created|airdrop"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -173,7 +181,10 @@ class TokenController extends Controller
         ?string $tab,
         ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
+        if ((preg_match('/(intro)/', $request->getPathInfo()) &&
+            !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) ||
+            'buy' === $tab
+        ) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
