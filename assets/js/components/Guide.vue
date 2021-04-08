@@ -1,6 +1,8 @@
 <template>
     <div class="d-inline">
-        <a v-tippy="tooltipOptions">
+        <a v-tippy="tooltipOptions"
+           :class="tippyClass"
+        >
             <slot name="icon">
                 <font-awesome-icon
                     icon="question"
@@ -30,6 +32,7 @@ export default {
     props: {
         maxWidth: {type: String, default: '350px'},
         placement: {type: String, default: 'bottom'},
+        tippyClass: {type: String, default: ''},
     },
     data() {
         return {
