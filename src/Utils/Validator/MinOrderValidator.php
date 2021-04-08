@@ -5,6 +5,7 @@ namespace App\Utils\Validator;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Wallet\Money\MoneyWrapper;
 use Brick\Math\BigDecimal;
 
 class MinOrderValidator implements ValidatorInterface
@@ -24,16 +25,20 @@ class MinOrderValidator implements ValidatorInterface
     /** @var string */
     private $message = 'Amount is low';
 
+    private string $minimalPriceOrder;
+
     public function __construct(
         ?TradebleInterface $baseTradable,
         ?TradebleInterface $quoteTradable,
         string $price,
-        string $amount
+        string $amount,
+        string $minimalPriceOrder
     ) {
         $this->baseTradable = $baseTradable;
         $this->quoteTradable = $quoteTradable;
         $this->price = $price;
         $this->amount = $amount;
+        $this->minimalPriceOrder =$minimalPriceOrder;
     }
 
     public function validate(): bool
@@ -62,11 +67,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && BigDecimal::of((float)$this->price)
-                ->toScale($scale)
-                ->multipliedBy(
-                    BigDecimal::of((float)$this->amount)->toScale($scale)
-                )->toFloat() >= $baseMinimal;
+            && $this->checkOrderPriceMinimal($scale);
     }
 
     public function getMessage(): string
@@ -91,6 +92,20 @@ class MinOrderValidator implements ValidatorInterface
 
     private function getMinimal(int $unit): float
     {
-        return 1 / intval(str_pad('1', $unit + 1, '0'));
+        return 1 / (int)str_pad('1', $unit + 1, '0');
+    }
+
+    private function checkOrderPriceMinimal(int $scale): bool
+    {
+        $totalOrderAmount = BigDecimal::of((float)$this->price)
+            ->toScale($scale)
+            ->multipliedBy(
+                BigDecimal::of((float)$this->amount)->toScale($scale)
+            )->toFloat();
+
+        // todo parse to USD using MoneyWarapper to compare
+
+        dd($totalOrderAmount);
+
     }
 }

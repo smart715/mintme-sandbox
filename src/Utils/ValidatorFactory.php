@@ -14,9 +14,17 @@ use App\Utils\Validator\ValidatorInterface;
 /** @codeCoverageIgnore */
 class ValidatorFactory implements ValidatorFactoryInterface
 {
+    public string $minimalPriceOrder;
+
     public function createOrderValidator(Market $market, string $price, string $amount): ValidatorInterface
     {
-        return new MinOrderValidator($market->getBase(), $market->getQuote(), $price, $amount);
+        return new MinOrderValidator(
+            $market->getBase(),
+            $market->getQuote(),
+            $price,
+            $amount,
+            $this->minimalPriceOrder
+        );
     }
 
     public function createMinAmountValidator(TradebleInterface $tradeble, string $amount): ValidatorInterface
