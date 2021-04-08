@@ -1104,6 +1104,8 @@ trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra r
 trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
+trading.fields.rank:
+trading.fields.rank.help:
 wallet.balance: Balance
 wallet.deposit: Depositar
 wallet.withdraw: Retirar
