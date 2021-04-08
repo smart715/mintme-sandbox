@@ -1,198 +1,251 @@
 <template>
     <div>
-        <div class="card h-100">
-            <div class="card-header">
-                {{ $t('token.intro.statistics.header') }}
-                <guide class="float-right">
-                    <div slot="header">
-                        <h5 class="font-bold">{{ $t('token.intro.statistics.guide_header') }}</h5>
-                    </div>
-                    <template slot="body">
-                        <span v-html="this.statisticGuideTranslation">
-                        </span>
-                    </template>
-                </guide>
-            </div>
-            <div class="card-body h-100 pb-0">
-                <template v-if="loaded">
-                    <div class="d-flex flex-column px-3 pb-3">
-                        <div v-if="isTokenDeployed">
-                            <div class="row">
-                                <strong class="mr-2">{{ $t('token.intro.statistics.token_address') }}</strong>
-                            </div>
-                            <div class="row truncate-address d-flex flex-row flex-nowrap mt-auto">
-                                <span>{{ tokenContractAddress }}</span>
-                                <div  class="token-address-buttons">
-                                    <copy-link
-                                        class="c-pointer"
-                                        :content-to-copy="tokenContractAddress"
-                                    >
-                                        <font-awesome-icon :icon="['far', 'copy']" class="icon-default"/>
-                                    </copy-link>
-                                    <guide>
-                                        <template slot="header">
-                                            {{ $t('token.intro.statistics.token_address.header') }}
-                                        </template>
-                                        <template slot="body">
-                                            {{ $t('token.intro.statistics.token_address.body') }}
-                                        </template>
-                                    </guide>
+        <div class="card">
+            <template v-if="shouldShowStats && loaded">
+                <div class="card-header">
+                    {{ $t('token.intro.statistics.header') }}
+                    <guide class="float-right">
+                        <div slot="header">
+                            <h5 class="font-bold">{{ $t('token.intro.statistics.guide_header') }}</h5>
+                        </div>
+                        <template slot="body">
+                            {{ statisticGuideTranslation }}
+                        </template>
+                    </guide>
+                </div>
+                <div class="card-body px-0">
+                        <div class="d-flex flex-column px-3">
+                            <div v-if="isTokenDeployed" class="pb-3">
+                                <div>
+                                    <strong class="mr-2">{{ $t('token.intro.statistics.token_address') }}</strong>
+                                </div>
+                                <div class="truncate-address d-flex flex-row flex-nowrap mt-auto">
+                                    <span>{{ tokenContractAddress }}</span>
+                                    <div  class="token-address-buttons">
+                                        <copy-link
+                                            class="c-pointer"
+                                            :content-to-copy="tokenContractAddress"
+                                        >
+                                            <font-awesome-icon :icon="['far', 'copy']" class="icon-default"/>
+                                        </copy-link>
+                                        <guide>
+                                            <template slot="header">
+                                                {{ $t('token.intro.statistics.token_address.header') }}
+                                            </template>
+                                            <template slot="body">
+                                                {{ $t('token.intro.statistics.token_address.body') }}
+                                            </template>
+                                        </guide>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col pr-1">
-                            <div class="font-weight-bold pb-1">
-                                {{ $t('token.intro.statistics.balance') }}
+                        <div>
+                            <div class="overflow-hidden">
+                                <div class="font-weight-bold px-3 pb-1">
+                                    {{ $t('token.intro.statistics.balance') }}
+                                </div>
+                                <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.exchange.header') }}
+                                        </div>
+                                        <div>
+                                            {{ walletBalance | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.exchange.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.exchange.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.active.header') }}
+                                        </div>
+                                        <div>
+                                            {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.active.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.active.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.withdraw.header') }}
+                                        </div>
+                                        <div>
+                                            {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.withdraw.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.withdraw.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item v-if="isMintmeToken" class="flex-1" >
+                                        <div>
+                                            {{ $t('token.intro.statistics.sold.header') }}
+                                        </div>
+                                        <div>
+                                            {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.sold.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.sold.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1" >
+                                        <div>
+                                            {{ $t('token.intro.statistics.donation.header') }}
+                                        </div>
+                                        <div>
+                                            {{ donationVolume }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.donation.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.donation.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1" >
+                                        <div>
+                                            {{ $t('token.intro.statistics.holders.header') }}
+                                        </div>
+                                        <div>
+                                            {{ holdersProp }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.holders.guide_header') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                </b-list-group>
                             </div>
-                            <div class="pb-1" v-if="isMintmeToken">
-                                {{ $t('token.intro.statistics.exchange.header') }} <br>
-                                {{ walletBalance | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.exchange.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.exchange.guide_body') }}
-                                    </template>
-                                </guide>
-                              </div>
-                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
-                                {{ $t('token.intro.statistics.active.header') }} <br v-if="isMintmeToken">
-                                {{ activeOrdersSum | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.active.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.active.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1" v-if="isMintmeToken">
-                                {{ $t('token.intro.statistics.withdraw.header') }} <br v-if="isMintmeToken">
-                                {{ withdrawBalance | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.withdraw.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.withdraw.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div v-if="isMintmeToken" class="pb-1">
-                                {{ $t('token.intro.statistics.sold.header') }} <br>
-                                {{ soldOnMarket | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.sold.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.sold.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
-                                {{ $t('token.intro.statistics.donation.header') }} <br v-if="isMintmeToken">
-                                {{ donationVolume }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.donation.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.donation.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div :class="[isMintmeToken ? 'pb-1' : 'pb-2']">
-                                {{ $t('token.intro.statistics.holders.header') }}
-                                <br v-if="isMintmeToken">
-                                {{ holdersProp }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.holders.guide_header') }}
-                                    </template>
-                                </guide>
+                            <div v-if="isMintmeToken" class="pt-3">
+                                <div class="font-weight-bold px-3 pb-1">
+                                    {{ $t('token.intro.statistics.token_release.header') }}
+                                    <guide>
+                                        <template slot="header">
+                                            {{ $t('token.intro.statistics.token_release.guide_header') }}
+                                        </template>
+                                        <template slot="body">
+                                            {{ $t('token.intro.statistics.token_release.guide_body') }}
+                                        </template>
+                                    </guide>
+                                </div>
+                                <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.period.header') }}
+                                        </div>
+                                        <div>
+                                            {{ stats.releasePeriod }}
+                                            <template v-if="stats.releasePeriod !== defaultValue">
+                                                {{ $t('text.time.year') }}
+                                            </template>
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.period.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.period.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.hourly.header') }}
+                                        </div>
+                                        <div>
+                                            {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.hourly.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.hourly.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.already_released.header') }}
+                                        </div>
+                                        <div>
+                                            {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.already_released.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.already_released.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.not_yet_released.header') }}
+                                        </div>
+                                        <div>
+                                            {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
+                                            <guide>
+                                                <template slot="header">
+                                                    {{ $t('token.intro.statistics.not_yet_released.guide_header') }}
+                                                </template>
+                                                <template slot="body">
+                                                    {{ $t('token.intro.statistics.not_yet_released.guide_body') }}
+                                                </template>
+                                            </guide>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-1">
+                                        <div>
+                                            {{ $t('token.intro.statistics.created') }}
+                                        </div>
+                                        <div>
+                                            {{ tokenCreated }}
+                                        </div>
+                                    </b-list-group-item>
+                                </b-list-group>
                             </div>
                         </div>
-                        <div class="col px-1" v-if="isMintmeToken">
-                            <div class="font-weight-bold pb-4">
-                                {{ $t('token.intro.statistics.token_release.header') }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.token_release.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.token_release.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.period.header') }} <br>
-                                {{ stats.releasePeriod }}
-                                <template v-if="stats.releasePeriod !== defaultValue">
-                                    {{ $t('text.time.year') }}
-                                </template>
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.period.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.period.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.hourly.header') }} <br>
-                                {{ stats.hourlyRate | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.hourly.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.hourly.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.already_released.header') }} <br>
-                                {{ stats.releasedAmount | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.already_released.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.already_released.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.not_yet_released.header') }} <br>
-                                {{  stats.frozenAmount | toMoney(precision, false) | formatMoney }}
-                                <guide>
-                                    <template slot="header">
-                                        {{ $t('token.intro.statistics.not_yet_released.guide_header') }}
-                                    </template>
-                                    <template slot="body">
-                                        {{ $t('token.intro.statistics.not_yet_released.guide_body') }}
-                                    </template>
-                                </guide>
-                            </div>
-                            <div class="pb-1">
-                                {{ $t('token.intro.statistics.created') }} <br>
-                                {{ tokenCreated }}
-                            </div>
-                        </div>
+                </div>
+            </template>
+            <template v-else>
+                <div class="card-body">
+                    <div class="text-center">
+                        <template v-if="!shouldShowStats">
+                            <b-link @click="showStats">{{ $t('token.intro.statistics.show') }}</b-link>
+                        </template>
+                        <template v-else>
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                        </template>
                     </div>
-                </template>
-                <template v-else>
-                    <div class="text-center h-100">
-                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner position-absolute top-50" fixed-width />
-                    </div>
-                </template>
-            </div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -233,30 +286,6 @@ export default {
         tokenContractAddress: String,
         tokenCreated: String,
         websocketUrl: String,
-        soldOnMarketProp: {
-            type: Number,
-            default: null,
-        },
-        donationVolumeProp: {
-            type: Number,
-            default: null,
-        },
-        tokenWithdrawnProp: {
-            type: Number,
-            default: null,
-        },
-        tokenExchangeProp: {
-            type: Number,
-            default: null,
-        },
-        activeOrders: {
-            type: Number,
-            default: null,
-        },
-        statsProp: {
-          type: Object,
-          default: null,
-        },
         holdersProp: {
             type: Number,
             default: null,
@@ -265,54 +294,12 @@ export default {
     data() {
         return {
             pendingSellOrders: null,
-            soldOnMarket: this.soldOnMarketProp,
+            soldOnMarket: null,
             defaultValue: defaultValue,
-            tokenWithdrawn: this.tokenWithdrawnProp,
-            donationVolume: this.donationVolumeProp,
+            tokenWithdrawn: null,
+            donationVolume: null,
+            shouldShowStats: false,
         };
-    },
-    mounted: function() {
-        if (this.isMintmeToken) {
-            if (null === this.tokenWithdrawnProp) {
-                this.getTokenWithdrawn();
-            }
-
-            if (!this.statsProp) {
-                this.getLockPeriod();
-            } else {
-                this.stats = this.statsProp;
-            }
-
-            if (null === this.tokenExchangeProp) {
-                this.getTokExchangeAmount();
-            } else {
-                this.tokenExchangeAmount = this.tokenExchangeProp;
-            }
-        }
-
-        if (null === this.soldOnMarket) {
-            this.getTokenSoldOnMarket();
-        }
-
-        if (!this.activeOrders) {
-            this.getPendingOrders();
-        }
-
-        if (null === this.donationVolume) {
-            this.getMarketStatus();
-        }
-
-        this.sendMessage(JSON.stringify({
-            method: 'kline.subscribe',
-            params: [this.market.identifier, 24 * 60 * 60],
-            id: parseInt(Math.random().toString().replace('0.', '')),
-        }));
-
-        this.addMessageHandler((result) => {
-            if ('kline.update' === result.method) {
-                this.donationVolume = result.params[0][8] || 0;
-            }
-        }, null, 'TokenIntroductionStatistics');
     },
     methods: {
         ...mapMutations('tokenStatistics', [
@@ -369,6 +356,36 @@ export default {
               this.sendLogs('error', 'Can not load market status', err);
             });
         },
+        showStats: function() {
+            if (!this.loaded) {
+                this.fetchAllData();
+            }
+
+            this.shouldShowStats = true;
+        },
+        fetchAllData: function() {
+            if (this.isMintmeToken) {
+                this.getTokenWithdrawn();
+                this.getLockPeriod();
+                this.getTokExchangeAmount();
+            }
+
+            this.getTokenSoldOnMarket();
+            this.getPendingOrders();
+            this.getMarketStatus();
+
+            this.sendMessage(JSON.stringify({
+                method: 'kline.subscribe',
+                params: [this.market.identifier, 24 * 60 * 60],
+                id: parseInt(Math.random().toString().replace('0.', '')),
+            }));
+
+            this.addMessageHandler((result) => {
+                if ('kline.update' === result.method) {
+                    this.donationVolume = result.params[0][8] || 0;
+                }
+            }, null, 'TokenIntroductionStatistics');
+        },
     },
     computed: {
         statisticGuideTranslation: function() {
@@ -385,17 +402,22 @@ export default {
             };
         },
         loaded: function() {
-            return (!this.isMintmeToken || this.tokenExchangeAmount !== null)
-                && this.soldOnMarket !== null && (this.pendingSellOrders !== null || this.activeOrders !== null);
+            if (
+                this.isMintmeToken &&
+                null === this.tokenWithdrawn &&
+                null === this.tokenExchangeAmount
+            ) {
+                return false;
+            }
+
+            return null !== this.soldOnMarket &&
+                null !== this.pendingSellOrders &&
+                null !== this.donationVolume;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            if (this.activeOrders) {
-                return this.activeOrders;
-            }
-
             let sum = new Decimal(0);
             for (let key in this.pendingSellOrders) {
                 if (this.pendingSellOrders.hasOwnProperty(key)) {

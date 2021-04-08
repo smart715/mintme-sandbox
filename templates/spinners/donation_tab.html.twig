@@ -11,12 +11,14 @@
                             </span>
                         </div>
                         <div class="card-body donation-body">
-                            {% if loggedIn is same as(true) %}
+                            {% if loggedIn is same as('true') %}
                                 <div class="h-100">
                                     <div>
                                         <div>
                                             <p class="info">
-                                                {% trans %}donation.nonrefund{% endtrans %}
+                                                {% trans with {'%path%': path('token_show', {name: token.name, tab: 'trade'})} %}
+                                                    donation.nonrefund
+                                                {% endtrans %}
                                             </p>
                                         </div>
                                         <div class="row">
