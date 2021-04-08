@@ -518,7 +518,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException('Token does not exist');
         }
 
-        return $this->view(['deployedDate' => $token->getDeployed()], Response::HTTP_OK);
+        return $this->view(['deployedDate' => $token->getDeployedDate()], Response::HTTP_OK);
     }
 
     /**
