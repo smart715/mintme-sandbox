@@ -95,6 +95,18 @@
                                 :busy="tableLoading"
                                 @sort-changed="sortChanged"
                         >
+                            <template v-slot:[`head(${fields.rank.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                    tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
+                            </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
                                         id="volume"
@@ -395,14 +407,11 @@ export default {
             let tokens = Object.values(this.sanitizedMarkets);
             if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
-                    if (first.tokenized && webSymbol === first.cryptoSymbol && webSymbol !== second.cryptoSymbol) {
-                        return -1;
-                    }
-                    if (second.tokenized && webSymbol === second.cryptoSymbol && webSymbol !== first.cryptoSymbol) {
-                        return 1;
-                    }
-                    if (first.tokenized !== second.tokenized) {
-                        return first.tokenized ? -1 : 1;
+                    let firstMintmeDeployed = first.tokenized && webSymbol === first.cryptoSymbol;
+                    let secondMintmeDeployed = second.tokenized && webSymbol === second.cryptoSymbol;
+
+                    if (firstMintmeDeployed !== secondMintmeDeployed) {
+                        return firstMintmeDeployed ? -1 : 1;
                     }
                     return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
                 });
@@ -426,6 +435,12 @@ export default {
         },
         fields: function() {
             return {
+                rank: {
+                    key: 'rank',
+                    label: this.$t('trading.fields.rank'),
+                    sortable: true,
+                    help: this.$t('trading.fields.rank.help'),
+                },
                 pair: {
                     key: 'pair',
                     label: this.$t('trading.fields.pair'),
@@ -527,29 +542,22 @@ export default {
             }, null, 'Trading');
         },
         sortCompare: function(a, b, key) {
-            let pair = false;
-            this.marketsOnTop.forEach((market)=> {
-                let currency = this.rebrandingFunc(market.currency);
-                let token = this.rebrandingFunc(market.token);
-
-                if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
-                    pair = true;
-                }
-            });
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
+                let rank = key === this.fields.rank.key;
+
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return pair ? 0 : compareResult;
+                return (-1) ** rank * compareResult;
             }
 
             // If the value is not numeric, currently only pair column
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
-            return pair ? 0 : b[key].localeCompare(a[key]);
+            return b[key].localeCompare(a[key]);
         },
         updateRawMarkets: function(page = null, deployedFirst = null) {
             return new Promise((resolve, reject) => {
@@ -559,7 +567,7 @@ export default {
                 let sort = this.sortBy.replace(USD.symbol, '');
 
                 // So that 'pair' column will be sorted A-Z on first click (which is DESC and would be Z-A)
-                let order = sort === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
+                let order = this.fields.pair.key === sort ? !this.sortDesc : this.sortDesc;
                 let params = {
                     page,
                     sort,
@@ -681,7 +689,8 @@ export default {
                 baseImage,
                 quoteImage,
                 market.quote.cryptoSymbol,
-                marketCap
+                marketCap,
+                market.rank || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -711,7 +720,8 @@ export default {
             baseImage,
             quoteImage,
             cryptoSymbol,
-            marketCap = 0
+            marketCap = 0,
+            rank = 0
         ) {
             let hiddenName = this.findHiddenName(token);
 
@@ -739,6 +749,7 @@ export default {
                 baseImage,
                 quoteImage,
                 cryptoSymbol,
+                rank,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -796,7 +807,8 @@ export default {
                         selectedMarket.base.image.avatar_small,
                         selectedMarket.quote.image? selectedMarket.quote.image.avatar_small: '',
                         selectedMarket.quote.cryptoSymbol,
-                        selectedMarket.marketCap || 0
+                        selectedMarket.marketCap || 0,
+                        selectedMarket.rank || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -857,7 +869,8 @@ export default {
                 market.base.image.avatar_small,
                 market.quote.image ? market.quote.image.avatar_small: '',
                 market.quote.cryptoSymbol,
-                market.marketCap || 0
+                market.marketCap || 0,
+                market.rank || 0
                 );
 
             if (marketOnTopIndex > -1) {
