@@ -167,17 +167,6 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
-
-            if (!$isDonationInMintme) {
-                $this->sendAmountFromUserToUser(
-                    $tokenCreator,
-                    $tokensWorthInMintmeWithFee,
-                    $tokenCreator,
-                    $this->getMintmeWorthInCrypto($tokensWorthInMintmeWithFee, $currency),
-                    Symbols::WEB,
-                    $currency
-                );
-            }
         } elseif (!$isDonationInMintme && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $sellOrdersSummaryWithFee = $this->calculateAmountWithFee($sellOrdersSummary);
@@ -357,11 +346,17 @@ class DonationHandler implements DonationHandlerInterface
             $this->cryptoManager->findBySymbol(Symbols::WEB)
         );
 
-        $pendingSellOrders = $this->marketHandler->getPendingSellOrders(
-            $market,
-            0,
-            100
-        );
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->marketHandler->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $pendingSellOrders = array_merge([], ...$paginatedOrders);
 
         $sellOrdersPrice = new Money(0, new Currency($cryptoSymbol));
         $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
