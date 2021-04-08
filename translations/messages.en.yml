@@ -1156,6 +1156,8 @@ trading.buy_depth.help: 'Buy depth is amount of buy orders in MINTME on each mar
 trading.fields.pair: 'Name'
 trading.fields.change: 'Change'
 trading.fields.last_price: 'Last Price'
+trading.fields.rank: '#'
+trading.fields.rank.help: 'The overall rank position of token.'
 wallet.balance: 'Balance'
 wallet.deposit: 'Deposit'
 wallet.withdraw: 'Withdraw'
