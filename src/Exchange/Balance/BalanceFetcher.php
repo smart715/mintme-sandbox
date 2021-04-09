@@ -99,14 +99,10 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function topBalances(string $tradableName, int $limit): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
-                $tradableName,
-                $limit,
-            ]);
-        } catch (\Throwable $e) {
-            throw $e;
-        }
+        $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
+            $tradableName,
+            $limit,
+        ]);
 
         if ($response->hasError()) {
             throw new BalanceException($response->getError()['message'] ?? 'get error response');
@@ -121,14 +117,10 @@ class BalanceFetcher implements BalanceFetcherInterface
             throw new BalanceException('Failed to get the balance. No token name', BalanceException::EMPTY);
         }
 
-        try {
-            $response = $this->jsonRpc->send(
-                self::BALANCE_METHOD,
-                array_merge([$userId + $this->config->getOffset()], $tokenNames)
-            );
-        } catch (\Throwable $e) {
-            throw $e;
-        }
+        $response = $this->jsonRpc->send(
+            self::BALANCE_METHOD,
+            array_merge([$userId + $this->config->getOffset()], $tokenNames)
+        );
 
         if ($response->hasError()) {
             throw new BalanceException($response->getError()['message'] ?? 'get error response');
