@@ -94,7 +94,7 @@ class MinOrderValidator implements ValidatorInterface
     {
         return $this->message;
     }
-    
+
     private function getMinimal(int $unit): float
     {
         return 1 / (int)str_pad('1', $unit + 1, '0');
