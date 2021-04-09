@@ -195,10 +195,10 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        if ($this->token->getDeployed() instanceof \DateTimeImmutable) {
+        if ($this->token->getDeployedDate() instanceof \DateTimeImmutable) {
             $timezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
-            $deployedTimestamp = strtotime($this->token->getDeployed()->format('Y-m-d H:i:s'));
+            $deployedTimestamp = strtotime($this->token->getDeployedDate()->format('Y-m-d H:i:s'));
             $currentTimestamp = time();
             $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
             date_default_timezone_set($timezone);
