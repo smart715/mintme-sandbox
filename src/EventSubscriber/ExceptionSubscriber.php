@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Communications\Exception\FetchException;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
@@ -106,6 +107,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof RedirectException) {
             $event->setResponse($exception->getResponse());
+        }
+
+        if ($exception instanceof FetchException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => $this->translator->trans('404.article'),
+                ]),
+                404
+            ));
         }
     }
 }
