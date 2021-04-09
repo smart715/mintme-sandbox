@@ -169,7 +169,9 @@ class OrdersController extends AbstractFOSRestController
             (string)$request->get('amountInput'),
             (string)$request->get('priceInput'),
             (bool)$request->get('marketPrice'),
-            Order::SIDE_MAP[$request->get('action')]
+            Order::SIDE_MAP[$request->get('action')],
+            $moneyWrapper,
+            $this->cryptoRatesFetcher
         );
 
         return $this->view([

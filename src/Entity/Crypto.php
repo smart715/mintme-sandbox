@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;

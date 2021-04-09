@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\TradebleInterface;
 use App\Exchange\Market;
 use App\Utils\Validator\AddressValidator;
@@ -10,20 +11,28 @@ use App\Utils\Validator\EthereumAddressValidator;
 use App\Utils\Validator\MinAmountValidator;
 use App\Utils\Validator\MinOrderValidator;
 use App\Utils\Validator\ValidatorInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 /** @codeCoverageIgnore */
 class ValidatorFactory implements ValidatorFactoryInterface
 {
     public string $minimalPriceOrder;
 
-    public function createOrderValidator(Market $market, string $price, string $amount): ValidatorInterface
-    {
+    public function createOrderValidator(
+        Market $market,
+        string $price,
+        string $amount,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
+    ): ValidatorInterface {
         return new MinOrderValidator(
             $market->getBase(),
             $market->getQuote(),
             $price,
             $amount,
-            $this->minimalPriceOrder
+            $this->minimalPriceOrder,
+            $moneyWrapper,
+            $cryptoRatesFetcher
         );
     }
 

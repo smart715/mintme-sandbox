@@ -3,6 +3,7 @@
 namespace App\Exchange;
 
 use App\Communications\AMQP\MarketAMQPInterface;
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -114,7 +115,9 @@ class Exchanger implements ExchangerInterface
         string $amountInput,
         string $priceInput,
         bool $marketPrice,
-        int $side
+        int $side,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ): TradeResult {
         $isSellSide = Order::SELL_SIDE === $side;
 
@@ -126,7 +129,13 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        if (!$this->vf->createOrderValidator($market, $priceInput, $amountInput)->validate()) {
+        if (!$this->vf->createOrderValidator(
+            $market,
+            $priceInput,
+            $amountInput,
+            $moneyWrapper,
+            $cryptoRatesFetcher
+        )->validate()) {
             return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
         }
 

@@ -2,8 +2,10 @@
 
 namespace App\Exchange;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\User;
 use App\Exchange\Trade\TradeResult;
+use App\Wallet\Money\MoneyWrapperInterface;
 
 interface ExchangerInterface
 {
@@ -13,7 +15,9 @@ interface ExchangerInterface
         string $amountInput,
         string $priceInput,
         bool $marketPrice,
-        int $side
+        int $side,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ): TradeResult;
 
     public function cancelOrder(Market $market, Order $order): TradeResult;
