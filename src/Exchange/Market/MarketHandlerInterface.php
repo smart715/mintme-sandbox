@@ -30,6 +30,12 @@ interface MarketHandlerInterface
 
     /**
      * @param Market $market
+     * @return Order[]
+     */
+    public function getAllPendingSellOrders(Market $market): array;
+
+    /**
+     * @param Market $market
      * @param int $offset
      * @param int $limit
      * @param bool $reverseBaseQuote

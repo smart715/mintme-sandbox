@@ -75,9 +75,8 @@ class DonationController extends AbstractFOSRestController
                 $user
             );
 
-            $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
+            $tokensWorth = $checkDonationResult->getTokensWorth();
             $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
-            $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary, $currency);
 
             return $this->view([
                 'amountToReceive' => $checkDonationResult->getExpectedTokens(),

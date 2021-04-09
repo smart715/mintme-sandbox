@@ -105,6 +105,21 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
+    public function getAllPendingSellOrders(Market $market): array
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        return array_merge([], ...$paginatedOrders);
+    }
+
     /** {@inheritdoc} */
     public function getPendingBuyOrders(
         Market $market,
@@ -545,17 +560,7 @@ class MarketHandler implements MarketHandlerInterface
     /** {@inheritdoc} */
     public function getBuyDepth(Market $market): string
     {
-        $offset = 0;
-        $limit = 100;
-        $paginatedOrders = [];
-
-        do {
-            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
-            $paginatedOrders[] = $moreOrders;
-            $offset += $limit;
-        } while (count($moreOrders) >= $limit);
-
-        $orders = array_merge([], ...$paginatedOrders);
+        $orders = $this->getAllPendingSellOrders($market);
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
