@@ -117,10 +117,14 @@ class BalanceFetcher implements BalanceFetcherInterface
             throw new BalanceException('Failed to get the balance. No token name', BalanceException::EMPTY);
         }
 
-        $response = $this->jsonRpc->send(
-            self::BALANCE_METHOD,
-            array_merge([$userId + $this->config->getOffset()], $tokenNames)
-        );
+        try {
+            $response = $this->jsonRpc->send(
+                self::BALANCE_METHOD,
+                array_merge([$userId + $this->config->getOffset()], $tokenNames)
+            );
+        } catch (\Throwable $e) {
+            throw $e;
+        }
 
         if ($response->hasError()) {
             throw new BalanceException($response->getError()['message'] ?? 'get error response');
