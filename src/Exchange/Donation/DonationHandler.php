@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
+use PHP_CodeSniffer\Standards\Generic\Sniffs\Commenting\TodoSniff;
 
 class DonationHandler implements DonationHandlerInterface
 {
@@ -130,7 +131,6 @@ class DonationHandler implements DonationHandlerInterface
             $checkDonationResult->getTokensWorth(),
             Symbols::WEB
         );
-        $tokensWorthInMintmeWithFee = $tokensWorthInMintme->divide(1 + floatval($this->donationConfig->getFee()));
 
         // Check expected tokens amount.
         if (!$currentExpectedAmount->equals($expectedAmount)) {
@@ -146,17 +146,9 @@ class DonationHandler implements DonationHandlerInterface
             $sellOrdersSummary->greaterThanOrEqual($donationAmount)
         ) {
             // Donate using donation viabtc API (token creator has available sell orders)
+
             if (!$isDonationInMintme) {
-                $this->sendAmountFromUserToUser(
-                    $donorUser,
-                    // Sum of donation in any crypto (ETH, BTC)
-                    $amountInCrypto,
-                    $donorUser,
-                    // Sum of donation in MINTME
-                    $tokensWorthInMintme,
-                    $currency,
-                    Symbols::WEB
-                );
+                // @TODO place orders to convert it in mintme here
             }
 
             $this->donationFetcher->makeDonation(
@@ -233,16 +225,20 @@ class DonationHandler implements DonationHandlerInterface
             );
         } else {
             // Donate (send) funds from user to user (token creator has no sell orders).
-            $feeFromDonationAmount = $this->calculateFee($amountInCrypto);
-            $amountToDonate = $amountInCrypto->subtract($feeFromDonationAmount);
-            $this->sendAmountFromUserToUser(
-                $donorUser,
-                $amountInCrypto,
-                $tokenCreator,
-                $amountToDonate,
-                $currency,
-                $currency
-            );
+            if ($isDonationInMintme) {
+                $feeFromDonationAmount = $this->calculateFee($amountInCrypto);
+                $amountToDonate = $amountInCrypto->subtract($feeFromDonationAmount);
+                $this->sendAmountFromUserToUser(
+                    $donorUser,
+                    $amountInCrypto,
+                    $tokenCreator,
+                    $amountToDonate,
+                    $currency,
+                    $currency
+                );
+            } else {
+                // @TODO Execute orders and convert it to MINTME and donate MINTME to user instead of another CRYPTO
+            }
         }
 
         $feeAmount = $this->calculateFee($amountInCrypto);
