@@ -99,10 +99,14 @@ class BalanceFetcher implements BalanceFetcherInterface
 
     public function topBalances(string $tradableName, int $limit): array
     {
-        $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
-            $tradableName,
-            $limit,
-        ]);
+        try {
+            $response = $this->jsonRpc->send(self::BALANCE_TOP_METHOD, [
+                $tradableName,
+                $limit,
+            ]);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
 
         if ($response->hasError()) {
             throw new BalanceException($response->getError()['message'] ?? 'get error response');
