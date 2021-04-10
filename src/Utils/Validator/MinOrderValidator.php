@@ -27,7 +27,7 @@ class MinOrderValidator implements ValidatorInterface
     private $amount;
 
     /** @var string */
-    private $message = 'Amount is low';
+    private $message;
 
     private string $minimalPriceOrder;
 
@@ -53,7 +53,7 @@ class MinOrderValidator implements ValidatorInterface
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
-    public function validate(): bool
+    public function validate(): Bool
     {
         /** @var Crypto $base */
         $base = $this->baseTradable;
@@ -87,7 +87,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && $this->checkOrderPriceMinimal($base, $scale);
+            && $this->checkOrderPriceMinimal($scale);
     }
 
     public function getMessage(): string
@@ -100,7 +100,7 @@ class MinOrderValidator implements ValidatorInterface
         return 1 / (int)str_pad('1', $unit + 1, '0');
     }
 
-    private function checkOrderPriceMinimal(TradebleInterface $base, int $scale): bool
+    private function checkOrderPriceMinimal(int $scale): bool
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
@@ -112,14 +112,28 @@ class MinOrderValidator implements ValidatorInterface
 
         $totalOrderAmountInBase = $this->moneyWrapper->parse(
             (string)$totalOrderAmount,
-            $base->getSymbol()
+            Symbols::WEB
         );
 
-        $totalOrderAmountInUsd = $this->moneyWrapper->parse(
-            $totalOrderAmountInBase->multiply($rates[$base->getSymbol()][Symbols::USD])->getAmount(),
-            Symbols::USD
+        $minimalPriceOrderInUsd = $this->moneyWrapper->parse($this->minimalPriceOrder, Symbols::USD);
+
+        $minimalPriceOrderInBase =  $this->moneyWrapper->convert(
+            $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
+            new Currency(Symbols::WEB),
+            new FixedExchange([
+                Symbols::USD => [ Symbols::WEB => 1 / $rates[Symbols::WEB][Symbols::USD] ],
+            ])
         );
 
-        // TODO compare to value from paramerters and return the properly message
+        if (!$totalOrderAmountInBase->greaterThanOrEqual($minimalPriceOrderInBase)) {
+            /*$this->message = $this->translator->trans('orders.minimumValue', [
+                '%valueInUsd%' => $minimalPriceOrderInUsd,
+                '%valueInMintme%' => $minimalPriceOrderInBase,
+            ]);*/
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -129,6 +129,24 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
+       /* $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $priceInput,
+            $amountInput,
+            $moneyWrapper,
+            $cryptoRatesFetcher
+        );
+        if (!$minOrderValidator->validate()) {
+
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+        }*/
+
+
+
+
         if (!$this->vf->createOrderValidator(
             $market,
             $priceInput,

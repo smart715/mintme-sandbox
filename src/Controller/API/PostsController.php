@@ -308,10 +308,7 @@ class PostsController extends AbstractFOSRestController
 
         $url = $this->generateUrl('show_post', ['id' => $post->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $message = $this->translator->trans('post.share.message', [
-            '%title%' => $post->getTitle(),
-            '%url%' => $url,
-        ]);
+        $message = $this->translator->trans('post.share.message', '');
 
         try {
             $this->twitterManager->sendTweet($user, $message);

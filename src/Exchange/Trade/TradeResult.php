@@ -3,6 +3,7 @@
 namespace App\Exchange\Trade;
 
 use Exception;
+use phpDocumentor\Reflection\Types\Self_;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TradeResult
@@ -30,8 +31,13 @@ class TradeResult
         self::USER_NOT_MATCH =>
             'place_order.not_match',
 
-        self::SMALL_AMOUNT =>
-            'place_order.too_small',
+        self::SMALL_AMOUNT =>[
+            'message' =>'place_order.too_small',
+            'params' =>[
+                '%valueInUsd%' => 0.1,
+                '%valueInMintme%' => 34.4,
+            ],
+        ],
     ];
 
     /** @var int */
@@ -52,6 +58,13 @@ class TradeResult
 
     public function getMessage(): string
     {
+        if (self::SMALL_AMOUNT === $this->result) {
+            return $this->translator->trans(
+                self::MESSAGES[$this->result]['message'],
+                self::MESSAGES[$this->result]['params']
+            );
+        }
+
         return $this->translator->trans(self::MESSAGES[$this->result]);
     }
 
