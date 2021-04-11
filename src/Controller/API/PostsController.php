@@ -33,7 +33,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use function GuzzleHttp\Promise\queue;
 
 /**
  * @Rest\Route("/api/posts")
@@ -426,57 +425,10 @@ class PostsController extends AbstractFOSRestController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $tokens = $user->getTokens();
-        $posts = $this->postManager->getRecentPost($tokens, $nextPage);
-        $postsData = [];
-
-        /** @var Post $post */
-        foreach ($posts as $post) {
-            $postsData[] = [
-                'token' => $post->getToken()->getName(),
-                'tokenImageUrl' => $post->getToken()->getImage(),
-                'author' => $post->getAuthor()->getNickname(),
-                'authorImage' => $post->getAuthor()->getImage(),
-                'createdAt' => $post->getCreatedAt(),
-                'title' => $post->getTitle(),
-                'content' => $this->isGranted('view', $post) ? $post->getContent() : null,
-                'commentCount' => $post->getCommentsCount(),
-                'postLink' => $this->generateUrl(
-                    'new_show_post',
-                    [
-                        'name' => $post->getToken()->getName(),
-                        'slug' => $post->getSlug(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-                'tokenLink' => $this->generateUrl(
-                    'token_show',
-                    [
-                        'name' => $post->getToken()->getName(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-                'authorLink' => $this->generateUrl(
-                    'profile-view',
-                    [
-                        'nickname' => $post->getAuthor()->getNickname(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-                'HashTagLink' => $this->generateUrl(
-                    'token_show',
-                    [
-                        'name' => $post->getToken()->getName(),
-                        'tab' => 'posts',
-                        '_fragment' => $post->getId(),
-                    ],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
-            ];
-        }
+        $posts = $this->postManager->getRecentPost($user, $nextPage);
 
         return $this->view(
-            ['posts' => $postsData, 'count' => count($postsData)],
+            ['posts' => $posts, 'count' => count($posts)],
             Response::HTTP_OK
         );
     }

@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\Post;
+use App\Entity\User;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -28,8 +29,8 @@ class PostManager implements PostManagerInterface
         return $this->repository->findOneBy(['slug' => $slug]);
     }
 
-    public function getRecentPost(array $tokens, int $page): array
+    public function getRecentPost(User $user, int $page): array
     {
-        return $this->repository->findByTokens($tokens, $page);
+        return $this->repository->findRecentPostsOfUser($user, $page);
     }
 }

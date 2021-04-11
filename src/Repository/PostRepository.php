@@ -2,20 +2,20 @@
 
 namespace App\Repository;
 
-use App\Entity\Token\Token;
+use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 class PostRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function findByTokens(array $tokens, int $page): array
+    public function findRecentPostsOfUser(User $user, int $page): array
     {
         return $this->createQueryBuilder('post')
             ->where('post.token IN (:tokens)')
-            ->setParameter('tokens', $tokens)
+            ->setParameter('tokens', $user->getTokens())
             ->orderBy('post.createdAt', 'ASC')
-            ->setFirstResult($page * 10)
-            ->setMaxResults(10)
+            ->setFirstResult($page * 2)
+            ->setMaxResults(2)
             ->getQuery()
             ->getResult();
     }
