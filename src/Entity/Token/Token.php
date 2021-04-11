@@ -209,7 +209,12 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="datetime_immutable", nullable=true)
      * @var \DateTimeImmutable|null
      */
-    private $deployed;
+    private $deployedDate;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
+     */
+    private bool $deployed = false; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string")
@@ -591,13 +596,27 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /** @codeCoverageIgnore */
-    public function getDeployed(): ?\DateTimeImmutable
+    public function getDeployedDate(): ?\DateTimeImmutable
+    {
+        return $this->deployedDate;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setDeployedDate(?\DateTimeImmutable $deployedDate): self
+    {
+        $this->deployedDate = $deployedDate;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getDeployed(): bool
     {
         return $this->deployed;
     }
 
     /** @codeCoverageIgnore */
-    public function setDeployed(?\DateTimeImmutable $deployed): self
+    public function setDeployed(bool $deployed): self
     {
         $this->deployed = $deployed;
 

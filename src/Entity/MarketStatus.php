@@ -98,6 +98,8 @@ class MarketStatus
      */
     private int $lastDealId = 0; // phpcs:ignore
 
+    private ?int $rank = null; // phpcs:ignore
+
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
         $this->crypto = $crypto;
@@ -226,5 +228,21 @@ class MarketStatus
     public function getLastDealId(): int
     {
         return $this->lastDealId;
+    }
+
+    /** @Groups({"API"}) */
+    public function getRank(): ?int
+    {
+        return $this->rank;
+    }
+
+    public function setRank(int $rank): void
+    {
+        $this->rank = $rank;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }
