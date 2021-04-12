@@ -79,12 +79,12 @@ class DonationHandler implements DonationHandlerInterface
 
         if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders(
-                $market = new Market(
+                new Market(
                     $this->cryptoManager->findBySymbol($currency),
                     $this->cryptoManager->findBySymbol(Symbols::WEB)
                 )
             );
-            $amountObj = $this->getCryptoWorthInMintme($pendingSellOrders, $amountObj, $currency);
+            $amountObj = $this->getCryptoWorthInMintme($pendingSellOrders, $amountObj);
         }
 
         return $this->donationFetcher->checkDonation(
@@ -132,7 +132,7 @@ class DonationHandler implements DonationHandlerInterface
             );
             // Convert sum of donation in any Crypto to MINTME
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders($cryptoMarket);
-            $donationMintmeAmount = $this->getCryptoWorthInMintme($pendingSellOrders, $donationMintmeAmount, $currency);
+            $donationMintmeAmount = $this->getCryptoWorthInMintme($pendingSellOrders, $donationMintmeAmount);
         }
 
         // Check how many tokens will recieve user and how many MINTME he should spend
@@ -199,8 +199,8 @@ class DonationHandler implements DonationHandlerInterface
                 $donationAmountLeft,
                 $tokenCreator,
                 $amountToDonate,
-                $currency,
-                $currency
+                Symbols::WEB,
+                Symbols::WEB
             );
         } elseif ($isDonationInMintme && $twoWayDonation) {
             // Donate MINTME using donation viabtc API AND donation from user to user.
@@ -351,23 +351,6 @@ class DonationHandler implements DonationHandlerInterface
         );
     }
 
-    private function getMintmeWorthInCrypto(Money $amountInMintme, string $cryptoSymbol): Money
-    {
-        $rates = $this->cryptoRatesFetcher->fetch();
-
-        if (Symbols::USDC === $cryptoSymbol) {
-            $usdcRate = 1 / $rates[Symbols::USDC][Symbols::USD]
-                * $rates[Symbols::WEB][Symbols::USD];
-            $rates[Symbols::WEB][$cryptoSymbol] = $usdcRate;
-        }
-
-        return $this->moneyWrapper->convert(
-            $amountInMintme,
-            new Currency($cryptoSymbol),
-            new FixedExchange($rates)
-        );
-    }
-
     /**
      * @param Order[] $pendingSellOrders
      * @param Money $amount
@@ -375,13 +358,14 @@ class DonationHandler implements DonationHandlerInterface
      * @return Money
      * @throws ApiBadRequestException
      */
-    private function getCryptoWorthInMintme(array $pendingSellOrders, Money $amount, string $cryptoSymbol): Money
+    private function getCryptoWorthInMintme(array $pendingSellOrders, Money $amount): Money
     {
-        $sellOrdersPrice = new Money(0, new Currency($cryptoSymbol));
-        $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
+        $donatinonAmount = new Money($this->moneyWrapper->format($amount), new Currency(Symbols::WEB));
+        $sellOrdersPrice = new Money(0, new Currency(Symbols::WEB));
+        $mintmeWorth = new Money(5, new Currency(Symbols::WEB));
 
         foreach ($pendingSellOrders as $sellOrder) {
-            if ($sellOrdersPrice->greaterThanOrEqual($amount)) {
+            if ($sellOrdersPrice->greaterThanOrEqual($donatinonAmount)) {
                 break;
             }
 
@@ -394,7 +378,7 @@ class DonationHandler implements DonationHandlerInterface
             $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
         }
 
-        if ($sellOrdersPrice->lessThan($amount)) {
+        if ($sellOrdersPrice->lessThan($donatinonAmount)) {
             throw new ApiBadRequestException('Market doesn\'t have enough orders.');
         }
 
@@ -440,12 +424,5 @@ class DonationHandler implements DonationHandlerInterface
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }
-    }
-
-    private function calculateAmountWithFee(Money $amount): Money
-    {
-        $divisor = 1 - (float)$this->donationConfig->getFee();
-
-        return $amount->divide($divisor);
     }
 }
