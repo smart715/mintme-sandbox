@@ -1,167 +1,161 @@
 <template>
-    <div
-        v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled"
-        class="container-fluid px-0"
-    >
-        <div class="row justify-content-center">
-            <div class="width-100 col-9 col-sm-10 col-md-9 col-lg-7 col-xl-6 mt-3">
-                <div class="card h-100">
-                    <div class="h-100 donation">
-                        <div class="donation-header text-left">
-                            <span>{{ $t('donation.header.logged') }}</span>
-                        </div>
-                        <div class="card-body donation-body">
-                            <div v-show="!showForms" class="h-100">
-                                <div>
-                                    <div>
-                                        <p class="info" v-html="$sanitize(nonrefundHtml)"></p>
-                                    </div>
-                                    <div class="row" v-bind:class="{ 'currency-container': isCurrencySelected }">
-                                        <div class="col">
-                                            <p class="mb-2">{{ $t('donation.currency') }}</p>
-                                            <b-dropdown
-                                                id="donation_currency"
-                                                :text="dropdownText"
-                                                variant="primary"
-                                            >
-                                                <b-dropdown-item
-                                                    v-for="option in options"
-                                                    :key="option"
-                                                    :value="option"
-                                                    @click="onSelect(option)"
-                                                >
-                                                    {{ option | rebranding }}
-                                                </b-dropdown-item>
-                                            </b-dropdown>
-                                        </div>
-                                        <div
-                                            v-if="isCurrencySelected && loggedIn"
-                                            class="col"
-                                            id="show-balance"
-                                        >
-                                            <p class="mb-2">{{ $t('donation.balance') }}</p>
-                                            <span v-if="balanceLoaded" class="d-block">
-                                                {{ balance | toMoney(currencySubunit) | formatMoney }}
-                                            </span>
-                                            <font-awesome-icon
-                                                v-else
-                                                icon="circle-notch"
-                                                spin
-                                                class="loading-spinner" fixed-width
-                                            />
-                                            <div v-if="insufficientFunds">
-                                                <span class="d-block text-danger font-size-90">
-                                                    {{ $t('donation.insufficient_funds') }}
-                                                </span>
-                                                <span class="d-block">
-                                                    {{ $t('donation.make') }}
-                                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
-                                                    {{ $t('donation.first') }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        v-if="isCurrencySelected"
-                                        class="w-100"
+    <div v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled">
+        <div class="card h-100">
+                <div class="card-header">
+                    <span>
+                        {{ $t('donation.header.logged', {token: market.quote.name}) }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div v-show="!showForms" class="row">
+                        <div
+                            class="col-xl-5"
+                            :class="isCurrencySelected && loggedIn ? 'col-lg-8' : 'col-lg-12'"
+                        >
+                            <div class="d-sm-flex">
+                                <b-dropdown
+                                    id="donation_currency"
+                                    :text="dropdownText"
+                                    variant="primary"
+                                    class="mr-2"
+                                >
+                                    <b-dropdown-item
+                                        v-for="option in options"
+                                        :key="option"
+                                        :value="option"
+                                        @click="onSelect(option)"
                                     >
-                                        <div>
-                                            <label for="amount-to-donate">{{ $t('donation.amount') }}</label>
-                                            <div class="input-group">
-                                                <price-converter-input
-                                                    class="d-block flex-grow-1"
-                                                    v-model="amountToDonate"
-                                                    input-id="amount-to-donate"
-                                                    @keypress="checkAmountInput"
-                                                    @paste="checkAmountInput"
-                                                    @keyup="onKeyup"
-                                                    :from="selectedCurrency"
-                                                    :to="USD.symbol"
-                                                    :subunit="4"
-                                                    symbol="$"
-                                                    :show-converter="currencyMode === currencyModes.usd.value"
-                                                />
-                                                <div v-if="loggedIn" class="input-group-append">
-                                                    <button
-                                                        @click="all"
-                                                        class="btn btn-primary all-button"
-                                                        type="button"
-                                                    >{{ $t('donation.button_all') }}</button>
-                                                </div>
-                                            </div>
-                                            <div
-                                                v-if="insufficientFundsError"
-                                                class="w-100 mt-1 text-danger">
-                                                {{
-                                                    $t('donation.min_amount', {
-                                                      donationCurrency:donationCurrency,
-                                                      currencyMinAmount:currencyMinAmount
-                                                    })
-                                                }}
-                                            </div>
-                                            <p class="mt-2 mb-4 text-nowrap">
-                                                {{ $t('donation.receive') }}
-                                                <font-awesome-icon
-                                                    v-if="donationChecking"
-                                                    icon="circle-notch"
-                                                    spin
-                                                    class="loading-spinner"
-                                                    fixed-width
-                                                />
-                                                <span v-else>{{ amountToReceive }}</span>
-                                                <span class="text-nowrap">
-                                                    tokens
-                                                    <guide
-                                                        :placement="'right-start'"
-                                                        :max-width="'200px'"
-                                                    >
-                                                        <template slot="body">
-                                                            {{ $t('donation.diff_number') }}
-                                                        </template>
-                                                    </guide>
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p class="mb-2">{{ $t('donation.fee', {fee: donationParams.fee}) }}</p>
-                                            <button
-                                                :disabled="buttonDisabled"
-                                                @click="showConfirmationModal"
-                                                class="btn btn-primary btn-donate"
-                                            >
-                                                <span :class="{'text-muted': disabledServices.newTradesDisabled}">
-                                                    {{ $t('donation.buy') }}
-                                                </span>
-                                            </button>
-                                            <confirm-modal
-                                                :visible="showModal"
-                                                :show-image="false"
-                                                @confirm="makeDonation"
-                                                @cancel="cancelDonation"
-                                                @close="showModal = false">
-                                                <p class="text-white modal-title pt-2 pb-4">
-                                                    {{ $t('donation.modal.1') }}
-                                                    <br />
-                                                    {{ $t('donation.modal.2', translationsContext) }}
-                                                </p>
-                                                <template v-slot:confirm>Continue</template>
-                                            </confirm-modal>
-                                        </div>
+                                        {{ option | rebranding }}
+                                    </b-dropdown-item>
+                                </b-dropdown>
+                                <div class="input-group flex-nowrap my-3 my-sm-0">
+                                    <price-converter-input
+                                        class="d-block flex-grow-1"
+                                        v-model="amountToDonate"
+                                        input-id="amount-to-donate"
+                                        @keypress="checkAmountInput"
+                                        @paste="checkAmountInput"
+                                        @keyup="onKeyup"
+                                        :from="selectedCurrency"
+                                        :to="USD.symbol"
+                                        :subunit="4"
+                                        symbol="$"
+                                        :show-converter="currencyMode === currencyModes.usd.value"
+                                    />
+                                    <div v-if="loggedIn" class="input-group-append">
+                                        <button
+                                            @click="all"
+                                            class="btn btn-primary all-button"
+                                            type="button"
+                                        >
+                                            {{ $t('donation.button_all') }}
+                                        </button>
                                     </div>
                                 </div>
+                                <div>
+                                    <button
+                                        :disabled="buttonDisabled"
+                                        @click="showConfirmationModal"
+                                        class="btn btn-primary btn-donate ml-sm-2"
+                                    >
+                                        <span :class="{'text-muted': disabledServices.newTradesDisabled}">
+                                            {{ $t('donation.buy') }}
+                                        </span>
+                                    </button>
+                                    <confirm-modal
+                                        :visible="showModal"
+                                        :show-image="false"
+                                        @confirm="makeDonation"
+                                        @cancel="cancelDonation"
+                                        @close="showModal = false">
+                                        <p class="text-white modal-title pt-2 pb-4">
+                                            {{ $t('donation.modal.1') }}
+                                            <br>
+                                            {{ $t('donation.modal.2', translationsContext) }}
+                                        </p>
+                                        <template v-slot:confirm>
+                                            {{ $t('confirm_modal.continue') }}
+                                        </template>
+                                    </confirm-modal>
+                                </div>
                             </div>
-                            <div v-if="!loggedIn">
-                                <login-signup-switcher
-                                    v-show="showForms"
-                                    :google-recaptcha-site-key="googleRecaptchaSiteKey"
-                                    @login="onLogin"
-                                    @signup="onSignup"
-                                />
+                            <div class="mt-1">
+                                <div
+                                    v-if="insufficientFundsError"
+                                    class="mt-1 text-danger">
+                                    {{
+                                        $t('donation.min_amount', {
+                                          donationCurrency:donationCurrency,
+                                          currencyMinAmount:currencyMinAmount
+                                        })
+                                    }}
+                                </div>
+                                <p class="m-0 mt-1">
+                                    {{ $t('donation.receive') }}
+                                    <font-awesome-icon
+                                        v-if="donationChecking"
+                                        icon="circle-notch"
+                                        spin
+                                        class="loading-spinner"
+                                        fixed-width
+                                    />
+                                    <span v-else class="text-nowrap">
+                                        {{ amountToReceive }} tokens
+                                        <guide
+                                            :placement="'right-start'"
+                                            :max-width="'200px'"
+                                        >
+                                            <template slot="body">
+                                                {{ $t('donation.diff_number') }}
+                                            </template>
+                                        </guide>
+                                    </span>
+                                </p>
                             </div>
                         </div>
+                        <div
+                            v-if="isCurrencySelected && loggedIn"
+                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
+                            id="show-balance"
+                        >
+                            <p class="m-0">
+                                <span>
+                                    {{ $t('donation.balance') }}
+                                </span>
+                                <span v-if="balanceLoaded">
+                                    {{ balance | toMoney(currencySubunit) | formatMoney }}
+                                </span>
+                                <font-awesome-icon
+                                    v-else
+                                    icon="circle-notch"
+                                    spin
+                                    class="loading-spinner" fixed-width
+                                />
+                            </p>
+                            <div v-if="insufficientFunds">
+                                <span class="d-block text-danger font-size-90">
+                                    {{ $t('donation.insufficient_funds') }}
+                                </span>
+                                <span class="d-block">
+                                    {{ $t('donation.make') }}
+                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
+                                    {{ $t('donation.first') }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col mt-3 mt-xl-0 pl-xl-0">
+                            <p class="info m-0" v-html="$sanitize(nonrefundHtml)"></p>
+                        </div>
+                    </div>
+                    <div v-if="!loggedIn" class="d-flex justify-content-center">
+                        <login-signup-switcher
+                            v-show="showForms"
+                            :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                            @login="onLogin"
+                            @signup="onSignup"
+                        />
                     </div>
                 </div>
-            </div>
         </div>
     </div>
     <div v-else>
@@ -472,7 +466,7 @@ export default {
                     window.history.replaceState(
                         {}, document.title, this.$routing.generate('token_show', {
                             name: this.market.quote.symbol,
-                            tab: 'buy',
+                            tab: 'intro',
                             modal: 'signup',
                         })
                     );

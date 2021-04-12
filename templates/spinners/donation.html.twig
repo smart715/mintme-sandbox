@@ -1,0 +1,79 @@
+<div class="col-12 mb-3">
+    {% if is_granted('trading') %}
+    <div class="card h-100">
+        <div class="card-header">
+            <span>
+                {% trans with {'%token%': market.quote.name} %}donation.header.logged{% endtrans %}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="{% if loggedIn == 'true'%}'col-lg-8'{% else %}'col-lg-12'{% endif %} col-xl-5">
+                   <div class="d-sm-flex">
+                      <div id="donation_currency" class="dropdown btn-group b-dropdown mr-2">
+                         <button 
+                             id="donation_currency__BV_toggle_"
+                             aria-haspopup="true" aria-expanded="false"
+                             type="button" class="btn dropdown-toggle btn-primary"
+                         >
+                                {% trans %} mintme {% endtrans %}
+                         </button>
+                      </div>
+                      <div class="input-group flex-nowrap my-3 my-sm-0">
+                         <div class="position-relative h-fit-content d-block flex-grow-1">
+                            <input type="text" class="form-control price-converter-input__input" disabled />
+                         </div>
+                         <div class="input-group-append">
+                             <button type="button" class="btn btn-primary all-button">
+                                 {% trans %} donation.button_all {% endtrans %}
+                              </button>
+                         </div>
+                      </div>
+                      <div>
+                         <button disabled class="btn btn-primary btn-donate ml-sm-2">
+                             <span class="text-muted">
+                                 {% trans %} donation.buy {% endtrans %}
+                             </span>
+                         </button>
+                      </div>
+                   </div>
+                    <div class="mt-1">
+                        <div class="m-0 mt-1">
+                        {% trans %} donation.receive {% endtrans %}
+                            <span class="text-nowrap">
+                                0 tokens
+                                <div class="d-inline">
+                                    <a>
+                                        <div class="ml-1 rounded-circle square blue-question mtrouneded">
+                                            <span class="mtquestion"></span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% if loggedIn is same as('true') %}
+                    <div id="show-balance" class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0">
+                        <p class="m-0">
+                            <span>{% trans %} donation.balance {% endtrans%}</span>
+                            <span class="vld-icon"></span>
+                        </p>
+                    </div>
+                {% endif %}
+                <div class="col mt-3 mt-xl-0 pl-xl-0">
+                    <p class="info m-0">
+                        {% trans with {'%path%': path('token_show', {name: token.name, tab: 'trade'})} %}
+                            donation.nonrefund
+                        {% endtrans %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="h1 text-center pt-5 mt-5">
+        {% trans %} trade.page.disabled {% endtrans %}
+    </div>
+    {% endif %}
+</div>
