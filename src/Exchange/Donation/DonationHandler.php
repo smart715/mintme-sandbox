@@ -23,6 +23,7 @@ use Money\Currency;
 use Money\Exchange\FixedExchange;
 use Money\Money;
 use PHP_CodeSniffer\Standards\Generic\Sniffs\Commenting\TodoSniff;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class DonationHandler implements DonationHandlerInterface
 {
@@ -36,6 +37,7 @@ class DonationHandler implements DonationHandlerInterface
     private EntityManagerInterface $em;
     private MarketHandlerInterface $marketHandler;
     private ExchangerInterface $exchanger;
+    private ParameterBagInterface $parameterBag;
 
     public function __construct(
         DonationFetcherInterface $donationFetcher,
@@ -47,7 +49,8 @@ class DonationHandler implements DonationHandlerInterface
         DonationConfig $donationConfig,
         EntityManagerInterface $em,
         MarketHandlerInterface $marketHandler,
-        ExchangerInterface $exchanger
+        ExchangerInterface $exchanger,
+        ParameterBagInterface $parameterBag
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -59,6 +62,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->em = $em;
         $this->marketHandler = $marketHandler;
         $this->exchanger = $exchanger;
+        $this->parameterBag = $parameterBag;
     }
 
     public function checkDonation(
@@ -254,12 +258,13 @@ class DonationHandler implements DonationHandlerInterface
                 );
             } else {
                 $this->executeMarketOrders($donorUser, $donationMintmeAmount, $pendingSellOrders, $cryptoMarket);
+                $donationMintmeWithOrdersFee = $this->calculateAmountWithOrdersFee($donationMintmeAmount);
 
                 $this->sendAmountFromUserToUser(
                     $donorUser,
-                    $donationMintmeAmount,
+                    $donationMintmeWithOrdersFee,
                     $tokenCreator,
-                    $donationMintmeAmount,
+                    $donationMintmeWithOrdersFee,
                     Symbols::WEB,
                     Symbols::WEB
                 );
@@ -392,6 +397,7 @@ class DonationHandler implements DonationHandlerInterface
     private function getCryptoWorthInMintme(array $pendingSellOrders, Money $amount, string $cryptoSymbol): Money
     {
         $sellOrdersPrice = new Money(0, new Currency($cryptoSymbol));
+        $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
 
         foreach ($pendingSellOrders as $sellOrder) {
             if ($sellOrdersPrice->greaterThanOrEqual($amount)) {
@@ -460,5 +466,14 @@ class DonationHandler implements DonationHandlerInterface
         $divisor = 1 - (float)$this->donationConfig->getFee();
 
         return $amount->divide($divisor);
+    }
+
+    private function calculateAmountWithOrdersFee(Money $amount): Money
+    {
+        return $amount->subtract(
+            $amount->multiply(
+                $this->parameterBag->get('maker_fee_rate')
+            )
+        );
     }
 }
