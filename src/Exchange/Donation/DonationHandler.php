@@ -20,9 +20,7 @@ use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
-use PHP_CodeSniffer\Standards\Generic\Sniffs\Commenting\TodoSniff;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class DonationHandler implements DonationHandlerInterface
@@ -270,30 +268,33 @@ class DonationHandler implements DonationHandlerInterface
 
     /**
      * @param User $donator
-     * @param Money $totalAmountToExecute
+     * @param Money $totalMintmeToExecute
      * @param Order[] $pendingSellOrders
      * @param Market $market
      */
     private function executeMarketOrders(
         User $donator,
-        Money $totalAmountToExecute,
+        Money $totalMintmeToExecute,
         array $pendingSellOrders,
         Market $market
     ): void {
         $executedSum = new Money('0', new Currency(Symbols::WEB));
 
-        foreach ($pendingSellOrders as $order) {
-            if ($executedSum->greaterThanOrEqual($totalAmountToExecute)) {
+        foreach ($pendingSellOrders as $sellOrder) {
+            if ($executedSum->greaterThanOrEqual($totalMintmeToExecute)) {
                 break;
             }
 
-            $amount = $order->getAmount();
-            $price = $order->getPrice();
+            $price = $sellOrder->getPrice();
+            $amount = $sellOrder->getAmount()->greaterThan($totalMintmeToExecute)
+                ? $totalMintmeToExecute->subtract($executedSum)
+                : $sellOrder->getAmount();
+
             $this->exchanger->placeOrder(
                 $donator,
                 $market,
-                $this->moneyWrapper->format($order->getAmount()),
-                $this->moneyWrapper->format($order->getPrice()),
+                $this->moneyWrapper->format($amount),
+                $this->moneyWrapper->format($price),
                 false,
                 Order::BUY_SIDE
             );
@@ -360,29 +361,30 @@ class DonationHandler implements DonationHandlerInterface
      */
     private function getCryptoWorthInMintme(array $pendingSellOrders, Money $amount): Money
     {
-        $donatinonAmount = new Money($this->moneyWrapper->format($amount), new Currency(Symbols::WEB));
-        $sellOrdersPrice = new Money(0, new Currency(Symbols::WEB));
-        $mintmeWorth = new Money(5, new Currency(Symbols::WEB));
+        $donatinonAmount = $this->moneyWrapper->parse($this->moneyWrapper->format($amount), Symbols::WEB);
+        $totalSum = new Money(0, new Currency(Symbols::WEB));
 
         foreach ($pendingSellOrders as $sellOrder) {
-            if ($sellOrdersPrice->greaterThanOrEqual($donatinonAmount)) {
+            if ($totalSum->greaterThanOrEqual($donatinonAmount)) {
                 break;
             }
 
-            $sellOrdersPrice = $sellOrdersPrice->add(
-                $sellOrder->getPrice()->multiply(
-                    $this->moneyWrapper->format($sellOrder->getAmount())
-                )
+            $order = $sellOrder->getPrice()->multiply(
+                $this->moneyWrapper->format($sellOrder->getAmount())
             );
 
-            $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
+            $totalSum = $order->greaterThan($totalSum)
+                ? $totalSum->add(
+                    $donatinonAmount->subtract($totalSum)->divide($this->moneyWrapper->format($sellOrder->getPrice()))
+                )
+                : $totalSum->add($order);
         }
 
-        if ($sellOrdersPrice->lessThan($donatinonAmount)) {
+        if ($totalSum->lessThan($donatinonAmount)) {
             throw new ApiBadRequestException('Market doesn\'t have enough orders.');
         }
 
-        return $mintmeWorth;
+        return $totalSum;
     }
 
     private function calculateFee(Money $amount): Money
