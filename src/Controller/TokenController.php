@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\Exception\FetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -302,6 +303,8 @@ class TokenController extends Controller
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
+
+                    throw new FetchException($exception->getMessage(), (int) $exception->getCode());
                 }
             }
         }
