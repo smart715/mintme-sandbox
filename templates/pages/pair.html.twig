@@ -122,6 +122,20 @@
                 class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
                 v-model="tabIndex"
             >
+                {% if isTokenPage and showDonation %}
+                    <div class="row">
+                        <donation
+                            class="col-12 mb-3"
+                            :market="{{ market | json_encode }}"
+                            :logged-in="{{ loggedIn }}"
+                            :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                            :donation-params="{{ donation_params | json_encode }}"
+                            websocket-url="{{ global_websocket_url }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                        >
+                        </donation>
+                    </div>
+                {% endif %}
                 <token-ongoing-airdrop-campaign
                     v-if="{{ showAirdropCampaign }}"
                     :logged-in="{{ loggedIn }}"
@@ -198,25 +212,6 @@
                         </div>
                     </b-tab>
                 {% endif %}
-                {% if showDonation %}
-                    <b-tab
-                        title="{% trans %}page.pair.buy_title{% endtrans %}"
-                        title-link-class="token-buy-tab-link"
-                        {% if tab == 'donate' or tab == 'buy' %} {{ 'active' }} {% endif %}
-                    >
-                        <div class="container-fluid px-0">
-                            <donation
-                                :market="{{ market | json_encode }}"
-                                :logged-in="{{ loggedIn }}"
-                                :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                                :donation-params="{{ donation_params | json_encode }}"
-                                websocket-url="{{ global_websocket_url }}"
-                                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                            >
-                            </donation>
-                        </div>
-                    </b-tab>
-                {% endif %}
                 {% if isTokenPage %}
                     <b-tab
                         title="{% trans %}page.pair.posts_title{% endtrans %}"
@@ -226,7 +221,7 @@
                     >
                         <div class="container-fluid">
                             {% if is_granted('edit', token) %}
-                                <div class="row justify-content-center">
+                                <div class="row mb-3 justify-content-center">
                                     <create-post class="col-12 col-md-10 col-lg-8"
                                          token-name="{{ token.name }}"
                                          :subunit="{{ tokenSubunit }}"
@@ -234,7 +229,7 @@
                                     />
                                 </div>
                             {% endif %}
-                            <div class="row mt-3 justify-content-center">
+                            <div class="row justify-content-center">
                                 <posts class="col-12 col-md-10 col-lg-8"
                                     :posts="posts || (posts = {{posts | json_encode}})"
                                     @update-post="updatePost($event)"
