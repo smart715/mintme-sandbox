@@ -42,19 +42,6 @@
                             aria-setsize="2"
                             aria-posinset="2"
                             target="_self"
-                            href="{{ path('token_show', {name: token.name, tab: 'buy'}) }}"
-                            class="nav-link {% if tab and tab == 'donate' %}active{% endif %}"
-                        >
-                            {% trans %}page.pair.buy_title{% endtrans %}
-                        </a>
-                    </li>
-                    <li role="presentation" class="nav-item">
-                        <a
-                            role="tab"
-                            aria-selected="false"
-                            aria-setsize="2"
-                            aria-posinset="2"
-                            target="_self"
                             href="{{ path('new_show_post', {name: token.name}) }}"
                             class="nav-link {% if tab and tab == 'posts' %}active{% endif %}"
                         >
@@ -85,6 +72,11 @@
                 </ul>
             </div>
             <div class="tab-content">
+                {% if showDonation %}
+                    <div class="row">
+                        {{ include('spinners/donation.html.twig') }}
+                    </div>
+                {% endif %}
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'intro' %}active{% endif %}">
                     <div class="row">
                         <div class="col-12 pb-3">
@@ -193,9 +185,6 @@
                 </div>
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'trade' %}active{% endif %}">
                     {{ include('spinners/trade_tab.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and (tab == 'donate' or tab == 'buy') %}active{% endif %}">
-                    {{ include('spinners/donation_tab.html.twig') }}
                 </div>
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'posts' %}active{% endif %}">
                     {{ include('spinners/posts_tab.html.twig') }}
