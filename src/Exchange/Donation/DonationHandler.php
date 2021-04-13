@@ -87,7 +87,7 @@ class DonationHandler implements DonationHandlerInterface
 
         return $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $this->moneyWrapper->format($amountObj),
+            $this->moneyWrapper->format($this->subtractOrdersFeeFromAmount($amountObj)),
             $this->donationConfig->getFee(),
             $token->getProfile()->getUser()->getId()
         );
@@ -136,7 +136,7 @@ class DonationHandler implements DonationHandlerInterface
         // Check how many tokens will recieve user and how many MINTME he should spend
         $checkDonationResult = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $this->moneyWrapper->format($donationMintmeAmount),
+            $this->moneyWrapper->format($this->subtractOrdersFeeFromAmount($donationMintmeAmount)),
             $this->donationConfig->getFee(),
             $tokenCreator->getId()
         );
@@ -164,7 +164,12 @@ class DonationHandler implements DonationHandlerInterface
         ) {
             // Donate using donation viabtc API (token creator has available sell orders)
             if (!$isDonationInMintme) {
-                $this->executeMarketOrders($donorUser, $donationMintmeAmount, $pendingSellOrders, $cryptoMarket);
+                $this->executeMarketOrders(
+                    $donorUser,
+                    $donationMintmeAmount,
+                    $pendingSellOrders,
+                    $cryptoMarket
+                );
             }
 
             $this->donationFetcher->makeDonation(
@@ -238,12 +243,13 @@ class DonationHandler implements DonationHandlerInterface
             } else {
                 $this->executeMarketOrders($donorUser, $donationMintmeAmount, $pendingSellOrders, $cryptoMarket);
                 $donationWithFee = $this->calculateFee($donationMintmeAmount);
+                $donationWithOrdersFee = $this->subtractOrdersFeeFromAmount($donationMintmeAmount);
 
                 $this->sendAmountFromUserToUser(
                     $donorUser,
-                    $donationWithFee,
+                    $donationWithOrdersFee,
                     $tokenCreator,
-                    $donationWithFee,
+                    $donationWithOrdersFee->subtract($donationWithFee),
                     Symbols::WEB,
                     Symbols::WEB
                 );
@@ -426,5 +432,12 @@ class DonationHandler implements DonationHandlerInterface
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         }
+    }
+
+    private function subtractOrdersFeeFromAmount(Money $money): Money
+    {
+        return $money->subtract(
+            $money->multiply($this->parameterBag->get('taker_fee_rate'))
+        );
     }
 }
