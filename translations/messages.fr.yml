@@ -2,3 +2,5 @@ token.delete.body.over_limit:
 token.intro.statistics.show:
 navbar.home:
 post.no_recent_posts:
+token.intro.created_modal.paragraph_2:
+confirm_modal.continue:
