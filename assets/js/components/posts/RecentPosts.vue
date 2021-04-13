@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import Post from 'Post';
+import Post from './Post';
 
 export default {
     name: 'RecentPosts',

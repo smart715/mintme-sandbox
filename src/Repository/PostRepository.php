@@ -14,8 +14,8 @@ class PostRepository extends EntityRepository
             ->where('post.token IN (:tokens)')
             ->setParameter('tokens', $user->getTokens())
             ->orderBy('post.createdAt', 'ASC')
-            ->setFirstResult($page * 2)
-            ->setMaxResults(2)
+            ->setFirstResult($page * 10)
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult();
     }
