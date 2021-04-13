@@ -110,7 +110,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         }
 
         if ($exception instanceof FetchException) {
-            if('Error creating token' === $exception->getMessage()) {
+            if ('Error creating token' === $exception->getMessage()) {
                 $response = new JsonResponse(
                     $this->translator->trans('toasted.error.service_unavailable'),
                     503
