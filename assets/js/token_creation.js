@@ -110,9 +110,7 @@ new Vue({
                         });
                         frm.submit();
                     }
-                }, (error) => {
-                    this.notifyError(this.$t('toasted.error.service_unavailable'));
-                });
+                }, (err) => this.notifyError(err.response.data.message));
         },
         tokenInvalid: function(e) {
             e.target.setCustomValidity('Invalid token name.');
