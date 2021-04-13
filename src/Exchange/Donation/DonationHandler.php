@@ -122,12 +122,12 @@ class DonationHandler implements DonationHandlerInterface
         $donationMintmeAmount = $amountInCrypto;
         $pendingSellOrders = [];
         $isDonationInMintme = Symbols::WEB === $currency;
+        $cryptoMarket = new Market(
+            $this->cryptoManager->findBySymbol($currency),
+            $this->cryptoManager->findBySymbol(Symbols::WEB)
+        );
 
         if (!$isDonationInMintme) {
-            $cryptoMarket = new Market(
-                $this->cryptoManager->findBySymbol($currency),
-                $this->cryptoManager->findBySymbol(Symbols::WEB)
-            );
             // Convert sum of donation in any Crypto to MINTME
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders($cryptoMarket);
             $donationMintmeAmount = $this->getCryptoWorthInMintme($pendingSellOrders, $donationMintmeAmount);
@@ -193,7 +193,9 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            $donationAmountLeft = $donationMintmeAmount->subtract($sellOrdersSummary);
+            $donationAmountLeft = $this
+                ->subtractOrdersFeeFromAmount($donationMintmeAmount)
+                ->subtract($tokensWorthInMintme);
             $feeFromDonationAmount = $this->calculateFee($donationAmountLeft);
             $amountToDonate = $donationAmountLeft->subtract($feeFromDonationAmount);
 
@@ -361,7 +363,6 @@ class DonationHandler implements DonationHandlerInterface
     /**
      * @param Order[] $pendingSellOrders
      * @param Money $amount
-     * @param string $cryptoSymbol
      * @return Money
      * @throws ApiBadRequestException
      */
@@ -387,7 +388,7 @@ class DonationHandler implements DonationHandlerInterface
         }
 
         if ($totalSum->lessThan($donatinonAmount)) {
-            throw new ApiBadRequestException('Market doesn\'t have enough orders.');
+            throw new ApiBadRequestException('Crypto market doesn\'t have enough orders.');
         }
 
         return $totalSum;
