@@ -304,7 +304,7 @@ class TokenController extends Controller
                         ['message' => $exception->getMessage()]
                     );
 
-                    throw new FetchException($exception->getMessage(), (int) $exception->getCode());
+                    throw new FetchException('Error creating token', (int) $exception->getCode());
                 }
             }
         }
