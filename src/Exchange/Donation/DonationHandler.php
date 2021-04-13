@@ -292,7 +292,8 @@ class DonationHandler implements DonationHandlerInterface
             if ($executedSum->greaterThanOrEqual($totalMintmeToExecute)) {
                 break;
             }
-
+            
+            $this->moneyWrapper->format($totalMintmeToExecute);
             $price = $sellOrder->getPrice();
             $amount = $sellOrder->getAmount()->greaterThan($totalMintmeToExecute)
                 ? $totalMintmeToExecute->subtract($executedSum)
@@ -307,7 +308,7 @@ class DonationHandler implements DonationHandlerInterface
                 Order::BUY_SIDE
             );
 
-            $executedSum->add($amount->multiply($this->moneyWrapper->format($price)));
+            $executedSum = $executedSum->add($amount);
         }
     }
 
@@ -370,6 +371,7 @@ class DonationHandler implements DonationHandlerInterface
     {
         $donatinonAmount = $this->moneyWrapper->parse($this->moneyWrapper->format($amount), Symbols::WEB);
         $totalSum = new Money(0, new Currency(Symbols::WEB));
+        $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
 
         foreach ($pendingSellOrders as $sellOrder) {
             if ($totalSum->greaterThanOrEqual($donatinonAmount)) {
@@ -379,19 +381,28 @@ class DonationHandler implements DonationHandlerInterface
             $order = $sellOrder->getPrice()->multiply(
                 $this->moneyWrapper->format($sellOrder->getAmount())
             );
+            $diff = $donatinonAmount->subtract($totalSum);
 
-            $totalSum = $order->greaterThan($totalSum)
-                ? $totalSum->add(
-                    $donatinonAmount->subtract($totalSum)->divide($this->moneyWrapper->format($sellOrder->getPrice()))
-                )
-                : $totalSum->add($order);
+            if ($diff->greaterThan($order)) {
+                $totalSum = $totalSum->add($order);
+                $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
+            } else {
+                $totalSum = $totalSum->add($sellOrder->getPrice()->multiply(
+                    $this->moneyWrapper->format(
+                        $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()))
+                    )
+                ));
+                $mintmeWorth = $mintmeWorth->add(
+                    $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()))
+                );
+            }
         }
 
         if ($totalSum->lessThan($donatinonAmount)) {
             throw new ApiBadRequestException('Crypto market doesn\'t have enough orders.');
         }
 
-        return $totalSum;
+        return $mintmeWorth;
     }
 
     private function calculateFee(Money $amount): Money
