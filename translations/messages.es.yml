@@ -1199,7 +1199,7 @@ toasted.error.can_not_update_orders: 'Algo salió mal. Las órdenes no pueden se
 toasted.error.service_unavailable: 'El servicio no se encuentra disponible. Intente de nuevo más tarde'
 toasted.error.can_not_update_market_cap_btc_mintme: 'No se puede actualizar la capitalización de mercados para MINTME/BTC'
 toasted.error.connection_problem: 'Error de conexión. Intente de nuevo más tarde.'
-toasted.success.email_sent: 'Un correo de confirmación ha sido envíado a su correo electrónico. Este expirará en %hours$ horas.'
+toasted.success.email_sent: 'Un correo de confirmación ha sido envíado a su correo electrónico. Este expirará en %hours% horas.'
 toasted.success.withdrawal.queued: 'La solicitud del retiro fue confirmada exitosamente y agregada a la cola de retiros.'
 toasted.success.facebook.added: 'La página de Facebook que registrada como %address%'
 toasted.success.facebook.deleted: 'La página de Facebook fue eliminada'
