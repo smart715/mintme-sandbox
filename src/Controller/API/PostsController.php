@@ -419,7 +419,7 @@ class PostsController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/recent_posts/{nextPage}", name="recent_posts", options={"expose"=true})
+     * @Rest\Get("/recent-posts/{nextPage}", name="recent_posts", options={"expose"=true})
      */
     public function getRecentPosts(int $nextPage): view
     {

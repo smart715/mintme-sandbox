@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exception\NotFoundPostException;
 use App\Manager\PostManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,5 +81,17 @@ class PostController extends Controller
                 ? Token::TOKEN_SUBUNIT
                 : $decimals,
         ]);
+    }
+
+    /**
+     * @Route("/home", name="show_user_home")
+     */
+    public function home(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $tokens = $user->getProfile()->getTokens();
+
+        return $this->render('pages/show_user_home.html.twig', ['user' => $user, 'tokens' => $tokens]);
     }
 }

@@ -74,18 +74,6 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     }
 
     /**
-     * @Route("/home", name="show_user_home")
-     */
-    public function home(): Response
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-        $tokens = $user->getProfile()->getTokens();
-
-        return $this->render('pages/show_user_home.html.twig', ['user' => $user, 'tokens' => $tokens,]);
-    }
-
-    /**
      * @Route("/settings", name="settings")
      * @Route("/settings/update", name="fos_user_profile_show")
      */
