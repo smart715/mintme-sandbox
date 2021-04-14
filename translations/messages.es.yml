@@ -114,7 +114,7 @@ page.index.promo.main_3: su
 page.index.promo.main.word_1: idea
 page.index.promo.main.word_2: comunidad
 page.index.promo.main.word_3: proyecto
-page.index.promo.main.word_4: '&nbsp;sostenibilidad'
+page.index.promo.main.word_4: '<br class="d-sm-none">&nbsp;<wbr>sostenibilidad'
 page.index.promo.description: 'o consiga ganancias en el comercio y el apoyo a otros tokens'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
