@@ -2,12 +2,21 @@
 
 namespace App\Validator\Constraints;
 
+use App\Manager\TokenManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class DisallowedWordValidator extends ConstraintValidator
 {
     private const FORBIDDEN_WORDS = ["token", "coin"];
+    private TokenManagerInterface $tokenManager;
+
+    public function __construct(
+        TokenManagerInterface $tokenManager
+    ) {
+        $this->tokenManager = $tokenManager;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -15,7 +24,7 @@ class DisallowedWordValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
-        if (null === $value || '' === $value) {
+        if (null === $value || '' === $value || $this->tokenManager->findByName($value)) {
             return;
         }
 
