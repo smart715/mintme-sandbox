@@ -132,10 +132,7 @@ class TokenController extends Controller
      */
     public function donate(string $name): RedirectResponse
     {
-        return $this->redirectToRoute('token_show', [
-            'name' => $name,
-            'tab' => 'buy',
-        ]);
+        return $this->redirectToRoute('token_show', ['name' => $name]);
     }
 
     /**
@@ -184,7 +181,10 @@ class TokenController extends Controller
         ?string $tab,
         ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
+        if ((preg_match('/(intro)/', $request->getPathInfo()) &&
+            !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) ||
+            'buy' === $tab
+        ) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
