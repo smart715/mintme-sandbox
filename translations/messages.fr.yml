@@ -7,6 +7,7 @@ navbar.referrals: Parrainés
 navbar.help: Aide
 navbar.profile: Profil
 navbar.settings: Paramètres
+navbar.home:
 footer.cookies: 'Ce site utilise des cookies'
 footer.press: 'Presser&nbsp;Kit'
 footer.wallet: Portefeuille
@@ -437,6 +438,7 @@ post.likes: Aimés
 post.deleted: 'Post supprimé.'
 post.error.deleted: 'Erreur lors de la suppression du post.'
 post.comment.deleted: 'Commentaire supprimé.'
+post.no_recent_posts:
 img.creator: 'Icône du créateur du contenu'
 img.tok_trading: 'Icône d''échange des jetons'
 img.tok_easy_icon_1: 'Créez votre jeton/monnaie'
