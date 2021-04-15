@@ -3,6 +3,7 @@
 namespace App\Tests\Exchange;
 
 use App\Communications\AMQP\MarketAMQPInterface;
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -24,9 +25,11 @@ use App\Utils\Symbols;
 use App\Utils\Validator\ValidatorInterface;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -54,13 +57,22 @@ class ExchangerTest extends TestCase
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true,
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher()
+        );
 
-        $this->assertEquals(TradeResult::INSUFFICIENT_BALANCE, $result->getResult());
+        self::assertEquals(TradeResult::INSUFFICIENT_BALANCE, $result->getResult());
     }
 
     public function testPlaceOrderSmallAmount(): void
@@ -81,13 +93,26 @@ class ExchangerTest extends TestCase
             $this->mockValidator(false),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher()
+        );
 
-        $this->assertEquals(TradeResult::SMALL_AMOUNT, $result->getResult());
+        self::assertEquals(
+            TradeResult::SMALL_AMOUNT,
+            $result->getResult(),
+            $result->getMessage()
+        );
     }
 
     public function testPlaceOrderSuccess(): void
@@ -108,11 +133,20 @@ class ExchangerTest extends TestCase
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher()
+        );
 
         $this->assertEquals($tradeResult, $result);
     }
@@ -135,11 +169,20 @@ class ExchangerTest extends TestCase
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', true, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            true,
+            Order::SELL_SIDE,
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoRatesFetcher()
+        );
 
         $this->assertEquals($tradeResult, $result);
     }
@@ -290,5 +333,29 @@ class ExchangerTest extends TestCase
     private function mockTranslator(): TranslatorInterface
     {
         return $this->createMock(TranslatorInterface::class);
+    }
+
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        $mw = $this->createMock(MoneyWrapperInterface::class);
+        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
+            return new Money($amount, new Currency($symbol));
+        });
+
+        return $mw;
+    }
+
+    /** @return CryptoRatesFetcherInterface|MockObject */
+    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
+    {
+        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
+
+        $crf->method('fetch')->willReturn([
+            Symbols::WEB => [
+                Symbols::BTC => 0.00000008,
+            ],
+        ]);
+
+        return $crf;
     }
 }

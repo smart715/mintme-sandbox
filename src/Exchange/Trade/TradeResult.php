@@ -3,7 +3,6 @@
 namespace App\Exchange\Trade;
 
 use Exception;
-use phpDocumentor\Reflection\Types\Self_;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TradeResult
@@ -31,13 +30,8 @@ class TradeResult
         self::USER_NOT_MATCH =>
             'place_order.not_match',
 
-        self::SMALL_AMOUNT =>[
-            'message' =>'place_order.too_small',
-            'params' =>[
-                '%valueInUsd%' => 0.1,
-                '%valueInMintme%' => 34.4,
-            ],
-        ],
+        self::SMALL_AMOUNT =>
+            'place_order.too_small',
     ];
 
     /** @var int */
@@ -46,23 +40,23 @@ class TradeResult
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(int $result, TranslatorInterface $translator)
+    private string $message;
+
+    public function __construct(int $result, TranslatorInterface $translator, string $message = '')
     {
-        if (!in_array($result, array_keys(self::MESSAGES))) {
+        if (!array_key_exists($result, self::MESSAGES) && '' === $message) {
             throw new Exception('Undefined error message');
         }
 
         $this->result = $result;
         $this->translator = $translator;
+        $this->message = $message;
     }
 
     public function getMessage(): string
     {
         if (self::SMALL_AMOUNT === $this->result) {
-            return $this->translator->trans(
-                self::MESSAGES[$this->result]['message'],
-                self::MESSAGES[$this->result]['params']
-            );
+            return $this->message;
         }
 
         return $this->translator->trans(self::MESSAGES[$this->result]);

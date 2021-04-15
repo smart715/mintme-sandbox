@@ -6,11 +6,13 @@ use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\TwigExtension\ToMoneyExtension;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MinOrderValidator implements ValidatorInterface
 {
@@ -35,6 +37,8 @@ class MinOrderValidator implements ValidatorInterface
 
     private CryptoRatesFetcherInterface $cryptoRatesFetcher;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         ?TradebleInterface $baseTradable,
         ?TradebleInterface $quoteTradable,
@@ -42,7 +46,8 @@ class MinOrderValidator implements ValidatorInterface
         string $amount,
         string $minimalPriceOrder,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        CryptoRatesFetcherInterface $cryptoRatesFetcher,
+        TranslatorInterface $translator
     ) {
         $this->baseTradable = $baseTradable;
         $this->quoteTradable = $quoteTradable;
@@ -51,6 +56,7 @@ class MinOrderValidator implements ValidatorInterface
         $this->minimalPriceOrder = $minimalPriceOrder;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+        $this->translator = $translator;
     }
 
     public function validate(): Bool
@@ -61,17 +67,12 @@ class MinOrderValidator implements ValidatorInterface
         /** @var Crypto|Token $quote */
         $quote = $this->quoteTradable;
 
-        $baseUnit = $base
-            ? $base->getShowSubunit()
-            : 0;
+        $baseUnit = $base->getShowSubunit();
 
-        $quoteUnit = 0;
+        $quoteUnit = $quote instanceof Token
+            ? Token::TOKEN_SUBUNIT
+            : $quote->getShowSubunit();
 
-        if ($quote) {
-            $quoteUnit = $quote instanceof Token
-                ? Token::TOKEN_SUBUNIT
-                : $quote->getShowSubunit();
-        }
 
         $scale = $baseUnit > $quoteUnit
             ? $baseUnit
@@ -115,25 +116,26 @@ class MinOrderValidator implements ValidatorInterface
             Symbols::WEB
         );
 
-        $minimalPriceOrderInUsd = $this->moneyWrapper->parse($this->minimalPriceOrder, Symbols::USD);
-
         $minimalPriceOrderInBase =  $this->moneyWrapper->convert(
             $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
             new Currency(Symbols::WEB),
             new FixedExchange([
                 Symbols::USD => [ Symbols::WEB => 1 / $rates[Symbols::WEB][Symbols::USD] ],
-            ])
+            ]),
         );
 
-        if (!$totalOrderAmountInBase->greaterThanOrEqual($minimalPriceOrderInBase)) {
-            /*$this->message = $this->translator->trans('orders.minimumValue', [
-                '%valueInUsd%' => $minimalPriceOrderInUsd,
-                '%valueInMintme%' => $minimalPriceOrderInBase,
-            ]);*/
+        $toMoney = new ToMoneyExtension();
 
-            return false;
-        }
+        $this->message = $this->translator->trans(
+            'place_order.too_small',
+            [
+                '%valueInUsd%' => $this->minimalPriceOrder,
+                '%valueInMintme%' => $toMoney->toMoney(
+                    $this->moneyWrapper->format($minimalPriceOrderInBase)
+                ),
+            ]
+        );
 
-        return true;
+        return $totalOrderAmountInBase->greaterThanOrEqual($minimalPriceOrderInBase);
     }
 }

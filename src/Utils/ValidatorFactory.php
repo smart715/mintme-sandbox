@@ -12,11 +12,18 @@ use App\Utils\Validator\MinAmountValidator;
 use App\Utils\Validator\MinOrderValidator;
 use App\Utils\Validator\ValidatorInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore */
 class ValidatorFactory implements ValidatorFactoryInterface
 {
     public string $minimalPriceOrder;
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     public function createOrderValidator(
         Market $market,
@@ -32,7 +39,8 @@ class ValidatorFactory implements ValidatorFactoryInterface
             $amount,
             $this->minimalPriceOrder,
             $moneyWrapper,
-            $cryptoRatesFetcher
+            $cryptoRatesFetcher,
+            $this->translator
         );
     }
 

@@ -109,6 +109,9 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function placeOrder(
         User $user,
         Market $market,
@@ -129,32 +132,20 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-       /* $minOrderValidator = $this->vf->createOrderValidator(
+        $minOrderValidator = $this->vf->createOrderValidator(
             $market,
             $priceInput,
             $amountInput,
             $moneyWrapper,
             $cryptoRatesFetcher
         );
-        if (!$minOrderValidator->validate()) {
 
+        if (!$minOrderValidator->validate()) {
             return new TradeResult(
                 TradeResult::SMALL_AMOUNT,
                 $this->translator,
                 $minOrderValidator->getMessage()
-        }*/
-
-
-
-
-        if (!$this->vf->createOrderValidator(
-            $market,
-            $priceInput,
-            $amountInput,
-            $moneyWrapper,
-            $cryptoRatesFetcher
-        )->validate()) {
-            return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
+            );
         }
 
         $price = $this->mw->parse(
