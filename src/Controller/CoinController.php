@@ -98,7 +98,6 @@ class CoinController extends Controller
             'tab' => 'trade',
             'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
             'showCreatedModal' => false,
-            'minimumOrderValue' => $this->getParameter('minimum_order_value'),
         ]);
     }
 

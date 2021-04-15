@@ -511,7 +511,6 @@ class TokenController extends Controller
                 'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
-                'minimumOrderValue' => $this->getParameter('minimum_order_value'),
             ], $extraData)
         );
     }

@@ -226,7 +226,6 @@ export default {
         balanceLoaded: Boolean,
         tradeDisabled: Boolean,
         currencyMode: String,
-        minimumOrderValue: Number,
     },
     data() {
         return {

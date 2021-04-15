@@ -28,7 +28,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    :minimum-order-value= "minimumOrderValue"
+
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -46,7 +46,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    :minimum-order-value= "minimumOrderValue"
+
                 />
             </div>
         </div>
@@ -128,7 +128,6 @@ export default {
         disabledServicesConfig: String,
         takerFee: Number,
         isMintmeToken: Boolean,
-        minimumOrderValue: Number,
     },
     data() {
         return {

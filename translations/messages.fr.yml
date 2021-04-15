@@ -1169,7 +1169,7 @@ place_order.failed: 'L''ordre a échoué. Essayez plus tard'
 place_order.insufficient_balance: 'Solde insuffisant'
 place_order.not_found: 'Ordre introuvable'
 place_order.not_match: 'Vous ne correspondez pas à cet ordre'
-place_order.too_small: 'Quantité insuffisante'
+place_order.too_small: ''
 mixin.websocket.hash_not_set: 'Hash non spécifié. Ne peut autoriser l''utilisateur'
 mixin.websocket.authorize_failed: 'Echec d''authorisation de l''utilisateur actuel. Echec de la réponse du serveur'
 mixin.websocket.server_not_respond: 'Aucune réponse du serveur'
@@ -1373,3 +1373,4 @@ mail.airdrop_claimed.message_2: 'Utiliser un lien de parrainage d''airdrop et ga
 mail.airdrop_claimed.message_3: 'Vous pouvez également gagner en partageant <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">posts</a> avec un ensemble de récompense.'
 modal.add_phone_alert.airdrop: 'Afin de collecter des récompenses vous devez ajouter un numéro de téléphone à votre <a href="%profileUrl%">profil</a>.'
 confirm_modal.continue:
+orders.minimumValue: ''
