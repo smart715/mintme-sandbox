@@ -58,11 +58,7 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(CryptoRatesFetcherInterface::class),
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->handleTokenEvent($event, $eventName);
@@ -112,11 +108,7 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(CryptoRatesFetcherInterface::class),
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->airdropClaimed($event, 'airdrop.claimed');
@@ -131,11 +123,7 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(CryptoRatesFetcherInterface::class),
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->handleTransactionEvent($event, 'deposit.completed');
@@ -153,58 +141,7 @@ class ActivitySubscriberTest extends TestCase
         $event->method('getAmount')->willReturn('1');
 
         $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->with('1', 'TOK')->willReturn(new Money('2', new Currency('TOK')));
-        $mw->method('format')
-            ->with(
-                $this->callback(
-                    fn (Money $a) => '3' === $a->getAmount() && 'WEB' === $a->getCurrency()->getCode()
-                )
-            )
-            ->willReturn('4');
-
-        $mw->method('convert')
-            ->withConsecutive(
-                [
-                    $this->callback(fn (Money $a) => '2' === $a->getAmount() && 'TOK' === $a->getCurrency()->getCode()),
-                    $this->callback(fn (Currency $c) => 'WEB' === $c->getCode()),
-                    $this->callback(
-                        fn (FixedExchange $e) =>
-                            4.0 === $e->quote(new Currency('TOK'), new Currency('WEB'))->getConversionRatio()
-                    ),
-                ],
-                [
-                    $this->callback(fn (Money $a) => '5' === $a->getAmount() && 'WEB' === $a->getCurrency()->getCode()),
-                    $this->callback(fn (Currency $c) => 'USD' === $c->getCode()),
-                    $this->callback(
-                        fn (FixedExchange $e) =>
-                            6.0 === $e->quote(new Currency('WEB'), new Currency('USD'))->getConversionRatio()
-                    ),
-                ]
-            )
-            ->willReturnOnConsecutiveCalls(
-                new Money('5', new Currency('WEB')),
-                new Money('7', new Currency('USD'))
-            );
-
-        $crypto = $this->createMock(Crypto::class);
-        $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->expects($this->once())->method('findBySymbol')->willReturn($crypto);
-
-        $ms = $this->createMock(MarketStatus::class);
-        $ms->expects($this->once())->method('getLastPrice')->willReturn(new Money('3', new Currency('WEB')));
-
-        $msm = $this->createMock(MarketStatusManagerInterface::class);
-        $msm->expects($this->once())
-            ->method('getMarketStatus')
-            ->with($this->callback(fn (Market $m) => $m->getBase() === $crypto && $m->getQuote() === $token))
-            ->willReturn($ms);
-
-        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
-        $crf->method('fetch')->willReturn([
-            'WEB' => [
-                'USD' => '6',
-            ],
-        ]);
+        $mw->expects($this->once())->method('parse');
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
@@ -213,18 +150,14 @@ class ActivitySubscriberTest extends TestCase
                 fn (UserAmountActivity $a) => $a instanceof $activityClass
                     && $a->getUser() === $user
                     && $a->getToken() === $token
-                    && '7' === $a->getAmount()->getAmount()
-                    && 'USD' === $a->getAmount()->getCurrency()->getCode()
+                    && '1000000000000' === $a->getAmount()->getAmount()
+                    && 'TOK' === $a->getAmount()->getCurrency()->getCode()
             ));
 
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $crf,
-            $msm,
-            $cm,
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->handleTransactionEvent($event, $eventName);
@@ -241,7 +174,6 @@ class ActivitySubscriberTest extends TestCase
     public function testDonation(): void
     {
         $web = new Currency('WEB');
-        $usd = new Currency('USD');
 
         $token = $this->createMock(Token::class);
 
@@ -251,32 +183,15 @@ class ActivitySubscriberTest extends TestCase
 
         $donation = $this->createMock(Donation::class);
         $donation->method('getAmount')->willReturn($amount);
+        $donation->method('getCurrency')->willReturn('WEB');
 
         $event = $this->createMock(DonationEvent::class);
         $event->method('getToken')->willReturn($token);
         $event->method('getUser')->willReturn($user);
         $event->method('getDonation')->willReturn($donation);
 
-        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
-        $crf->expects($this->once())
-            ->method('fetch')
-            ->willReturn([
-                'WEB' => [
-                    'USD' => '2',
-                ],
-            ]);
 
         $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->expects($this->once())
-            ->method('convert')
-            ->with(
-                $amount,
-                $this->callback(fn (Currency $c) => 'USD' === $c->getCode()),
-                $this->callback(
-                    fn (FixedExchange $e) => 2.0 === $e->quote($web, $usd)->getConversionRatio()
-                )
-            )
-            ->willReturn(new Money('3', $usd));
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
@@ -284,18 +199,14 @@ class ActivitySubscriberTest extends TestCase
             ->with(
                 $this->callback(
                     fn (DonationActivity $a) => $a->getToken() === $token
-                        && $a->getUser() === $user && '3' === $a->getAmount()->getAmount()
+                        && $a->getUser() === $user && '1' === $a->getAmount()->getAmount()
                 )
             );
 
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $crf,
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->donation($event, 'donation');
@@ -316,11 +227,7 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(CryptoRatesFetcherInterface::class),
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->handleOrderEvent($event, 'order.completed');
@@ -331,13 +238,16 @@ class ActivitySubscriberTest extends TestCase
     {
         $token = $this->createMock(Token::class);
 
+        $crypto = $this->createMock(Crypto::class);
+        $crypto->method('getSymbol')->willReturn('WEB');
+
         $market = $this->createMock(Market::class);
         $market->expects($this->once())->method('isTokenMarket')->willReturn(true);
         $market->expects($this->once())->method('getQuote')->willReturn($token);
+        $market->expects($this->once())->method('getBase')->willReturn($crypto);
 
         $web = new Currency('WEB');
         $tok = new Currency('TOK');
-        $usd = new Currency('USD');
 
         $price = new Money('1', $web);
         $amount = new Money('2', $tok);
@@ -357,24 +267,7 @@ class ActivitySubscriberTest extends TestCase
         $event->method('getOrder')->willReturn($order);
 
         $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->expects($this->once())->method('format')->with($amount)->willReturn('3');
-        $mw->expects($this->once())
-            ->method('convert')
-            ->with(
-                $this->callback(fn (Money $a) => $a->getAmount() === $price->multiply('3')->getAmount()),
-                $this->callback(fn (Currency $c) => 'USD' === $c->getCode()),
-                $this->callback(fn (FixedExchange $e) => 4.0 === $e->quote($web, $usd)->getConversionRatio())
-            )
-            ->willReturn(new Money('5', $usd));
-
-        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
-        $crf->expects($this->once())
-            ->method('fetch')
-            ->willReturn([
-                'WEB' => [
-                    'USD' => '4',
-                ],
-            ]);
+        $mw->expects($this->once())->method('format')->with($amount)->willReturn('2');
 
         $isSellOrder = Order::SELL_SIDE === $side;
 
@@ -384,8 +277,8 @@ class ActivitySubscriberTest extends TestCase
             ->with(
                 $this->callback(
                     fn (TokenTradedActivity $a) => $a->getToken() === $token
-                        && '5' === $a->getAmount()->getAmount()
-                        && 'USD' === $a->getAmount()->getCurrency()->getCode()
+                        && '2' === $a->getAmount()->getAmount()
+                        && 'WEB' === $a->getAmount()->getCurrency()->getCode()
                         && (
                             ($isSellOrder && $a->getSeller() === $taker && $a->getBuyer() === $maker)
                             || ($a->getSeller() === $maker && $a->getBuyer() === $taker)
@@ -396,11 +289,7 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $crf,
-            $this->createMock(MarketStatusManagerInterface::class),
-            $this->createMock(CryptoManagerInterface::class),
-            $this->createMock(PublisherInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(PublisherInterface::class)
         );
 
         $subscriber->handleOrderEvent($event, 'order.completed');
