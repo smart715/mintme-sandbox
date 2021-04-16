@@ -8,14 +8,14 @@ use Doctrine\ORM\EntityRepository;
 class PostRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function findRecentPostsOfUser(User $user, int $page): array
+    public function findRecentPostsOfUser(User $user, int $page = 0, int $max = 10): array
     {
         return $this->createQueryBuilder('post')
             ->where('post.token IN (:tokens)')
             ->setParameter('tokens', $user->getTokens())
             ->orderBy('post.createdAt', 'ASC')
-            ->setFirstResult($page * 10)
-            ->setMaxResults(10)
+            ->setFirstResult($page * $max)
+            ->setMaxResults($max)
             ->getQuery()
             ->getResult();
     }

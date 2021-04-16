@@ -1,8 +1,6 @@
 <template>
     <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
-        <template v-if="loading">
-          <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-        </template>
+        <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
         <template v-else-if="postsCount > 0">
             <post v-for="(n, i) in postsCount"
                   :post="posts[i]"
@@ -48,7 +46,7 @@ export default {
                 this.notifyError(this.$t('toasted.error.try_later'));
             });
         },
-        onScrollDown(event) {
+        onScrollDown() {
             let bottomOfWindow = document.documentElement.scrollTop +
                 window.innerHeight === document.documentElement.offsetHeight;
 
