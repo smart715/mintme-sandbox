@@ -171,3 +171,13 @@ export const currencyModes = {
         text: 'Crypto',
     },
 };
+
+export const currencies = {
+    WEB,
+    MINTME,
+    BTC,
+    TOK,
+    USD,
+    ETH,
+    USDC,
+};
