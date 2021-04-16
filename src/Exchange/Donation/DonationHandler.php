@@ -18,6 +18,8 @@ use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -292,7 +294,7 @@ class DonationHandler implements DonationHandlerInterface
             if ($executedSum->greaterThanOrEqual($totalMintmeToExecute)) {
                 break;
             }
-            
+
             $this->moneyWrapper->format($totalMintmeToExecute);
             $price = $sellOrder->getPrice();
             $amount = $sellOrder->getAmount()->greaterThan($totalMintmeToExecute)
@@ -402,7 +404,11 @@ class DonationHandler implements DonationHandlerInterface
             throw new ApiBadRequestException('Crypto market doesn\'t have enough orders.');
         }
 
-        return $mintmeWorth;
+        return $this->moneyWrapper->parse(
+            (string)BigDecimal::of($this->moneyWrapper->format($mintmeWorth))
+                ->dividedBy('1', 4, RoundingMode::DOWN),
+            Symbols::WEB
+        );
     }
 
     private function calculateFee(Money $amount): Money
