@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Communications\Exception\FetchException;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundKnowledgeBaseException;
@@ -110,21 +111,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
         }
 
         if ($exception instanceof FetchException) {
-            if ('Error creating token' === $exception->getMessage()) {
-                $response = new JsonResponse(
-                    $this->translator->trans('toasted.error.service_unavailable'),
-                    503
-                );
-                $response->headers->set('Content-Type', 'application/problem+json');
-                $event->setResponse($response);
-            } else {
-                $event->setResponse(new Response(
-                    $this->template->render('pages/503.html.twig', [
-                        'error_message' => $this->translator->trans('toasted.error.service_unavailable'),
-                    ]),
-                    503
-                ));
-            }
+            $event->setResponse(new Response(
+                $this->template->render('pages/503.html.twig', [
+                    'error_message' => $this->translator->trans('toasted.error.service_unavailable'),
+                ]),
+                503
+            ));
         }
     }
 }

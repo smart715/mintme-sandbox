@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Communications\Exception\FetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -304,7 +305,7 @@ class TokenController extends Controller
                         ['message' => $exception->getMessage()]
                     );
 
-                    throw new FetchException('Error creating token', (int) $exception->getCode());
+                    throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
                 }
             }
         }
