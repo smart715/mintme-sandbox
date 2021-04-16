@@ -18,6 +18,9 @@ class TokenTradedActivity extends Activity
     /** @ORM\Column(type="string") */
     protected string $amount;
 
+    /** @ORM\Column(type="string") */
+    protected string $currency;
+
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="user1_id")
@@ -71,6 +74,19 @@ class TokenTradedActivity extends Activity
     /** @Groups({"Default", "API"}) */
     public function getAmount(): Money
     {
-        return new Money($this->amount, new Currency(Symbols::USD));
+        return new Money($this->amount, new Currency($this->currency));
+    }
+
+    public function setCurrency(string $currency): self
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getCurrency(): string
+    {
+        return $this->currency;
     }
 }
