@@ -128,11 +128,12 @@ class TokensControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res['common']);
-        $this->assertCount(3, $res['predefined']);
+        $this->assertCount(4, $res['predefined']);
         $this->assertArrayHasKey($tokName, $res['common']);
         $this->assertArrayHasKey('WEB', $res['predefined']);
         $this->assertArrayHasKey('BTC', $res['predefined']);
         $this->assertArrayHasKey('ETH', $res['predefined']);
+        $this->assertArrayHasKey('USDC', $res['predefined']);
     }
 
     public function testGetTokenExchange(): void
@@ -191,31 +192,6 @@ class TokensControllerTest extends WebTestCase
         $this->client->request('GET', '/api/tokens/' . $tokName . '/is-exchanged');
 
         $this->assertTrue(
-            json_decode((string)$this->client->getResponse()->getContent(), true)
-        );
-    }
-
-    public function testIsTokenNotDeployed(): void
-    {
-        $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-
-        $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
-
-        $this->assertTrue(
-            json_decode((string)$this->client->getResponse()->getContent(), true)
-        );
-
-
-        /** @var Token $token */
-        $token = $this->getToken($tokName);
-        $token->setAddress('0x00');
-        $this->em->persist($token);
-        $this->em->flush();
-
-        $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
-
-        $this->assertFalse(
             json_decode((string)$this->client->getResponse()->getContent(), true)
         );
     }
