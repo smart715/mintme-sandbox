@@ -8,13 +8,14 @@ use App\Utils\Symbols;
 
 class OrderbookControllerTest extends WebTestCase
 {
-    private const URL = '/dev/api/v2/open/orderbook';
+    private const URL = self::LOCALHOST . '/dev/api/v2/open/orderbook';
 
     public function testGetOrderbook(): void
     {
         $markets = [
             Symbols::MINTME . '_' . Symbols::BTC,
             Symbols::MINTME . '_' . Symbols::ETH,
+            Symbols::MINTME . '_' . Symbols::USDC,
         ];
 
         foreach ($markets as $market) {

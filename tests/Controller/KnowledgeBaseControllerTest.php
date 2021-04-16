@@ -20,7 +20,7 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
         $this->createKB($cat, $fooUrl, 'foo description');
 
-        $this->client->request('GET', '/kb');
+        $this->client->request('GET', self::LOCALHOST . '/kb');
 
         $this->assertContains($fooUrl, $this->client->getResponse()->getContent());
         $this->assertGreaterThan(
@@ -33,7 +33,7 @@ class KnowledgeBaseControllerTest extends WebTestCase
     {
         $this->truncateEntities([KnowledgeBase::class]);
 
-        $this->client->request('GET', '/kb');
+        $this->client->request('GET', self::LOCALHOST . '/kb');
 
         $this->assertContains(
             'No articles found',
@@ -54,7 +54,7 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
         $this->createKB($cat, $fooUrl, 'foo description');
 
-        $this->client->request('GET', '/kb/' . $fooUrl);
+        $this->client->request('GET', self::LOCALHOST . '/kb/' . $fooUrl);
 
         $res = $this->client->getResponse()->getContent();
 
@@ -68,7 +68,7 @@ class KnowledgeBaseControllerTest extends WebTestCase
 
     public function testShowIfNotFound(): void
     {
-        $this->client->request('GET', '/kb/FooNotExistTest');
+        $this->client->request('GET', self::LOCALHOST . '/kb/FooNotExistTest');
 
         $this->assertTrue($this->client->getResponse()->isNotFound());
     }

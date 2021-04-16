@@ -9,7 +9,7 @@ class TickerControllerTest extends WebTestCase
 {
     public function testGetAssets(): void
     {
-        $this->client->request('GET', '/dev/api/v2/open/ticker');
+        $this->client->request('GET', self::LOCALHOST . '/dev/api/v2/open/ticker');
 
         $this->client->followRedirect();
 
