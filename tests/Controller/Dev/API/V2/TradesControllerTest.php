@@ -8,13 +8,14 @@ use App\Utils\Symbols;
 
 class TradesControllerTest extends WebTestCase
 {
-    private const URL = '/dev/api/v2/open/trades';
+    private const URL = self::LOCALHOST . '/dev/api/v2/open/trades';
 
     public function testGetTrades(): void
     {
         $markets = [
             Symbols::MINTME . '_' . Symbols::BTC,
             Symbols::MINTME . '_' . Symbols::ETH,
+            Symbols::MINTME . '_' . Symbols::USDC,
         ];
 
         foreach ($markets as $market) {

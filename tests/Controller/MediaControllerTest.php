@@ -18,7 +18,7 @@ class MediaControllerTest extends WebTestCase
         copy($dir . DIRECTORY_SEPARATOR . 'default_mintme.png', $path);
         $file = new UploadedFile($path, $originalName, null, UPLOAD_ERR_OK, true);
 
-        $this->client->request('POST', '/api/media/upload', [
+        $this->client->request('POST', self::LOCALHOST . '/api/media/upload', [
             'type' => 'profile',
         ], ['file' => $file]);
 
