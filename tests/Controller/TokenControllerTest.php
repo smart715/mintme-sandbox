@@ -26,12 +26,6 @@ class TokenControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isClientError());
         $this->assertTrue($this->client->getResponse()->isNotFound());
 
-        $this->client->request('GET', '/token/' . $tokName . '/buy');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-
-        $this->client->request('GET', '/token/' . $tokName . '/donate');
-        $this->assertTrue($this->client->getResponse()->isRedirection());
-
         $this->client->request('GET', '/token/' . $tokName . '/intro');
         $this->assertTrue($this->client->getResponse()->isRedirection());
 
