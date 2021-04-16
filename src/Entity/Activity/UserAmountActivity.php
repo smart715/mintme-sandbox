@@ -24,7 +24,8 @@ abstract class UserAmountActivity extends Activity
      */
     protected User $user;
 
-    protected string $amount_symbol = Symbols::USD; // phpcs:ignore
+    /** @ORM\Column(type="string") */
+    protected string $currency = Symbols::TOK; // phpcs:ignore
 
     public function setAmount(Money $amount): self
     {
@@ -36,7 +37,7 @@ abstract class UserAmountActivity extends Activity
     /** @Groups({"Default", "API"}) */
     public function getAmount(): Money
     {
-        return new Money($this->amount, new Currency($this->amount_symbol));
+        return new Money($this->amount, new Currency($this->currency));
     }
 
     public function setUser(User $user): self
@@ -50,5 +51,18 @@ abstract class UserAmountActivity extends Activity
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    public function setCurrency(string $currency): self
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getCurrency(): string
+    {
+        return $this->currency;
     }
 }
