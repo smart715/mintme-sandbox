@@ -8,7 +8,7 @@ class SummaryControllerTest extends WebTestCase
 {
     public function testGetAssets(): void
     {
-        $this->client->request('GET', '/dev/api/v2/open/summary');
+        $this->client->request('GET', self::LOCALHOST . '/dev/api/v2/open/summary');
 
         $this->assertTrue($this->client->getResponse()->isRedirect());
 

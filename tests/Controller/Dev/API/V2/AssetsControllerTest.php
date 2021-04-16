@@ -10,8 +10,7 @@ class AssetsControllerTest extends WebTestCase
 {
     public function testGetAssets(): void
     {
-        $this->client->request('GET', '/dev/api/v2/open/assets');
-
+        $this->client->request('GET', self::LOCALHOST . '/dev/api/v2/open/assets');
         $this->client->followRedirect();
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
@@ -19,5 +18,6 @@ class AssetsControllerTest extends WebTestCase
         $this->assertArrayHasKey(Symbols::MINTME, $res);
         $this->assertArrayHasKey(Symbols::BTC, $res);
         $this->assertArrayHasKey(Symbols::ETH, $res);
+        $this->assertArrayHasKey(Symbols::USDC, $res);
     }
 }
