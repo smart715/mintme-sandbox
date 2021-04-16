@@ -14,6 +14,7 @@ use App\Entity\Activity\TokenDeployedActivity;
 use App\Entity\Activity\TokenDepositedActivity;
 use App\Entity\Activity\TokenTradedActivity;
 use App\Entity\Activity\TokenWithdrawnActivity;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Events\DepositCompletedEvent;
 use App\Events\DonationEvent;
@@ -55,28 +56,16 @@ class ActivitySubscriber implements EventSubscriberInterface
 
     private EntityManagerInterface $entityManager;
     private MoneyWrapperInterface $moneyWrapper;
-    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
-    private MarketStatusManagerInterface $marketStatusManager;
-    private CryptoManagerInterface $cryptoManager;
     private PublisherInterface $publisher;
-    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher,
-        MarketStatusManagerInterface $marketStatusManager,
-        CryptoManagerInterface $cryptoManager,
-        PublisherInterface $publisher,
-        LoggerInterface $logger
+        PublisherInterface $publisher
     ) {
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
-        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
-        $this->marketStatusManager = $marketStatusManager;
-        $this->cryptoManager = $cryptoManager;
         $this->publisher = $publisher;
-        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents(): array
@@ -122,12 +111,13 @@ class ActivitySubscriber implements EventSubscriberInterface
     {
         $token = $event->getToken();
         $user = $event->getUser();
-        $amount = $this->convertToUSD($event->getDonation()->getAmount());
+        $amount = $event->getDonation()->getAmount();
+        $currency = $event->getDonation()->getCurrency();
 
         /** @var DonationActivity $activity */
         $activity = $this->createActivity($eventName);
 
-        $activity->setAmount($amount)->setUser($user)->setToken($token);
+        $activity->setAmount($amount)->setCurrency($currency)->setUser($user)->setToken($token);
 
         $this->saveActivity($activity);
     }
@@ -141,11 +131,7 @@ class ActivitySubscriber implements EventSubscriberInterface
         }
 
         $user = $event->getUser();
-
-        $amount = $event->getAmount();
-        $amount = $this->moneyWrapper->parse($amount, Symbols::TOK);
-        $amount = $this->convertToMintme($amount, $token);
-        $amount = $this->convertToUSD($amount);
+        $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
 
         /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
         $activity = $this->createActivity($eventName);
@@ -167,13 +153,17 @@ class ActivitySubscriber implements EventSubscriberInterface
         /** @var Token $token */
         $token = $market->getQuote();
 
+        $base = $market->getBase();
+
         $price = $order->getPrice();
         $amount = $order->getAmount();
         $amount = $this->moneyWrapper->format($amount);
 
         $totalPrice = $price->multiply($amount);
 
-        $totalPrice = $this->convertToUSD($totalPrice);
+        $currency = $base instanceof Crypto
+            ? $base->getSymbol()
+            : Symbols::TOK;
 
         $taker = $order->getTaker();
         $maker = $order->getMaker();
@@ -189,7 +179,13 @@ class ActivitySubscriber implements EventSubscriberInterface
         /** @var TokenTradedActivity $activity */
         $activity = $this->createActivity($eventName);
 
-        $activity->setSeller($seller)->setBuyer($buyer)->setAmount($totalPrice)->setToken($token);
+        $activity
+            ->setSeller($seller)
+            ->setBuyer($buyer)
+            ->setAmount($totalPrice)
+            ->setCurrency($currency)
+            ->setToken($token)
+        ;
 
         $this->saveActivity($activity);
     }
@@ -198,40 +194,7 @@ class ActivitySubscriber implements EventSubscriberInterface
     {
         $class = self::EVENT_ACTIVITY_MAP[$eventName];
 
-        /** @var Activity $activity */
-        $activity = new $class();
-
-        return $activity;
-    }
-
-    private function convertToUSD(Money $amount): Money
-    {
-        $rates = $this->cryptoRatesFetcher->fetch();
-        $exchange = new FixedExchange($rates);
-
-        return $this->moneyWrapper->convert($amount, new Currency(Symbols::USD), $exchange);
-    }
-
-    private function getLastPrice(Token $token): Money
-    {
-        $base = $this->cryptoManager->findBySymbol(Symbols::WEB);
-        $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($base, $token));
-
-        return $marketStatus->getLastPrice();
-    }
-
-    private function convertToMintme(Money $amount, Token $token): Money
-    {
-        $lastPrice = $this->getLastPrice($token);
-        $lastPrice = $this->moneyWrapper->format($lastPrice);
-
-        $exchange = new FixedExchange([
-            Symbols::TOK => [
-                Symbols::WEB => $lastPrice,
-            ],
-        ]);
-
-        return $this->moneyWrapper->convert($amount, new Currency(Symbols::WEB), $exchange);
+        return new $class();
     }
 
     private function saveActivity(Activity $activity): void

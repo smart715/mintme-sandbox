@@ -11,8 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AirdropClaimedActivity extends UserAmountActivity
 {
-    protected string $amount_symbol = Symbols::TOK; // phpcs:ignore
-
     public function getType(): int
     {
         return self::AIRDROP_CLAIMED;
