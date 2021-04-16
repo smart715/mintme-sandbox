@@ -22,16 +22,20 @@
 <script>
 import moment from 'moment';
 import {toMoney} from '../utils';
-import {MINTME, USD} from '../utils/constants';
+import {currencies, TOK} from '../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {downArrow} from '../utils/icons';
+import {RebrandingFilterMixin} from '../mixins';
 import TruncateFilterMixin from '../mixins/filters/truncate';
 
 library.add(downArrow);
 
 export default {
     name: 'Feed',
-    mixins: [TruncateFilterMixin],
+    mixins: [
+        TruncateFilterMixin,
+        RebrandingFilterMixin,
+    ],
     props: {
         itemsProp: Array,
         mercureHubUrl: String,
@@ -71,7 +75,8 @@ export default {
     },
     methods: {
         createTranslationContext(item) {
-            let subunit = item.type === 0 ? MINTME.subunit : USD.subunit;
+            let subunit = item.currency ? currencies[item.currency].subunit : TOK.subunit;
+            let symbol = this.rebrandingFunc(TOK.symbol === item.currency ? 'tokens' : item.currency);
 
             return {
                 token: this.truncateFunc(item.token.name, 25),
@@ -83,6 +88,7 @@ export default {
                 buyerUrl: item.buyer ? this.$routing.generate('profile-view', {nickname: item.buyer.profile.nickname}) : null,
                 seller: item.seller ? this.truncateFunc(item.seller.profile.nickname, 12) : null,
                 sellerUrl: item.seller ? this.$routing.generate('profile-view', {nickname: item.seller.profile.nickname}) : null,
+                symbol,
             };
         },
         toggle() {
