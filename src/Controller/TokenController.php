@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Communications\Exception\ApiFetchException;
-use App\Communications\Exception\FetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;

@@ -2,7 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Communications\Exception\ApiFetchException;
 use App\Communications\Exception\FetchException;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundKnowledgeBaseException;
