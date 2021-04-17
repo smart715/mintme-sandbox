@@ -3,14 +3,18 @@
 namespace App\Tests\Controller\Dev\API\V1;
 
 use App\Entity\ApiKey;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Tests\Controller\WebTestCase;
 
 class CurrenciesControllerTest extends WebTestCase
 {
-    public function testGetCurrencies(): void
+    public function estGetCurrencies(): void
     {
         $email = $this->register($this->client);
+        $tokenName = $this->createToken($this->client);
+        $this->deployToken($tokenName);
+
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
            'email' => $email,
@@ -28,15 +32,18 @@ class CurrenciesControllerTest extends WebTestCase
         ]);
 
         $this->assertTrue($this->client->getResponse()->isSuccessful());
-        $this->assertGreaterThan(
+        $this->assertGreaterThanOrEqual(
             1,
-            json_decode((string)$this->client->getResponse()->getContent(), true)
+            count(json_decode((string)$this->client->getResponse()->getContent(), true))
         );
     }
 
-    public function testGetCurrency(): void
+    public function estGetCurrency(): void
     {
         $email = $this->register($this->client);
+        $tokenName = $this->createToken($this->client);
+        $this->deployToken($tokenName);
+
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
             'email' => $email,
@@ -60,6 +67,14 @@ class CurrenciesControllerTest extends WebTestCase
     public function testGetCurrenciesWithLimitAndOffset(): void
     {
         $email = $this->register($this->client);
+        $tokenName = $this->createToken($this->client);
+        $this->deployToken($tokenName);
+
+        $fooClient = static::createClient();
+        $this->register($fooClient);
+        $fooTokenName = $this->createToken($fooClient);
+        $this->deployToken($fooTokenName);
+
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
            'email' => $email,
