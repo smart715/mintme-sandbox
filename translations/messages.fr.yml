@@ -882,7 +882,7 @@ token.intro.statistics.not_yet_released.guide_header: 'Pas encore libéré:'
 token.intro.statistics.not_yet_released.guide_body: 'Nombre de jetons pas encore libéré par le créateur du jeton ou vendu sur le marché'
 token.intro.statistics.created: 'crée le:'
 token.intro.statistics.holders.header: 'Détenteurs:'
-token.intro.statistics.holders.guide_header: 'Nombre d''utilisateurs de ce jeton'
+token.intro.statistics.holders.guide_header:
 token.intro.created_modal.paragraph_1.part_1: 'Féliciations '
 token.intro.created_modal.paragraph_1.part_2: 'besoin de support. Vous pouvez également utiliser la fonction Airdrop et donner vos pièces en petites quantités en échange de la publicité. Pensez à envoyer des messages aux personnes que vous ne connaissez pas, mais soyez prêt à avoir des arguments solides sur les raisons pour lesquelles ils devraient acheter votre jeton.'
 token.intro.created_modal.paragraph_2:
