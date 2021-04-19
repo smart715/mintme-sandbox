@@ -43,6 +43,7 @@ new Vue({
             lastNameAux: false,
             isValidPhone: false,
             enablePhoneMessage: false,
+            phoneNumber: null,
         };
     },
     beforeMount() {
@@ -147,12 +148,14 @@ new Vue({
     },
     computed: {
         disableSave: function() {
+            const isPhoneFieldInvalid = !!this.phoneNumber && !this.isValidPhone;
+
             return this.$v.$invalid ||
                 !this.zipCodeValid ||
                 this.zipCodeProcessing ||
                 this.firstNameAux ||
                 this.lastNameAux ||
-                !this.isValidPhone;
+                isPhoneFieldInvalid;
         },
     },
     validations() {

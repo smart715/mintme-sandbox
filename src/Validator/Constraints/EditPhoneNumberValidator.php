@@ -47,6 +47,10 @@ class EditPhoneNumberValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
+        if ($value === null) {
+            return;
+        }
+
         $oldPhoneNumber = $this->user->getProfile()->getPhoneNumber();
 
         $newPhoneEntity = $this->phoneNumberManager->findVerifiedPhoneNumber($value);

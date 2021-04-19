@@ -1,6 +1,7 @@
 <template>
     <div class="phone-number">
         <maz-phone-number-input
+            ref="phoneNumberInput"
             v-model="phone"
             @update="updatePhone"
             :translations="translations"
@@ -63,7 +64,7 @@ export default {
         updatePhone: function(data) {
             this.isValidNumber = data.isValid;
             this.$emit('is-valid-phone', this.isValidNumber);
-            this.phoneNumberModel = data.e164;
+            this.phoneNumberModel = data.e164 || this.$refs.phoneNumberInput.asYouTypeNumber;
         },
     },
 };
