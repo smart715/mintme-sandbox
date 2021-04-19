@@ -457,6 +457,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
+                    WHERE qt.is_blocked = false
                 ) AS r
                 WHERE r.id IN (:ids)";
 
