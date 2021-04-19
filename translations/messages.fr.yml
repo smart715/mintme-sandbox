@@ -100,6 +100,9 @@ page.error.404.body: 'La page sollicitée n''a pu être trouvée. Vérifier l''o
 page.error.500.title: 'Erreur interne du serveur'
 page.error.500.header: 'Erreur interne du serveur'
 page.error.500.body: 'Quelque chose est cassé. Veuillez nous indiquer ce que vous faisiez lorsque cette erreur s''est produite. Nous allons le réparer dès que possible. Désolé pour tout inconvénient causé.'
+page.error.503.title:
+page.error.503.header:
+page.error.503.body:
 page.news.title: Informations
 page.news.read_more: 'En savoir plus'
 page.news.current: 'En savoir plus'
