@@ -86,6 +86,7 @@ class ProfileType extends AbstractType
                 'label_attr' => ['class' => 'custom-control-label'],
             ])
             ->add('phoneNumber', PhoneNumberType::class, [
+                'required' => false,
                 'mapped' => false,
             ]);
 
