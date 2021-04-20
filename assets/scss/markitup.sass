@@ -210,15 +210,20 @@ $dialog-border-radius: $radius
   white-space: nowrap
 
 .markitup-button-group
-  display: inline-block
-  margin-right: $margin
-  margin-left: 1px
+  display: flex
+  overflow: hidden;
+  min-width: 400px
 
   .markitup-button
     border-right: none
+    width: 100%
 
+  .markitup-button-wrapper
+    flex: 1
+    
   .markitup-button-wrapper:last-child .markitup-button
     border-right: 1px solid $button-color-border
+
 
 .markitup-dropdown
   padding: 0
@@ -304,6 +309,7 @@ $dialog-border-radius: $radius
 .markitup-textarea
   width: 100%
   height: $textarea-height
+  min-height: 94px
   padding: 10px
   margin-bottom: $margin
   border-radius: $textarea-border-radius
