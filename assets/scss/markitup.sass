@@ -218,16 +218,8 @@ $dialog-border-radius: $radius
     border-right: none
     width: 100%
 
-  .markitup-button-wrapper
-    flex: 1
-    display: inline-block
-
-    &.markitup-open > .markitup-dropdown
-      visibility: visible
-
   .markitup-button-wrapper:last-child .markitup-button
     border-right: 1px solid $button-color-border
-
 
 .markitup-dropdown
   padding: 0
@@ -281,6 +273,13 @@ $dialog-border-radius: $radius
     &:hover
       color: $menu-color-text-hover
       background-color: $menu-color-background-hover
+
+.markitup-button-wrapper
+  display: inline-block
+  flex: 1
+
+  &.markitup-open > .markitup-dropdown
+    visibility: visible
 
 .markitup-caret
   width: 0
