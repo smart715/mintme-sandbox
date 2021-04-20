@@ -88,10 +88,6 @@ class PostController extends Controller
      */
     public function home(): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $tokens = $user->getProfile()->getTokens();
-
-        return $this->render('pages/show_user_home.html.twig', ['user' => $user, 'tokens' => $tokens]);
+        return $this->render('pages/show_user_home.html.twig');
     }
 }
