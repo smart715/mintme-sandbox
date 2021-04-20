@@ -134,7 +134,6 @@ class MinOrderValidator implements ValidatorInterface
     private function getMinUsdInBase(string $baseSymbol): Money
     {
         $rates = $this->cryptoRatesFetcher->fetch();
-        dd($rates);
 
         return  $this->moneyWrapper->convert(
             $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
