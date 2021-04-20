@@ -811,7 +811,6 @@ export default {
                         this.markets[market].supply = 1e7;
                     }
 
-                    this.markets[market].holders = this.markets[market].quote.holdersCount;
                     const selectedMarket = this.markets[market];
 
                     const sanitizedMarket = this.getSanitizedMarket(
@@ -833,7 +832,7 @@ export default {
                         selectedMarket.quote.cryptoSymbol,
                         selectedMarket.marketCap || 0,
                         selectedMarket.rank || 0,
-                        selectedMarket.holders || 0
+                        selectedMarket.quote.holdersCount || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);

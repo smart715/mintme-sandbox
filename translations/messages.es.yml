@@ -1106,7 +1106,7 @@ trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
 trading.fields.rank:
 trading.fields.rank.help:
-trading.fields.holders: 'Holders'
+trading.fields.holders:
 trading.fields.holders.help:
 wallet.balance: Balance
 wallet.deposit: Depositar
