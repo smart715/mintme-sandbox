@@ -1,8 +1,8 @@
 <template>
     <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
         <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
-        <template v-else-if="postsCount > 0">
-            <post v-for="(n, i) in postsCount"
+        <template v-else-if="posts.length > 0">
+            <post v-for="(n, i) in posts.length"
                   :post="posts[i]"
                   :key="i"
                   :index="i"
@@ -26,7 +26,6 @@ export default {
         return {
             posts: [],
             nextPage: 0,
-            postsCount: 0,
             loading: true,
         };
     },
@@ -35,7 +34,6 @@ export default {
             this.$axios.single.get(this.$routing.generate('recent_posts', {nextPage: this.nextPage}))
             .then((res) => {
                 if (res.data) {
-                    this.postsCount += res.data.count;
                     this.posts = this.posts.concat(res.data.posts);
                     this.nextPage += 1;
                 }
