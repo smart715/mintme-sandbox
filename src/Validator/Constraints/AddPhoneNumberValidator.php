@@ -3,6 +3,7 @@
 namespace App\Validator\Constraints;
 
 use App\Manager\PhoneNumberManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use libphonenumber\PhoneNumberUtil;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Validator\Constraint;
@@ -15,17 +16,20 @@ class AddPhoneNumberValidator extends ConstraintValidator
     private ParameterBagInterface $parameterBag;
     private PhoneNumberUtil $phoneNumberUtil;
     private PhoneNumberManagerInterface $phoneNumberManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         TranslatorInterface $translator,
         ParameterBagInterface $parameterBag,
         PhoneNumberUtil $phoneNumberUtil,
-        PhoneNumberManagerInterface $phoneNumberManager
+        PhoneNumberManagerInterface $phoneNumberManager,
+        EntityManagerInterface $entityManager
     ) {
         $this->translator = $translator;
         $this->parameterBag = $parameterBag;
         $this->phoneNumberUtil = $phoneNumberUtil;
         $this->phoneNumberManager = $phoneNumberManager;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -44,6 +48,33 @@ class AddPhoneNumberValidator extends ConstraintValidator
 
         if (!$phoneNumber) {
             return;
+        }
+
+        $addDate = $phoneNumber->getAttemptsDate();
+
+        if ($addDate) {
+            $nowDate = new \DateTimeImmutable();
+
+            $sameDay = $nowDate->format('d-m-Y') === $addDate->format('d-m-Y');
+            $sameWeek = $nowDate->format('W-Y') === $addDate->format('W-Y');
+            $sameMonth = $nowDate->format('m-Y') === $addDate->format('m-Y');
+
+            if (!$sameDay) {
+                $phoneNumber->setDailyAttempts(0);
+            }
+
+            if (!$sameWeek) {
+                $phoneNumber->setWeeklyAttempts(0);
+            }
+
+            if (!$sameMonth) {
+                $phoneNumber->setMonthlyAttempts(0);
+            }
+
+            if (!$sameDay || !$sameWeek || !$sameMonth) {
+                $this->entityManager->persist($phoneNumber);
+                $this->entityManager->flush();
+            }
         }
 
         if ($phoneNumber->getDailyAttempts() >= $daily) {
