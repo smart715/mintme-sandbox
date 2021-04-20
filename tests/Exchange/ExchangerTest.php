@@ -55,7 +55,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockCryptoRatesFetcher(),
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -68,8 +69,6 @@ class ExchangerTest extends TestCase
             '5',
             false,
             Order::SELL_SIDE,
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoRatesFetcher()
         );
 
         self::assertEquals(TradeResult::INSUFFICIENT_BALANCE, $result->getResult());
@@ -91,7 +90,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(false),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockCryptoRatesFetcher()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -104,8 +104,6 @@ class ExchangerTest extends TestCase
             '5',
             false,
             Order::SELL_SIDE,
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoRatesFetcher()
         );
 
         self::assertEquals(
@@ -131,7 +129,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockCryptoRatesFetcher()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -144,8 +143,6 @@ class ExchangerTest extends TestCase
             '5',
             false,
             Order::SELL_SIDE,
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoRatesFetcher()
         );
 
         $this->assertEquals($tradeResult, $result);
@@ -167,7 +164,8 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(true),
-            $this->mockTranslator()
+            $this->mockTranslator(),
+            $this->mockCryptoRatesFetcher()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -180,8 +178,6 @@ class ExchangerTest extends TestCase
             '5',
             true,
             Order::SELL_SIDE,
-            $this->mockMoneyWrapper(),
-            $this->mockCryptoRatesFetcher()
         );
 
         $this->assertEquals($tradeResult, $result);

@@ -51,23 +51,18 @@ class OrdersController extends AbstractFOSRestController
     /** @var TranslatorInterface */
     private $translations;
 
-    /** @var CryptoRatesFetcherInterface */
-    private $cryptoRatesFetcher;
-
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
-        TranslatorInterface $translations,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        TranslatorInterface $translations
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
         $this->eventDispatcher = $eventDispatcher;
         $this->translations = $translations;
-        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     /**
