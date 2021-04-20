@@ -13,10 +13,14 @@ use App\Exception\NotFoundTokenException;
 use App\Exception\RedirectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -25,11 +29,19 @@ class ExceptionSubscriber implements EventSubscriberInterface
 {
     private Environment $template;
     private TranslatorInterface $translator;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private UrlGeneratorInterface $route;
 
-    public function __construct(Environment $environment, TranslatorInterface $translator)
-    {
+    public function __construct(
+        Environment $environment,
+        TranslatorInterface $translator,
+        AuthorizationCheckerInterface $authorizationChecker,
+        UrlGeneratorInterface $route
+    ) {
         $this->template = $environment;
         $this->translator = $translator;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->route = $route;
     }
 
     public static function getSubscribedEvents(): array
@@ -112,6 +124,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof FetchException) {
             throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
+
+        if ($exception instanceof AccessDeniedHttpException &&
+            $this->authorizationChecker->isGranted('ROLE_USER')
+        ) {
+            $homePage = $this->route->generate('homepage');
+            $event->setResponse(new RedirectResponse($homePage));
         }
     }
 }
