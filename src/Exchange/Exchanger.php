@@ -60,6 +60,8 @@ class Exchanger implements ExchangerInterface
     /** @var TranslatorInterface */
     private $translator;
 
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
+
     public function __construct(
         TraderInterface $trader,
         MoneyWrapperInterface $moneyWrapper,
@@ -71,7 +73,8 @@ class Exchanger implements ExchangerInterface
         MarketHandlerInterface $marketHandler,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
     ) {
         $this->trader = $trader;
         $this->mw = $moneyWrapper;
@@ -84,6 +87,7 @@ class Exchanger implements ExchangerInterface
         $this->tm = $tokenManager;
         $this->vf = $validatorFactory;
         $this->translator = $translator;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     public function cancelOrder(Market $market, Order $order): TradeResult
@@ -118,9 +122,7 @@ class Exchanger implements ExchangerInterface
         string $amountInput,
         string $priceInput,
         bool $marketPrice,
-        int $side,
-        MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        int $side
     ): TradeResult {
         $isSellSide = Order::SELL_SIDE === $side;
 
@@ -136,8 +138,8 @@ class Exchanger implements ExchangerInterface
             $market,
             $priceInput,
             $amountInput,
-            $moneyWrapper,
-            $cryptoRatesFetcher
+            $this->mw,
+            $this->cryptoRatesFetcher
         );
 
         if (!$minOrderValidator->validate()) {

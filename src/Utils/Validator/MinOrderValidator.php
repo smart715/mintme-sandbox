@@ -12,6 +12,7 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
+use Money\Money;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MinOrderValidator implements ValidatorInterface
@@ -59,7 +60,7 @@ class MinOrderValidator implements ValidatorInterface
         $this->translator = $translator;
     }
 
-    public function validate(): Bool
+    public function validate(): bool
     {
         /** @var Crypto $base */
         $base = $this->baseTradable;
@@ -73,11 +74,6 @@ class MinOrderValidator implements ValidatorInterface
             ? Token::TOKEN_SUBUNIT
             : $quote->getShowSubunit();
 
-
-        $scale = $baseUnit > $quoteUnit
-            ? $baseUnit
-            : $quoteUnit;
-
         $baseMinimal = $baseUnit > 0
             ? $this->getMinimal($baseUnit)
             : 0;
@@ -88,7 +84,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && $this->checkOrderPriceMinimal($scale, $base);
+            && $this->validMinUSD($base);
     }
 
     public function getMessage(): string
@@ -101,48 +97,50 @@ class MinOrderValidator implements ValidatorInterface
         return 1 / (int)str_pad('1', $unit + 1, '0');
     }
 
-    private function checkOrderPriceMinimal(int $scale, TradebleInterface $base): bool
+    private function validMinUSD(TradebleInterface $base): bool
     {
-        $rates = $this->cryptoRatesFetcher->fetch();
-
-        $totalOrderAmount = BigDecimal::of((float)$this->price)
-           ->toScale($scale)
-           ->multipliedBy(
-               BigDecimal::of((float)$this->amount)->toScale($scale)
-           )->toFloat();
         $baseSymbol = $base->getSymbol();
+        $price = $this->moneyWrapper->parse($this->price, Symbols::TOK);
+        $amount = $this->moneyWrapper->parse($this->amount, Symbols::TOK);
 
-        $totalOrderAmountInBase = $this->moneyWrapper->parse((string)$totalOrderAmount, $baseSymbol);
-
-        $minimalPriceOrderInBase =  $this->moneyWrapper->convert(
-            $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
-            new Currency($baseSymbol),
-            new FixedExchange([
-                Symbols::USD => [ $baseSymbol => 1 / $rates[$baseSymbol][Symbols::USD] ],
-            ]),
+        $totalOrderAmount = $price->multiply(
+            $this->moneyWrapper->format($amount)
         );
 
-        $minimalPriceOrderInMintme = Symbols::WEB === $baseSymbol ?
-            $minimalPriceOrderInBase :
-            $this->moneyWrapper->convert(
-                $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
-                new Currency(Symbols::WEB),
-                new FixedExchange([
-                    Symbols::USD => [ Symbols::WEB => 1 / $rates[Symbols::WEB][Symbols::USD] ],
-                ]),
-            );
+        $totalOrderAmountInBase = $this->moneyWrapper->parse(
+            $this->moneyWrapper->format($totalOrderAmount),
+            $baseSymbol
+        );
+
+        $minUsdInBase = $this->getMinUsdInBase($baseSymbol);
+
+        $minUsdInMintme = Symbols::WEB === $baseSymbol ?
+            $minUsdInBase : $this->getMinUsdInBase(Symbols::WEB);
 
         $this->message = $this->translator->trans(
             'place_order.too_small',
             [
                 '%valueInUsd%' => $this->minimalPriceOrder,
                 '%valueInMintme%' => round(
-                    (float)$this->moneyWrapper->format($minimalPriceOrderInMintme),
-                    2
+                    (float)$this->moneyWrapper->format($minUsdInMintme),
+                    4
                 ),
             ]
         );
 
-        return $totalOrderAmountInBase-> greaterThanOrEqual($minimalPriceOrderInBase);
+        return $totalOrderAmountInBase-> greaterThanOrEqual($minUsdInBase);
+    }
+
+    public function getMinUsdInBase(string $baseSymbol): Money
+    {
+        $rates = $this->cryptoRatesFetcher->fetch();
+
+        return  $this->moneyWrapper->convert(
+            $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
+            new Currency($baseSymbol),
+            new FixedExchange([
+                Symbols::USD => [ $baseSymbol => 1 / $rates[$baseSymbol][Symbols::USD] ],
+            ]),
+        );
     }
 }

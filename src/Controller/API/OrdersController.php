@@ -21,7 +21,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -170,8 +169,6 @@ class OrdersController extends AbstractFOSRestController
             (string)$request->get('priceInput'),
             (bool)$request->get('marketPrice'),
             Order::SIDE_MAP[$request->get('action')],
-            $moneyWrapper,
-            $this->cryptoRatesFetcher
         );
 
         return $this->view([

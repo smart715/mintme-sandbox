@@ -289,5 +289,5 @@ parameters:
     liip_data_root: '%kernel.project_dir%/public'
 
     # minimum order value (USD) to make buy/sell orders
-    minimum_order_value: 0.1
+    minimum_order_value_usd: 0.1
 

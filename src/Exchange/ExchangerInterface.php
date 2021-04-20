@@ -15,9 +15,7 @@ interface ExchangerInterface
         string $amountInput,
         string $priceInput,
         bool $marketPrice,
-        int $side,
-        MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        int $side
     ): TradeResult;
 
     public function cancelOrder(Market $market, Order $order): TradeResult;

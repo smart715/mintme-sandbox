@@ -2,7 +2,6 @@
 
 namespace App\Controller\Dev\API\V1\User;
 
-use App\Communications\CryptoRatesFetcherInterface;
 use App\Controller\Dev\API\V1\DevApiController;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -22,7 +21,6 @@ use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Validator\MarketValidator;
 use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Utils\Validator\TradebleDigitsValidator;
-use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -57,10 +55,6 @@ class OrdersController extends DevApiController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    private MoneyWrapperInterface $moneyWrapper;
-    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
-
-
     public function __construct(
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler,
@@ -68,9 +62,7 @@ class OrdersController extends DevApiController
         TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter,
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager,
-        MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        TokenManagerInterface $tokenManager
     ) {
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
@@ -79,8 +71,6 @@ class OrdersController extends DevApiController
         $this->rebrandingConverter = $rebrandingConverter;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
-        $this->moneyWrapper = $moneyWrapper;
-        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     /**
@@ -294,8 +284,6 @@ class OrdersController extends DevApiController
             $price,
             filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
             Order::SIDE_MAP[$request->get('action')],
-            $this->moneyWrapper,
-            $this->cryptoRatesFetcher
         );
 
         return $this->view([

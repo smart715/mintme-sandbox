@@ -704,5 +704,5 @@ services:
 
     App\Utils\ValidatorFactory:
         properties:
-            minimalPriceOrder: '%minimum_order_value%'
+            minimalPriceOrder: '%minimum_order_value_usd%'
 
