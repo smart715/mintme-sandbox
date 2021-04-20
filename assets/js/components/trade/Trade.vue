@@ -28,7 +28,6 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -46,7 +45,6 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-
                 />
             </div>
         </div>

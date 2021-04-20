@@ -283,7 +283,7 @@ class OrdersController extends DevApiController
             $amount,
             $price,
             filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
-            Order::SIDE_MAP[$request->get('action')],
+            Order::SIDE_MAP[$request->get('action')]
         );
 
         return $this->view([
