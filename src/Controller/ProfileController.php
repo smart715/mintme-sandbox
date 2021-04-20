@@ -194,7 +194,7 @@ class ProfileController extends Controller
                 $profile->getPhoneNumber()->setVerified(false);
                 $profile->getPhoneNumber()->setVerificationCode(null);
             }
-        } elseif ($oldPhoneE164 !== null) {
+        } elseif (!$oldPhoneE164) {
             $profile->setPhoneNumber(null);
             $phoneChanged = true;
         }

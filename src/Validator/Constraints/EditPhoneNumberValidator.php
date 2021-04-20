@@ -78,6 +78,5 @@ class EditPhoneNumberValidator extends ConstraintValidator
                 ->setParameter('{{message}}', $this->translator->trans('phone_number.in_use'))
                 ->addViolation();
         }
-
     }
 }
