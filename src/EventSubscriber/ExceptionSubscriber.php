@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Communications\Exception\FetchException;
 use App\Exception\ApiExceptionInterface;
 use App\Exception\NotFoundKnowledgeBaseException;
@@ -110,12 +111,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         }
 
         if ($exception instanceof FetchException) {
-            $event->setResponse(new Response(
-                $this->template->render('pages/503.html.twig', [
-                    'error_message' => $this->translator->trans('toasted.error.service_unavailable'),
-                ]),
-                503
-            ));
+            throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
         }
     }
 }
