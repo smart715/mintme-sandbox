@@ -1113,6 +1113,8 @@ trading.buy_depth.help: 'La demande est le montant d''ordres d''achat sur MINTME
 trading.fields.pair: Nom
 trading.fields.change: Echange
 trading.fields.last_price: 'Dernier prix'
+trading.fields.holders: 'Holders'
+trading.fields.holders.help:
 wallet.balance: Solde
 wallet.deposit: Dépôt
 wallet.withdraw: Retrait
