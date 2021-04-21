@@ -118,6 +118,7 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        serviceUnavailable: Boolean,
     },
     components: {
         Avatar,
@@ -127,6 +128,7 @@ export default {
     },
     mounted() {
         this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
+        this.notifyError(this.$t('toasted.error.service_unavailable'));
     },
     methods: {
         ...mapMutations('tokenStatistics', [

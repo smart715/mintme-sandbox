@@ -467,7 +467,7 @@ class TokenController extends Controller
         $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
 
         $topHolders = null;
-
+        $serviceUnavailable = false;
         if ('intro' === $tab) {
             try {
                 $topHolders = $this->balanceHandler->topHolders(
@@ -475,6 +475,7 @@ class TokenController extends Controller
                     $this->parameterBag->get('top_holders')
                 );
             } catch (\Throwable $e) {
+                $serviceUnavailable = true;
             }
         }
 
@@ -517,6 +518,7 @@ class TokenController extends Controller
                 'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
+                'serviceUnavailable' => $serviceUnavailable,
             ], $extraData)
         );
     }
