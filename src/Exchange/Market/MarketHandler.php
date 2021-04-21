@@ -287,7 +287,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['side'],
                 $this->moneyWrapper->parse(
                     (string)$orderData['price'],
-                    $this->getSymbol($market->getQuote())
+                    $this->getSymbol($market->getBase())
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(
@@ -564,7 +564,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
-            $market->isTokenMarket() ? Symbols::TOK : $market->getQuote()->getSymbol()
+            $this->getSymbol($market->getBase())
         );
 
         /** @var Money $depthAmount */
@@ -592,21 +592,29 @@ class MarketHandler implements MarketHandlerInterface
 
         $orders = array_merge([], ...$paginatedOrders);
 
-        $zeroDepth = $this->moneyWrapper->parse('0', Symbols::TOK);
+        $zeroDepthBase = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getBase())
+        );
 
         /** @var Money $sellOrdersSum */
         $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
             return $order->getPrice()->multiply(
                 $this->moneyWrapper->format($order->getAmount())
             )->add($sum);
-        }, $zeroDepth);
+        }, $zeroDepthBase);
 
         $sellOrdersSum = $this->moneyWrapper->format($sellOrdersSum);
+
+        $zeroDepthQuote = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getQuote())
+        );
 
         /** @var Money $quoteAmountSummary */
         $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
             return $order->getAmount()->add($sum);
-        }, $zeroDepth);
+        }, $zeroDepthQuote);
 
         $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
 
