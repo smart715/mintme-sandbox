@@ -229,6 +229,18 @@
                                     </guide>
                                 </div>
                             </template>
+                            <template v-slot:[`head(${fields.holders.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                       tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
+                            </template>
                         </b-table>
                     </div>
                     <template v-if="!tableLoading">
@@ -405,6 +417,7 @@ export default {
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
+
             if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
                     let firstMintmeDeployed = first.tokenized && webSymbol === first.cryptoSymbol;
@@ -469,6 +482,12 @@ export default {
                     key: this.marketCapOptions[this.activeMarketCap].key + ( this.showUsd ? USD.symbol : ''),
                     sortable: true,
                     formatter: 'marketCap' === this.activeMarketCap ? this.marketCapFormatter : formatMoney,
+                },
+                holders: {
+                    key: 'holders',
+                    label: this.$t('trading.fields.holders'),
+                    sortable: true,
+                    help: this.$t('trading.fields.holders.help'),
                 },
             };
         },
@@ -690,7 +709,8 @@ export default {
                 quoteImage,
                 market.quote.cryptoSymbol,
                 marketCap,
-                market.rank || 0
+                market.rank || 0,
+                market.quote.holdersCount || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -721,7 +741,8 @@ export default {
             quoteImage,
             cryptoSymbol,
             marketCap = 0,
-            rank = 0
+            rank = 0,
+            holders,
         ) {
             let hiddenName = this.findHiddenName(token);
 
@@ -750,6 +771,7 @@ export default {
                 quoteImage,
                 cryptoSymbol,
                 rank,
+                holders,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -774,6 +796,7 @@ export default {
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
                     const webBtcOnTop = this.marketsOnTop[0];
+
                     if (marketOnTopIndex > -1 &&
                         cryptoSymbol === webBtcOnTop.currency &&
                         tokenName === webBtcOnTop.token) {
@@ -808,7 +831,8 @@ export default {
                         selectedMarket.quote.image? selectedMarket.quote.image.avatar_small: '',
                         selectedMarket.quote.cryptoSymbol,
                         selectedMarket.marketCap || 0,
-                        selectedMarket.rank || 0
+                        selectedMarket.rank || 0,
+                        selectedMarket.quote.holdersCount || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -870,7 +894,8 @@ export default {
                 market.quote.image ? market.quote.image.avatar_small: '',
                 market.quote.cryptoSymbol,
                 market.marketCap || 0,
-                market.rank || 0
+                market.rank || 0,
+                market.quote.holdersCount || 0
                 );
 
             if (marketOnTopIndex > -1) {
