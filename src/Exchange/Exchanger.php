@@ -20,6 +20,9 @@ use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
+use Money\Currency;
+use Money\Exchange\FixedExchange;
+use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -136,11 +139,10 @@ class Exchanger implements ExchangerInterface
         );
 
         if ($marketPrice) {
-            /** @var Order[] $orders */
-            $orders = $this->getPendingOrders($market, $isSellSide ? Order::BUY_SIDE : Order::SELL_SIDE);
-
-            if ($orders) {
-                $price = $orders[0]->getPrice();
+            try {
+                $price = $this->getMarketPrice($market, $user, $isSellSide);
+            } catch (\Throwable $e) {
+                return new TradeResult(TradeResult::FAILED, $this->translator);
             }
         }
 
@@ -219,11 +221,11 @@ class Exchanger implements ExchangerInterface
     }
 
     /** @return array<Order> */
-    private function getPendingOrders(Market $market, int $side): array
+    private function getPendingOrders(Market $market, int $side, int $offset): array
     {
         return Order::BUY_SIDE === $side ?
-            $this->mh->getPendingBuyOrders($market, 0, 1) :
-            $this->mh->getPendingSellOrders($market, 0, 1);
+            $this->mh->getPendingBuyOrders($market, $offset) :
+            $this->mh->getPendingSellOrders($market, $offset);
     }
 
     private function exceedAvailableReleased(
@@ -246,5 +248,80 @@ class Exchanger implements ExchangerInterface
         }
 
         return false;
+    }
+
+    private function getMarketPrice(Market $market, User $user, bool $isSellSide): Money
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        $balance = $this->getBalance(
+            $user,
+            $isSellSide ? $quote : $base
+        );
+
+        $ordersQuoteAmountSum = new Money(0, new Currency($this->getSymbol($quote)));
+
+        $offset = 0;
+        $orders = [];
+
+        $marketPrice = null;
+
+        do {
+            $offset += count($orders);
+            $moreOrders = $this->getPendingOrders(
+                $market,
+                $isSellSide ? Order::BUY_SIDE : Order::SELL_SIDE,
+                $offset
+            );
+
+            // This is so that $orders will keep the last orders if $moreOrders comes empty
+            // so that price can be set to last order's price if the market price is still null after loop
+            $orders = count($moreOrders)
+                ? $moreOrders
+                : $orders;
+
+            foreach ($moreOrders as $order) {
+                $ordersQuoteAmountSum = $ordersQuoteAmountSum->add($order->getAmount());
+
+                $totalPrice = $order->getPrice()->multiply($this->mw->format($ordersQuoteAmountSum));
+
+                $condition = $balance->lessThanOrEqual(
+                    $isSellSide ? $ordersQuoteAmountSum : $totalPrice
+                );
+
+                if ($condition) {
+                    $marketPrice = $order->getPrice();
+
+                    break;
+                }
+            }
+
+            if ($marketPrice) {
+                break;
+            }
+        } while ($moreOrders);
+
+        $count = count($orders);
+
+        if (null === $marketPrice && $count > 0) {
+            $marketPrice = $orders[$count - 1]->getPrice();
+        } elseif (null === $marketPrice) {
+            throw new \Exception('Market price selected when market price is 0');
+        }
+
+        return $marketPrice;
+    }
+
+    private function getBalance(User $user, TradebleInterface $tradeble): Money
+    {
+        /** @var Token $token */
+        $token = $tradeble instanceof Crypto
+            ? Token::getFromCrypto($tradeble)
+            : $tradeble;
+
+        $balanceResult = $this->bh->balance($user, $token);
+
+        return $this->tm->getRealBalance($token, $balanceResult)->getAvailable();
     }
 }
