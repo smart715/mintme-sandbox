@@ -78,6 +78,9 @@ import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenAvatar',
+    mixins: [
+        NotificationMixin,
+    ],
     props: {
         isOwner: Boolean,
         hasReleasePeriodProp: Boolean,
