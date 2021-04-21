@@ -51,7 +51,7 @@ describe('Donation', () => {
         },
     });
 
-    it('should renders correctly for logged in user', () => {
+    it('should render correctly for logged in user', () => {
         const wrapper = shallowMount(Donation, {
             store,
             localVue,
@@ -74,7 +74,7 @@ describe('Donation', () => {
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
+        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
     });
 
@@ -122,7 +122,7 @@ describe('Donation', () => {
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
+        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
         // Select ETH

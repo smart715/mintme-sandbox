@@ -111,7 +111,7 @@ page.index.promo.main_3: su
 page.index.promo.main.word_1: idea
 page.index.promo.main.word_2: comunidad
 page.index.promo.main.word_3: proyecto
-page.index.promo.main.word_4: '&nbsp;sostenibilidad'
+page.index.promo.main.word_4: '<br class="d-sm-none">&nbsp;<wbr>sostenibilidad'
 page.index.promo.description: 'o consiga ganancias en el comercio y el apoyo a otros tokens'
 page.index.promo.btn.trade: 'Haga trading ahora'
 page.index.block_1.header: '¿CÓMO FUNCIONA?'
@@ -642,7 +642,7 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.header.logged: Comprar
+donation.header.logged: 'Comprar %token%'
 donation.header.not_logged: 'Para comprar tokens, tiene que registrarse o ingresar'
 donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no deseas apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>'
 donation.currency: Moneda
@@ -666,6 +666,7 @@ donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
+confirm_modal.continue: 'Continuar'
 confirm_modal.cancel: Cancelar
 confirm_modal.accept_delete: 'Sí, elimínalo'
 deposit_modal.title: DEPOSITAR
@@ -835,6 +836,7 @@ token.intro.profile.twitter_description: 'Una gran forma de apoyo mutuo. Revisa 
 token.intro.profile.contract_address: 'Dirección de contrato del token:'
 token.intro.profile.contract_address.header: 'Dirección de contrato del token'
 token.intro.profile.contract_address.body: 'Dirección de contrato única del token, creada cuando el token se despliega en la blockchain. Es necesaria cuando se añade el token a la aplicación MintMe Wallet.'
+token.intro.statistics.show: 'Mostrar estadísticas'
 token.intro.statistics.header: Estadísticas
 token.intro.statistics.guide_header: Estadísticas
 token.intro.statistics.guide_body.mintme_token: 'Estadísticas asociadas con %symbol%. Aquí usted puede descubrir cómo el creador del token maneja sus tokens y si establece alguna restricción en la liberación del token.'
@@ -878,8 +880,7 @@ token.intro.statistics.holders.header:
 token.intro.statistics.holders.guide_header:
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
-token.intro.created_modal.paragraph_2.part_1: 'Los usuarios que compren tokens a través de este enlace'
-token.intro.created_modal.paragraph_2.part_2: 'comprarlo sólo a usted, al contrario de la opción de comercio. Recuerde que la comercialización de su token depende de usted y la mejor manera de atraer a los participantes es haciendo lanzamientos  de su token utilizando la función incorporada de airdrop. Así que empiece a compartir el enlace de su token ahora y ¡buena suerte!'
+token.intro.created_modal.paragraph_2:
 token.intro.created_modal.paragraph_3: 'Además, consulte nuestros artículos con consejos de marketing:'
 token.intro.created_modal.list_1.item_1: 'Es hora de la venta de tokens, ¿cómo puedo hacer la diferencia?'
 token.intro.created_modal.list_1.item_2: '¿Apuntando a un token fuerte?'
@@ -935,7 +936,7 @@ token.change_name.must_own_all: 'Debe tener todos sus tokens para poder cambiar 
 token.change_name.changed_successfully: 'El nombre del Token se ha cambiado exitosamente'
 token.delete.delete_token: 'Eliminar Token'
 token.delete.header: 'Eliminar Token'
-token.delete.body.all_tokens: 'Debe tener todos sus tokens para luego eliminarlo.'
+token.delete.body.over_limit:
 token.delete.body.deploying_or_deployed: 'El token está siendo desplegado o ya ha sido desplegado.'
 token.progress.body: 'Mientras más información suministre sobre su token y perfil, mayor será este número. Además obtendrá un incremento significativo si despliega su token en la blockchain. '
 token.release.new_address: 'Nueva dirección:'
@@ -1103,6 +1104,8 @@ trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra r
 trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
+trading.fields.rank:
+trading.fields.rank.help:
 wallet.balance: Balance
 wallet.deposit: Depositar
 wallet.withdraw: Retirar
@@ -1193,7 +1196,7 @@ toasted.error.can_not_update_orders: 'Algo salió mal. Las órdenes no pueden se
 toasted.error.service_unavailable: 'El servicio no se encuentra disponible. Intente de nuevo más tarde'
 toasted.error.can_not_update_market_cap_btc_mintme: 'No se puede actualizar la capitalización de mercados para MINTME/BTC'
 toasted.error.connection_problem: 'Error de conexión. Intente de nuevo más tarde.'
-toasted.success.email_sent: 'Un correo de confirmación ha sido envíado a su correo electrónico. Este expirará en %hours$ horas.'
+toasted.success.email_sent: 'Un correo de confirmación ha sido envíado a su correo electrónico. Este expirará en %hours% horas.'
 toasted.success.withdrawal.queued: 'La solicitud del retiro fue confirmada exitosamente y agregada a la cola de retiros.'
 toasted.success.facebook.added: 'La página de Facebook que registrada como %address%'
 toasted.success.facebook.deleted: 'La página de Facebook fue eliminada'
@@ -1326,16 +1329,16 @@ phone_number.add.limit_daily: 'Ha alcanzado el límite diario previsto, por favo
 phone_number.add.limit_weekly: 'Ha alcanzado el límite semanal previsto, por favor, intente añadir el número de teléfono la próxima semana'
 phone_number.add.limit_monthly: 'Ha alcanzado el límite mensual previsto, por favor, intente añadir el número de teléfono el próximo mes'
 phone_number.in_use: 'Este número de teléfono ya está en uso'
-activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% tokens lanzado(s) a <a href="%userUrl%">%user%</a>'
+activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(s) a <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'
-activity_3_message: '<a href="%tokenUrl%">%token%</a> recibió una donación por valor de $%amount%'
+activity_3_message: '<a href="%tokenUrl%">%token%</a> recibió una donación por valor de %amount% %symbol%'
 activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación'
 activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
-activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de $%amount%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> fue vendido por <a href="%sellerUrl%">%seller%</a> a <a href="%buyerUrl%">%buyer%</a> por un valor de $%amount%'
-activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de $%amount%'
+activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
+activity_8_message: '<a href="%tokenUrl%">%token%</a> fue vendido por <a href="%sellerUrl%">%seller%</a> a <a href="%buyerUrl%">%buyer%</a> por un valor de %amount% %symbol%'
+activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado
 airdrop_backend.invalid_actions: 'Acciones inválidas'

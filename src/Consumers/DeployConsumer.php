@@ -112,7 +112,8 @@ class DeployConsumer implements ConsumerInterface
                     $token->setAddress('');
                     $token->setTxHash(null);
                     $token->setDeployCost(null);
-                    $token->setDeployed(null);
+                    $token->setDeployedDate(null);
+                    $token->setDeployed(false);
 
                     $this->logger->info(
                         '[deploy-consumer] the money is payed back returned back'
@@ -126,7 +127,8 @@ class DeployConsumer implements ConsumerInterface
             } else {
                 $lockIn->setReleasedAtStart($lockIn->getReleasedAmount()->getAmount());
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
-                $token->setDeployed(new \DateTimeImmutable());
+                $token->setDeployedDate(new \DateTimeImmutable());
+                $token->setDeployed(true);
                 $token->setAddress($clbResult->getAddress());
                 $token->setShowDeployedModal(true);
                 $token->setTxHash($clbResult->getTxHash());

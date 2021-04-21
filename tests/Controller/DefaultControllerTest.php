@@ -5,10 +5,9 @@ namespace App\Tests\Controller;
 class DefaultControllerTest extends WebTestCase
 {
     /** @dataProvider unAuthUPages */
-    public function testUnauthorizedPages(string $url): void
+    public function testUnauthorizedPages(string $route): void
     {
-        $this->client->request('GET', $url);
-
+        $this->client->request('GET', self::LOCALHOST . $route);
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $this->assertGreaterThan(
@@ -18,21 +17,21 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /** @dataProvider authPages */
-    public function testAuthorizedPages(string $url): void
+    public function testAuthorizedPages(string $route): void
     {
-        $this->client->request('GET', $url);
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login'));
+        $this->client->request('GET', self::LOCALHOST . $route);
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::LOCALHOST . '/login'));
 
         $this->register($this->client);
 
-        $this->client->request('GET', $url);
+        $this->client->request('GET', $route);
         $this->assertFalse($this->client->getResponse()->isRedirect());
     }
 
     public function testProfileAuth(): void
     {
-        $this->client->request('GET', '/profile');
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login'));
+        $this->client->request('GET', self::LOCALHOST . '/profile');
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::LOCALHOST .'/login'));
 
         $nickname = $this->generateString();
         $this->register($this->client, $nickname);
@@ -45,7 +44,7 @@ class DefaultControllerTest extends WebTestCase
     public function unAuthUPages(): array
     {
         return [
-            ['/'],
+            [''],
             ['/trading'],
             ['/news'],
             ['/kb'],
@@ -61,6 +60,8 @@ class DefaultControllerTest extends WebTestCase
     {
         return [
             ['/token'],
+            ['/chat'],
+            ['/wallet'],
         ];
     }
 }

@@ -148,7 +148,7 @@ export const notificationTypes = {
     tokenMarketingTips: 'token_marketing_tips',
 };
 
-export const tabs = ['intro', 'buy', 'posts', 'trade', 'post'];
+export const tabs = ['intro', 'posts', 'trade', 'post'];
 
 export const descriptionLength = {
     min: 200,
@@ -170,4 +170,14 @@ export const currencyModes = {
         value: 'crypto',
         text: 'Crypto',
     },
+};
+
+export const currencies = {
+    WEB,
+    MINTME,
+    BTC,
+    TOK,
+    USD,
+    ETH,
+    USDC,
 };

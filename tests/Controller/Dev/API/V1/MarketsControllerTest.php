@@ -64,9 +64,17 @@ class MarketsControllerTest extends WebTestCase
         );
     }
 
-    public function testGetCurrenciesWithLimitAndOffset(): void
+    public function testGetMarketsWithLimitAndOffset(): void
     {
         $email = $this->register($this->client);
+        $tokName = $this->createToken($this->client);
+        $this->deployToken($tokName);
+
+        $fooClient = static::createClient();
+        $this->register($fooClient);
+        $fooTokenName = $this->createToken($fooClient);
+        $this->deployToken($fooTokenName);
+
         /** @var User $user */
         $user = $this->em->getRepository(User::class)->findOneBy([
            'email' => $email,
@@ -77,7 +85,7 @@ class MarketsControllerTest extends WebTestCase
 
         $this->client->request('GET', '/dev/api/v1/markets', [
             'offset' => 0,
-            'limit' => 4,
+            'limit' => 5,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
@@ -86,18 +94,19 @@ class MarketsControllerTest extends WebTestCase
 
         $this->client->request('GET', '/dev/api/v1/markets', [
             'offset' => 1,
-            'limit' => 4,
+            'limit' => 5,
         ], [], [
             'HTTP_X-API-ID' => $keys->getPublicKey(),
             'HTTP_X-API-KEY' => $keys->getPlainPrivateKey(),
         ]);
         $res2 = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(4, $res1);
-        $this->assertCount(4, $res2);
+        $this->assertCount(5, $res1);
+        $this->assertCount(5, $res2);
         $this->assertEquals($res1[0], $res2[0]);
         $this->assertEquals($res1[1], $res2[1]);
-        $this->assertNotEquals($res1[2], $res2[2]);
-        $this->assertEquals($res1[3], $res2[2]);
+        $this->assertEquals($res1[2], $res2[2]);
+        $this->assertNotEquals($res1[3], $res2[3]);
+        $this->assertEquals($res1[4], $res2[3]);
     }
 }

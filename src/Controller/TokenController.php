@@ -14,7 +14,6 @@ use App\Exception\RedirectException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\OrdersFactoryInterface;
-use App\Exchange\Factory\TradeInfoFactory;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
@@ -133,10 +132,7 @@ class TokenController extends Controller
      */
     public function donate(string $name): RedirectResponse
     {
-        return $this->redirectToRoute('token_show', [
-            'name' => $name,
-            'tab' => 'buy',
-        ]);
+        return $this->redirectToRoute('token_show', ['name' => $name]);
     }
 
     /**
@@ -185,7 +181,10 @@ class TokenController extends Controller
         ?string $tab,
         ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
+        if ((preg_match('/(intro)/', $request->getPathInfo()) &&
+            !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) ||
+            'buy' === $tab
+        ) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
@@ -462,18 +461,16 @@ class TokenController extends Controller
 
         $tokenDecimals = $token->getDecimals();
 
-        $tradeInfo = null;
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
+        $topHolders = null;
 
         if ('intro' === $tab) {
-            $tradeInfo = (new TradeInfoFactory(
-                $market,
-                $this->balanceHandler,
-                $this->marketHandler,
-                $this->parameterBag
-            ))->create();
+            $topHolders = $this->balanceHandler->topHolders(
+                $token,
+                $this->parameterBag->get('top_holders')
+            );
         }
-
-        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
 
         return $this->render(
             'pages/pair.html.twig',
@@ -509,8 +506,9 @@ class TokenController extends Controller
                 'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                     ? Token::TOKEN_SUBUNIT
                     : $tokenDecimals,
-                'tradeInfo' => $this->normalize($tradeInfo, ['API']),
+                'topHolders' => $this->normalize($topHolders, ['API']),
                 'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
+                'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
             ], $extraData)

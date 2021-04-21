@@ -5,6 +5,17 @@
     {% endspaceless %}
 {% endblock %}
 
+{% block head %}
+        <noscript>
+            <style>
+                [data-aos] {
+                    opacity: 1 !important;
+                    transform: translate(0) scale(1) !important;
+                }
+            </style>
+        </noscript>
+{% endblock %}
+
 {% block content %}
     <div class="container pt-4 text-white news">
         <div class="row justify-content-center">
@@ -27,6 +38,9 @@
                                 {% if post.image != null %}
                                     <div class="center-block text-center col-12">
                                         <a href="{{ url('sonata_news_view', { 'permalink': sonata_news_permalink(post) }) }}">
+                                            <noscript>
+                                                <img src="{% path post.image, 'wide' %}"/>
+                                            </noscript>
                                             <news-image src="{% path post.image, 'wide' %}" v-bind:query-number="{{i}}"></news-image>
                                         {% set i = i+1 %}
                                         </a>

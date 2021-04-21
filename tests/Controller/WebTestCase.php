@@ -14,6 +14,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class WebTestCase extends BaseWebTestCase
 {
+    protected const LOCALHOST = 'https://localhost';
     protected const DEFAULT_USER_PASS = 'Foo123456';
 
     /** @var EntityManagerInterface */
@@ -35,7 +36,7 @@ class WebTestCase extends BaseWebTestCase
     {
         $email = $this->generateEmail();
 
-        $client->request('GET', '/register/');
+        $client->request('GET', self::LOCALHOST . '/register/');
         $client->submitForm(
             'Sign Up',
             [
@@ -83,10 +84,8 @@ class WebTestCase extends BaseWebTestCase
     protected function createToken(Client $client): string
     {
         $name = $this->generateString(25);
-
-        $client->request('GET', '/token');
-
-        $csrfToken = $client->getContainer()->get('security.csrf.token_manager')->getToken('token_create');
+        $client->request('GET', self::LOCALHOST . '/token');
+        $csrfToken = $client->getCrawler()->filter('input[id="token_create__token"]')->attr('value');
 
         $formHtml = '
             <form method="post">
@@ -96,13 +95,13 @@ class WebTestCase extends BaseWebTestCase
                 <input type="submit" name="Create token" />
             </form>
         ';
-        $dom = new Crawler($formHtml, 'http://localhost/token');
-        $form = $dom->selectButton('Create token')->form([
+        $dom = new Crawler($formHtml, self::LOCALHOST . '/token');
+        $form = $dom->selectButton('Create token')->form();
+        $client->submit($form, [
             'token_create[name]' => $name,
             'token_create[description]' => str_repeat('a', 200),
             'token_create[_token]' => $csrfToken,
         ]);
-        $client->submit($form);
 
         return $name;
     }
@@ -147,5 +146,18 @@ class WebTestCase extends BaseWebTestCase
         if ($databasePlatform->supportsForeignKeyConstraints()) {
             $connection->query('SET FOREIGN_KEY_CHECKS=1');
         }
+    }
+
+    protected function deployToken(string $tokenName): void
+    {
+        /** @var Token $token */
+        $token = $this->em->getRepository(Token::class)->findOneBy([
+            'name' => $tokenName,
+        ]);
+        $token->setAddress('0x123');
+        $token->setDeployed(true);
+        $token->setDeployedDate(new \DateTimeImmutable());
+        $this->em->persist($token);
+        $this->em->flush();
     }
 }

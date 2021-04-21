@@ -41,6 +41,9 @@ chmod -R g+s /var/www/html/panel/
 php bin/console doctrine:database:create --if-not-exists
 php bin/console doctrine:migrations:migrate --allow-no-migration -n
 
+# generate translations
+php bin/console app:load-translations-ui
+
 # Starting internal services
 echo 'Starting crons...'
 php bin/console cron:start

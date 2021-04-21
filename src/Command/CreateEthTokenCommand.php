@@ -217,7 +217,8 @@ class CreateEthTokenCommand extends Command
         $token->setName($name)
             ->setAddress($tokenAddress)
             ->setExchangeCrypto($this->exchangeCrypto)
-            ->setDeployed(new \DateTimeImmutable())
+            ->setDeployedDate(new \DateTimeImmutable())
+            ->setDeployed(true)
             ->setCrypto($this->crypto)
             ->setProfile($profile)
             ->setFee(
