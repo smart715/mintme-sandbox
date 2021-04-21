@@ -175,28 +175,24 @@ class ProfileController extends Controller
             $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164):
             null;
 
-        $phoneChanged = false;
-        $verifyPhone = false;
+        $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
+        $verifyPhone = !!$oldPhoneE164 && !$profile->getPhoneNumber()->isVerified();
 
-        if ($phoneNumber) {
-            $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
-
-            $verifyPhone = $phoneChanged || !$profile->getPhoneNumber()->isVerified();
-
-            if ($verifyPhone) {
-                if (!$oldPhoneE164) {
-                    $profile->setPhoneNumber(new PhoneNumber());
-                    $profile->getPhoneNumber()->setProfile($profile);
-                }
-
+        if ($phoneChanged && $newPhoneE164) {
+            if (!$oldPhoneE164) {
+                $profile->setPhoneNumber(new PhoneNumber());
                 $profile->getPhoneNumber()->setProfile($profile);
-                $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
-                $profile->getPhoneNumber()->setVerified(false);
-                $profile->getPhoneNumber()->setVerificationCode(null);
             }
-        } elseif (!$oldPhoneE164) {
+
+            $profile->getPhoneNumber()->setProfile($profile);
+            $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
+            $profile->getPhoneNumber()->setVerified(false);
+            $profile->getPhoneNumber()->setVerificationCode(null);
+
+            $verifyPhone = true;
+        } elseif ($phoneChanged && !$newPhoneE164) {
             $profile->setPhoneNumber(null);
-            $phoneChanged = true;
+            $verifyPhone = false;
         }
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -216,16 +212,14 @@ class ProfileController extends Controller
 
         $this->userActionLogger->info('Edit profile');
 
-        if ($phoneChanged) {
-            if ($newPhoneE164) {
-                $this->userActionLogger->info(
-                    'Phone number changed. From: '.$oldPhoneE164. '. To: '.$newPhoneE164.' (not verified yet)'
-                );
-            } else {
-                $this->userActionLogger->info(
-                    'Phone number changed. From: '.$oldPhoneE164. '. To: NULL.'
-                );
-            }
+        if ($phoneChanged && $newPhoneE164) {
+            $this->userActionLogger->info(
+                'Phone number changed. From: '.$oldPhoneE164. '. To: '.$newPhoneE164.' (not verified yet)'
+            );
+        } elseif ($phoneChanged && !$newPhoneE164) {
+            $this->userActionLogger->info(
+                'Phone number changed. From: '.$oldPhoneE164. '. To: NULL.'
+            );
         }
 
         if ($verifyPhone) {
