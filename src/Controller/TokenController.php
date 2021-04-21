@@ -468,6 +468,7 @@ class TokenController extends Controller
 
         $topHolders = null;
         $serviceUnavailable = false;
+
         if ('intro' === $tab) {
             try {
                 $topHolders = $this->balanceHandler->topHolders(
