@@ -61,7 +61,7 @@ class GuzzleWrapper implements JsonRpcInterface
                 json_encode($requestParams) . " Error: " . $e->getCode() .". ". $e->getMessage()
             );
 
-            throw new FetchException($e->getMessage(), (int) $e->getCode());
+            return json_decode('{"message":"Service unavailable, try again later"}', true);
         }
     }
 
