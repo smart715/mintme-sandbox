@@ -22,10 +22,12 @@ export default {
 
             if (!this.getUseSellMarketPrice) {
                 this.setSellPriceInput(toMoney(order.price, this.basePrecision));
+                this.setSellPriceManuallyEdited(true);
             }
 
             if (!this.getUseBuyMarketPrice) {
                 this.setBuyPriceInput(toMoney(order.price, this.basePrecision));
+                this.setBuyPriceManuallyEdited(true);
             }
 
             this.setSellAmountInput(
@@ -45,6 +47,8 @@ export default {
             'setSellAmountInput',
             'setBuyPriceInput',
             'setBuyAmountInput',
+            'setSellPriceManuallyEdited',
+            'setBuyPriceManuallyEdited',
         ]),
     },
 };
