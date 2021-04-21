@@ -2,10 +2,8 @@
 
 namespace App\Exchange;
 
-use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\User;
 use App\Exchange\Trade\TradeResult;
-use App\Wallet\Money\MoneyWrapperInterface;
 
 interface ExchangerInterface
 {

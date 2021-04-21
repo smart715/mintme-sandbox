@@ -128,7 +128,7 @@ class MinOrderValidator implements ValidatorInterface
             ]
         );
 
-        return $totalOrderAmountInBase-> greaterThanOrEqual($minUsdInBase);
+        return $totalOrderAmountInBase->greaterThanOrEqual($minUsdInBase);
     }
 
     private function getMinUsdInBase(string $baseSymbol): Money

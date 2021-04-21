@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\User;
 use App\Events\OrderEvent;
 use App\Exchange\ExchangerInterface;
