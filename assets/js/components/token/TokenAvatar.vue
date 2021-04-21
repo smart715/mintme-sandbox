@@ -73,6 +73,7 @@ import Avatar from '../Avatar';
 import TokenName from './TokenName';
 import TokenDeployIcon from './deploy/TokenDeployIcon';
 import TokenPointsProgress from './TokenPointsProgress';
+import {NotificationMixin} from '../../mixins';
 import {mapMutations} from 'vuex';
 
 export default {
@@ -128,7 +129,9 @@ export default {
     },
     mounted() {
         this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
-        this.notifyError(this.$t('toasted.error.service_unavailable'));
+        if (this.serviceUnavailable) {
+            this.notifyError(this.$t('toasted.error.service_unavailable'));
+        }
     },
     methods: {
         ...mapMutations('tokenStatistics', [

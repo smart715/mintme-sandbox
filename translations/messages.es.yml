@@ -100,9 +100,6 @@ page.error.404.body: 'La página solicitada no pudo ser localizada. Revise si ha
 page.error.500.title: '500 - Error Interno del Servidor'
 page.error.500.header: 'Error Interno del Servidor'
 page.error.500.body: 'Algo está mal. Por favor, háganos saber lo que estaba haciendo cuando ocurrió este error. Lo arreglaremos lo antes posible. Disculpe las molestias causadas.'
-page.error.503.title:
-page.error.503.header:
-page.error.503.body:
 page.news.title: Noticias
 page.news.read_more: 'Leer más'
 page.news.current: 'Leer más'
