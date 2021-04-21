@@ -469,10 +469,13 @@ class TokenController extends Controller
         $topHolders = null;
 
         if ('intro' === $tab) {
-            $topHolders = $this->balanceHandler->topHolders(
-                $token,
-                $this->parameterBag->get('top_holders')
-            );
+            try {
+                $topHolders = $this->balanceHandler->topHolders(
+                    $token,
+                    $this->parameterBag->get('top_holders')
+                );
+            } catch (\Throwable $e) {
+            }
         }
 
         return $this->render(
