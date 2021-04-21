@@ -124,6 +124,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception instanceof FetchException) {
             throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
+        }
 
         if ($exception instanceof AccessDeniedHttpException &&
             $this->authorizationChecker->isGranted('ROLE_USER')
