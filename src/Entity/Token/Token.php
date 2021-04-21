@@ -310,7 +310,7 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /**
-     * @Groups({"Default"})
+     * @Groups({"Default", "API"})
      * @return int
      */
     public function getHoldersCount(): int
