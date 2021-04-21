@@ -50,12 +50,12 @@
                             />
                             <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
                                 {{ $t('trade.sell_order.your.header') }}
-                                <span>
-                                    <span v-if="shouldTruncate" class="c-pointer" @click="balanceClicked"
+                                <span class="c-pointer" @click="balanceClicked">
+                                    <span v-if="shouldTruncate"
                                         v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'window', customClass:'tooltip-custom'}">
                                         {{ market.quote | rebranding | truncate(17) }} :
                                     </span>
-                                    <span v-else class="c-pointer" @click="balanceClicked">
+                                    <span v-else>
                                         {{ market.quote | rebranding }} :
                                     </span>
                                     <span class="text-white">
@@ -220,7 +220,6 @@ export default {
         signupUrl: String,
         loggedIn: Boolean,
         market: Object,
-        marketPrice: [Number, String],
         balance: [String, Boolean],
         isOwner: Boolean,
         balanceLoaded: Boolean,
@@ -231,18 +230,14 @@ export default {
         return {
             action: 'sell',
             placingOrder: false,
-            balanceManuallyEdited: false,
             USD,
             currencyModes,
         };
     },
     methods: {
-        setBalanceManuallyEdited: function(val = true) {
-            this.balanceManuallyEdited = val;
-        },
         checkPriceInput() {
             this.$emit('check-input', this.market.base.subunit);
-            this.setBalanceManuallyEdited(true);
+            this.priceManuallyEdited = true;
         },
         checkAmountInput() {
             this.$emit(
@@ -269,10 +264,10 @@ export default {
 
                 this.placingOrder = true;
                 let data = {
-                    'amountInput': toMoney(this.sellAmount, this.market.quote.subunit),
-                    'priceInput': toMoney(this.sellPrice, this.market.base.subunit),
-                    'marketPrice': this.useMarketPrice,
-                    'action': this.action,
+                    amountInput: toMoney(this.sellAmount, this.market.quote.subunit),
+                    priceInput: toMoney(this.sellPrice, this.market.base.subunit),
+                    marketPrice: this.useMarketPrice,
+                    action: this.action,
                 };
                 this.$axios.single.post(this.$routing.generate('token_place_order', {
                     base: this.market.base.symbol,
@@ -301,8 +296,6 @@ export default {
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.sellPrice = this.price || 0;
-            } else {
-                this.sellPrice = 0;
             }
 
             if (this.disabledMarketPrice) {
@@ -315,17 +308,21 @@ export default {
                 return;
             }
 
-            if (!this.balanceManuallyEdited || !parseFloat(this.sellPrice)) {
-                this.sellPrice = toMoney(this.price || 0, this.market.base.subunit);
-                this.setBalanceManuallyEdited(false);
+            if (!this.priceManuallyEdited || !parseFloat(this.sellPrice)) {
+                this.sellPrice = this.price;
+                this.priceManuallyEdited = false;
             }
 
+            this.fillAmount();
+        },
+        fillAmount() {
             this.sellAmount = toMoney(this.immutableBalance, this.market.quote.subunit);
         },
         ...mapMutations('tradeBalance', [
             'setSellPriceInput',
             'setSellAmountInput',
             'setUseSellMarketPrice',
+            'setSellPriceManuallyEdited',
         ]),
     },
     computed: {
@@ -353,7 +350,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0 || !this.loggedIn;
+            return this.marketPrice <= 0 || !this.loggedIn;
         },
         translationsContext: function() {
             return {
@@ -368,7 +365,11 @@ export default {
             'getSellAmountInput',
             'getQuoteBalance',
             'getUseSellMarketPrice',
+            'getSellPriceManuallyEdited',
         ]),
+        ...mapGetters('orders', {
+            buyOrders: 'getBuyOrders',
+        }),
         sellPrice: {
             get() {
                 return this.getSellPriceInput;
@@ -398,10 +399,40 @@ export default {
                 this.setUseSellMarketPrice(val);
             },
         },
+        priceManuallyEdited: {
+            get() {
+                return this.getSellPriceManuallyEdited;
+            },
+            set(val) {
+                this.setSellPriceManuallyEdited(val);
+            },
+        },
+        marketPrice() {
+            let tokenAmount = new Decimal(0);
+            let balance = new Decimal(this.immutableBalance).toDecimalPlaces(this.market.quote.subunit, Decimal.ROUND_DOWN);
+
+            let result = this.buyOrders[0] ? this.buyOrders[this.buyOrders.length - 1].price : 0;
+
+            for (let order of this.buyOrders) {
+                tokenAmount = tokenAmount.add(order.amount);
+
+                if (balance.lessThanOrEqualTo(tokenAmount)) {
+                    result = order.price;
+
+                    break;
+                }
+            }
+
+            return result;
+        },
     },
     watch: {
-        useMarketPrice: function() {
+        useMarketPrice: function(newVal) {
             this.updateMarketPrice();
+
+            if (!newVal) {
+                this.resetOrder();
+            }
         },
         marketPrice: function() {
             this.updateMarketPrice();

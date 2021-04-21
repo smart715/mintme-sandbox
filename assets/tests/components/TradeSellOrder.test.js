@@ -4,6 +4,7 @@ import Axios from '../../js/axios';
 import moxios from 'moxios';
 import Vuex from 'vuex';
 import tradeBalance from '../../js/storage/modules/trade_balance';
+import orders from '../../js/storage/modules/orders';
 
 /**
  * @return {Wrapper<Vue>}
@@ -20,24 +21,26 @@ function mockVue() {
     return localVue;
 }
 
+const localVue = mockVue();
+const store = new Vuex.Store({
+    modules: {
+        tradeBalance,
+        orders,
+        websocket: {
+            namespaced: true,
+            actions: {
+                addMessageHandler: () => {},
+            },
+        },
+    },
+});
+
 /**
  * @param {number} balance
  * @return {Wrapper<Vue>}
  */
 function mockVm(balance = 1) {
-    const localVue = mockVue();
     const $routing = {generate: () => 'URL'};
-    const store = new Vuex.Store({
-        modules: {
-            tradeBalance,
-            websocket: {
-                namespaced: true,
-                actions: {
-                    addMessageHandler: () => {},
-                },
-            },
-        },
-    });
 
     return shallowMount(TradeSellOrder, {
         store,
@@ -117,10 +120,11 @@ describe('TradeSellOrder', () => {
 
     describe('useMarketPrice', () => {
         it('should be disabled if marketPrice not greater than zero', () => {
-            wrapper.setProps({marketPrice: 0});
             expect(wrapper.vm.disabledMarketPrice).toBe(true);
-            wrapper.setProps({marketPrice: 2});
+            store.commit('orders/setBuyOrders', [{price: 2, amount: 1}]);
             expect(wrapper.vm.disabledMarketPrice).toBe(false);
+
+            store.commit('orders/setBuyOrders', []);
         });
 
         it('should be unchecked if it is disabled', () => {
@@ -139,28 +143,24 @@ describe('TradeSellOrder', () => {
         expect(wrapper.vm.sellPrice).toBe(0);
         expect(wrapper.vm.sellAmount).toBe(0);
 
-        wrapper.setProps({marketPrice: 1});
+        store.commit('orders/setBuyOrders', [{price: 1, amount: 1}]);
         wrapper.vm.sellAmount = 2;
         wrapper.vm.useMarketPrice = true;
         wrapper.vm.resetOrder();
         expect(wrapper.vm.sellPrice).toBe('1');
         expect(wrapper.vm.sellAmount).toBe(0);
+
+        store.commit('orders/setBuyOrders', []);
     });
 
     it('should update market price properly', () => {
-        wrapper.vm.sellPrice = 1.5;
-        wrapper.vm.useMarketPrice = false;
-        wrapper.vm.updateMarketPrice();
-        expect(wrapper.vm.sellPrice).toBe(0);
-
-        wrapper.setProps({marketPrice: '7.0'});
+        store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
         wrapper.vm.useMarketPrice = true;
         wrapper.vm.updateMarketPrice();
         expect(wrapper.vm.sellPrice).toBe('7');
 
-        wrapper.setProps({marketPrice: 0});
+        store.commit('orders/setBuyOrders', []);
         wrapper.vm.useMarketPrice = true;
-        wrapper.setProps({disabledMarketPrice: true});
         wrapper.vm.updateMarketPrice();
         expect(wrapper.vm.sellPrice).toBe(0);
         expect(wrapper.vm.useMarketPrice).toBe(false);
@@ -175,50 +175,58 @@ describe('TradeSellOrder', () => {
 
         it('should add all the balance to the amount input', () => {
             wrapper = mockVm(5);
-            wrapper.setProps({marketPrice: 7});
+            store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).toBe('5');
             expect(wrapper.vm.sellPrice).toBe('7');
+
+            store.commit('orders/setBuyOrders', []);
         });
 
         it('shouldn\'t add price if the price edited manually', () => {
             wrapper = mockVm(5);
-            wrapper.setProps({marketPrice: 7});
+            store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.sellPrice = 2;
-            wrapper.vm.balanceManuallyEdited = true;
+            wrapper.vm.priceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).toBe('5');
             expect(wrapper.vm.sellPrice).toBe(2);
+
+            store.commit('orders/setBuyOrders', []);
         });
 
-        it('should add price if the price edited manually but has 0 value', () => {
+        it('should change price if the price edited manually but has 0 value', () => {
             wrapper.vm.immutableBalance = 5;
-            wrapper.setProps({marketPrice: 7});
+            store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.sellPrice = '000';
-            wrapper.vm.balanceManuallyEdited = false;
+            wrapper.vm.priceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).toBe('5');
             expect(wrapper.vm.sellPrice).toBe('7');
+
+            store.commit('orders/setBuyOrders', []);
         });
 
         it('should add price if the price edited manually but has null value', () => {
             // wrapper.vm.immutableBalance = 5;
             // wrapper.setProps({balance: 5});
-            wrapper.setProps({marketPrice: 7});
+            store.commit('orders/setBuyOrders', [{price: 7, amount: 1}]);
             wrapper.vm.sellPrice = null;
-            wrapper.vm.balanceManuallyEdited = false;
+            wrapper.vm.priceManuallyEdited = true;
             wrapper.vm.balanceClicked(event);
 
             expect(wrapper.vm.sellAmount).toBe('5');
             expect(wrapper.vm.sellPrice).toBe('7');
+
+            store.commit('orders/setBuyOrders', []);
         });
 
         it('Deposit more link click - should not add the balance to the amount input, price/amount not changing', () => {
             wrapper.vm.immutableBalance = 50;
-            wrapper.setProps({marketPrice: 17});
+            store.commit('orders/setBuyOrders', [{price: 17, amount: 1}]);
             wrapper.vm.sellAmount = '0';
             wrapper.vm.sellPrice = '0';
             event.target.tagName = 'a';
@@ -226,6 +234,8 @@ describe('TradeSellOrder', () => {
 
             expect(wrapper.vm.sellAmount).toBe('0');
             expect(wrapper.vm.sellPrice).toBe('0');
+
+            store.commit('orders/setBuyOrders', []);
         });
     });
 });
