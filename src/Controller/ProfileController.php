@@ -148,8 +148,11 @@ class ProfileController extends Controller
         }
 
         $clonedProfile = clone $profile;
-        $form = $this->createForm(ProfileType::class, $profile);
-
+        $form = $this->createForm(
+            ProfileType::class,
+            $profile,
+            ['had_phone_number' => (bool)$profile->getPhoneNumber()]
+        );
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -171,14 +174,17 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->getPhoneNumber(),
             PhoneNumberFormat::E164
         ) : null;
+
         $newPhoneE164 = $phoneNumber ?
             $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164):
             null;
 
         $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
-        $verifyPhone = !!$oldPhoneE164 && !$profile->getPhoneNumber()->isVerified();
 
-        if ($phoneChanged && $newPhoneE164) {
+        $verifyPhone = $phoneChanged ||
+            ((bool)$oldPhoneE164 && !$profile->getPhoneNumber()->isVerified());
+
+        if ($verifyPhone) {
             if (!$oldPhoneE164) {
                 $profile->setPhoneNumber(new PhoneNumber());
                 $profile->getPhoneNumber()->setProfile($profile);
@@ -188,11 +194,6 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->setPhoneNumber($phoneNumber);
             $profile->getPhoneNumber()->setVerified(false);
             $profile->getPhoneNumber()->setVerificationCode(null);
-
-            $verifyPhone = true;
-        } elseif ($phoneChanged && !$newPhoneE164) {
-            $profile->setPhoneNumber(null);
-            $verifyPhone = false;
         }
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -212,13 +213,9 @@ class ProfileController extends Controller
 
         $this->userActionLogger->info('Edit profile');
 
-        if ($phoneChanged && $newPhoneE164) {
+        if ($phoneChanged) {
             $this->userActionLogger->info(
                 'Phone number changed. From: '.$oldPhoneE164. '. To: '.$newPhoneE164.' (not verified yet)'
-            );
-        } elseif ($phoneChanged && !$newPhoneE164) {
-            $this->userActionLogger->info(
-                'Phone number changed. From: '.$oldPhoneE164. '. To: NULL.'
             );
         }
 
@@ -246,7 +243,11 @@ class ProfileController extends Controller
         $user = $this->getUser();
 
         $profile  = new Profile($user);
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->createForm(
+            ProfileType::class,
+            $profile,
+            ['had_phone_number' => (bool)$profile->getPhoneNumber()]
+        );
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {

@@ -49,9 +49,26 @@ class EditPhoneNumberValidator extends ConstraintValidator
     {
         $oldPhoneNumber = $this->user->getProfile()->getPhoneNumber();
 
+        if (!$value) {
+            if ($oldPhoneNumber) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{message}}', $this->translator->trans('phone_number.already_registered'))
+                    ->addViolation();
+            }
+
+            return;
+        }
+
+        $newPhoneEntity = $this->phoneNumberManager->findVerifiedPhoneNumber($value);
+
+        if ($newPhoneEntity && $oldPhoneNumber !== $newPhoneEntity) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{message}}', $this->translator->trans('phone_number.in_use'))
+                ->addViolation();
+        }
+
         if (!$oldPhoneNumber ||
             !$oldPhoneNumber->getEditDate() ||
-            !$value ||
             $this->numberUtil->format($value, PhoneNumberFormat::E164) ===
             $this->numberUtil->format($oldPhoneNumber->getPhoneNumber(), PhoneNumberFormat::E164)
         ) {
@@ -68,14 +85,6 @@ class EditPhoneNumberValidator extends ConstraintValidator
         ) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{message}}', $this->translator->trans('phone_number.edit.limit'))
-                ->addViolation();
-        }
-
-        $newPhoneEntity = $this->phoneNumberManager->findVerifiedPhoneNumber($value);
-
-        if ($newPhoneEntity && $oldPhoneNumber !== $newPhoneEntity) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{message}}', $this->translator->trans('phone_number.in_use'))
                 ->addViolation();
         }
     }

@@ -43,6 +43,7 @@ new Vue({
             lastNameAux: false,
             isValidPhone: false,
             enablePhoneMessage: false,
+            isPhoneRequired: true,
             phoneNumber: null,
         };
     },
@@ -55,6 +56,7 @@ new Vue({
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
+        this.isPhoneRequired = !!this.phoneNumber;
 
         if (this.$refs.city) {
             this.city = this.$refs.city.getAttribute('value');
@@ -148,7 +150,9 @@ new Vue({
     },
     computed: {
         disableSave: function() {
-            const isPhoneFieldInvalid = !!this.phoneNumber && !this.isValidPhone;
+            const isPhoneFieldInvalid = this.isPhoneRequired ?
+                                        !this.isValidPhone :
+                                        (!!this.phoneNumber && !this.isValidPhone);
 
             return this.$v.$invalid ||
                 !this.zipCodeValid ||
