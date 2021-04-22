@@ -367,17 +367,7 @@ class ExchangerTest extends TestCase
     {
         return $this->createMock(TranslatorInterface::class);
     }
-
-    private function mockMoneyWrapper(): MoneyWrapperInterface
-    {
-        $mw = $this->createMock(MoneyWrapperInterface::class);
-        $mw->method('parse')->willReturnCallback(function (string $amount, string $symbol): Money {
-            return new Money($amount, new Currency($symbol));
-        });
-
-        return $mw;
-    }
-
+    
     /** @return CryptoRatesFetcherInterface|MockObject */
     private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
     {
