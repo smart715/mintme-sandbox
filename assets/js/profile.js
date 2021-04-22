@@ -151,8 +151,8 @@ new Vue({
     computed: {
         disableSave: function() {
             const isPhoneFieldInvalid = this.isPhoneRequired ?
-                                        !this.isValidPhone :
-                                        (!!this.phoneNumber && !this.isValidPhone);
+                !this.isValidPhone :
+                !!this.phoneNumber && !this.isValidPhone;
 
             return this.$v.$invalid ||
                 !this.zipCodeValid ||
