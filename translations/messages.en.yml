@@ -1391,6 +1391,7 @@ phone_number.add.limit_weekly: 'You have reached the limit for this week, please
 phone_number.add.limit_monthly: 'You have reached the limit for this month, please try to add phone number next month'
 phone_confirmation.sent: 'Sent'
 phone_number.edit.limit: 'You can edit phone number only once per month'
+phone_number.already_registered: 'You already had a phone number registered, phone field can''t be empty'
 phone_number.in_use: 'This phone number is already in use'
 activity_0_message: '<a href="%tokenUrl%">%token%</a> airdropped %amount% %symbol% to <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> started an airdrop'
