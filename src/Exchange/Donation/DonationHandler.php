@@ -135,10 +135,12 @@ class DonationHandler implements DonationHandlerInterface
             $donationMintmeAmount = $this->getCryptoWorthInMintme($pendingSellOrders, $donationMintmeAmount);
         }
 
-        // Check how many tokens will recieve user and how many MINTME he should spend
+        $donationMintmeAmountWithSubstractedOrdersFee = $this->subtractOrdersFeeFromAmount($donationMintmeAmount);
+
+            // Check how many tokens will recieve user and how many MINTME he should spend
         $checkDonationResult = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $this->moneyWrapper->format($this->subtractOrdersFeeFromAmount($donationMintmeAmount)),
+            $this->moneyWrapper->format($donationMintmeAmountWithSubstractedOrdersFee),
             $this->donationConfig->getFee(),
             $tokenCreator->getId()
         );
@@ -195,11 +197,11 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            $donationAmountLeft = $this
-                ->subtractOrdersFeeFromAmount($donationMintmeAmount)
-                ->subtract($tokensWorthInMintme);
-            $feeFromDonationAmount = $this->calculateFee($donationAmountLeft);
-            $amountToDonate = $donationAmountLeft->subtract($feeFromDonationAmount);
+            $feeFromDonationAmount = $this->calculateFee($tokensWorthInMintme);
+            $tokensWorthInMintmeWithSubtractedFee = $tokensWorthInMintme->subtract($feeFromDonationAmount);
+            $amountToDonate = $donationMintmeAmountWithSubstractedOrdersFee
+                ->subtract($tokensWorthInMintmeWithSubtractedFee);
+            $donationAmountLeft = $donationMintmeAmountWithSubstractedOrdersFee->subtract($tokensWorthInMintme);
 
             $this->sendAmountFromUserToUser(
                 $donorUser,
@@ -404,11 +406,7 @@ class DonationHandler implements DonationHandlerInterface
             throw new ApiBadRequestException('Crypto market doesn\'t have enough orders.');
         }
 
-        return $this->moneyWrapper->parse(
-            (string)BigDecimal::of($this->moneyWrapper->format($mintmeWorth))
-                ->dividedBy('1', 4, RoundingMode::DOWN),
-            Symbols::WEB
-        );
+        return $mintmeWorth;
     }
 
     private function calculateFee(Money $amount): Money
