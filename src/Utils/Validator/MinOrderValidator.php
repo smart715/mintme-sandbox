@@ -98,16 +98,11 @@ class MinOrderValidator implements ValidatorInterface
     private function validMinUSD(TradebleInterface $base): bool
     {
         $baseSymbol = $base->getSymbol();
-        $price = $this->moneyWrapper->parse($this->price, Symbols::TOK);
+        $price = $this->moneyWrapper->parse($this->price, $baseSymbol);
         $amount = $this->moneyWrapper->parse($this->amount, Symbols::TOK);
 
-        $totalOrderAmount = $price->multiply(
+        $totalOrderAmountInBase = $price->multiply(
             $this->moneyWrapper->format($amount)
-        );
-
-        $totalOrderAmountInBase = $this->moneyWrapper->parse(
-            $this->moneyWrapper->format($totalOrderAmount),
-            $baseSymbol
         );
 
         $minUsdInBase = $this->getMinUsdInBase($baseSymbol);
