@@ -148,6 +148,7 @@
                     current-locale="{{ currentLocale }}"
                     :show-airdrop-modal="{{ showAirdropModal }}"
                     profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                    :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
