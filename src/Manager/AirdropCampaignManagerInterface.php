@@ -24,4 +24,5 @@ interface AirdropCampaignManagerInterface
     public function createAction(string $action, ?string $actionData, Airdrop $airdrop): void;
     public function claimAirdropAction(AirdropAction $action, User $user): void;
     public function checkIfUserCompletedActions(Airdrop $airdrop, User $user): bool;
+    public function claimAirdropsActionsFromSessionData(User $user): void;
 }
