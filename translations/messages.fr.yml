@@ -1376,3 +1376,5 @@ mail.airdrop_claimed.message_2: 'Utiliser un lien de parrainage d''airdrop et ga
 mail.airdrop_claimed.message_3: 'Vous pouvez également gagner en partageant <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">posts</a> avec un ensemble de récompense.'
 modal.add_phone_alert.airdrop: 'Afin de collecter des récompenses vous devez ajouter un numéro de téléphone à votre <a href="%profileUrl%">profil</a>.'
 confirm_modal.continue:
+ongoing_airdrop.claim.login_to_complete: ''
+ongoing_airdrop.claim: ''

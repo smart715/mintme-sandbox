@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Mailer\MailerInterface;
+use App\Manager\AirdropCampaignManagerInterface;
 use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -50,6 +52,8 @@ class RegistrationController extends FOSRegistrationController
     private string $mintmeHostPath;
     private AirdropReferralCodeManagerInterface $arcManager;
     private RefererRequestHandlerInterface $refererRequestHandler;
+    private AirdropCampaignManagerInterface $airdropCampaignManager;
+    private SessionInterface $session;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -67,7 +71,9 @@ class RegistrationController extends FOSRegistrationController
         string $mintmeHostPrice,
         string $mintmeHostPath,
         AirdropReferralCodeManagerInterface $arcManager,
-        RefererRequestHandlerInterface $refererRequestHandler
+        RefererRequestHandlerInterface $refererRequestHandler,
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        SessionInterface $session
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -83,7 +89,8 @@ class RegistrationController extends FOSRegistrationController
         $this->mintmeHostPrice =$mintmeHostPrice;
         $this->mintmeHostPath = $mintmeHostPath;
         $this->arcManager = $arcManager;
-
+        $this->airdropCampaignManager = $airdropCampaignManager;
+        $this->session = $session;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
         $this->refererRequestHandler = $refererRequestHandler;
     }
@@ -243,6 +250,8 @@ class RegistrationController extends FOSRegistrationController
             $this->mintmeHostFreeDays,
             $this->mintmeHostPath
         );
+
+        $this->airdropCampaignManager->claimAirdropsActionsFromSessionData($user);
 
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
