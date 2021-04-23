@@ -50,18 +50,17 @@
                     </template>
                     <confirm-modal
                         :visible="showModal"
-                        :button-disabled="loggedIn && !isOwner && !userAlreadyClaimed && !actionsCompleted"
+                        :button-disabled="!isOwner && !userAlreadyClaimed && !actionsCompleted"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
                         :show-image="false"
                         @confirm="modalOnConfirm"
-                        @cancel="modalOnCancel"
                         @close="showModal = false"
                     >
                         <div class="d-flex flex-column align-items-center">
                             <p class="text-white modal-title pt-2 pb-4">
                                 {{ confirmModalMessage }}
                             </p>
-                            <div class="w-75" v-if="loggedIn && !isOwner && actionsLength > 0 && !alreadyClaimed && loaded">
+                            <div class="w-75" v-if="!isOwner && actionsLength > 0 && !alreadyClaimed && loaded">
                                 <div class="d-flex my-3" v-if="airdropCampaign.actions.twitterMessage">
                                     <font-awesome-layers class="mt-1">
                                         <font-awesome-icon icon="circle" size="lg" transform="grow-4" class="icon-blue"/>
@@ -218,8 +217,7 @@
                                 </div>
                             </div>
                         </div>
-                        <template v-if="!loggedIn" v-slot:cancel>Sign up</template>
-                        <template v-if="!loggedIn || isOwner || timeElapsed" v-slot:confirm>
+                        <template v-if="isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
                     </confirm-modal>
@@ -249,15 +247,26 @@
             :message="addPhoneModalMessage"
             @close="addPhoneModalVisible = false"
         />
+        <modal :visible="loginShowModal" @close="loginShowModal = false">
+            <div slot="header">
+                {{ $t('ongoing_airdrop.claim') }}
+            </div>
+            <div slot="body">
+                <p>{{ $t('ongoing_airdrop.claim.login_to_complete') }}</p>
+                <login-signup-switcher :google-recaptcha-site-key="googleRecaptchaSiteKey"/>
+            </div>
+        </modal>
     </div>
 </template>
 
 <script>
+import LoginSignupSwitcher from '../../../components/LoginSignupSwitcher';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
+import Modal from '../../modal/Modal';
 import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin} from '../../../mixins';
-import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED} from '../../../utils/constants';
+import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
@@ -277,6 +286,8 @@ export default {
     ],
     components: {
         ConfirmModal,
+        LoginSignupSwitcher,
+        Modal,
         CopyLink,
         AddPhoneAlertModal,
     },
@@ -291,10 +302,12 @@ export default {
         currentLocale: String,
         showAirdropModal: Boolean,
         profileNickname: String,
+        googleRecaptchaSiteKey: String,
     },
     data() {
         return {
             showModal: false,
+            loginShowModal: false,
             airdropCampaign: null,
             loaded: false,
             btnDisabled: false,
@@ -314,7 +327,6 @@ export default {
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
-
         this.showModal = this.showAirdropModal;
     },
     computed: {
@@ -373,10 +385,6 @@ export default {
         confirmButtonText: function() {
             let button = '';
 
-            if (!this.loggedIn) {
-                button = this.$t('log_in');
-            }
-
             if (this.isOwner || this.timeElapsed) {
                 button = 'OK';
             }
@@ -384,13 +392,6 @@ export default {
             return button;
         },
         confirmModalMessage: function() {
-            if (!this.loggedIn) {
-                return this.$t('ongoing_airdrop.confirm_message.logged_in', {
-                    airdropReward: this.airdropReward,
-                    tokenName: this.tokenName,
-                });
-            }
-
             if (this.isOwner) {
                 return this.$t('ongoing_airdrop.confirm_message.cant_participate');
             }
@@ -486,6 +487,26 @@ export default {
         showModalOnClick: function() {
             this.showModal = !this.isOwner;
         },
+        updateAirdropActionFromSession: function() {
+          this.$axios.retry.get(this.$routing.generate('get_airdrop_completed_actions', {
+              tokenName: this.tokenName,
+          }))
+              .then((result) => {
+                  if (!result.data) {
+                      return;
+                  }
+                  for (let action in this.airdropCampaign.actions) {
+                      if (this.airdropCampaign.actions.hasOwnProperty(action)) {
+                          this.airdropCampaign.actions[action].done =
+                              result.data.includes(this.airdropCampaign.actions[action].id);
+                      }
+                  }
+              })
+              .catch((err) => {
+                  this.notifyError(this.$t('toasted.error.try_reload'));
+                  this.sendLogs('error', 'Can not load airdrop campaign.', err);
+              });
+        },
         showCountdown: function() {
             this.duration = moment.duration(this.duration - 1000, 'milliseconds');
             if (this.duration.asMilliseconds() <= 0) {
@@ -508,6 +529,9 @@ export default {
                     this.loaded = true;
                     this.showCountdown();
                     this.countdownInterval();
+                    if (!this.loggedIn) {
+                        this.updateAirdropActionFromSession();
+                    }
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_reload'));
@@ -516,15 +540,15 @@ export default {
         },
         modalOnConfirm: function() {
             if (!this.loggedIn) {
-                window.location.replace(this.loginUrl);
+                this.showModal = false;
+                this.loginShowModal = true;
                 return;
             }
-
             if (this.isOwner || this.timeElapsed || !this.actionsCompleted) {
                 return;
             }
 
-            this.alreadyClaimed = true;
+           this.alreadyClaimed = true;
 
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
@@ -560,14 +584,22 @@ export default {
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
                 });
         },
-        modalOnCancel: function() {
-            if (!this.loggedIn) {
-                window.location.replace(this.signupUrl);
-            }
-        },
         claimAction(action) {
             if (action.done) {
                 return;
+            }
+            if (!this.loggedIn) {
+                let data = {
+                    tokenName: this.tokenName,
+                    actionId: action.id,
+                };
+               return this.$axios.single.post(this.$routing.generate('claim_airdrop_action_for_guest_user'), data)
+                    .then(() => {
+                        action.done = true;
+                    }).catch((err) => {
+                        this.notifyError(this.$t('ongoing_airdrop.actions.claim_error'));
+                        this.sendLogs('error', 'Error claiming action fot he guest user', err);
+                    });
             }
 
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_action', {
