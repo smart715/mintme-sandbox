@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -302,6 +303,8 @@ class TokenController extends Controller
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
+
+                    throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
                 }
             }
         }
@@ -464,12 +467,17 @@ class TokenController extends Controller
         $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
 
         $topHolders = null;
+        $serviceUnavailable = false;
 
         if ('intro' === $tab) {
-            $topHolders = $this->balanceHandler->topHolders(
-                $token,
-                $this->parameterBag->get('top_holders')
-            );
+            try {
+                $topHolders = $this->balanceHandler->topHolders(
+                    $token,
+                    $this->parameterBag->get('top_holders')
+                );
+            } catch (\Throwable $e) {
+                $serviceUnavailable = true;
+            }
         }
 
         return $this->render(
@@ -511,6 +519,7 @@ class TokenController extends Controller
                 'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
+                'serviceUnavailable' => $serviceUnavailable,
             ], $extraData)
         );
     }

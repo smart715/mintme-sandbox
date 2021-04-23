@@ -73,10 +73,14 @@ import Avatar from '../Avatar';
 import TokenName from './TokenName';
 import TokenDeployIcon from './deploy/TokenDeployIcon';
 import TokenPointsProgress from './TokenPointsProgress';
+import {NotificationMixin} from '../../mixins';
 import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenAvatar',
+    mixins: [
+        NotificationMixin,
+    ],
     props: {
         isOwner: Boolean,
         hasReleasePeriodProp: Boolean,
@@ -118,6 +122,7 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        serviceUnavailable: Boolean,
     },
     components: {
         Avatar,
@@ -127,6 +132,9 @@ export default {
     },
     mounted() {
         this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
+        if (this.serviceUnavailable) {
+            this.notifyError(this.$t('toasted.error.service_unavailable'));
+        }
     },
     methods: {
         ...mapMutations('tokenStatistics', [
