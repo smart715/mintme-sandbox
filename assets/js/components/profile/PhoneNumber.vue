@@ -33,11 +33,10 @@ export default {
     props: {
         countryCode: String,
         phoneNumber: String,
-        enableValidMsg: Boolean,
     },
     computed: {
         showValidationMessage: function() {
-            return false === this.isValid && (this.phone || this.enableValidMsg);
+            return !!this.phone && !this.isValidNumber;
         },
         phoneNumberModel: {
             set: function(phone) {
@@ -47,9 +46,6 @@ export default {
             get: function() {
                 return this.phone;
             },
-        },
-        isValid: function() {
-            return this.isValidNumber;
         },
         translations() {
             return {
