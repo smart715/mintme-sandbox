@@ -95,6 +95,7 @@
                 :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.getDeployed | json_encode}})"
                 :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
                 mintme-explorer-url="{{ global_mintme_explorer_url }}"
+                :service-unavailable="{{ serviceUnavailable ? 'true' : 'false' }}"
             ></token-avatar>
             <token-social-media-icons
                 youtube-client-id="{{ global_youtube_client_id }}"
@@ -148,6 +149,7 @@
                     current-locale="{{ currentLocale }}"
                     :show-airdrop-modal="{{ showAirdropModal }}"
                     profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                    :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
                 ></token-ongoing-airdrop-campaign>
                 {% if isTokenPage %}
                     <b-tab
