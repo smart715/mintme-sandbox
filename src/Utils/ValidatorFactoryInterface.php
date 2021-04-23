@@ -13,9 +13,7 @@ interface ValidatorFactoryInterface
     public function createOrderValidator(
         Market $market,
         string $price,
-        string $amount,
-        MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        string $amount
     ): ValidatorInterface;
     public function createMinAmountValidator(TradebleInterface $tradeble, string $amount): ValidatorInterface;
     public function createBTCAddressValidator(string $address): ValidatorInterface;

@@ -19,18 +19,23 @@ class ValidatorFactory implements ValidatorFactoryInterface
 {
     public string $minimalPriceOrder;
     private TranslatorInterface $translator;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
 
-    public function __construct(TranslatorInterface $translator)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
+    ) {
         $this->translator = $translator;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
     }
 
     public function createOrderValidator(
         Market $market,
         string $price,
-        string $amount,
-        MoneyWrapperInterface $moneyWrapper,
-        CryptoRatesFetcherInterface $cryptoRatesFetcher
+        string $amount
     ): ValidatorInterface {
         return new MinOrderValidator(
             $market->getBase(),
@@ -38,8 +43,8 @@ class ValidatorFactory implements ValidatorFactoryInterface
             $price,
             $amount,
             $this->minimalPriceOrder,
-            $moneyWrapper,
-            $cryptoRatesFetcher,
+            $this->moneyWrapper,
+            $this->cryptoRatesFetcher,
             $this->translator
         );
     }

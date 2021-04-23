@@ -140,9 +140,7 @@ class Exchanger implements ExchangerInterface
         $minOrderValidator = $this->vf->createOrderValidator(
             $market,
             $priceInput,
-            $amountInput,
-            $this->mw,
-            $this->cryptoRatesFetcher
+            $amountInput
         );
 
         if (!$minOrderValidator->validate()) {
