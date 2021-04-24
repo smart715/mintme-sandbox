@@ -14,6 +14,8 @@ const storage = {
         subtractQuoteBalanceFromBuyAmount: false,
         takerFee: 0,
         balances: null,
+        sellPriceManuallyEdited: false,
+        buyPriceManuallyEdited: false,
     },
     getters: {
         getQuoteBalance: function(state) {
@@ -42,6 +44,12 @@ const storage = {
         },
         getBalances: function(state) {
             return state.balances;
+        },
+        getSellPriceManuallyEdited: function(state) {
+            return state.sellPriceManuallyEdited;
+        },
+        getBuyPriceManuallyEdited: function(state) {
+            return state.buyPriceManuallyEdited;
         },
     },
     mutations: {
@@ -85,6 +93,12 @@ const storage = {
         },
         setBalances: function(state, n) {
             state.balances = n;
+        },
+        setSellPriceManuallyEdited: function(state, n) {
+            state.sellPriceManuallyEdited = n;
+        },
+        setBuyPriceManuallyEdited: function(state, n) {
+            state.buyPriceManuallyEdited = n;
         },
     },
 };
