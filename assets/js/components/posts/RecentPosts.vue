@@ -6,6 +6,7 @@
                   :post="posts[i]"
                   :key="i"
                   :index="i"
+                  :recent-post="true"
             />
         </template>
         <p v-else>

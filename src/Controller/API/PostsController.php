@@ -428,7 +428,7 @@ class PostsController extends AbstractFOSRestController
         $posts = $this->postManager->getRecentPost($user, $nextPage);
 
         return $this->view(
-            ['posts' => $posts, 'count' => count($posts)],
+            ['posts' => $posts],
             Response::HTTP_OK
         );
     }

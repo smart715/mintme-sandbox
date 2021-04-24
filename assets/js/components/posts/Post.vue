@@ -25,14 +25,28 @@
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
             </h1>
+            <h2 v-else-if="recentPost">
+                <a :href="singlePageUrl"
+                   class="text-decoration-none text-white"
+                   >{{ post.title }}
+                </a>
+                <b>by</b>
+                <a :href="$routing.generate('token_show', {name: post.token.name})" class="text-white">
+                    <img :src="post.token.image.avatar_small"  class="rounded-circle d-inline-block" alt="avatar">
+                </a>
+                <small>{{ post.token.name }}</small>
+            </h2>
             <a v-else :href="singlePageUrl"
                class="text-decoration-none"
                @click.prevent="$emit('go-to-post', post)"
             >
                 <h2 class="post-title">
                     {{ post.title }}
+                    <small> By
+                      {{ post.token.name }}</small>
                 </h2>
             </a>
+
         </template>
         <div>
             <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
@@ -180,6 +194,7 @@ export default {
         },
         loggedIn: Boolean,
         singlePage: Boolean,
+        recentPost: Boolean,
     },
     data() {
         return {
