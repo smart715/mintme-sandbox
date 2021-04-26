@@ -382,8 +382,8 @@ class DonationHandler implements DonationHandlerInterface
                 break;
             }
 
-            $order = $sellOrder->getPrice()->multiply(
-                $this->moneyWrapper->format($sellOrder->getAmount())
+            $order = $sellOrder->getAmount()->multiply(
+                $this->moneyWrapper->format($sellOrder->getPrice())
             );
             $diff = $donatinonAmount->subtract($totalSum);
 
@@ -391,7 +391,7 @@ class DonationHandler implements DonationHandlerInterface
                 $totalSum = $totalSum->add($order);
                 $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
             } else {
-                $totalSum = $totalSum->add($sellOrder->getPrice()->multiply(
+                $totalSum = $totalSum->add($sellOrder->getAmount()->multiply(
                     $this->moneyWrapper->format(
                         $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()))
                     )
