@@ -1345,6 +1345,7 @@ phone_number.add.limit_monthly: 'Vous avez atteint la limite pour ce mois, veuil
 phone_confirmation.sent: Envoyé
 phone_number.edit.limit: 'Vous ne pouvez modifier le numéro de téléphone qu''une fois par mois'
 phone_number.in_use: 'Ce numéro de téléphone est déjà utilisé'
+phone_number.already_registered:
 activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% jetons distribués à <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> début de l''airdrop'
 activity_2_message: 'Fin de l''airdrop pour <a href="%tokenUrl%">%token%</a>'
