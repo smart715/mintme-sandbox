@@ -264,10 +264,7 @@ class ProfileController extends Controller
     ): Response {
         /** @var User $user*/
         $user = $this->getUser();
-
-        if ($profile->getUser() === $user) {
-            $profile->setDisabledAnonymous(true);
-        }
+        $profile->setDisabledAnonymous(true);
 
         $profileDescription = $profile->getDescription() ?? '';
         $profileDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($profileDescription);

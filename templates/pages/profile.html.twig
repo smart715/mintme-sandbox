@@ -47,7 +47,19 @@
                         {% endif %}
                         {% if (profile.anonymous == true) %}
                             <div v-if="!showEditForm">
-                                {% trans %}page.profile.is_private{% endtrans %}
+                                <div class="col-12">
+                                    <div class="float-left mr-2" style="max-width: 50%;">
+                                        <avatar
+                                            type="profile"
+                                            size="large"
+                                            image="{{ profile.image.url | imagine_filter('avatar_large') }}"
+                                            :editable="{{ canEdit ? 'true' : 'false' }}"
+                                        ></avatar>
+                                    </div>
+                                    <div class="pb-1">
+                                        {% trans %}page.profile.is_private{% endtrans %}
+                                    </div>
+                                </div>
                             </div>
                             <div class="pb-1">
                                 {% if profile.created is not null %}
