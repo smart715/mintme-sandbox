@@ -15,6 +15,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
@@ -532,6 +533,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         EmailAuthManagerInterface $emailAuthManager,
         BalanceHandlerInterface $balanceHandler,
         MailerInterface $mailer,
+        ExchangerInterface $exchanger,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -570,6 +572,19 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
             $user->setEmailAuthCode('');
             $this->em->persist($user);
+        }
+
+        $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
+        $market = new Market($crypto, $token);
+        $offset = 0;
+        $limit = 100;
+
+        while ($pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit)) {
+            foreach ($pendingBuyOrders as $order) {
+                $exchanger->cancelOrder($market, $order);
+            }
+
+            $offset += $limit;
         }
 
         $this->em->remove($token);
