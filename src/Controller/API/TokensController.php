@@ -16,7 +16,7 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\ExchangerInterface;
-use App\Exchange\Market;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Form\TokenType;
 use App\Logger\UserActionLogger;
@@ -58,6 +58,7 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
+    public const ORDERS_LIMIT = 100;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -534,6 +535,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         BalanceHandlerInterface $balanceHandler,
         MailerInterface $mailer,
         ExchangerInterface $exchanger,
+        MarketFactoryInterface $marketFactory,
         string $name
     ): View {
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
@@ -575,16 +577,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         }
 
         $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
-        $market = new Market($crypto, $token);
+        $market = $marketFactory->create($crypto, $token);
         $offset = 0;
-        $limit = 100;
 
-        while ($pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit)) {
+        while ($pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, self::ORDERS_LIMIT)) {
             foreach ($pendingBuyOrders as $order) {
                 $exchanger->cancelOrder($market, $order);
             }
 
-            $offset += $limit;
+            $offset += self::ORDERS_LIMIT;
         }
 
         $this->em->remove($token);
