@@ -97,12 +97,17 @@
         border-radius: 1em
         border: 1px solid #ffffff
         overflow: hidden
+        background-color: #1e5496
 
         .feed-row
           background-color: #194276
 
           &:nth-of-type(2n)
             background-color: #1e5496
+
+          &--preload
+            min-height: 33.6px
+            background: none
 
           .feed-cell
             padding: 0.3em
@@ -213,3 +218,9 @@
             text-decoration: none
             white-space: normal
           /* stylelint-enable no-descending-specificity */
+
+.absolute-center
+  position: absolute;
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
