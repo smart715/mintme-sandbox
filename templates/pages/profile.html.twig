@@ -45,29 +45,7 @@
                                 <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-default" v-if="!showEditForm"></font-awesome-icon>
                             </a>
                         {% endif %}
-                        {% if (profile.anonymous == true) %}
-                            <div v-if="!showEditForm">
-                                <div class="col-12">
-                                    <div class="float-left mr-2" style="max-width: 50%;">
-                                        <avatar
-                                            type="profile"
-                                            size="large"
-                                            image="{{ profile.image.url | imagine_filter('avatar_large') }}"
-                                            :editable="{{ canEdit ? 'true' : 'false' }}"
-                                        ></avatar>
-                                    </div>
-                                    <div class="pb-1">
-                                        {% trans %}page.profile.is_private{% endtrans %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pb-1">
-                                {% if profile.created is not null %}
-                                    {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <div v-if="!showEditForm" class="row mr-1">
+                        <div v-if="!showEditForm">
                             <div class="col-12">
                                 <div class="float-left mr-2" style="max-width: 50%;">
                                     <avatar
@@ -77,50 +55,55 @@
                                         :editable="{{ canEdit ? 'true' : 'false' }}"
                                     ></avatar>
                                 </div>
-                                {% if profile.firstname is not empty %}
+                                {% if (profile.anonymous == true) %}
                                     <div class="pb-1">
-                                        {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
+                                        {% trans %}page.profile.is_private{% endtrans %}
                                     </div>
-                                {% endif %}
-                                {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified and canEdit %}
-                                    <div class="pb-1">
-                                        {% trans %}page.profile.form.phone_number{% endtrans %} {{ profile.phoneNumber.phoneNumber|phone_number_format('E164') }}
-                                    </div>
-                                {%  endif %}
-                                {% if profile.country is not empty %}
-                                    <div class="pb-1">
-                                        {% trans %}page.profile.form.country{% endtrans %} {{ profile.getCountryFullName() }}
-                                    </div>
-                                {% endif %}
-                                {% if show_full_data_in_profile %}
-                                    <div class="pb-1">
-                                        {% if profile.city is not empty %}
-                                            {% trans %}page.profile.form.city{% endtrans %} {{ profile.city }}
-                                        {% endif %}
-                                    </div>
-                                    <div class="pb-1">
-                                        {% if profile.zipCode is not empty %}
-                                            {% trans %}page.profile.form.zip_code{% endtrans %} {{ profile.zipCode }}
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                                {% if token is not empty %}
-                                    <div class="pb-1">
-                                        <div>{% trans %}page.profile.form.token{% endtrans %}</div>
-                                        <a class="word-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="col-12 pt-3">
-                                <bbcode-view value="{{ profile.description }}"></bbcode-view>
-                            </div>
-                                <div class="col-12 pt-3">
-                                    {% if profile.created is not null %}
-                                        {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                                {% else %}
+                                    {% if profile.firstname is not empty %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
+                                        </div>
                                     {% endif %}
+                                    {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified and canEdit %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.phone_number{% endtrans %} {{ profile.phoneNumber.phoneNumber|phone_number_format('E164') }}
+                                        </div>
+                                    {%  endif %}
+                                    {% if profile.country is not empty %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.country{% endtrans %} {{ profile.getCountryFullName() }}
+                                        </div>
+                                    {% endif %}
+                                    {% if show_full_data_in_profile %}
+                                        <div class="pb-1">
+                                            {% if profile.city is not empty %}
+                                                {% trans %}page.profile.form.city{% endtrans %} {{ profile.city }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="pb-1">
+                                            {% if profile.zipCode is not empty %}
+                                                {% trans %}page.profile.form.zip_code{% endtrans %} {{ profile.zipCode }}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    {% if token is not empty %}
+                                        <div class="pb-1">
+                                            <div>{% trans %}page.profile.form.token{% endtrans %}</div>
+                                            <a class="word-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                        </div>
+                                    {% endif %}
+                                <div class="col-12 pt-3">
+                                    <bbcode-view value="{{ profile.description }}"></bbcode-view>
                                 </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        {% endif %}
+                        <div class="pb-1">
+                            {% if profile.created is not null %}
+                                {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                            {% endif %}
+                        </div>
 
                         {% if (canEdit == true) %}
                             <div v-show="showEditForm" v-cloak>
