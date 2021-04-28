@@ -40,15 +40,15 @@ class PostRepository extends ServiceEntityRepository
                 $this->balanceHandler->balance($user, $token)
             )->getAvailable();
 
-            if ($available->greaterThanOrEqual(new Money(0, new Currency(Symbols::TOK)))) {
+            if (!$available->isZero()) {
                 $tokens[] = $token;
             }
         }
-        
+
         return $this->createQueryBuilder('post')
             ->where('post.token IN (:tokens)')
             ->andWhere('post.createdAt BETWEEN :thirtyDays AND :today')
-            ->setParameter('tokens', $user->getTokens())
+            ->setParameter('tokens', $tokens)
             ->setParameter('today', date('Y-m-d H:i:s'))
             ->setParameter('thirtyDays', date('Y-m-d H:i:s', strtotime('-30 days')))
             ->orderBy('post.createdAt', 'DESC')
