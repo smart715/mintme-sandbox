@@ -25,7 +25,6 @@ use App\Tests\MockMoneyWrapper;
 use App\Utils\Symbols;
 use App\Utils\Validator\ValidatorInterface;
 use App\Utils\ValidatorFactoryInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
@@ -205,6 +204,63 @@ class ExchangerTest extends TestCase
         $this->assertEquals($tradeResult, $result);
     }
 
+    public function testPlaceOrderOnValidatorFailed(): void
+    {
+        $user = $this->mockUser();
+        $tok = $this->mockToken(Symbols::TOK, $user);
+        $tradeResult = $this->mockTradeResult();
+
+        $balance = $this->money(6);
+        $br = $this->createMock(BalanceResult::class);
+        $br->method('getAvailable')->willReturn($balance);
+        $bh = $this->mockBalanceHandler($this->once(), $user, $tok);
+        $bh->method('balance')->with($user, $tok)->willReturn($br);
+
+        $tm = $this->mockTokenManager($tok);
+        $tm->method('getRealBalance')->with($tok, $br)->willReturn($br);
+
+        $mh = $this->createMock(MarketHandlerInterface::class);
+        $mh->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
+            $this->mockOrder(3, 1),
+            $this->mockOrder(2, 1),
+            $this->mockOrder(1, 1),
+        ], []);
+
+        $trader = $this->mockTrader($tradeResult);
+        $trader->expects($this->once())->method('placeOrder')->with(
+            $this->callback(fn (Order $o) => '1' === $o->getPrice()->getAmount())
+        );
+
+        $exchanger = new Exchanger(
+            $trader,
+            $this->mockMoneyWrapper(),
+            $this->mockMarketProducer($this->once()),
+            $bh,
+            $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
+            $this->mockLogger(),
+            $this->mockParameterBag(),
+            $mh,
+            $tm,
+            $this->mockValidator(true),
+            $this->mockTranslator(),
+            $this->mockCryptoRatesFetcher()
+        );
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '1',
+            '1',
+            true,
+            Order::SELL_SIDE,
+        );
+        $this->assertEquals($tradeResult, $result);
+        $this->assertNotNull($tradeResult->getMessage(), $result->getMessage());
+    }
+
     private function mockValidator(bool $res): ValidatorFactoryInterface
     {
         $validator = $this->createMock(ValidatorInterface::class);
@@ -367,7 +423,7 @@ class ExchangerTest extends TestCase
     {
         return $this->createMock(TranslatorInterface::class);
     }
-    
+
     /** @return CryptoRatesFetcherInterface|MockObject */
     private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
     {

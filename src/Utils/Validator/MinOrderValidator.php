@@ -82,7 +82,7 @@ class MinOrderValidator implements ValidatorInterface
 
         return $this->price >= $baseMinimal
             && $this->amount >= $quoteMinimal
-            && $this->validMinUSD($base);
+            && $this->validMinUSD($base, $baseUnit);
     }
 
     public function getMessage(): string
@@ -95,7 +95,7 @@ class MinOrderValidator implements ValidatorInterface
         return 1 / (int)str_pad('1', $unit + 1, '0');
     }
 
-    private function validMinUSD(TradebleInterface $base): bool
+    private function validMinUSD(TradebleInterface $base, int $baseUnit): bool
     {
         $baseSymbol = $base->getSymbol();
         $price = $this->moneyWrapper->parse($this->price, $baseSymbol);
@@ -105,10 +105,10 @@ class MinOrderValidator implements ValidatorInterface
             $this->moneyWrapper->format($amount)
         );
 
-        $minUsdInBase = $this->getMinUsdInBase($baseSymbol);
+        $minUsdInBase = $this->getMinUsdInBase($baseSymbol, $baseUnit);
 
         $minUsdInMintme = Symbols::WEB === $baseSymbol ?
-            $minUsdInBase : $this->getMinUsdInBase(Symbols::WEB);
+            $minUsdInBase : $this->getMinUsdInBase(Symbols::WEB, $baseUnit);
 
         $this->message = $this->translator->trans(
             'place_order.too_small',
@@ -116,7 +116,7 @@ class MinOrderValidator implements ValidatorInterface
                 '%valueInUsd%' => $this->minimalPriceOrder,
                 '%valueInMintme%' => round(
                     (float)$this->moneyWrapper->format($minUsdInMintme),
-                    4
+                    Token::TOKEN_SUBUNIT
                 ),
             ]
         );
@@ -124,16 +124,21 @@ class MinOrderValidator implements ValidatorInterface
         return $totalOrderAmountInBase->greaterThanOrEqual($minUsdInBase);
     }
 
-    private function getMinUsdInBase(string $baseSymbol): Money
+    private function getMinUsdInBase(string $baseSymbol, int $baseUnit): Money
     {
         $rates = $this->cryptoRatesFetcher->fetch();
 
-        return  $this->moneyWrapper->convert(
+        $minUsdInBase =  $this->moneyWrapper->convert(
             $this->moneyWrapper->parse((string)$this->minimalPriceOrder, Symbols::USD),
             new Currency($baseSymbol),
             new FixedExchange([
                 Symbols::USD => [ $baseSymbol => 1 / $rates[$baseSymbol][Symbols::USD] ],
             ]),
+        );
+
+        return $this->moneyWrapper->parse(
+            (string)round((float)$this->moneyWrapper->format($minUsdInBase), $baseUnit),
+            $baseSymbol
         );
     }
 }
