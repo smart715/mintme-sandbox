@@ -803,6 +803,8 @@ ongoing_airdrop.referral: 'Adicionalmente, obtenga %halfReward% %tokenName% por 
 ongoing_airdrop.actions.claim_error: 'Ocurrió un error al completar la tarea, inténtelo mas tarde'
 ongoing_airdrop.twitter_message.confirm: 'Al hacer clic en aceptar, publicaremos el siguiente mensaje en twitter desde su cuenta'
 ongoing_airdrop.accept: Aceptar
+ongoing_airdrop.claim.login_to_complete: ''
+ongoing_airdrop.claim: ''
 token.deploy.final_step: 'Este es el último paso para la creación del token. Despues de pagar el despliegue de su token en la blockchain, usted y otros podrán retirar tokens desde MintMe hacia su billetera MintMe Coin.'
 token.deploy.frozen: 'Los MINTME gastados acá serán inaccesibles (congelados) para todos durante 5 años. De esta manera se disminuyen los MINTME en circulación con cada compra y se incrementa la probabilidad de que el precio de MINTME aumente.'
 token.deploy.irreversible: 'Este proceso es irreversible, una vez que confirmes el pago no hay vuelta atrás.'
@@ -1106,6 +1108,8 @@ trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
 trading.fields.rank:
 trading.fields.rank.help:
+trading.fields.holders:
+trading.fields.holders.help:
 wallet.balance: Balance
 wallet.deposit: Depositar
 wallet.withdraw: Retirar
@@ -1329,6 +1333,7 @@ phone_number.add.limit_daily: 'Ha alcanzado el límite diario previsto, por favo
 phone_number.add.limit_weekly: 'Ha alcanzado el límite semanal previsto, por favor, intente añadir el número de teléfono la próxima semana'
 phone_number.add.limit_monthly: 'Ha alcanzado el límite mensual previsto, por favor, intente añadir el número de teléfono el próximo mes'
 phone_number.in_use: 'Este número de teléfono ya está en uso'
+phone_number.already_registered:
 activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(s) a <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'

@@ -58,6 +58,7 @@ import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {WSAPI} from '../../utils/constants';
 import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenTradeOrders',
@@ -114,13 +115,20 @@ export default {
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
+            let orders = this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
+            this.setBuyOrders(orders);
+
+            return orders;
         },
         filteredSellOrders: function() {
-            return this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
+            let orders = this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
+            this.setSellOrders(orders);
+
+            return orders;
         },
     },
     methods: {
+        ...mapMutations('orders', ['setSellOrders', 'setBuyOrders']),
         updateBuyOrders: function({attach, resolve}) {
             return this.updateOrders(attach, 'buy', resolve);
         },

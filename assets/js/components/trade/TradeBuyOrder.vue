@@ -214,7 +214,6 @@ export default {
         signupUrl: String,
         loggedIn: Boolean,
         market: Object,
-        marketPrice: [Number, String],
         balance: [String, Boolean],
         balanceLoaded: [String, Boolean],
         takerFee: Number,
@@ -225,18 +224,14 @@ export default {
         return {
             action: 'buy',
             placingOrder: false,
-            balanceManuallyEdited: false,
             USD,
             currencyModes,
         };
     },
     methods: {
-        setBalanceManuallyEdited: function(val = true) {
-            this.balanceManuallyEdited = val;
-        },
         checkPriceInput() {
             this.$emit('check-input', this.market.base.subunit);
-            this.setBalanceManuallyEdited(true);
+            this.priceManuallyEdited = true;
         },
         checkAmountInput() {
             this.$emit(
@@ -263,10 +258,10 @@ export default {
 
                 this.placingOrder = true;
                 let data = {
-                    'amountInput': toMoney(this.buyAmount, this.market.quote.subunit),
-                    'priceInput': toMoney(this.buyPrice, this.market.base.subunit),
-                    'marketPrice': this.useMarketPrice,
-                    'action': this.action,
+                    amountInput: toMoney(this.buyAmount, this.market.quote.subunit),
+                    priceInput: toMoney(this.buyPrice, this.market.base.subunit),
+                    marketPrice: this.useMarketPrice,
+                    action: this.action,
                 };
 
                 this.$axios.single.post(this.$routing.generate('token_place_order', {
@@ -295,8 +290,6 @@ export default {
         updateMarketPrice: function() {
             if (this.useMarketPrice) {
                 this.buyPrice = this.price || 0;
-            } else {
-                this.buyPrice = 0;
             }
 
             if (this.disabledMarketPrice) {
@@ -309,11 +302,14 @@ export default {
                 return;
             }
 
-            if (!this.balanceManuallyEdited || !parseFloat(this.buyPrice)) {
-                this.buyPrice = toMoney(this.price || 0, this.market.base.subunit);
-                this.setBalanceManuallyEdited(false);
+            if (!this.priceManuallyEdited || !parseFloat(this.buyPrice)) {
+                this.buyPrice = this.price;
+                this.priceManuallyEdited = false;
             }
 
+            this.fillAmount();
+        },
+        fillAmount() {
             this.buyAmount = toMoney(
                 new Decimal(this.immutableBalance).div(parseFloat(this.buyPrice)|| 1).toString(),
                 this.market.quote.subunit
@@ -325,6 +321,7 @@ export default {
             'setBaseBalance',
             'setUseBuyMarketPrice',
             'setTakerFee',
+            'setBuyPriceManuallyEdited',
         ]),
     },
     computed: {
@@ -349,7 +346,7 @@ export default {
             return this.fieldsValid && !this.placingOrder;
         },
         disabledMarketPrice: function() {
-            return !this.marketPrice > 0 || !this.loggedIn;
+            return this.marketPrice <= 0 || !this.loggedIn;
         },
         translationsContext: function() {
             return {
@@ -364,7 +361,11 @@ export default {
             'getBuyAmountInput',
             'getBaseBalance',
             'getUseBuyMarketPrice',
+            'getBuyPriceManuallyEdited',
         ]),
+        ...mapGetters('orders', {
+             sellOrders: 'getSellOrders',
+        }),
         buyPrice: {
             get() {
                 return this.getBuyPriceInput;
@@ -397,10 +398,40 @@ export default {
                 this.setUseBuyMarketPrice(val);
             },
         },
+        priceManuallyEdited: {
+            get() {
+                return this.getBuyPriceManuallyEdited;
+            },
+            set(val) {
+                this.setBuyPriceManuallyEdited(val);
+            },
+        },
+        marketPrice() {
+            let tokenAmount = new Decimal(0);
+            let balance = new Decimal(this.immutableBalance);
+
+            let result = this.sellOrders[0] ? this.sellOrders[this.sellOrders.length - 1].price : 0;
+
+            for (let order of this.sellOrders) {
+                tokenAmount = tokenAmount.add(order.amount);
+
+                if (balance.div(order.price).lessThanOrEqualTo(tokenAmount)) {
+                    result = order.price;
+
+                    break;
+                }
+            }
+
+            return result;
+        },
     },
     watch: {
-        useMarketPrice: function() {
+        useMarketPrice: function(newVal) {
             this.updateMarketPrice();
+
+            if (!newVal) {
+                this.resetOrder();
+            }
         },
         marketPrice: function() {
             this.updateMarketPrice();
