@@ -51,6 +51,7 @@
                         </div>
                     </div>
                     <div class="col-12 mt-5 p-lg-0 d-flex justify-content-center">
+                        {{ include("spinners/feed.html.twig") }}
                         <feed
                             :items-prop="{{ activities | json_encode }}"
                             mercure-hub-url="{{ mercure_hub_url }}"
