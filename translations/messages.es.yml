@@ -1336,6 +1336,7 @@ phone_number.add.limit_daily: 'Ha alcanzado el límite diario previsto, por favo
 phone_number.add.limit_weekly: 'Ha alcanzado el límite semanal previsto, por favor, intente añadir el número de teléfono la próxima semana'
 phone_number.add.limit_monthly: 'Ha alcanzado el límite mensual previsto, por favor, intente añadir el número de teléfono el próximo mes'
 phone_number.in_use: 'Este número de teléfono ya está en uso'
+phone_number.already_registered:
 activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(s) a <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'

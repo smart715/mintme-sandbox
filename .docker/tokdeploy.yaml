@@ -12,6 +12,7 @@ mintme_account:   '0x9139413fe7247da35ae0797f9270271ba758d248'
 webchain_gas_limit: 21000
 webchain_withdraw_contract_gas_limit: 90000
 webchain_gas_limit_contract: 90000
+mintme_transfer_gas_limit: 90000
 
 # ethereum rpc server url
 ethereum_daemon_host: 'http://212.32.255.232:8545'
