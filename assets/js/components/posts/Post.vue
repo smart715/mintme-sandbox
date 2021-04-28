@@ -30,7 +30,7 @@
                    class="text-decoration-none text-white"
                    >{{ post.title }}
                 </a>
-                <b>by</b>
+                <b> {{ $t('by') }}</b>
                 <a :href="$routing.generate('token_show', {name: post.token.name})" class="text-white">
                     <img :src="post.token.image.avatar_small"  class="rounded-circle d-inline-block" alt="avatar">
                 </a>
@@ -42,8 +42,6 @@
             >
                 <h2 class="post-title">
                     {{ post.title }}
-                    <small> By
-                      {{ post.token.name }}</small>
                 </h2>
             </a>
 

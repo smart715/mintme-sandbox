@@ -32,23 +32,12 @@ class PostRepository extends ServiceEntityRepository
     /** @codeCoverageIgnore */
     public function findRecentPostsOfUser(User $user, int $page = 0, int $max = 10): array
     {
-        $tokens = [];
-
-        foreach ($user->getTokens() as $token) {
-            $available = $this->tokenManager->getRealBalance(
-                $token,
-                $this->balanceHandler->balance($user, $token)
-            )->getAvailable();
-
-            if ($available->greaterThanOrEqual(new Money(1, new Currency(Symbols::TOK))) &&
-            strtotime($token->getCreated()->format('Y-m-d')) < strtotime('30 days')) {
-                $tokens[] = $token;
-            }
-        }
-
         return $this->createQueryBuilder('post')
             ->where('post.token IN (:tokens)')
-            ->setParameter('tokens', $tokens)
+            ->andWhere('post.createdAt BETWEEN :thirtyDays AND :today')
+            ->setParameter('tokens', $user->getTokens())
+            ->setParameter('today', date('Y-m-d h:i:s'))
+            ->setParameter('thirtyDays', date('Y-m-d h:i:s', strtotime('-30 days')))
             ->orderBy('post.createdAt', 'DESC')
             ->setFirstResult($page * $max)
             ->setMaxResults($max)
