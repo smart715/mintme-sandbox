@@ -151,20 +151,14 @@ class ExchangerTest extends TestCase
         $tradeResult = $this->mockTradeResult();
 
         $balance = $this->money(6);
-        $br = $this->createMock(BalanceResult::class);
-        $br->method('getAvailable')->willReturn($balance);
+        $br = $this->mockBalanceResult($balance);
         $bh = $this->mockBalanceHandler($this->once(), $user, $tok);
         $bh->method('balance')->with($user, $tok)->willReturn($br);
 
         $tm = $this->mockTokenManager($tok);
         $tm->method('getRealBalance')->with($tok, $br)->willReturn($br);
 
-        $mh = $this->createMock(MarketHandlerInterface::class);
-        $mh->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
-            $this->mockOrder(3, 1),
-            $this->mockOrder(2, 1),
-            $this->mockOrder(1, 1),
-        ], []);
+        $mh = $this->mockMarketHandlerInterface();
 
         $trader = $this->mockTrader($tradeResult);
         $trader->expects($this->once())->method('placeOrder')->with(
@@ -207,8 +201,7 @@ class ExchangerTest extends TestCase
         $tradeResult = $this->mockTradeResult();
 
         $balance = $this->money(6);
-        $br = $this->createMock(BalanceResult::class);
-        $br->method('getAvailable')->willReturn($balance);
+        $br = $this->mockBalanceResult($balance);
         $bh = $this->mockBalanceHandler($this->once(), $user, $tok);
         $bh->method('balance')->with($user, $tok)->willReturn($br);
 
@@ -223,37 +216,35 @@ class ExchangerTest extends TestCase
         ], []);
 
         $trader = $this->mockTrader($tradeResult);
-        $trader->expects($this->once())->method('placeOrder')->with(
-            $this->callback(fn (Order $o) => '1' === $o->getPrice()->getAmount())
-        );
 
         $exchanger = new Exchanger(
             $trader,
             $this->mockMoneyWrapper(),
-            $this->mockMarketProducer($this->once()),
+            $this->mockMarketProducer($this->never()),
             $bh,
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
             $this->mockParameterBag(),
             $mh,
             $tm,
-            $this->mockValidator(true),
+            $this->mockValidator(false),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder(
+
+        $trader->expects($this->never())->method('placeOrder');
+
+        $exchanger->placeOrder(
             $user,
             $this->mockMarket(
                 $this->mockCrypto('WEB'),
                 $tok,
                 true
             ),
-            '1',
-            '1',
+            '50',
+            '50',
             true,
             Order::SELL_SIDE,
         );
-        $this->assertEquals($tradeResult, $result);
-        $this->assertNotNull($tradeResult->getMessage(), $result->getMessage());
     }
 
     public function testPlaceOlderOnValidatorSuccess(): void
@@ -263,8 +254,7 @@ class ExchangerTest extends TestCase
         $tradeResult = $this->mockTradeResult();
 
         $balance = $this->money(6);
-        $br = $this->createMock(BalanceResult::class);
-        $br->method('getAvailable')->willReturn($balance);
+        $br = $this->mockBalanceResult($balance);
         $bh = $this->mockBalanceHandler($this->once(), $user, $tok);
         $bh->method('balance')->with($user, $tok)->willReturn($br);
 
@@ -472,5 +462,24 @@ class ExchangerTest extends TestCase
     private function mockTranslator(): TranslatorInterface
     {
         return $this->createMock(TranslatorInterface::class);
+    }
+
+    private function mockBalanceResult(Money $balance): BalanceResult
+    {
+        $br = $this->createMock(BalanceResult::class);
+        $br->method('getAvailable')->willReturn($balance);
+
+        return $br;
+    }
+
+    private function mockMarketHandlerInterface(): MarketHandlerInterface
+    {
+        $mh = $this->createMock(MarketHandlerInterface::class);
+        $mh->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
+            $this->mockOrder(3, 1),
+            $this->mockOrder(2, 1),
+            $this->mockOrder(1, 1),
+        ], []);
+        return $mh;
     }
 }
