@@ -97,14 +97,13 @@
                                     <bbcode-view value="{{ profile.description }}"></bbcode-view>
                                 </div>
                                 {% endif %}
+                                <div class="pb-1">
+                                    {% if profile.created is not null %}
+                                        {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                        <div class="pb-1">
-                            {% if profile.created is not null %}
-                                {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
-                            {% endif %}
-                        </div>
-
                         {% if (canEdit == true) %}
                             <div v-show="showEditForm" v-cloak>
                             {{ form_start(form) }}
