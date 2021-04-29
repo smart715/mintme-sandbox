@@ -29,7 +29,11 @@ class PostController extends Controller
      */
     public function show(int $id): Response
     {
-        $post = $this->postManager->getById($id);
+       	if(!empty($id)){
+		 $post = $this->postManager->getById($id);
+	} else {
+	$post = 0;
+	}
 
         if (!$post) {
             throw new NotFoundPostException();

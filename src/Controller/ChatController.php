@@ -45,9 +45,11 @@ class ChatController extends Controller
     {
         /** @var User $user */
         $user = $this->getUser();
-
-        $thread = $this->threadManager->find($threadId);
-
+	if(!empty($threadId)){
+        	$thread = $this->threadManager->find($threadId);
+	} else {
+		$threadId = 0;
+	}
         if ($threadId > 0 &&
             (!$thread || !$thread->hasParticipant($user))
         ) {
