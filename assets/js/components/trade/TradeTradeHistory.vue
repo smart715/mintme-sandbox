@@ -15,12 +15,11 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table mb-0" ref="tableData">
+                <div class="table-responsive fixed-head-table mb-0" ref="table">
                     <template v-if="loaded">
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
-                            ref="table"
                             :items="ordersList"
                             :fields="fields">
 
@@ -291,10 +290,6 @@ export default {
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-
-                    if (this.$refs.table) {
-                        this.$refs.table.hasOwnProperty('refresh') ? this.$refs.table.refresh() : null;
-                    }
 
                     resolve(result.data);
                 }).catch(reject);
