@@ -54,8 +54,7 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(true),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher(),
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -89,8 +88,7 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(false),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -128,8 +126,7 @@ class ExchangerTest extends TestCase
             $this->mockMarketHandler([$this->mockOrder(2)], []),
             $this->mockTokenManager($tok),
             $this->mockValidator(true),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -185,8 +182,7 @@ class ExchangerTest extends TestCase
             $mh,
             $tm,
             $this->mockValidator(true),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -242,8 +238,7 @@ class ExchangerTest extends TestCase
             $mh,
             $tm,
             $this->mockValidator(true),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -299,8 +294,7 @@ class ExchangerTest extends TestCase
             $mh,
             $tm,
             $this->mockValidator(true),
-            $this->mockTranslator(),
-            $this->mockCryptoRatesFetcher()
+            $this->mockTranslator()
         );
         $result = $exchanger->placeOrder(
             $user,
@@ -478,19 +472,5 @@ class ExchangerTest extends TestCase
     private function mockTranslator(): TranslatorInterface
     {
         return $this->createMock(TranslatorInterface::class);
-    }
-
-    /** @return CryptoRatesFetcherInterface|MockObject */
-    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
-    {
-        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
-
-        $crf->method('fetch')->willReturn([
-            Symbols::WEB => [
-                Symbols::BTC => 0.00000008,
-            ],
-        ]);
-
-        return $crf;
     }
 }
