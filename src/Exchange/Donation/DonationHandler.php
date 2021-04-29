@@ -14,6 +14,7 @@ use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
@@ -38,6 +39,7 @@ class DonationHandler implements DonationHandlerInterface
     private MarketHandlerInterface $marketHandler;
     private ExchangerInterface $exchanger;
     private ParameterBagInterface $parameterBag;
+    private TraderInterface $trader;
 
     public function __construct(
         DonationFetcherInterface $donationFetcher,
@@ -50,7 +52,8 @@ class DonationHandler implements DonationHandlerInterface
         EntityManagerInterface $em,
         MarketHandlerInterface $marketHandler,
         ExchangerInterface $exchanger,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        TraderInterface $trader
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -63,6 +66,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->marketHandler = $marketHandler;
         $this->exchanger = $exchanger;
         $this->parameterBag = $parameterBag;
+        $this->trader = $trader;
     }
 
     public function checkDonation(
@@ -302,15 +306,24 @@ class DonationHandler implements DonationHandlerInterface
             $amount = $sellOrder->getAmount()->greaterThan($totalMintmeToExecute)
                 ? $totalMintmeToExecute->subtract($executedSum)
                 : $sellOrder->getAmount();
-
-            $this->exchanger->placeOrder(
+            
+            $fee = $this->moneyWrapper->parse((string)$this->parameterBag->get('maker_fee_rate'), Symbols::TOK);
+            $order = new Order(
+                null,
                 $donator,
+                null,
                 $market,
-                $this->moneyWrapper->format($amount),
-                $this->moneyWrapper->format($price),
-                false,
-                Order::BUY_SIDE
+                $amount,
+                Order::BUY_SIDE,
+                $price,
+                Order::PENDING_STATUS,
+                $fee,
+                null,
+                null,
+                $donator->getReferencer() ? (int)$donator->getReferencer()->getId() : 0
             );
+
+            $this->trader->placeOrder($order, false);
 
             $executedSum = $executedSum->add($amount);
         }
