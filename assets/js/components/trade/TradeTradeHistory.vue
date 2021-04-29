@@ -240,6 +240,8 @@ export default {
         },
     },
     mounted: function() {
+        this.startScrollListeningOnce(this.ordersList);
+
         this.updateTableData().then((res) => {
             this.sendMessage(JSON.stringify({
                 method: 'deals.subscribe',
@@ -263,8 +265,6 @@ export default {
                         if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
                         }
-
-                        this.startScrollListeningOnce(this.ordersList);
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not get executed order details', err);
                     });
