@@ -263,6 +263,8 @@ export default {
                         if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
                         }
+
+                        this.startScrollListeningOnce(this.ordersList);
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not get executed order details', err);
                     });
@@ -273,9 +275,6 @@ export default {
         });
     },
     methods: {
-        startScrollListeningOnce: function(val) {
-            // Disable listener from mixin
-        },
         updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
