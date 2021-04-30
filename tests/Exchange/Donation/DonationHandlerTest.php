@@ -14,6 +14,7 @@ use App\Exchange\Donation\DonationHandler;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Trade\TraderInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\MarketNameConverterInterface;
@@ -168,8 +169,8 @@ class DonationHandlerTest extends TestCase
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(ExchangerInterface::class),
-            $this->createMock(ParameterBagInterface::class)
+            $this->createMock(ParameterBagInterface::class),
+            $this->createMock(TraderInterface::class)
         );
 
         $donationHandler->makeDonation($market, Symbols::BTC, '30000', '20000', $donorUser, '0');

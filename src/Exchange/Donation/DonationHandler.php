@@ -10,7 +10,6 @@ use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
-use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -19,8 +18,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Brick\Math\BigDecimal;
-use Brick\Math\RoundingMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -37,7 +34,6 @@ class DonationHandler implements DonationHandlerInterface
     private DonationConfig $donationConfig;
     private EntityManagerInterface $em;
     private MarketHandlerInterface $marketHandler;
-    private ExchangerInterface $exchanger;
     private ParameterBagInterface $parameterBag;
     private TraderInterface $trader;
 
@@ -51,7 +47,6 @@ class DonationHandler implements DonationHandlerInterface
         DonationConfig $donationConfig,
         EntityManagerInterface $em,
         MarketHandlerInterface $marketHandler,
-        ExchangerInterface $exchanger,
         ParameterBagInterface $parameterBag,
         TraderInterface $trader
     ) {
@@ -64,7 +59,6 @@ class DonationHandler implements DonationHandlerInterface
         $this->donationConfig = $donationConfig;
         $this->em = $em;
         $this->marketHandler = $marketHandler;
-        $this->exchanger = $exchanger;
         $this->parameterBag = $parameterBag;
         $this->trader = $trader;
     }
@@ -306,7 +300,7 @@ class DonationHandler implements DonationHandlerInterface
             $amount = $sellOrder->getAmount()->greaterThan($totalMintmeToExecute)
                 ? $totalMintmeToExecute->subtract($executedSum)
                 : $sellOrder->getAmount();
-            
+
             $fee = $this->moneyWrapper->parse((string)$this->parameterBag->get('maker_fee_rate'), Symbols::TOK);
             $order = new Order(
                 null,
