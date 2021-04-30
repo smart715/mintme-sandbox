@@ -1,0 +1,10 @@
+{% if activities is not empty %}
+    <div v-if="false" class="feed-container">
+        <div class="feed d-flex flex-column position-relative">
+            {% for activity in activities|slice(0, 5) %}
+                <div class="feed-row feed-row--preload"></div>
+            {% endfor %}
+            <div class="vld-icon absolute-center"></div>
+        </div>
+    </div>
+{% endif %}
