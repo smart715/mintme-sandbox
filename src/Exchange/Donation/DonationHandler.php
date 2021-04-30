@@ -74,8 +74,9 @@ class DonationHandler implements DonationHandlerInterface
         $token = $market->getQuote();
 
         $this->checkAmount($donorUser, $amountObj, $currency, false);
+        $isDonationInMintme = Symbols::WEB === $currency;
 
-        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
+        if (!$isDonationInMintme) {
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders(
                 new Market(
                     $this->cryptoManager->findBySymbol($currency),
@@ -87,7 +88,9 @@ class DonationHandler implements DonationHandlerInterface
 
         return $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $this->moneyWrapper->format($this->subtractOrdersFeeFromAmount($amountObj)),
+            $isDonationInMintme
+                ? $this->moneyWrapper->format($amountObj)
+                : $this->moneyWrapper->format($this->subtractOrdersFeeFromAmount($amountObj)),
             $this->donationConfig->getFee(),
             $token->getProfile()->getUser()->getId()
         );
@@ -138,7 +141,9 @@ class DonationHandler implements DonationHandlerInterface
             // Check how many tokens will recieve user and how many MINTME he should spend
         $checkDonationResult = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
-            $this->moneyWrapper->format($donationMintmeAmountWithSubstractedOrdersFee),
+            $isDonationInMintme
+                ? $this->moneyWrapper->format($donationMintmeAmount)
+                : $this->moneyWrapper->format($donationMintmeAmountWithSubstractedOrdersFee),
             $this->donationConfig->getFee(),
             $tokenCreator->getId()
         );
@@ -246,7 +251,7 @@ class DonationHandler implements DonationHandlerInterface
                 );
             } else {
                 $this->executeMarketOrders($donorUser, $donationMintmeAmount, $pendingSellOrders, $cryptoMarket);
-                $donationWithFee = $this->calculateFee($donationMintmeAmount);
+                $donationWithFee = $donationMintmeAmount->multiply($this->donationConfig->getFeeWithOrdersExecution());
                 $donationWithOrdersFee = $this->subtractOrdersFeeFromAmount($donationMintmeAmount);
 
                 $this->sendAmountFromUserToUser(

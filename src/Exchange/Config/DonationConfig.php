@@ -10,15 +10,15 @@ use Money\Money;
 class DonationConfig
 {
     /** @var array<int|float> */
-    private $donationParams;
+    private array $donationParams;
+    private MoneyWrapperInterface $moneyWrapper;
+    private float $ordersFee;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    public function __construct(array $donationParams, MoneyWrapperInterface $moneyWrapper)
+    public function __construct(array $donationParams, float $ordersFee, MoneyWrapperInterface $moneyWrapper)
     {
         $this->donationParams = $donationParams;
         $this->moneyWrapper = $moneyWrapper;
+        $this->ordersFee = $ordersFee;
     }
 
     public function getFee(): string
@@ -26,6 +26,13 @@ class DonationConfig
         $fee = $this->donationParams['fee'] ?? 0;
 
         return (string)($fee / 100);
+    }
+
+    public function getFeeWithOrdersExecution(): string
+    {
+        $fee = $this->donationParams['fee'] ?? 0;
+
+        return (string)(($fee / 100) - $this->ordersFee);
     }
 
     public function getMinBtcAmount(): Money
