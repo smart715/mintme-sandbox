@@ -58,7 +58,7 @@ use Throwable;
  */
 class TokensController extends AbstractFOSRestController implements TwoFactorAuthenticatedInterface
 {
-    public const ORDERS_LIMIT = 100;
+    public const ORDER_REQUEST_LIMIT = 100;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -580,12 +580,16 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
         $market = $marketFactory->create($crypto, $token);
         $offset = 0;
 
-        while ($pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, self::ORDERS_LIMIT)) {
+        while ($pendingBuyOrders = $this->marketHandler->getPendingBuyOrders(
+            $market,
+            $offset,
+            self::ORDER_REQUEST_LIMIT
+        )) {
             foreach ($pendingBuyOrders as $order) {
                 $exchanger->cancelOrder($market, $order);
             }
 
-            $offset += self::ORDERS_LIMIT;
+            $offset += self::ORDER_REQUEST_LIMIT;
         }
 
         $this->em->remove($token);
