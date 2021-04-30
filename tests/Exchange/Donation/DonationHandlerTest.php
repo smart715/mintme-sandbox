@@ -93,8 +93,8 @@ class DonationHandlerTest extends TestCase
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(ExchangerInterface::class),
-            $this->createMock(ParameterBagInterface::class)
+            $this->createMock(ParameterBagInterface::class),
+            $this->createMock(TraderInterface::class)
         );
 
         $this->assertEquals(
