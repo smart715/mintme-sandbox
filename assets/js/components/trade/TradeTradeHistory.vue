@@ -262,8 +262,6 @@ export default {
                         if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
                             this.tableData.unshift(res.data);
                         }
-
-                        this.startScrollListeningOnce(this.ordersList);
                     }).catch((err) => {
                         this.sendLogs('error', 'Can not get executed order details', err);
                     });
