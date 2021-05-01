@@ -567,11 +567,15 @@ export default {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
-                let rank = key === this.fields.rank.key;
+                let column = key === this.fields.rank.key;
+
+                if (!column) {
+                    column = key === this.fields.holders.key;
+                }
 
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return (-1) ** rank * compareResult;
+                return (-1) ** column * compareResult;
             }
 
             // If the value is not numeric, currently only pair column
@@ -981,7 +985,10 @@ export default {
                 market.buyDepth,
                 market.base.image.avatar_small,
                 market.quote.image.avatar_small,
-                market.quote.cryptoSymbol
+                market.quote.cryptoSymbol,
+                market.marketCap,
+                market.rank,
+                market.quote.holdersCount
             );
             this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
