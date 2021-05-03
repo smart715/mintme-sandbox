@@ -284,7 +284,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         if (!$this->isGranted('claim', $airdrop)) {
-            return $this->view(['error' => true], Response::HTTP_OK);
+            return $this->view(['error' => true, 'type' => 'airdrop'], Response::HTTP_OK);
         }
 
         $this->airdropCampaignManager->claimAirdropCampaign(

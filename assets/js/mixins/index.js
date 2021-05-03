@@ -11,6 +11,7 @@ import PlaceOrder from './place_order';
 import TraderHoveredMixin from './trader_hovered';
 import TwitterMixin from './twitter';
 import WebSocketMixin from './websocket';
+import AddPhoneAlertMixin from './add_phone_alert';
 import {
     MoneyFilterMixin,
     RebrandingFilterMixin,
@@ -34,4 +35,5 @@ export {
     TraderHoveredMixin,
     TwitterMixin,
     WebSocketMixin,
+    AddPhoneAlertMixin,
 };
