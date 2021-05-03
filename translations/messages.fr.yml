@@ -749,6 +749,7 @@ comment.deleted: 'Commentaire supprimé.'
 comment.edited: 'Commentaire modifié.'
 comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
+comment.min_amount:
 like.removed: 'Mention aimé retirée.'
 airdrop.end: 'Finaliser cet airdrop'
 airdrop.amount_tokens: 'Nombre de tokens pour l''airdrop:'
