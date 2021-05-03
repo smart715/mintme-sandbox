@@ -238,12 +238,20 @@
             :no-close="false"
             @close="closeDeposit()"
         />
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            :no-close="false"
+            @close="addPhoneModalVisible = false"
+        >
+        </add-phone-alert-modal>
     </div>
 </template>
 
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
+import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 import {
     WebSocketMixin,
     FiltersMixin,
@@ -251,6 +259,7 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
+    AddPhoneAlertMixin,
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
@@ -271,11 +280,13 @@ export default {
         RebrandingFilterMixin,
         NotificationMixin,
         LoggerMixin,
+        AddPhoneAlertMixin,
     ],
     components: {
         BuyCrypto,
         WithdrawModal,
         DepositModal,
+        AddPhoneAlertModal,
     },
     props: {
         withdrawUrl: {type: String, required: true},
@@ -291,6 +302,8 @@ export default {
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
+        cantMakeDepositWithdrawal: Boolean,
+        profileNickname: String,
     },
     data() {
         return {
@@ -306,6 +319,8 @@ export default {
             depositDescription: null,
             showDepositModal: null,
             noClose: false,
+            addPhoneModalMessageType: 'deposit_withdrawal',
+            addPhoneModalProfileNickName: this.profileNickname,
             tooltipOptions: {
                 placement: 'bottom',
                 arrow: true,
@@ -427,6 +442,13 @@ export default {
         });
     },
     methods: {
+        checkIsUserAbleToDepositWithdraw: function() {
+            if (this.cantMakeDepositWithdrawal) {
+                this.addPhoneModalVisible = true;
+                return false;
+            }
+            return true;
+        },
         isCryptoActionDisabled: function(action, data) {
             return this.isUserBlocked
             || this.isDisabledCrypto(data.name)
@@ -459,6 +481,10 @@ export default {
                 return;
             }
 
+            if (!this.checkIsUserAbleToDepositWithdraw()) {
+                return;
+            }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
@@ -487,6 +513,10 @@ export default {
             }
 
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
+                return;
+            }
+
+            if (!this.checkIsUserAbleToDepositWithdraw()) {
                 return;
             }
 

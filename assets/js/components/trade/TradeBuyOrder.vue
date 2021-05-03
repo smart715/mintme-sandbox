@@ -269,6 +269,13 @@ export default {
                     quote: this.market.quote.symbol,
                 }), data)
                     .then(({data}) => {
+                        if (
+                            data.hasOwnProperty('error') &&
+                            data.hasOwnProperty('type')
+                        ) {
+                            this.$emit('making-order-prevented');
+                            return;
+                        }
                         if (data.result === 1) {
                             this.resetOrder();
                         }

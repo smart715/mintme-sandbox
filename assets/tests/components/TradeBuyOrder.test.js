@@ -6,6 +6,7 @@ import Vuex from 'vuex';
 import tradeBalance from '../../js/storage/modules/trade_balance';
 import orders from '../../js/storage/modules/orders';
 
+
 describe('TradeBuyOrder', () => {
     beforeEach(() => {
        moxios.install();
@@ -96,6 +97,24 @@ describe('TradeBuyOrder', () => {
         wrapper.vm.buyAmount = 2;
         wrapper.vm.placeOrder();
         done();
+    });
+
+    it('should show phone verify modal if user is not totally authenticated', () => {
+        moxios.stubRequest('token_place_order', {
+            status: 200,
+            response: {
+                error: true,
+                type: 'trading',
+            },
+        });
+
+        wrapper.vm.placeOrder();
+
+        moxios.wait(() => {
+            wrapper.vm.$emit('making-order-prevented');
+            expect(wrapper.emitted().making-order-prevented).toBeTruthy();
+            done();
+        });
     });
 
     describe('useMarketPrice', function() {
