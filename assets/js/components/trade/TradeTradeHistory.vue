@@ -20,7 +20,6 @@
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
-                            ref="tableData"
                             :items="ordersList"
                             :fields="fields">
 
@@ -289,11 +288,6 @@ export default {
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-
-
-                    if (this.$refs.tableData) {
-                        this.$refs.tableData.hasOwnProperty('refresh') ? this.$refs.tableData.refresh() : null;
-                    }
 
                     resolve(result.data);
                 }).catch(reject);
