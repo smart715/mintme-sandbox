@@ -82,10 +82,12 @@ class MarketConsumer implements ConsumerInterface
         $quote = $this->cryptoManager->findBySymbol($clbResult->getQuote())
             ?? $this->tokenManager->findByName($clbResult->getQuote());
 
-        if (!$base && !$quote) {
-            $this->logger->error(
-                '[market-consumer] market not found: '.$body
+        if (!$base || !$quote) {
+            $this->logger->warning(
+                '[market-consumer] base or quote not found: '.$body
             );
+
+            return true;
         }
 
         $market = new Market($base, $quote);
