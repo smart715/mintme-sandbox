@@ -1,5 +1,5 @@
 <template>
-    <div class="comments">
+    <div v-if="post.content" class="comments">
         <comment-form
             class="p-2"
             :logged-in="loggedIn"
