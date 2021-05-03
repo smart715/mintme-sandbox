@@ -265,7 +265,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import ConfirmModal from '../../modal/ConfirmModal';
 import Modal from '../../modal/Modal';
-import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin} from '../../../mixins';
+import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin, AddPhoneAlertMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
 import {toMoney, openPopup} from '../../../utils';
 import gapi from 'gapi';
@@ -283,6 +283,7 @@ export default {
         LoggerMixin,
         FiltersMixin,
         TwitterMixin,
+        AddPhoneAlertMixin,
     ],
     components: {
         ConfirmModal,
@@ -320,7 +321,8 @@ export default {
             blackListedDomain: false,
             checkDomainTimeout: null,
             referralCode: null,
-            addPhoneModalVisible: false,
+            addPhoneModalProfileNickName: this.profileNickname,
+            addPhoneModalMessageType: 'airdrop',
         };
     },
     mounted: function() {
@@ -330,14 +332,6 @@ export default {
         this.showModal = this.showAirdropModal;
     },
     computed: {
-        addPhoneModalMessage: function() {
-            return this.$t('modal.add_phone_alert.airdrop', {
-                profileUrl: this.$routing.generate('profile-view', {
-                  nickname: this.profileNickname,
-                  edit: 1,
-                }),
-            });
-        },
         actionsLength() {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
         },
@@ -555,20 +549,19 @@ export default {
                 id: this.airdropCampaign.id,
             }))
                 .then((response) => {
-                    if (response.data.hasOwnProperty('error')) {
+                    if (
+                        response.data.hasOwnProperty('error') &&
+                        response.data.hasOwnProperty('type')
+                    ) {
+                        this.errorType = response.data.type;
                         this.addPhoneModalVisible = true;
                         return;
                     }
-
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
                 })
                 .catch((err) => {
-                    if (HTTP_UNAUTHORIZED === err.response.status) {
-                        this.addPhoneModalVisible = true;
-                        return;
-                    }
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
                         this.notifyError(err.response.data.message);
                         setTimeout(()=> {
