@@ -2,7 +2,8 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import LimitedTextarea from './components/LimitedTextarea';
 import Guide from './components/Guide';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
-import {NotificationMixin} from './mixins/';
+import {NotificationMixin, AddPhoneAlertMixin} from './mixins/';
+import AddPhoneAlertModal from './components/modal/AddPhoneAlertModal';
 import i18n from './utils/i18n/i18n';
 import {
     HTTP_OK,
@@ -17,7 +18,7 @@ import {
 new Vue({
     el: '#token',
     i18n,
-    mixins: [NotificationMixin],
+    mixins: [NotificationMixin, AddPhoneAlertMixin],
     delimiters: ['${', '}'],
     data() {
         return {
@@ -29,12 +30,16 @@ new Vue({
             tokenNameInBlacklist: false,
             description: '',
             tokenCreation: true,
+            noClose: true,
+            addPhoneModalMessageType: 'token_create',
+
         };
     },
     components: {
         LimitedTextarea,
         FontAwesomeIcon,
         Guide,
+        AddPhoneAlertModal,
     },
     computed: {
         saveBtnDisabled: function() {
@@ -87,6 +92,11 @@ new Vue({
         },
     },
     methods: {
+        closeAddPhoneModal: function() {
+            window.history.length > 1
+                ? window.history.back()
+                : window.location.href = '/';
+        },
         redirectToProfile: function() {
             location.href = this.$routing.generate('profile-view');
         },
@@ -127,6 +137,9 @@ new Vue({
     },
     mounted: function() {
         window.onload = () => this.domLoaded = true;
+        if (this.$refs.tokenCreateError.value) {
+            this.addPhoneModalVisible = true;
+        }
         this.$axios.single.get(this.$routing.generate('check_token_creation'))
             .then((result) => {
                 if (result.data) {
