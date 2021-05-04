@@ -32,7 +32,7 @@
                 </a>
                 <b> {{ $t('by') }}</b>
                 <a :href="$routing.generate('token_show', {name: post.token.name})" class="text-white">
-                    <img :src="post.token.image.avatar_small"  class="rounded-circle d-inline-block" alt="avatar">
+                    <img :src="tokenAvatar"  class="rounded-circle d-inline-block" alt="avatar">
                 </a>
                 <small>{{ post.token.name }}</small>
             </h2>
@@ -256,6 +256,11 @@ export default {
         },
         isOwner() {
             return this.loggedInUserId === this.post.token.ownerId;
+        },
+        tokenAvatar() {
+            return null !== this.post.image
+                ? this.post.token.image.avatar_small
+                : require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
         },
     },
     methods: {
