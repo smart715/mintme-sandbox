@@ -185,9 +185,9 @@ class PostsController extends AbstractFOSRestController
             throw new ApiNotFoundException($this->translator->trans('post.not_found'));
         }
 
-        $this->denyAccessUnlessGranted('view', $post);
+        $canView = $this->isGranted('view', $post);
 
-        return $this->view($post->getComments(), Response::HTTP_OK);
+        return $this->view($canView ? $post->getComments() : [], Response::HTTP_OK);
     }
 
     /**

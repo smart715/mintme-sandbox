@@ -49,6 +49,8 @@
                             coinify-ui-url="{{ global_coinify_ui_url }}"
                             :coinify-partner-id="{{ global_partner_id }}"
                             :coinify-crypto-currencies="{{ global_coinify_crypto_currencies | json_encode }}"
+                            :cant-make-deposit-withdrawal="{{ error ? 'true' : 'false' }}"
+                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                         >
                         </wallet>
                     </b-tab>

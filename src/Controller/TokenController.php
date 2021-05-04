@@ -230,6 +230,7 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('new-trades');
             $this->denyAccessUnlessGranted('trading');
+            $this->denyAccessUnlessGranted('create', $token);
 
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
@@ -312,6 +313,7 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
+            'tokenCreateError' => !$this->isGranted('create', $token),
         ]);
     }
 

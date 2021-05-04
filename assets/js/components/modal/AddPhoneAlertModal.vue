@@ -2,10 +2,11 @@
     <div>
         <modal
             :visible="visible"
+            :no-close="noClose"
             @close="closeModal">
             <template slot="body">
                 <div class="text-center">
-                    <div class="col-12 pt-2" v-html="$sanitize(body)"></div>
+                    <div class="col-12 pt-2" v-html-sanitize="body"></div>
                     <div class="pt-2 text-center">
                         <button
                             class="btn btn-primary"
@@ -31,6 +32,10 @@ export default {
     props: {
         visible: Boolean,
         message: String,
+        noClose: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         body: function() {

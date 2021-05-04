@@ -28,6 +28,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/orders")
@@ -55,6 +56,8 @@ class OrdersController extends DevApiController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler,
@@ -62,7 +65,8 @@ class OrdersController extends DevApiController
         TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter,
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        TranslatorInterFace $translator
     ) {
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
@@ -71,6 +75,7 @@ class OrdersController extends DevApiController
         $this->rebrandingConverter = $rebrandingConverter;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -231,6 +236,12 @@ class OrdersController extends DevApiController
     ): View {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
+
+        if (!$this->isGranted('make-orders')) {
+            return $this->view([
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ], Response::HTTP_OK);
+        }
 
         $base = $request->get('base');
         $quote = $request->get('quote');
