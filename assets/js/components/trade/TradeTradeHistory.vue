@@ -280,9 +280,11 @@ export default {
                     id: this.lastId,
                 })).then((result) => {
                     if (!result.data.length) {
-                        console.log(result.data);
                         if (!attach) {
-                            this.tableData = result.data;
+                            console.log(attach);
+                            console.log(this.tableData);
+
+                            return resolve(this.tableData);
                         }
 
                         return resolve([]);
