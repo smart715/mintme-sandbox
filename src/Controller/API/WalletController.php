@@ -104,6 +104,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createAccessDeniedException();
         }
 
+        if (!$this->isGranted('make-withdrawal')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
             ?? $tokenManager->findByName($request->get('crypto'));
 

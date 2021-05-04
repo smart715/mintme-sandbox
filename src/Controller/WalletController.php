@@ -73,6 +73,7 @@ class WalletController extends Controller
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
             'tab' => $tab,
+            'error' => !$this->isGranted('make-deposit') || !$this->isGranted('make-withdrawal'),
         ]);
     }
 

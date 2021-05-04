@@ -3,7 +3,16 @@
 {% block title %}{% trans %}page.token_creation.title{% endtrans %} | mintMe{% endblock %}
 
 {% block content %}
-    <div class="container" id="token">
+    <div id="token" class="container">
+        <input type="hidden" ref="profileNickname" value="{{ app.user ? app.user.profile.nickname : '' }}">
+        <input type="hidden" ref="tokenCreateError" value="{{tokenCreateError}}">
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            :no-close="true"
+            @close="closeAddPhoneModal"
+        >
+        </add-phone-alert-modal>
         <div class="row pt-4 justify-content-center">
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">

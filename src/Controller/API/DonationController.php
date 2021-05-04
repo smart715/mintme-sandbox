@@ -130,6 +130,10 @@ class DonationController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('trading');
         $user = $this->getCurrentUser();
 
+        if (!$this->isGranted('make-donation')) {
+            return $this->view(['error' => true, 'type' => 'donation'], Response::HTTP_OK);
+        }
+
         $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
 
         if (!$lock->acquire()) {
