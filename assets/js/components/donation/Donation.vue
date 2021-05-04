@@ -77,6 +77,11 @@
                                             {{ $t('confirm_modal.continue') }}
                                         </template>
                                     </confirm-modal>
+                                    <add-phone-alert-modal
+                                        :visible="addPhoneModalVisible"
+                                        :message="addPhoneModalMessage"
+                                        @close="addPhoneModalVisible = false"
+                                    />
                                 </div>
                             </div>
                             <div class="mt-1">
@@ -174,8 +179,10 @@ import {
     LoggerMixin,
     RebrandingFilterMixin,
     WebSocketMixin,
+    AddPhoneAlertMixin,
 } from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
+import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 import Guide from '../Guide';
 import LoginSignupSwitcher from '../LoginSignupSwitcher';
 import Decimal from 'decimal.js';
@@ -205,12 +212,14 @@ export default {
         LoggerMixin,
         RebrandingFilterMixin,
         WebSocketMixin,
+        AddPhoneAlertMixin,
     ],
     components: {
         PriceConverterInput,
         Guide,
         ConfirmModal,
         LoginSignupSwitcher,
+        AddPhoneAlertModal,
     },
     props: {
         market: Object,
@@ -218,6 +227,7 @@ export default {
         googleRecaptchaSiteKey: String,
         donationParams: Object,
         disabledServicesConfig: String,
+        profileNickname: String,
     },
     data() {
         return {
@@ -241,6 +251,8 @@ export default {
             tokensAvailabilityChanged: false,
             USD,
             showForms: false,
+            addPhoneModalMessageType: 'donation',
+            addPhoneModalProfileNickName: this.profileNickname,
         };
     },
     computed: {
@@ -411,6 +423,14 @@ export default {
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {
+                    if (
+                        response.data.hasOwnProperty('error') &&
+                        response.data.hasOwnProperty('type')
+                    ) {
+                        this.errorType = response.data.type;
+                        this.addPhoneModalVisible = true;
+                        return;
+                    }
                     this.notifySuccess(
                         this.$t('donation.successfully_made', {
                             amount: this.amountToReceive,

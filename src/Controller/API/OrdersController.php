@@ -125,6 +125,10 @@ class OrdersController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
 
+        if (!$this->isGranted('make-order', $market)) {
+             return $this->view(['error' => true, 'type' => 'make_orders'], Response::HTTP_OK);
+        }
+
         /** @var User $currentUser */
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
