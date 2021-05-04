@@ -666,7 +666,7 @@ donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
-confirm_modal.continue: 'Continuar'
+confirm_modal.continue: Continuar
 confirm_modal.cancel: Cancelar
 confirm_modal.accept_delete: 'Sí, elimínalo'
 deposit_modal.title: DEPOSITAR
@@ -744,7 +744,7 @@ comment.deleted: 'Comentario borrado.'
 comment.edited: 'Comentario editado.'
 comment.liked: 'Comentario que gustó.'
 comment.load_error: 'Error al cargar los comentarios'
-comment.min_amount: ''
+comment.min_amount: 'Se necesita %amount% %token% para ver los comentarios.'
 like.removed: 'Me gusta eliminado '
 airdrop.end: 'Finalizar este airdrop'
 airdrop.amount_tokens: 'Cantidad de tokens para el airdrop:'
@@ -803,6 +803,8 @@ ongoing_airdrop.referral: 'Adicionalmente, obtenga %halfReward% %tokenName% por 
 ongoing_airdrop.actions.claim_error: 'Ocurrió un error al completar la tarea, inténtelo mas tarde'
 ongoing_airdrop.twitter_message.confirm: 'Al hacer clic en aceptar, publicaremos el siguiente mensaje en twitter desde su cuenta'
 ongoing_airdrop.accept: Aceptar
+ongoing_airdrop.claim.login_to_complete: 'Para completar la reclamación del airdrop, regístrese o inicie sesión'
+ongoing_airdrop.claim: Reclamar
 token.deploy.final_step: 'Este es el último paso para la creación del token. Despues de pagar el despliegue de su token en la blockchain, usted y otros podrán retirar tokens desde MintMe hacia su billetera MintMe Coin.'
 token.deploy.frozen: 'Los MINTME gastados acá serán inaccesibles (congelados) para todos durante 5 años. De esta manera se disminuyen los MINTME en circulación con cada compra y se incrementa la probabilidad de que el precio de MINTME aumente.'
 token.deploy.irreversible: 'Este proceso es irreversible, una vez que confirmes el pago no hay vuelta atrás.'
@@ -876,11 +878,11 @@ token.intro.statistics.not_yet_released.header: 'No liberados aún:'
 token.intro.statistics.not_yet_released.guide_header: 'No liberados aún'
 token.intro.statistics.not_yet_released.guide_body: 'Número de tokens que aún no han sido entregados al creador del token o vendidos en el mercado'
 token.intro.statistics.created: 'Creado el:'
-token.intro.statistics.holders.header:
-token.intro.statistics.holders.guide_header:
+token.intro.statistics.holders.header: Propietarios
+token.intro.statistics.holders.guide_header: 'El número de personas que tienen esta moneda'
 token.intro.created_modal.paragraph_1.part_1: 'Felicitaciones por crear su propio token %tokenName%. El siguiente paso es enviar un mensaje a todas las personas que conoces con un enlace a tu token'
 token.intro.created_modal.paragraph_1.part_2: 'pidiendo apoyo. También puedes usar la función de airdrop y obsequiar tus monedas en pequeñas cantidades a cambio de anunciarlo. Considere enviar mensajes a personas que no conoce, pero esté preparado para tener argumentos fuertes sobre por qué deberían comprar su token.'
-token.intro.created_modal.paragraph_2:
+token.intro.created_modal.paragraph_2: 'Los usuarios que compren tokens a través de la sección de compra que se muestra debajo del menú del token, se las comprarán directamente a usted, al contrario que la opción de trade. Recuerda que la comercialización de tu ficha depende de ti y que la mejor manera de atraer a los seguidores es lanzando tus fichas mediante la función de incorporada para airdrops. Así que empiece a compartir el enlace a su ficha ahora y ¡buena suerte!'
 token.intro.created_modal.paragraph_3: 'Además, consulte nuestros artículos con consejos de marketing:'
 token.intro.created_modal.list_1.item_1: 'Es hora de la venta de tokens, ¿cómo puedo hacer la diferencia?'
 token.intro.created_modal.list_1.item_2: '¿Apuntando a un token fuerte?'
@@ -936,7 +938,7 @@ token.change_name.must_own_all: 'Debe tener todos sus tokens para poder cambiar 
 token.change_name.changed_successfully: 'El nombre del Token se ha cambiado exitosamente'
 token.delete.delete_token: 'Eliminar Token'
 token.delete.header: 'Eliminar Token'
-token.delete.body.over_limit:
+token.delete.body.over_limit: 'Has vendido más de %limit% de tokens.'
 token.delete.body.deploying_or_deployed: 'El token está siendo desplegado o ya ha sido desplegado.'
 token.progress.body: 'Mientras más información suministre sobre su token y perfil, mayor será este número. Además obtendrá un incremento significativo si despliega su token en la blockchain. '
 token.release.new_address: 'Nueva dirección:'
@@ -1089,7 +1091,7 @@ trading.no_one_airdrop: 'Aún no hay ningún airdrop activo'
 trading.no_any_token: 'No hay tokens aún'
 trading.show_all_tokens: 'Mostrar todos los tokens'
 trading.deployed.label: 'Desplegados en MINTME'
-trading.deployed_eth.label: ''
+trading.deployed_eth.label: 'Desplegado en ETH'
 trading.airdrop.label: 'Airdrops activos'
 trading.all_tokens.label: 'Todos los tokens'
 trading.own_tokens.label: 'Mis tokens'
@@ -1104,10 +1106,10 @@ trading.buy_depth.help: 'La demanda es la cantidad total de órdenes de compra r
 trading.fields.pair: Nombre
 trading.fields.change: Cambio
 trading.fields.last_price: 'Último precio'
-trading.fields.rank:
-trading.fields.rank.help:
-trading.fields.holders:
-trading.fields.holders.help:
+trading.fields.rank: '#'
+trading.fields.rank.help: 'La posición global del token.'
+trading.fields.holders: Propietarios
+trading.fields.holders.help: 'El número de personas que tienen esta moneda'
 wallet.balance: Balance
 wallet.deposit: Depositar
 wallet.withdraw: Retirar
@@ -1331,6 +1333,7 @@ phone_number.add.limit_daily: 'Ha alcanzado el límite diario previsto, por favo
 phone_number.add.limit_weekly: 'Ha alcanzado el límite semanal previsto, por favor, intente añadir el número de teléfono la próxima semana'
 phone_number.add.limit_monthly: 'Ha alcanzado el límite mensual previsto, por favor, intente añadir el número de teléfono el próximo mes'
 phone_number.in_use: 'Este número de teléfono ya está en uso'
+phone_number.already_registered: 'Ya había registrado un número de teléfono, el campo del teléfono no puede estar vacío'
 activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(s) a <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'
@@ -1376,4 +1379,10 @@ mail.airdrop_claimed.subject: '¡Gane más con el airdrop!'
 mail.airdrop_claimed.message_1: 'Ha recibido <strong>%airdropReward%</strong> %tokenName% del airdrop. ¿Quiere más?'
 mail.airdrop_claimed.message_2: 'Utilice un enlace de referencia del airdrop y gane más por cada persona que se registre y complete con éxito la reclamación del airdrop. <a href="%airdropReferralLink%">%airdropReferralLink%</a>'
 mail.airdrop_claimed.message_3: 'También puede ganar compartiendo las <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family: Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">publicaciones</a> con una recompensa establecida.'
-modal.add_phone_alert.airdrop: 'Para obtener la recompensa es necesario que agregue un número de teléfono en su <a href="%profileUrl%">perfil</a>.'
+modal.add_phone_alert: '%messageType% es necesario que agregue un número de teléfono en su <a href="%profileUrl%">perfil</a>.'
+modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
+modal.add_phone_alert_make_orders.message: 'Para emitir órdenes'
+modal.add_phone_alert_token_create.message: 'Para crear un token'
+modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
+modal.add_phone_alert_donation.message: 'Para hacer donaciones'
+api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'

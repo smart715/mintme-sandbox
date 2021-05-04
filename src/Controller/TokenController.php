@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -229,6 +230,7 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('new-trades');
             $this->denyAccessUnlessGranted('trading');
+            $this->denyAccessUnlessGranted('create', $token);
 
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
@@ -302,6 +304,8 @@ class TokenController extends Controller
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
+
+                    throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
                 }
             }
         }
@@ -309,6 +313,7 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
+            'tokenCreateError' => !$this->isGranted('create', $token),
         ]);
     }
 
@@ -464,12 +469,17 @@ class TokenController extends Controller
         $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
 
         $topHolders = null;
+        $serviceUnavailable = false;
 
         if ('intro' === $tab) {
-            $topHolders = $this->balanceHandler->topHolders(
-                $token,
-                $this->parameterBag->get('top_holders')
-            );
+            try {
+                $topHolders = $this->balanceHandler->topHolders(
+                    $token,
+                    $this->parameterBag->get('top_holders')
+                );
+            } catch (\Throwable $e) {
+                $serviceUnavailable = true;
+            }
         }
 
         return $this->render(
@@ -511,6 +521,7 @@ class TokenController extends Controller
                 'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
+                'serviceUnavailable' => $serviceUnavailable,
             ], $extraData)
         );
     }

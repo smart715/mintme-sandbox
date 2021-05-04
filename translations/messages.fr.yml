@@ -749,6 +749,7 @@ comment.deleted: 'Commentaire supprimé.'
 comment.edited: 'Commentaire modifié.'
 comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
+comment.min_amount: 'You need %amount% %token% to see comments.'
 like.removed: 'Mention aimé retirée.'
 airdrop.end: 'Finaliser cet airdrop'
 airdrop.amount_tokens: 'Nombre de tokens pour l''airdrop:'
@@ -882,10 +883,10 @@ token.intro.statistics.not_yet_released.guide_header: 'Pas encore libéré:'
 token.intro.statistics.not_yet_released.guide_body: 'Nombre de jetons pas encore libéré par le créateur du jeton ou vendu sur le marché'
 token.intro.statistics.created: 'crée le:'
 token.intro.statistics.holders.header: 'Détenteurs:'
-token.intro.statistics.holders.guide_header:
+token.intro.statistics.holders.guide_header: 'Nombre de personnes ayant cette pièce'
 token.intro.created_modal.paragraph_1.part_1: 'Féliciations '
 token.intro.created_modal.paragraph_1.part_2: 'besoin de support. Vous pouvez également utiliser la fonction Airdrop et donner vos pièces en petites quantités en échange de la publicité. Pensez à envoyer des messages aux personnes que vous ne connaissez pas, mais soyez prêt à avoir des arguments solides sur les raisons pour lesquelles ils devraient acheter votre jeton.'
-token.intro.created_modal.paragraph_2:
+token.intro.created_modal.paragraph_2: 'Les utilisateurs qui achètent des jetons via la section Acheter affichée sous le menu Jeton, les achèteront directement auprès de vous, contrairement à l''option d''échange. N''oubliez pas que la commercialisation de votre jeton dépend de vous et que le meilleur moyen d''attirer des supporters est de faire des airdrops de vos jetons à via la fonction d''airdrop intégrée. Alors commencez à partager le lien vers votre jeton maintenant et bonne chance!'
 token.intro.created_modal.paragraph_2.part_1: 'Utilisateurs achetant des jetons via ce lien'
 token.intro.created_modal.paragraph_2.part_2: 'achetez-le uniquement auprès de vous, contrairement à l''option d''échange. Souvenez-vous que la vulgarisation de votre jeton dépend de vous et le meilleur moyen d''attirer des supporters se fait via des airdrops de vos jetons qui se fait par le biais de la fonction d''airdrop intégrée. De ce fait partagez le lien vers votre jeton maintenant et bonne chance!'
 token.intro.created_modal.paragraph_3: 'Consultez également nos articles ayant des actuces marketing:'
@@ -901,7 +902,7 @@ token.intro.created_modal.list_2.item_2: 'Meilleure position sur la page d''éch
 token.intro.created_modal.paragraph_6.part_1: Lire
 token.intro.created_modal.paragraph_6.part_2: 'Comment déployer mon jeton sur la chaîne de blocs?'
 token.intro.created_modal.paragraph_6.part_3: 'article pour en savoir plus sur les détails.'
-token.intro.statistics.show:
+token.intro.statistics.show: 'Afficher les statistisques'
 token.release_period.header: 'Période de libération du jeton:'
 token.release_period.body: 'Durée qu''il faudra pour la libération totale des jetons non libérés lors de la création. Les jetons sont progressivement libérés durant une période bien définie afin de s''assurer de ne pas inonder le marché. Si vous choisissez de libérer 100% de vos jetons immédiatement, cette fonctionnalité sera désactivée et les 10 millions seront directement accessibles.'
 token.release_period.amount: 'Quantité libérée au début: %released%%'
@@ -946,7 +947,7 @@ token.delete.delete_token: 'Supprimer ce jeton'
 token.delete.header: 'Supprimer ce jeton'
 token.delete.body.all_tokens: 'Vous avez besoin de tous vos jetons afin de supprimer votre jeton'
 token.delete.body.deploying_or_deployed: 'Jeton en cours de déploiement ou déployé.'
-token.delete.body.over_limit:
+token.delete.body.over_limit: 'Vous avez vendu %limit% jetons.'
 token.progress.body: 'Plus vous fournissez d''informations sur votre jeton et votre profil, plus ce nombre sera élevé. Vous obtiendrez également un gros coup de pouce si vous déployez votre jeton sur la blockchain.'
 token.release.new_address: 'Nouvelle adresse:'
 token.release.not_deployed: 'Jeton pas encore déployé.'
@@ -1113,8 +1114,8 @@ trading.buy_depth.help: 'La demande est le montant d''ordres d''achat sur MINTME
 trading.fields.pair: Nom
 trading.fields.change: Echange
 trading.fields.last_price: 'Dernier prix'
-trading.fields.holders:
-trading.fields.holders.help:
+trading.fields.holders: Titulaires
+trading.fields.holders.help: 'Nombre de personnes ayant cette pièce'
 wallet.balance: Solde
 wallet.deposit: Dépôt
 wallet.withdraw: Retrait
@@ -1345,6 +1346,7 @@ phone_number.add.limit_monthly: 'Vous avez atteint la limite pour ce mois, veuil
 phone_confirmation.sent: Envoyé
 phone_number.edit.limit: 'Vous ne pouvez modifier le numéro de téléphone qu''une fois par mois'
 phone_number.in_use: 'Ce numéro de téléphone est déjà utilisé'
+phone_number.already_registered: 'Vous avez déjà un numéro de téléphone enregistré, le champ téléphone ne peut être vide'
 activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% jetons distribués à <a href="%userUrl%">%user%</a>'
 activity_1_message: '<a href="%tokenUrl%">%token%</a> début de l''airdrop'
 activity_2_message: 'Fin de l''airdrop pour <a href="%tokenUrl%">%token%</a>'
@@ -1374,4 +1376,13 @@ mail.airdrop_claimed.message_1: 'You avez reçu <strong>%airdropReward%</strong>
 mail.airdrop_claimed.message_2: 'Utiliser un lien de parrainage d''airdrop et gagner plus pour chaque personne qui s''inscrit et réussit à réclamer un airdrop. <a href="%airdropReferralLink%">%airdropReferralLink%</a>'
 mail.airdrop_claimed.message_3: 'Vous pouvez également gagner en partageant <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">posts</a> avec un ensemble de récompense.'
 modal.add_phone_alert.airdrop: 'Afin de collecter des récompenses vous devez ajouter un numéro de téléphone à votre <a href="%profileUrl%">profil</a>.'
-confirm_modal.continue:
+confirm_modal.continue: Continue
+ongoing_airdrop.claim.login_to_complete: 'To complete claiming airdrop please sign up or log in'
+ongoing_airdrop.claim: Claim
+modal.add_phone_alert: '%messageType% you need to add a phone number in your <a href="%profileUrl%">profile</a>.'
+modal.add_phone_alert_airdrop.message: 'To collect the reward'
+modal.add_phone_alert_make_orders.message: 'To make orders'
+modal.add_phone_alert_token_create.message: 'To create a token'
+modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawals'
+modal.add_phone_alert_donation.message: 'To make donations'
+api.add_phone_number_message: 'you need to add phone number in your profile'
