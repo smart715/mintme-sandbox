@@ -283,8 +283,6 @@ export default {
                         if (!attach) {
                             console.log(attach);
                             console.log(this.tableData);
-
-                            return resolve(this.tableData);
                         }
 
                         return resolve([]);
