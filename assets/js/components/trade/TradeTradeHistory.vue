@@ -280,7 +280,7 @@ export default {
                     id: this.lastId,
                 })).then((result) => {
                     if (!result.data.length) {
-                        comsole.log(result.data);
+                        console.log(result.data);
                         if (!attach) {
                             this.tableData = result.data;
                         }
@@ -290,7 +290,7 @@ export default {
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
                     console.log(attach);
-                    comsole.log(result.data);
+                    console.log(result.data);
 
                     resolve(result.data);
                 }).catch(reject);
