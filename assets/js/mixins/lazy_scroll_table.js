@@ -30,7 +30,10 @@ export default {
                 if (evt.target.scrollTop && evt.target.scrollTop + boundings.height >=
                     evt.target.scrollHeight - 1 && !this.loading) {
                     this.loading = true;
-                    this.updateTableData(true).then(() => {this.loading = false; console.log(this.loading);}).catch(() => console.log('err'));
+                    this.updateTableData(true).then(() => {
+                        this.loading = false;
+                        console.log(this.loading);
+                    }).catch(() => console.log('err'));
                 }
             };
         },
