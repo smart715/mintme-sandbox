@@ -281,18 +281,13 @@ export default {
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
-                            console.log(attach);
-                            console.log(this.tableData);
                             this.tableData = result.data;
-                            console.log(this.tableData);
                         }
 
                         return resolve([]);
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-                    console.log(attach);
-                    console.log(result.data);
 
                     resolve(result.data);
                 }).catch(reject);
