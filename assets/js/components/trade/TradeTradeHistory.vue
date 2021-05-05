@@ -15,8 +15,8 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table mb-0" ref="table">
-                    <template v-if="loaded">
+                <template v-if="loaded">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
@@ -108,19 +108,19 @@
                                 </span>
                             </template>
                         </b-table>
-                        <div v-if="!hasOrders">
-                            <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
-                        </div>
-                        <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="p-5 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                </div>
+                    </div>
+                    <div v-if="!hasOrders">
+                        <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
+                    </div>
+                    <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
