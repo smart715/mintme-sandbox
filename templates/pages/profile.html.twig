@@ -46,7 +46,7 @@
                             </a>
                         {% endif %}
                         <div v-if="!showEditForm">
-                            <div class="col-12">
+
                                 <div class="float-left mr-2" style="max-width: 50%;">
                                     <avatar
                                         type="profile"
@@ -93,18 +93,22 @@
                                             <a class="word-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
                                         </div>
                                     {% endif %}
-                                <div class="col-12 pt-3">
-                                    <bbcode-view value="{{ profile.description }}"></bbcode-view>
-                                </div>
+
+                                            <div class="pb-1">
+                                                <br>
+                                                <br>
+                                              <bbcode-view value="{{ profile.description }}"></bbcode-view>
+                                            </div>
                                 {% endif %}
-                                <div class="pb-1">
-                                    {% if profile.created is not null %}
+                                <div class="col-12 pt-3">
+                                   {% if profile.created is not null %}
                                         {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
-                                    {% endif %}
+                                   {% endif %}
                                 </div>
-                            </div>
+
+                           
                         </div>
-                        {% if (canEdit == true) %}
+                   {% if (canEdit == true) %}
                             <div v-show="showEditForm" v-cloak>
                             {{ form_start(form) }}
                             <div class="row mb-3">
