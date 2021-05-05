@@ -415,7 +415,7 @@ class MarketHandler implements MarketHandlerInterface
             $amount = $isUserDonator
                 ? $donation->getAmount()->subtract($donation->getFeeAmount())
                 : ($donation->getMintmeAmount()
-                    ? $donation->getMintmeAmount()->subtract($donation->getFeeAmount())
+                    ? $donation->getMintmeAmount()->subtract($donation->getMintmeFeeAmount())
                     : $donation->getAmount()->subtract($donation->getFeeAmount()));
 
             return new Deal(
