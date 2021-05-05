@@ -34,6 +34,8 @@ interface DonationHandlerInterface
         Money $amount,
         Money $feeAmount,
         Money $tokenAmount,
-        Token $token
+        Token $token,
+        Money $mintmeAmount,
+        Money $mintmeFeeAmount
     ): Donation;
 }

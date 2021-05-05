@@ -273,7 +273,9 @@ class DonationHandler implements DonationHandlerInterface
             $amountInCrypto,
             $feeAmount,
             $expectedAmount,
-            $token
+            $token,
+            $donationMintmeAmount,
+            $this->calculateFee($donationMintmeAmount)
         );
 
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
@@ -335,7 +337,9 @@ class DonationHandler implements DonationHandlerInterface
         Money $amount,
         Money $feeAmount,
         Money $tokenAmount,
-        Token $token
+        Token $token,
+        Money $mintmeAmount,
+        Money $mintmeFeeAmount
     ): Donation {
         $donation = new Donation();
         $donation
@@ -347,6 +351,12 @@ class DonationHandler implements DonationHandlerInterface
             ->setTokenAmount($tokenAmount)
             ->setToken($token)
         ;
+
+        if (Symbols::WEB !== $currency) {
+            $donation
+                ->setMintmeAmount($mintmeAmount)
+                ->setMintmeFeeAmount($mintmeFeeAmount);
+        }
 
         $this->em->persist($donation);
         $this->em->flush();

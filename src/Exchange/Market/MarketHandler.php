@@ -411,20 +411,31 @@ class MarketHandler implements MarketHandlerInterface
                 return null;
             }
 
+            $isUserDonator = (int)$donation->getDonor()->getId() === $user->getId();
+            $amount = $isUserDonator
+                ? $donation->getAmount()->subtract($donation->getFeeAmount())
+                : ($donation->getMintmeAmount()
+                    ? $donation->getMintmeAmount()->subtract($donation->getFeeAmount())
+                    : $donation->getAmount()->subtract($donation->getFeeAmount()));
+
             return new Deal(
                 0,
                 $donation->getCreatedAt()->getTimestamp(),
                 (int)$donation->getDonor()->getId(),
-                (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
-                (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
-                $donation->getAmount()->subtract($donation->getFeeAmount()),
+                $isUserDonator ? self::BUY : self::SELL,
+                $isUserDonator ? 2 : 1,
+                $amount,
                 $this->moneyWrapper->parse('0', $donation->getCurrency()),
                 $this->moneyWrapper->parse('0', $donation->getCurrency()),
-                $donation->getFeeAmount(),
+                $isUserDonator
+                    ? $donation->getFeeAmount()
+                    : $donation->getMintmeFeeAmount() ?? $donation->getFeeAmount(),
                 0,
                 0,
                 $this->marketFactory->create(
-                    $this->cryptoManager->findBySymbol($donation->getCurrency()),
+                    $this->cryptoManager->findBySymbol(
+                        !$isUserDonator && $donation->getMintmeAmount() ? Symbols::WEB : $donation->getCurrency()
+                    ),
                     $donation->getToken()
                 )
             );
