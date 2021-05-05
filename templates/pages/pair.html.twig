@@ -133,6 +133,7 @@
                             :donation-params="{{ donation_params | json_encode }}"
                             websocket-url="{{ global_websocket_url }}"
                             disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                         >
                         </donation>
                     </div>
@@ -270,6 +271,7 @@
                             {% if isTokenPage %}
                                 :taker-fee="{{ taker_fee }}"
                             {% endif %}
+                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                         >
                         </trade>
                     </b-tab>
