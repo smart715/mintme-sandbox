@@ -10,6 +10,7 @@
                     :orders-updated="ordersUpdated"
                     :token-name="market.base.symbol"
                     :fields="fields"
+                    :total-buy-orders="totalBuyOrders"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
@@ -25,7 +26,7 @@
                     :orders-updated="ordersUpdated"
                     :market="market"
                     :fields="fields"
-                    :total-orders="totalOrders"
+                    :total-sell-orders="totalSellOrders"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
@@ -81,7 +82,8 @@ export default {
         },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
-        totalOrders: [Array, Object],
+        totalSellOrders: [Array, Object],
+        totalBuyOrders: [Array, Object],
         market: Object,
         userId: Number,
         loggedIn: Boolean,
