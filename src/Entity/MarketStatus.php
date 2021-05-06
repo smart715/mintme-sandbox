@@ -244,7 +244,9 @@ class MarketStatus
     /** @Groups({"API"}) */
     public function getHolders(): int
     {
-        return $this->quoteToken ? $this->quoteToken->getHoldersCount() : 0;
+        return $this->quoteToken
+            ? $this->quoteToken->getHoldersCount()
+            : 0;
     }
 
     public function getId(): int

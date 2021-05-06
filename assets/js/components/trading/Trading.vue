@@ -691,7 +691,7 @@ export default {
 
             const baseImage = market.base.image.avatar_small;
             const quoteImage = market.quote.image ? market.quote.image.avatar_small : '';
-          
+
             const sanitizedMarket = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
