@@ -197,12 +197,32 @@ class OrdersController extends AbstractFOSRestController
             self::PENDING_OFFSET
         );
 
+        $allSellOrders=[];
+
+        for ($i=1;; $i++) {
+            $orders = $this->marketHandler->getPendingSellOrders(
+                $market,
+                ($i - 1) * self::PENDING_OFFSET,
+                100,
+            );
+            $count = count($orders);
+
+            foreach ($orders as $order) {
+                $allSellOrders[] = $order;
+            }
+
+            if ($count<100) {
+                break;
+            }
+        }
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
+            'allOrders' => $allSellOrders,
         ];
     }
 

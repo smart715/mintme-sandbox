@@ -25,6 +25,7 @@
                     :orders-updated="ordersUpdated"
                     :market="market"
                     :fields="fields"
+                    :total-orders="totalOrders"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
@@ -80,6 +81,7 @@ export default {
         },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
+        totalOrders: [Array, Object],
         market: Object,
         userId: Number,
         loggedIn: Boolean,
@@ -191,9 +193,9 @@ export default {
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
 
                 let order = obj.main.order;
-                order.amount = obj.sum;
-                order.owner = obj.owner;
-                filtered.push(order);
+                order ? order.amount = obj.sum : '';
+                order ? order.owner = obj.owner : '';
+                order ? filtered.push(order) : '';
             });
             return filtered;
         },

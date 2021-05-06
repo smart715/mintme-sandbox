@@ -60,6 +60,7 @@
                 :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
+                :total-orders="totalOrders"
                 :market="market"
                 :user-id="userId"
                 :logged-in="loggedIn"
@@ -141,6 +142,7 @@ export default {
         return {
             buyOrders: null,
             sellOrders: null,
+            totalOrders: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
@@ -246,6 +248,7 @@ export default {
                     })).then((result) => {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
+                        this.totalOrders = result.data.allOrders;
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -275,6 +278,7 @@ export default {
                                 this.buyPage++;
                                 break;
                         }
+                        this.totalOrders = result.data.allOrders;
 
                         context.resolve();
                         resolve(result.data);
@@ -289,6 +293,12 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
+            let totalOrders = isSell ? this.totalOrders : '';
+            let totalOrder = 0;
+
+            if (totalOrders) {
+              totalOrder = totalOrders.find((order) => data.id === order.id);
+            }
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -299,7 +309,8 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        this.saveOrders(orders, isSell);
+                        totalOrders.push(res.data);
+                        this.saveOrders(orders, isSell, totalOrders);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -316,11 +327,24 @@ export default {
                         order.createdTimestamp = data.ctime;
                     }
 
+                    if (totalOrder && !totalOrder.hasOwnProperty('createdTimestamp') && data.hasOwnProperty('ctime')) {
+                      totalOrder.createdTimestamp = data.ctime;
+                    }
+
                     let index = orders.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+
+                    if (totalOrder) {
+                      let totalIndex = totalOrders.indexOf(totalOrder);
+                      totalOrder.amount = data.left;
+                      totalOrder.price = data.price;
+                      totalOrder.timestamp = data.mtime;
+                      totalOrders[totalIndex] = totalOrder;
+                    }
+
                     this.ordersUpdated = true;
                     break;
                 case WSAPI.order.status.FINISH:
@@ -330,14 +354,23 @@ export default {
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
+
+                    if (totalOrders) {
+                      totalOrders.splice(totalOrders.indexOf(totalOrder), 1);
+                    }
+
                     break;
             }
 
-            this.saveOrders(orders, isSell);
+            this.saveOrders(orders, isSell, totalOrders);
         },
-        saveOrders: function(orders, isSell) {
+        saveOrders: function(orders, isSell, totalOrders) {
             if (isSell) {
                 this.sellOrders = orders;
+                if (totalOrders) {
+                  this.totalOrders = [];
+                  this.totalOrders = totalOrders;
+                }
             } else {
                 this.buyOrders = orders;
             }
