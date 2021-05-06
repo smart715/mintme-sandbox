@@ -203,6 +203,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::SORT_HOLDERS:
+                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders')
+                    ->groupBy('ms');
+                
                 $result[] = 'holders';
                 $result[] = 'to_number(ms.monthVolume)';
 
@@ -254,13 +257,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
         $queryBuilder = $this->repository->createQueryBuilder('ms')
-            ->select('COUNT(u) AS HIDDEN holders', 'ms')
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
             ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
-            ->groupBy('ms')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
         ;
