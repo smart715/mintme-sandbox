@@ -166,6 +166,9 @@ class DonationHandler implements DonationHandlerInterface
         $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationMintmeAmount);
 
+        $mintmeAmount = $donationMintmeAmount;
+        $mintmeFee = $this->calculateFee($donationMintmeAmount);
+
         if ($expectedAmount->greaterThanOrEqual($minTokensAmount) &&
             $sellOrdersSummary->greaterThanOrEqual($donationMintmeAmount)
         ) {
@@ -187,6 +190,9 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
+
+            $mintmeFee = $this->calculateFee($tokensWorthInMintme);
+            $mintmeAmount = $tokensWorthInMintme->subtract($mintmeFee);
         } elseif (!$isDonationInMintme && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $this->executeMarketOrders($donorUser, $donationMintmeAmount, $pendingSellOrders, $cryptoMarket);
@@ -274,8 +280,8 @@ class DonationHandler implements DonationHandlerInterface
             $feeAmount,
             $expectedAmount,
             $token,
-            $donationMintmeAmount,
-            $this->calculateFee($donationMintmeAmount)
+            $mintmeAmount,
+            $mintmeFee
         );
 
         $this->balanceHandler->updateUserTokenRelation($donorUser, $token);
