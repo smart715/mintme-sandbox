@@ -566,10 +566,12 @@ export default {
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
-                let shouldBeReversed = [this.fields.rank.key].includes(key);
+
+                let rank = key === this.fields.rank.key;
+
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return (-1) ** shouldBeReversed * compareResult;
+                return (-1) ** rank * compareResult;
             }
 
             // If the value is not numeric, currently only pair column
