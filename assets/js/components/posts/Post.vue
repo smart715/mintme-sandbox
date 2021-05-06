@@ -44,7 +44,6 @@
                     {{ post.title }}
                 </h2>
             </a>
-
         </template>
         <div>
             <a :href="$routing.generate('profile-view', {nickname: post.author.nickname})" class="text-white">
@@ -262,6 +261,9 @@ export default {
                 ? this.post.token.image.avatar_small
                 : require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
         },
+        tokenLink() {
+            return this.$routing.generate('token_show', {name: this.post.token.name});
+        }
     },
     methods: {
         deletePost() {

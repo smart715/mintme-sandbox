@@ -40,7 +40,7 @@ class PostRepository extends ServiceEntityRepository
                 $this->balanceHandler->balance($user, $token)
             )->getAvailable();
 
-            if (!$available->isZero()) {
+            if ($available->greaterThanOrEqual(new Money(0, new Currency(Symbols::TOK)))) {
                 $tokens[] = $token;
             }
         }

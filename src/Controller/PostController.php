@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Token\Token;
-use App\Entity\User;
 use App\Exception\NotFoundPostException;
 use App\Manager\PostManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
