@@ -207,7 +207,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     ->groupBy('ms');
                 
                 $result[] = 'holders';
-                $result[] = 'to_number(ms.monthVolume)';
 
                 break;
             default:
