@@ -60,7 +60,8 @@
                 :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
-                :total-orders="totalOrders"
+                :total-sell-orders="totalSellOrders"
+                :total-buy-orders="totalBuyOrders"
                 :market="market"
                 :user-id="userId"
                 :logged-in="loggedIn"
@@ -142,7 +143,8 @@ export default {
         return {
             buyOrders: null,
             sellOrders: null,
-            totalOrders: null,
+            totalSellOrders: null,
+            totalBuyOrders: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
@@ -248,7 +250,8 @@ export default {
                     })).then((result) => {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
-                        this.totalOrders = result.data.allOrders;
+                        this.totalSellOrders = result.data.allSellOrders;
+                        this.totalBuyOrders = result.data.allBuyOrders;
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -278,7 +281,8 @@ export default {
                                 this.buyPage++;
                                 break;
                         }
-                        this.totalOrders = result.data.allOrders;
+                        this.totalSellOrders = result.data.allSellOrders;
+                        this.totalBuyOrders = result.data.allBuyOrders;
 
                         context.resolve();
                         resolve(result.data);
@@ -293,7 +297,7 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
-            let totalOrders = isSell ? this.totalOrders : '';
+            let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
             let totalOrder = 0;
 
             if (totalOrders) {
@@ -368,11 +372,15 @@ export default {
             if (isSell) {
                 this.sellOrders = orders;
                 if (totalOrders) {
-                  this.totalOrders = [];
-                  this.totalOrders = totalOrders;
+                  this.totalSellOrders = [];
+                  this.totalSellOrders = totalOrders;
                 }
             } else {
                 this.buyOrders = orders;
+                if (totalOrders) {
+                  this.totalBuyOrders = [];
+                  this.totalBuyOrders = totalOrders;
+                }
             }
         },
     },
