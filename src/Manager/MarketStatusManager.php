@@ -261,8 +261,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->andWhere('qt.isBlocked=false')
             ->groupBy('ms')
             ->setFirstResult($offset)
-            ->setMaxResults($limit)
-        ;
+            ->setMaxResults($limit);
 
         if (null !== $userId) {
             $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')

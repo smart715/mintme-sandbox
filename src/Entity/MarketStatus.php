@@ -241,6 +241,12 @@ class MarketStatus
         $this->rank = $rank;
     }
 
+    /** @Groups({"API"}) */
+    public function getHolders(): int
+    {
+        return $this->quoteToken ? $this->quoteToken->getHoldersCount() : 0;
+    }
+
     public function getId(): int
     {
         return $this->id;

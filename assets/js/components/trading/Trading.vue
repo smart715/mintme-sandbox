@@ -566,7 +566,7 @@ export default {
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
-                let shouldBeReversed = [this.fields.rank.key, this.fields.holders.key].includes(key);
+                let shouldBeReversed = [this.fields.rank.key].includes(key);
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
                 return (-1) ** shouldBeReversed * compareResult;
@@ -691,7 +691,7 @@ export default {
 
             const baseImage = market.base.image.avatar_small;
             const quoteImage = market.quote.image ? market.quote.image.avatar_small : '';
-
+          
             const sanitizedMarket = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
@@ -708,7 +708,7 @@ export default {
                 market.quote.cryptoSymbol,
                 marketCap,
                 market.rank || 0,
-                market.quote.holdersCount || 0
+                market.holders || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -740,7 +740,7 @@ export default {
             cryptoSymbol,
             marketCap = 0,
             rank = 0,
-            holders,
+            holders = 0,
         ) {
             let hiddenName = this.findHiddenName(token);
 
@@ -830,7 +830,7 @@ export default {
                         selectedMarket.quote.cryptoSymbol,
                         selectedMarket.marketCap || 0,
                         selectedMarket.rank || 0,
-                        selectedMarket.quote.holdersCount || 0
+                        selectedMarket.holders || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -893,7 +893,7 @@ export default {
                 market.quote.cryptoSymbol,
                 market.marketCap || 0,
                 market.rank || 0,
-                market.quote.holdersCount || 0
+                market.holders || 0
                 );
 
             if (marketOnTopIndex > -1) {
@@ -982,7 +982,7 @@ export default {
                 market.quote.cryptoSymbol,
                 market.marketCap,
                 market.rank,
-                market.quote.holdersCount
+                market.holders
             );
             this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
