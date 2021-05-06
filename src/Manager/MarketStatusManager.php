@@ -203,9 +203,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::SORT_HOLDERS:
-                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders')
-                    ->groupBy('ms');
-                
+                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
                 $result[] = 'holders';
 
                 break;
@@ -261,6 +259,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->groupBy('ms')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
         ;
