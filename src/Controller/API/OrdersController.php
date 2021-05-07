@@ -199,10 +199,10 @@ class OrdersController extends AbstractFOSRestController
 
         $allSellOrders = [];
 
-        for ($i=1;; $i++) {
+        for ($sellOrderPage=1;; $sellOrderPage++) {
             $sellOrders = $this->marketHandler->getPendingSellOrders(
                 $market,
-                ($i - 1) * self::PENDING_OFFSET,
+                ($sellOrderPage - 1) * self::PENDING_OFFSET,
                 100,
             );
             $sellCount = count($sellOrders);
@@ -218,10 +218,10 @@ class OrdersController extends AbstractFOSRestController
 
         $allBuyOrders = [];
 
-        for ($i=1;; $i++) {
+        for ($buyOrderPage=1;; $buyOrderPage++) {
             $buyOrders = $this->marketHandler->getPendingBuyOrders(
                 $market,
-                ($i - 1) * self::PENDING_OFFSET,
+                ($buyOrderPage - 1) * self::PENDING_OFFSET,
                 100,
             );
             $buyCount = count($buyOrders);
