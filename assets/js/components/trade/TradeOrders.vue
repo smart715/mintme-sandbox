@@ -195,9 +195,11 @@ export default {
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
 
                 let order = obj.main.order;
-                order ? order.amount = obj.sum : '';
-                order ? order.owner = obj.owner : '';
-                order ? filtered.push(order) : '';
+                if (order) {
+                  order.amount = obj.sum;
+                  order.owner = obj.owner;
+                  filtered.push(order);
+                }
             });
             return filtered;
         },
