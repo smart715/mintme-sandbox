@@ -263,7 +263,7 @@ export default {
         },
         tokenLink() {
             return this.$routing.generate('token_show', {name: this.post.token.name});
-        }
+        },
     },
     methods: {
         deletePost() {

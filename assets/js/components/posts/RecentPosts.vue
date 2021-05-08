@@ -1,7 +1,7 @@
 <template>
     <div id="posts-container" ref="postsContainer" class="w-100 d-flex flex-column align-items-center">
         <font-awesome-icon v-if="loading" icon="circle-notch" spin class="loading-spinner" fixed-width />
-        <template v-else-if="posts.length > 0">
+        <template v-else-if="hasPosts">
             <post v-for="(n, i) in posts.length"
                   :post="posts[i]"
                   :key="i"
@@ -10,7 +10,7 @@
             />
         </template>
         <p v-else>
-          {{ $t('post.no_recent_posts') }}
+            {{ $t('post.no_recent_posts') }}
         </p>
     </div>
 </template>
@@ -23,9 +23,15 @@ export default {
     components: {
         Post,
     },
+    props: {
+        postsProp: {
+            type: Array,
+            default: () => [],
+        },
+    },
     data() {
         return {
-            posts: [],
+            posts: this.postsProp,
             nextPage: 0,
             loading: true,
         };
@@ -52,6 +58,11 @@ export default {
             if (bottomOfWindow) {
                 this.fetchPosts();
             }
+        },
+    },
+    computed: {
+        hasPosts() {
+            return this.posts.length > 0;
         },
     },
     mounted() {
