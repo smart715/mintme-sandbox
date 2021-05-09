@@ -315,11 +315,11 @@ class Token implements TradebleInterface, ImagineInterface
      */
     public function getHoldersCount(): int
     {
-        if ($this->users) {
-            return $this->users->count();
+        if (is_null($this->users)) {
+            return 0;
         }
 
-        return 0;
+        return $this->users->count();
     }
 
     /** {@inheritdoc} */
