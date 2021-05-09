@@ -394,7 +394,7 @@ export default {
                     ? 'token.intro.statistics.guide_body.mintme_token'
                     : 'token.intro.statistics.guide_body.eth_token',
                 this.translationsContext
-          );
+            );
         },
         translationsContext: function() {
             return {
