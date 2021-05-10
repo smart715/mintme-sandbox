@@ -45,7 +45,7 @@ class DepositWithdrawalVoter extends Voter
         }
 
         if (self::MAKE_DEPOSIT === $attribute || self::MAKE_WITHDRAWAL === $attribute) {
-            $this->canMakeDepositOrWithdrawal($token);
+           return $this->canMakeDepositOrWithdrawal($token);
         }
 
         return false;
