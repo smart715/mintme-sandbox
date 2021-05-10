@@ -238,7 +238,7 @@ class OrdersController extends AbstractFOSRestController
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
             'totalSellOrders' => $totalSellOrders,
-            'totalBuyOrders' => $totalBuyOrders,    
+            'totalBuyOrders' => $totalBuyOrders,
         ];
     }
 
