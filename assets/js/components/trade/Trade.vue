@@ -100,6 +100,7 @@ import {
 import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
 import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
+import Decimal from 'decimal.js';
 
 const WSAPI = Constants.WSAPI;
 
@@ -250,8 +251,8 @@ export default {
                     })).then((result) => {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
-                        this.totalSellOrders = result.data.allSellOrders;
-                        this.totalBuyOrders = result.data.allBuyOrders;
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -281,8 +282,8 @@ export default {
                                 this.buyPage++;
                                 break;
                         }
-                        this.totalSellOrders = result.data.allSellOrders;
-                        this.totalBuyOrders = result.data.allBuyOrders;
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
 
                         context.resolve();
                         resolve(result.data);
@@ -298,11 +299,6 @@ export default {
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
             let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
-            let totalOrder = 0;
-
-            if (totalOrders) {
-              totalOrder = totalOrders.find((order) => data.id === order.id);
-            }
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -313,7 +309,7 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        totalOrders.push(res.data);
+                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
                         this.saveOrders(orders, isSell, totalOrders);
                         this.ordersUpdated = true;
                     })
@@ -331,22 +327,15 @@ export default {
                         order.createdTimestamp = data.ctime;
                     }
 
-                    if (totalOrder && !totalOrder.hasOwnProperty('createdTimestamp') && data.hasOwnProperty('ctime')) {
-                      totalOrder.createdTimestamp = data.ctime;
-                    }
-
                     let index = orders.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
 
-                    if (totalOrder) {
-                      let totalIndex = totalOrders.indexOf(totalOrder);
-                      totalOrder.amount = data.left;
-                      totalOrder.price = data.price;
-                      totalOrder.timestamp = data.mtime;
-                      totalOrders[totalIndex] = totalOrder;
+                    if (totalOrders) {
+                        totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
+                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
                     }
 
                     this.ordersUpdated = true;
@@ -360,7 +349,7 @@ export default {
                     orders.splice(orders.indexOf(order), 1);
 
                     if (totalOrders) {
-                      totalOrders.splice(totalOrders.indexOf(totalOrder), 1);
+                      totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
                     }
 
                     break;
@@ -372,14 +361,12 @@ export default {
             if (isSell) {
                 this.sellOrders = orders;
                 if (totalOrders) {
-                  this.totalSellOrders = [];
                   this.totalSellOrders = totalOrders;
                 }
             } else {
                 this.buyOrders = orders;
-                if (totalOrders) {
-                  this.totalBuyOrders = [];
-                  this.totalBuyOrders = totalOrders;
+                 if (totalOrders) {
+                    this.totalBuyOrders = totalOrders;
                 }
             }
         },

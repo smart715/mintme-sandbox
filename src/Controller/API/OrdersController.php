@@ -197,43 +197,39 @@ class OrdersController extends AbstractFOSRestController
             self::PENDING_OFFSET
         );
 
-        $allSellOrders = [];
+        $sellOrderPage=1;
+        $totalSellOrders = new Money(0, new Currency('WEB'));
 
-        for ($sellOrderPage=1;; $sellOrderPage++) {
+        do {
             $sellOrders = $this->marketHandler->getPendingSellOrders(
                 $market,
                 ($sellOrderPage - 1) * self::PENDING_OFFSET,
-                100,
+                self::PENDING_OFFSET,
             );
-            $sellCount = count($sellOrders);
+            $sellOrderPage++;
+            $sellOrdersCount = count($sellOrders);
 
             foreach ($sellOrders as $sellOrder) {
-                $allSellOrders[] = $sellOrder;
+                $totalSellOrders = $totalSellOrders->add($sellOrder->getAmount());
             }
+        } while ($sellOrdersCount>=self::PENDING_OFFSET);
 
-            if ($sellCount<100) {
-                break;
-            }
-        }
+        $buyOrderPage=1;
+        $totalBuyOrders = new Money(0, new Currency('BTC'));
 
-        $allBuyOrders = [];
-
-        for ($buyOrderPage=1;; $buyOrderPage++) {
+        do {
             $buyOrders = $this->marketHandler->getPendingBuyOrders(
                 $market,
                 ($buyOrderPage - 1) * self::PENDING_OFFSET,
-                100,
+                self::PENDING_OFFSET,
             );
-            $buyCount = count($buyOrders);
+            $buyOrderPage++;
+            $buyOrdersCount = count($buyOrders);
 
             foreach ($buyOrders as $buyOrder) {
-                $allBuyOrders[] = $buyOrder;
+                $totalBuyOrders = $totalBuyOrders->add($buyOrder->getPrice());
             }
-
-            if ($buyCount<100) {
-                break;
-            }
-        }
+        } while ($buyOrdersCount>=self::PENDING_OFFSET);
 
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
@@ -241,8 +237,8 @@ class OrdersController extends AbstractFOSRestController
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
-            'allSellOrders' => $allSellOrders,
-            'allBuyOrders' => $allBuyOrders,
+            'totalSellOrders' => $totalSellOrders,
+            'totalBuyOrders' => $totalBuyOrders,    
         ];
     }
 
