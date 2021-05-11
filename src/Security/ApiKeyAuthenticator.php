@@ -131,7 +131,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             $user,
             $credentials->getToken(),
             $providerKey,
-            [user::ROLE_API, ...$user->getRoles()]
+            [user::ROLE_API, $user->getRoles()]
         );
     }
 
