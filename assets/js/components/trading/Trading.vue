@@ -710,7 +710,7 @@ export default {
                 market.quote.cryptoSymbol,
                 marketCap,
                 market.rank || 0,
-                market.quote.holdersCount || 0
+                market.holders || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -742,7 +742,7 @@ export default {
             cryptoSymbol,
             marketCap = 0,
             rank = 0,
-            holders,
+            holders = 0,
         ) {
             let hiddenName = this.findHiddenName(token);
 
@@ -832,7 +832,7 @@ export default {
                         selectedMarket.quote.cryptoSymbol,
                         selectedMarket.marketCap || 0,
                         selectedMarket.rank || 0,
-                        selectedMarket.quote.holdersCount || 0
+                        selectedMarket.holders || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -895,7 +895,7 @@ export default {
                 market.quote.cryptoSymbol,
                 market.marketCap || 0,
                 market.rank || 0,
-                market.quote.holdersCount || 0
+                market.holders || 0
                 );
 
             if (marketOnTopIndex > -1) {
@@ -981,7 +981,10 @@ export default {
                 market.buyDepth,
                 market.base.image.avatar_small,
                 market.quote.image.avatar_small,
-                market.quote.cryptoSymbol
+                market.quote.cryptoSymbol,
+                market.marketCap,
+                market.rank,
+                market.holders
             );
             this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
