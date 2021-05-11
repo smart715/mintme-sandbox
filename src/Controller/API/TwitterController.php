@@ -55,7 +55,7 @@ class TwitterController extends AbstractFOSRestController
         try {
             $response = $this->twitter->oauth(
                 'oauth/request_token',
-                ['oauth_callback' => $this->generateUrl('twitter_callback', [], UrlGeneratorInterface::ABSOLUTE_URL)]
+                ['oauth_callback' => $this->generateUrl('twitter_callback', ['_locale' => 'en'], UrlGeneratorInterface::ABSOLUTE_URL)]
             );
         } catch (\Throwable $e) {
             $this->logger->error("Failed to get request token for twitter: {$e->getMessage()}");
