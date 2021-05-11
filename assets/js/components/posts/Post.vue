@@ -257,7 +257,7 @@ export default {
             return this.loggedInUserId === this.post.token.ownerId;
         },
         tokenAvatar() {
-            return null !== this.post.image
+            return this.post.token.image
                 ? this.post.token.image.avatar_small
                 : require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
         },
