@@ -79,8 +79,12 @@ describe('TokenPointsProgress', () => {
                 tokenStatus: tokenDeploymentStatus.notDeployed,
                 tokenWebsite: null,
                 tokenYoutube: null,
+                hasReleasePeriod: true,
             },
         });
+        expect(wrapper.vm.tokenPointsGained).toBe(4);
+        wrapper.setProps({hasReleasePeriod: false});
+        expect(wrapper.vm.tokenPointsGained).toBe(0);
         store.commit('tokenStatistics/setStats', {releasePeriod: 10});
         expect(wrapper.vm.tokenPointsGained).toBe(4);
         store.commit('tokenStatistics/setStats', {releasePeriod: '-'});
