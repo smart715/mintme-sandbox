@@ -49,6 +49,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const SORT_MARKET_CAP = 'marketCap';
     public const SORT_MARKET_CAP_USD = 'marketCapUsd';
     public const SORT_RANK = 'rank';
+    public const SORT_HOLDERS = 'holders';
 
     /** @var MarketStatusRepository */
     protected $repository;
@@ -201,6 +202,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $result[] = 'to_number(ms.monthVolume)';
 
                 break;
+            case self::SORT_HOLDERS:
+                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
+                $result[] = 'holders';
+
+                break;
             default:
                 $result[] = 'to_number(ms.monthVolume)';
         }
@@ -250,11 +256,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
+            ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->groupBy('ms')
             ->setFirstResult($offset)
-            ->setMaxResults($limit)
-        ;
+            ->setMaxResults($limit);
 
         if (null !== $userId) {
             $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')

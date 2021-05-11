@@ -389,9 +389,12 @@ export default {
     },
     computed: {
         statisticGuideTranslation: function() {
-            return this.isMintmeToken
-                ? this.$t('token.intro.statistics.guide_body.mintme_token', this.translationsContext)
-                : this.$t('token.intro.statistics.guide_body.eth_token', this.translationsContext);
+            return this.$t(
+                this.isMintmeToken
+                    ? 'token.intro.statistics.guide_body.mintme_token'
+                    : 'token.intro.statistics.guide_body.eth_token',
+                this.translationsContext
+            );
         },
         translationsContext: function() {
             return {
