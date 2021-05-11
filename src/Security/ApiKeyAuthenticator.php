@@ -15,7 +15,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
@@ -28,14 +27,10 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
     /** @var OAuth2 */
     private $oauth;
 
-    /** @var Security */
-    private $security;
-
-    public function __construct(ApiKeyManagerInterface $keyManager, IOAuth2Storage $oAuthStorage, Security $security)
+    public function __construct(ApiKeyManagerInterface $keyManager, IOAuth2Storage $oAuthStorage)
     {
         $this->keyManager = $keyManager;
         $this->oauth = new OAuth2($oAuthStorage);
-        $this->security = $security;
     }
 
     /** {@inheritdoc}
@@ -132,17 +127,11 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             throw new BadCredentialsException();
         }
 
-        $roles = [User::ROLE_API];
-
-        if ($this->security->isGranted(User::ROLE_AUTHENTICATED)) {
-            $roles[] = User::ROLE_AUTHENTICATED;
-        }
-
         return new PreAuthenticatedToken(
             $user,
             $credentials->getToken(),
             $providerKey,
-            $roles
+            [user::ROLE_API, ...$user->getRoles()]
         );
     }
 
