@@ -40,19 +40,22 @@ class TradeResult
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(int $result, TranslatorInterface $translator)
+    private ?string $translatedMessage;
+
+    public function __construct(int $result, TranslatorInterface $translator, ?string $translatedMessage = null)
     {
-        if (!in_array($result, array_keys(self::MESSAGES))) {
+        if (!array_key_exists($result, self::MESSAGES) && !$translatedMessage) {
             throw new Exception('Undefined error message');
         }
 
         $this->result = $result;
         $this->translator = $translator;
+        $this->translatedMessage = $translatedMessage;
     }
 
     public function getMessage(): string
     {
-        return $this->translator->trans(self::MESSAGES[$this->result]);
+        return $this->translatedMessage ?? $this->translator->trans(self::MESSAGES[$this->result]);
     }
 
     public function getResult(): int

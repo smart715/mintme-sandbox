@@ -293,3 +293,7 @@ parameters:
     auth_make_disable_token_creation: false
     auth_make_disable_withdrawals_and_deposit: false
     auth_make_disable_donations: false
+
+    # minimum order value (USD) to make buy/sell orders
+    minimum_order_value_usd: 0.1
+

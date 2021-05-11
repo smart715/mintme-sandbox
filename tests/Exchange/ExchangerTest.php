@@ -24,7 +24,6 @@ use App\Tests\MockMoneyWrapper;
 use App\Utils\Symbols;
 use App\Utils\Validator\ValidatorInterface;
 use App\Utils\ValidatorFactoryInterface;
-use Hoa\Iterator\Mock;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\InvokedCount;
@@ -47,22 +46,29 @@ class ExchangerTest extends TestCase
             $this->mockTrader($tradeResult),
             $this->mockMoneyWrapper(),
             $this->mockMarketProducer($this->never()),
-            $this->mockBalanceHandler($this->once(), $user, $tok),
+            $this->mockBalanceHandler($this->once(), $user, $tok, null),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(1))),
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockTokenManager($tok),
+            $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true,
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+        );
 
-        $this->assertEquals(TradeResult::INSUFFICIENT_BALANCE, $result->getResult());
+        self::assertEquals(TradeResult::INSUFFICIENT_BALANCE, $result->getResult());
     }
 
     public function testPlaceOrderSmallAmount(): void
@@ -74,22 +80,33 @@ class ExchangerTest extends TestCase
             $this->mockTrader($tradeResult),
             $this->mockMoneyWrapper(),
             $this->mockMarketProducer($this->never()),
-            $this->mockBalanceHandler($this->once(), $user, $tok),
+            $this->mockBalanceHandler($this->once(), $user, $tok, null),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockTokenManager($tok),
+            $this->mockTokenManager($tok, null),
             $this->mockValidator(false),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+        );
 
-        $this->assertEquals(TradeResult::SMALL_AMOUNT, $result->getResult());
+        self::assertEquals(
+            TradeResult::SMALL_AMOUNT,
+            $result->getResult(),
+            $result->getMessage()
+        );
     }
 
     public function testPlaceOrderSuccess(): void
@@ -101,20 +118,27 @@ class ExchangerTest extends TestCase
             $this->mockTrader($tradeResult),
             $this->mockMoneyWrapper(),
             $this->mockMarketProducer($this->once()),
-            $this->mockBalanceHandler($this->once(), $user, $tok),
+            $this->mockBalanceHandler($this->once(), $user, $tok, null),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockTokenManager($tok),
+            $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', false, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            false,
+            Order::SELL_SIDE,
+        );
 
         $this->assertEquals($tradeResult, $result);
     }
@@ -124,23 +148,6 @@ class ExchangerTest extends TestCase
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
         $tradeResult = $this->mockTradeResult();
-
-        $balance = $this->money(6);
-        $br = $this->createMock(BalanceResult::class);
-        $br->method('getAvailable')->willReturn($balance);
-        $bh = $this->mockBalanceHandler($this->once(), $user, $tok);
-        $bh->method('balance')->with($user, $tok)->willReturn($br);
-
-        $tm = $this->mockTokenManager($tok);
-        $tm->method('getRealBalance')->with($tok, $br)->willReturn($br);
-
-        $mh = $this->createMock(MarketHandlerInterface::class);
-        $mh->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
-            $this->mockOrder(3, 1),
-            $this->mockOrder(2, 1),
-            $this->mockOrder(1, 1),
-        ], []);
-
         $trader = $this->mockTrader($tradeResult);
         $trader->expects($this->once())->method('placeOrder')->with(
             $this->callback(fn (Order $o) => '1' === $o->getPrice()->getAmount())
@@ -150,22 +157,104 @@ class ExchangerTest extends TestCase
             $trader,
             $this->mockMoneyWrapper(),
             $this->mockMarketProducer($this->once()),
-            $bh,
+            $this->mockBalanceHandler($this->once(), $user, $tok, $this->mockBalanceResult()),
             $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
             $this->mockLogger(),
             $this->mockParameterBag(),
-            $mh,
-            $tm,
+            $this->mockMarketHandlerForConsecutiveCalls(),
+            $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(true),
             $this->mockTranslator()
         );
-        $result = $exchanger->placeOrder($user, $this->mockMarket(
-            $this->mockCrypto('WEB'),
-            $tok,
-            true
-        ), '4', '5', true, Order::SELL_SIDE);
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '4',
+            '5',
+            true,
+            Order::SELL_SIDE,
+        );
 
         $this->assertEquals($tradeResult, $result);
+    }
+
+    public function testPlaceOrderOnValidatorFailed(): void
+    {
+        $user = $this->mockUser();
+        $tok = $this->mockToken(Symbols::TOK, $user);
+        $tradeResult = $this->mockTradeResult();
+        $trader = $this->mockTrader($tradeResult);
+
+        $exchanger = new Exchanger(
+            $trader,
+            $this->mockMoneyWrapper(),
+            $this->mockMarketProducer($this->never()),
+            $this->mockBalanceHandler($this->once(), $user, $tok, $this->mockBalanceResult()),
+            $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
+            $this->mockLogger(),
+            $this->mockParameterBag(),
+            $this->mockMarketHandlerForConsecutiveCalls(),
+            $this->mockTokenManager($tok, $this->mockBalanceResult()),
+            $this->mockValidator(false),
+            $this->mockTranslator()
+        );
+
+        $trader->expects($this->never())->method('placeOrder');
+
+        $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '50',
+            '50',
+            true,
+            Order::SELL_SIDE,
+        );
+    }
+
+    public function testPlaceOlderOnValidatorSuccess(): void
+    {
+        $user = $this->mockUser();
+        $tok = $this->mockToken(Symbols::TOK, $user);
+        $tradeResult = $this->mockTradeResult();
+        $trader = $this->mockTrader($tradeResult);
+        $trader->expects($this->once())->method('placeOrder')->with(
+            $this->callback(fn (Order $o) => '1' === $o->getPrice()->getAmount())
+        );
+
+        $exchanger = new Exchanger(
+            $trader,
+            $this->mockMoneyWrapper(),
+            $this->mockMarketProducer($this->once()),
+            $this->mockBalanceHandler($this->once(), $user, $tok, $this->mockBalanceResult()),
+            $this->mockBalanceViewFactory($tok->getSymbol(), $this->mockBalanceView($this->money(100))),
+            $this->mockLogger(),
+            $this->mockParameterBag(),
+            $this->mockMarketHandlerForConsecutiveCalls(),
+            $this->mockTokenManager($tok, $this->mockBalanceResult()),
+            $this->mockValidator(true),
+            $this->mockTranslator()
+        );
+        $result = $exchanger->placeOrder(
+            $user,
+            $this->mockMarket(
+                $this->mockCrypto('WEB'),
+                $tok,
+                true
+            ),
+            '0',
+            '0.1',
+            true,
+            Order::SELL_SIDE,
+        );
+        self::assertEquals(null, $result->getResult());
     }
 
     private function mockValidator(bool $res): ValidatorFactoryInterface
@@ -208,10 +297,15 @@ class ExchangerTest extends TestCase
     private function mockBalanceHandler(
         InvokedCount $count,
         User $user,
-        Token $token
+        Token $token,
+        ?BalanceResult $br
     ): BalanceHandlerInterface {
         $balanceHandler = $this->createMock(BalanceHandlerInterface::class);
         $balanceHandler->expects($count)->method('balances')->with($user, [$token]);
+
+        if ($br) {
+            $balanceHandler->method('balance')->with($user, $token)->willReturn($br);
+        }
 
         return $balanceHandler;
     }
@@ -254,6 +348,11 @@ class ExchangerTest extends TestCase
         $marketHandler = $this->createMock(MarketHandlerInterface::class);
         $marketHandler->method('getPendingBuyOrders')->willReturn($buyOrders);
         $marketHandler->method('getPendingSellOrders')->willReturn($sellOrders);
+        $marketHandler->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
+            $this->mockOrder(3, 1),
+            $this->mockOrder(2, 1),
+            $this->mockOrder(1, 1),
+        ], []);
 
         return $marketHandler;
     }
@@ -261,10 +360,14 @@ class ExchangerTest extends TestCase
     /**
      * @return TokenManagerInterface|MockObject
      */
-    private function mockTokenManager(?Token $token): TokenManagerInterface
+    private function mockTokenManager(?Token $token, ?BalanceResult $br): TokenManagerInterface
     {
         $tokenManager = $this->createMock(TokenManagerInterface::class);
         $tokenManager->method('findByName')->willReturn($token);
+
+        if ($br) {
+            $tokenManager->method('getRealBalance')->with($token, $br)->willReturn($br);
+        }
 
         return $tokenManager;
     }
@@ -329,5 +432,26 @@ class ExchangerTest extends TestCase
     private function mockTranslator(): TranslatorInterface
     {
         return $this->createMock(TranslatorInterface::class);
+    }
+
+    private function mockBalanceResult(): BalanceResult
+    {
+        $balance = $this->money(6);
+        $br = $this->createMock(BalanceResult::class);
+        $br->method('getAvailable')->willReturn($balance);
+
+        return $br;
+    }
+
+    private function mockMarketHandlerForConsecutiveCalls(): MarketHandlerInterface
+    {
+        $mh = $this->createMock(MarketHandlerInterface::class);
+        $mh->method('getPendingBuyOrders')->willReturnOnConsecutiveCalls([
+            $this->mockOrder(3, 1),
+            $this->mockOrder(2, 1),
+            $this->mockOrder(1, 1),
+        ], []);
+
+        return $mh;
     }
 }
