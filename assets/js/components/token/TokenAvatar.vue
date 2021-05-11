@@ -63,6 +63,7 @@
                 :token-website="tokenWebsite"
                 :token-status="statusProp"
                 :is-mintme-token="isMintmeToken"
+                :has-release-period="hasReleasePeriodProp"
             />
         </div>
     </div>
