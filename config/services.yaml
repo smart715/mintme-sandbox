@@ -701,3 +701,8 @@ services:
             $mintmeHostFreeDays: '%freeDays%'
             $mintmeHostPrice: '%price%'
             $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Utils\ValidatorFactory:
+        properties:
+            minimalPriceOrder: '%minimum_order_value_usd%'
+

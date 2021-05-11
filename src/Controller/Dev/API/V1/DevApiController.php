@@ -3,8 +3,6 @@
 namespace App\Controller\Dev\API\V1;
 
 use App\Exception\ApiNotFoundException;
-use App\Manager\CryptoManagerInterface;
-use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -14,18 +12,11 @@ abstract class DevApiController extends AbstractFOSRestController
     private const DISALLOWED_VALUES = [
         Symbols::WEB,
     ];
-
-    private CryptoManagerInterface $cryptoManager;
-    private TokenManagerInterface $tokenManager;
     private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
-        CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager,
         RebrandingConverterInterface $rebrandingConverter
     ) {
-        $this->cryptoManager = $cryptoManager;
-        $this->tokenManager = $tokenManager;
         $this->rebrandingConverter = $rebrandingConverter;
     }
 
