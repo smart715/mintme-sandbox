@@ -133,7 +133,6 @@ class OrdersController extends AbstractFOSRestController
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
         $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
-
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
         $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
