@@ -1,6 +1,8 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import '../__mocks__/ResizeObserver';
 import RecentPosts from '../../js/components/posts/RecentPosts';
+import axios from "axios";
+import moxios from "moxios";
 
 /**
  * @return {Wrapper<Vue>}
@@ -9,6 +11,7 @@ function mockVue() {
     const localVue = createLocalVue();
     localVue.use({
         install(Vue, options) {
+            Vue.prototype.$axios = {retry: axios, single: axios};
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$t = (val) => val;
         },
@@ -52,5 +55,22 @@ describe('Post', () => {
         });
 
         expect(wrapper.vm.hasPosts).toBe(true);
+    });
+
+    it('fetch recent posts', () => {
+        const localVue = mockVue();
+
+        const wrapper = shallowMount(RecentPosts, {
+            localVue,
+        });
+
+        wrapper.vm.fetchPosts();
+
+        moxios.stubRequest('recent_posts', {status: 200});
+
+        moxios.wait(() => {
+            expect(wrapper.vm.hasPosts).toBe(false);
+            done();
+        });
     });
 });
