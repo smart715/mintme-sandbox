@@ -3,6 +3,7 @@
 namespace App\Exchange;
 
 use App\Communications\AMQP\MarketAMQPInterface;
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -111,6 +112,9 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function placeOrder(
         User $user,
         Market $market,
@@ -129,8 +133,18 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        if (!$this->vf->createOrderValidator($market, $priceInput, $amountInput)->validate()) {
-            return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $priceInput,
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
         }
 
         $price = $this->mw->parse(
