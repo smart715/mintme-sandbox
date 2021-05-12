@@ -1,0 +1,310 @@
+{% extends 'base.html.twig' %}
+
+{% if profile.image is not null %}
+    {% set metaImage = profile.image.url | imagine_filter('avatar_large') %}
+{% endif %}
+{% set metaTitle = profile.nickname ~ '\'s profile | mintMe' %}
+{% set metaImageAlt = profile.nickname ~ '\'s profile | mintMe' %}
+
+{% block title %}
+    {% if profile.anonymous %}
+        {{ profile.nickname }}'s {% trans %}page.profile.title{% endtrans %} | mintMe
+    {% else %}
+        {{ profile.nickname }}
+        {{ (profile.city is empty or not show_full_data_in_profile) ? '' : ' (from ' ~ profile.city ~ ')' }}
+         {% trans %}page.profile.title{% endtrans %} | mintMe
+    {% endif %}
+{% endblock %}
+
+{% block metaDescription %}
+    {% if profileDescription is defined and profileDescription is not empty %}
+        <meta property="og:description" content="{{ profileDescription }}">
+        <meta property="description" content="{{ profileDescription }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block bodyclass %}profile-view{% endblock %}
+
+{% block content %}
+    <div id="profile" class="container">
+        <div class="row pt-4 justify-content-center">
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
+                    <div class="card-header">
+                        <h1>{{ savedNickname }} </h1>
+                    </div>
+                    <div class="card-body position-relative">
+                        {% if (canEdit == true) %}
+                            <a  @click="showEditForm = true"
+                                @keyup.enter="showEditForm = true"
+                                class="edit-icon"
+                                tabindex="0"
+                            >
+                                <font-awesome-icon icon="edit" class="c-pointer ml-2 icon-default" v-if="!showEditForm"></font-awesome-icon>
+                            </a>
+                        {% endif %}
+
+                        <div v-if="!showEditForm" class="row mr-1">
+                            <div class="col-12">
+                                <div class="float-left mr-2" style="max-width: 50%;">
+                                    <avatar
+                                            type="profile"
+                                            size="large"
+                                            image="{{ profile.image.url | imagine_filter('avatar_large') }}"
+                                            :editable="{{ canEdit ? 'true' : 'false' }}"
+                                    ></avatar>
+                                </div>
+
+                                {% if (profile.anonymous != true) %}
+                                    {% if profile.firstname is not empty %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
+                                        </div>
+                                    {% endif %}
+                                    {%  if profile.phoneNumber is not empty and profile.phoneNumber.verified and canEdit %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.phone_number{% endtrans %} {{ profile.phoneNumber.phoneNumber|phone_number_format('E164') }}
+                                        </div>
+                                    {%  endif %}
+                                    {% if profile.country is not empty %}
+                                        <div class="pb-1">
+                                            {% trans %}page.profile.form.country{% endtrans %} {{ profile.getCountryFullName() }}
+                                        </div>
+                                    {% endif %}
+                                    {% if show_full_data_in_profile %}
+                                        <div class="pb-1">
+                                            {% if profile.city is not empty %}
+                                                {% trans %}page.profile.form.city{% endtrans %} {{ profile.city }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="pb-1">
+                                            {% if profile.zipCode is not empty %}
+                                                {% trans %}page.profile.form.zip_code{% endtrans %} {{ profile.zipCode }}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    {% if token is not empty %}
+                                        <div class="pb-1">
+                                            <div>{% trans %}page.profile.form.token{% endtrans %}</div>
+                                            <a class="word-break-all" href="{{ path('token_show', {'name': token.getName()}) }}">{{ token.getName() }}</a>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if (profile.anonymous == true) %}
+                            <div class="col-12 pt-3">
+                                {% trans %}page.profile.is_private{% endtrans %}
+                            </div>
+                            {% else %}
+                                <div class="col-12 pt-3">
+                                    <bbcode-view value="{{ profile.description }}"></bbcode-view>
+                                </div>
+                            {% endif %}
+                            <div class="col-12 pt-3">
+                                {% if profile.created is not null %}
+                                    {% trans%} page.profile.created_on {% endtrans %}  {{ profile.created.format('d.m.Y') }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if (canEdit == true) %}
+                            <div v-show="showEditForm" v-cloak>
+                            {{ form_start(form) }}
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="pb-1">
+                                        {% include 'form/nickname_field.html.twig' %}
+                                    </div>
+                                    <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center">
+                                        {% trans %}page.profile.error.nickname.min{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center">
+                                        {% trans %}page.profile.error.nickname.letters_numbers{% endtrans %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_label(form.phoneNumber.phoneNumber) }}
+                                        <guide>
+                                            <template slot="header">
+                                                {% trans %}phone.guide.header{% endtrans %}
+                                            </template>
+                                            <template slot="body">
+                                                {% trans %}phone.guide.body{% endtrans %}
+                                            </template>
+                                        </guide>
+                                        {% if form_errors(form.phoneNumber.phoneNumber)|length > 0 %}
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="bg-danger text-white">{{ form_errors(form.phoneNumber.phoneNumber) }}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        {{ form_widget(form.phoneNumber.phoneNumber, {
+                                            'value': profile.phoneNumber
+                                                ? profile.phoneNumber.phoneNumber|phone_number_format('NATIONAL')
+                                                : '',
+                                            'attr': {
+                                                'v-model': 'phoneNumber'
+                                            }
+                                        }) }}
+                                        <phone-number
+                                            country-code="{{ phoneCountryCode }}"
+                                            :phone-number="phoneNumber"
+                                            @phone-change="phoneChange"
+                                            @is-valid-phone="validPhone"
+                                        >
+                                        </phone-number>
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.firstName, {'attr':
+                                            {
+                                                'v-model.trim': '$v.firstName.$model',
+                                                'v-on:keyup': 'validation',
+                                                'class': 'form-control',
+                                                'ref': 'firstName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-show="!$v.firstName.required" class="text-danger text-center">
+                                        {% trans %}page.profile.error.fn.required{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="!$v.firstName.helpers" class="text-danger text-center">
+                                        {% trans %}page.profile.error.fn.letters{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.firstName" v-if="firstNameAux" class="text-danger text-center">
+                                        {% trans %}page.profile.error.fn.min_letters{% endtrans %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.lastName, {'attr':
+                                            {
+                                                'v-model.trim': '$v.lastName.$model',
+                                                'v-on:keyup': 'validation',
+                                                'class': 'form-control',
+                                                'ref': 'lastName'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.required" class="text-danger text-center">
+                                        {% trans %}page.profile.error.ln.required{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="!$v.lastName.helpers" class="text-danger text-center">
+                                        {% trans %}page.profile.error.ln.letters{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.lastName" v-if="lastNameAux" class="text-danger text-center">
+                                        {% trans %}page.profile.error.ln.min_letters{% endtrans %}
+                                    </div>
+                                    <div class="pb-1">
+                                        {{ form_row(form.country, {'attr':
+                                            {
+                                                'ref': 'country',
+                                                'v-on:change': 'countryChanged'
+                                            }
+                                        }) }}
+                                    </div>
+                                    {% if show_full_data_in_profile %}
+                                        <div class="pb-1">
+                                            {{ form_row(form.city, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.city.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'city'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.helpers" class="text-danger text-center">
+                                            {% trans %}page.profile.error.city.letters{% endtrans %}
+                                        </div>
+                                        <div v-cloak="$v.city" v-if="!$v.city.minLength" class="text-danger text-center">
+                                            {% trans %}page.profile.error.city.min_letters{% endtrans %}
+                                        </div>
+                                        <div class="pb-1">
+                                            {{ form_row(form.zipCode, {'attr':
+                                                {
+                                                    'v-model.trim': '$v.zipCode.$model',
+                                                    'class': 'form-control',
+                                                    'ref': 'zipCode',
+                                                    'v-on:input': 'zipCodeValidate',
+                                                    'v-on:change': 'zipCodeValidate'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div
+                                            v-if="!$v.zipCode.zipCodeContain"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            {% trans %}page.profile.error.zip_code.contain{% endtrans %}
+                                        </div>
+                                        <div
+                                            v-else-if="!zipCodeValid"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            {% trans %}page.profile.error.zip_code.not_valid{% endtrans %}
+                                        </div>
+
+                                        <div
+                                            v-else-if="!$v.zipCode.zipCodeWrongChars"
+                                            v-cloak="$v.zipCode"
+                                            class="text-danger text-center"
+                                        >
+                                            {% trans %}page.profile.error.zip_code.consist{% endtrans %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 pt-3">
+                                    <div>
+                                        {{ form_row(form.description, {'attr':
+                                            {
+                                                'class': 'form-control form-control-md',
+                                                'ref': 'description'
+                                            }
+                                        }) }}
+                                    </div>
+                                </div>
+                                <div class="col-12 pt-3">
+                                    <div class="custom-control custom-checkbox">
+                                        {{ form_widget(form.anonymous) }}
+                                        {{ form_label(form.anonymous) }}
+                                        <guide>
+                                            <template slot="header">
+                                                {% trans %}page.profile.guide.header{% endtrans %}
+                                            </template>
+                                            <template slot="body">
+                                                {% trans %}page.profile.guide.body{% endtrans %}
+                                            </template>
+                                        </guide>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <input
+                                    type="submit"
+                                    :disabled="disableSave"
+                                    class="btn btn-primary"
+                                    value="{% trans %}page.profile.save{% endtrans %}"
+                                >
+                                <span
+                                    class="btn-cancel pl-3 c-pointer"
+                                    @click="showEditForm = false"
+                                    @keyup.enter="showEditForm = false"
+                                    tabindex="0"
+                                >
+                                    <slot name="cancel">{% trans %}page.profile.cancel{% endtrans %}</slot>
+                                </span>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <input type="hidden" ref="editFormShowFirst" value="{{ editFormShowFirst }}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('profile') }}
+{% endblock %}
