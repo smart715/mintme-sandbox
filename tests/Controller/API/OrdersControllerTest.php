@@ -21,14 +21,18 @@ class OrdersControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
         $this->assertCount(0, $res['buy']);
         $this->assertCount(1, $res['sell']);
+        $this->assertCount(0, $res['totalBuyOrders']);
+        $this->assertCount(1, $res['totalSellOrders']);
         $this->assertEquals(
             [
+                '1.000000000000',
                 '1.000000000000',
                 '1.000000000000',
             ],
             [
                 $res['sell'][0]['amount'],
                 $res['sell'][0]['price'],
+                $res['totalSellOrders'],
             ]
         );
     }
@@ -50,14 +54,18 @@ class OrdersControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isSuccessful());
         $this->assertCount(0, $res['sell']);
         $this->assertCount(1, $res['buy']);
+        $this->assertCount(1, $res['totalBuyOrders']);
+        $this->assertCount(0, $res['totalSellOrders']);
         $this->assertEquals(
             [
                 '0.998000000000',
+                '1.000000000000',
                 '1.000000000000',
             ],
             [
                 $res['buy'][0]['amount'],
                 $res['buy'][0]['price'],
+                $res['totalBuyOrders'],
             ]
         );
     }

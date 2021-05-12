@@ -197,39 +197,8 @@ class OrdersController extends AbstractFOSRestController
             self::PENDING_OFFSET
         );
 
-        $sellOrderPage=1;
-        $totalSellOrders = new Money(0, new Currency('WEB'));
-
-        do {
-            $sellOrders = $this->marketHandler->getPendingSellOrders(
-                $market,
-                ($sellOrderPage - 1) * self::PENDING_OFFSET,
-                self::PENDING_OFFSET,
-            );
-            $sellOrderPage++;
-            $sellOrdersCount = count($sellOrders);
-
-            foreach ($sellOrders as $sellOrder) {
-                $totalSellOrders = $totalSellOrders->add($sellOrder->getAmount());
-            }
-        } while ($sellOrdersCount>=self::PENDING_OFFSET);
-
-        $buyOrderPage=1;
-        $totalBuyOrders = new Money(0, new Currency('BTC'));
-
-        do {
-            $buyOrders = $this->marketHandler->getPendingBuyOrders(
-                $market,
-                ($buyOrderPage - 1) * self::PENDING_OFFSET,
-                self::PENDING_OFFSET,
-            );
-            $buyOrderPage++;
-            $buyOrdersCount = count($buyOrders);
-
-            foreach ($buyOrders as $buyOrder) {
-                $totalBuyOrders = $totalBuyOrders->add($buyOrder->getPrice());
-            }
-        } while ($buyOrdersCount>=self::PENDING_OFFSET);
+        $totalSellOrders = $this->marketHandler->getSellOrdersSummary($market)->getQuoteAmount();
+        $totalBuyOrders = $this->marketHandler->getBuyOrdersSummary($market)->getBasePrice();
 
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
