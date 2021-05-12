@@ -34,6 +34,7 @@ export default {
         tokenWebsite: String,
         tokenStatus: String,
         isMintmeToken: Boolean,
+        hasReleasePeriod: Boolean,
     },
     components: {
         CircleProgress,
@@ -44,7 +45,7 @@ export default {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            return (typeof this.releasePeriod === 'number') || !this.isMintmeToken ? 4 : 0;
+            return this.hasReleasePeriod || (typeof this.releasePeriod === 'number') || !this.isMintmeToken ? 4 : 0;
         },
         tokenDescriptionSet: function() {
             return this.tokenDescription ? 4 : 0;
