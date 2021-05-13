@@ -127,7 +127,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface, Authentica
             throw new BadCredentialsException();
         }
 
-        $roles = !in_array('ROLE_AUTHENTICATED', $user->getRoles(), true) ?
+        $roles = !in_array(User::ROLE_AUTHENTICATED, $user->getRoles(), true) ?
             [User::ROLE_API] :
             [User::ROLE_API, User::ROLE_AUTHENTICATED];
 
