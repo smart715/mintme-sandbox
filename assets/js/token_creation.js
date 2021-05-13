@@ -111,6 +111,10 @@ new Vue({
                 return;
             }
 
+            if (this.handlingSubmit) {
+                return;
+            }
+
             this.handlingSubmit = true;
 
             let frm = document.querySelector('form[name="token_create"]');
