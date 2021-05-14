@@ -334,8 +334,9 @@ export default {
                     orders[index] = order;
 
                     if (totalOrders) {
-                        totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
-                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
+                        totalOrders = isSell
+                            ? totalOrders.sub(order.amount).add(data.amount)
+                            : totalOrders.sub(order.price).add(data.price);
                     }
 
                     this.ordersUpdated = true;
