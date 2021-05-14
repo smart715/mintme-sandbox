@@ -129,8 +129,9 @@ new Vue({
                         });
                         frm.submit();
                     }
-                }, (err) => this.notifyError(err.response.data.message))
-                .finally(()=>{
+                })
+                .catch((err) => {
+                    this.notifyError(err.response.data.message);
                     this.handlingSubmit = false;
                 });
         },
