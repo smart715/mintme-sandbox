@@ -78,7 +78,10 @@
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney | rebranding }}
+                    {{ marketStatus.marketCap | formatMoney }}
+                    <template v-if="marketStatus.marketCap !== '-'">
+                        {{ market.base.symbol | rebranding }}
+                    </template>
                 </div>
             </div>
             <div class="row">
@@ -187,7 +190,7 @@ export default {
                 monthVolume: '0',
                 monthChange: '0',
                 monthAmount: '0',
-                marketCap: '0 ' + this.market.base.symbol,
+                marketCap: '0',
             },
             stats: [],
             maxAvailableDays: 30,
@@ -256,9 +259,7 @@ export default {
         this.handleRightLabel();
 
         if (!this.isToken) {
-            this.fetchWEBsupply().then(() => {
-                this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
-            });
+            this.fetchWEBsupply();
         }
 
         this.$axios.retry.get(this.$routing.generate('market_kline', {
@@ -329,9 +330,18 @@ export default {
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
             };
-            if (!this.isToken && 1e7 === this.supply) {
-                this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
-                monthInfo.marketCap = 0;
+
+            if (!this.isToken) {
+                if (1e7 === this.supply) {
+                    // if fetchWEBsupply() fails
+                    this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
+                    monthInfo.marketCap = '-';
+                } else {
+                    monthInfo.marketCap = toMoney(
+                        Decimal.mul(this.marketStatus.last, this.supply),
+                        this.market.base.subunit
+                    );
+                }
             } else if (this.isToken) {
                 if (!this.isMintmeToken || marketAmount < this.minimumVolumeForMarketcap) {
                   monthInfo.marketCap = '-';
@@ -341,12 +351,16 @@ export default {
                     }))
                     .then((res) => {
                         monthInfo.marketCap = toMoney(
-                        parseFloat(this.marketStatus.last) * res.data, this.market.base.subunit
-                        ) + ' ' + this.market.base.symbol;
+                            parseFloat(this.marketStatus.last) * res.data,
+                            this.market.base.subunit
+                        );
                     })
                     .catch((err) => {
                         monthInfo.marketCap = '-';
                         this.sendLogs('error', 'Can not load soldOnMarket value', err);
+                    })
+                    .finally(() => {
+                        this.marketStatus = {...this.marketStatus, ...monthInfo};
                     });
                 }
             }
