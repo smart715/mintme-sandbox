@@ -1,8 +1,8 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import '../__mocks__/ResizeObserver';
 import RecentPosts from '../../js/components/posts/RecentPosts';
-import axios from "axios";
-import moxios from "moxios";
+import axios from 'axios';
+import moxios from 'moxios';
 
 /**
  * @return {Wrapper<Vue>}
