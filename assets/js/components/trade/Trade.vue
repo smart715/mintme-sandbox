@@ -60,6 +60,8 @@
                 :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
+                :total-sell-orders="totalSellOrders"
+                :total-buy-orders="totalBuyOrders"
                 :market="market"
                 :user-id="userId"
                 :logged-in="loggedIn"
@@ -98,6 +100,7 @@ import {
 import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
 import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
+import Decimal from 'decimal.js';
 
 const WSAPI = Constants.WSAPI;
 
@@ -141,6 +144,8 @@ export default {
         return {
             buyOrders: null,
             sellOrders: null,
+            totalSellOrders: null,
+            totalBuyOrders: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
@@ -246,6 +251,8 @@ export default {
                     })).then((result) => {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -275,6 +282,8 @@ export default {
                                 this.buyPage++;
                                 break;
                         }
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
 
                         context.resolve();
                         resolve(result.data);
@@ -289,6 +298,7 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
+            let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -299,7 +309,8 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        this.saveOrders(orders, isSell);
+                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
+                        this.saveOrders(orders, isSell, totalOrders);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -321,6 +332,13 @@ export default {
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+
+                    if (totalOrders) {
+                        totalOrders = isSell
+                            ? totalOrders.sub(order.amount).add(data.amount)
+                            : totalOrders.sub(order.price).add(data.price);
+                    }
+
                     this.ordersUpdated = true;
                     break;
                 case WSAPI.order.status.FINISH:
@@ -330,16 +348,27 @@ export default {
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
+
+                    if (totalOrders) {
+                      totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
+                    }
+
                     break;
             }
 
-            this.saveOrders(orders, isSell);
+            this.saveOrders(orders, isSell, totalOrders);
         },
-        saveOrders: function(orders, isSell) {
+        saveOrders: function(orders, isSell, totalOrders) {
             if (isSell) {
                 this.sellOrders = orders;
+                if (totalOrders) {
+                  this.totalSellOrders = totalOrders;
+                }
             } else {
                 this.buyOrders = orders;
+                 if (totalOrders) {
+                    this.totalBuyOrders = totalOrders;
+                }
             }
         },
     },

@@ -121,6 +121,7 @@ export default {
         ordersList: [Array],
         tokenName: String,
         fields: Array,
+        totalBuyOrders: [Array, Object],
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
@@ -147,9 +148,13 @@ export default {
             'getRates',
         ]),
         total: function() {
-            return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.sum).add(sum), 0), this.basePrecision
-            );
+            if (this.totalBuyOrders) {
+              return toMoney(this.totalBuyOrders, this.basePrecision);
+            } else {
+              return toMoney(this.tableData.reduce((sum, order) =>
+                  new Decimal(order.sum).add(sum), 0), this.basePrecision
+              );
+            }
         },
         hasOrders: function() {
             return this.tableData.length > 0;

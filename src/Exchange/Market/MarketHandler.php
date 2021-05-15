@@ -11,6 +11,7 @@ use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\BuyOrdersSummaryResult;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
@@ -642,6 +643,49 @@ class MarketHandler implements MarketHandlerInterface
             $offset,
         );
     }
+
+    /** {@inheritdoc} */
+    public function getBuyOrdersSummary(Market $market): BuyOrdersSummaryResult
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedBuyOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $paginatedBuyOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedBuyOrders);
+
+        $zeroDepthBase = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getBase())
+        );
+
+        /** @var Money $buyOrdersSum */
+        $buyOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getPrice()->add($sum);
+        }, $zeroDepthBase);
+
+        $buyOrdersSum = $this->moneyWrapper->format($buyOrdersSum);
+
+        $zeroDepthQuote = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getQuote())
+        );
+
+        /** @var Money $quoteAmountSummary */
+        $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getAmount()->add($sum);
+        }, $zeroDepthQuote);
+
+        $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
+
+        return new BuyOrdersSummaryResult($buyOrdersSum, $quoteAmountSummary);
+    }
+
 
     private function getPendingOrders(
         Market $market,
