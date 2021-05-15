@@ -196,12 +196,17 @@ class OrdersController extends AbstractFOSRestController
             self::PENDING_OFFSET
         );
 
+        $totalSellOrders = $this->marketHandler->getSellOrdersSummary($market)->getQuoteAmount();
+        $totalBuyOrders = $this->marketHandler->getBuyOrdersSummary($market)->getBasePrice();
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
+            'totalSellOrders' => $totalSellOrders,
+            'totalBuyOrders' => $totalBuyOrders,
         ];
     }
 
