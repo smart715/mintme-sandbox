@@ -134,6 +134,7 @@ export default {
         ordersList: [Array],
         market: Object,
         fields: Array,
+        totalSellOrders: [Array, Object],
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
@@ -163,9 +164,13 @@ export default {
             return this.market.quote.symbol.length > 12;
         },
         total: function() {
-            return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.amount).add(sum), 0), this.quotePrecision
-            );
+            if (this.totalSellOrders) {
+                return toMoney(this.totalSellOrders, this.quotePrecision);
+            } else {
+                return toMoney(this.tableData.reduce((sum, order) =>
+                    new Decimal(order.amount).add(sum), 0), this.quotePrecision
+                );
+            }
         },
         hasOrders: function() {
             return this.tableData.length > 0;

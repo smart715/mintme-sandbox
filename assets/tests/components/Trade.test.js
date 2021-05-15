@@ -265,6 +265,8 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
@@ -273,6 +275,8 @@ describe('Trade', () => {
             moxios.wait(() => {
                 expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
@@ -292,6 +296,8 @@ describe('Trade', () => {
                     buy: [],
                     sell: [],
                     buyDepth: 0,
+                    totalSellOrders: 0,
+                    totalBuyOrders: 0,
                 },
             });
 
@@ -318,12 +324,16 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
             moxios.wait(() => {
                 expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}, {price: '3'}, {price: '4'}]);
                 expect(wrapper.vm.sellPage).toBe(3);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
@@ -344,12 +354,16 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
             moxios.wait(() => {
                 expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}, {price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.buyPage).toBe(3);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
