@@ -291,6 +291,7 @@ export default {
 
                     if (!attach) {
                         this.tableData = result.data;
+                        this.currentPage = 2;
                     } else {
                         let resultData = result.data.filter((order) => order.id < this.lastId);
                         this.tableData = this.tableData.concat(resultData);
