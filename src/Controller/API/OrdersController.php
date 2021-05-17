@@ -31,7 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class OrdersController extends AbstractFOSRestController
 {
-    private const OFFSET = 100;
+    private const OFFSET = 10;
     private const PENDING_OFFSET = 100;
     private const WALLET_OFFSET = 20;
 

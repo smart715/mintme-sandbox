@@ -219,8 +219,8 @@ describe('TradeTradeHistory', () => {
         });
         wrapper.vm.tableData = tableData;
         expect(wrapper.vm.lastId).toBe(101);
-        wrapper.vm.tableData[0].id = 52;
-        expect(wrapper.vm.lastId).toBe(52);
+        wrapper.vm.tableData[0].id = 102;
+        expect(wrapper.vm.lastId).toBe(102);
     });
 
     describe('updateTableData', () => {
@@ -246,7 +246,7 @@ describe('TradeTradeHistory', () => {
         it('should do $axios request and set tableData correctly when attach is true and result of $axios request is not empty', (done) => {
             moxios.stubRequest('executed_orders', {
                 status: 200,
-                response: tableData,
+                response: tableDataNext,
             });
 
             const localVue = mockVue();
@@ -257,7 +257,7 @@ describe('TradeTradeHistory', () => {
             wrapper.vm.updateTableData(true);
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).toEqual([tableData[0], tableData[0]]);
+                expect(wrapper.vm.tableData).toEqual(tableData);
                 done();
             });
         });

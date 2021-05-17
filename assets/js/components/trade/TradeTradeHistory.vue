@@ -194,7 +194,7 @@ export default {
                 },
             ],
             currentPage: 1,
-            limit: 100,
+            limit: 10,
         };
     },
     computed: {
