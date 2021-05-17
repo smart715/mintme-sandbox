@@ -246,7 +246,7 @@ describe('TradeTradeHistory', () => {
         it('should do $axios request and set tableData correctly when attach is true and result of $axios request is not empty', (done) => {
             moxios.stubRequest('executed_orders', {
                 status: 200,
-                response: tableDataNext,
+                response: tableData,
             });
 
             const localVue = mockVue();
