@@ -62,7 +62,10 @@ class TradingController extends Controller
         }
 
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $this->getTokenRepository()->count(['isBlocked' => false]),
+            'tokensCount' => $this->getTokenRepository()->count([
+                'isBlocked' => false,
+                'deployed' => true,
+            ]),
             'btcImage' => $btcCrypto->getImage(),
             'mintmeImage' => $webCrypto->getImage(),
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
