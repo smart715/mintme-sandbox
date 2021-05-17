@@ -63,6 +63,7 @@ function mockVue() {
 }
 
 let propsForTestCorrectlyRenders = {
+    id: 100,
     websocketUrl: '',
     market: {
         base: {
