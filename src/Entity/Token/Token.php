@@ -269,7 +269,7 @@ class Token implements TradebleInterface, ImagineInterface
     /**
      * @ORM\Column(type="boolean", nullable=false)
      */
-    protected bool $isHidden = false;
+    protected bool $isHidden = false; // phpcs:ignore
 
     /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
