@@ -289,10 +289,14 @@ export default {
                         return resolve([]);
                     }
 
-                    let resultData = result.data.filter((order) => order.id < this.lastId);
-                    this.tableData = !attach ? result.data : this.tableData.concat(resultData);
-                    if (!resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
-                        this.currentPage++;
+                    if (!attach) {
+                        this.tableData = result.data;
+                    } else {
+                        let resultData = result.data.filter((order) => order.id < this.lastId);
+                        this.tableData = this.tableData.concat(resultData);
+                        if (resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
+                            this.currentPage++;
+                        }
                     }
 
                     resolve(result.data);
