@@ -130,7 +130,7 @@ const tableData = [
             },
         },
         'status': 'finished',
-        'id': 100,
+        'id': 101,
         'timestamp': 1596541004,
         'createdTimestamp': null,
         'side': 2,
@@ -218,7 +218,7 @@ describe('TradeTradeHistory', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tableData = tableData;
-        expect(wrapper.vm.lastId).toBe(53);
+        expect(wrapper.vm.lastId).toBe(101);
         wrapper.vm.tableData[0].id = 52;
         expect(wrapper.vm.lastId).toBe(52);
     });
