@@ -194,6 +194,7 @@ export default {
                 },
             ],
             currentPage: 1,
+            limit: 100,
         };
     },
     computed: {
@@ -288,8 +289,11 @@ export default {
                         return resolve([]);
                     }
 
-                    this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-                    this.currentPage++;
+                    let resultData = result.data.filter((order) => order.id < this.lastId);
+                    this.tableData = !attach ? result.data : this.tableData.concat(resultData);
+                    if (!resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
+                        this.currentPage++;
+                    }
 
                     resolve(result.data);
                 }).catch(reject);
