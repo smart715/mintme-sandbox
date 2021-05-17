@@ -42,6 +42,12 @@ class HideTokenCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
 
+        if (!is_string($name)) {
+            $io->error('Wrong token name argument, it must be a string!');
+
+            return 1;
+        }
+
         $token = $this->tokenManager->findByName($name);
         $unhide = (bool)$input->getOption('unhide');
 
