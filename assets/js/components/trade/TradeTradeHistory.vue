@@ -193,6 +193,7 @@ export default {
                     label: this.$t('trade.history.time'),
                 },
             ],
+            currentPage: 1,
         };
     },
     computed: {
@@ -230,8 +231,8 @@ export default {
             return this.tableData !== null;
         },
         lastId: function() {
-            return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
-                this.tableData[0].id :
+            return this.tableData && this.tableData.length && this.tableData[this.tableData.length - 1].hasOwnProperty('id') ?
+                this.tableData[this.tableData.length - 1].id :
                 0;
         },
         rate: function() {
@@ -277,7 +278,7 @@ export default {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
-                    id: this.lastId,
+                    id: this.currentPage,
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
@@ -288,6 +289,7 @@ export default {
                     }
 
                     this.tableData = !attach ? result.data : this.tableData.concat(result.data);
+                    this.currentPage++;
 
                     resolve(result.data);
                 }).catch(reject);

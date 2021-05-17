@@ -218,7 +218,7 @@ class OrdersController extends AbstractFOSRestController
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
     }
 
     /**
