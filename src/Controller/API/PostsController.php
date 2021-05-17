@@ -416,4 +416,20 @@ class PostsController extends AbstractFOSRestController
 
         return $this->view(["message" => $message, "comment" => $comment], Response::HTTP_OK);
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/recent-posts/{nextPage}", name="recent_posts", options={"expose"=true})
+     */
+    public function getRecentPosts(int $nextPage): view
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $posts = $this->postManager->getRecentPost($user, $nextPage);
+
+        return $this->view(
+            ['posts' => $posts],
+            Response::HTTP_OK
+        );
+    }
 }
