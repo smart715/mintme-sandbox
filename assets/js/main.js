@@ -4,6 +4,9 @@ import Vuelidate from 'vuelidate';
 import sanitizeHtml from './sanitize_html';
 import store from './storage';
 import UserInit from './components/UserInit';
+import moment from 'moment';
+
+Vue.prototype.moment = moment;
 
 /*
     To enable passive listeners,

@@ -81,4 +81,12 @@ class PostController extends Controller
                 : $decimals,
         ]);
     }
+
+    /**
+     * @Route("/home", name="show_user_home")
+     */
+    public function home(): Response
+    {
+        return $this->render('pages/show_user_home.html.twig');
+    }
 }

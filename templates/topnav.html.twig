@@ -93,6 +93,15 @@
                         {% trans %}navbar.trading{% endtrans %}
                     </a>
                 </li>
+
+                {% if show_links %}
+                    <li class="nav-item align-self-center {{ route == 'show_user_home' ? 'active' : '' }}">
+                        <a href="{{ path('show_user_home') }}" class="nav-link">
+                            {% trans %}navbar.home{% endtrans %}
+                        </a>
+                    </li>
+                {% endif %}
+
                 <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
                     <a href="{{ path('sonata_news_home') }}" class="nav-link">
                         {% trans %}navbar.news{% endtrans %}

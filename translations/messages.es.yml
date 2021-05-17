@@ -1,3 +1,4 @@
+by:
 navbar.my_token: 'Mi Token'
 navbar.token_show_modal: 'Ajustes del token'
 navbar.trading: Mercados
@@ -7,6 +8,7 @@ navbar.referrals: Referencias
 navbar.help: Ayuda
 navbar.profile: Perfil
 navbar.settings: Ajustes
+navbar.home:
 footer.cookies: 'Esta página web usa cookies'
 footer.press: Press
 footer.wallet: Billetera
@@ -431,6 +433,7 @@ post.tab.content: 'El contenido no puede estar vacío o contener sólo bbcodes y
 post.required: 'Cantidad requerida de tokens:'
 post.not_any_post: 'El creador del token no ha añadido ninguna publicación todavía.'
 post.created: 'Su publicación fue creada.'
+post.no_recent_posts:
 post.comments: Comentarios
 post.no_one_commented: 'Sin comentarios.'
 post.likes: 'Me gusta'
