@@ -520,8 +520,15 @@ export default {
                 && this.currentPage === totalPages;
         },
         marketFiltersOptions: function() {
-            return Object.values(this.marketFilters.options)
-                .filter((filter) => 'user' !== filter.key || 'user' === filter.key && this.userId);
+            const options = Object.values(this.marketFilters.options);
+            const allKey = this.marketFilters.options.all.key;
+            const userKey = this.marketFilters.options.user.key;
+
+            return options.filter((filter) =>
+                (userKey !== filter.key ||
+                userKey === filter.key && this.userId) &&
+                allKey !== filter.key
+            );
         },
     },
     mounted() {
