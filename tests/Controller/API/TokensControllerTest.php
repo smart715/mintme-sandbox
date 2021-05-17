@@ -9,6 +9,8 @@ use App\Tests\Controller\WebTestCase;
 use App\Utils\DateTime;
 use App\Utils\Symbols;
 use DateInterval;
+use Money\Currency;
+use Money\Money;
 
 class TokensControllerTest extends WebTestCase
 {
@@ -474,6 +476,59 @@ class TokensControllerTest extends WebTestCase
         $token = $this->getToken($tokName);
 
         $this->assertEquals('0x', $token->getMintDestination());
+    }
+
+    public function testTokensWithBalance(): void
+    {
+        $balanceHandler = self::$container->get(BalanceHandler::class);
+        $tokenManager = self::$container->get(TokenManager::class);
+
+        $this->register($this->client);
+        $tokName = $this->createToken($this->client);
+        $tokNameNotTaken = $this->createToken($this->client);
+
+        $fooClient = static::createClient();
+        $fooEmail = $this->register($fooClient);
+        $this->sendWeb($fooEmail);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 4,
+            'action' => 'sell',
+        ]);
+
+        $this->client->request('POST', '/api/orders/WEB/'. $tokNameNotTaken . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 4,
+            'action' => 'sell',
+        ]);
+
+        $fooClient->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+            'priceInput' => 1,
+            'amountInput' => 2,
+            'action' => 'buy',
+        ]);
+
+        $this->client->request('GET', '/api/tokens');
+
+        $res = json_decode((string)$this->client->getResponse()->getContent());
+        $user = $this->getToken($tokName)->getProfile()->getUser();
+        $tokens = [];
+
+        /** @var Token $token */
+        foreach ($res as $token) {
+            $available = $tokenManager->getRealBalance(
+                $token,
+                $balanceHandler->balance($user, $token)
+            )->getAvailable();
+
+            if ($available->greaterThanOrEqual(new Money(0, new Currency(Symbols::TOK)))) {
+                $tokens[] = $token;
+            }
+        }
+
+        $this->assertCount(1, $tokens);
+        $this->assertEquals($tokName, $tokens[0]->getName());
     }
 
     private function getToken(string $name): ?Token
