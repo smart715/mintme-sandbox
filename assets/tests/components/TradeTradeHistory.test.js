@@ -63,7 +63,6 @@ function mockVue() {
 }
 
 let propsForTestCorrectlyRenders = {
-    id: 100,
     websocketUrl: '',
     market: {
         base: {
@@ -79,7 +78,6 @@ let propsForTestCorrectlyRenders = {
             identifier: 'WEB',
         },
     },
-    page: 1,
 };
 
 const tableData = [
@@ -132,7 +130,7 @@ const tableData = [
             },
         },
         'status': 'finished',
-        'id': 53,
+        'id': 100,
         'timestamp': 1596541004,
         'createdTimestamp': null,
         'side': 2,
