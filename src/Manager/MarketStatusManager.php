@@ -129,7 +129,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1");
 
                 break;
         }
@@ -158,7 +159,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1");
 
                 break;
         }
