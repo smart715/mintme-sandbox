@@ -32,7 +32,7 @@ new Vue({
             tokenCreation: true,
             noClose: true,
             addPhoneModalMessageType: 'token_create',
-
+            handlingSubmit: false,
         };
     },
     components: {
@@ -43,8 +43,11 @@ new Vue({
     },
     computed: {
         saveBtnDisabled: function() {
-            return this.$v.$anyError || !this.tokenName ||
-                this.tokenNameExists || this.tokenNameProcessing;
+            return this.$v.$anyError ||
+                !this.tokenName ||
+                this.tokenNameExists ||
+                this.tokenNameProcessing ||
+                this.handlingSubmit;
         },
         translationsContext: function() {
             return {
@@ -108,6 +111,12 @@ new Vue({
                 return;
             }
 
+            if (this.handlingSubmit) {
+                return;
+            }
+
+            this.handlingSubmit = true;
+
             let frm = document.querySelector('form[name="token_create"]');
             let frmData = new FormData(frm);
             this.$axios.single.post(this.$routing.generate('token_create'), frmData)
@@ -120,7 +129,11 @@ new Vue({
                         });
                         frm.submit();
                     }
-                }, (err) => this.notifyError(err.response.data.message));
+                })
+                .catch((err) => {
+                    this.notifyError(err.response.data.message);
+                    this.handlingSubmit = false;
+                });
         },
         tokenInvalid: function(e) {
             e.target.setCustomValidity('Invalid token name.');
