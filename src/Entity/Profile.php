@@ -413,9 +413,7 @@ class Profile implements ImagineInterface
      */
     public function getImage(): Image
     {
-        return $this->image && $this->returnDefault()
-            ? $this->image
-            : Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }
 
 
