@@ -83,6 +83,16 @@ class Crypto implements TradebleInterface, ImagineInterface
      */
     protected Image $image;
 
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\CryptoVoting",
+     *     mappedBy="crypto"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
+
     public function getId(): int
     {
         return $this->id;
@@ -164,5 +174,10 @@ class Crypto implements TradebleInterface, ImagineInterface
     public function setIsToken(bool $isToken): void
     {
         $this->isToken = $isToken;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

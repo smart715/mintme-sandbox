@@ -8,6 +8,7 @@ import tokenStatistics from './modules/token_statistics';
 import chat from './modules/chat';
 import rates from './modules/rates';
 import user from './modules/user';
+import voting from './modules/voting';
 import orders from './modules/orders';
 
 export default {
@@ -24,6 +25,7 @@ export default {
         chat,
         rates,
         user,
+        voting,
         orders,
     },
 };
