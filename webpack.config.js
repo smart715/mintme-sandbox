@@ -28,6 +28,7 @@ Encore
     .addEntry('home', './assets/js/home.js')
     .addEntry('footer', './assets/js/footer.js')
     .addEntry('phone_verification', './assets/js/phone_verification.js')
+    .addEntry('voting', './assets/js/voting.js')
     .addEntry('recent_posts', './assets/js/recent_posts.js')
 
     .splitEntryChunks()

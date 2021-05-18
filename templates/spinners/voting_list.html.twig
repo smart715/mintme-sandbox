@@ -1,0 +1,32 @@
+<div v-if="false">
+    <div class="card h-100 posts-container">
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                {% trans %}voting.propositions{% endtrans %}
+            </div>
+        </div>
+        <div class="card-body posts overflow-hidden position-relative">
+            {% for voting in votings %}
+            <div class="w-100 c-pointer mb-2">
+                <div class="d-flex align-items-center">
+                    <div class="badge badge-primary h-100 py-1 px-4 mr-3">
+                        {% if voting.closed %}
+                            {% trans %}voting.proposition.closed{% endtrans %}
+                        {% else %}
+                            {% trans %}voting.proposition.active{% endtrans %}
+                        {% endif %}
+                    </div>
+                    <h4 class="p-0 m-0">{{ voting.title }}</h4>
+                </div>
+                <div class="pt-1">
+                    {{ "voting.proposition.info" | trans({
+                        '%nickname%': voting.creatorProfile.nickname,
+                        '%startDate%': voting.createdAt | date('m.d.Y H:m:s'),
+                        '%endDate%': voting.endDate | date('m.d.Y H:m:s'),
+                    }) }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -297,6 +297,16 @@ class Token implements TradebleInterface, ImagineInterface
     private $decimals = 12;
 
     /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\TokenVoting",
+     *     mappedBy="token"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
+
+    /**
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
      */
     private bool $showDeployedModal = false; // phpcs:ignore
@@ -865,5 +875,10 @@ class Token implements TradebleInterface, ImagineInterface
     public function getTxHash(): ?string
     {
         return $this->txHash;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

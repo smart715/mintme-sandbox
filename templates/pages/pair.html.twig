@@ -313,6 +313,46 @@
                             </div>
                         </div>
                     </b-tab>
+                    <b-tab
+                        title="{% trans %}voting.voting{% endtrans %}"
+                        title-link-class="token-voting-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-list
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            :min-amount="{{ dMMinAmount }}"
+                            @go-to-create="goToCreateVoting"
+                            @go-to-show="goToShowVoting"
+                        >
+                        </voting-list>
+                    </b-tab>
+                    <b-tab
+                        title="create-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'create-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-create
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                        >
+                        </voting-create>
+                    </b-tab>
+                    <b-tab
+                        title="show-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'show-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-show
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            {% if voting is defined %}
+                            :voting-prop="{{ voting | json_encode }}"
+                            {% endif %}
+                        >
+                        </voting-show>
+                    </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
                     {% if isTokenPage %}

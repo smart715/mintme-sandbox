@@ -48,6 +48,13 @@ form.token.initial_order: 'Définir les ordres de vente initiaux'
 form.token.initial_order.guide: '15% de vos jetons seront définis pour la vente de 0.1 à 10 MINTME. Si vous désélectionnez, assurez d''ajouter manuellement votre jeton dans la section de Trade'
 form.token.characters_used: 'Caractères utilisés:'
 form.token.min: min.
+form.validation.option.required:
+form.validation.option.max:
+form.validation.title.min:
+form.validation.title.max:
+form.validation.description.min:
+form.validation.description.max:
+form.validation.description.required:
 page.settings.title: Paramètres
 page.settings.account.header: 'Paramètres du compte'
 page.settings.account.submit: Sauvegarder
@@ -745,7 +752,6 @@ post_form.msg.share_reward.max_decimals: 'La récompense doit avoir tout au plus
 post_form.msg.share_reward.between: 'La récompense doit être entre 0 et %maxReward%'
 post_form.msg.title.required: 'Titre requis'
 post_form.msg.title.max_length: 'Le titre ne peut avoir plus de %maxTitleLength% caractères'
-post_form.backend.no_token: 'L''utilisateur actuel n''a pas crée de jeton'
 posts.all: 'Tous les posts'
 comment.created: 'Commentaire crée.'
 comment.confirm_delete: 'Voulez-vous vraiment supprimer définitivement ce commentaire?'
@@ -755,6 +761,30 @@ comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
 comment.min_amount: 'You need %amount% %token% to see comments.'
 like.removed: 'Mention aimé retirée.'
+voting.voting:
+voting.information:
+voting.propositions:
+voting.new_proposition:
+voting.create:
+voting.form.title:
+voting.form.description:
+voting.form.start_date:
+voting.form.end_date:
+voting.form.created_by:
+voting.options:
+voting.add_option:
+voting.publish:
+voting.vote:
+voting.current_results:
+voting.no_propositions:
+voting.proposition.info:
+voting.proposition.active:
+voting.proposition.closed:
+voting.added_successfully:
+voting.already_voted:
+voting.creator_vot_not_allowed:
+voting.create.min_amount_required:
+voting.vote.zero_balance:
 airdrop.end: 'Finaliser cet airdrop'
 airdrop.amount_tokens: 'Nombre de tokens pour l''airdrop:'
 airdrop.insufficient_funds: 'Fonds insuffisant pour la campagne de l''airdrop.'
@@ -1231,6 +1261,7 @@ api.wallet.not_found_currency: 'Devise introuvable'
 api.wallet.withdrawal_failed: 'Retrait échoué'
 api.wallet.not_found: Introuvable
 api.tokens.token_not_exists: 'Jeton inexistant'
+api.tokens.user_not_created_token:
 api.tokens.you_need_all_tokens_to_change_name: 'Vous avez besoin de tous vos jetons afin de changer le nom de ce dernier'
 api.tokens.deploying: 'Jeton en cours de déploiement ou déployé.'
 api.tokens.forbidden_name: 'Nom de jeton non autorisé, essayer un autre'
@@ -1298,6 +1329,7 @@ mail.verification_code: 'Votre code de vérification:'
 404.profile: 'Profil inexistant'
 404.token: 'Jeton introuvable'
 404.pair: 'Paire introuvable'
+404.voting:
 text.time.year: année(s)
 mail.mintme_host.1: 'Vous pouvez utiliser <strong>des hébergements dédiés spéciaux</strong> pour votre projet mintme à:'
 mail.mintme_host.2: 'Réalisé par <strong>l''équipe mintMe</strong>, vous pouvez gratuitement essayer durant %freeDays% jours et le prix du trafic illimité pendant la première année est de seulement <strong>%price% USD/AN</strong>'
