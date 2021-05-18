@@ -5,7 +5,7 @@ namespace App\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 /** @codeCoverageIgnore  */
-class ApiBadForbiddenException extends ApiException
+class ApiForbiddenException extends ApiException
 {
     public function getStatusCode(): int
     {

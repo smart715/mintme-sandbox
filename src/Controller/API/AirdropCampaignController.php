@@ -9,8 +9,8 @@ use App\Entity\User;
 use App\Events\AirdropEvent;
 use App\Events\TokenEvents;
 use App\Events\UserAirdropEvent;
-use App\Exception\ApiBadForbiddenException;
 use App\Exception\ApiBadRequestException;
+use App\Exception\ApiForbiddenException;
 use App\Exception\ApiUnauthorizedException;
 use App\Exception\InvalidTwitterTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -101,7 +101,6 @@ class AirdropCampaignController extends AbstractFOSRestController
      * @Rest\Get("/{tokenName}", name="get_airdrop_campaign", options={"expose"=true})
      * @param string $tokenName
      * @return View
-     * @throws ApiBadRequestException
      */
     public function getAirdropCampaign(string $tokenName): View
     {
@@ -414,7 +413,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         if ($this->blacklistManager->isBlacklistedAirdropDomain($url)) {
-            throw new ApiBadForbiddenException($this->translator->trans('api.airdrop.forbidden_domain', [
+            throw new ApiForbiddenException($this->translator->trans('api.airdrop.forbidden_domain', [
                 '%domain%' => $url,
             ]));
         }
