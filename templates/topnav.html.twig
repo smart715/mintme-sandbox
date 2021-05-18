@@ -15,7 +15,7 @@
     <div class="container-fluid">
         <a class="order-first navbar-brand" href="{{ path('homepage') }}">
             {% if is_beta_version %}
-                <div class="badge">{% trans %}beta{% endtrans %}</div>
+                <div class="badge badge-beta">{% trans %}beta{% endtrans %}</div>
             {% endif %}
                 <img
                     {% if is_beta_version %}
@@ -117,6 +117,11 @@
                 <li class="nav-item align-self-center {{ route starts with 'kb' ? 'active' : '' }}">
                     <a href="{{ path('kb') }}" class="nav-link">
                         {% trans %}navbar.help{% endtrans %}
+                    </a>
+                </li>
+                <li class="nav-item align-self-center {{ route starts with 'voting' ? 'active' : '' }}">
+                    <a href="{{ path('voting') }}" class="nav-link">
+                        {% trans %}voting.voting{% endtrans %}
                     </a>
                 </li>
                 {% if not app.user %}

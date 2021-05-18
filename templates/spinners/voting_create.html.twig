@@ -1,0 +1,20 @@
+<div class="row" v-if="false">
+    <div class="card h-100 col-sm-12 col-lg-7">
+        <div class="card-header">
+            {% trans %}voting.create{% endtrans %}
+        </div>
+        <div class="card-body">
+            {{ include('spinners/spinner.html.twig') }}
+        </div>
+    </div>
+    <div class="card h-100 col-sm-12 col-lg-5">
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                {% trans %}voting.options{% endtrans %}
+            </div>
+        </div>
+        <div class="card-body">
+            {{ include('spinners/spinner.html.twig') }}
+        </div>
+    </div>
+</div>
