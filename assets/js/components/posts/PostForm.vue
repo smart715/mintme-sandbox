@@ -98,7 +98,7 @@ import BbcodeEditor from '../bbcode/BbcodeEditor';
 import BbcodeHelp from '../bbcode/BbcodeHelp';
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
-import {HTTP_OK} from '../../utils/constants';
+import {HTTP_OK, requiredBBCText} from '../../utils/constants';
 import {CheckInputMixin, NotificationMixin} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
@@ -340,9 +340,7 @@ export default {
     validations() {
         return {
             content: {
-                required: (val) => required(
-                    val.replace(/\[\s*\/?\s*(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim()
-                ),
+                required: requiredBBCText,
                 minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
             },

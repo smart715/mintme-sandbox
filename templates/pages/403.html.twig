@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}page.error.403.title{% endtrans %} - {{ error_message | default('')}} {% endblock %}
+
+{% block bodyclass %}errorpage{% endblock %}
+
+{% block messageClass %}d-none{% endblock %}
+
+{% block content %}
+    <div class="container top-4 h-100">
+        <div class="row justify-content-center align-content-center text-center text-white h-100">
+            <div class="col-12 py-5">
+                <div class="error-code">403</div>
+                <div class="error-text text-uppercase">
+                    {{ 'page.error.403.header'| trans }}
+                </div>
+                <p class="error-msg">
+                    {{ error_message | default('') | trans }}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

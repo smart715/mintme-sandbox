@@ -19,7 +19,10 @@ import Envelope from './components/chat/Envelope';
 import i18n from './utils/i18n/i18n';
 import TokenCreatedModal from './components/modal/TokenCreatedModal';
 import TokenDeployedModal from './components/modal/TokenDeployedModal';
-import {tabs} from './utils/constants';
+import VotingList from './components/voting/VotingList';
+import VotingCreate from './components/voting/VotingCreate';
+import VotingShow from './components/voting/VotingShow';
+import {tabs, tabsArr} from './utils/constants';
 
 new Vue({
   el: '#token',
@@ -70,6 +73,9 @@ new Vue({
     TokenSocialMediaIcons,
     TopHolders,
     Trade,
+    VotingList,
+    VotingCreate,
+    VotingShow,
   },
   mounted: function() {
     let divEl = document.createElement('div');
@@ -97,11 +103,13 @@ new Vue({
       tokenName = tokenName.replace(/\s/g, '-');
       document.addEventListener('DOMContentLoaded', () => {
         let introLink = document.querySelectorAll('a.token-intro-tab-link')[0];
-        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[0]});
+        introLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.intro});
         let postsLink = document.querySelectorAll('a.token-posts-tab-link')[0];
-        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[1]});
+        postsLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.posts});
         let tradeLink = document.querySelectorAll('a.token-trade-tab-link')[0];
-        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs[2]});
+        tradeLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.trade});
+        let votingLink = document.querySelectorAll('a.token-voting-tab-link')[0];
+        votingLink.href = this.$routing.generate('token_show', {name: tokenName, tab: tabs.voting});
       });
     }
   },
@@ -182,24 +190,31 @@ new Vue({
         // prevents browser from storing history with each change:
         let url = '';
         switch (i) {
-          case 1:
+          case tabsArr.indexOf(tabs.posts):
             url = this.$routing.generate('new_show_post', {
               name: this.tokenName,
               slug: null,
             });
 
             break;
-          case 3:
+          case tabsArr.indexOf(tabs.post):
             url = this.$routing.generate('new_show_post', {
               name: this.tokenName,
               slug: this.singlePost.slug,
             });
 
             break;
+          case tabsArr.indexOf(tabs.show_voting):
+            url = this.$routing.generate('token_show_voting', {
+              name: this.tokenName,
+              id: this.currentVoting.id,
+            });
+
+            break;
           default:
             url = this.$routing.generate('token_show', {
               name: this.tokenName,
-              tab: tabs[i],
+              tab: tabsArr[i],
             });
         }
 
@@ -246,7 +261,7 @@ new Vue({
           });
     },
     goToPosts: function() {
-      this.tabIndex = 1;
+      this.tabIndex = tabsArr.indexOf(tabs.posts);
     },
     deletePost: function(index) {
       this.posts.splice(index, 1);
@@ -255,7 +270,7 @@ new Vue({
       return null !== a ? a : b;
     },
     goToTrade: function(amount) {
-      this.tabIndex= 2;
+      this.tabIndex = tabsArr.indexOf(tabs.trade);
       this.setUseBuyMarketPrice(true);
       this.setBuyAmountInput(amount);
       this.setSubtractQuoteBalanceFromBuyAmount(true);
@@ -268,7 +283,7 @@ new Vue({
     },
     goToPost: function(post) {
       this.singlePost = post;
-      this.tabIndex = 3;
+      this.tabIndex = tabsArr.indexOf(tabs.post);
       this.comments = [];
 
       this.loadComments(post.id);
@@ -285,11 +300,20 @@ new Vue({
       this.posts = this.posts.filter((post) => post.id !== postId);
       this.goToPosts();
     },
+    goToCreateVoting() {
+      this.tabIndex = tabsArr.indexOf(tabs.create_voting);
+    },
+    goToShowVoting() {
+      this.tabIndex = tabsArr.indexOf(tabs.show_voting);
+    },
   },
   computed: {
     ...mapGetters('tradeBalance', [
       'getQuoteBalance',
     ]),
+    ...mapGetters('voting', {
+      currentVoting: 'getCurrentVoting',
+    }),
   },
   watch: {
     getQuoteBalance: function() {
