@@ -112,7 +112,7 @@ class MarketCapCalculator
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
             return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume()) ||
-                !$market->quoteToken->getDeployed()
+                !$market->getQuote()->getDeployed()
                 ? $marketCap
                 : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Symbols::WEB));
