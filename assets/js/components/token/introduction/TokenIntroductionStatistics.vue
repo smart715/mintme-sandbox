@@ -253,7 +253,6 @@
 <script>
 import CopyLink from '../../CopyLink';
 import Guide from '../../Guide';
-import {Decimal} from 'decimal.js';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
@@ -293,12 +292,12 @@ export default {
     },
     data() {
         return {
-            pendingSellOrders: null,
             soldOnMarket: null,
             defaultValue: defaultValue,
             tokenWithdrawn: null,
             donationVolume: null,
             shouldShowStats: false,
+            totalPendingSellOrders: null,
         };
     },
     methods: {
@@ -341,7 +340,7 @@ export default {
               base: this.market.base.symbol,
               quote: this.market.quote.symbol,
             }))
-                .then((res) => this.pendingSellOrders = res.data.sell)
+                .then((res) => this.totalPendingSellOrders = res.data.totalSellOrders)
                 .catch((err) => {
                   this.sendLogs('error', 'Can not load statistic data', err);
                 });
@@ -411,21 +410,15 @@ export default {
             }
 
             return null !== this.soldOnMarket &&
-                null !== this.pendingSellOrders &&
+                null !== this.totalPendingSellOrders &&
                 null !== this.donationVolume;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            let sum = new Decimal(0);
-            for (let key in this.pendingSellOrders) {
-                if (this.pendingSellOrders.hasOwnProperty(key)) {
-                    let amount = new Decimal(this.pendingSellOrders[key]['amount']);
-                    sum = sum.plus(amount);
-                }
-            }
-            return toMoney(sum.toString());
+            let total = this.totalPendingSellOrders;
+            return toMoney(total);
         },
         withdrawBalance: function() {
             return toMoney(this.tokenWithdrawn);
