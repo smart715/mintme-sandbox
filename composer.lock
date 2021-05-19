@@ -12124,16 +12124,16 @@
         },
         {
             "name": "symfony/security-core",
-            "version": "v4.4.10",
+            "version": "v4.4.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-core.git",
-                "reference": "16ab88e5692e3fc32ae4ad550a55fbced516203b"
+                "reference": "c8b37f1583138cc53edbefe81f0fa274f548129c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-core/zipball/16ab88e5692e3fc32ae4ad550a55fbced516203b",
-                "reference": "16ab88e5692e3fc32ae4ad550a55fbced516203b",
+                "url": "https://api.github.com/repos/symfony/security-core/zipball/c8b37f1583138cc53edbefe81f0fa274f548129c",
+                "reference": "c8b37f1583138cc53edbefe81f0fa274f548129c",
                 "shasum": ""
             },
             "require": {
@@ -12147,12 +12147,13 @@
                 "symfony/security-guard": "<4.3"
             },
             "require-dev": {
-                "psr/container": "^1.0",
+                "psr/container": "^1.0|^2.0",
                 "psr/log": "~1.0",
                 "symfony/event-dispatcher": "^4.3",
                 "symfony/expression-language": "^3.4|^4.0|^5.0",
                 "symfony/http-foundation": "^3.4|^4.0|^5.0",
                 "symfony/ldap": "^4.4|^5.0",
+                "symfony/translation": "^4.4|^5.0",
                 "symfony/validator": "^3.4.31|^4.3.4|^5.0"
             },
             "suggest": {
@@ -12164,11 +12165,6 @@
                 "symfony/validator": "For using the user password constraint"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\Security\\Core\\": ""
@@ -12193,7 +12189,7 @@
             ],
             "description": "Symfony Security Component - Core Library",
             "homepage": "https://symfony.com",
-            "time": "2020-05-30T21:50:11+00:00"
+            "time": "2021-05-19T12:06:31+00:00"
         },
         {
             "name": "symfony/security-csrf",
@@ -12256,16 +12252,16 @@
         },
         {
             "name": "symfony/security-guard",
-            "version": "v4.4.10",
+            "version": "v4.4.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-guard.git",
-                "reference": "699162c3a9fcceb5ec8bce35a3dc2fcb79c6751e"
+                "reference": "d0326e1c4a833c9df598d08e1496cb6d79a443f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-guard/zipball/699162c3a9fcceb5ec8bce35a3dc2fcb79c6751e",
-                "reference": "699162c3a9fcceb5ec8bce35a3dc2fcb79c6751e",
+                "url": "https://api.github.com/repos/symfony/security-guard/zipball/d0326e1c4a833c9df598d08e1496cb6d79a443f3",
+                "reference": "d0326e1c4a833c9df598d08e1496cb6d79a443f3",
                 "shasum": ""
             },
             "require": {
@@ -12277,11 +12273,6 @@
                 "psr/log": "~1.0"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.4-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\Security\\Guard\\": ""
@@ -12306,7 +12297,7 @@
             ],
             "description": "Symfony Security Component - Guard",
             "homepage": "https://symfony.com",
-            "time": "2020-05-20T08:37:50+00:00"
+            "time": "2021-05-12T12:42:28+00:00"
         },
         {
             "name": "symfony/security-http",
