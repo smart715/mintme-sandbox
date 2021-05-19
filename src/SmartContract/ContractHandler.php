@@ -241,7 +241,7 @@ class ContractHandler implements ContractHandlerInterface
         }
 
         /** @var Token $tradeble */
-        return Symbols::ETH === $tradeble->getCryptoSymbol()
+        return in_array($tradeble->getCryptoSymbol(), [Symbols::ETH, Symbols::BNB], true)
             ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
                 (string)$this->parameterBag->get('token_withdraw_fee'),
                 Symbols::ETH
@@ -312,12 +312,13 @@ class ContractHandler implements ContractHandlerInterface
         );
     }
 
-    public function getDecimalsContract(string $tokenAddress): int
+    public function getDecimalsContract(string $tokenAddress, string $blockchain): int
     {
         $response = $this->rpc->send(
             self::GET_DECIMALS_CONTRACT,
             [
                 'address' => $tokenAddress,
+                'blockchain' => $blockchain,
             ]
         );
 
