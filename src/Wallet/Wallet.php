@@ -117,7 +117,7 @@ class Wallet implements WalletInterface
             $crypto = $tradable;
             $token = Token::getFromCrypto($tradable);
         } else {
-            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
+            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
             $token = $tradable;
         }
 
@@ -131,9 +131,11 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
+        $cryptoSymbol = $crypto->getSymbol();
+
         if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB], true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
-                !$this->withdrawGateway->isContractAddress($address->getAddress(), $crypto->getSymbol())
+                !$this->withdrawGateway->isContractAddress($address->getAddress(), $cryptoSymbol)
             ) {
                 throw new IncorrectAddressException();
             }

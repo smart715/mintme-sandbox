@@ -8,14 +8,18 @@ use Doctrine\ORM\EntityRepository;
 class CryptoRepository extends EntityRepository
 {
     /** @codeCoverageIgnore */
-    public function getBySymbol(string $symbol): ?Crypto
+    public function getBySymbol(string $symbol, bool $showHidden): ?Crypto
     {
-        return $this->findOneBy(['symbol' => $symbol]);
-    }
+        $query = $this->createQueryBuilder('c')
+            ->where('c.symbol = :symbol')
+            ->setParameter('symbol', $symbol);
 
-    /** @codeCoverageIgnore */
-    public function getByName(string $name): ?Crypto
-    {
-        return $this->findOneBy(['name' => $name]);
+        if (!$showHidden) {
+            $query->andWhere('c.tradable = 1 OR c.exchangeble = 1');
+        }
+
+        return $query
+            ->getQuery()
+            ->getResult()[0] ?? null;
     }
 }

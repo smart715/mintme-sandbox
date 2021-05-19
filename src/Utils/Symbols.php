@@ -11,6 +11,7 @@ final class Symbols
     public const ETH = "ETH";
     public const USD = "USD";
     public const USDC = "USDC";
+    public const BNB = "BNB";
 
     private function __construct()
     {
