@@ -473,6 +473,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
+                    AND qt.is_hidden = false
                 ) AS r
                 WHERE r.id IN (:ids)";
 
