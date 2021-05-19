@@ -32,7 +32,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_DEPLOYED_ONLY_MINTME = 2;
     public const FILTER_AIRDROP_ONLY = 3;
     public const FILTER_DEPLOYED_ONLY_ETH = 4;
-    public const FILTER_DEPLOYED = 5;
     public const FILTER_AIRDROP_ACTIVE = true;
     public const FILTER_FOR_TOKENS = [
             'deployed_first' => self::FILTER_DEPLOYED_FIRST,
@@ -122,20 +121,15 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::FILTER_DEPLOYED_ONLY_ETH:
-                $queryBuilder->andWhere(
-                    "qt.deployed = 1 AND c.symbol = :eth"
-                )->setParameter('eth', Symbols::ETH);
+                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :eth")
+                             ->setParameter('eth', Symbols::ETH);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
-                    ->andWhere("qt.deployed = 1");
-
-                break;
-            case self::FILTER_DEPLOYED:
-                $queryBuilder->andWhere("qt.deployed = 1");
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
@@ -165,7 +159,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
                     ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
-                    ->andWhere("qt.deployed = 1");
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
