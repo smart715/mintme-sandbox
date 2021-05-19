@@ -170,7 +170,7 @@ describe('Wallet', () => {
         wrapper.setProps({twofa: 'foo'});
         wrapper.vm.predefinedTokens = {};
         wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
-        wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8);
+        wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8, false, false, webSymbol);
         expect(wrapper.vm.showModal).toBe(true);
         expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
         expect(wrapper.vm.isTokenModal).toBe(false);

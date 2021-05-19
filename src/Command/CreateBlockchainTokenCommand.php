@@ -25,12 +25,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CreateEthTokenCommand extends Command
+class CreateBlockchainTokenCommand extends Command
 {
     /** @var string */
-    protected static $defaultName = 'token:eth:create';
+    protected static $defaultName = 'token:create';
 
     private const INIT_BALANCE = '0';
+
+    private const ETH_BLOCKCHAIN = 'ETH';
+    private const BNB_BLOCKCHAIN = 'BNB';
+    private const ALLOWED_BLOCKCHAINS = [
+        self::ETH_BLOCKCHAIN,
+        self::BNB_BLOCKCHAIN,
+    ];
 
     private EntityManagerInterface $em;
     private ProfileManagerInterface $profileManager;
@@ -76,7 +83,7 @@ class CreateEthTokenCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Add eth tokens to a user.')
+            ->setDescription('Add ethereum or binance tokens to a user.')
             ->addArgument('tokenName', InputArgument::REQUIRED, 'The name of the token.')
             ->addArgument('email', InputArgument::REQUIRED, 'Email of the token owner.')
             ->addArgument('tokenAddress', InputArgument::REQUIRED, 'The address of the token')
@@ -92,6 +99,12 @@ class CreateEthTokenCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Withdrawal fee value (for ex.: 0.005, 7 etc.)'
             )
+            ->addOption(
+                'blockchain',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Specify token\'s blockchain, ETH or BNB (Ethereum or Binance)'
+            )
         ;
     }
 
@@ -106,9 +119,19 @@ class CreateEthTokenCommand extends Command
         $minDeposit = $input->getOption('minDeposit');
         /** @var string|null $withdrawalFee */
         $withdrawalFee = $input->getOption('withdrawalFee');
+        /** @var string $blockchain */
+        $blockchain = $input->getOption('blockchain');
+
+        if (!$blockchain || !is_string($blockchain) ||  !in_array($blockchain, self::ALLOWED_BLOCKCHAINS)) {
+            $io->error('Wrong blockchain parameter. Allowed: '.implode(', ', self::ALLOWED_BLOCKCHAINS));
+
+            return 1;
+        }
 
         if ($minDeposit && !is_numeric($minDeposit) || $withdrawalFee && !is_numeric($withdrawalFee)) {
             $io->error('Wrong minimal deposit or withdrawal fee argument. Should be positive numeric (0.1, 2.5, 10)');
+
+            return 1;
         }
 
         if (!is_string($tokenName) || !is_string($email) || !is_string($tokenAddress)) {
@@ -118,7 +141,7 @@ class CreateEthTokenCommand extends Command
         }
 
         $profile = $this->profileManager->findByEmail($email);
-        $this->crypto = $this->cryptoManager->findBySymbol(Symbols::ETH);
+        $this->crypto = $this->cryptoManager->findBySymbol($blockchain, true);
         $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($tokenName)
             ?? $this->tokenManager->findByAddress($tokenAddress);
@@ -127,6 +150,11 @@ class CreateEthTokenCommand extends Command
         if (!$this->crypto || !$this->exchangeCrypto) {
             $hasErrors = true;
             $io->error('Cryptos don\'t exist');
+        }
+
+        if (self::BNB_BLOCKCHAIN === $blockchain && !$withdrawalFee) {
+            $hasErrors = true;
+            $io->error('Binance token should have withdrawal fee parameter');
         }
 
         if (!$profile) {
@@ -144,7 +172,7 @@ class CreateEthTokenCommand extends Command
             $io->error('User with provided email has already created a token');
         }
 
-        $contractDecimals = (int)$this->contractHandler->getDecimalsContract($tokenAddress);
+        $contractDecimals = (int)$this->contractHandler->getDecimalsContract($tokenAddress, $blockchain);
 
         if ($minDeposit && !$this->checkDecimals($minDeposit, $contractDecimals)) {
             $hasErrors = true;
@@ -160,7 +188,7 @@ class CreateEthTokenCommand extends Command
             return 1;
         }
 
-        if (!$this->createEthToken($tokenName, $profile, $tokenAddress, $minDeposit, $withdrawalFee)) {
+        if (!$this->createBlockchainToken($tokenName, $profile, $tokenAddress, $minDeposit, $withdrawalFee)) {
             $io->error('Please make sure that the internal services are running then try again!');
 
             return 1;
@@ -171,7 +199,7 @@ class CreateEthTokenCommand extends Command
         return 0;
     }
 
-    private function createEthToken(
+    private function createBlockchainToken(
         string $name,
         Profile $profile,
         string $tokenAddress,
@@ -180,6 +208,7 @@ class CreateEthTokenCommand extends Command
     ): bool {
         $this->em->beginTransaction();
         $token = $this->storeToken($name, $profile, $tokenAddress, $withdrawalFee);
+        $symbol = $this->crypto->getSymbol();
 
         try {
             $this->balanceHandler->deposit(
@@ -192,7 +221,7 @@ class CreateEthTokenCommand extends Command
             );
             $this->contractHandler->addToken($token, $minDeposit);
         } catch (\Throwable $exception) {
-            $this->logger->error('error while adding ETH token: ' . json_encode($exception));
+            $this->logger->error('error while adding '.$symbol.'token: ' . json_encode($exception));
 
             return false;
         }
@@ -206,7 +235,7 @@ class CreateEthTokenCommand extends Command
         );
 
         $this->em->commit();
-        $this->logger->info('Create eth token', ['name' => $token->getName(), 'id' => $token->getId()]);
+        $this->logger->info('Create '.$symbol.' token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
         return true;
     }

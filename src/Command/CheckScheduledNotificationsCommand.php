@@ -105,7 +105,7 @@ class CheckScheduledNotificationsCommand extends Command
         }
 
         foreach ($quoteTokens as $quoteToken) {
-            $baseCrypto = $this->cryptoManager->findBySymbol($quoteToken->getCryptoSymbol());
+            $baseCrypto = $this->cryptoManager->findBySymbol($quoteToken->getCryptoSymbol(), true);
             $userMarket = new Market($baseCrypto, $quoteToken);
             $userSellOrders = $this->marketHandler->getSellOrdersSummaryByUser($user, $userMarket);
 

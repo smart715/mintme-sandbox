@@ -130,8 +130,8 @@ class MarketsUpdateCommand extends Command
             return 1;
         }
 
-        $base = $this->cryptoManager->findBySymbol($market[0]);
-        $quote = $this->cryptoManager->findBySymbol($market[1]) ?? $this->tokenManager->findByName($market[1]);
+        $base = $this->cryptoManager->findBySymbol($market[0], true);
+        $quote = $this->cryptoManager->findBySymbol($market[1], true) ?? $this->tokenManager->findByName($market[1]);
 
         if (!$base) {
             $io->error('Base crypto not found');
