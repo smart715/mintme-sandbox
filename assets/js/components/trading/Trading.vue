@@ -525,8 +525,7 @@ export default {
             const userKey = this.marketFilters.options.user.key;
 
             return options.filter((filter) =>
-                (userKey !== filter.key ||
-                userKey === filter.key && this.userId) &&
+                (userKey !== filter.key || this.userId) &&
                 allKey !== filter.key
             );
         },
