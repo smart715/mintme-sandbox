@@ -32,7 +32,7 @@ interface ContractHandlerInterface
 
     public function ping(): bool;
 
-    public function getDecimalsContract(string $tokenAddress): int;
+    public function getDecimalsContract(string $tokenAddress, string $blockchain): int;
 
     public function getTxHash(string $tokenName): string;
 }
