@@ -94,7 +94,7 @@ class PostsController extends AbstractFOSRestController
         $token = $this->tokenManager->getOwnTokenByName($tokenName);
 
         if (!$token) {
-            throw new ApiNotFoundException($this->translator->trans('post_form.backend.no_token'));
+            throw new ApiNotFoundException($this->translator->trans('api.tokens.user_not_created_token'));
         }
 
         $post = new Post();

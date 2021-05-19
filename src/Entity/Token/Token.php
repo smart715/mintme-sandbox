@@ -51,7 +51,7 @@ class Token implements TradebleInterface, ImagineInterface
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\s-]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
@@ -290,6 +290,16 @@ class Token implements TradebleInterface, ImagineInterface
      * @var int|null
      */
     private $decimals = 12;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\TokenVoting",
+     *     mappedBy="token"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
@@ -848,5 +858,10 @@ class Token implements TradebleInterface, ImagineInterface
     public function getTxHash(): ?string
     {
         return $this->txHash;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

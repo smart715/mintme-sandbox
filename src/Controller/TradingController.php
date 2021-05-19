@@ -3,13 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Image;
-use App\Entity\Token\Token;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManager;
 use App\Manager\MarketStatusManagerInterface;
-use App\Repository\TokenRepository;
 use App\Utils\Symbols;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -35,7 +32,6 @@ class TradingController extends Controller
      */
     public function trading(
         int $page,
-        Request $request,
         CryptoManagerInterface $cryptoManager,
         MarketStatusManagerInterface $marketStatusManager
     ): Response {
@@ -62,10 +58,9 @@ class TradingController extends Controller
         }
 
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $this->getTokenRepository()->count([
-                'isBlocked' => false,
-                'deployed' => true,
-            ]),
+            'tokensCount' => $marketStatusManager->getMarketsCount(
+                MarketStatusManager::FILTER_DEPLOYED
+            ),
             'btcImage' => $btcCrypto->getImage(),
             'mintmeImage' => $webCrypto->getImage(),
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
@@ -77,10 +72,5 @@ class TradingController extends Controller
             'rows' => $marketStatusManager->getMarketsCount($filter),
             'perPage' => $tokensOnPage,
         ]);
-    }
-
-    private function getTokenRepository(): TokenRepository
-    {
-        return $this->getDoctrine()->getManager()->getRepository(Token::class);
     }
 }
