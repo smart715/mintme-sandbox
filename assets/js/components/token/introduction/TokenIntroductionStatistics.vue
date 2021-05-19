@@ -417,8 +417,7 @@ export default {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            let total = this.totalPendingSellOrders;
-            return toMoney(total);
+            return toMoney(this.totalPendingSellOrders);
         },
         withdrawBalance: function() {
             return toMoney(this.tokenWithdrawn);
