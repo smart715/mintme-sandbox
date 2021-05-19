@@ -672,7 +672,7 @@ export default {
                 url: this.postLinkUrl,
             }).then((res) => {
                 if (!res.data.verified) {
-                    throw new Error();
+                    return;
                 }
 
                 return this.claimAction(this.airdropCampaign.actions.postLink);

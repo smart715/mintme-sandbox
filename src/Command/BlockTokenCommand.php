@@ -24,6 +24,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class BlockTokenCommand extends Command
 {
     private const ORDERS_LIMIT = 100;
+    private const OPTION_BOTH = 'both';
+    private const OPTION_TOKEN = 'token';
+    private const OPTION_USER = 'user';
 
     /** @var string */
     protected static $defaultName = 'app:block';
@@ -137,26 +140,32 @@ class BlockTokenCommand extends Command
         }
 
         if ($tokenOption) {
-            if ($token) {
-                if ($this->isExecuted($token, $user, $unblock, $io, 'token')) {
-                    return 1;
-                } else {
-                    $token->setIsBlocked(!$unblock);
-                    $this->em->persist($token);
-                }
-            } else {
+            if (!$token) {
                 $io->warning('Token doesn\'t exist');
 
                 return 1;
             }
+
+            if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_TOKEN)) {
+                return 1;
+            } else {
+                $token->setIsBlocked(!$unblock);
+                $this->em->persist($token);
+            }
         } elseif ($userOption) {
-            if ($this->isExecuted($token, $user, $unblock, $io, 'user')) {
+            if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_USER)) {
                 return 1;
             } else {
                 $user->setIsBlocked(!$unblock);
             }
         } else {
-            if ($this->isExecuted($token, $user, $unblock, $io)) {
+            if ($this->isExecuted(
+                $token,
+                $user,
+                $unblock,
+                $io,
+                $token ? self::OPTION_BOTH : self::OPTION_USER
+            )) {
                 return 1;
             } else {
                 $user->setIsBlocked(!$unblock);
@@ -168,14 +177,9 @@ class BlockTokenCommand extends Command
             }
         }
 
-        $entityExecutedMsg = $tokenOption
-            ? 'Token '.$token->getName()
-            : ($userOption
-                ? 'User '.$user->getUsername()
-                : 'Token '.$token->getName().' and User '.$user->getUsername()
-            );
+        $entityExecutedMsg = $this->generateEntityExecutedMsg($token, $userOption ? $user : null);
 
-        if (!$unblock) {
+        if (!$unblock && $token) {
             $this->cancelOrders($token, $tokenOption, $userOption, $io);
         }
 
@@ -193,7 +197,7 @@ class BlockTokenCommand extends Command
         User $user,
         bool $unblock,
         SymfonyStyle $io,
-        string $option = 'both'
+        string $option
     ): bool {
         $blockName = 'both' === $option
             ? 'User and Token'
@@ -272,5 +276,20 @@ class BlockTokenCommand extends Command
         foreach ($orders as $order) {
             $this->exchanger->cancelOrder($order->getMarket(), $order);
         }
+    }
+
+    private function generateEntityExecutedMsg(?Token $token, ?User $user): string
+    {
+        $optionsTxt = [];
+
+        if ($token) {
+            $optionsTxt[] = 'Token '.$token->getName();
+        }
+
+        if ($user) {
+            $optionsTxt[] = 'User '.$user->getUsername();
+        }
+
+        return implode(' and ', $optionsTxt);
     }
 }
