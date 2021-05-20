@@ -11,7 +11,7 @@ use Money\Money;
 
 interface WithdrawGatewayInterface extends RowsFetcherInterface
 {
-    public function withdraw(User $user, Money $balance, string $address, Crypto $crypto): void;
+    public function withdraw(User $user, Money $balance, string $address, Crypto $crypto, ?Money $fee = null): void;
 
     public function retryWithdraw(WithdrawCallbackMessage $callbackMessage): void;
 

@@ -23,6 +23,7 @@ use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
+use App\Wallet\Model\Fee;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
@@ -111,7 +112,8 @@ class Wallet implements WalletInterface
         User $user,
         Address $address,
         Amount $amount,
-        TradebleInterface $tradable
+        TradebleInterface $tradable,
+        ?Fee $withdrawFee
     ): PendingWithdrawInterface {
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
@@ -122,6 +124,7 @@ class Wallet implements WalletInterface
         }
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
+
         $tokenEthFee = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_withdraw_fee'),
             Symbols::ETH
@@ -177,7 +180,7 @@ class Wallet implements WalletInterface
             );
         }
 
-        return $this->pendingManager->create($user, $address, $amount, $tradable);
+        return $this->pendingManager->create($user, $address, $amount, $tradable, $withdrawFee ? $withdrawFee->getFee() : null);
     }
 
     /**
@@ -193,6 +196,7 @@ class Wallet implements WalletInterface
         $user = $pendingWithdraw->getUser();
         $amount = $pendingWithdraw->getAmount();
         $address = $pendingWithdraw->getAddress();
+        $fee = new Money($pendingWithdraw->getFee(), $tradable->getFee()->getCurrency());
 
         if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
@@ -202,9 +206,9 @@ class Wallet implements WalletInterface
 
         try {
             if ($tradable instanceof Crypto && !$tradable->isToken()) {
-                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $fee);
             } else {
-                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $fee);
             }
 
             $this->em->remove($pendingWithdraw);

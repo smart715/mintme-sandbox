@@ -21,6 +21,7 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Model\Fee;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;
@@ -158,7 +159,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
-            $this->mockCrypto(Symbols::WEB)
+            $this->mockCrypto(Symbols::WEB),
+            $this->mockFee(new Money('1000000000000000000', new Currency(Symbols::WEB)))
         );
     }
 
@@ -184,7 +186,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000000000', new Currency(Symbols::WEB))),
-            $this->mockCrypto(Symbols::WEB)
+            $this->mockCrypto(Symbols::WEB),
+            $this->mockFee(new Money('1000000000000000000', new Currency(Symbols::WEB)))
         );
     }
 
@@ -212,7 +215,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockFee(new Money('1000000000000', new Currency(Symbols::TOK)))
         );
     }
 
@@ -242,7 +246,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockFee(new Money('1000000000000', new Currency(Symbols::TOK)))
         );
     }
 
@@ -272,7 +277,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockFee(new Money('1000000000000', new Currency(Symbols::TOK)))
         );
     }
 
@@ -302,7 +308,8 @@ class WalletTest extends TestCase
             $this->mockUser(),
             $this->mockAddress('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'),
             $this->mockAmount(new Money('1000000000000', new Currency(Symbols::TOK))),
-            $this->mockToken()
+            $this->mockToken(),
+            $this->mockFee(new Money('1000000000000', new Currency(Symbols::TOK)))
         );
     }
 
@@ -407,6 +414,14 @@ class WalletTest extends TestCase
         $amount->method('getAmount')->willReturn($money);
 
         return $amount;
+    }
+
+    private function mockFee(Money $money): Fee
+    {
+        $fee = $this->createMock(Fee::class);
+        $fee->method('getFee')->willReturn($money);
+
+        return $fee;
     }
 
     private function mockDepositCommunicator(array $transactions): DepositGatewayCommunicator

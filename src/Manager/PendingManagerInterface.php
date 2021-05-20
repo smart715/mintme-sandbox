@@ -7,8 +7,9 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use Money\Money;
 
 interface PendingManagerInterface
 {
-    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable): PendingWithdrawInterface;
+    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, ?Money $fee = null): PendingWithdrawInterface;
 }

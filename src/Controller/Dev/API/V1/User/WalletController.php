@@ -23,11 +23,13 @@ use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use App\Wallet\Model\Fee;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Money\Money;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
@@ -236,6 +238,7 @@ class WalletController extends DevApiController
         $currency = $request->get('currency');
         $amount = $request->get('amount');
         $address = $request->get('address');
+        $fee = $request->get('fee') ?: new Money('0', $request->get('fee'));
 
         $this->checkForDisallowedValues($currency);
 
@@ -287,7 +290,11 @@ class WalletController extends DevApiController
                     $amount,
                     $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
-                $tradable
+                $tradable,
+                new Fee($moneyWrapper->parse(
+                    $fee,
+                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
+                ))
             );
 
             $this->denyAccessUnlessGranted('edit', $pendingWithdraw);

@@ -68,6 +68,12 @@ class PendingWithdraw implements PendingWithdrawInterface
      */
     protected string $hash;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var string
+     */
+    private $fee;
+
     public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
     {
         $this->user = $user;
@@ -126,6 +132,18 @@ class PendingWithdraw implements PendingWithdrawInterface
     {
         $this->hash = hash('sha256', Uuid::uuid4()->toString());
         $this->date = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getFee(): ?string
+    {
+        return $this->fee;
+    }
+
+    public function setFee(?string $fee): self
+    {
+        $this->fee = $fee;
 
         return $this;
     }

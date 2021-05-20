@@ -180,7 +180,7 @@ class ContractHandler implements ContractHandlerInterface
         return $response->getResult();
     }
 
-    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void
+    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token, ?Money $fee = null): void
     {
         if ($token instanceof Token && Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
@@ -198,6 +198,7 @@ class ContractHandler implements ContractHandlerInterface
                 'to' => $address,
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
+                'fee' => $fee->getAmount(),
             ]
         );
 
@@ -263,6 +264,14 @@ class ContractHandler implements ContractHandlerInterface
                 $this->logger->info("[contract-handler] traedable name not exist ($tokenName)");
             }
 
+            $fee = $transaction['fee'] && $transaction['crypto'] ? new Money($transaction['fee'], new Currency($transaction['token'])) : $this->getFee(
+                $tradeble,
+                $transaction['type'],
+                $wallet
+            );
+
+            $this->logger->info($fee->getAmount());
+
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 (string)$transaction['hash'],
@@ -272,11 +281,7 @@ class ContractHandler implements ContractHandlerInterface
                     $transaction['amount'],
                     new Currency($cryptoToken ? $cryptoToken->getSymbol() : Symbols::TOK)
                 ),
-                $this->getFee(
-                    $tradeble,
-                    $transaction['type'],
-                    $wallet
-                ),
+                $fee,
                 $tradeble,
                 Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])
