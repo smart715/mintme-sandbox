@@ -78,7 +78,6 @@ let propsForTestCorrectlyRenders = {
             identifier: 'WEB',
         },
     },
-    page: 1,
 };
 
 const tableData = [
@@ -131,7 +130,7 @@ const tableData = [
             },
         },
         'status': 'finished',
-        'id': 53,
+        'id': 101,
         'timestamp': 1596541004,
         'createdTimestamp': null,
         'side': 2,
@@ -219,9 +218,9 @@ describe('TradeTradeHistory', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.tableData = tableData;
-        expect(wrapper.vm.lastId).toBe(53);
-        wrapper.vm.tableData[0].id = 52;
-        expect(wrapper.vm.lastId).toBe(52);
+        expect(wrapper.vm.lastId).toBe(101);
+        wrapper.vm.tableData[0].id = 102;
+        expect(wrapper.vm.lastId).toBe(102);
     });
 
     describe('updateTableData', () => {
@@ -258,7 +257,7 @@ describe('TradeTradeHistory', () => {
             wrapper.vm.updateTableData(true);
 
             moxios.wait(() => {
-                expect(wrapper.vm.tableData).toEqual([tableData[0], tableData[0]]);
+                expect(wrapper.vm.tableData).toEqual(tableData);
                 done();
             });
         });
