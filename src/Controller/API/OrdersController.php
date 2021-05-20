@@ -212,13 +212,13 @@ class OrdersController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=0}, options={"expose"=true}
+     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=1}, options={"expose"=true}
      * )
      * @Rest\View()
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
     }
 
     /**
