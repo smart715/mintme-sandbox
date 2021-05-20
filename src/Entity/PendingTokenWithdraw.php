@@ -73,9 +73,8 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @var string
      */
-    private $fee;
+    private string $fee;
 
     public function __construct(User $user, Token $token, Amount $amount, Address $address)
     {

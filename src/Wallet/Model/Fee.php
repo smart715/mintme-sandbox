@@ -6,8 +6,7 @@ use Money\Money;
 
 class Fee
 {
-    /** @var Money */
-    private $fee;
+    private Money $fee;
 
     public function __construct(Money $fee)
     {

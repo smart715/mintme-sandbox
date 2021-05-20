@@ -264,11 +264,9 @@ class ContractHandler implements ContractHandlerInterface
                 $this->logger->info("[contract-handler] traedable name not exist ($tokenName)");
             }
 
-            $fee = $transaction['fee'] && $transaction['crypto'] ? new Money($transaction['fee'], new Currency($transaction['token'])) : $this->getFee(
-                $tradeble,
-                $transaction['type'],
-                $wallet
-            );
+            $fee = $transaction['fee'] && $transaction['crypto'] ?
+                new Money($transaction['fee'], new Currency($transaction['token'])) :
+                $this->getFee($tradeble, $transaction['type'], $wallet);
 
             $this->logger->info($fee->getAmount());
 
