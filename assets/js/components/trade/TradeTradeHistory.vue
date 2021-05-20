@@ -15,12 +15,11 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table mb-0" ref="tableData">
-                    <template v-if="loaded">
+                <template v-if="loaded">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
-                            ref="table"
                             :items="ordersList"
                             :fields="fields">
 
@@ -109,19 +108,19 @@
                                 </span>
                             </template>
                         </b-table>
-                        <div v-if="!hasOrders">
-                            <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
-                        </div>
-                        <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="p-5 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                </div>
+                    </div>
+                    <div v-if="!hasOrders">
+                        <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
+                    </div>
+                    <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -194,6 +193,8 @@ export default {
                     label: this.$t('trade.history.time'),
                 },
             ],
+            currentPage: 1,
+            limit: 100,
         };
     },
     computed: {
@@ -231,8 +232,8 @@ export default {
             return this.tableData !== null;
         },
         lastId: function() {
-            return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
-                this.tableData[0].id :
+            return this.tableData && this.tableData.length && this.tableData[this.tableData.length - 1].hasOwnProperty('id') ?
+                this.tableData[this.tableData.length - 1].id :
                 0;
         },
         rate: function() {
@@ -273,15 +274,12 @@ export default {
         });
     },
     methods: {
-        startScrollListeningOnce: function(val) {
-            // Disable listener from mixin
-        },
         updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
-                    id: this.lastId,
+                    id: this.currentPage,
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
@@ -291,10 +289,15 @@ export default {
                         return resolve([]);
                     }
 
-                    this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-
-                    if (this.$refs.table) {
-                        this.$refs.table.hasOwnProperty('refresh') ? this.$refs.table.refresh() : null;
+                    if (!attach) {
+                        this.tableData = result.data;
+                        this.currentPage = 2;
+                    } else {
+                        let resultData = result.data.filter((order) => order.id < this.lastId);
+                        this.tableData = this.tableData.concat(resultData);
+                        if (resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
+                            this.currentPage++;
+                        }
                     }
 
                     resolve(result.data);
