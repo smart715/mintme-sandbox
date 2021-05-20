@@ -127,7 +127,7 @@ import {
     LoggerMixin,
 } from '../../mixins/';
 import PriceConverterInput from '../PriceConverterInput';
-console.log('WithdrawModal');
+
 export default {
     name: 'WithdrawModal',
     mixins: [
