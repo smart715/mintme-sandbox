@@ -113,7 +113,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
             ->where('qt IS NOT NULL')
-            ->andWhere('qt.isBlocked=false');
+            ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false');
 
         switch ($filter) {
             case self::FILTER_DEPLOYED_ONLY_MINTME:
@@ -260,6 +261,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false')
             ->groupBy('ms')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
@@ -472,6 +474,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
+                    AND qt.is_hidden = false
                 ) AS r
                 WHERE r.id IN (:ids)";
 
