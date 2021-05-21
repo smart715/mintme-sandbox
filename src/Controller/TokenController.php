@@ -9,8 +9,10 @@ use App\Entity\User;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exception\ForbiddenException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
+use App\Exception\NotFoundVotingException;
 use App\Exception\RedirectException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
@@ -31,6 +33,7 @@ use App\Manager\PostManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\VotingManagerInterface;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
@@ -51,7 +54,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -78,10 +81,12 @@ class TokenController extends Controller
     private TranslatorInterface $translator;
     private EventDispatcherInterface $eventDispatcher;
     private PostManagerInterface $postManager;
+    private VotingManagerInterface $votingManager;
     private TokenNameConverterInterface $tokenNameConverter;
     private AirdropCampaignManagerInterface $airdropCampaignManager;
     private LimitOrderConfig $orderConfig;
     private DisabledServicesConfig $disabledServicesConfig;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -100,10 +105,12 @@ class TokenController extends Controller
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
         PostManagerInterface $postManager,
+        VotingManagerInterface $votingManager,
         TokenNameConverterInterface $tokenNameConverter,
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig,
-        DisabledServicesConfig $disabledServicesConfig
+        DisabledServicesConfig $disabledServicesConfig,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -120,10 +127,12 @@ class TokenController extends Controller
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
         $this->postManager = $postManager;
+        $this->votingManager = $votingManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->airdropCampaignManager = $airdropCampaignManager;
         $this->orderConfig = $orderConfig;
         $this->disabledServicesConfig = $disabledServicesConfig;
+        $this->moneyWrapper = $moneyWrapper;
 
         parent::__construct($normalizer);
     }
@@ -168,11 +177,64 @@ class TokenController extends Controller
     }
 
     /**
+     * @Route("/{name}/voting", name="token_list_voting", options={"expose"=true})
+     */
+    public function listVoting(Request $request, string $name): Response
+    {
+        $token = $this->fetchToken($request, $name);
+
+        return $this->renderPairPage($token, $request, 'voting');
+    }
+
+    /**
+     * @Route("/{name}/create-voting", name="token_create_voting", options={"expose"=true})
+     */
+    public function createVoting(Request $request, string $name): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $token = $this->fetchToken($request, $name);
+
+        $balance = $this->balanceHandler->balance($user, $token)->getAvailable();
+        $min = (float)$this->getParameter('dm_min_amount');
+
+        if ((float)$this->moneyWrapper->format($balance) < $min) {
+            throw new ForbiddenException(
+                $this->translator->trans('voting.create.min_amount_required', [
+                    '%amount%' => $min,
+                    '%currency%' => $token->getName(),
+                ])
+            );
+        }
+
+        return $this->renderPairPage($token, $request, 'create-voting');
+    }
+
+    /**
+     * @Route("/{name}/voting/{id}", name="token_show_voting", requirements={"id"="\d+"}, options={"expose"=true})
+     */
+    public function showVoting(Request $request, string $name, int $id): Response
+    {
+        $token = $this->fetchToken($request, $name);
+        $voting = $this->votingManager->getByIdForTradable($id, $token);
+
+        if (!$voting) {
+            throw new NotFoundVotingException();
+        }
+
+        $extraData = [
+            'voting' => $this->normalize($voting),
+        ];
+
+        return $this->renderPairPage($token, $request, 'show-voting', null, $extraData);
+    }
+
+    /**
      * @Route("/{name}/{tab}/{modal}",
      *     name="token_show",
      *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|buy", "modal" = "settings|signup|created|airdrop"},
+     *     requirements={"tab" = "trade|intro|buy|posts", "modal" = "settings|signup|created|airdrop"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -439,9 +501,14 @@ class TokenController extends Controller
         return $token;
     }
 
-    private function renderPairPage(Token $token, Request $request, string $tab, ?string $modal = null, array $extraData = []): Response
-    {
-        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
+    private function renderPairPage(
+        Token $token,
+        Request $request,
+        string $tab,
+        ?string $modal = null,
+        array $extraData = []
+    ): Response {
+        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol(), true);
         $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
         $market = $exchangeCrypto
             ? $this->marketManager->create($exchangeCrypto, $token)
@@ -509,6 +576,7 @@ class TokenController extends Controller
                 'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
                 'userAlreadyClaimed' => $userAlreadyClaimed,
                 'posts' => $this->normalize($token->getPosts()),
+                'votings' => $this->normalize($token->getVotings()),
                 'taker_fee' => $this->orderConfig->getTakerFeeRate(),
                 'showTokenEditModal' => 'settings' === $modal,
                 'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),

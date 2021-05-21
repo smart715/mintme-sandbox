@@ -94,7 +94,7 @@ class PostsController extends AbstractFOSRestController
         $token = $this->tokenManager->getOwnTokenByName($tokenName);
 
         if (!$token) {
-            throw new ApiNotFoundException($this->translator->trans('post_form.backend.no_token'));
+            throw new ApiNotFoundException($this->translator->trans('api.tokens.user_not_created_token'));
         }
 
         $post = new Post();
@@ -415,5 +415,21 @@ class PostsController extends AbstractFOSRestController
         $this->entityManager->flush();
 
         return $this->view(["message" => $message, "comment" => $comment], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/recent-posts/{nextPage}", name="recent_posts", options={"expose"=true})
+     */
+    public function getRecentPosts(int $nextPage): view
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $posts = $this->postManager->getRecentPost($user, $nextPage);
+
+        return $this->view(
+            ['posts' => $posts],
+            Response::HTTP_OK
+        );
     }
 }

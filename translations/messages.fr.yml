@@ -1,3 +1,4 @@
+by:
 navbar.my_token: 'Mon jeton'
 navbar.token_show_modal: 'Paramètres du jeton'
 navbar.trading: Echange
@@ -7,6 +8,7 @@ navbar.referrals: Parrainés
 navbar.help: Aide
 navbar.profile: Profil
 navbar.settings: Paramètres
+navbar.home:
 footer.cookies: 'Ce site utilise des cookies'
 footer.press: 'Presser&nbsp;Kit'
 footer.wallet: Portefeuille
@@ -46,6 +48,13 @@ form.token.initial_order: 'Définir les ordres de vente initiaux'
 form.token.initial_order.guide: '15% de vos jetons seront définis pour la vente de 0.1 à 10 MINTME. Si vous désélectionnez, assurez d''ajouter manuellement votre jeton dans la section de Trade'
 form.token.characters_used: 'Caractères utilisés:'
 form.token.min: min.
+form.validation.option.required:
+form.validation.option.max:
+form.validation.title.min:
+form.validation.title.max:
+form.validation.description.min:
+form.validation.description.max:
+form.validation.description.required:
 page.settings.title: Paramètres
 page.settings.account.header: 'Paramètres du compte'
 page.settings.account.submit: Sauvegarder
@@ -396,6 +405,7 @@ page.terms.content.14.3a: '(a) n''agit pas en tant que votre courtier, interméd
 page.terms.content.14.3b: '(b) n''agit pas en tant que partie au transfert d''un actif cryptographique particulier.'
 page.terms.content.14.4: '14.4. Taux commerciaux. Chaque ordre commercial passé crée différents taux de change du marché. Vous reconnaissez et acceptez que les informations sur les tarifs mises à disposition via MintMe peuvent différer des tarifs en vigueur mis à disposition via d''autres sources en dehors de la plate-forme technologique.'
 page.terms.content.14.5: '14.5. Volatilité du marché. En particulier pendant les périodes de volume élevé, d''illiquidité, de mouvement rapide ou de volatilité sur le marché pour tout crypto-actif, le taux de marché réel auquel une transaction d''échange de marché est exécutée peut être différemment du taux en vigueur indiqué via MintMe au moment de votre transaction. Vous comprenez que nous ne sommes pas responsables de ces fluctuations de taux.'
+page.terms.content.14.6:
 page.terms.content.15: '15. FRAIS de MintMe'
 page.terms.content.15.1: '15.1. Montant des frais. Vous acceptez de payer les frais pour les transferts effectués via MintMe («frais») tels que définis par nous, qui peuvent changer de temps à autre. Les changements aux frais entrent en vigueur à la date d''entrée en vigueur indiquée dans l''affichage des frais révisés et s''appliqueront de manière prospective à toute transaction qui a lieu après la date d''entrée en vigueur de ces frais révisés.'
 page.terms.content.15.2: '15.2. Paiement des frais. Vous nous autorisez ou notre processeur de paiement désigné à facturer ou à déduire les actifs cryptographiques de votre compte MintMe pour tous les frais applicables dus dans le cadre des transactions que vous effectuez via notre plate-forme.'
@@ -437,6 +447,7 @@ post.likes: Aimés
 post.deleted: 'Post supprimé.'
 post.error.deleted: 'Erreur lors de la suppression du post.'
 post.comment.deleted: 'Commentaire supprimé.'
+post.no_recent_posts:
 img.creator: 'Icône du créateur du contenu'
 img.tok_trading: 'Icône d''échange des jetons'
 img.tok_easy_icon_1: 'Créez votre jeton/monnaie'
@@ -741,7 +752,6 @@ post_form.msg.share_reward.max_decimals: 'La récompense doit avoir tout au plus
 post_form.msg.share_reward.between: 'La récompense doit être entre 0 et %maxReward%'
 post_form.msg.title.required: 'Titre requis'
 post_form.msg.title.max_length: 'Le titre ne peut avoir plus de %maxTitleLength% caractères'
-post_form.backend.no_token: 'L''utilisateur actuel n''a pas crée de jeton'
 posts.all: 'Tous les posts'
 comment.created: 'Commentaire crée.'
 comment.confirm_delete: 'Voulez-vous vraiment supprimer définitivement ce commentaire?'
@@ -751,6 +761,30 @@ comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
 comment.min_amount: 'You need %amount% %token% to see comments.'
 like.removed: 'Mention aimé retirée.'
+voting.voting:
+voting.information:
+voting.propositions:
+voting.new_proposition:
+voting.create:
+voting.form.title:
+voting.form.description:
+voting.form.start_date:
+voting.form.end_date:
+voting.form.created_by:
+voting.options:
+voting.add_option:
+voting.publish:
+voting.vote:
+voting.current_results:
+voting.no_propositions:
+voting.proposition.info:
+voting.proposition.active:
+voting.proposition.closed:
+voting.added_successfully:
+voting.already_voted:
+voting.creator_vot_not_allowed:
+voting.create.min_amount_required:
+voting.vote.zero_balance:
 airdrop.end: 'Finaliser cet airdrop'
 airdrop.amount_tokens: 'Nombre de tokens pour l''airdrop:'
 airdrop.insufficient_funds: 'Fonds insuffisant pour la campagne de l''airdrop.'
@@ -1227,6 +1261,7 @@ api.wallet.not_found_currency: 'Devise introuvable'
 api.wallet.withdrawal_failed: 'Retrait échoué'
 api.wallet.not_found: Introuvable
 api.tokens.token_not_exists: 'Jeton inexistant'
+api.tokens.user_not_created_token:
 api.tokens.you_need_all_tokens_to_change_name: 'Vous avez besoin de tous vos jetons afin de changer le nom de ce dernier'
 api.tokens.deploying: 'Jeton en cours de déploiement ou déployé.'
 api.tokens.forbidden_name: 'Nom de jeton non autorisé, essayer un autre'
@@ -1294,6 +1329,7 @@ mail.verification_code: 'Votre code de vérification:'
 404.profile: 'Profil inexistant'
 404.token: 'Jeton introuvable'
 404.pair: 'Paire introuvable'
+404.voting:
 text.time.year: année(s)
 mail.mintme_host.1: 'Vous pouvez utiliser <strong>des hébergements dédiés spéciaux</strong> pour votre projet mintme à:'
 mail.mintme_host.2: 'Réalisé par <strong>l''équipe mintMe</strong>, vous pouvez gratuitement essayer durant %freeDays% jours et le prix du trafic illimité pendant la première année est de seulement <strong>%price% USD/AN</strong>'

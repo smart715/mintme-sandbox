@@ -4,7 +4,7 @@
         <div class="token-avatar ml-2">
             <div class="d-flex align-items-center token-name">
                 <div class="overflow-hidden token-name d-flex align-items-center">
-                    <h1 class="h2 current-token-name">{{  token.name }}</h1>
+                    <h1 class="h2 current-token-name">{{ token.name }}</h1>
                 </div>
             </div>
         </div>
@@ -59,6 +59,19 @@
                             class="nav-link {% if tab and tab == 'trade' %}active{% endif %}"
                         >
                             {% trans %}page.pair.tab.trade{% endtrans %}
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2"
+                            target="_self"
+                            href="{{ path('token_list_voting', {name: token.name, tab: 'voting'}) }}"
+                            class="nav-link {% if tab and tab == 'voting' %}active{% endif %}"
+                        >
+                            {% trans %}voting.voting{% endtrans %}
                         </a>
                     </li>
                     <li class="nav-item-token">
@@ -176,7 +189,7 @@
                     <div class="row">
                         <div class="card col-12 mt-3">
                             <div class="card-body text-center">
-                                <a target"_self" href="#" style="pointer-events: none;">
+                                <a target="_self" href="#" style="pointer-events: none;">
                                     {% trans %}token.intro.statistics.show{% endtrans %}
                                 </a>
                             </div>
@@ -191,6 +204,15 @@
                 </div>
                 <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'post' %}active{% endif %}">
                     {{ include('spinners/single_post_tab.html.twig') }}
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'voting' %}active{% endif %}">
+                    {{ include('spinners/voting_list.html.twig') }}
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'create-voting' %}active{% endif %}">
+                    {{ include('spinners/voting_create.html.twig') }}
+                </div>
+                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'show-voting' %}active{% endif %}">
+                    {{ include('spinners/voting_show.html.twig') }}
                 </div>
             </div>
         </div>

@@ -25,6 +25,17 @@
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
             </h1>
+            <h2 v-else-if="recentPost">
+                <a :href="singlePageUrl"
+                   class="text-decoration-none text-white"
+                   >{{ post.title }}
+                </a>
+                <b> {{ $t('by') }}</b>
+                <a :href="$routing.generate('token_show', {name: post.token.name})" class="text-white">
+                    <img :src="tokenAvatar"  class="rounded-circle d-inline-block" alt="avatar">
+                </a>
+                <small>{{ post.token.name }}</small>
+            </h2>
             <a v-else :href="singlePageUrl"
                class="text-decoration-none"
                @click.prevent="$emit('go-to-post', post)"
@@ -180,6 +191,7 @@ export default {
         },
         loggedIn: Boolean,
         singlePage: Boolean,
+        recentPost: Boolean,
     },
     data() {
         return {
@@ -243,6 +255,14 @@ export default {
         },
         isOwner() {
             return this.loggedInUserId === this.post.token.ownerId;
+        },
+        tokenAvatar() {
+            return this.post.token.image
+                ? this.post.token.image.avatar_small
+                : require('../../../img/' + this.post.token.cryptoSymbol + '_avatar.png');
+        },
+        tokenLink() {
+            return this.$routing.generate('token_show', {name: this.post.token.name});
         },
     },
     methods: {

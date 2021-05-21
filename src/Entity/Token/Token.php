@@ -267,6 +267,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $isBlocked = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHidden = false; // phpcs:ignore
+
+    /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
      * @var int
      */
@@ -290,6 +295,16 @@ class Token implements TradebleInterface, ImagineInterface
      * @var int|null
      */
     private $decimals = 12;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\TokenVoting",
+     *     mappedBy="token"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
 
     /**
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
@@ -731,6 +746,18 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    public function setIsHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
+
+        return $this;
+    }
+
     /**
      * @return Post[]
      */
@@ -848,5 +875,10 @@ class Token implements TradebleInterface, ImagineInterface
     public function getTxHash(): ?string
     {
         return $this->txHash;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

@@ -3,11 +3,13 @@
 namespace App\EventSubscriber;
 
 use App\Exception\ApiExceptionInterface;
+use App\Exception\ForbiddenException;
 use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundProfileException;
 use App\Exception\NotFoundTokenException;
+use App\Exception\NotFoundVotingException;
 use App\Exception\RedirectException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,10 +55,28 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
         $exception = $event->getException();
 
+        if ($exception instanceof ForbiddenException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/403.html.twig', [
+                    'error_message' => $exception->getMessage(),
+                ]),
+                403
+            ));
+        }
+
         if ($exception instanceof NotFoundPairException) {
             $event->setResponse(new Response(
                 $this->template->render('pages/404.html.twig', [
                     'error_message' => $this->translator->trans('404.pair'),
+                ]),
+                404
+            ));
+        }
+
+        if ($exception instanceof NotFoundVotingException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => $this->translator->trans('404.voting'),
                 ]),
                 404
             ));
