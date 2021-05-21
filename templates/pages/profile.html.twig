@@ -232,24 +232,24 @@
                                                 }) }}
                                             </div>
                                             <div
-                                                v-if="!$v.zipCode.zipCodeContain"
-                                                v-cloak="$v.zipCode"
-                                                class="text-danger text-center"
+                                                    v-if="!$v.zipCode.zipCodeContain"
+                                                    v-cloak="$v.zipCode"
+                                                    class="text-danger text-center"
                                             >
                                                 {% trans %}page.profile.error.zip_code.contain{% endtrans %}
                                             </div>
                                             <div
-                                                v-else-if="!zipCodeValid"
-                                                v-cloak="$v.zipCode"
-                                                class="text-danger text-center"
+                                                    v-else-if="!zipCodeValid"
+                                                    v-cloak="$v.zipCode"
+                                                    class="text-danger text-center"
                                             >
                                                 {% trans %}page.profile.error.zip_code.not_valid{% endtrans %}
                                             </div>
 
                                             <div
-                                                v-else-if="!$v.zipCode.zipCodeWrongChars"
-                                                v-cloak="$v.zipCode"
-                                                class="text-danger text-center"
+                                                    v-else-if="!$v.zipCode.zipCodeWrongChars"
+                                                    v-cloak="$v.zipCode"
+                                                    class="text-danger text-center"
                                             >
                                                 {% trans %}page.profile.error.zip_code.consist{% endtrans %}
                                             </div>
@@ -282,16 +282,16 @@
                                 </div>
                                 <div class="text-left">
                                     <input
-                                        type="submit"
-                                        :disabled="disableSave"
-                                        class="btn btn-primary"
-                                        value="{% trans %}page.profile.save{% endtrans %}"
+                                            type="submit"
+                                            :disabled="disableSave"
+                                            class="btn btn-primary"
+                                            value="{% trans %}page.profile.save{% endtrans %}"
                                     >
                                     <span
-                                        class="btn-cancel pl-3 c-pointer"
-                                        @click="showEditForm = false"
-                                        @keyup.enter="showEditForm = false"
-                                        tabindex="0"
+                                            class="btn-cancel pl-3 c-pointer"
+                                            @click="showEditForm = false"
+                                            @keyup.enter="showEditForm = false"
+                                            tabindex="0"
                                     >
                                     <slot name="cancel">{% trans %}page.profile.cancel{% endtrans %}</slot>
                                 </span>
