@@ -48,7 +48,7 @@ interface BalanceHandlerInterface
 
     /**
      * @param User $user
-     * @param array $tokens
+     * @param array $tradables
      * @return BalanceResultContainer
      */
     public function balances(User $user, array $tradables): BalanceResultContainer;

@@ -3,6 +3,7 @@
 namespace App\Utils\Converter;
 
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Exchange\Config\Config;
 use App\Manager\CryptoManagerInterface;
 
@@ -20,10 +21,10 @@ class TokenNameConverter implements TokenNameConverterInterface
         $this->config = $config;
     }
 
-    public function convert(Token $token): string
+    public function convert(TradebleInterface $tradable): string
     {
-        return !$this->cryptoManager->findBySymbol(strtoupper($token->getName()))
-            ? 'TOK'.str_pad((string)($token->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
-            : $token->getName();
+        return $tradable instanceof Token && !$this->cryptoManager->findBySymbol(strtoupper($tradable->getName()))
+            ? 'TOK'.str_pad((string)($tradable->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
+            : $tradable->getName();
     }
 }
