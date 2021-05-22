@@ -107,18 +107,18 @@ class BalanceHandler implements BalanceHandlerInterface
         return $this->balanceFetcher->summary($this->converter->convert($token));
     }
 
-    public function balances(User $user, array $tokens): BalanceResultContainer
+    public function balances(User $user, array $tradables): BalanceResultContainer
     {
         return $this->balanceFetcher
-            ->balance($user->getId(), array_map(function (Token $token) {
-                return $this->converter->convert($token);
-            }, $tokens));
+            ->balance($user->getId(), array_map(function (TradebleInterface $tradable) {
+                return $this->converter->convert($tradable);
+            }, $tradables));
     }
 
-    public function balance(User $user, Token $token): BalanceResult
+    public function balance(User $user, TradebleInterface $tradable): BalanceResult
     {
-        return $this->balances($user, [$token])
-            ->get($this->converter->convert($token));
+        return $this->balances($user, [$tradable])
+            ->get($this->converter->convert($tradable));
     }
 
     public function exchangeBalance(User $user, Token $token): Money

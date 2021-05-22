@@ -266,7 +266,7 @@ class Wallet implements WalletInterface
             throw new NotFoundTokenException();
         }
 
-        $balance = $this->balanceHandler->balance($user, Token::getFromCrypto($crypto));
+        $balance = $this->balanceHandler->balance($user, $crypto);
 
         if ($balance->getAvailable()->lessThan(
             Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()

@@ -42,7 +42,7 @@ interface BalanceHandlerInterface
 
     public function summary(Token $token): SummaryResult;
 
-    public function balance(User $user, Token $token): BalanceResult;
+    public function balance(User $user, TradebleInterface $tradable): BalanceResult;
 
     public function exchangeBalance(User $user, Token $token): Money;
 
@@ -51,7 +51,7 @@ interface BalanceHandlerInterface
      * @param array $tokens
      * @return BalanceResultContainer
      */
-    public function balances(User $user, array $tokens): BalanceResultContainer;
+    public function balances(User $user, array $tradables): BalanceResultContainer;
 
     public function isNotExchanged(Token $token, int $amount): bool;
 
