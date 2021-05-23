@@ -198,7 +198,7 @@ class ContractHandler implements ContractHandlerInterface
                 'to' => $address,
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
-                'fee' => $fee->getAmount(),
+                'tokenFee' => $fee->getAmount(),
             ]
         );
 
@@ -227,7 +227,7 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
+    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet, array $transaction = []): Money
     {
         if (!$tradeble) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
@@ -238,6 +238,10 @@ class ContractHandler implements ContractHandlerInterface
         }
 
         if ($tradeble instanceof Crypto) {
+            if (isset($transaction['tokenFee']) && isset($transaction['token'])) {
+                return new Money($transaction['tokenFee'], new Currency($transaction['token']));
+            }
+
             return $tradeble->getFee();
         }
 
@@ -264,11 +268,7 @@ class ContractHandler implements ContractHandlerInterface
                 $this->logger->info("[contract-handler] traedable name not exist ($tokenName)");
             }
 
-            $fee = $transaction['fee'] && $transaction['crypto'] ?
-                new Money($transaction['fee'], new Currency($transaction['token'])) :
-                $this->getFee($tradeble, $transaction['type'], $wallet);
-
-            $this->logger->info($fee->getAmount());
+            $fee = $this->getFee($tradeble, $transaction['type'], $wallet, $transaction);
 
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),

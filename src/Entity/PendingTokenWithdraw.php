@@ -72,7 +72,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
     protected string $hash;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private string $fee;
 
@@ -138,12 +138,12 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return $this;
     }
 
-    public function getFee(): ?string
+    public function getFee(): string
     {
         return $this->fee;
     }
 
-    public function setFee(?string $fee): self
+    public function setFee(string $fee): self
     {
         $this->fee = $fee;
 

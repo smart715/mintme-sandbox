@@ -82,7 +82,6 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\Post("/withdraw", name="withdraw", options={"2fa"="optional"})
      * @Rest\RequestParam(name="crypto", allowBlank=false)
      * @Rest\RequestParam(name="amount", allowBlank=false)
-     * @Rest\RequestParam(name="fee", allowBlank=false)
      * @Rest\RequestParam(
      *      name="address",
      *      allowBlank=false,
@@ -134,11 +133,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                     $request->get('amount'),
                     $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
-                $tradable,
-                new Fee($moneyWrapper->parse(
-                    $request->get('fee'),
-                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
-                ))
+                $tradable
             );
         } catch (Throwable $exception) {
             return $this->view([

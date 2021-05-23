@@ -205,7 +205,7 @@ class ContractHandlerTest extends TestCase
                     'value' => '1',
                     'userId' => 1,
                     'crypto' => '',
-                    'fee' => '1',
+                    'tokenFee' => '1',
                 ]
             );
 
@@ -265,7 +265,7 @@ class ContractHandlerTest extends TestCase
                     'value' => '1',
                     'userId' => 1,
                     'crypto' => '',
-                    'fee' => '1',
+                    'tokenFee' => '1',
                 ]
             )->willReturn($this->mockResponse(true));
 
@@ -311,7 +311,7 @@ class ContractHandlerTest extends TestCase
                     'status' => 'paid',
                     'type' => 'withdraw',
                     'crypto' => 'WEB',
-                    'fee' => '1000000000000',
+                    'tokenFee' => '1000000000000',
                 ],
                 [
                     'hash' => 'hash',
@@ -323,7 +323,7 @@ class ContractHandlerTest extends TestCase
                     'status' => 'paid',
                     'type' => 'deposit',
                     'crypto' => 'WEB',
-                    'fee' => '1000000000000',
+                    'tokenFee' => '1000000000000',
                 ],
             ]));
 

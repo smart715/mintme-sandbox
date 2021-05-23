@@ -112,8 +112,7 @@ class Wallet implements WalletInterface
         User $user,
         Address $address,
         Amount $amount,
-        TradebleInterface $tradable,
-        ?Fee $withdrawFee
+        TradebleInterface $tradable
     ): PendingWithdrawInterface {
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
@@ -180,7 +179,7 @@ class Wallet implements WalletInterface
             );
         }
 
-        return $this->pendingManager->create($user, $address, $amount, $tradable, $withdrawFee ? $withdrawFee->getFee() : null);
+        return $this->pendingManager->create($user, $address, $amount, $tradable, $fee);
     }
 
     /**

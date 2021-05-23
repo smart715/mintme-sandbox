@@ -224,7 +224,6 @@ export default {
                 'amount': this.amount,
                 'address': this.address,
                 'code': this.code,
-                'fee': this.fee,
             })
             .then((response) => {
                 if (this.code === null) {

@@ -38,8 +38,7 @@ interface WalletInterface
         User $user,
         Address $address,
         Amount $amount,
-        TradebleInterface $tradable,
-        ?Fee $fee
+        TradebleInterface $tradable
     ): PendingWithdrawInterface;
 
     public function withdrawCommit(PendingWithdrawInterface $pendingWithdraw): void;
