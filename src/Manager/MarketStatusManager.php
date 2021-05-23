@@ -257,6 +257,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
+            ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
             ->andWhere('qt.isHidden=false')
@@ -265,7 +266,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setMaxResults($limit);
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            $queryBuilder->andWhere('u.user = :id')
                 ->setParameter('id', $userId);
         }
 
