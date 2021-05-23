@@ -228,9 +228,7 @@ class Wallet implements WalletInterface
     {
         return array_map(function (string $address) {
             return new Address($address);
-        }, $this->depositCommunicator->getDepositCredentials($user->getId(), array_map(function ($crypto) {
-            return Token::getFromCrypto($crypto);
-        }, $cryptos))->toArray());
+        }, $this->depositCommunicator->getDepositCredentials($user->getId(), $cryptos)->toArray());
     }
 
     /** {@inheritDoc} */
