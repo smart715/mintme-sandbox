@@ -93,10 +93,10 @@ class BalanceHandler implements BalanceHandlerInterface
         }
     }
 
-    public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void
+    public function withdraw(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void
     {
         try {
-            $this->update($user, $token, $amount->negative(), 'withdraw', $businessId);
+            $this->update($user, $tradable, $amount->negative(), 'withdraw', $businessId);
         } catch (\Throwable $e) {
             throw $e;
         }
@@ -166,19 +166,19 @@ class BalanceHandler implements BalanceHandlerInterface
         return $available->equals($balance);
     }
 
-    public function update(User $user, Token $token, Money $amount, string $type, ?int $businessId = null): void
+    public function update(User $user, TradebleInterface $tradable, Money $amount, string $type, ?int $businessId = null): void
     {
         try {
             $this->balanceFetcher->update(
                 $user->getId(),
-                $this->converter->convert($token),
+                $this->converter->convert($tradable),
                 $this->moneyWrapper->format($amount),
                 $type,
                 $businessId
             );
         } catch (BalanceException $e) {
             $this->logger->error(
-                "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
+                "Failed to update '{$user->getEmail()}' balance for {$tradable->getSymbol()}.
                 Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$e->getMessage()}"
             );
 
@@ -187,7 +187,9 @@ class BalanceHandler implements BalanceHandlerInterface
             throw $e;
         }
 
-        $this->updateUserTokenRelation($user, $token);
+        if ($tradable instanceof Token) {
+            $this->updateUserTokenRelation($user, $tradable);
+        }
     }
 
     public function updateUserTokenRelation(User $user, Token $token): void

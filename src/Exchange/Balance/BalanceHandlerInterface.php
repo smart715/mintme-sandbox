@@ -71,7 +71,7 @@ interface BalanceHandlerInterface
         int $max = 40
     ): array;
 
-    public function update(User $user, Token $token, Money $amount, string $type, ?int $businessId = null): void;
+    public function update(User $user, TradebleInterface $tradable, Money $amount, string $type, ?int $businessId = null): void;
 
     public function updateUserTokenRelation(User $user, Token $token): void;
 }
