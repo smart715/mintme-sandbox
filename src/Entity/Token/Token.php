@@ -267,6 +267,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $isBlocked = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHidden = false; // phpcs:ignore
+
+    /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
      * @var int
      */
@@ -737,6 +742,18 @@ class Token implements TradebleInterface, ImagineInterface
     public function setIsBlocked(bool $isBlocked): self
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    public function setIsHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
 
         return $this;
     }
