@@ -332,10 +332,9 @@ export default {
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
-
                     if (totalOrders) {
                         totalOrders = isSell
-                            ? totalOrders.sub(order.amount).add(data.amount)
+                            ? totalOrders.sub(data.amount).add(order.amount)
                             : totalOrders.sub(order.price).add(data.price);
                     }
 
@@ -348,7 +347,6 @@ export default {
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
-
                     if (totalOrders) {
                       totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
                     }
