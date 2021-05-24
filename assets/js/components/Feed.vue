@@ -88,6 +88,8 @@ export default {
                 buyerUrl: item.buyer ? this.$routing.generate('profile-view', {nickname: item.buyer.profile.nickname}) : null,
                 seller: item.seller ? this.truncateFunc(item.seller.profile.nickname, 12) : null,
                 sellerUrl: item.seller ? this.$routing.generate('profile-view', {nickname: item.seller.profile.nickname}) : null,
+                post: item.post ? `"${this.truncateFunc(item.post.title, 32)}"` : '',
+                postUrl: item.post ? this.$routing.generate('show_post', {id: item.post.id}) : '',
                 symbol,
             };
         },

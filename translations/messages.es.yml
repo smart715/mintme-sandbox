@@ -1374,7 +1374,7 @@ activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'
 activity_3_message: '<a href="%tokenUrl%">%token%</a> recibió una donación por valor de %amount% %symbol%'
-activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación'
+activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación <a href="%postUrl%">%post%</a>'
 activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
