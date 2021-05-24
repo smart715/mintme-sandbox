@@ -32,13 +32,13 @@ interface BalanceHandlerInterface
 
     /**
      * @param User $user
-     * @param Token $token
+     * @param Token $tradable
      * @param Money $amount
      * @param int|null $businessId
      * @throws FetchException
      * @throws BalanceException
      */
-    public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void;
+    public function withdraw(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void;
 
     public function summary(Token $token): SummaryResult;
 
