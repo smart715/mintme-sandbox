@@ -172,7 +172,7 @@ class Wallet implements WalletInterface
         if ($tradable instanceof Token && !$tradable->getFee()) {
             $this->balanceHandler->withdraw(
                 $user,
-                Token::getFromCrypto($crypto),
+                $crypto,
                 Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
             );
         }
