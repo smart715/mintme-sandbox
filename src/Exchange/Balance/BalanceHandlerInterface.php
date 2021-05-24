@@ -32,7 +32,7 @@ interface BalanceHandlerInterface
 
     /**
      * @param User $user
-     * @param Token $tradable
+     * @param TradebleInterface $tradable
      * @param Money $amount
      * @param int|null $businessId
      * @throws FetchException
