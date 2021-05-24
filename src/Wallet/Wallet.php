@@ -115,7 +115,7 @@ class Wallet implements WalletInterface
     ): PendingWithdrawInterface {
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
-            $token = Token::getFromCrypto($tradable);
+            $token = (new Token)->setName($crypto->getSymbol());
         } else {
             $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
             $token = $tradable;
