@@ -57,7 +57,7 @@
                                     ></avatar>
                                 </div>
 
-                                {% if (profile.anonymous != true) %}
+                                {% if (not profile.anonymous == true) %}
                                     {% if profile.firstname is not empty %}
                                         <div class="pb-1">
                                             {% trans %}page.profile.form.full_name{% endtrans %} {{ profile.firstname() }} {{ profile.lastname() }}
