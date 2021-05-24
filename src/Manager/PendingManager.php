@@ -31,9 +31,7 @@ class PendingManager implements PendingManagerInterface
             ? new PendingTokenWithdraw($user, $tradable, $amount, $address)
             : new PendingWithdraw($user, $tradable, $amount, $address);
 
-        if ($fee) {
-            $pending->setFee($fee->getAmount());
-        }
+        $pending->setFee($fee->getAmount());
 
         $this->em->persist($pending);
         $this->em->flush();
