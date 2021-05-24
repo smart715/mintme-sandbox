@@ -20,6 +20,7 @@ use App\Events\DepositCompletedEvent;
 use App\Events\DonationEvent;
 use App\Events\OrderEvent;
 use App\Events\OrderEventInterface;
+use App\Events\PostEvent;
 use App\Events\TokenEventInterface;
 use App\Events\TokenEvents;
 use App\Events\TransactionCompletedEvent;
@@ -75,7 +76,7 @@ class ActivitySubscriber implements EventSubscriberInterface
             TokenEvents::DEPLOYED => 'handleTokenEvent',
             TokenEvents::AIRDROP_CREATED => 'handleTokenEvent',
             TokenEvents::AIRDROP_ENDED => 'handleTokenEvent',
-            TokenEvents::POST_CREATED => 'handleTokenEvent',
+            TokenEvents::POST_CREATED => 'handlePostEvent',
             TokenEvents::AIRDROP_CLAIMED => 'airdropClaimed',
             TokenEvents::DONATION => 'donation',
             DepositCompletedEvent::NAME => 'handleTransactionEvent',
@@ -89,6 +90,19 @@ class ActivitySubscriber implements EventSubscriberInterface
         $token = $event->getToken();
 
         $activity = $this->createActivity($eventName)->setToken($token);
+
+        $this->saveActivity($activity);
+    }
+
+    public function handlePostEvent(PostEvent $event, string $eventName): void
+    {
+        $token = $event->getToken();
+        $post = $event->getPost();
+
+        /** @var NewPostActivity $activity */
+        $activity = $this->createActivity($eventName);
+
+        $activity->setPost($post)->setToken($token);
 
         $this->saveActivity($activity);
     }
