@@ -11,7 +11,6 @@ use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
-use App\Wallet\Model\Fee;
 use App\Wallet\Model\Transaction;
 
 interface WalletInterface

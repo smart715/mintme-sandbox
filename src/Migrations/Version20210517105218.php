@@ -22,8 +22,8 @@ final class Version20210517105218 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE pending_withdraw ADD fee VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE pending_token_withdraw ADD fee VARCHAR(255) DEFAULT NULL');
+        $this->addSql("ALTER TABLE pending_withdraw ADD fee VARCHAR(255) DEFAULT '0'");
+        $this->addSql("ALTER TABLE pending_token_withdraw ADD fee VARCHAR(255) DEFAULT '0'");
     }
 
     public function down(Schema $schema) : void

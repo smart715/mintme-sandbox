@@ -21,7 +21,6 @@ use App\Wallet\Exception\NotEnoughAmountException;
 use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Model\Fee;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
 use App\Wallet\Money\MoneyWrapper;

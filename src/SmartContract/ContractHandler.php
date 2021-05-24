@@ -237,12 +237,8 @@ class ContractHandler implements ContractHandlerInterface
             return $wallet->getDepositInfo($tradeble)->getFee();
         }
 
-        if ($tradeble instanceof Crypto) {
-            if (isset($transaction['tokenFee']) && isset($transaction['token'])) {
-                return new Money($transaction['tokenFee'], new Currency($transaction['token']));
-            }
-
-            return $tradeble->getFee();
+        if ($tradeble instanceof Crypto && isset($transaction['tokenFee']) && isset($transaction['token'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['token']));
         }
 
         /** @var Token $tradeble */

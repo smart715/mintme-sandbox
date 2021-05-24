@@ -11,5 +11,5 @@ use Money\Money;
 
 interface PendingManagerInterface
 {
-    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, ?Money $fee = null): PendingWithdrawInterface;
+    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, Money $fee): PendingWithdrawInterface;
 }

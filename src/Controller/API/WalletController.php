@@ -16,7 +16,6 @@ use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Model\Fee;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;

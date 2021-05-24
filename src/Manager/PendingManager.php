@@ -25,7 +25,7 @@ class PendingManager implements PendingManagerInterface
     }
 
     /** @param Crypto|Token $tradable */
-    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, ?Money $fee = null): PendingWithdrawInterface
+    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, Money $fee): PendingWithdrawInterface
     {
         $pending = $tradable instanceof Token
             ? new PendingTokenWithdraw($user, $tradable, $amount, $address)

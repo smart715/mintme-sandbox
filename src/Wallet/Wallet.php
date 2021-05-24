@@ -23,7 +23,6 @@ use App\Wallet\Exception\NotEnoughUserAmountException;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
-use App\Wallet\Model\Fee;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
@@ -94,7 +93,6 @@ class Wallet implements WalletInterface
         $depositHistory = $this->depositCommunicator->getTransactions($user, 0, $gatewayLimit);
         $withdrawHistory = $this->withdrawGateway->getHistory($user, 0, $gatewayLimit);
         $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, 0, $gatewayLimit);
-
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
         usort($history, function (Transaction $first, Transaction $second) {
