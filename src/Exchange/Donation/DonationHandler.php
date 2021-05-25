@@ -322,13 +322,13 @@ class DonationHandler implements DonationHandlerInterface
         $cryptos = $this->cryptoManager->findAllIndexed('symbol');
         $this->balanceHandler->update(
             $withdrawFromUser,
-            Token::getFromCrypto($cryptos[$withdrawCurrency]),
+            $cryptos[$withdrawCurrency],
             $donationAmount->negative(),
             'donation'
         );
         $this->balanceHandler->update(
             $depositToUser,
-            Token::getFromCrypto($cryptos[$depositCurrency]),
+            $cryptos[$depositCurrency],
             $amountToDonate,
             'donation'
         );
