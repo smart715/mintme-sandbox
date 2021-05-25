@@ -54,6 +54,36 @@ class MarketCapCalculatorTest extends TestCase
         $this->assertEquals('11000', $marketCapCalculator->calculate());
     }
 
+    public function testCalculateWithNotDeployed(): void
+    {
+        # Cryptos
+        $web = $this->mockCrypto('WEB', 'Webchain', true);
+        $btc = $this->mockCrypto('BTC', 'Bitcoin', true);
+
+        # Tokens
+        $token = $this->mockToken(false);
+
+        # Markets
+        $webbtc = $this->mockMarketStatus($web, $btc, '10', '0');
+        $tokenweb = $this->mockMarketStatus($token, $web, '10', '0');
+
+        # Market Status Repository
+
+        $repo = $this->mockMarketStatusRepository([$tokenweb], [$webbtc], $webbtc);
+
+        $marketCapCalculator = new MarketCapCalculator(
+            ['Webchain' => __DIR__.'/supply.txt'],
+            100,
+            $this->mockEntityManager($repo),
+            $this->mockMoneyWrapper(0),
+            $this->mockRpc(),
+            $this->mockCryptoRatesFetcher(),
+            0
+        );
+
+        $this->assertEquals('1000', $marketCapCalculator->calculate());
+    }
+
     public function testCalculateWithMoreMarkets(): void
     {
         # Cryptos
@@ -251,9 +281,12 @@ class MarketCapCalculatorTest extends TestCase
         return $crypto;
     }
 
-    private function mockToken(): Token
+    private function mockToken(bool $deployed = true): Token
     {
-        return $this->createMock(Token::class);
+        $token = $this->createMock(Token::class);
+        $token->method('getDeployed')->willReturn($deployed);
+
+        return $token;
     }
 
     private function mockMoneyWrapper(int $minimumVolumeForMarketcap): MoneyWrapperInterface

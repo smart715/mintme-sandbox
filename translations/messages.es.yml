@@ -1103,7 +1103,7 @@ trade.sell_order.amount: 'Cantidad en'
 trade.sell_order.amount_has_to_be: 'La cantidad total tiene que ser al menos %minTotalPrice% %baseSymbol%'
 trade.sell_order.submit: 'Crear orden de venta'
 trading.crypto.header: Cripto
-trading.crypto.spinner: '0 tokens | Capitalización del mercado: 0 BTC'
+trading.crypto.spinner: '0 tokens desplegados | Capitalización del mercado: 0 BTC'
 trading.header: 'Pricipales tokens %tokensCount%'
 trading.i_own: 'Mis Tokens '
 trading.header_24h: 'Volúmen de 24h'
@@ -1119,7 +1119,7 @@ trading.mintme_markets: 'Mercados MINTME'
 trading.tokens: Tokens
 trading.currency.usd: USD
 trading.currency.crypto: Cripto
-trading.tokens_and_market_cap: 'tokens | Capitalización de Mercados:'
+trading.tokens_and_market_cap: 'tokens desplegados | Capitalización de Mercados:'
 trading.exist_on_blockchain_guide: 'Este token existe en la blockchain.'
 trading.no_one_deployed: 'Nadie ha desplegado su token aún'
 trading.no_one_airdrop: 'Aún no hay ningún airdrop activo'
