@@ -298,8 +298,6 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
-            let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
-            console.log('first writing');
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -310,14 +308,6 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        console.log('data.side = ' +isSell);
-                        console.log('data.amount = ' +data.amount);
-                        console.log('data.amount = ' +data.price);
-                        console.log('totlalOrders first:');
-                        console.log(totalOrders);
-                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
-                        console.log('totlalOrders second:');
-                        console.log(totalOrders);
 
                         if (isSell) {
                             this.totalSellOrders = this.totalSellOrders.add(data.amount);
@@ -325,10 +315,7 @@ export default {
                             this.totalBuyOrders = this.totalBuyOrders.add(data.price);
                         }
 
-                        console.log('this.totlalSellOrders :');
-                        console.log(this.totalSellOrders);
-
-                        this.saveOrders(orders, isSell, 0);
+                        this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -345,15 +332,11 @@ export default {
                         order.createdTimestamp = data.ctime;
                     }
 
-                    console.log('update first :');
-                    console.log(totalOrders);
-                    if (totalOrders) {
-                        totalOrders = isSell
-                            ? totalOrders.sub(data.amount).add(order.amount)
-                            : totalOrders.sub(order.price).add(data.price);
+                    if (isSell) {
+                        this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
+                    } else {
+                        this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(data.price);
                     }
-                    console.log('update second :');
-                    console.log(totalOrders);
 
                     let index = orders.indexOf(order);
                     order.amount = data.left;
@@ -367,14 +350,12 @@ export default {
                     if (typeof order === 'undefined') {
                         return;
                     }
-                    console.log('subsribe first :');
-                    console.log(totalOrders);
-                    if (totalOrders) {
-                        totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
-                    }
 
-                    console.log('subsribe second :');
-                    console.log(totalOrders);
+                    if (isSell) {
+                        this.totalSellOrders = this.totalSellOrders.sub(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price);
+                    }
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
@@ -382,21 +363,13 @@ export default {
                     break;
             }
 
-            this.saveOrders(orders, isSell, totalOrders);
+            this.saveOrders(orders, isSell);
         },
-        saveOrders: function(orders, isSell, totalOrders) {
+        saveOrders: function(orders, isSell) {
             if (isSell) {
                 this.sellOrders = orders;
-                console.log('save: ');
-                console.log(totalOrders);
-                if (totalOrders) {
-                    this.totalSellOrders = totalOrders;
-                }
             } else {
                 this.buyOrders = orders;
-                if (totalOrders) {
-                    this.totalBuyOrders = totalOrders;
-                }
             }
         },
     },
