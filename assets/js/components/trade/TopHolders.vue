@@ -11,7 +11,7 @@
                     :fields="fields"
                 >
                     <template v-slot:cell(trader)="row">
-                        <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                        <elastic-text :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
                     </template>
                 </b-table>
             </div>
@@ -30,13 +30,13 @@
 <script>
 import {formatMoney} from '../../utils';
 import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
-import HolderName from './HolderName';
+import ElasticText from '../ElasticText';
 
 export default {
     name: 'TopHolders',
     mixins: [FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin],
     components: {
-        HolderName,
+        ElasticText,
     },
     props: {
         tokenName: String,

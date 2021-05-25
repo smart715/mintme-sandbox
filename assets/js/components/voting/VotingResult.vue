@@ -1,5 +1,5 @@
 <template>
-    <div class="card h-100">
+    <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <slot name="title">{{ $t('voting.current_results') }}</slot>

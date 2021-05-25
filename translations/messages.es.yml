@@ -770,6 +770,7 @@ voting.options:
 voting.add_option:
 voting.publish:
 voting.vote:
+voting.votes:
 voting.current_results:
 voting.no_propositions:
 voting.proposition.info:
