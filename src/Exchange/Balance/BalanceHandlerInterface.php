@@ -22,13 +22,13 @@ interface BalanceHandlerInterface
 {
     /**
      * @param User $user
-     * @param Token $token
+     * @param TradebleInterface $tradable
      * @param Money $amount
      * @param int|null $businessId
      * @throws FetchException
      * @throws BalanceException
      */
-    public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void;
+    public function deposit(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void;
 
     /**
      * @param User $user

@@ -84,10 +84,10 @@ class BalanceHandler implements BalanceHandlerInterface
         $this->logger = $logger;
     }
 
-    public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void
+    public function deposit(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void
     {
         try {
-            $this->update($user, $token, $amount, 'deposit', $businessId);
+            $this->update($user, $tradable, $amount, 'deposit', $businessId);
         } catch (\Throwable $e) {
             throw $e;
         }
