@@ -299,7 +299,7 @@ export default {
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
             let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
-
+            
             switch (type) {
                 case WSAPI.order.status.PUT:
                     this.$axios.retry.get(this.$routing.generate('pending_order_details', {
@@ -309,12 +309,23 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        console.log('data.side = ' +data.side);
+                        console.log('data.side = ' +isSell);
                         console.log('data.amount = ' +data.amount);
                         console.log('data.amount = ' +data.price);
-                        totalOrders = data.side ? totalOrders.add(data.amount) : totalOrders.add(data.price);
+
+                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
                         console.log(totalOrders);
-                        this.saveOrders(orders, isSell, totalOrders);
+                        if (isSell) {
+                            this.totalSellOrders = this.totalSellOrders.add(data.amount);
+                        } else {
+                            this.totalBuyOrders = this.totalBuyOrders.add(data.price);
+                        }
+                        console.log('totlalOrders :');
+                        console.log(totalOrders);
+                        console.log('this.totlalSellOrders :');
+                        console.log(this.totalSellOrders);
+
+                        this.saveOrders(orders, isSell, 0);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -366,12 +377,12 @@ export default {
             if (isSell) {
                 this.sellOrders = orders;
                 if (totalOrders) {
-                  this.totalSellOrders = totalOrders;
+                    this.totalSellOrders = totalOrders;
                 }
             } else {
                 this.buyOrders = orders;
                 if (totalOrders) {
-                  this.totalBuyOrders = totalOrders;
+                    this.totalBuyOrders = totalOrders;
                 }
             }
         },
