@@ -1378,7 +1378,7 @@ activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publ
 activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> fue vendido por <a href="%sellerUrl%">%seller%</a> a <a href="%buyerUrl%">%buyer%</a> por un valor de %amount% %symbol%'
+activity_8_message:
 activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado

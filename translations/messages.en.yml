@@ -1439,7 +1439,7 @@ activity_4_message: '<a href="%tokenUrl%">%token%</a> added a new post <a href="
 activity_5_message: '<a href="%tokenUrl%">%token%</a> has been created'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> was deployed'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> was deposited by <a href="%userUrl%">%user%</a> worth %amount% %symbol%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> was sold from <a href="%sellerUrl%">%seller%</a> to <a href="%buyerUrl%">%buyer%</a> worth %amount% %symbol%'
+activity_8_message: '<a href="%buyerUrl%">%buyer%</a> purchased <a href="%tokenUrl%">%token%</a> worth %amount% %symbol%'
 activity_9_message: '<a href="%tokenUrl%">%token%</a> was withdrawn by <a href="%userUrl%">%user%</a> worth %amount% %symbol%'
 token.intro.deployed_modal.paragraph_1.head: 'There are some new functions for your token:'
 token.intro.deployed_modal.paragraph_1.part_1: 'It can be withdrawn and deposited'
