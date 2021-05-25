@@ -108,9 +108,11 @@ class MarketCapCalculator
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
         // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
+        // and for not deployed tokens
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
-            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume())
+            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume()) ||
+                !$market->getQuote()->getDeployed()
                 ? $marketCap
                 : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
         }, $this->getZero(Symbols::WEB));
