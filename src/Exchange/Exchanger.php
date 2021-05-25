@@ -331,10 +331,10 @@ class Exchanger implements ExchangerInterface
     {
         /** @var Token $token */
         $token = $tradeble instanceof Crypto
-            ? Token::getFromCrypto($tradeble)
+            ? (new Token())->setName($tradeble->getSymbol())
             : $tradeble;
 
-        $balanceResult = $this->bh->balance($user, $token);
+        $balanceResult = $this->bh->balance($user, $tradeble);
 
         return $this->tm->getRealBalance($token, $balanceResult)->getAvailable();
     }
