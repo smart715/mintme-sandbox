@@ -308,8 +308,11 @@ export default {
                         id: data.id,
                     }))
                     .then((res) => {
-                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
+                        console.log(res.data);
                         orders.push(res.data);
+                        console.log(orders);
+                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
+                        console.log(totalOrders);
                         this.saveOrders(orders, isSell, totalOrders);
                         this.ordersUpdated = true;
                     })
@@ -361,12 +364,12 @@ export default {
         saveOrders: function(orders, isSell, totalOrders) {
             if (isSell) {
                 if (totalOrders) {
-                  this.totalSellOrders = totalOrders;
+                    this.totalSellOrders = totalOrders;
                 }
                 this.sellOrders = orders;
             } else {
                 if (totalOrders) {
-                  this.totalBuyOrders = totalOrders;
+                    this.totalBuyOrders = totalOrders;
                 }
                 this.buyOrders = orders;
             }
