@@ -125,7 +125,7 @@ class TokenManager implements TokenManagerInterface
     {
         return array_map(
             function (Crypto $crypto) {
-                return Token::getFromCrypto($crypto)->setCrypto($crypto);
+                return (new Token())->setName($crypto->getSymbol());
             },
             $this->cryptoManager->findAll()
         );
