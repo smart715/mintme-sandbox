@@ -1111,7 +1111,7 @@ trade.sell_order.amount: 'Quantité en'
 trade.sell_order.amount_has_to_be: 'Le montant total doit être au moins %minTotalPrice% %baseSymbol%'
 trade.sell_order.submit: 'Créer un ordre de vente'
 trading.crypto.header: Crypto
-trading.crypto.spinner: '0 jetons | Capitalisation du marché: 0 BTC'
+trading.crypto.spinner:
 trading.header: 'Principaux jetons %tokensCount%'
 trading.i_own: 'Mes jetons'
 trading.header_24h: 'Volume en 24h'
@@ -1127,15 +1127,15 @@ trading.mintme_markets: 'Marchés MINTME'
 trading.tokens: Jetons
 trading.currency.usd: USD
 trading.currency.crypto: Crypto
-trading.tokens_and_market_cap: 'jetons | Capitalisation du marché:'
+trading.tokens_and_market_cap:
 trading.exist_on_blockchain_guide: 'Ce jeton existe sur la chaîne de blocs'
 trading.no_one_deployed: 'Aucun jeton déployé'
-trading.no_one_airdrop: 'Aucun airdrop de jetons actif'
+trading.no_one_airdrop:
 trading.no_any_token: 'Aucun jeton pour l''instant'
 trading.show_all_tokens: 'Afficher tous les jetons'
 trading.deployed.label: 'Déployé sur MINTME'
 trading.deployed_eth.label: 'Déployé sur ETH'
-trading.airdrop.label: 'Airdrop de jetons actif'
+trading.airdrop.label:
 trading.all_tokens.label: 'Tous les jetons'
 trading.own_tokens.label: 'Mes jetons'
 trading.day_volume.label: 'Volume en 24 heures'
