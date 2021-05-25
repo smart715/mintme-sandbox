@@ -58,7 +58,9 @@ class TradingController extends Controller
         }
 
         return $this->render('pages/trading.html.twig', [
-            'tokensCount' => $marketStatusManager->getMarketsCount(),
+            'tokensCount' => $marketStatusManager->getMarketsCount(
+                MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME
+            ),
             'btcImage' => $btcCrypto->getImage(),
             'mintmeImage' => $webCrypto->getImage(),
             'tokenImage' => Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL),
