@@ -299,6 +299,7 @@ export default {
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
             let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
+            console.log('first writing');
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -344,11 +345,15 @@ export default {
                         order.createdTimestamp = data.ctime;
                     }
 
+                    console.log('update first :');
+                    console.log(totalOrders);
                     if (totalOrders) {
                         totalOrders = isSell
                             ? totalOrders.sub(data.amount).add(order.amount)
                             : totalOrders.sub(order.price).add(data.price);
                     }
+                    console.log('update second :');
+                    console.log(totalOrders);
 
                     let index = orders.indexOf(order);
                     order.amount = data.left;
@@ -362,10 +367,14 @@ export default {
                     if (typeof order === 'undefined') {
                         return;
                     }
-
+                    console.log('subsribe first :');
+                    console.log(totalOrders);
                     if (totalOrders) {
                         totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
                     }
+
+                    console.log('subsribe second :');
+                    console.log(totalOrders);
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
@@ -378,6 +387,8 @@ export default {
         saveOrders: function(orders, isSell, totalOrders) {
             if (isSell) {
                 this.sellOrders = orders;
+                console.log('save: ');
+                console.log(totalOrders);
                 if (totalOrders) {
                     this.totalSellOrders = totalOrders;
                 }
