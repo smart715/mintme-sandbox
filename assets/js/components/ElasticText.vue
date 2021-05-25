@@ -7,18 +7,20 @@
             boundary="viewport"
         />
         <img
+            v-if="img"
             :src="img"
             class="d-block rounded-circle"
             alt="avatar">
-        <a
+        <comment
+            :is="component"
             ref="a"
             :href="url"
-            class="holder-name mr-1 text-white"
+            class="elastic-text mr-1 text-white"
         >
             <v-clamp autoresize @clampchange="updateTooltip" :max-lines="1">
                 {{ value }}
             </v-clamp>
-        </a>
+        </comment>
     </div>
 </template>
 
@@ -26,7 +28,7 @@
 import VClamp from 'vue-clamp/dist/vue-clamp';
 
 export default {
-    name: 'HolderName',
+    name: 'ElasticText',
     components: {
         VClamp,
     },
@@ -37,8 +39,19 @@ export default {
     },
     props: {
         value: String,
-        url: String,
-        img: String,
+        url: {
+            type: String,
+            default: null,
+        },
+        img: {
+            type: String,
+            default: null,
+        },
+    },
+    computed: {
+        component: function() {
+            return this.url ? 'a' : 'span';
+        },
     },
     methods: {
         updateTooltip: function(val) {
