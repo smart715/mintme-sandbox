@@ -267,7 +267,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setMaxResults($limit);
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            $queryBuilder->andWhere('u.user = :id')
                 ->setParameter('id', $userId);
         }
 
