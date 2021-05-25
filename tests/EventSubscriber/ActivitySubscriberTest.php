@@ -58,7 +58,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->handleTokenEvent($event, $eventName);
@@ -108,7 +110,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->airdropClaimed($event, 'airdrop.claimed');
@@ -123,7 +127,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->handleTransactionEvent($event, 'deposit.completed');
@@ -157,7 +163,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->handleTransactionEvent($event, $eventName);
@@ -206,7 +214,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->donation($event, 'donation');
@@ -227,7 +237,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $this->createMock(EntityManagerInterface::class),
             $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->handleOrderEvent($event, 'order.completed');
@@ -289,7 +301,9 @@ class ActivitySubscriberTest extends TestCase
         $subscriber = new ActivitySubscriber(
             $em,
             $mw,
-            $this->createMock(PublisherInterface::class)
+            $this->createMock(PublisherInterface::class),
+            $this->createMock(MarketStatusManagerInterface::class),
+            $this->createMock(CryptoManagerInterface::class)
         );
 
         $subscriber->handleOrderEvent($event, 'order.completed');

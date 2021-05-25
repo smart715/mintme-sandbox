@@ -58,15 +58,21 @@ class ActivitySubscriber implements EventSubscriberInterface
     private EntityManagerInterface $entityManager;
     private MoneyWrapperInterface $moneyWrapper;
     private PublisherInterface $publisher;
+    private MarketStatusManagerInterface $marketStatusManager;
+    private CryptoManagerInterface $cryptoManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        PublisherInterface $publisher
+        PublisherInterface $publisher,
+        MarketStatusManagerInterface $marketStatusManager,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->publisher = $publisher;
+        $this->marketStatusManager = $marketStatusManager;
+        $this->cryptoManager = $cryptoManager;
     }
 
     public static function getSubscribedEvents(): array
@@ -146,11 +152,15 @@ class ActivitySubscriber implements EventSubscriberInterface
 
         $user = $event->getUser();
         $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
+        $amountWorthInMintme = $this->convertToMintme($amount, $token);
 
         /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
         $activity = $this->createActivity($eventName);
 
-        $activity->setAmount($amount)->setUser($user)->setToken($token);
+        $activity
+            ->setAmount($amountWorthInMintme)
+            ->setUser($user)
+            ->setToken($token);
 
         $this->saveActivity($activity);
     }
@@ -221,5 +231,27 @@ class ActivitySubscriber implements EventSubscriberInterface
     private function publishActivity(Activity $activity): void
     {
         $this->publisher->publish('activities', $activity);
+    }
+
+    private function getLastPrice(Token $token): Money
+    {
+        $base = $this->cryptoManager->findBySymbol(Symbols::WEB);
+        $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($base, $token));
+
+        return $marketStatus->getLastPrice();
+    }
+
+    private function convertToMintme(Money $amount, Token $token): Money
+    {
+        $lastPrice = $this->getLastPrice($token);
+        $lastPrice = $this->moneyWrapper->format($lastPrice);
+
+        $exchange = new FixedExchange([
+            Symbols::TOK => [
+                Symbols::WEB => $lastPrice,
+            ],
+        ]);
+
+        return $this->moneyWrapper->convert($amount, new Currency(Symbols::WEB), $exchange);
     }
 }
