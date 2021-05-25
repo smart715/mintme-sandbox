@@ -332,17 +332,17 @@ export default {
                         order.createdTimestamp = data.ctime;
                     }
 
-                    if (isSell) {
-                        this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
-                    } else {
-                        this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(data.price);
-                    }
-
                     let index = orders.indexOf(order);
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(data.price);
+                    }
 
                     this.ordersUpdated = true;
                     break;
@@ -351,14 +351,14 @@ export default {
                         return;
                     }
 
+                    this.ordersUpdated = true;
+                    orders.splice(orders.indexOf(order), 1);
+
                     if (isSell) {
-                        this.totalSellOrders = this.totalSellOrders.sub(order.amount);
+                      this.totalSellOrders = this.totalSellOrders.sub(order.amount);
                     } else {
                       this.totalBuyOrders = this.totalBuyOrders.sub(order.price);
                     }
-
-                    this.ordersUpdated = true;
-                    orders.splice(orders.indexOf(order), 1);
 
                     break;
             }
