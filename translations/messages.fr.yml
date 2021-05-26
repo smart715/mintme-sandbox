@@ -483,7 +483,9 @@ mail.new_investor_bought_token.msg: 'a acheté votre jeton.'
 mail.new_investor_check_hostory: 'Consulter l''historique d''échanges'
 mail.new_device.login.msg: 'Notre système a détecté une nouvelle tentative de connexion'
 mail.new_device.new_ip.msg: 'd''une nouvelle adresse IP ou d''un nouvel appareil '
-mail.new_investor.actively_social_media_token:
+mail.new_investor.actively_social_media_token_1:
+mail.new_investor.actively_social_media_token_2:
+mail.join_mintme_hosting:
 mail.new_investor.create_token_here:
 new_post.msg: '%tokenName% a crée un nouveau post. Lisez le <a href="%urlToken%">ici.</a>'
 mail.new_post.msg: 'créer un nouveau post'

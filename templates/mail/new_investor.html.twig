@@ -24,18 +24,6 @@
 {% set url = absolute_url(path('token_show', {'name': userTokenName })) %}
 {% set tab = '/trade' %}
 {% set vars = {'href': url ~ tab, 'text': 'Check Trading History' } %}
-<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
-    <tr>
-        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#ffffff">
-            <p style="Margin:0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;line-height:26px;color:#0a0a0a;">
-                {% trans from 'messages' %} mail.new_investor.actively_social_media_token {% endtrans %}
-            </p>
-            <p style="Margin:0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:400;line-height:26px;color:#0a0a0a;">
-                {% trans from 'messages' {'%urlCreateToken%': 'https://www.mintme.com/token' } %} mail.new_investor.create_token_here {% endtrans %}
-            </p>
-        </td>
-    </tr>
-</table>
 {% include 'mail/mail_block_button.html.twig' with vars %}
 <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
     <tr>
