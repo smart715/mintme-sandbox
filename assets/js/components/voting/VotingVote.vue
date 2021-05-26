@@ -1,5 +1,5 @@
 <template>
-    <div class="card h-100">
+    <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <slot name="title">{{ $t('voting.vote') }}</slot>
@@ -14,7 +14,9 @@
                     :class="{border: selected === key}"
                     @click="select(key)"
                 >
-                    <div class="flex-1 text-center">{{ option.title }}</div>
+                    <div class="flex-1 text-center">
+                        <elastic-text :value="option.title"/>
+                    </div>
                 </div>
                 <button :disabled="btnDisabled" class="btn btn-primary m-2" @click="vote">
                     {{ $t('voting.vote') }}
@@ -26,6 +28,7 @@
 
 <script>
 import {NotificationMixin, LoggerMixin, RebrandingFilterMixin} from '../../mixins';
+import ElasticText from '../ElasticText';
 import {mapGetters, mapActions} from 'vuex';
 
 export default {
@@ -36,6 +39,9 @@ export default {
             selected: -1,
             requesting: false,
         };
+    },
+    components: {
+        ElasticText,
     },
     computed: {
         ...mapGetters('voting', {

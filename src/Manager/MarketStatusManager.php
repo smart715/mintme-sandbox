@@ -122,15 +122,15 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::FILTER_DEPLOYED_ONLY_ETH:
-                $queryBuilder->andWhere(
-                    "qt.deployed = 1 AND c.symbol = :eth"
-                )->setParameter('eth', Symbols::ETH);
+                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :eth")
+                             ->setParameter('eth', Symbols::ETH);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
@@ -159,7 +159,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
@@ -266,7 +267,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->setMaxResults($limit);
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            $queryBuilder->andWhere('u.user = :id')
                 ->setParameter('id', $userId);
         }
 
