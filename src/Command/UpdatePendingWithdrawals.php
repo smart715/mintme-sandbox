@@ -149,7 +149,9 @@ class UpdatePendingWithdrawals extends Command
                         ? $mintmeCrypto->getFee()
                         : $ethTokenFeeInCrypto;
 
-                    $feeToken = $token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto();
+                    $feeToken = $token->isMintmeToken()
+                        ? $mintmeCrypto
+                        : $token->getCrypto();
                     $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();
                     $amount = $isFeeInCrypto
                         ? $item->getAmount()->getAmount()
