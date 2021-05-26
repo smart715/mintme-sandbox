@@ -89,13 +89,12 @@ class UpdatePendingWithdrawals extends Command
                     $errorMessage = '';
                     $crypto = $item->getCrypto();
                     $fee = $crypto->getFee();
-                    $token = Token::getFromCrypto($crypto);
                     $this->em->beginTransaction();
 
                     try {
                         $this->balanceHandler->deposit(
                             $item->getUser(),
-                            $token,
+                            $crypto,
                             $item->getAmount()->getAmount(),
                             $item->getId()
                         );
@@ -107,7 +106,7 @@ class UpdatePendingWithdrawals extends Command
                     try {
                         $this->balanceHandler->deposit(
                             $item->getUser(),
-                            $token,
+                            $crypto,
                             $fee,
                             $item->getId() + 1000000
                         );
@@ -122,7 +121,7 @@ class UpdatePendingWithdrawals extends Command
 
                     $this->em->remove($item);
                     $this->em->flush();
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$token->getName()} addr: {$token->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$crypto->getName()} addr: {$crypto->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
 
                     $lock->refresh();
@@ -150,7 +149,7 @@ class UpdatePendingWithdrawals extends Command
                         ? $mintmeCrypto->getFee()
                         : $ethTokenFeeInCrypto;
 
-                    $feeToken = Token::getFromCrypto($token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto());
+                    $feeToken = $token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto();
                     $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();
                     $amount = $isFeeInCrypto
                         ? $item->getAmount()->getAmount()
