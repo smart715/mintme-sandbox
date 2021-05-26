@@ -223,8 +223,11 @@ page.privacy.7.1: '7.1. No tenemos la intención de solicitar o recopilar inform
 page.privacy.8: '8. Cambios en la política de privacidad'
 page.privacy.8.1: '8.1. MintMe.com tiene la potestad de actualizar esta Política en cualquier momento. El uso continuado del servicio después de que publiquemos cualquier modificación de la Política de Privacidad en esta página constituirá su reconocimiento de las modificaciones y su consentimiento para cumplir y estar obligado por la Política de Privacidad modificada.'
 page.privacy.8.2: '8.2. Si realizamos algún cambio material en esta Política de Privacidad, le notificaremos a través de la dirección de correo electrónico que nos haya proporcionado o colocando un aviso destacado en la Plataforma Tecnológica. Usted reconoce y acepta que es su responsabilidad revisar esta Política de Privacidad periódicamente y estar al tanto de las modificaciones.'
-page.privacy.9: '9. Contactar con nosotros'
-page.privacy.9.1: '9.1. Si tiene alguna pregunta sobre esta Política de Privacidad, desea ejercer alguno de sus derechos sobre su Información Personal o presentar una queja, por favor contáctenos en:'
+page.privacy.9:
+page.privacy.9.1:
+page.privacy.9.2:
+page.privacy.10: '10. Contactar con nosotros'
+page.privacy.10.1: '10.1. Si tiene alguna pregunta sobre esta Política de Privacidad, desea ejercer alguno de sus derechos sobre su Información Personal o presentar una queja, por favor contáctenos en:'
 page.privacy.address: 'ABC Hosting Ltd<br/>Calle 7B Neal Pen<br/> Cuidad de Belice, Belice<br/> Correo electrónico:'
 page.profile.title: Perfil
 page.profile.is_private: 'Este perfil es privado'
@@ -401,6 +404,8 @@ page.terms.content.15.1: '15.1. Cantidad de Comisiones. Usted acepta pagar las c
 page.terms.content.15.2: '15.2. Pago de Comisiones. Usted nos autoriza a Nosotros o a nuestro procesador de pago designado a cargar o deducir criptoactivos de su cuenta MintMe para cualquiera de las debidas Comisiones aplicables en relación a las transacciones que usted realice a través de nuestra Plataforma.'
 page.terms.content.16: '16. CONTENIDO DE TERCEROS'
 page.terms.content.16.1: 'Mientras se encuentre usando nuestra Plataforma Tecnológica usted puede visualizar Contenido de Terceros. Nosotros no controlamos, respaldamos o adoptamos (aunque sin embargo expresamente instaurado por Nosotros) cualquier Contenido de Terceros y no tendremos responsabilidad por el Contenido de Terceros, incluyendo sin limitación esencial que pueda ser desviada, incompleta, errónea, ofensiva, indecente o en caso tal cuestionable. Además, su relación de negocio o correspondencia con terceras partes son exclusivamente entre usted y terceros. Nosotros no somos responsables o sujetos por cualquier pérdida o daño de cualquier índole como resultado de tales relaciones, y usted entiende que su uso del Contenido de Terceros, y sus interacciones con terceros, están bajo su propio riesgo.'
+page.terms.content.17:
+page.terms.content.17.1:
 page.token_creation.title: 'Creación del token'
 page.token_creation.form_header: 'Cree su propio token'
 page.token_creation.error.taken: 'Ya existe un token con ese nombre'
