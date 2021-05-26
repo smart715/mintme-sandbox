@@ -77,6 +77,10 @@ task('database-migrate', function() {
      run('cd {{release_path}} && export $(grep -v "^#" .env | xargs) && bin/console doctrine:migrations:migrate --env=prod --no-interaction');
 });
 
+task('load-translations', function() {
+     run('cd {{release_path}} && export $(grep -v "^#" .env | xargs) && bin/console app:load-translations-ui');
+});
+
 task('cache-move', function() {
      run('cd {{release_path}} && mv var/cache/prod var/cache/prod.todelete');
 });
@@ -139,6 +143,7 @@ task('deploy', [
     'composer-install',
     'node-install',
     'node-build',
+    'load-translations',
     'deploy:writable',
     'database-migrate',
     'change-version',
