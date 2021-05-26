@@ -232,8 +232,11 @@ page.privacy.7.1: '7.1. Nous n''avons pas l''intention de solliciter ou de colle
 page.privacy.8: '8. Modifications de la politique de confidentialité'
 page.privacy.8.1: '8.1. MintMe.com a le pouvoir discrétionnaire de mettre à jour cette politique à tout moment. Votre utilisation continue du service après la publication de toute modification de la politique de confidentialité sur cette page constituera votre reconnaissance des modifications et votre consentement à respecter et à être lié par la politique de confidentialité modifiée.'
 page.privacy.8.2: '8.2. Si nous apportons des modifications importantes à cette politique de confidentialité, nous vous en informerons soit via l''adresse e-mail que vous nous avez fournie, soit en plaçant un avis bien en vue sur la plate-forme technologique. Vous reconnaissez et acceptez qu''il est de votre responsabilité de revoir périodiquement cette politique de confidentialité et de prendre connaissance des modifications.'
-page.privacy.9: '9. Contactez nous'
-page.privacy.9.1: '9.1. Si vous avez des questions sur cette politique de confidentialité, souhaitez exercer l''un de vos droits sur vos informations personnelles ou déposer une plainte, veuillez nous contacter à l''adresse suivante:'
+page.privacy.9:
+page.privacy.9.1:
+page.privacy.9.2:
+page.privacy.10: '10. Contactez nous'
+page.privacy.10.1: '10.1. Si vous avez des questions sur cette politique de confidentialité, souhaitez exercer l''un de vos droits sur vos informations personnelles ou déposer une plainte, veuillez nous contacter à l''adresse suivante:'
 page.privacy.address: 'ABC Hosting Ltd <br/> 7B Neal Pen Road <br/> Belize City, Belize <br/> E-mail:'
 page.profile.title: profil
 page.profile.is_private: 'Ce profil est privé'
@@ -411,6 +414,8 @@ page.terms.content.15.1: '15.1. Montant des frais. Vous acceptez de payer les fr
 page.terms.content.15.2: '15.2. Paiement des frais. Vous nous autorisez ou notre processeur de paiement désigné à facturer ou à déduire les actifs cryptographiques de votre compte MintMe pour tous les frais applicables dus dans le cadre des transactions que vous effectuez via notre plate-forme.'
 page.terms.content.16: '16. CONTENU TIERS'
 page.terms.content.16.1: 'Lorsque vous utilisez notre plate-forme technologique, vous pouvez afficher du contenu tiers. Nous ne contrôlons, n''approuvons ni n''adoptons (sauf indication contraire expresse de notre part) tout contenu de tiers et n''avons aucune responsabilité pour le contenu de tiers, y compris, sans s''y limiter, le matériel qui peut être trompeur, incomplet, erroné, offensant, indécent ou répréhensible. En outre, vos relations commerciales ou votre correspondance avec ces tiers sont uniquement entre vous et les tiers. Nous ne sommes pas responsables de toute perte ou dommage de quelque nature que ce soit résultant de telles transactions, et vous comprenez que votre utilisation du contenu tiers et vos interactions avec des tiers sont à vos propres risques.'
+page.terms.content.17:
+page.terms.content.17.1:
 page.token_creation.title: 'Création du jeton'
 page.token_creation.form_header: 'Créez votre propre jeton'
 page.token_creation.error.taken: 'Nom du jeton déjà utilisé'
