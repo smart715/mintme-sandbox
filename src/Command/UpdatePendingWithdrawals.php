@@ -121,7 +121,7 @@ class UpdatePendingWithdrawals extends Command
 
                     $this->em->remove($item);
                     $this->em->flush();
-                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$crypto->getName()} addr: {$crypto->getAddress()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
+                    $this->logger->info("[withdrawals] $pendingCount Pending withdrawal to {$crypto->getName()} (({$item->getAmount()->getAmount()->getAmount()} {$item->getAmount()->getAmount()->getCurrency()->getCode()} + {$fee->getAmount()}{$fee->getCurrency()->getCode()} ), user id={$item->getUser()->getId()}) returns.");
                     $this->em->commit();
 
                     $lock->refresh();
