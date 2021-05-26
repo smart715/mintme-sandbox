@@ -6,6 +6,7 @@
 
 {% block content %}
     <div id="trading" class="container-fluid">
+        {{ include('spinners/trading.html.twig') }}
         <div class="row pt-4 justify-content-center">
             <div class="col-12">
                 <trading
@@ -17,7 +18,11 @@
                         mintme-supply-url="{{ mintme_supply }}"
                         :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
                         sort="{{ sort }}"
-                        :order="{{ order ? 'true' : 'false' }}"
+                        :markets-prop="{{ markets | json_encode }}"
+                        :order="{{ order == 'DESC' ? 'true' : 'false' }}"
+                        :filter-for-tokens="{{ filterForTokens | json_encode() }}"
+                        :per-page="{{ perPage }}"
+                        :rows-prop="{{ rows }}"
                 >
                 </trading>
             </div>
@@ -26,5 +31,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/trading.js') }}"></script>
+    {{ encore_entry_script_tags('trading') }}
 {% endblock %}

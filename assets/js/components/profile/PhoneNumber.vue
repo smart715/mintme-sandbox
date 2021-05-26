@@ -1,6 +1,7 @@
 <template>
     <div class="phone-number">
         <maz-phone-number-input
+            ref="phoneNumberInput"
             v-model="phone"
             @update="updatePhone"
             :translations="translations"
@@ -32,11 +33,10 @@ export default {
     props: {
         countryCode: String,
         phoneNumber: String,
-        enableValidMsg: Boolean,
     },
     computed: {
         showValidationMessage: function() {
-            return false === this.isValid && (this.phone || this.enableValidMsg);
+            return !!this.phone && !this.isValidNumber;
         },
         phoneNumberModel: {
             set: function(phone) {
@@ -46,9 +46,6 @@ export default {
             get: function() {
                 return this.phone;
             },
-        },
-        isValid: function() {
-            return this.isValidNumber;
         },
         translations() {
             return {
@@ -63,7 +60,7 @@ export default {
         updatePhone: function(data) {
             this.isValidNumber = data.isValid;
             this.$emit('is-valid-phone', this.isValidNumber);
-            this.phoneNumberModel = data.e164;
+            this.phoneNumberModel = data.e164 || this.$refs.phoneNumberInput.asYouTypeNumber;
         },
     },
 };

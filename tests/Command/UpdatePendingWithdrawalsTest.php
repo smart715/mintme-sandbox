@@ -15,6 +15,7 @@ use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Wallet\Model\Amount;
 use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
@@ -193,8 +194,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
     {
         $lock = $this->createMock(Crypto::class);
 
-        $lock->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
-        $lock->method('getName')->willReturn(Token::WEB_SYMBOL);
+        $lock->method('getSymbol')->willReturn(Symbols::WEB);
+        $lock->method('getName')->willReturn(Symbols::WEB);
 
         return $lock;
     }

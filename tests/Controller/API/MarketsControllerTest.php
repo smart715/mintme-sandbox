@@ -12,10 +12,11 @@ class MarketsControllerTest extends WebTestCase
         $tokName = $this->createToken($this->client);
 
         $this->client->request('GET', '/api/markets');
-
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertCount(3, $res);
+        file_put_contents('test.json', json_encode($res));
+
+        $this->assertCount(4, $res);
         $this->assertEquals(
             [
                 $res[0]['base']['symbol'],
@@ -26,6 +27,9 @@ class MarketsControllerTest extends WebTestCase
                 $res[1]['identifier'],
                 $res[2]['base']['symbol'],
                 $res[2]['quote']['symbol'],
+                $res[2]['identifier'],
+                $res[3]['base']['symbol'],
+                $res[3]['quote']['symbol'],
             ],
             [
                 'BTC',
@@ -34,6 +38,9 @@ class MarketsControllerTest extends WebTestCase
                 'ETH',
                 'WEB',
                 'WEBETH',
+                'USDC',
+                'WEB',
+                'WEBUSDC',
                 'WEB',
                 $tokName,
             ]
@@ -49,7 +56,7 @@ class MarketsControllerTest extends WebTestCase
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertGreaterThan(1, $res['markets']);
+        $this->assertGreaterThan(4, $res['markets']);
     }
 
     // todo test getMarketKline()

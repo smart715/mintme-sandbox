@@ -89,7 +89,7 @@ describe('TradeChart', () => {
                                     monthVolume: '0',
                                     monthChange: '0',
                                     monthAmount: '0',
-                                    marketCap: '0 testBaseSymbol',
+                                    marketCap: '0',
                                 });
                             done();
                         });
@@ -128,7 +128,7 @@ describe('TradeChart', () => {
                                     monthVolume: '0',
                                     monthChange: '0',
                                     monthAmount: '0',
-                                    marketCap: '0 testBaseSymbol',
+                                    marketCap: '0',
                                 });
                             done();
                         });

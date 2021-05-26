@@ -35,6 +35,7 @@ export const GENERAL = {
     precision: 8,
     dateTimeFormat: 'DD.MM.YYYY HH:mm:ss',
     dateFormat: 'MMM D, YYYY',
+    timeFormat: 'HH:mm',
 };
 
 export const webSymbol = 'WEB';
@@ -147,7 +148,7 @@ export const notificationTypes = {
     tokenMarketingTips: 'token_marketing_tips',
 };
 
-export const tabs = ['intro', 'buy', 'posts', 'trade', 'post'];
+export const tabs = ['intro', 'posts', 'trade', 'post'];
 
 export const descriptionLength = {
     min: 200,

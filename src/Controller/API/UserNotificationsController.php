@@ -6,8 +6,6 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
 use App\Manager\UserNotificationConfigManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
-use App\Utils\NotificationChannels;
-use App\Utils\NotificationTypes;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;

@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {

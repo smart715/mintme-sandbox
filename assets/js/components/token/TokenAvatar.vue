@@ -63,6 +63,7 @@
                 :token-website="tokenWebsite"
                 :token-status="statusProp"
                 :is-mintme-token="isMintmeToken"
+                :has-release-period="hasReleasePeriodProp"
             />
         </div>
     </div>
@@ -73,9 +74,14 @@ import Avatar from '../Avatar';
 import TokenName from './TokenName';
 import TokenDeployIcon from './deploy/TokenDeployIcon';
 import TokenPointsProgress from './TokenPointsProgress';
+import {NotificationMixin} from '../../mixins';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenAvatar',
+    mixins: [
+        NotificationMixin,
+    ],
     props: {
         isOwner: Boolean,
         hasReleasePeriodProp: Boolean,
@@ -106,6 +112,7 @@ export default {
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
         tokenName: String,
+        tokenDeleteSoldLimit: Number,
         currentLocale: String,
         tokenDeployedDate: {
             type: Object,
@@ -116,12 +123,24 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        serviceUnavailable: Boolean,
     },
     components: {
         Avatar,
         TokenName,
         TokenDeployIcon,
         TokenPointsProgress,
+    },
+    mounted() {
+        this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
+        if (this.serviceUnavailable) {
+            this.notifyError(this.$t('toasted.error.service_unavailable'));
+        }
+    },
+    methods: {
+        ...mapMutations('tokenStatistics', [
+            'setTokenDeleteSoldLimit',
+        ]),
     },
 };
 </script>

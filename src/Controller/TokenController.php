@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\Exception\ApiFetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -14,7 +15,6 @@ use App\Exception\RedirectException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\OrdersFactoryInterface;
-use App\Exchange\Factory\TradeInfoFactory;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
@@ -40,7 +40,6 @@ use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
 use App\Utils\Validator\AirdropReferralCodeHashValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
@@ -134,10 +133,7 @@ class TokenController extends Controller
      */
     public function donate(string $name): RedirectResponse
     {
-        return $this->redirectToRoute('token_show', [
-            'name' => $name,
-            'tab' => 'buy',
-        ]);
+        return $this->redirectToRoute('token_show', ['name' => $name]);
     }
 
     /**
@@ -186,7 +182,10 @@ class TokenController extends Controller
         ?string $tab,
         ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) {
+        if ((preg_match('/(intro)/', $request->getPathInfo()) &&
+            !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) ||
+            'buy' === $tab
+        ) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
@@ -231,6 +230,7 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('new-trades');
             $this->denyAccessUnlessGranted('trading');
+            $this->denyAccessUnlessGranted('create', $token);
 
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
@@ -269,7 +269,7 @@ class TokenController extends Controller
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
-                        MoneyWrapper::TOK_SYMBOL
+                        Symbols::TOK
                     )
                 );
                 $market = $this->marketManager->createUserRelated($user);
@@ -304,6 +304,8 @@ class TokenController extends Controller
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
+
+                    throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
                 }
             }
         }
@@ -311,6 +313,7 @@ class TokenController extends Controller
         return $this->render('pages/token_creation.html.twig', [
             'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
+            'tokenCreateError' => !$this->isGranted('create', $token),
         ]);
     }
 
@@ -413,16 +416,12 @@ class TokenController extends Controller
     {
         $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
 
-        if ($dashedName != $name) {
-            throw new RedirectException($this->redirectToRoute($request->get('_route'), ['name' => $dashedName, 'modal' => $modal]));
-        }
-
         //rebranding
-        if (Symbols::MINTME === mb_strtoupper($name)) {
-            $name = Symbols::WEB;
+        if (Symbols::MINTME === mb_strtoupper($dashedName)) {
+            $dashedName = Symbols::WEB;
         }
 
-        $token = $this->tokenManager->findByName($name);
+        $token = $this->tokenManager->findByName($dashedName);
 
         if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
@@ -433,7 +432,7 @@ class TokenController extends Controller
                 $this->redirectToRoute('coin', [
                     'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
                     'quote'=> Symbols::MINTME,
-                ], 301)
+                ])
             );
         }
 
@@ -467,18 +466,21 @@ class TokenController extends Controller
 
         $tokenDecimals = $token->getDecimals();
 
-        $tradeInfo = null;
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
+        $topHolders = null;
+        $serviceUnavailable = false;
 
         if ('intro' === $tab) {
-            $tradeInfo = (new TradeInfoFactory(
-                $market,
-                $this->balanceHandler,
-                $this->marketHandler,
-                $this->parameterBag
-            ))->create();
+            try {
+                $topHolders = $this->balanceHandler->topHolders(
+                    $token,
+                    $this->parameterBag->get('top_holders')
+                );
+            } catch (\Throwable $e) {
+                $serviceUnavailable = true;
+            }
         }
-
-        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
 
         return $this->render(
             'pages/pair.html.twig',
@@ -514,10 +516,12 @@ class TokenController extends Controller
                 'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
                     ? Token::TOKEN_SUBUNIT
                     : $tokenDecimals,
-                'tradeInfo' => $this->normalize($tradeInfo, ['API']),
+                'topHolders' => $this->normalize($topHolders, ['API']),
                 'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
+                'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
                 'post' => null,
                 'comments' => [],
+                'serviceUnavailable' => $serviceUnavailable,
             ], $extraData)
         );
     }

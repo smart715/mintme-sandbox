@@ -41,3 +41,6 @@ public/build
 
 ###< avatar uploader ###
 public/media/cache
+
+###< translations ###
+templates/translations.html.twig

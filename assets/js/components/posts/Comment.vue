@@ -102,13 +102,13 @@ export default {
         comment: Object,
         index: Number,
         loggedIn: Boolean,
-        isConfirmVisible: false,
     },
     data() {
         return {
             deleteDisabled: false,
             editing: false,
             liking: false,
+            isConfirmVisible: false,
         };
     },
     computed: {
@@ -138,7 +138,7 @@ export default {
                 });
         },
         editComment(comment) {
-            this.comment.content = comment.content;
+            this.$emit('update-comment', {...this.comment, content: comment.content});
             this.cancelEditing();
         },
         cancelEditing() {
@@ -154,9 +154,12 @@ export default {
             }
             this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {commentId: this.comment.id}))
-                .then((res) => {
-                    this.comment.likeCount += this.comment.liked ? -1 : 1;
-                    this.comment.liked = !this.comment.liked;
+                .then(() => {
+                    this.$emit('update-comment', {
+                        ...this.comment,
+                        likeCount: this.comment.likeCount + (this.comment.liked ? -1 : 1),
+                        liked: !this.comment.liked,
+                    });
                 })
                 .catch(() => {
                     this.notifyError('Error liking comment.');

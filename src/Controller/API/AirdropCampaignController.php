@@ -22,9 +22,9 @@ use App\Manager\TokenManagerInterface;
 use App\Manager\TwitterManagerInterface;
 use App\Utils\AirdropCampaignActions;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Utils\Validator\AirdropCampaignActionsValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -34,6 +34,7 @@ use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\Url;
@@ -54,6 +55,7 @@ class AirdropCampaignController extends AbstractFOSRestController
     private LockFactory $lockFactory;
     private EventDispatcherInterface $eventDispatcher;
     private AirdropReferralCodeManager $arcManager;
+    private SessionInterface $session;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -64,7 +66,8 @@ class AirdropCampaignController extends AbstractFOSRestController
         BlacklistManagerInterface $blacklistManager,
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher,
-        AirdropReferralCodeManager $arcManager
+        AirdropReferralCodeManager $arcManager,
+        SessionInterface $session
     ) {
         $this->tokenManager = $tokenManager;
         $this->airdropCampaignManager = $airdropCampaignManager;
@@ -75,6 +78,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->arcManager = $arcManager;
+        $this->session = $session;
     }
 
     /**
@@ -95,6 +99,9 @@ class AirdropCampaignController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Get("/{tokenName}", name="get_airdrop_campaign", options={"expose"=true})
+     * @param string $tokenName
+     * @return View
+     * @throws ApiBadRequestException
      */
     public function getAirdropCampaign(string $tokenName): View
     {
@@ -162,7 +169,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             throw new ApiBadRequestException($this->translator->trans('airdrop_backend.already_has_active_airdrop'));
         }
 
-        $amount = $moneyWrapper->parse((string)$request->get('amount'), MoneyWrapper::TOK_SYMBOL);
+        $amount = $moneyWrapper->parse((string)$request->get('amount'), Symbols::TOK);
         $participants = (int)$request->get('participants');
         $endDateTimestamp = (int)$request->get('endDate');
         $balance = $balanceHandler->exchangeBalance(
@@ -277,7 +284,7 @@ class AirdropCampaignController extends AbstractFOSRestController
         }
 
         if (!$this->isGranted('claim', $airdrop)) {
-            return $this->view(['error' => true], Response::HTTP_OK);
+            return $this->view(['error' => true, 'type' => 'airdrop'], Response::HTTP_OK);
         }
 
         $this->airdropCampaignManager->claimAirdropCampaign(
@@ -320,6 +327,65 @@ class AirdropCampaignController extends AbstractFOSRestController
 
         return $this->view(null, Response::HTTP_OK);
     }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post(
+     *     "/action/save",
+     *     name="claim_airdrop_action_for_guest_user",
+     *     options={"expose"=true}
+     *     )
+     * @Rest\RequestParam(
+     *     name="tokenName",
+     *     allowBlank=false,
+     *     description="token name of airdrop"
+     * )
+     * @Rest\RequestParam(
+     *     name="actionId",
+     *     allowBlank=false,
+     *     description="id of airdrop action"
+     * )
+     * @return View
+     * @param ParamFetcherInterface $request
+     */
+    public function storeAirdropTaskCompleted(ParamFetcherInterface $request): View
+    {
+        $tokenName = $request->get('tokenName');
+        $actionId = $request->get('actionId');
+
+        $airdropTasksCompleted =  $this->session->get('airdrops', []);
+
+        if (!array_key_exists($tokenName, $airdropTasksCompleted)) {
+            $airdropTasksCompleted[$tokenName] = [];
+        }
+
+        if (!in_array($actionId, $airdropTasksCompleted[$tokenName], true)) {
+            $airdropTasksCompleted[$tokenName][] = $actionId;
+        }
+
+        $this->session->set('airdrops', $airdropTasksCompleted);
+
+        return $this->view(null, Response::HTTP_OK);
+    }
+
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{tokenName}/completed-actions", name="get_airdrop_completed_actions", options={"expose"=true})
+     * @param string $tokenName
+     * @return View
+     */
+    public function getAirdropCompletedActions(string $tokenName): View
+    {
+        $airdropCompletedActions = $this->session->get('airdrops', []);
+
+        return $this->view(
+            $airdropCompletedActions[$tokenName] ?? [],
+            Response::HTTP_OK
+        );
+    }
+
+
 
     /**
      * @Rest\View()

@@ -148,7 +148,11 @@ class ProfileController extends Controller
         }
 
         $clonedProfile = clone $profile;
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->createForm(
+            ProfileType::class,
+            $profile,
+            ['had_phone_number' => (bool)$profile->getPhoneNumber()]
+        );
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -170,10 +174,15 @@ class ProfileController extends Controller
             $profile->getPhoneNumber()->getPhoneNumber(),
             PhoneNumberFormat::E164
         ) : null;
-        $newPhoneE164 = $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164);
+
+        $newPhoneE164 = $phoneNumber ?
+            $this->phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164):
+            null;
+
         $phoneChanged = $newPhoneE164 !== $oldPhoneE164;
 
-        $verifyPhone = $phoneChanged || !$profile->getPhoneNumber()->isVerified();
+        $verifyPhone = $phoneChanged ||
+            ((bool)$oldPhoneE164 && !$profile->getPhoneNumber()->isVerified());
 
         if ($verifyPhone) {
             if (!$oldPhoneE164) {
@@ -234,7 +243,11 @@ class ProfileController extends Controller
         $user = $this->getUser();
 
         $profile  = new Profile($user);
-        $form = $this->createForm(ProfileType::class, $profile);
+        $form = $this->createForm(
+            ProfileType::class,
+            $profile,
+            ['had_phone_number' => (bool)$profile->getPhoneNumber()]
+        );
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -278,8 +291,16 @@ class ProfileController extends Controller
         ) ?? '';
         $profileDescription = preg_replace('/[\n\r]+/', ' ', $profileDescription);
 
+        $token = $profile->getFirstToken();
+
+        if ($token) {
+            $token = $token->isBlocked()
+                ? null
+                : $token;
+        }
+
         return $this->render('pages/profile.html.twig', [
-            'token' => $profile->getFirstToken(),
+            'token' => $token,
             'profile' => $profile,
             'savedNickname' => $clonedProfile->getNickname(),
             'profileDescription' => substr($profileDescription, 0, 200),

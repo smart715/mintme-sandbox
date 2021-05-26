@@ -3,8 +3,11 @@
 namespace App\Tests\Controller\API;
 
 use App\Entity\Token\Token;
+use App\Exchange\Balance\BalanceHandler;
+use App\Manager\TokenManager;
 use App\Tests\Controller\WebTestCase;
 use App\Utils\DateTime;
+use App\Utils\Symbols;
 use DateInterval;
 
 class TokensControllerTest extends WebTestCase
@@ -128,11 +131,12 @@ class TokensControllerTest extends WebTestCase
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $res['common']);
-        $this->assertCount(3, $res['predefined']);
+        $this->assertCount(4, $res['predefined']);
         $this->assertArrayHasKey($tokName, $res['common']);
         $this->assertArrayHasKey('WEB', $res['predefined']);
         $this->assertArrayHasKey('BTC', $res['predefined']);
         $this->assertArrayHasKey('ETH', $res['predefined']);
+        $this->assertArrayHasKey('USDC', $res['predefined']);
     }
 
     public function testGetTokenExchange(): void
@@ -195,40 +199,33 @@ class TokensControllerTest extends WebTestCase
         );
     }
 
-    public function testIsTokenNotDeployed(): void
-    {
-        $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-
-        $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
-
-        $this->assertTrue(
-            json_decode((string)$this->client->getResponse()->getContent(), true)
-        );
-
-
-        /** @var Token $token */
-        $token = $this->getToken($tokName);
-        $token->setAddress('0x00');
-        $this->em->persist($token);
-        $this->em->flush();
-
-        $this->client->request('GET', '/api/tokens/' . $tokName . '/is-not_deployed');
-
-        $this->assertFalse(
-            json_decode((string)$this->client->getResponse()->getContent(), true)
-        );
-    }
-
     public function testDelete(): void
     {
-        $this->register($this->client);
+        $balanceHandler = self::$container->get(BalanceHandler::class);
+        $tokenManager = self::$container->get(TokenManager::class);
+
+        $email = $this->register($this->client);
         $tokName = $this->createToken($this->client);
+        $this->sendWeb($email);
 
         /** @var Token $token */
         $token = $this->getToken($tokName);
 
         $user = $token->getProfile()->getUser();
+
+        $initBalance = $balanceHandler->balance(
+            $user,
+            $tokenManager->findByName(Symbols::WEB)
+        );
+
+        for ($i = 0; $i < 10; $i++) {
+            $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [
+                'priceInput' => 1,
+                'amountInput' => 10,
+                'action' => 'buy',
+            ]);
+        }
+
         $user->setEmailAuthCode('123456');
         $codeExpirationTime = (new DateTime())->now()->add(new DateInterval('PT1M'));
         $user->setEmailAuthCodeExpirationTime($codeExpirationTime);
@@ -242,8 +239,15 @@ class TokensControllerTest extends WebTestCase
 
         /** @var Token|null $token */
         $token = $this->getToken($tokName);
-
         $this->assertNull($token);
+
+        $finalBalance = $balanceHandler->balance(
+            $user,
+            $tokenManager->findByName(Symbols::WEB)
+        );
+
+        $isSameBalance = $initBalance->getAvailable()->equals($finalBalance->getAvailable());
+        $this->assertTrue($isSameBalance);
     }
 
     public function testSendCode(): void

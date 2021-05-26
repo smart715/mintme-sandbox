@@ -33,7 +33,7 @@
             <div class="col-12">
                 <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
-                        <span>{{ savedNickname }} </span>
+                        <h1>{{ savedNickname }} </h1>
                     </div>
                     <div class="card-body position-relative">
                         {% if (canEdit == true) %}
@@ -152,7 +152,6 @@
                                         <phone-number
                                             country-code="{{ phoneCountryCode }}"
                                             :phone-number="phoneNumber"
-                                            :enable-valid-msg="enablePhoneMessage"
                                             @phone-change="phoneChange"
                                             @is-valid-phone="validPhone"
                                         >
@@ -308,5 +307,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/profile.js') }}"></script>
+    {{ encore_entry_script_tags('profile') }}
 {% endblock %}

@@ -25,7 +25,7 @@ security:
         main:
             pattern: ^/
             logout:
-                handlers: [logout_listner]
+                handlers: [logout_listener]
                 target: logout_success
                 path: fos_user_security_logout
                 csrf_token_generator: security.csrf.token_manager

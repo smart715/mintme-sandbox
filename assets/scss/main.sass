@@ -41,14 +41,16 @@ html
   box-sizing: border-box
   overflow-y: scroll
   font-display: swap
+  overflow-x: hidden
 
 body
   @include font-scale(sm)
   color: $dark-white
   font-family: $lato-font
-  background: $black url("../img/sky_image.jpg") no-repeat fixed
+  background: $black url("../img/sky_image.webp") no-repeat fixed
   background-size: 100% 100%
   min-height: 100vh
+  overflow-x: hidden
 
   &.modal-open
     padding-right: 0 !important
@@ -404,42 +406,9 @@ a
   &.currency-container
     min-height: 95px
 
-  .donation
-    background: none
-    position: relative
-    color: $card-text-color
-    border: none
-    border-radius: 0
-
-    .donation-header
-      border: none
-      background: $donation-header-bg
-      color: $dark-white
-      padding: .2rem 1.25rem
-
-      @include font-scale(md)
-
-    .donation-body
-      background: $donation-body-bg
-
-      p.info
-        line-height: 1 !important
-        margin-bottom: 2rem !important
-
-      .input-group-append
-        button.all-button
-          z-index: 4
-
-      @media (max-width: 550px)
-        p.text-nowrap
-          white-space: unset !important
-
-    &.transparent
-      background-color: transparent
-
-      > .donation-header
-        background-color: $dark-white
-        color: inherit
+  .col-donation-balance
+    @include media-breakpoint-up(lg)
+      min-width: 197px
 
 .btn-primary
   color: $dark-white !important
@@ -614,7 +583,7 @@ a
         color: inherit
 
       &:nth-child(odd)
-        background-color: #00334E
+        background-color: $odd-item-color
         border: none
 
   &, tbody
@@ -1061,7 +1030,7 @@ meter
     right: 1rem
 
   .token-info-container
-    min-height: 370px
+    height: 410px
 
     .posts-container
       position: absolute
@@ -1400,3 +1369,12 @@ li.trade-tab
 
   .custom-control-label::after
     background-color: $white !important
+
+.odd-item-bg
+  background-color: $odd-item-color
+
+.flex-1
+  flex: 1 !important
+
+.list-group-item
+  background: inherit

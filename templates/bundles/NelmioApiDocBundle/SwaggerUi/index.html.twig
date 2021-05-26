@@ -42,7 +42,7 @@
           transition: all .3s ease;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('build/base_main.css') }}">
+    {{ encore_entry_link_tags('base_main') }}
 {% endblock stylesheets %}
 
 {% block javascripts %}
@@ -53,7 +53,7 @@
     {% include 'base_scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    <script src="{{ asset('build/api.js') }}"></script>
+    {{ encore_entry_script_tags('api') }}
     {% endapply %}
 {% endblock javascripts %}
 

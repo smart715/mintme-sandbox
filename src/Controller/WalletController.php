@@ -47,7 +47,7 @@ class WalletController extends Controller
      * @Route("/{tab}",
      *     name="wallet",
      *     defaults={"tab"="wallet"},
-     *     requirements={"tab"="(dw-history|trade-history|active-orders)"},
+     *     requirements={"tab"="dw-history|trade-history|active-orders"},
      *     options={"expose"=true}
      * )
      * @param Request $request
@@ -72,6 +72,8 @@ class WalletController extends Controller
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
+            'tab' => $tab,
+            'error' => !$this->isGranted('make-deposit') || !$this->isGranted('make-withdrawal'),
         ]);
     }
 

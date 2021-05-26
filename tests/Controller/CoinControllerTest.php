@@ -6,19 +6,19 @@ class CoinControllerTest extends WebTestCase
 {
     public function testPair(): void
     {
-        $this->client->request('GET', '/coin/mintme/btc');
+        $this->client->request('GET', self::LOCALHOST . '/coin/mintme/btc');
         $this->assertTrue($this->client->getResponse()->isSuccessful());
     }
 
     public function testPairRedirectIfQuoteIsWEB(): void
     {
-        $this->client->request('GET', '/coin/web/btc');
+        $this->client->request('GET', self::LOCALHOST . '/coin/web/btc');
         $this->assertTrue($this->client->getResponse()->isRedirect('/coin/MINTME/BTC'));
     }
 
     public function testPairIfNotFound(): void
     {
-        $this->client->request('GET', '/coin/btc/foo');
+        $this->client->request('GET', self::LOCALHOST . '/coin/btc/foo');
         $this->assertTrue($this->client->getResponse()->isNotFound());
 
         $this->client->request('GET', '/coin/foo/mintme');

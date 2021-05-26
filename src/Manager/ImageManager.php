@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Model\Binary;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\MakerBundle\FileManager;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

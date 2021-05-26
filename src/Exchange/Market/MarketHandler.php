@@ -21,7 +21,7 @@ use App\Manager\DonationManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Exception;
 use InvalidArgumentException;
@@ -197,6 +197,8 @@ class MarketHandler implements MarketHandlerInterface
             return $lOrder->getTimestamp() > $rOrder->getTimestamp();
         });
 
+        $orders = array_slice($orders, 0, $limit);
+
         return $orders;
     }
 
@@ -270,7 +272,7 @@ class MarketHandler implements MarketHandlerInterface
                 $orderData['side'],
                 $this->moneyWrapper->parse(
                     (string)$orderData['price'],
-                    $this->getSymbol($market->getQuote())
+                    $this->getSymbol($market->getBase())
                 ),
                 Order::PENDING_STATUS,
                 $this->moneyWrapper->parse(
@@ -536,7 +538,7 @@ class MarketHandler implements MarketHandlerInterface
     private function getSymbol(TradebleInterface $tradable): string
     {
         return $tradable instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradable->getSymbol();
     }
 
@@ -557,7 +559,7 @@ class MarketHandler implements MarketHandlerInterface
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
-            $market->isTokenMarket() ? Token::TOK_SYMBOL : $market->getQuote()->getSymbol()
+            $this->getSymbol($market->getBase())
         );
 
         /** @var Money $depthAmount */
@@ -585,21 +587,29 @@ class MarketHandler implements MarketHandlerInterface
 
         $orders = array_merge([], ...$paginatedOrders);
 
-        $zeroDepth = $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+        $zeroDepthBase = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getBase())
+        );
 
         /** @var Money $sellOrdersSum */
         $sellOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
             return $order->getPrice()->multiply(
                 $this->moneyWrapper->format($order->getAmount())
             )->add($sum);
-        }, $zeroDepth);
+        }, $zeroDepthBase);
 
         $sellOrdersSum = $this->moneyWrapper->format($sellOrdersSum);
+
+        $zeroDepthQuote = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getQuote())
+        );
 
         /** @var Money $quoteAmountSummary */
         $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
             return $order->getAmount()->add($sum);
-        }, $zeroDepth);
+        }, $zeroDepthQuote);
 
         $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
 
@@ -665,12 +675,12 @@ class MarketHandler implements MarketHandlerInterface
     public function soldOnMarket(Token $token): Money
     {
         if (!$token->isMintmeToken()) {
-            return $this->moneyWrapper->parse('0', Token::TOK_SYMBOL);
+            return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 
         $init = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_quantity'),
-            Token::TOK_SYMBOL
+            Symbols::TOK
         );
 
         $balanceView = $this->balanceHandler->balance($token->getOwner(), $token);

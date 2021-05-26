@@ -9,10 +9,10 @@ class SecurityControllerTest extends WebTestCase
         $fooClient = self::createClient();
         $fooEmail = $this->register($fooClient);
 
-        $this->client->request('GET', '/profile');
+        $this->client->request('GET', self::LOCALHOST . '/profile');
         $this->assertTrue($this->client->getResponse()->isRedirect());
 
-        $this->client->request('GET', '/login');
+        $this->client->request('GET', self::LOCALHOST . '/login');
         $this->client->submitForm(
             '_submit',
             [
@@ -28,36 +28,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isRedirect('/login_check'));
         $this->client->followRedirect();
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/profile'));
-    }
-
-    public function testLoginFromTab(): void
-    {
-        $fooEmail = $this->register($this->client);
-        $tokName = $this->createToken($this->client);
-
-        $fooClient = self::createClient();
-
-        $fooClient->request('GET', '/token/' . $tokName . '/buy');
-        $this->assertTrue($fooClient->getResponse()->isSuccessful());
-
-        $fooClient->request('GET', '/login?formContentOnly=true');
-        $this->assertTrue($fooClient->getResponse()->isSuccessful());
-
-        $fooClient->submitForm(
-            '_submit',
-            [
-                '_username' => $fooEmail,
-                '_password' => self::DEFAULT_USER_PASS,
-            ],
-            'POST',
-            [
-                '_with_csrf' => false,
-            ]
-        );
-
-        $this->assertTrue($fooClient->getResponse()->isRedirect('/login_check'));
-        $fooClient->followRedirect();
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::LOCALHOST . '/profile'));
     }
 
     public function testLoginFails(): void
@@ -65,10 +36,10 @@ class SecurityControllerTest extends WebTestCase
         $fooClient = self::createClient();
         $fooEmail = $this->register($fooClient);
 
-        $this->client->request('GET', '/profile');
+        $this->client->request('GET', self::LOCALHOST . '/profile');
         $this->assertTrue($this->client->getResponse()->isRedirect());
 
-        $this->client->request('GET', '/login');
+        $this->client->request('GET', self::LOCALHOST . '/login');
         $this->client->submitForm(
             '_submit',
             [
@@ -84,7 +55,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isRedirect('/login_check'));
         $this->client->followRedirect();
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/login'));
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::LOCALHOST . '/login'));
     }
 
     public function testRefererRedirect(): void
@@ -94,7 +65,7 @@ class SecurityControllerTest extends WebTestCase
 
         $fooClient = self::createClient();
 
-        $fooClient->request('GET', '/token/' . $tokName . '/trade');
+        $fooClient->request('GET', self::LOCALHOST . '/token/' . $tokName . '/trade');
         $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
         $fooClient->clickLink('Log In');
@@ -114,9 +85,9 @@ class SecurityControllerTest extends WebTestCase
 
         $this->assertTrue($fooClient->getResponse()->isRedirect('/login_check'));
         $fooClient->followRedirect();
-        $this->assertTrue($fooClient->getResponse()->isRedirect('http://localhost/login_success'));
+        $this->assertTrue($fooClient->getResponse()->isRedirect(self::LOCALHOST . '/login_success'));
         $fooClient->followRedirect();
-        $this->assertTrue($fooClient->getResponse()->isRedirect('http://localhost/token/' . $tokName . '/trade'));
+        $this->assertTrue($fooClient->getResponse()->isRedirect(self::LOCALHOST . '/token/' . $tokName . '/trade'));
         $this->assertTrue($fooClient->getResponse()->isRedirection());
         $fooClient->followRedirect();
         $this->assertTrue($fooClient->getResponse()->isSuccessful());

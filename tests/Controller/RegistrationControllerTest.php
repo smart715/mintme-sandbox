@@ -10,7 +10,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $email = $this->generateEmail();
 
-        $this->client->request('GET', '/register/');
+        $this->client->request('GET', self::LOCALHOST . '/register/');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -37,7 +37,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $str = $this->generateString();
 
-        $this->client->request('GET', '/register/');
+        $this->client->request('GET', self::LOCALHOST . '/register/');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -61,7 +61,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $email = $this->generateEmail();
 
-        $this->client->request('GET', '/sign-up');
+        $this->client->request('GET', self::LOCALHOST . '/sign-up');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -99,7 +99,7 @@ class RegistrationControllerTest extends WebTestCase
 
         $fooClient = self::createClient();
 
-        $fooClient->request('GET', '/token/' . $tokName . '/trade');
+        $fooClient->request('GET', self::LOCALHOST . '/token/' . $tokName . '/trade');
         $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
         $fooClient->clickLink('Sign Up');
@@ -121,7 +121,7 @@ class RegistrationControllerTest extends WebTestCase
 
         $this->assertTrue($fooClient->getResponse()->isRedirect('/register/confirmed'));
         $fooClient->followRedirect();
-        $this->assertTrue($fooClient->getResponse()->isRedirect('http://localhost/token/' . $tokName . '/trade'));
+        $this->assertTrue($fooClient->getResponse()->isRedirect(self::LOCALHOST . '/token/' . $tokName . '/trade'));
         $this->assertTrue($fooClient->getResponse()->isRedirection());
         $fooClient->followRedirect();
         $this->assertTrue($fooClient->getResponse()->isSuccessful());

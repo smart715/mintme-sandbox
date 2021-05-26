@@ -18,11 +18,11 @@ use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\LockFactory;
 use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -33,6 +33,7 @@ use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -58,8 +59,9 @@ class WalletController extends DevApiController
     /** @var ValidatorFactoryInterface */
     private $vf;
 
-    /** @var UserNotificationManagerInterface */
     private UserNotificationManagerInterface $userNotificationManager;
+
+    private TranslatorInterface $translator;
 
     public function __construct(
         WalletInterface $wallet,
@@ -68,7 +70,8 @@ class WalletController extends DevApiController
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        TranslatorInterface $translator
     ) {
         $this->wallet = $wallet;
         $this->userActionLogger = $userActionLogger;
@@ -77,6 +80,7 @@ class WalletController extends DevApiController
         $this->tokenManager = $tokenManager;
         $this->vf = $validatorFactory;
         $this->userNotificationManager = $userNotificationManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -99,6 +103,13 @@ class WalletController extends DevApiController
     public function getDepositAddresses(WalletInterface $depositCommunicator): array
     {
         $this->denyAccessUnlessGranted('deposit');
+
+        if (!$this->isGranted('make-deposit')) {
+            return [
+                'status' => 'error',
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ];
+        }
 
         /** @var User $user */
         $user = $this->getUser();
@@ -216,6 +227,12 @@ class WalletController extends DevApiController
 
         $this->denyAccessUnlessGranted('withdraw');
 
+        if (!$this->isGranted('make-withdrawal')) {
+            return $this->view([
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ], Response::HTTP_OK);
+        }
+
         $currency = $request->get('currency');
         $amount = $request->get('amount');
         $address = $request->get('address');
@@ -268,7 +285,7 @@ class WalletController extends DevApiController
                 new Address(trim((string)$address)),
                 new Amount($moneyWrapper->parse(
                     $amount,
-                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
+                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
                 $tradable
             );

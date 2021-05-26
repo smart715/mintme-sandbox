@@ -3,7 +3,6 @@
 namespace App\Exchange\Factory;
 
 use App\Entity\Token\Token;
-use App\Entity\User;
 
 interface OrdersFactoryInterface
 {

@@ -21,13 +21,13 @@
                     :signup-url="signupUrl"
                     :logged-in="loggedIn"
                     :market="market"
-                    :market-price="marketPriceBuy"
                     :balance="baseBalance"
                     :balance-loaded="balanceLoaded"
                     :taker-fee="takerFee"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
+                    @making-order-prevented="addPhoneModalVisible = true"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -38,16 +38,21 @@
                     :signup-url="signupUrl"
                     :logged-in="loggedIn"
                     :market="market"
-                    :market-price="marketPriceSell"
                     :balance="quoteBalance"
                     :balance-loaded="balanceLoaded"
                     :is-owner="isOwner"
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
+                    @making-order-prevented="addPhoneModalVisible = true"
                 />
             </div>
-        </div>
+            <add-phone-alert-modal
+                :visible="addPhoneModalVisible"
+                :message="addPhoneModalMessage"
+                @close="addPhoneModalVisible = false"
+            />
+    </div>
         <div class="row">
             <trade-orders
                 @update-data="updateOrders"
@@ -83,15 +88,16 @@ import TradeSellOrder from './TradeSellOrder';
 import TradeChart from './TradeChart';
 import TradeOrders from './TradeOrders';
 import TradeTradeHistory from './TradeTradeHistory';
-import OrderModal from '../modal/OrderModal';
 import {
     CheckInputMixin,
     LoggerMixin,
     NotificationMixin,
     WebSocketMixin,
+    AddPhoneAlertMixin,
 } from '../../mixins';
 import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
+import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 
 const WSAPI = Constants.WSAPI;
 
@@ -102,6 +108,7 @@ export default {
         LoggerMixin,
         NotificationMixin,
         WebSocketMixin,
+        AddPhoneAlertMixin,
     ],
     components: {
         TradeBuyOrder,
@@ -109,7 +116,7 @@ export default {
         TradeChart,
         TradeOrders,
         TradeTradeHistory,
-        OrderModal,
+        AddPhoneAlertModal,
     },
     props: {
         websocketUrl: String,
@@ -128,6 +135,7 @@ export default {
         disabledServicesConfig: String,
         takerFee: Number,
         isMintmeToken: Boolean,
+        profileNickname: String,
     },
     data() {
         return {
@@ -137,6 +145,8 @@ export default {
             buyPage: 2,
             buyDepth: null,
             ordersUpdated: false,
+            addPhoneModalMessageType: 'make_orders',
+            addPhoneModalProfileNickName: this.profileNickname,
         };
     },
     computed: {

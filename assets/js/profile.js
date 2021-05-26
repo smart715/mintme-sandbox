@@ -42,7 +42,8 @@ new Vue({
             firstNameAux: false,
             lastNameAux: false,
             isValidPhone: false,
-            enablePhoneMessage: false,
+            isPhoneRequired: true,
+            phoneNumber: null,
         };
     },
     beforeMount() {
@@ -54,6 +55,7 @@ new Vue({
         this.firstName = this.$refs.firstName.getAttribute('value');
         this.lastName = this.$refs.lastName.getAttribute('value');
         this.country = this.$refs.country.value;
+        this.isPhoneRequired = !!this.phoneNumber;
 
         if (this.$refs.city) {
             this.city = this.$refs.city.getAttribute('value');
@@ -80,7 +82,6 @@ new Vue({
             this.isValidPhone = isValidPhone;
         },
         validation: function(event) {
-            this.enablePhoneMessage = true;
             if (event.target.id ==='profile_firstName') {
                 let hasChinese = this.firstName.match(REGEX_CHINESE);
                 if (hasChinese) {
@@ -147,12 +148,16 @@ new Vue({
     },
     computed: {
         disableSave: function() {
+            const isPhoneFieldInvalid = this.isPhoneRequired ?
+                !this.isValidPhone :
+                !!this.phoneNumber && !this.isValidPhone;
+
             return this.$v.$invalid ||
                 !this.zipCodeValid ||
                 this.zipCodeProcessing ||
                 this.firstNameAux ||
                 this.lastNameAux ||
-                !this.isValidPhone;
+                isPhoneFieldInvalid;
         },
     },
     validations() {

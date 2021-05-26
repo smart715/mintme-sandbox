@@ -1,5 +1,26 @@
 <template>
     <div :id="post.id" class="post">
+        <button v-if="showEdit"
+                class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showModal"
+        >
+            <font-awesome-icon
+                class="icon-default c-pointer align-middle"
+                icon="trash"
+                transform="shrink-4 up-1.5"
+            />
+        </button>
+        <a v-if="showEdit"
+           class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
+           :href="$routing.generate('edit_post_page', {id: post.id})"
+        >
+            <font-awesome-icon
+                class="icon-default c-pointer align-middle"
+                icon="edit"
+                transform="shrink-4 up-1.5"
+            />
+        </a>
         <template v-if="post.title">
             <h1 v-if="singlePage" class="post-title">
                 {{ post.title }}
@@ -28,27 +49,6 @@
             <copy-link :content-to-copy="link" class="c-pointer ml-1">
               <font-awesome-icon :icon="['far', 'copy']"/>
             </copy-link>
-            <button v-if="showEdit"
-                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                    :disabled="deleteDisabled"
-                    @click="showModal"
-            >
-                <font-awesome-icon
-                    class="icon-default c-pointer align-middle"
-                    icon="trash"
-                    transform="shrink-4 up-1.5"
-                />
-            </button>
-            <a v-if="showEdit"
-               class="btn btn-link p-0 post-edit-icon float-right text-decoration-none text-reset"
-               :href="$routing.generate('edit_post_page', {id: post.id})"
-            >
-                <font-awesome-icon
-                    class="icon-default c-pointer align-middle"
-                    icon="edit"
-                    transform="shrink-4 up-1.5"
-                />
-            </a>
         </div>
         <template>
             <p v-if="post.content" class="post-content my-2">
@@ -69,6 +69,9 @@
         <a href="#" @click="sharePost">
             {{ shareText }}
         </a>
+        <p v-if="!post.content && singlePage" class="text-center">
+            {{ commentsRestriction }}
+        </p>
         <confirm-modal
             :visible="isModalVisible"
             @confirm="deletePost"
@@ -143,7 +146,7 @@ import {MoneyFilterMixin, NotificationMixin, TwitterMixin, FiltersMixin} from '.
 import ConfirmModal from '../modal/ConfirmModal';
 import Modal from '../modal/Modal';
 import CopyLink from '../CopyLink';
-import {openPopup, toMoney} from '../../utils';
+import {formatMoney, openPopup, toMoney} from '../../utils';
 import {mapGetters} from 'vuex';
 
 library.add(faEdit);
@@ -222,6 +225,9 @@ export default {
         reward() {
             return toMoney(this.post.shareReward);
         },
+        commentsRestriction() {
+          return this.$t('comment.min_amount', {token: this.post.token.name, amount: formatMoney(toMoney(this.post.amount))});
+        },
         shareText() {
             return this.hasReward && !this.post.isUserAlreadyRewarded
                 ? this.$t('post.share.reward', this.translationContext)
@@ -282,7 +288,10 @@ export default {
             this.$axios.single.post(this.$routing.generate('share_post', {id: this.post.id}))
                 .then(
                     () => {
-                        this.post.isUserAlreadyRewarded = true;
+                        this.$emit('update-post', {
+                            ...this.post,
+                            isUserAlreadyRewarded: true,
+                        });
                         this.notifySuccess(this.$t('post.share.success', this.translationContext));
                     },
                     ({response}) => {

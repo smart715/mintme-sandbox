@@ -26,6 +26,7 @@ parameters:
     maker_fee_rate: 0.002
     verify_timeout_seconds: 10
     token_quantity: 10000000
+    token_delete_sold_limit: 100000
     referral_fee: 0.5
     donation:
         fee: 5
@@ -64,6 +65,7 @@ parameters:
     quick_registration_password: blockchaincrowdfunding
     front_end_logs_cut_headers: true
     minimum_volume_for_marketcap: 100000
+    tokens_on_page: 50
     top_holders: 10
     images_path: /uploads/images
     airdrop_params:
@@ -182,3 +184,7 @@ parameters:
         interval: 30D
     mintme_explorer_url: 'https://mintme.com/explorer'
     liip_data_root: '%kernel.project_dir%/public'
+    auth_make_disable_trading: false
+    auth_make_disable_token_creation: false
+    auth_make_disable_withdrawals_and_deposit: false
+    auth_make_disable_donations: false

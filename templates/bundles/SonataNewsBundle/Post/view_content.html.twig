@@ -3,7 +3,7 @@
         <div class="col-md-12 card-fixed-large px-0 box news-box p-4">
             <header>
                 <h1 class="word-break">
-                    {{ post.title }}
+                    {{ post|translateArticle('title') }}
                 </h1>
 
                 <span>{{ post.publicationDateStart | format_date }}</span>
@@ -15,7 +15,7 @@
                     {% media post.image, 'wide' with {'class': 'img-fluid'} %}
                 </div>
                 <div class="col-12 mt-4 word-break">
-                    {{ post.content|safeHtml|raw }}
+                    {{ post|translateArticle('content')|safeHtml|raw }}
                 </div>
             </div>
 

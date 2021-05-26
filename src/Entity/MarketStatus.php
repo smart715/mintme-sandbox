@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -96,6 +97,8 @@ class MarketStatus
      * @ORM\Column(type="integer", options={"default": 0})
      */
     private int $lastDealId = 0; // phpcs:ignore
+
+    private ?int $rank = null; // phpcs:ignore
 
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
@@ -206,7 +209,7 @@ class MarketStatus
     {
         return new Money(
             $this->soldOnMarket,
-            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Token::TOK_SYMBOL)
+            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Symbols::TOK)
         );
     }
 
@@ -225,5 +228,21 @@ class MarketStatus
     public function getLastDealId(): int
     {
         return $this->lastDealId;
+    }
+
+    /** @Groups({"API"}) */
+    public function getRank(): ?int
+    {
+        return $this->rank;
+    }
+
+    public function setRank(int $rank): void
+    {
+        $this->rank = $rank;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

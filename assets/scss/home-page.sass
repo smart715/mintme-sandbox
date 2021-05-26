@@ -3,7 +3,7 @@
 @import "mixins"
 
 .homepage
-  font-size: 16px
+  font-size: 15px
 
   nav
     position: relative
@@ -42,11 +42,11 @@
 
     .title
       font-family: $concord-font
-      font-size: 3.1em
-      min-height: 3.3em
+      font-size: 2em
+      min-height: 4em
 
       @media screen and (min-width: 320px)
-        font-size: 3.59em
+        font-size: 2.1em
 
       @include media-breakpoint-up(sm)
         font-size: 4.6em
@@ -59,7 +59,7 @@
         font-size: 3.6em
 
       @include media-breakpoint-up(xl)
-        font-size: 4.4em
+        font-size: 2.1em
 
       @media screen and (min-width: 1400px)
         font-size: 5.4em
@@ -97,12 +97,17 @@
         border-radius: 1em
         border: 1px solid #ffffff
         overflow: hidden
+        background-color: #1e5496
 
         .feed-row
           background-color: #194276
 
           &:nth-of-type(2n)
             background-color: #1e5496
+
+          &--preload
+            min-height: 33.6px
+            background: none
 
           .feed-cell
             padding: 0.3em
@@ -213,3 +218,9 @@
             text-decoration: none
             white-space: normal
           /* stylelint-enable no-descending-specificity */
+
+.absolute-center
+  position: absolute;
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)

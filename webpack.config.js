@@ -1,6 +1,4 @@
 const Encore = require('@symfony/webpack-encore');
-const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 Encore
     .setOutputPath('public/build/')
@@ -31,6 +29,10 @@ Encore
     .addEntry('footer', './assets/js/footer.js')
     .addEntry('phone_verification', './assets/js/phone_verification.js')
 
+    .splitEntryChunks()
+
+    .enableSingleRuntimeChunk()
+
     .enablePostCssLoader()
 
     .enableSourceMaps(!Encore.isProduction())
@@ -43,8 +45,8 @@ Encore
 
     .enableVueLoader(() => {}, {runtimeCompilerBuild: false})
 
-    .configureFilenames({
-        'images': 'images/[name].[hash:8].[ext]',
+    .configureImageRule({
+        filename: 'images/[name].[hash:8].[ext]',
     })
 
     .addExternals({
@@ -59,14 +61,6 @@ config.resolve.alias['vue$'] = Encore.isProduction()
     ? 'vue/dist/vue.min.js'
     : 'vue/dist/vue.js';
 
-if (Encore.isProduction()) {
-    // Remove the old UglifyJs version
-    config.plugins = config.plugins.filter(
-        (plugin) => !(plugin instanceof webpack.optimize.UglifyJsPlugin)
-    );
-
-    // Add the new one
-    config.plugins.push(new UglifyJsPlugin());
-}
+config.resolve.fallback = {crypto: false};
 
 module.exports = config;

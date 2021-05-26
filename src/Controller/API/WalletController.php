@@ -13,9 +13,9 @@ use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -104,6 +104,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createAccessDeniedException();
         }
 
+        if (!$this->isGranted('make-withdrawal')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
             ?? $tokenManager->findByName($request->get('crypto'));
 
@@ -126,7 +130,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 new Address(trim((string)$request->get('address'))),
                 new Amount($moneyWrapper->parse(
                     $request->get('amount'),
-                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
+                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
                 $tradable
             );
@@ -245,7 +249,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         BalanceHandlerInterface $balanceHandler,
         TokenManagerInterface $tokenManager
     ): View {
-        $webToken = $tokenManager->findByName(Token::WEB_SYMBOL);
+        $webToken = $tokenManager->findByName(Symbols::WEB);
 
         if (!$webToken) {
             throw new InvalidArgumentException();

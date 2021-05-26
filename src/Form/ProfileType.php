@@ -10,7 +10,6 @@ use App\Form\Type\BbcodeEditorType;
 use App\Form\Type\NicknameType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -87,6 +86,7 @@ class ProfileType extends AbstractType
                 'label_attr' => ['class' => 'custom-control-label'],
             ])
             ->add('phoneNumber', PhoneNumberType::class, [
+                'required' => $options['had_phone_number'],
                 'mapped' => false,
             ]);
 
@@ -132,5 +132,8 @@ class ProfileType extends AbstractType
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_intention',
         ]);
+
+        $resolver->setDefault('had_phone_number', false);
+        $resolver->setAllowedTypes('had_phone_number', 'bool');
     }
 }

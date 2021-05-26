@@ -14,6 +14,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
+use App\Utils\Symbols;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -218,7 +219,7 @@ class ContractHandlerTest extends TestCase
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
             $this->mockToken(true, '0x123', 'deployed')
         );
@@ -243,7 +244,7 @@ class ContractHandlerTest extends TestCase
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
             $this->mockToken(true, '0x123', 'not-deployed')
         );
@@ -277,7 +278,7 @@ class ContractHandlerTest extends TestCase
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
             $this->mockToken(true, '0x123', 'deployed')
         );
@@ -414,7 +415,7 @@ class ContractHandlerTest extends TestCase
             $this->mockParameterBagInterface()
         );
 
-        $expectedMinDeposit = new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+        $expectedMinDeposit = new Money('1000000000000', new Currency(Symbols::TOK));
         $result = $handler->getDepositInfo('AWESOME');
 
         $this->assertEquals($expectedMinDeposit, $result->getMinDeposit());
@@ -452,7 +453,7 @@ class ContractHandlerTest extends TestCase
         $wallet = $this->createMock(WalletInterface::class);
         $depositInfo = $this->createMock(DepositInfo::class);
 
-        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
         $wallet->method('getDepositInfo')->willReturn($depositInfo);
 
         return $wallet;
@@ -474,7 +475,7 @@ class ContractHandlerTest extends TestCase
         $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
         $moneyWrapper->method('getRepository')->willReturn($currencies);
         $moneyWrapper->method('parse')->willReturnCallback(function () {
-            return new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money('1000000000000', new Currency(Symbols::TOK));
         });
         $moneyWrapper->method('format')->willReturnCallback(function ($money) {
             return $money->getAmount();
@@ -502,7 +503,7 @@ class ContractHandlerTest extends TestCase
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getReleasePeriod')->willReturn(10);
-        $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(Symbols::TOK)));
         $token->method('getLockIn')->willReturn($lockIn);
 
         $user = $this->createMock(User::class);
@@ -517,7 +518,7 @@ class ContractHandlerTest extends TestCase
     private function mockCrypto(): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
-        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
 
         return $crypto;
     }
@@ -525,7 +526,7 @@ class ContractHandlerTest extends TestCase
     private function mockTokenCrypto(): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
-        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Token::USDC_SYMBOL)));
+        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::USDC)));
         $crypto->method('getSymbol')->willReturn('USDC');
         $crypto->method('getSubunit')->willReturn(6);
 

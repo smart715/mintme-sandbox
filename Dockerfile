@@ -27,7 +27,8 @@ RUN yes | pecl install apcu
 RUN touch /usr/local/etc/php/php.ini
 
 RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini \
-    && echo 'extension=apcu.so' >> /usr/local/etc/php/php.ini
+    && echo 'extension=apcu.so' >> /usr/local/etc/php/php.ini \
+    && echo 'extension=intl' >> /usr/local/etc/php/php.ini
 
 # NodeJs
 RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.x | bash -

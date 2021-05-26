@@ -13,13 +13,14 @@ use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\AirdropCampaign\AirdropParticipantRepository;
 use App\Repository\AirdropCampaign\AirdropRepository;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Money\Currency;
 use Money\Money;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AirdropCampaignManager implements AirdropCampaignManagerInterface
 {
@@ -31,19 +32,24 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     private MoneyWrapperInterface $moneyWrapper;
     private BalanceHandlerInterface $balanceHandler;
     private EventDispatcherInterface $eventDispatcher;
-
     private AirdropRepository $airdropRepository;
+    private TokenManagerInterface $tokenManager;
+    private SessionInterface $session;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
         BalanceHandlerInterface $balanceHandler,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TokenManagerInterface $tokenManager,
+        SessionInterface $session
     ) {
         $this->em = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->balanceHandler = $balanceHandler;
         $this->eventDispatcher = $eventDispatcher;
+        $this->tokenManager = $tokenManager;
+        $this->session = $session;
 
         /** @var AirdropParticipantRepository $objRepository */
         $objRepository = $entityManager->getRepository(AirdropParticipant::class);
@@ -188,7 +194,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
         $amount = $airdrop->getAmount();
         $participants = $this->moneyWrapper->parse(
             (string)$airdrop->getParticipants(),
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
 
         if ($amount->isZero() || !$airdrop->getParticipants()) {
@@ -201,7 +207,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         return $this->moneyWrapper->parse(
             $reward,
-            MoneyWrapper::TOK_SYMBOL
+            Symbols::TOK
         );
     }
 
@@ -262,7 +268,7 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
     private function getRestOfTokens(Airdrop $airdrop): ?Money
     {
         $diffAmount = $airdrop->getLockedAmount()->subtract($airdrop->getActualAmount());
-        $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
         if ($diffAmount->greaterThan($zeroValue)) {
             return $diffAmount;
@@ -288,6 +294,47 @@ class AirdropCampaignManager implements AirdropCampaignManagerInterface
 
         if ($balance->lessThan($amount)) {
             throw new ApiBadRequestException('Insufficient funds.');
+        }
+    }
+
+    public function claimAirdropsActionsFromSessionData(User $user): void
+    {
+        if (!$airdropCompletedActions = $this->session->get('airdrops', [])) {
+            return;
+        }
+
+        foreach ($airdropCompletedActions as $tokenName => $airdropSessionData) {
+
+            /** @var Token $token */
+            $token = $this->tokenManager->findByName($tokenName);
+
+            if ($this->checkIfUserClaimed($user, $token)) {
+                continue;
+            }
+
+            $this->doClaimAirdropActions($airdropSessionData, $user);
+        }
+
+        $this->session->remove('airdrops');
+    }
+
+    private function doClaimAirdropActions(array $airdropSessionData, User $user): void
+    {
+        $airdropActionRepository = $this->em->getRepository(AirdropAction::class);
+
+        foreach ($airdropSessionData as $airdropActionId) {
+            /** @var AirdropAction $airdropAction */
+            $airdropAction = $airdropActionRepository->find($airdropActionId);
+
+            if (Airdrop::STATUS_REMOVED === $airdropAction->getAirdrop()->getStatus()) {
+                continue;
+            }
+
+            if (in_array($user, $airdropAction->getUsers()->getValues(), true)) {
+                continue;
+            }
+
+            $this->claimAirdropAction($airdropAction, $user);
         }
     }
 }

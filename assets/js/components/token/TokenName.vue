@@ -28,7 +28,6 @@
                 :disabled-services-config="disabledServicesConfig"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
-                @update-release-address="updateReleaseAddress"
                 @updated-website="$emit('updated-website', $event)"
                 @updated-facebook="$emit('updated-facebook', $event)"
                 @updated-youtube="$emit('updated-youtube', $event)"
@@ -186,9 +185,6 @@ export default {
             }
 
             this.showTokenEditModal = true;
-        },
-        updateReleaseAddress: function() {
-            this.releaseAddress = '0x';
         },
     },
 };

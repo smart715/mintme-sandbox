@@ -5,6 +5,7 @@ import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
 import {webSymbol, btcSymbol, tokSymbol, MINTME, ethSymbol} from '../../js/utils/constants';
+import {AddPhoneAlertMixin} from '../../js/mixins';
 
 /**
  * @return {Wrapper<Vue>}
@@ -51,7 +52,7 @@ describe('Donation', () => {
         },
     });
 
-    it('should renders correctly for logged in user', () => {
+    it('should render correctly for logged in user', () => {
         const wrapper = shallowMount(Donation, {
             store,
             localVue,
@@ -74,7 +75,7 @@ describe('Donation', () => {
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
+        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
     });
 
@@ -122,7 +123,7 @@ describe('Donation', () => {
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.donation-header span').text()).toBe('donation.header.logged');
+        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
         // Select ETH
@@ -470,7 +471,7 @@ describe('Donation', () => {
         });
 
         moxios.stubRequest('make_donation', {
-            status: 200,
+            status: 200, response: {},
         });
 
         wrapper.vm.makeDonation();
@@ -547,5 +548,42 @@ describe('Donation', () => {
 
         expect(wrapper.vm.amountToDonate).toBe(0);
         expect(wrapper.vm.amountToReceive).toBe(0);
+    });
+
+    it('should show phone verify modal if user is not totally authenticated', () => {
+        const wrapper = shallowMount(Donation, {
+            mixins: [AddPhoneAlertMixin],
+            store,
+            localVue,
+            propsData: {
+                loggedIn: true,
+                donationParams: {fee: .01},
+                websocketUrl: '',
+                market: {
+                    base: {
+                        symbol: webSymbol,
+                    },
+                    quote: {
+                        name: 'foo',
+                        symbol: 'TOK00011122233',
+                    },
+                },
+                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+            },
+        });
+        moxios.stubRequest('make_donation', {
+            status: 200,
+            response: {
+                error: true,
+                type: 'donation',
+            },
+        });
+
+        wrapper.vm.makeDonation();
+
+        moxios.wait(() => {
+            done();
+            expect(wrapper.vm.addPhoneModalVisible).toBe(true);
+        });
     });
 });

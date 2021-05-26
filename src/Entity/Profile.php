@@ -12,7 +12,6 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -414,9 +413,7 @@ class Profile implements ImagineInterface
      */
     public function getImage(): Image
     {
-        return $this->image && $this->returnDefault()
-            ? $this->image
-            : Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }
 
 

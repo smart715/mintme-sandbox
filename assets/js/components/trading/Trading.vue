@@ -66,8 +66,7 @@
                             </template>
                             <template>
                                 <b-dropdown-item
-                                        v-for="filter in marketFilters.options"
-                                        v-if="'user' !== filter.key || 'user' === filter.key && userId"
+                                        v-for="filter in marketFiltersOptions"
                                         :key="filter.key"
                                         :value="filter.label"
                                         @click="toggleFilter(filter.key)"
@@ -96,6 +95,18 @@
                                 :busy="tableLoading"
                                 @sort-changed="sortChanged"
                         >
+                            <template v-slot:[`head(${fields.rank.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                    tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
+                            </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
                                         id="volume"
@@ -218,6 +229,18 @@
                                     </guide>
                                 </div>
                             </template>
+                            <template v-slot:[`head(${fields.holders.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                       tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
+                            </template>
                         </b-table>
                     </div>
                     <template v-if="!tableLoading">
@@ -277,10 +300,6 @@ import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
-const DEPLOYED_FIRST = 1;
-const DEPLOYED_ONLY = 2;
-const AIRDROP_ONLY = 3;
-
 export default {
     name: 'Trading',
     mixins: [
@@ -297,8 +316,12 @@ export default {
         coinbaseUrl: String,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        marketsProp: Object,
         sort: String,
         order: Boolean,
+        filterForTokens: Object,
+        perPage: Number,
+        rowsProp: Number,
     },
     components: {
         Guide,
@@ -309,11 +332,9 @@ export default {
             MINTME: MINTME,
             deployedFirst: ('' === this.sort),
             tableLoading: false,
-            markets: null,
+            markets: this.marketsProp,
             currentPage: this.page,
-            perPage: 25,
-            totalRows: 25,
-            loading: false,
+            totalRows: this.rowsProp,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
             currencyModes,
@@ -339,6 +360,10 @@ export default {
                     deployed: {
                         key: 'deployed',
                         label: this.$t('trading.deployed.label'),
+                    },
+                    deployedEth: {
+                        key: 'deployedEth',
+                        label: this.$t('trading.deployed_eth.label'),
                     },
                     airdrop: {
                         key: 'airdrop',
@@ -392,16 +417,14 @@ export default {
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
+
             if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
-                    if (first.tokenized && webSymbol === first.cryptoSymbol && webSymbol !== second.cryptoSymbol) {
-                        return -1;
-                    }
-                    if (second.tokenized && webSymbol === second.cryptoSymbol && webSymbol !== first.cryptoSymbol) {
-                        return 1;
-                    }
-                    if (first.tokenized !== second.tokenized) {
-                        return first.tokenized ? -1 : 1;
+                    let firstMintmeDeployed = first.tokenized && webSymbol === first.cryptoSymbol;
+                    let secondMintmeDeployed = second.tokenized && webSymbol === second.cryptoSymbol;
+
+                    if (firstMintmeDeployed !== secondMintmeDeployed) {
+                        return firstMintmeDeployed ? -1 : 1;
                     }
                     return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
                 });
@@ -418,13 +441,19 @@ export default {
             return tokens;
         },
         loaded: function() {
-            return this.markets !== null && !this.loading;
+            return this.markets !== null;
         },
         marketsOnTopIsLoaded: function() {
             return this.sanitizedMarketsOnTop.length;
         },
         fields: function() {
             return {
+                rank: {
+                    key: 'rank',
+                    label: this.$t('trading.fields.rank'),
+                    sortable: true,
+                    help: this.$t('trading.fields.rank.help'),
+                },
                 pair: {
                     key: 'pair',
                     label: this.$t('trading.fields.pair'),
@@ -454,6 +483,12 @@ export default {
                     sortable: true,
                     formatter: 'marketCap' === this.activeMarketCap ? this.marketCapFormatter : formatMoney,
                 },
+                holders: {
+                    key: 'holders',
+                    label: this.$t('trading.fields.holders'),
+                    sortable: true,
+                    help: this.$t('trading.fields.holders.help'),
+                },
             };
         },
         fieldsArray: function() {
@@ -464,12 +499,29 @@ export default {
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
         },
+        filterDeployedFirst: function() {
+            return this.filterForTokens.deployed_first || 0;
+        },
+        filterDeployedOnlyMintme: function() {
+            return this.filterForTokens.deployed_only_mintme || 0;
+        },
+        filterAirdropOnly: function() {
+            return this.filterForTokens.airdrop_only || 0;
+        },
+        filterDeployedOnlyEth: function() {
+            return this.filterForTokens.deployed_only_eth || 0;
+        },
         shouldShowAll: function() {
             const totalPages = Math.ceil(this.totalRows / this.perPage);
 
-            return this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+            return (this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
+                    || this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key)
                 && this.tokens.length
                 && this.currentPage === totalPages;
+        },
+        marketFiltersOptions: function() {
+            return Object.values(this.marketFilters.options)
+                .filter((filter) => 'user' !== filter.key || 'user' === filter.key && this.userId);
         },
     },
     mounted() {
@@ -483,6 +535,7 @@ export default {
             let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
                 && (
                     value === this.marketFilters.options.deployed.key
+                    || value === this.marketFilters.options.deployedEth.key
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
@@ -494,50 +547,36 @@ export default {
             this.updateMarkets(page, true);
         },
         initialLoad: function() {
-            this.loading = true;
             this.fetchGlobalMarketCap();
-            let updateDataPromise = this.updateRawMarkets(this.currentPage, this.deployedFirst);
-            let conversionRatesPromise = this.fetchConversionRates();
+            this.updateSanitizedMarkets();
+            this.fetchConversionRates().catch((e) => e);
 
-            Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
-                .then((res) => {
-                    this.updateSanitizedMarkets();
-                    this.loading = false;
-
-                    this.addMessageHandler((result) => {
-                        if ('state.update' === result.method) {
-                            this.sanitizeMarket(result);
-                            this.requestMonthInfo(result.params[0]);
-                        } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                            this.updateMonthVolume(result.id, result.result);
-                        }
-                    }, null, 'Trading');
-                });
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                    this.requestMonthInfo(result.params[0]);
+                } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                    this.updateMonthVolume(result.id, result.result);
+                }
+            }, null, 'Trading');
         },
         sortCompare: function(a, b, key) {
-            let pair = false;
-            this.marketsOnTop.forEach((market)=> {
-                let currency = this.rebrandingFunc(market.currency);
-                let token = this.rebrandingFunc(market.token);
-
-                if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
-                    pair = true;
-                }
-            });
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
+                let rank = key === this.fields.rank.key;
+
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return pair ? 0 : compareResult;
+                return (-1) ** rank * compareResult;
             }
 
             // If the value is not numeric, currently only pair column
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
-            return pair ? 0 : b[key].localeCompare(a[key]);
+            return b[key].localeCompare(a[key]);
         },
         updateRawMarkets: function(page = null, deployedFirst = null) {
             return new Promise((resolve, reject) => {
@@ -547,7 +586,7 @@ export default {
                 let sort = this.sortBy.replace(USD.symbol, '');
 
                 // So that 'pair' column will be sorted A-Z on first click (which is DESC and would be Z-A)
-                let order = sort === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
+                let order = this.fields.pair.key === sort ? !this.sortDesc : this.sortDesc;
                 let params = {
                     page,
                     sort,
@@ -559,13 +598,17 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.filter = DEPLOYED_ONLY;
+                    params.filter = this.filterDeployedOnlyMintme;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
+                ) {
+                    params.filter = this.filterDeployedOnlyEth;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {
-                    params.filter = AIRDROP_ONLY;
+                    params.filter = this.filterAirdropOnly;
                 } else if (deployedFirst) {
-                    params.filter = DEPLOYED_FIRST;
+                    params.filter = this.filterDeployedFirst;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
@@ -594,7 +637,6 @@ export default {
                         this.deployedFirst = deployedFirst;
                         this.currentPage = page;
                         this.markets = res.data.markets;
-                        this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
 
                         if (window.history.replaceState) {
@@ -666,7 +708,9 @@ export default {
                 baseImage,
                 quoteImage,
                 market.quote.cryptoSymbol,
-                marketCap
+                marketCap,
+                market.rank || 0,
+                market.quote.holdersCount || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -696,7 +740,9 @@ export default {
             baseImage,
             quoteImage,
             cryptoSymbol,
-            marketCap = 0
+            marketCap = 0,
+            rank = 0,
+            holders,
         ) {
             let hiddenName = this.findHiddenName(token);
 
@@ -724,6 +770,8 @@ export default {
                 baseImage,
                 quoteImage,
                 cryptoSymbol,
+                rank,
+                holders,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -748,6 +796,7 @@ export default {
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
                     const webBtcOnTop = this.marketsOnTop[0];
+
                     if (marketOnTopIndex > -1 &&
                         cryptoSymbol === webBtcOnTop.currency &&
                         tokenName === webBtcOnTop.token) {
@@ -781,7 +830,9 @@ export default {
                         selectedMarket.base.image.avatar_small,
                         selectedMarket.quote.image? selectedMarket.quote.image.avatar_small: '',
                         selectedMarket.quote.cryptoSymbol,
-                        selectedMarket.marketCap || 0
+                        selectedMarket.marketCap || 0,
+                        selectedMarket.rank || 0,
+                        selectedMarket.quote.holdersCount || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -842,7 +893,9 @@ export default {
                 market.base.image.avatar_small,
                 market.quote.image ? market.quote.image.avatar_small: '',
                 market.quote.cryptoSymbol,
-                market.marketCap || 0
+                market.marketCap || 0,
+                market.rank || 0,
+                market.quote.holdersCount || 0
                 );
 
             if (marketOnTopIndex > -1) {

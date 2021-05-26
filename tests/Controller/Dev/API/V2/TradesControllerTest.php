@@ -4,16 +4,18 @@ namespace App\Tests\Controller\Dev\API\V2;
 
 use App\Entity\Token\Token;
 use App\Tests\Controller\WebTestCase;
+use App\Utils\Symbols;
 
 class TradesControllerTest extends WebTestCase
 {
-    private const URL = '/dev/api/v2/open/trades';
+    private const URL = self::LOCALHOST . '/dev/api/v2/open/trades';
 
     public function testGetTrades(): void
     {
         $markets = [
-            Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL,
-            Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL,
+            Symbols::MINTME . '_' . Symbols::BTC,
+            Symbols::MINTME . '_' . Symbols::ETH,
+            Symbols::MINTME . '_' . Symbols::USDC,
         ];
 
         foreach ($markets as $market) {
