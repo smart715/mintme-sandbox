@@ -271,8 +271,11 @@ page.privacy.7.1: '7.1. We do not intend to solicit or collect Personal Informat
 page.privacy.8: '8. Changes to the Privacy Policy'
 page.privacy.8.1: '8.1. MintMe.com has the discretion to update this Policy at any time. Your continued use of the service after We post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.'
 page.privacy.8.2: '8.2. If We make any material changes to this Privacy Policy, We will notify You either through the email address You have provided Us or by placing a prominent notice on the Technology Platform. You acknowledge and agree that it is your responsibility to review this Privacy Policy periodically and become aware of modifications.'
-page.privacy.9: '9. Contacting Us'
-page.privacy.9.1: '9.1. If You have any questions about this Privacy Policy, wish to exercise any of your rights to your Personal Information or file a complaint, please contact Us at:'
+page.privacy.9: '9. YouTube API Services'
+page.privacy.9.1: '9.1. Youtube social media link feature uses YouTube API Services and Google Privacy Policy is available at <a href="https://policies.google.com/privacy">google.com/policies/privacy</a>.'
+page.privacy.9.2: '9.2. MintMe access YouTube API Services in read-only scope to check and store the channel''s ID. To revoke MintMe''s access to your Youtube data, go to <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.'
+page.privacy.10: '10. Contacting Us'
+page.privacy.10.1: '10.1. If You have any questions about this Privacy Policy, wish to exercise any of your rights to your Personal Information or file a complaint, please contact Us at:'
 page.privacy.address: 'ABC Hosting Ltd<br/>
                        7B Neal Pen Road<br/>
                        Belize City, Belize<br/>
@@ -455,6 +458,8 @@ page.terms.content.15.1: '15.1. Amount of Fees. You agree to pay the fees for Tr
 page.terms.content.15.2: '15.2. Payment of Fees. You authorize Us or our designated payment processor to charge or deduct your MintMe Account crypto assets for any applicable Fees owed in connection with trades you complete via our Platform.'
 page.terms.content.16: '16. THIRD-PARTY CONTENT'
 page.terms.content.16.1: 'While using our Technology Platform you may view Third-Party Content. We do not control, endorse or adopt (unless otherwise expressly stated by Us) any Third-Party Content and shall have no responsibility for Third-Party Content, including without limitation material that may be misleading, incomplete, erroneous, offensive, indecent or otherwise objectionable. In addition, your business dealings or correspondence with such third parties are solely between you and the third parties. We are not responsible or liable for any loss or damage of any sort incurred as the result of any such dealings, and you understand that your use of Third-Party Content, and your interactions with third parties, is at your own risk.'
+page.terms.content.17: '17. YouTube API Services'
+page.terms.content.17.1: 'By using the youtube social media link feature, the user is accepting to be bound by the <a href="https://www.youtube.com/t/terms">YouTube Terms of Service</a>.'
 page.token_creation.title: 'Token Creation'
 page.token_creation.form_header: 'Create your own token'
 page.token_creation.error.taken: 'Token name is already taken'

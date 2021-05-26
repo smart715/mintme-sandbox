@@ -37,6 +37,7 @@ class RefererRequestHandler implements RefererRequestHandlerInterface
             'fos_user_registration_register',
             'login_success',
             'login',
+            'nelmio_security',
             null,
         ];
     }
