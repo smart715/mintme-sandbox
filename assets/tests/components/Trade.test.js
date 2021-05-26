@@ -416,15 +416,15 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.totalSellOrders = {sub: () => {
- return wrapper.vm.totalSellOrders;
-}, add: () => {
- return wrapper.vm.totalSellOrders;
-}};
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
             wrapper.vm.totalBuyOrders = {sub: () => {
- return wrapper.vm.totalBuyOrders;
-}, add: () => {
- return wrapper.vm.totalBuyOrders;
-}};
+                 return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                 return wrapper.vm.totalBuyOrders;
+            }};
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.UPDATE);
             expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
             expect(wrapper.vm.buyOrders).toBe(null);
@@ -439,15 +439,15 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.totalSellOrders = {sub: () => {
- return wrapper.vm.totalSellOrders;
-}, add: () => {
- return wrapper.vm.totalSellOrders;
-}};
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
             wrapper.vm.totalBuyOrders = {sub: () => {
- return wrapper.vm.totalBuyOrders;
-}, add: () => {
- return wrapper.vm.totalBuyOrders;
-}};
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                 return wrapper.vm.totalBuyOrders;
+            }};
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}, Constants.WSAPI.order.status.UPDATE);
             expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime', createdTimestamp: 'nestCtime', amount: 'testLeft', timestamp: 'testMtime'}]);
             expect(wrapper.vm.buyOrders).toBe(null);
@@ -462,15 +462,15 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.totalSellOrders = {sub: () => {
- return wrapper.vm.totalSellOrders;
-}, add: () => {
- return wrapper.vm.totalSellOrders;
-}};
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
             wrapper.vm.totalBuyOrders = {sub: () => {
- return wrapper.vm.totalBuyOrders;
-}, add: () => {
- return wrapper.vm.totalBuyOrders;
-}};
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+             return wrapper.vm.totalBuyOrders;
+            }};
             expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
             expect(wrapper.vm.buyOrders).toBe(null);
         });
@@ -484,15 +484,15 @@ describe('Trade', () => {
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
             wrapper.vm.totalSellOrders = {sub: () => {
- return wrapper.vm.totalSellOrders;
-}, add: () => {
- return wrapper.vm.totalSellOrders;
-}};
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
             wrapper.vm.totalBuyOrders = {sub: () => {
- return wrapper.vm.totalBuyOrders;
-}, add: () => {
- return wrapper.vm.totalBuyOrders;
-}};
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                return wrapper.vm.totalBuyOrders;
+            }};
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar'}, Constants.WSAPI.order.status.FINISH);
             expect(wrapper.vm.sellOrders).toEqual([]);
             expect(wrapper.vm.buyOrders).toBe(null);
