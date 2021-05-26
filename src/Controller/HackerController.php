@@ -76,7 +76,7 @@ class HackerController extends AbstractController
 
         $balanceHandler->deposit(
             $user,
-            Token::getFromCrypto($crypto),
+            $crypto,
             $moneyWrapper->parse($amount, $symbol)
         );
 
