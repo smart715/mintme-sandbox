@@ -298,7 +298,6 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
-            let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -309,8 +308,14 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
-                        this.saveOrders(orders, isSell, totalOrders);
+
+                        if (isSell) {
+                            this.totalSellOrders = this.totalSellOrders.add(data.amount);
+                        } else {
+                            this.totalBuyOrders = this.totalBuyOrders.add(data.price);
+                        }
+
+                        this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -333,10 +338,10 @@ export default {
                     order.timestamp = data.mtime;
                     orders[index] = order;
 
-                    if (totalOrders) {
-                        totalOrders = isSell
-                            ? totalOrders.sub(order.amount).add(data.amount)
-                            : totalOrders.sub(order.price).add(data.price);
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(data.price);
                     }
 
                     this.ordersUpdated = true;
@@ -349,26 +354,22 @@ export default {
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
 
-                    if (totalOrders) {
-                      totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price);
                     }
 
                     break;
             }
 
-            this.saveOrders(orders, isSell, totalOrders);
+            this.saveOrders(orders, isSell);
         },
-        saveOrders: function(orders, isSell, totalOrders) {
+        saveOrders: function(orders, isSell) {
             if (isSell) {
                 this.sellOrders = orders;
-                if (totalOrders) {
-                  this.totalSellOrders = totalOrders;
-                }
             } else {
                 this.buyOrders = orders;
-                 if (totalOrders) {
-                    this.totalBuyOrders = totalOrders;
-                }
             }
         },
     },
