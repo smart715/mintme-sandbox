@@ -152,13 +152,16 @@ class ActivitySubscriber implements EventSubscriberInterface
 
         $user = $event->getUser();
         $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
+
         $amountWorthInMintme = $this->convertToMintme($amount, $token);
+        $currency = $amountWorthInMintme->getCurrency()->getCode();
 
         /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
         $activity = $this->createActivity($eventName);
 
         $activity
             ->setAmount($amountWorthInMintme)
+            ->setCurrency($currency)
             ->setUser($user)
             ->setToken($token);
 
