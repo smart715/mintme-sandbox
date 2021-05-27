@@ -38,6 +38,7 @@
     "maz-ui": "^2.3.5",
     "moment": "^2.22.2",
     "sanitize-html": "^1.22.1",
+    "secure-random-password": "^0.2.2",
     "typed.js": "^2.0.11",
     "url-parse": "^1.4.4",
     "v-autocomplete": "^1.8.2",
