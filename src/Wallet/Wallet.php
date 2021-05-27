@@ -193,7 +193,11 @@ class Wallet implements WalletInterface
         $user = $pendingWithdraw->getUser();
         $amount = $pendingWithdraw->getAmount();
         $address = $pendingWithdraw->getAddress();
-        $fee = new Money($pendingWithdraw->getFee(), $tradable->getFee()->getCurrency());
+
+        $currency = $tradable instanceof Token ?
+            $tradable->getCryptoSymbol() :
+            $tradable->getSymbol();
+        $fee = new Money($pendingWithdraw->getFee(), new Currency($currency));
 
         if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
