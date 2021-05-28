@@ -22,9 +22,14 @@
 </template>
 
 <script>
+import {BDropdown, BDropdownItem} from 'bootstrap-vue';
 
 export default {
     name: 'ApiVersion',
+    components: {
+        BDropdown,
+        BDropdownItem,
+    },
     props: {
         urlVersion: String,
     },

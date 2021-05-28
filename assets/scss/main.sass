@@ -1,36 +1,11 @@
 @import 'variables'
 @import 'mixins'
 @import '~bootstrap/scss/bootstrap'
-@import '~bootstrap-vue/src/index.scss'
-@import '~pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build'
-@import '~vue-range-slider/dist/vue-range-slider'
-@import '~flag-icon-css/sass/flag-icon'
 @import url('https://fonts.googleapis.com/css?family=Lato')
-@import '~aos/dist/aos.css'
-@import '../fonts/AlphaCloud/AlphaCloud.css'
-@import '~maz-ui/lib/css/index.css'
 @import 'topnav'
-@import 'header'
-@import 'footer'
 @import 'avatar'
-@import 'home-page'
-@import 'token-page'
-@import 'profile-view-page'
-@import 'errorpages'
-@import 'mixins'
-@import 'wallet'
-@import 'news'
-@import 'trading'
-@import 'markitup'
-@import 'bbcode-help'
-@import 'knowledge-base'
-@import 'doc'
 @import 'icons'
-@import 'sign-up-landing'
-@import 'spinner'
-@import 'posts'
-@import 'lang-menu'
-@import 'chat'
+@import 'footer'
 
 *, *:before, *:after
   box-sizing: inherit
@@ -90,6 +65,8 @@ body
 
 .content-wrapper
   min-height: 100vh
+  background: $index-description-bg
+  width: 100% !important
 
 .form-control
   height: auto
@@ -108,11 +85,6 @@ body
 
 .min-width-0
   min-width: 0
-
-.trading-head
-  tr
-    th
-      outline: none
 
 .text-bold
   font-weight: 800
@@ -206,19 +178,18 @@ a
   i
     margin-right: 15px
 
-.add-phone-notification
-  width: 100%
-  margin: 0 auto
-  text-align: center
-  a
-    color: $secondary-dark
-    text-decoration: underline
-  a:hover
-    color: $primary-light
-  .alert
-    border-radius: 0
-
 .faq-block
+  &.light-border
+    border-top: none !important
+    border-bottom: 1px solid $secondary !important
+
+    &:last-child
+      border: none !important
+
+  &.no-decoration a
+      text-decoration: none
+      white-space: normal
+
   a:hover
     color: white
 
@@ -230,13 +201,6 @@ a
 
 .visible-hidden
   visibility: hidden
-
-.range-slider-fill
-  background: $color-slider-range
-
-.range-slider-knob
-  background: $color-slider-range
-  border: none
 
 .c-pointer
   cursor: pointer
@@ -262,40 +226,6 @@ a
   &.square
     width: 1em
     height: 1em
-
-.tooltip-static
-  background: white
-  height: auto
-  width: 50%
-  padding: 0.3rem
-  margin-left: 7.5em
-  position: absolute
-  z-index: 5
-  display: inline-block
-  color: black
-  border-radius: 0.6rem
-  margin-top: 9px
-
-  @include font-scale(xs)
-
-  &.tooltip-static-left
-    &:before
-      content: ''
-      width: 0
-      height: 0
-      border-bottom: 6px solid white
-      border-left: 6px solid white
-      border-top: 6px solid transparent
-      border-right: 6px solid transparent
-      position: absolute
-      display: inline-block
-      top: 50%
-      transform: rotate(45deg)
-      margin-top: -6px
-      margin-left: -9px
-
-.margin-neg-15
-  margin-top: -15px
 
 .success-highlight
   animation: success-highlight 1000ms ease-out
@@ -507,29 +437,6 @@ a
   @include media-breakpoint-down(xs)
     font-size: 9px !important
 
-.token-point-progress
-  margin-top: 15px
-  margin-bottom: -9px
-
-  @include media-breakpoint-down(md)
-    margin-top: 18px
-  @include media-breakpoint-down(sm)
-    margin-top: 4px
-
-.token-deploy-icon
-  margin-top: 19px
-
-  @include media-breakpoint-down(md)
-    margin-top: 23px
-  @include media-breakpoint-down(sm)
-    margin-top: 9px
-
-.token-edit-icon
-  margin-top: 12px
-
-  @include media-breakpoint-down(sm)
-    margin-top: 4px
-
 .nav-item-circle-progress
   @include media-breakpoint-up(md)
     margin-left: 30px
@@ -564,12 +471,34 @@ a
     height: 30px
     background-color: $primary-light
 
+.fixed-head-table
+  thead
+    tr
+      display: table
+      width: 100%
+      table-layout: fixed
+      justify-content: space-between
+
+      th
+        width: 100px
+
+  tbody
+    max-height: 17.7rem
+    display: block
+    width: 100%
+    position: relative
+
+    tr
+      width: 100%
+      table-layout: fixed
+      display: table
+
 .table, .table-responsive
   color: inherit
   margin-bottom: 0.7rem
 
   thead
-    th
+    tr th
       border: none
       font-weight: normal
       padding-top: 0.2rem
@@ -803,10 +732,6 @@ a
       padding: 1rem 0
       background: none
 
-.parent-trade-tab
-  ul
-    margin-top: 1.4rem
-
 .modal-content
   background: $secondary
 
@@ -858,9 +783,6 @@ nav.top-navbar
   padding-top: 3px
   padding-bottom: 3px
   margin-left: 2px
-
-.wallet-code
-  @include font-scale(sm)
 
 .modal.show
   display: block
@@ -940,10 +862,6 @@ nav.top-navbar
 .flex-basis-200
   flex-basis: 200px
 
-.token-introduction-profile-icon
-  width: 22px
-  height: 20px
-
 .tooltip:not(.tooltip-traders)
   transition-duration: .4s !important
   transition-timing-function: ease-in !important
@@ -985,23 +903,6 @@ nav.top-navbar
 .toasted
   pointer-events: auto
 
-.airdrop-container
-  background: $secondary !important
-  font-size: 18px
-
-  button
-    &.btn-primary
-      padding: 0 0.5rem !important
-      font-size: 17px
-
-.airdrop-campaign
-  ::placeholder
-    color: $white
-
-.airdrop-campaign__token-facebook-address,
-.airdrop-campaign__token-youtube-address
-  margin-left: 0.9rem
-
 meter
   width: 100%
   height: .5em
@@ -1022,28 +923,6 @@ meter
 
 .top-50
   top: 50% !important
-
-@media (min-width: 992px)
-  .resetlabel
-    position: absolute
-    bottom: 1.2rem
-    right: 1rem
-
-  .token-info-container
-    height: 410px
-
-    .posts-container
-      position: absolute
-      top: 0
-      bottom: 0
-
-    .read-more
-      position: absolute
-      background-color: $card-body-bg
-      bottom: 0
-      padding: 10px
-      width: 100%
-      text-align: center
 
 #token, #profile, #phone-verification
   [v-cloak]
@@ -1127,10 +1006,6 @@ input[type=search]::-webkit-search-cancel-button
 .pair-cell
   max-width: 200px
 
-.pair-cell-trading
-  max-width: 260px
-  min-width: 260px
-
 .card-fixed-small
   width: 100%
   max-width: 450px
@@ -1139,33 +1014,15 @@ input[type=search]::-webkit-search-cancel-button
   width: 100%
   max-width: 981px
 
-.markitup-dropdown li a:hover
-  background: $primary
-
 .form-control-btn.is-invalid
   background-size: calc(0.75em + 7rem) calc(0.75em + 0.25rem)
 
-.form-control:focus, .maz-input__input:focus
-  border-style: solid
-  border-width: thin
-  border-color: $pale-gray
-  -webkit-box-shadow: none
-  box-shadow: none
-
-.bootstrap-datetimepicker-widget
-  &, &:hover, &:focus, &:active
-    background-color: $secondary-dark
-
-  table
-    thead tr:first-child th:hover,
-    td.day:hover,
-    td.hour:hover,
-    td.minute:hover,
-    td.second:hover,
-    td span:hover,
-    td i:hover,
-    svg
-      color: $blue !important
+.form-control:focus, .phone-number .input-tel__input:focus
+  border-style: solid !important
+  border-width: thin !important
+  border-color: $pale-gray !important
+  -webkit-box-shadow: none !important
+  box-shadow: none !important
 
 .hover-icon:hover svg, svg.hover-icon:hover, .icon-default:hover
   color: $gold
@@ -1233,40 +1090,9 @@ a.hover-icon:hover, div.hover-icon:hover
       .bbcode-span-list-item
         left: 0 !important
 
-.socialMediaIcon
-  margin-top: 58px
-
-.dropdown-menu-social-media
-  min-width: 7rem
-  left: -68px
-
-.pair-container
-  margin-top: 1.5rem !important
-
-  @include media-breakpoint-down(md)
-    margin-top: 0.3rem !important
-
-.token-trading-title
-  height: 38px
-  @media(max-width: 480px)
-    height: 74px
-  @media(max-width: 393px)
-    height: 116px
-
-  .chat-envelope
-    background: $secondary
-
-  .div-container-avatar
-    background: $secondary
-    padding-left: 5px
-    padding-right: 17px
-
 #client-copy-btn, #secret-copy-btn
   textarea
     top: 0 !important
-
-.social-media-menu
-  margin-right: 13px
 
 #captcha_login
   min-height: 78px
@@ -1378,6 +1204,11 @@ li.trade-tab
 
 .list-group-item
   background: inherit
+
+.input-group-text
+  background: $dark-white
+  border: none
+  padding: 0.5rem 0.2rem
 
 .elastic-text
   width: calc(100% - 2em)

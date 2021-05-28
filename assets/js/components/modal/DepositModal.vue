@@ -44,17 +44,26 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BRow, BCol} from 'bootstrap-vue';
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
 import {RebrandingFilterMixin} from '../../mixins';
 import {webSymbol} from '../../utils/constants';
 
+library.add(faCopy);
+
 export default {
     name: 'DepositModal',
     mixins: [RebrandingFilterMixin],
     components: {
-        Modal,
+        BRow,
+        BCol,
         CopyLink,
+        Modal,
+        FontAwesomeIcon,
     },
     props: {
         visible: Boolean,

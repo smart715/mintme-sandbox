@@ -6,6 +6,7 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -14,10 +15,17 @@ class LoadTranslationsUi extends Command
     private string $translationsPath;
     private string $jsPath;
     private string $twigPath;
+    private string $filepath;
+    private string $extraFilepath;
     protected EngineInterface $twigEngine;
 
-    public function __construct(EngineInterface $twigEngine)
-    {
+    public function __construct(
+        EngineInterface $twigEngine,
+        ParameterBagInterface $params
+    ) {
+        $this->filepath = $params->get('ui_trans_keys_filepath');
+        $this->extraFilepath = $params->get('ui_extra_keys_filepath');
+
         $this->translationsPath = 'translations/messages.en.yml';
         $this->jsPath = 'assets/js';
         $this->twigPath = 'templates';
@@ -31,7 +39,7 @@ class LoadTranslationsUi extends Command
         $this
             ->setName('app:load-translations-ui')
             ->setDescription('Update load translations for frontend')
-            ->setHelp('This command will generate window.translations on base_script.html.twig');
+            ->setHelp('Generate all the translation keys used in the frontend');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -60,11 +68,8 @@ class LoadTranslationsUi extends Command
 
         sort($words);
 
-        $content= $this->twigEngine->render('translations/pattern.html.twig', [
-            'words' => $words,
-        ]);
+        file_put_contents($this->filepath, json_encode($words));
 
-        file_put_contents('templates/translations.html.twig', $content);
         $output->writeln('Translations has been loaded');
 
         return 0;
@@ -83,7 +88,9 @@ class LoadTranslationsUi extends Command
             $it->next();
         }
 
-        $words= [];
+        $words = file_exists($this->extraFilepath) ?
+            json_decode(file_get_contents($this->extraFilepath) ?: '[]'):
+            [];
 
         foreach ($filesToCheck as $filePath) {
             $file = file_get_contents($filePath, true);

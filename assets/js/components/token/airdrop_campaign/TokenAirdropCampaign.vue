@@ -326,26 +326,44 @@
 <script>
 import moment from 'moment';
 import Decimal from 'decimal.js';
-import datePicker from 'vue-bootstrap-datetimepicker';
+import datePicker from '../../DatePicker';
+import {BCollapse, VBToggle} from 'bootstrap-vue';
+import {mapGetters} from 'vuex';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faCircle, faGlobe} from '@fortawesome/free-solid-svg-icons';
+import {faTwitter, faFacebookF, faLinkedinIn, faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED, tweetLink, facebookPostLink} from '../../../utils/constants';
-import {mapGetters} from 'vuex';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import {requiredIf} from 'vuelidate/lib/validators';
+
+library.add(
+    faCircleNotch,
+    faCircle,
+    faGlobe,
+    faTwitter,
+    faFacebookF,
+    faLinkedinIn,
+    faYoutube
+);
 
 export default {
     name: 'TokenAirdropCampaign',
     mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
+        BCollapse,
         datePicker,
         ConfirmModal,
         FontAwesomeIcon,
         FontAwesomeLayers,
         TokenFacebookAddress,
         TokenYoutubeAddress,
+    },
+    directives: {
+        'b-toggle': VBToggle,
     },
     props: {
         tokenName: String,

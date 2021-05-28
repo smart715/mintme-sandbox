@@ -28,8 +28,13 @@
 </template>
 
 <script>
+import {BModal} from 'bootstrap-vue';
+
 export default {
     name: 'Modal',
+    components: {
+        BModal,
+    },
     props: {
         visible: Boolean,
         size: String,

@@ -8,7 +8,6 @@ import moxios from 'moxios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
