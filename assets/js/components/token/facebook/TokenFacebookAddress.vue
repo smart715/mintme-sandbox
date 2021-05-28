@@ -95,6 +95,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTooltip} from 'bootstrap-vue';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import Modal from '../../modal/Modal';
 import {HTTP_OK} from '../../../utils/constants';
@@ -103,11 +104,8 @@ library.add(faFacebookSquare, faTimes);
 
 export default {
     name: 'TokenFacebookAddress',
-    props: {
-        address: String,
-        tokenName: String,
-    },
     components: {
+        BTooltip,
         FontAwesomeIcon,
         Modal,
     },
@@ -116,6 +114,10 @@ export default {
         NotificationMixin,
         LoggerMixin,
     ],
+    props: {
+        address: String,
+        tokenName: String,
+    },
     data() {
         return {
             pages: [],

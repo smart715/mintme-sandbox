@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/wallet') }}
+{% endblock %}
+
 {% block title %}{% trans %}page.wallet.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}wallet{% endblock %}
@@ -88,5 +93,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('wallet') }}
+    {{ encore_entry_script_tags('pages/wallet') }}
 {% endblock %}

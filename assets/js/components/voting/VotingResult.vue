@@ -28,12 +28,17 @@
 </template>
 
 <script>
+import {BProgress, BProgressBar} from 'bootstrap-vue';
 import {mapGetters} from 'vuex';
 import {RebrandingFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 
 export default {
     name: 'VotingResult',
+    components: {
+        BProgress,
+        BProgressBar,
+    },
     mixins: [
         RebrandingFilterMixin,
     ],

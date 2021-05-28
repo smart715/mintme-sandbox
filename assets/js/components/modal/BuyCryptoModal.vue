@@ -32,8 +32,13 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
 import {primaryColor} from '../../utils/constants';
+
+library.add(faCircleNotch);
 
 const ADDRESS_CHANGED_EVENT = 'trade.receive-account-changed';
 const RECEIVED_ACCOUNT_CONFIRMED_EVENT = 'trade.receive-account-confirmed';
@@ -42,6 +47,7 @@ export default {
     name: 'BuyCryptoModal',
     components: {
         Modal,
+        FontAwesomeIcon,
     },
     props: {
         visible: Boolean,

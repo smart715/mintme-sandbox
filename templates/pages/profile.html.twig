@@ -6,6 +6,11 @@
 {% set metaTitle = profile.nickname ~ '\'s profile | mintMe' %}
 {% set metaImageAlt = profile.nickname ~ '\'s profile | mintMe' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/profile') }}
+{% endblock %}
+
 {% block title %}
     {% if profile.anonymous %}
         {{ profile.nickname }}'s {% trans %}page.profile.title{% endtrans %} | mintMe
@@ -306,5 +311,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('profile') }}
+    {{ encore_entry_script_tags('pages/profile') }}
 {% endblock %}
