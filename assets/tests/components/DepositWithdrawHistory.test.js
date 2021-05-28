@@ -21,10 +21,6 @@ const $routing = {
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(Vuex);
-    localVue.component('b-table', {});
-    localVue.component('FontAwesomeIcon', {
-        template: '<i></i>',
-    });
     const $store = new Vuex.Store({
         modules: {status},
     });

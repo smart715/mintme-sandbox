@@ -3,12 +3,18 @@ import Guide from './Guide';
 import {minLength} from 'vuelidate/lib/validators';
 import {nickname} from '../utils/constants';
 import i18n from '../utils/i18n/i18n';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faEye} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faEye);
 
 export default {
     i18n,
     components: {
         Passwordmeter,
         Guide,
+        FontAwesomeIcon,
     },
     data() {
         return {

@@ -103,11 +103,15 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Decimal from 'decimal.js';
+import {mapGetters} from 'vuex';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
 import {toMoney, removeSpaces, currencyConversion} from '../../utils';
-import {mapGetters} from 'vuex';
 import {USD, usdSign, currencyModes} from '../../utils/constants.js';
-import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
     FiltersMixin,
@@ -118,8 +122,18 @@ import {
     OrderHighlights,
 } from '../../mixins/';
 
+library.add(faCircleNotch, faTimes);
+
 export default {
     name: 'TradeSellOrders',
+    components: {
+        Guide,
+        BTable,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         FiltersMixin,
         LazyScrollTableMixin,
@@ -149,9 +163,6 @@ export default {
             tableData: this.ordersList,
             currencyModes,
         };
-    },
-    components: {
-        Guide,
     },
     mounted: function() {
         this.startScrollListeningOnce(this.ordersList);

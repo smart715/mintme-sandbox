@@ -20,7 +20,7 @@
                         <div
                             v-for="config in userConfigModelFiltered"
                             :key="config.text"
-                            class="row faq-block mx-0 border-bottom border-top">
+                            class="row faq-block light-border no-decoration mx-0">
                             <faq-item>
                                 <template slot="title"> {{ config.text }} </template>
                                     <template slot="body">
@@ -74,17 +74,31 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
 import FaqItem from '../FaqItem';
 import {NotificationMixin, LoggerMixin} from '../../mixins/';
+import {BCard, BCardText, BLink, BFormCheckbox} from 'bootstrap-vue';
+
+library.add(faCircleNotch);
 
 export default {
-    mixins: [NotificationMixin, LoggerMixin],
     name: 'NotificationManagementModal',
     components: {
+        BCard,
+        BCardText,
+        BLink,
+        BFormCheckbox,
         Modal,
         FaqItem,
+        FontAwesomeIcon,
     },
+    mixins: [
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         notificationConfigModalVisible: Boolean,
         noClose: Boolean,

@@ -1,10 +1,11 @@
+@import "~bootstrap/scss/functions";
+
 // Change bootstrap variables to match Mintme style
 
 // Fonts
 $lato-font: 'Lato', 'Arial', sans-serif;
 $concord-font: 'Concord';
 $concord-bold-font: 'ConcordBold';
-$cloud-font: 'AlphaCloud', sans-serif;
 
 $font-scales: (
   xs: 13px,
@@ -144,3 +145,8 @@ $token-avatar-margin-left: 115px;
 
 // Posts
 $post-border-color: #0e3b59;
+
+// This variable should mirror config/paramaters.dist.yml translation_flags.flag variable.
+$translation-flags: gb, es, ru, ua, pl, ae, pt, fr;
+
+@import "~bootstrap/scss/variables";

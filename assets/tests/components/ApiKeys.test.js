@@ -9,9 +9,6 @@ import axiosPlugin from '../../js/axios';
 function mockVue() {
     const localVue = createLocalVue();
     localVue.use(axiosPlugin);
-    localVue.component('font-awesome-icon', {
-        template: '',
-    });
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};

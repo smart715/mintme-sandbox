@@ -38,7 +38,11 @@
 
 <script>
 import BuyCryptoModal from '../modal/BuyCryptoModal';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCcVisa, faCcMastercard} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faCcVisa, faCcMastercard);
 
 export default {
     name: 'BuyCrypto',

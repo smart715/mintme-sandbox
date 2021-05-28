@@ -260,6 +260,11 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faCircle, faGlobe, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
+import {faTwitter, faFacebookF, faLinkedinIn, faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import LoginSignupSwitcher from '../../../components/LoginSignupSwitcher';
 import moment from 'moment';
 import Decimal from 'decimal.js';
@@ -272,6 +277,18 @@ import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
 import CopyLink from '../../CopyLink';
 import AddPhoneAlertModal from '../../modal/AddPhoneAlertModal';
+
+library.add(
+    faCircleNotch,
+    faCircle,
+    faGlobe,
+    faExclamationCircle,
+    faTwitter,
+    faFacebookF,
+    faLinkedinIn,
+    faYoutube,
+    faCopy
+);
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -291,6 +308,8 @@ export default {
         Modal,
         CopyLink,
         AddPhoneAlertModal,
+        FontAwesomeIcon,
+        FontAwesomeLayers,
     },
     props: {
         loggedIn: Boolean,

@@ -84,9 +84,7 @@ import moment from 'moment';
 import {NotificationMixin} from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
 
-library.add(faEdit);
-library.add(faTrash);
-library.add(faThumbsUp);
+library.add(faEdit, faTrash, faThumbsUp);
 
 export default {
     name: 'Comment',
