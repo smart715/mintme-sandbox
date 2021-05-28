@@ -45,7 +45,8 @@
         {"name": "WEB","prec_save": 20,"prec_show": 8},
         {"name": "ETH","prec_save": 20,"prec_show": 8},
         {"name": "USDC","prec_save": 20,"prec_show": 8},
-        {"name": "BTC","prec_save": 20,"prec_show": 8}
+        {"name": "BTC","prec_save": 20,"prec_show": 8},
+        {"name": "BNB","prec_save": 20,"prec_show": 8}
     ],
     "markets": [
         {
@@ -80,6 +81,18 @@
             },
             "money": {
                 "name": "USDC",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        },
+        {
+            "name": "WEBBNB",
+            "stock": {
+                "name": "WEB",
+                "prec": 4
+            },
+            "money": {
+                "name": "BNB",
                 "prec": 8
             },
             "min_amount": "0.001"
