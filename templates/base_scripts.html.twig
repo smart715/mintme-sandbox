@@ -1,56 +1,5 @@
-<script defer>
-    window.translations = {
-        "confirm_modal.confirm" : "{{ 'confirm_modal.confirm' | trans }}",
-        "2fa_modal.label.2fa" : "{{ '2fa_modal.label.2fa' | trans }}",
-        "2fa_modal.label.email" : "{{ '2fa_modal.label.email' | trans }}",
-        "confirm_modal.accept_delete"  : "{{ 'confirm_modal.accept_delete' | trans }}",
-        "toasted.success.facebook.added"  : "{{ 'toasted.success.facebook.added' | trans }}",
-        "toasted.success.facebook.deleted"  : "{{ 'toasted.success.facebook.deleted' | trans }}",
-        "toasted.success.youtube.added"  : "{{ 'toasted.success.youtube.added' | trans }}",
-        "toasted.success.youtube.deleted"  : "{{ 'toasted.success.youtube.deleted' | trans }}",
-        "toasted.success.discord.added"  : "{{ 'toasted.success.discord.added' | trans }}",
-        "toasted.success.discord.deleted"  : "{{ 'toasted.success.discord.deleted' | trans }}",
-        "toasted.success.telegram.added"  : "{{ 'toasted.success.telegram.added' | trans }}",
-        "toasted.success.telegram.deleted"  : "{{ 'toasted.success.telegram.deleted' | trans }}",
-        "trading.currency.usd" : "{{ 'trading.currency.usd' | trans }}",
-        "trading.currency.crypto" : "{{ 'trading.currency.crypto' | trans }}",
-        "utils.markitup.heading_level": "{{ 'utils.markitup.heading_level' | trans }}",
-        "utils.markitup.link" : "{{ 'utils.markitup.link' | trans }}",
-        "utils.markitup.picture" : "{{ 'utils.markitup.picture' | trans }}",
-        "utils.markitup.headings" : "{{ 'utils.markitup.headings' | trans }}",
-        "utils.markitup.bold" : "{{ 'utils.markitup.bold' | trans }}",
-        "utils.markitup.italic" : "{{ 'utils.markitup.italic' | trans }}",
-        "utils.markitup.underline" : "{{ 'utils.markitup.underline' | trans }}",
-        "utils.markitup.strikethrough" : "{{ 'utils.markitup.strikethrough' | trans }}",
-        "utils.markitup.unordered_list" : "{{ 'utils.markitup.unordered_list' | trans }}",
-        "utils.markitup.ordered_list" : "{{ 'utils.markitup.ordered_list' | trans }}",
-        "utils.markitup.list_item" : "{{ 'utils.markitup.list_item' | trans }}",
-        "utils.markitup.paragraph" : "{{ 'utils.markitup.paragraph' | trans }}",
-        "utils.markitup.youtube" : "{{ 'utils.markitup.youtube' | trans }}",
-        "activity_0_message" : "{{ 'activity_0_message' | trans }}",
-        "activity_1_message" : "{{ 'activity_1_message' | trans }}",
-        "activity_2_message" : "{{ 'activity_2_message' | trans }}",
-        "activity_3_message" : "{{ 'activity_3_message' | trans }}",
-        "activity_4_message" : "{{ 'activity_4_message' | trans }}",
-        "activity_5_message" : "{{ 'activity_5_message' | trans }}",
-        "activity_6_message" : "{{ 'activity_6_message' | trans }}",
-        "activity_7_message" : "{{ 'activity_7_message' | trans }}",
-        "activity_8_message" : "{{ 'activity_8_message' | trans }}",
-        "activity_9_message" : "{{ 'activity_9_message' | trans }}",
-        "deposit.msg" : "{{ 'deposit.msg' | trans }}",
-        "new_investor.msg" : "{{ 'new_investor.msg' | trans }}",
-        "withdrawal.msg" : "{{ 'withdrawal.msg' | trans }}",
-        "new_device.detected.msg" : "{{ 'new_device.detected.msg' | trans }}",
-        "new_post.msg" : "{{ 'new_post.msg' | trans }}",
-        "deployed.msg" : "{{ 'deployed.msg' | trans }}",
-        "token_marketing_tips.msg" : "{{ 'token_marketing_tips.msg' | trans }}",
-        "phone_confirmation.msg" : "{{ 'phone_confirmation.msg' | trans }}",
-
-        {% include 'translations.html.twig' %}
-    };
-</script>
-
-<script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
-<script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+<script defer src="{{ path('translations-ui') }}"></script>
+<script defer src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+<script defer src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
 {{ encore_entry_script_tags('base_main') }}
 {{ encore_entry_script_tags('footer') }}

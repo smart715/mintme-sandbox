@@ -25,15 +25,19 @@
 </template>
 
 <script>
+import {VBTooltip} from 'bootstrap-vue';
 import Guide from '../../Guide';
 
 export default {
     name: 'TokenWebsiteAddress',
-    props: {
-        currentWebsite: String,
-    },
     components: {
         Guide,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    props: {
+        currentWebsite: String,
     },
 };
 </script>

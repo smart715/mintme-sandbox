@@ -4,7 +4,9 @@
             {% for activity in activities|slice(0, 5) %}
                 <div class="feed-row feed-row--preload"></div>
             {% endfor %}
-            <div class="vld-icon absolute-center"></div>
+            <div class="absolute-center">
+                <div class="icon-loading"></div>
+            </div>
         </div>
     </div>
 {% endif %}

@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import {BTable} from 'bootstrap-vue';
 import {mapGetters} from 'vuex';
 import {RebrandingFilterMixin} from '../../mixins';
 import ElasticText from '../ElasticText';
@@ -34,6 +35,7 @@ export default {
         RebrandingFilterMixin,
     ],
     components: {
+        BTable,
         ElasticText,
     },
     data() {

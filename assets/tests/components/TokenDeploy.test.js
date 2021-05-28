@@ -36,7 +36,6 @@ function mockVue() {
 function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed') {
     const localVue = mockVue();
     localVue.use(Axios);
-    localVue.component('font-awesome-icon', {});
     const store = new Vuex.Store({
         modules: {
             tradeBalance,

@@ -1,4 +1,11 @@
-@import "variables"
+/* ignored by stylelint because of github.com/AleshaOleg/postcss-sass/issues/120 */
+
+@import '~flag-icon-css/sass/variables'
+@import '~flag-icon-css/sass/flag-icon-base'
+
+// Including flag icon classes and images
+@each $country in $translation-flags
+  @include flag-icon($country)
 
 .language-switcher
   margin-left: -9px

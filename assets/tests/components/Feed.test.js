@@ -10,7 +10,6 @@ Object.defineProperty(window, 'EventSource', {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};

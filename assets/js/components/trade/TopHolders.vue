@@ -28,15 +28,23 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTable} from 'bootstrap-vue';
 import {formatMoney} from '../../utils';
 import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
 import ElasticText from '../ElasticText';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TopHolders',
     mixins: [FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin],
     components: {
+        BTable,
         ElasticText,
+        FontAwesomeIcon,
     },
     props: {
         tokenName: String,
