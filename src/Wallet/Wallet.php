@@ -127,7 +127,10 @@ class Wallet implements WalletInterface
             Symbols::ETH
         );
 
-        $withdrawFee = $tradable->getFee() ?? $tokenEthFee;
+        $withdrawFee = $tradable->getFee() ?? $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('token_withdraw_fee'),
+            Symbols::TOK
+        );
 
         if (!$crypto) {
             throw new NotFoundTokenException();
