@@ -27,8 +27,17 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faQuestion} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faQuestion);
+
 export default {
     name: 'Guide',
+    components: {
+        FontAwesomeIcon,
+    },
     props: {
         maxWidth: {type: String, default: '350px'},
         placement: {type: String, default: 'bottom'},

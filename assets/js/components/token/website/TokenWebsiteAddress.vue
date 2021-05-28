@@ -164,13 +164,14 @@
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faGlobe, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faGlobe, faTimes, faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {BTooltip} from 'bootstrap-vue';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins/';
 import {isValidUrl} from '../../../utils';
 import Modal from '../../modal/Modal';
 
-library.add(faGlobe, faTimes);
+library.add(faGlobe, faTimes, faCircleNotch);
 
 export default {
     name: 'TokenWebsiteAddress',
@@ -180,6 +181,7 @@ export default {
         tokenName: String,
     },
     components: {
+        BTooltip,
         FontAwesomeIcon,
         Modal,
     },

@@ -90,130 +90,137 @@
                         {{ include('spinners/donation.html.twig') }}
                     </div>
                 {% endif %}
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'intro' %}active{% endif %}">
-                    <div class="row">
-                        <div class="col-12 pb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    {% trans %}token.intro.description.header{% endtrans %}
-                                    <div class="d-inline float-right">
-                                        <a>
-                                            <div class="ml-1 rounded-circle square blue-question mtrouneded">
-                                                <span class="mtquestion"></span>
-                                            </div>
-                                        </a>
+                {% if tab|default and tab and tab == 'intro' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        <div class="row">
+                            <div class="col-12 pb-3">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        {% trans %}token.intro.description.header{% endtrans %}
                                     </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row fix-height custom-scrollbar">
-                                        <div class="col-12">
-                                            <div>
-                                                <p>
-                                                    {% if token.description and tokenDescription is defined %}
-                                                        {{ tokenDescription }}
-                                                    {% endif %}
-                                                </p>
+                                    <div class="card-body">
+                                        <div class="row fix-height custom-scrollbar">
+                                            <div class="col-12">
+                                                <div>
+                                                    <p>
+                                                        {% if token.description and tokenDescription is defined %}
+                                                            {{ tokenDescription }}
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row token-info-container">
-                        <div class="h-100 col-12 col-lg-7 pr-lg-1">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    {% trans %}page.pair.recent_posts{% endtrans %}
+                        <div class="row token-info-container">
+                            <div class="h-100 col-12 col-lg-7 pr-lg-1">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        {% trans %}page.pair.recent_posts{% endtrans %}
+                                    </div>
+                                    {% include 'spinners/posts_card_body.html.twig' %}
                                 </div>
-                                {% include 'spinners/posts_card_body.html.twig' %}
                             </div>
-                        </div>
-                        <div class="h-100 col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
-                            <div class="card h-100 top-holders">
-                                <div class="card-header">
-                                    {% trans %}trade.top_holders.header{% endtrans %}
-                                </div>
-                                    {% if topHolders is not empty %}
-                                        <div class="card-body p-0">
-                                            <div class="table-responsive">
-                                                <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
-                                                    <thead role="rowgroup">
-                                                    <tr role="row">
-                                                        <th role="columnheader" scope="col" aria-colindex="1">
-                                                            {% trans %}trade.top_holders.trader{% endtrans %}
-                                                        </th>
-                                                        <th role="columnheader" scope="col" aria-colindex="3">
-                                                            {% trans %}trade.top_holders.amount{% endtrans %}
-                                                        </th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody role="rowgroup">
-                                                        {% for holder in topHolders %}
+                            <div class="h-100 col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
+                                <div class="card h-100 top-holders">
+                                    <div class="card-header">
+                                        {% trans %}trade.top_holders.header{% endtrans %}
+                                    </div>
+                                        {% if topHolders is not empty %}
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
+                                                        <thead role="rowgroup">
                                                         <tr role="row">
-                                                            <td role="cell" aria-colindex="1">
-                                                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
-                                                                    <img
-                                                                        src="{{ holder.user.profile.image.avatar_small }}"
-                                                                        alt="avatar" class="d-block rounded-circle">
-                                                                    <a
-                                                                        href="{{ path('profile', {nickname: holder.user.profile.nickname}) }}"
-                                                                        class="holder-name mr-1 text-white">
-                                                                        <div class="overflow-hidden">
-                                                                            <span>
-                                                                                {{ holder.user.profile.nickname|truncate(12) }}
-                                                                            </span>
-                                                                        </div>
-                                                                    </a>
-                                                                </div>
-                                                            </td>
-                                                            <td role="cell" aria-colindex="3">
-                                                                {{ holder.balance | toMoney(0) }}
-                                                            </td>
+                                                            <th role="columnheader" scope="col" aria-colindex="1">
+                                                                {% trans %}trade.top_holders.trader{% endtrans %}
+                                                            </th>
+                                                            <th role="columnheader" scope="col" aria-colindex="3">
+                                                                {% trans %}trade.top_holders.amount{% endtrans %}
+                                                            </th>
                                                         </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody role="rowgroup">
+                                                            {% for holder in topHolders %}
+                                                            <tr role="row">
+                                                                <td role="cell" aria-colindex="1">
+                                                                    <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                                                        <img
+                                                                            src="{{ holder.user.profile.image.avatar_small }}"
+                                                                            alt="avatar" class="d-block rounded-circle">
+                                                                        <a
+                                                                            href="{{ path('profile', {nickname: holder.user.profile.nickname}) }}"
+                                                                            class="holder-name mr-1 text-white">
+                                                                            <div class="overflow-hidden">
+                                                                                <span>
+                                                                                    {{ holder.user.profile.nickname|truncate(12) }}
+                                                                                </span>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td role="cell" aria-colindex="3">
+                                                                    {{ holder.balance | toMoney(0) }}
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="card-body h-100 d-flex align-items-center justify-content-center">
-                                            <span class="py-4">
-                                                <div class="vld-icon"></div>
-                                            </span>
-                                        </div>
-                                    {% endif %}
+                                        {% else %}
+                                            <div class="card-body h-100 d-flex align-items-center justify-content-center">
+                                                <span class="py-4">
+                                                    <div class="icon-loading"></div>
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="card col-12 mt-3">
+                                <div class="card-body text-center">
+                                    <a target"_self" href="#" style="pointer-events: none;">
+                                        {% trans %}token.intro.statistics.show{% endtrans %}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="card col-12 mt-3">
-                            <div class="card-body text-center">
-                                <a target="_self" href="#" style="pointer-events: none;">
-                                    {% trans %}token.intro.statistics.show{% endtrans %}
-                                </a>
-                            </div>
-                        </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'trade' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/trade_tab.html.twig') }}
                     </div>
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'trade' %}active{% endif %}">
-                    {{ include('spinners/trade_tab.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'posts' %}active{% endif %}">
-                    {{ include('spinners/posts_tab.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'post' %}active{% endif %}">
-                    {{ include('spinners/single_post_tab.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'voting' %}active{% endif %}">
-                    {{ include('spinners/voting_list.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'create-voting' %}active{% endif %}">
-                    {{ include('spinners/voting_create.html.twig') }}
-                </div>
-                <div role="tabpanel" aria-hidden="false" class="tab-pane {% if tab|default and tab and tab == 'show-voting' %}active{% endif %}">
-                    {{ include('spinners/voting_show.html.twig') }}
-                </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'posts' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/posts_tab.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'post' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane ">
+                        {{ include('spinners/single_post_tab.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_list.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'create-voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_create.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'show-voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_show.html.twig') }}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

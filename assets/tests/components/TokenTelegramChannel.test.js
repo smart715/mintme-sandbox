@@ -8,7 +8,6 @@ import axios from 'axios';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('b-tooltip', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
