@@ -1,10 +1,18 @@
 import Passwordmeter from './components/PasswordMeter';
 import i18n from './utils/i18n/i18n';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faEye} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faEye);
 
 new Vue({
     el: '#reset',
     i18n,
-    components: {Passwordmeter},
+    components: {
+        Passwordmeter,
+        FontAwesomeIcon,
+    },
     data: {
         password: '',
         disabled: false,

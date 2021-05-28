@@ -1,0 +1,36 @@
+@import "../variables"
+@import '../mixins'
+@import '../markitup.sass'
+
+.profile-view
+  .description
+    @include media-breakpoint-up(md)
+      border-left: .125rem solid $primary
+
+.edit-icon
+  position: absolute
+  top: 20px
+  right: 20px
+  z-index: 999
+
+.phone-number
+  .input-phone-number
+    background-color: $input-focus !important
+
+  .country-selector .input-country-selector
+    background-color: $input-bg !important
+
+  .country-selector__list
+    background-color: $input-bg !important
+    border-top: thin solid #ced4da
+
+  .country-selector__input, .input-tel__input
+    border: none
+
+  .country-selector__list__item
+    font-size: 16px !important
+
+    .country-selector__list__item__calling-code
+      color: rgba(255, 255, 255, 0.54) !important
+      width: 49px !important
+      text-align: left !important

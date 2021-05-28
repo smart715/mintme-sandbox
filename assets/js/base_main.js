@@ -1,17 +1,10 @@
 import '../scss/main.sass';
 import Vue from 'vue';
-import VueBootstrap from 'bootstrap-vue';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
-import {faCog, fas, faSearch, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import {library, dom} from '@fortawesome/fontawesome-svg-core';
-import {far} from '@fortawesome/free-regular-svg-icons';
-import {fab} from '@fortawesome/free-brands-svg-icons';
+import {dom} from '@fortawesome/fontawesome-svg-core';
 import TokenSearcher from './components/token/TokenSearcher';
 import {directive as onClickaway} from 'vue-clickaway';
 import Toasted from 'vue-toasted';
 import Notification from './components/Notification';
-import AdminMenu from './components/AdminMenu';
-import InfoBar from './components/InfoBar';
 import Routing from './routing';
 import Axios from './axios';
 import Avatar from './components/Avatar';
@@ -21,16 +14,15 @@ import UserNotification from './components/UserNotification';
 import NavEnvelope from './components/chat/NavEnvelope';
 import Helpers from './helpers';
 
+// Async css import
+import(/* webpackPreload: true */ '../scss/bootstrap-vue.sass');
+
 window.Vue = Vue;
-Vue.use(VueBootstrap);
 Vue.use(Routing);
 Vue.use(Axios);
 Vue.use(VueI18n);
 Vue.use(Helpers);
 
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('font-awesome-layers', FontAwesomeLayers);
-library.add(fas, far, fab, faSearch, faCog, faEnvelope);
 dom.watch();
 
 const i18n = new VueI18n({
@@ -42,12 +34,30 @@ const i18n = new VueI18n({
 });
 
 if (document.getElementById('info-bar')) {
-    new Vue({
-        el: '#info-bar',
-        i18n,
-        components: {
-            InfoBar,
-        },
+    import('./components/InfoBar').then((data) => {
+        const InfoBar = data.default;
+
+        new Vue({
+            el: '#info-bar',
+            i18n,
+            components: {
+                InfoBar,
+            },
+        });
+    });
+}
+
+if (document.getElementById('admin-menu')) {
+    import('./components/AdminMenu').then((data) => {
+        const AdminMenu = data.default;
+
+        new Vue({
+            el: '#admin-menu',
+            i18n,
+            components: {
+                AdminMenu,
+            },
+        });
     });
 }
 
@@ -83,7 +93,6 @@ new Vue({
     },
     components: {
         TokenSearcher,
-        AdminMenu,
         Avatar,
         UserNotification,
         NavEnvelope,

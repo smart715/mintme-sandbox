@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/voting') }}
+{% endblock %}
+
 {% block title %}{% trans %}voting.voting{% endtrans %} | mintMe{% endblock %}
 
 {% block content %}
@@ -41,5 +46,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-   {{ encore_entry_script_tags('voting') }}
+   {{ encore_entry_script_tags('pages/voting') }}
 {% endblock %}

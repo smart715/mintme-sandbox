@@ -7,7 +7,7 @@
         <div>
             <passwordmeter :password="password" @toggle-error="toggleError">
                 <span @click="togglePassword()" class="show-password">
-                    <i class="far fa-eye"></i>
+                    <font-awesome-icon icon="eye"></font-awesome-icon>
                 </span>
                 {{ form_row(resettingForm.plainPassword, {'attr': {'v-model': 'password'}}) }}
             </passwordmeter>

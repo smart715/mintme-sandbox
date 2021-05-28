@@ -42,13 +42,6 @@
                         {% trans %} donation.receive {% endtrans %}
                             <span class="text-nowrap">
                                 0 tokens
-                                <div class="d-inline">
-                                    <a>
-                                        <div class="ml-1 rounded-circle square blue-question mtrouneded">
-                                            <span class="mtquestion"></span>
-                                        </div>
-                                    </a>
-                                </div>
                             </span>
                         </div>
                     </div>
@@ -57,7 +50,7 @@
                     <div id="show-balance" class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0">
                         <p class="m-0">
                             <span>{% trans %} donation.balance {% endtrans%}</span>
-                            <span class="vld-icon"></span>
+                            <div class="icon-loading"></div>
                         </p>
                     </div>
                 {% endif %}

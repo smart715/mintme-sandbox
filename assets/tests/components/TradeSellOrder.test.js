@@ -93,10 +93,10 @@ describe('TradeSellOrder', () => {
 
     it('hide sell order  contents and show loading instead', () => {
         wrapper.setProps({balanceLoaded: false});
-        expect(wrapper.find('font-awesome-icon').exists()).toBe(true);
+        expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(true);
         expect(wrapper.find('div.card-body > div.row').exists()).toBe(false);
         wrapper.setProps({balanceLoaded: true});
-        expect(wrapper.find('font-awesome-icon').exists()).toBe(false);
+        expect(wrapper.find('font-awesome-icon-stub').exists()).toBe(false);
         expect(wrapper.find('div.card-body > div.row').exists()).toBe(true);
     });
 

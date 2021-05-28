@@ -17,9 +17,6 @@ window.location = {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('b-toggle', {});
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-collapse', {});
     localVue.use(Vuex);
     localVue.use(Vuelidate);
     localVue.use({
