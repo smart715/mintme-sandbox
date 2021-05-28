@@ -127,6 +127,8 @@ class Wallet implements WalletInterface
             Symbols::ETH
         );
 
+        $withdrawFee = $tradable->getFee() ?? $tokenEthFee;
+
         if (!$crypto) {
             throw new NotFoundTokenException();
         }
@@ -177,7 +179,7 @@ class Wallet implements WalletInterface
             );
         }
 
-        return $this->pendingManager->create($user, $address, $amount, $tradable, $fee);
+        return $this->pendingManager->create($user, $address, $amount, $tradable, $withdrawFee);
     }
 
     /**
