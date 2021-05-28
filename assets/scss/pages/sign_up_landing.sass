@@ -1,0 +1,123 @@
+@import '../variables'
+@import '../mixins'
+
+@media (min-width: 992px)
+  #sign-up-langing
+    &.container
+      max-width: 1500px
+
+@media (max-width: 770px)
+  .logo-div
+    overflow: hidden
+
+.landing-font
+  font-size: 20px
+
+.text-white
+  color: $dark-white
+
+@include media-breakpoint-down(xl)
+  .we-will-pay
+    position: absolute
+    bottom: 0
+    right: 0
+  .web-chain
+    width: 100% !important
+
+@include media-breakpoint-down(md)
+  .xl-text
+    display: none !important
+  .md-text
+    display: block !important
+
+@include media-breakpoint-only(md)
+  .g-recaptcha
+    transform: scale(0.65) !important
+    transform-origin: 0 0 !important
+  .logo-div
+    position: relative
+    width: 450px
+    overflow: hidden
+  .logo-web
+    width: 550px !important
+    margin-left: -60px
+  .we-will-pay
+    position: relative
+    float: right
+    bottom: 30px
+
+@include media-breakpoint-down(sm)
+  .logo-web
+    width: 160% !important
+    position: relative
+    left: -150px
+  .arrows
+    width: 120px !important
+  .arr-text
+    max-width: calc(100% - 130px)
+  .logo-text
+    display: flex
+    flex-wrap: wrap
+    margin-right: -15px
+    margin-left: -15px
+  .we-will-pay
+    margin: 0 auto
+    position: relative
+
+    .h1
+      font-size: 2rem
+
+    .landing-font
+      font-size: 17px
+  .landing-font
+    font-size: 17px !important
+
+.title
+  font-family: $concord-bold-font
+  line-height: 1.1
+
+.what-is
+  i
+    font-family: $concord-bold-font
+
+  span:first-of-type
+    font-size: 31px
+    line-height: 0
+
+
+.normal-title
+  font-size: 1vw
+  float: right
+
+
+.feature-row
+  background-color: $secondary
+
+  i
+    font-family: $concord-bold-font
+
+  .small-text
+    width: 170px
+    font-size: 13px
+
+.arr-text
+  width: 65%
+
+.arrows
+  width: 33%
+
+.diagrams
+  img
+    width: 170px
+
+  .landing-font
+    font-size: 18px !important
+
+.hand-and-lamp
+  width: 200px
+
+.letter-space
+  letter-spacing: -.01em
+
+.not-demand
+  line-height: 1

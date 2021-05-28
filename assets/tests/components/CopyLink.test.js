@@ -6,8 +6,6 @@ import CopyLink from '../../js/components/CopyLink';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('clipboard', {});
-    localVue.directive('tippy', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;

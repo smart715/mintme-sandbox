@@ -47,7 +47,11 @@ import TwoFactorModal from '../modal/TwoFactorModal';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK} from '../../utils/constants';
 import {mapGetters} from 'vuex';
+import {library} from '@fortawesome/fontawesome-svg-core';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TokenDelete',

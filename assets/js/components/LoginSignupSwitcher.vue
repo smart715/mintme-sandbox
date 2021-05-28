@@ -15,11 +15,19 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Register from './Register';
 import {LoggerMixin} from '../mixins';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'LoginSignupSwitcher',
+    components: {
+        FontAwesomeIcon,
+    },
     mixins: [LoggerMixin],
     props: {
         googleRecaptchaSiteKey: String,

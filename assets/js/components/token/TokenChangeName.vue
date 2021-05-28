@@ -78,6 +78,9 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
@@ -90,11 +93,14 @@ import {
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 
+library.add(faExclamationCircle);
+
 export default {
     name: 'TokenChangeName',
     mixins: [NotificationMixin, LoggerMixin],
     components: {
         TwoFactorModal,
+        FontAwesomeIcon,
     },
     props: {
         isTokenExchanged: Boolean,

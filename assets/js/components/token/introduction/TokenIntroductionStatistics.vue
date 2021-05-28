@@ -251,32 +251,41 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BListGroup, BListGroupItem, BLink} from 'bootstrap-vue';
+import {mapGetters, mapMutations} from 'vuex';
 import CopyLink from '../../CopyLink';
 import Guide from '../../Guide';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
-import {mapGetters, mapMutations} from 'vuex';
 import {
   LoggerMixin,
   MoneyFilterMixin,
   WebSocketMixin,
 } from '../../../mixins';
 
+library.add(faCircleNotch, faCopy);
+
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
+    components: {
+        BListGroup,
+        BListGroupItem,
+        BLink,
+        CopyLink,
+        FontAwesomeIcon,
+        Guide,
+    },
     mixins: [
         MoneyFilterMixin,
         LoggerMixin,
         WebSocketMixin,
     ],
-    components: {
-        CopyLink,
-        FontAwesomeIcon,
-        Guide,
-    },
     props: {
         isMintmeToken: Boolean,
         deploymentStatus: String,

@@ -285,7 +285,18 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import _ from 'lodash';
+import {
+    BDropdown,
+    BDropdownItem,
+    BTable,
+    BLink,
+    BPagination,
+    VBTooltip,
+} from 'bootstrap-vue';
 import Guide from '../Guide';
 import Avatar from '../Avatar';
 import {
@@ -300,8 +311,23 @@ import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'Trading',
+    components: {
+        BDropdown,
+        BDropdownItem,
+        BTable,
+        BLink,
+        BPagination,
+        Guide,
+        Avatar,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -322,10 +348,6 @@ export default {
         filterForTokens: Object,
         perPage: Number,
         rowsProp: Number,
-    },
-    components: {
-        Guide,
-        Avatar,
     },
     data() {
         return {

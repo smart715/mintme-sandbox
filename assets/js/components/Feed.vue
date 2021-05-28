@@ -25,6 +25,7 @@ import {toMoney} from '../utils';
 import {currencies, TOK} from '../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {downArrow} from '../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {RebrandingFilterMixin} from '../mixins';
 import TruncateFilterMixin from '../mixins/filters/truncate';
 
@@ -32,6 +33,9 @@ library.add(downArrow);
 
 export default {
     name: 'Feed',
+    components: {
+        FontAwesomeIcon,
+    },
     mixins: [
         TruncateFilterMixin,
         RebrandingFilterMixin,

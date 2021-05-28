@@ -6,13 +6,6 @@ import FaqItem from '../../js/components/FaqItem';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('b-toggle', {});
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-card-body', {});
-    localVue.component('b-collapse', {});
-    localVue.component('b-card', {});
-    localVue.component('b-card-header', {});
-    localVue.component('b-btn', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;

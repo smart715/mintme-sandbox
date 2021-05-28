@@ -28,8 +28,6 @@ const $routing = {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-table', {});
     localVue.use(Vuex);
     localVue.use({
         install(Vue) {

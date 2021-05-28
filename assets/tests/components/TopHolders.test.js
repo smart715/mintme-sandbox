@@ -28,8 +28,6 @@ function mockVue() {
             });
         },
     });
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-table', {});
     return localVue;
 }
 

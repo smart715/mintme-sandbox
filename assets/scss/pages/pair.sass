@@ -1,0 +1,265 @@
+@import '../variables'
+@import '../mixins'
+@import '../posts'
+@import '../markitup'
+@import '../date-picker'
+
+.pair-container
+  margin-top: 1.5rem !important
+
+  @include media-breakpoint-down(md)
+    margin-top: 0.3rem !important
+
+.chat
+  &:nth-child(even)
+    background-color: $odd-item-color
+
+  img
+    height: 22px
+
+#token-data-form
+  .custom-btn
+    color: $dark-white
+    vertical-align: middle
+    width: 100%
+
+    svg
+      width: 1.5em
+      padding-right: 0.4em
+
+.form-control-range
+  position: relative
+  -webkit-box-flex: 1
+  -ms-flex: 1 1 auto
+  flex: 1 1 auto
+  width: 1%
+
+.social-help
+  padding-left: 0
+
+  tbody
+    max-height: 17.7rem
+    display: block
+    width: 100%
+    position: relative
+    overflow-y: overlay
+
+    tr
+      width: 100%
+      table-layout: fixed
+      display: table
+
+.token-name-input
+  background-color: $card-input-color !important
+  color: $dark-white
+  border-radius: 0
+  border: none
+
+.alert-float
+  font-size: 14px !important
+  padding: 0 10px !important
+  margin-bottom: 5px
+
+.token-social-media-edit
+  a:hover
+    text-decoration: underline
+
+#token
+  .deployed-icon, .not-deployed-icon
+    height: 42px
+    @include media-breakpoint-down('md')
+      height: 34px
+    @include media-breakpoint-down('sm')
+      height: 27px
+
+  min-height: 800px
+
+  .not-deployed-icon
+    img
+      filter: grayscale(100%)
+
+  .buy-order, .sell-order
+    @include media-breakpoint-up('xl')
+      flex: 0 0 35%
+      max-width: 35%
+
+  .chart
+    @include media-breakpoint-up('xl')
+      flex: 0 0 30%
+      max-width: 30%
+
+  .fix-height
+    overflow-y: hidden
+
+  .profile-link
+    padding-left: 2px
+
+  ul.nav .token-avatar-left
+    margin-left: 132px
+    background: transparent
+    z-index: 1
+    @media(max-width: 1199px)
+      margin-left: 128px
+
+    @media(max-width: 991px)
+      margin-left: 112px
+
+    @media(max-width: 767px)
+      margin-left: 0
+
+    a
+      background: transparent
+
+  .token-avatar
+    z-index: 1
+    min-width: 0
+    &.show-avatar
+      margin-left: calc(#{$token-avatar-margin-left} + 20px) !important
+
+    @media(max-width: 1199px)
+      margin-left: calc(111px + 20px) !important
+
+    @media(max-width: 991px)
+      margin-left: calc(94px + 20px) !important
+
+    @media(max-width: 767px)
+      margin-left: calc(54px + 20px) !important
+
+    .token-avatar-link
+      position: absolute
+      top: 0
+      left: 2%
+
+      img
+        width: 126px
+
+      @include media-breakpoint-down(md)
+        img
+          width: 104px
+        top: 29%
+        left: 23px
+
+      @include media-breakpoint-down(sm)
+        img
+          width: 74px
+        top: 4%
+        left: 23px
+
+      @include media-breakpoint-down(xs)
+        img
+          width: 64px
+        left: 22px
+        top: 3px
+
+    .token-name
+      min-width: 100px
+      margin-left: 8px
+      margin-top: 15px
+
+      @include media-breakpoint-down(md)
+        margin-top: 19px
+      @include media-breakpoint-down(sm)
+        margin-top: 11px
+
+      .current-token-name
+        margin-bottom: -3px
+        font-size: 25px
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+        display: block
+
+        @include media-breakpoint-down(md)
+          margin-bottom: -2px !important
+        @include media-breakpoint-down(sm)
+          margin-bottom: 5px !important
+        @include media-breakpoint-down(xs)
+          margin-bottom: 1px !important
+
+  .token-profile-avatar
+    width: 26px
+    height: 26px
+
+.token-point-progress
+  margin-top: 15px
+  margin-bottom: -9px
+
+  @include media-breakpoint-down(md)
+    margin-top: 18px
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
+
+.token-deploy-icon
+  margin-top: 19px
+
+  @include media-breakpoint-down(md)
+    margin-top: 23px
+  @include media-breakpoint-down(sm)
+    margin-top: 9px
+
+.token-edit-icon
+  margin-top: 12px
+
+  @include media-breakpoint-down(sm)
+    margin-top: 4px
+
+.parent-trade-tab
+  ul
+    margin-top: 1.4rem
+
+.token-introduction-profile-icon
+  width: 22px
+  height: 20px
+
+.airdrop-container
+  background: $secondary !important
+  font-size: 18px
+
+  button
+    &.btn-primary
+      padding: 0 0.5rem !important
+      font-size: 17px
+
+.airdrop-campaign
+  ::placeholder
+    color: $white
+
+.airdrop-campaign__token-facebook-address,
+.airdrop-campaign__token-youtube-address
+  margin-left: 0.9rem
+
+@media (min-width: 992px)
+  .resetlabel
+    position: absolute
+    bottom: 1.2rem
+    right: 1rem
+
+  .token-info-container
+    height: 410px
+
+    .posts-container
+      position: absolute
+      top: 0
+      bottom: 0
+
+    .read-more
+      position: absolute
+      background-color: $card-body-bg
+      bottom: 0
+      padding: 10px
+      width: 100%
+      text-align: center
+
+.socialMediaIcon
+  margin-top: 58px
+
+.dropdown-menu-social-media
+  min-width: 7rem
+  left: -68px
+
+.social-media-menu
+  margin-right: 13px
+
+.top-holders
+  td:not(:first-child)
+    white-space: nowrap
