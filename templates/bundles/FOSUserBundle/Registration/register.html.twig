@@ -8,7 +8,7 @@
 
 {% block pagescripts %}
     {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
-    {{ encore_entry_script_tags('register') }}
+    {{ encore_entry_script_tags('pages/register') }}
     <script>
         window.onload = function() {
             document.getElementById("fos_user_registration_form_email").focus();

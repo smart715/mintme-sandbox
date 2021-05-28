@@ -43,7 +43,7 @@
                     </template>
                     <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
-                            <span class="icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
+                            <span class="icon icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
                         </a>
                     </template>
                 </b-table>
@@ -72,9 +72,13 @@
     </div>
 </template>
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
-import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
+import {BTable, VBTooltip} from 'bootstrap-vue';
+import ConfirmModal from '../modal/ConfirmModal';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {
@@ -88,8 +92,18 @@ import {
     OrderMixin,
 } from '../../mixins/';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'ActiveOrders',
+    components: {
+        BTable,
+        FontAwesomeIcon,
+        ConfirmModal,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -100,7 +114,6 @@ export default {
         PairNameMixin,
         OrderMixin,
     ],
-    components: {ConfirmModal},
     props: {
         userId: Number,
         isUserBlocked: Boolean,

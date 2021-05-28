@@ -32,9 +32,13 @@
 </template>
 
 <script>
+import {BTable} from 'bootstrap-vue';
 
 export default {
     name: 'ContactsList',
+    components: {
+        BTable,
+    },
     props: {
         nickname: String,
         threadId: Number,

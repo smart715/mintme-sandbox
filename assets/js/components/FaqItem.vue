@@ -1,10 +1,10 @@
 <template>
     <b-card no-body class="w-100">
         <b-card-header header-tag="div" class="p-1" role="tab">
-            <b-btn block href="#" v-b-toggle="identifier" variant="link" class="text-white text-left">
+            <b-button block href="#" v-b-toggle="identifier" variant="link" class="text-white text-left">
                 <slot name="title">{{ $t('faq_item.title') }}</slot>
                 <font-awesome-icon :icon="icon"  class="float-right"></font-awesome-icon>
-            </b-btn>
+            </b-button>
         </b-card-header>
         <b-collapse @show="switchIcon" @hide="switchIcon" :id="identifier" :accordion="groupName" role="tabpanel">
             <b-card-body class="pt-1 pb-1">
@@ -19,9 +19,33 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faChevronUp, faChevronDown} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {
+    BCard,
+    BCardHeader,
+    BCardBody,
+    BButton,
+    BCollapse,
+    VBToggle,
+} from 'bootstrap-vue';
+
+library.add(faChevronUp, faChevronDown);
 
 export default {
     name: 'FaqItem',
+    components: {
+        BCard,
+        BCardHeader,
+        BCardBody,
+        BButton,
+        BCollapse,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-toggle': VBToggle,
+    },
     props: {
         groupName: {type: String, default: 'faq-accordion'},
     },

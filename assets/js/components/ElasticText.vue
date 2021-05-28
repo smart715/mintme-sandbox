@@ -26,16 +26,13 @@
 
 <script>
 import VClamp from 'vue-clamp/dist/vue-clamp';
+import {BTooltip} from 'bootstrap-vue';
 
 export default {
     name: 'ElasticText',
     components: {
+        BTooltip,
         VClamp,
-    },
-    data() {
-      return {
-          disableTooltip: false,
-      };
     },
     props: {
         value: String,
@@ -52,6 +49,11 @@ export default {
         component: function() {
             return this.url ? 'a' : 'span';
         },
+    },
+    data() {
+      return {
+          disableTooltip: false,
+      };
     },
     methods: {
         updateTooltip: function(val) {

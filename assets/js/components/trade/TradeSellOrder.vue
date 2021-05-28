@@ -182,6 +182,12 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {VBTooltip} from 'bootstrap-vue';
+import Decimal from 'decimal.js';
+import {mapMutations, mapGetters} from 'vuex';
 import Guide from '../Guide';
 import {
     FiltersMixin,
@@ -194,16 +200,20 @@ import {
     LoggerMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
-import Decimal from 'decimal.js';
-import {mapMutations, mapGetters} from 'vuex';
 import {MINTME, USD, currencyModes} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TradeSellOrder',
     components: {
         PriceConverterInput,
         Guide,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     mixins: [
         WebSocketMixin,

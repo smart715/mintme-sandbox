@@ -77,15 +77,25 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mapGetters} from 'vuex';
+import moment from 'moment';
+import {BTable} from 'bootstrap-vue';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {GENERAL} from '../../utils/constants';
-import moment from 'moment';
+
+library.add(faCircleNotch);
 
 const updateMessagesMS = 3500;
 
 export default {
     name: 'ChatBox',
+    components: {
+        BTable,
+        FontAwesomeIcon,
+    },
     mixins: [
         LoggerMixin,
         NotificationMixin,

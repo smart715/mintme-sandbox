@@ -152,6 +152,7 @@ import BbcodeView from '../bbcode/BbcodeView';
 import moment from 'moment';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit, faTrash, faComment} from '@fortawesome/free-solid-svg-icons';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {MoneyFilterMixin, NotificationMixin, TwitterMixin, FiltersMixin} from '../../mixins';
 import ConfirmModal from '../modal/ConfirmModal';
@@ -160,9 +161,7 @@ import CopyLink from '../CopyLink';
 import {formatMoney, openPopup, toMoney} from '../../utils';
 import {mapGetters} from 'vuex';
 
-library.add(faEdit);
-library.add(faTrash);
-library.add(faComment);
+library.add(faEdit, faTrash, faComment, faCopy);
 
 export default {
     name: 'Post',

@@ -194,6 +194,17 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faEdit, faTimes, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {
+    faFacebook,
+    faLinkedin,
+    faReddit,
+    faTelegram,
+    faTwitter,
+} from '@fortawesome/free-brands-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BDropdown} from 'bootstrap-vue';
 import TokenDiscordChannel from '../TokenDiscordChannel';
 import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
 import TokenFacebookAddressView from '../facebook/TokenFacebookAddressView';
@@ -203,9 +214,6 @@ import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
 import Avatar from '../../Avatar';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import CopyLink from '../../CopyLink';
 import {tokenDeploymentStatus} from '../../../utils/constants';
@@ -214,10 +222,34 @@ let SocialSharing = require('vue-social-sharing');
 
 Vue.use(SocialSharing);
 
-library.add(faEdit, faTimes);
+library.add(
+    faEdit,
+    faTimes,
+    faEnvelope,
+    faFacebook,
+    faLinkedin,
+    faReddit,
+    faTelegram,
+    faTwitter
+);
 
 export default {
     name: 'TokenIntroductionProfile',
+    components: {
+        Avatar,
+        BDropdown,
+        CopyLink,
+        FontAwesomeIcon,
+        Guide,
+        TokenDiscordChannel,
+        TokenFacebookAddress,
+        TokenFacebookAddressView,
+        TokenTelegramChannel,
+        TokenYoutubeAddress,
+        TokenYoutubeAddressView,
+        TokenWebsiteAddress,
+        TokenWebsiteAddressView,
+    },
     props: {
         deploymentStatus: String,
         discordUrl: String,
@@ -233,20 +265,6 @@ export default {
         websiteUrl: String,
         youtubeClientId: String,
         youtubeChannelId: String,
-    },
-    components: {
-        Avatar,
-        CopyLink,
-        FontAwesomeIcon,
-        Guide,
-        TokenDiscordChannel,
-        TokenFacebookAddress,
-        TokenFacebookAddressView,
-        TokenTelegramChannel,
-        TokenYoutubeAddress,
-        TokenYoutubeAddressView,
-        TokenWebsiteAddress,
-        TokenWebsiteAddressView,
     },
     data() {
         return {

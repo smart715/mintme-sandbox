@@ -6,7 +6,6 @@ import Modal from '../../js/components/modal/Modal';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('b-modal', {});
     return localVue;
 }
 
@@ -44,8 +43,8 @@ describe('Modal', () => {
            },
             localVue: mockVue(),
         });
-        expect(wrapper.find('b-modal-stub').attributes('no-close-on-backdrop')).toBe(undefined);
-        expect(wrapper.find('b-modal-stub').attributes('no-close-on-esc')).toBe(undefined);
+        expect(wrapper.find('b-modal-stub').attributes('nocloseonbackdrop')).toBe(undefined);
+        expect(wrapper.find('b-modal-stub').attributes('nocloseonesc')).toBe(undefined);
     });
 
     it('disable closing on ESC and disable closing on backdrop click when noClose props is true', () => {
@@ -57,8 +56,8 @@ describe('Modal', () => {
            },
             localVue: mockVue(),
         });
-        expect(wrapper.find('b-modal-stub').attributes('no-close-on-backdrop')).toBe('true');
-        expect(wrapper.find('b-modal-stub').attributes('no-close-on-esc')).toBe('true');
+        expect(wrapper.find('b-modal-stub').attributes('nocloseonbackdrop')).toBe('true');
+        expect(wrapper.find('b-modal-stub').attributes('nocloseonesc')).toBe('true');
     });
 
     it('a padding should be present when withoutPadding props is false', () => {
@@ -70,7 +69,7 @@ describe('Modal', () => {
            },
             localVue: mockVue(),
         });
-        expect(wrapper.find('b-modal-stub').attributes('body-class')).toBe('');
+        expect(wrapper.find('b-modal-stub').attributes('bodyclass')).toBe('');
         expect(wrapper.find('.modal-body').attributes('class')).toBe('modal-body');
     });
 
@@ -83,7 +82,7 @@ describe('Modal', () => {
            },
             localVue: mockVue(),
         });
-        expect(wrapper.find('b-modal-stub').attributes('body-class')).toBe('m-0 p-0');
+        expect(wrapper.find('b-modal-stub').attributes('bodyclass')).toBe('m-0 p-0');
         expect(wrapper.find('.modal-body').attributes('class')).toBe('modal-body m-0 p-0');
     });
 

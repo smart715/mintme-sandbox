@@ -85,14 +85,22 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney, formatMoney} from '../../../utils';
 import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
 import Decimal from 'decimal.js';
 import {tokenDeploymentStatus, webSymbol, GENERAL} from '../../../utils/constants';
 import moment from 'moment';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'TokenDeploy',
+    components: {
+        FontAwesomeIcon,
+    },
     mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
     props: {
         hasReleasePeriod: Boolean,

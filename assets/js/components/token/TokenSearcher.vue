@@ -28,8 +28,13 @@
 </template>
 
 <script>
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTimes, faSearch} from '@fortawesome/free-solid-svg-icons';
 import Autocomplete from 'v-autocomplete';
 import {LoggerMixin} from '../../mixins';
+
+library.add(faTimes, faSearch);
 
 const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
@@ -38,6 +43,7 @@ export default {
     mixins: [LoggerMixin],
     components: {
         Autocomplete,
+        FontAwesomeIcon,
     },
     props: {
         searchUrl: {type: String, required: true},

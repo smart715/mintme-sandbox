@@ -41,6 +41,7 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faYoutubeSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTooltip} from 'bootstrap-vue';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
 import gapi from 'gapi';
 import {HTTP_OK} from '../../../utils/constants';
@@ -52,20 +53,20 @@ const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
 
 export default {
     name: 'TokenYoutubeAddress',
+    components: {
+        BTooltip,
+        FontAwesomeIcon,
+    },
+    mixins: [
+        FiltersMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         channelId: String,
         clientId: String,
         editable: Boolean,
         tokenName: String,
-    },
-    components: {
-        FontAwesomeIcon,
-    },
-    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
-    created: function() {
-        if (this.editable) {
-            this.loadYoutubeClient();
-        }
     },
     data() {
         return {
@@ -87,6 +88,11 @@ export default {
                 address: this.buildYoutubeUrl(this.currentChannelId),
             };
         },
+    },
+    created: function() {
+        if (this.editable) {
+            this.loadYoutubeClient();
+        }
     },
     methods: {
         buildYoutubeUrl: function(id) {
