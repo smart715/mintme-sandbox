@@ -57,7 +57,11 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import {toMoney, formatMoney} from '../../utils';
 import {
     LazyScrollTableMixin,
@@ -68,15 +72,24 @@ import {
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'DepositWithdrawHistory',
+    components: {
+        BTable,
+        CopyLink,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         LazyScrollTableMixin,
         FiltersMixin,
         RebrandingFilterMixin,
         LoggerMixin,
     ],
-    components: {CopyLink},
     data() {
         return {
             fields: {

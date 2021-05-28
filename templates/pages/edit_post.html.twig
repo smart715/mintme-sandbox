@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/edit_post') }}
+{% endblock %}
+
 {% block title %}
 	{% trans %}edit_post{% endtrans %} | mintMe
 {% endblock %}
@@ -17,5 +22,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-	{{ encore_entry_script_tags('edit_post') }}
+	{{ encore_entry_script_tags('pages/edit_post') }}
 {% endblock %}

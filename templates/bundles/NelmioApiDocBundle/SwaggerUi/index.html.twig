@@ -43,6 +43,7 @@
         }
     </style>
     {{ encore_entry_link_tags('base_main') }}
+    {{ encore_entry_link_tags('pages/api') }}
 {% endblock stylesheets %}
 
 {% block javascripts %}
@@ -53,7 +54,7 @@
     {% include 'base_scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    {{ encore_entry_script_tags('api') }}
+    {{ encore_entry_script_tags('pages/api') }}
     {% endapply %}
 {% endblock javascripts %}
 
@@ -183,4 +184,8 @@
     %}
     {% include 'head.html.twig' %}
     {% endapply %}
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/doc') }}
 {% endblock %}

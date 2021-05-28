@@ -84,7 +84,10 @@ export default {
         Modal,
     },
     props: {
-        visible: Boolean,
+        visible: {
+            type: Boolean,
+            default: true,
+        },
         tokenName: String,
     },
 };

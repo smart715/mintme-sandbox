@@ -96,14 +96,20 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
 import CopyLink from '../CopyLink';
+
+library.add(faCopy);
 
 export default {
     name: 'TokenCreatedModal',
     components: {
         CopyLink,
         Modal,
+        FontAwesomeIcon,
     },
     props: {
         visible: Boolean,

@@ -28,20 +28,26 @@
 </template>
 
 <script>
-import {FiltersMixin} from '../../../mixins';
 import gapi from 'gapi';
+import {VBTooltip} from 'bootstrap-vue';
+import {FiltersMixin} from '../../../mixins';
 import Guide from '../../Guide';
 
 export default {
     name: 'TokenYoutubeAddressView',
+    components: {
+        Guide,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        FiltersMixin,
+    ],
     props: {
         channelId: String,
         clientId: String,
     },
-    components: {
-        Guide,
-    },
-    mixins: [FiltersMixin],
     computed: {
         youTubeUrl: function() {
             return this.buildYoutubeUrl(this.channelId);

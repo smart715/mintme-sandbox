@@ -43,4 +43,4 @@ public/build
 public/media/cache
 
 ###< translations ###
-templates/translations.html.twig
+translations/ui/auto_gen_keys.json

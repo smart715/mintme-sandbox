@@ -11,7 +11,6 @@ Vue.use({
 describe('TokenFacebookAddressView', () => {
     it('show facebook link and button', () => {
         const localVue = createLocalVue();
-        localVue.directive('b-tooltip', {});
 
         const wrapper = shallowMount(TokenFacebookAddressView, {
             localVue,

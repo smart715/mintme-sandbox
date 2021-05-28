@@ -6,7 +6,6 @@ import TokenWebsiteAddressView from '../../js/components/token/website/TokenWebs
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('b-tooltip', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;

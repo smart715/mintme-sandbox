@@ -265,11 +265,13 @@ import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import BuyCrypto from './BuyCrypto';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 
-library.add(depositIcon);
-library.add(withdrawIcon);
+library.add(depositIcon, withdrawIcon, faCircleNotch);
 
 export default {
     name: 'Wallet',
@@ -283,10 +285,15 @@ export default {
         AddPhoneAlertMixin,
     ],
     components: {
+        BTable,
         BuyCrypto,
         WithdrawModal,
         DepositModal,
         AddPhoneAlertModal,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         withdrawUrl: {type: String, required: true},
