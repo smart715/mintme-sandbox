@@ -258,7 +258,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
-            ->leftJoin('qt.users', 'u')
+//            ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
             ->andWhere('qt.isHidden=false')
