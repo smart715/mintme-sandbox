@@ -470,7 +470,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $sql = "SELECT * FROM (
                     SELECT ms.id,
                     qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
-                    ROW_NUMBER() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
+                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC) AS rank
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
