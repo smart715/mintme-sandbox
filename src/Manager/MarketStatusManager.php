@@ -256,6 +256,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $predefinedMarketStatus = $this->getPredefinedMarketStatuses();
 
         $queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->addSelect('qt')
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
             ->leftJoin('qt.users', 'u')
@@ -467,16 +468,14 @@ class MarketStatusManager implements MarketStatusManagerInterface
     {
         $ids = array_map(fn (MarketStatus $ms) => $ms->getId(), $marketStatuses);
 
-        $sql = "SELECT * FROM (
-                    SELECT ms.id,
-                    qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
-                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
-                    FROM market_status AS ms
-                    INNER JOIN token AS qt ON ms.quote_token_id = qt.id
-                    WHERE qt.is_blocked = false
-                    AND qt.is_hidden = false
-                ) AS r
-                WHERE r.id IN (:ids)";
+        $sql = "SELECT ms.id,
+                qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
+                RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
+                FROM market_status AS ms
+                INNER JOIN token AS qt ON ms.quote_token_id = qt.id
+                WHERE qt.is_blocked = false
+                AND qt.is_hidden = false
+                AND ms.id IN (:ids)";
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('id', 'id', 'integer');
