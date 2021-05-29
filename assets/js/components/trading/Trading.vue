@@ -591,16 +591,16 @@ export default {
         sortCompare: function(a, b, key) {
             let numeric = key !== this.fields.pair.key;
 
-            if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
-                let first = parseFloat(a[key]);
-                let second = parseFloat(b[key]);
-
-                let rank = key === this.fields.rank.key;
-
-                let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
-
-                return (-1) ** rank * compareResult;
-            }
+            // if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
+            //     let first = parseFloat(a[key]);
+            //     let second = parseFloat(b[key]);
+            //
+            //     let rank = key === this.fields.rank.key;
+            //
+            //     let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
+            //
+            //     return (-1) ** rank * compareResult;
+            // }
 
             // If the value is not numeric, currently only pair column
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
