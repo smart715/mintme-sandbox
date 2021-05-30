@@ -26,7 +26,7 @@ use App\Events\TokenEvents;
 use App\Events\TransactionCompletedEvent;
 use App\Events\UserAirdropEvent;
 use App\Events\WithdrawCompletedEvent;
-use App\Exchange\Factory\MarketFactory;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -60,7 +60,7 @@ class ActivitySubscriber implements EventSubscriberInterface
     private PublisherInterface $publisher;
     private MarketStatusManagerInterface $marketStatusManager;
     private CryptoManagerInterface $cryptoManager;
-    private MarketFactory $marketFactory;
+    private MarketFactoryInterface $marketFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -68,7 +68,7 @@ class ActivitySubscriber implements EventSubscriberInterface
         PublisherInterface $publisher,
         MarketStatusManagerInterface $marketStatusManager,
         CryptoManagerInterface $cryptoManager,
-        MarketFactory $marketFactory
+        MarketFactoryInterface $marketFactory
     ) {
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
