@@ -153,15 +153,23 @@ class ActivitySubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
 
-        $amountWorthInMintme = $this->convertToMintme($amount, $token);
-        $currency = $amountWorthInMintme->getCurrency()->getCode();
+        $lastPrice = $this->getLastPrice($token);
+        $lastPrice = $this->moneyWrapper->format($lastPrice);
+
+        $mintmeCurrency = new Currency(Symbols::WEB);
+
+        $amountWorthInMintme = $this->moneyWrapper->convertByRatio(
+            $amount,
+            $mintmeCurrency,
+            $lastPrice
+        );
 
         /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
         $activity = $this->createActivity($eventName);
 
         $activity
             ->setAmount($amountWorthInMintme)
-            ->setCurrency($currency)
+            ->setCurrency($mintmeCurrency->getCode())
             ->setUser($user)
             ->setToken($token);
 
@@ -242,19 +250,5 @@ class ActivitySubscriber implements EventSubscriberInterface
         $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($base, $token));
 
         return $marketStatus->getLastPrice();
-    }
-
-    private function convertToMintme(Money $amount, Token $token): Money
-    {
-        $lastPrice = $this->getLastPrice($token);
-        $lastPrice = $this->moneyWrapper->format($lastPrice);
-
-        $exchange = new FixedExchange([
-            Symbols::TOK => [
-                Symbols::WEB => $lastPrice,
-            ],
-        ]);
-
-        return $this->moneyWrapper->convert($amount, new Currency(Symbols::WEB), $exchange);
     }
 }
