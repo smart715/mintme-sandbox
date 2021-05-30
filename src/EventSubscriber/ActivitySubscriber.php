@@ -26,7 +26,7 @@ use App\Events\TokenEvents;
 use App\Events\TransactionCompletedEvent;
 use App\Events\UserAirdropEvent;
 use App\Events\WithdrawCompletedEvent;
-use App\Exchange\Market;
+use App\Exchange\Factory\MarketFactory;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -60,19 +60,22 @@ class ActivitySubscriber implements EventSubscriberInterface
     private PublisherInterface $publisher;
     private MarketStatusManagerInterface $marketStatusManager;
     private CryptoManagerInterface $cryptoManager;
+    private MarketFactory $marketFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
         PublisherInterface $publisher,
         MarketStatusManagerInterface $marketStatusManager,
-        CryptoManagerInterface $cryptoManager
+        CryptoManagerInterface $cryptoManager,
+        MarketFactory $marketFactory
     ) {
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->publisher = $publisher;
         $this->marketStatusManager = $marketStatusManager;
         $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
     }
 
     public static function getSubscribedEvents(): array
@@ -247,7 +250,8 @@ class ActivitySubscriber implements EventSubscriberInterface
     private function getLastPrice(Token $token): Money
     {
         $base = $this->cryptoManager->findBySymbol(Symbols::WEB);
-        $marketStatus = $this->marketStatusManager->getMarketStatus(new Market($base, $token));
+        $market = $this->marketFactory->create($base, $token);
+        $marketStatus = $this->marketStatusManager->getMarketStatus($market);
 
         return $marketStatus->getLastPrice();
     }
