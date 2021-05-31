@@ -29,6 +29,7 @@ use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Money\Currency;
+use Money\Exchange\FixedExchange;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -127,10 +128,13 @@ class Wallet implements WalletInterface
             Symbols::ETH
         );
 
-        $withdrawFee = $tradable->getFee() ?? $this->moneyWrapper->parse(
-            (string)$this->parameterBag->get('token_withdraw_fee'),
-            Symbols::TOK
-        );
+        $exchange = new FixedExchange(['WEB' => ['TOK' => 1]]);
+        $withdrawFee = $tradable->getFee() ?? ($crypto->getFee()->isSameCurrency(new Money(0, new Currency('WEB'))) ?
+            $this->moneyWrapper->convert($crypto->getFee(), new Currency('TOK'), $exchange) :
+            $this->moneyWrapper->parse(
+                (string)$this->parameterBag->get('token_withdraw_fee'),
+                Symbols::TOK
+            ));
 
         if (!$crypto) {
             throw new NotFoundTokenException();
