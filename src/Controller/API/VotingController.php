@@ -166,7 +166,7 @@ class VotingController extends AbstractFOSRestController
 
         $token = $voting instanceof TokenVoting
             ? $voting->getToken()
-            : (new Token())->setName($voting->getCrypto()->getSymbol())
+            : $voting->getCrypto()
             ;
 
         $balance = $this->balanceHandler->balance($user, $token)->getAvailable()->getAmount();
