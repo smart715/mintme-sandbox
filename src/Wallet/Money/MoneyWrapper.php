@@ -60,18 +60,17 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return $this->getFormatter()->format($money);
     }
 
-    public function convertByRatio(Money $amount, Currency $toCurrency, string $ratio): Money
+    public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money
     {
         $from = $amount->getCurrency()->getCode();
-        $to = $toCurrency->getCode();
 
         $exchange = new FixedExchange([
             $from => [
-                $to => $ratio,
+                $toCurrency => $ratio,
             ],
         ]);
 
-        return $this->convert($amount, $toCurrency, $exchange);
+        return $this->convert($amount, new Currency($toCurrency), $exchange);
     }
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string

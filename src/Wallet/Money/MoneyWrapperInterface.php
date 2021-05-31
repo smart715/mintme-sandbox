@@ -14,5 +14,5 @@ interface MoneyWrapperInterface
     public function parse(string $value, string $symbol): Money;
     public function convertToDecimalIfNotation(string $notation, string $symbol): string;
     public function convert(Money $money, Currency $currency, ?FixedExchange $exchange = null): Money;
-    public function convertByRatio(Money $amount, Currency $toCurrency, string $ratio): Money;
+    public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money;
 }

@@ -159,11 +159,9 @@ class ActivitySubscriber implements EventSubscriberInterface
         $lastPrice = $this->getLastPrice($token);
         $lastPrice = $this->moneyWrapper->format($lastPrice);
 
-        $mintmeCurrency = new Currency(Symbols::WEB);
-
         $amountWorthInMintme = $this->moneyWrapper->convertByRatio(
             $amount,
-            $mintmeCurrency,
+            Symbols::WEB,
             $lastPrice
         );
 
@@ -172,7 +170,7 @@ class ActivitySubscriber implements EventSubscriberInterface
 
         $activity
             ->setAmount($amountWorthInMintme)
-            ->setCurrency($mintmeCurrency->getCode())
+            ->setCurrency(Symbols::WEB)
             ->setUser($user)
             ->setToken($token);
 
