@@ -279,6 +279,14 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
+    public function removeToken(UserToken $userToken): self
+    {
+        $this->tokens->removeElement($userToken);
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
     public function addCrypto(UserCrypto $userCrypto): self
     {
         $this->cryptos->add($userCrypto);

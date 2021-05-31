@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserTokenRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(
  *     name="user_tokens",
