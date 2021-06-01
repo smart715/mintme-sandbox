@@ -4,6 +4,7 @@ namespace App\Tests\Wallet\Money;
 
 use App\Entity\Crypto;
 use App\Manager\CryptoManager;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -44,6 +45,18 @@ class MoneyWrapperTest extends TestCase
         $moneyWrapper->convert($money, $currency);
 
         $this->assertTrue(true);
+    }
+
+    public function testConvertByRatio(): void
+    {
+        $moneyWrapper = new MoneyWrapper($this->mockCryptoManager());
+
+        $tokenAmount = $moneyWrapper->parse('1000', Symbols::TOK);
+
+        $worth = $moneyWrapper->convertByRatio($tokenAmount, Symbols::BTC, '0.1');
+        $expectedWorth = $moneyWrapper->parse('100', Symbols::BTC);
+
+        $this->assertTrue($worth->equals($expectedWorth));
     }
 
     private function mockCryptoManager(): CryptoManager
