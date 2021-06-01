@@ -60,6 +60,19 @@ final class MoneyWrapper implements MoneyWrapperInterface
         return $this->getFormatter()->format($money);
     }
 
+    public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money
+    {
+        $from = $amount->getCurrency()->getCode();
+
+        $exchange = new FixedExchange([
+            $from => [
+                $toCurrency => $ratio,
+            ],
+        ]);
+
+        return $this->convert($amount, new Currency($toCurrency), $exchange);
+    }
+
     public function convertToDecimalIfNotation(string $notation, string $symbol): string
     {
         $regEx = '/^(?<left> (?P<sign> [+\-]?) 0*(?P<mantissa> [0-9]+(?P<decimals> \.[0-9]+)?) )[eE] (?<right> (?P<expSign> [+\-]?)(?P<exp> \d+))$/x';

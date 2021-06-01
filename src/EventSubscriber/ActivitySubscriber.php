@@ -20,12 +20,13 @@ use App\Events\DepositCompletedEvent;
 use App\Events\DonationEvent;
 use App\Events\OrderEvent;
 use App\Events\OrderEventInterface;
+use App\Events\PostEvent;
 use App\Events\TokenEventInterface;
 use App\Events\TokenEvents;
 use App\Events\TransactionCompletedEvent;
 use App\Events\UserAirdropEvent;
 use App\Events\WithdrawCompletedEvent;
-use App\Exchange\Market;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
@@ -57,15 +58,24 @@ class ActivitySubscriber implements EventSubscriberInterface
     private EntityManagerInterface $entityManager;
     private MoneyWrapperInterface $moneyWrapper;
     private PublisherInterface $publisher;
+    private MarketStatusManagerInterface $marketStatusManager;
+    private CryptoManagerInterface $cryptoManager;
+    private MarketFactoryInterface $marketFactory;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         MoneyWrapperInterface $moneyWrapper,
-        PublisherInterface $publisher
+        PublisherInterface $publisher,
+        MarketStatusManagerInterface $marketStatusManager,
+        CryptoManagerInterface $cryptoManager,
+        MarketFactoryInterface $marketFactory
     ) {
         $this->entityManager = $entityManager;
         $this->moneyWrapper = $moneyWrapper;
         $this->publisher = $publisher;
+        $this->marketStatusManager = $marketStatusManager;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
     }
 
     public static function getSubscribedEvents(): array
@@ -75,7 +85,7 @@ class ActivitySubscriber implements EventSubscriberInterface
             TokenEvents::DEPLOYED => 'handleTokenEvent',
             TokenEvents::AIRDROP_CREATED => 'handleTokenEvent',
             TokenEvents::AIRDROP_ENDED => 'handleTokenEvent',
-            TokenEvents::POST_CREATED => 'handleTokenEvent',
+            TokenEvents::POST_CREATED => 'handlePostEvent',
             TokenEvents::AIRDROP_CLAIMED => 'airdropClaimed',
             TokenEvents::DONATION => 'donation',
             DepositCompletedEvent::NAME => 'handleTransactionEvent',
@@ -89,6 +99,19 @@ class ActivitySubscriber implements EventSubscriberInterface
         $token = $event->getToken();
 
         $activity = $this->createActivity($eventName)->setToken($token);
+
+        $this->saveActivity($activity);
+    }
+
+    public function handlePostEvent(PostEvent $event, string $eventName): void
+    {
+        $token = $event->getToken();
+        $post = $event->getPost();
+
+        /** @var NewPostActivity $activity */
+        $activity = $this->createActivity($eventName);
+
+        $activity->setPost($post)->setToken($token);
 
         $this->saveActivity($activity);
     }
@@ -133,10 +156,23 @@ class ActivitySubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
 
+        $lastPrice = $this->getLastPrice($token);
+        $lastPrice = $this->moneyWrapper->format($lastPrice);
+
+        $amountWorthInMintme = $this->moneyWrapper->convertByRatio(
+            $amount,
+            Symbols::WEB,
+            $lastPrice
+        );
+
         /** @var TokenDepositedActivity|TokenWithdrawnActivity $activity */
         $activity = $this->createActivity($eventName);
 
-        $activity->setAmount($amount)->setUser($user)->setToken($token);
+        $activity
+            ->setAmount($amountWorthInMintme)
+            ->setCurrency(Symbols::WEB)
+            ->setUser($user)
+            ->setToken($token);
 
         $this->saveActivity($activity);
     }
@@ -207,5 +243,14 @@ class ActivitySubscriber implements EventSubscriberInterface
     private function publishActivity(Activity $activity): void
     {
         $this->publisher->publish('activities', $activity);
+    }
+
+    private function getLastPrice(Token $token): Money
+    {
+        $base = $this->cryptoManager->findBySymbol(Symbols::WEB);
+        $market = $this->marketFactory->create($base, $token);
+        $marketStatus = $this->marketStatusManager->getMarketStatus($market);
+
+        return $marketStatus->getLastPrice();
     }
 }
