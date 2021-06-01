@@ -27,6 +27,7 @@ use App\Events\TokenEventInterface;
 use App\Events\TransactionCompletedEvent;
 use App\Events\UserAirdropEvent;
 use App\EventSubscriber\ActivitySubscriber;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
@@ -55,11 +56,7 @@ class ActivitySubscriberTest extends TestCase
             ->method('persist')
             ->with($this->callback(fn (Activity $a) => $a instanceof $activityClass && $a->getToken() === $token));
 
-        $subscriber = new ActivitySubscriber(
-            $em,
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber($em);
 
         $subscriber->handleTokenEvent($event, $eventName);
     }
@@ -105,11 +102,7 @@ class ActivitySubscriberTest extends TestCase
                 }
             ));
 
-        $subscriber = new ActivitySubscriber(
-            $em,
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber($em);
 
         $subscriber->airdropClaimed($event, 'airdrop.claimed');
     }
@@ -120,11 +113,7 @@ class ActivitySubscriberTest extends TestCase
         $event->method('getTradable')->willReturn($this->createMock(Crypto::class));
         $event->expects($this->never())->method('getUser');
 
-        $subscriber = new ActivitySubscriber(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber();
 
         $subscriber->handleTransactionEvent($event, 'deposit.completed');
     }
@@ -154,11 +143,7 @@ class ActivitySubscriberTest extends TestCase
                     && 'TOK' === $a->getAmount()->getCurrency()->getCode()
             ));
 
-        $subscriber = new ActivitySubscriber(
-            $em,
-            $mw,
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber($em, $mw);
 
         $subscriber->handleTransactionEvent($event, $eventName);
     }
@@ -203,11 +188,7 @@ class ActivitySubscriberTest extends TestCase
                 )
             );
 
-        $subscriber = new ActivitySubscriber(
-            $em,
-            $mw,
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber($em, $mw);
 
         $subscriber->donation($event, 'donation');
     }
@@ -224,11 +205,7 @@ class ActivitySubscriberTest extends TestCase
         $event = $this->createMock(OrderEventInterface::class);
         $event->method('getOrder')->willReturn($order);
 
-        $subscriber = new ActivitySubscriber(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(MoneyWrapperInterface::class),
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber();
 
         $subscriber->handleOrderEvent($event, 'order.completed');
     }
@@ -286,11 +263,7 @@ class ActivitySubscriberTest extends TestCase
                 )
             );
 
-        $subscriber = new ActivitySubscriber(
-            $em,
-            $mw,
-            $this->createMock(PublisherInterface::class)
-        );
+        $subscriber = $this->mockActivitySubscriber($em, $mw);
 
         $subscriber->handleOrderEvent($event, 'order.completed');
     }
@@ -301,5 +274,23 @@ class ActivitySubscriberTest extends TestCase
             [1],
             [2],
         ];
+    }
+
+    public function mockActivitySubscriber(
+        ?EntityManagerInterface $em = null,
+        ?MoneyWrapperInterface $mw = null,
+        ?PublisherInterface $pu = null,
+        ?MarketStatusManagerInterface $ms = null,
+        ?CryptoManagerInterface $cm = null,
+        ?MarketFactoryInterface $mf = null
+    ): ActivitySubscriber {
+        return new ActivitySubscriber(
+            $em ?? $this->createMock(EntityManagerInterface::class),
+            $mw ?? $this->createMock(MoneyWrapperInterface::class),
+            $pu ?? $this->createMock(PublisherInterface::class),
+            $ms ?? $this->createMock(MarketStatusManagerInterface::class),
+            $cm ?? $this->createMock(CryptoManagerInterface::class),
+            $mf ?? $this->createMock(MarketFactoryInterface::class)
+        );
     }
 }
