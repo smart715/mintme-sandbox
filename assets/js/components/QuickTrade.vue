@@ -3,26 +3,31 @@
         <div class="card h-100">
                 <div class="card-header">
                     <ul class="nav quick-trade-nav">
-                      <li class="nav-item">
-                        <a
+                        <li class="nav-item">
+                            <a
                             class="nav-link"
-                            :class="{'active': tradeMode === BUY_MODE}"
+                            :class="{'active': isBuyMode}"
                             href="#"
                             @click.prevent="setTradeMode(BUY_MODE)"
-                        >
-                            {{ $t('donation.header.buy') }}
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a
+                            >
+                                {{ $t('donation.buy') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
                             class="nav-link"
-                            :class="{'active': tradeMode === SELL_MODE}"
+                            :class="{'active': isSellMode}"
                             href="#"
                             @click.prevent="setTradeMode(SELL_MODE)"
-                        >
-                            {{ $t('donation.header.sell') }}
-                        </a>
-                      </li>
+                            >
+                                {{ $t('donation.sell') }}
+                            </a>
+                        </li>
+                        <guide v-if="isToken" class="ml-auto">
+                            <template slot="body">
+                                <span v-html="$sanitize(nonrefundHtml)"></span>
+                            </template>
+                        </guide>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -33,6 +38,7 @@
                         >
                             <div class="d-sm-flex">
                                 <b-dropdown
+                                    v-if="isBuyMode"
                                     id="donation_currency"
                                     :text="dropdownText"
                                     variant="primary"
@@ -78,7 +84,12 @@
                                         class="btn btn-primary btn-donate ml-sm-2"
                                     >
                                         <span :class="{'text-muted': disabledServices.newTradesDisabled}">
-                                            {{ $t('donation.buy') }}
+                                            <template v-if="isBuyMode">
+                                                {{ $t('donation.buy') }}
+                                            </template>
+                                            <template v-if="isSellMode">
+                                                {{ $t('donation.sell') }}
+                                            </template>
                                         </span>
                                     </button>
                                     <confirm-modal
@@ -166,9 +177,6 @@
                                     {{ $t('donation.first') }}
                                 </span>
                             </div>
-                        </div>
-                        <div class="col mt-3 mt-xl-0 pl-xl-0">
-                            <p class="info m-0" v-html="$sanitize(nonrefundHtml)"></p>
                         </div>
                     </div>
                     <div v-if="!loggedIn" class="d-flex justify-content-center">
@@ -258,6 +266,7 @@ export default {
         donationParams: Object,
         disabledServicesConfig: String,
         profileNickname: String,
+        isToken: Boolean,
     },
     data() {
         return {
@@ -287,6 +296,12 @@ export default {
         };
     },
     computed: {
+        isBuyMode: function() {
+            return this.tradeMode === BUY_MODE;
+        },
+        isSellMode: function() {
+            return this.tradeMode === SELL_MODE;
+        },
         currencyMode: function() {
             return localStorage.getItem('_currency_mode');
         },

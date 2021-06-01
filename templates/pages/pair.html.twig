@@ -138,6 +138,7 @@
                             websocket-url="{{ global_websocket_url }}"
                             disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                             profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
                         >
                         </quick-trade>
                     </div>

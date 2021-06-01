@@ -662,9 +662,7 @@ bbcode.help.image: Image
 bbcode.help.images: Images
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Vidéo YouTube'
-donation.header.buy:
-donation.header.sell:
-donation.nonrefund: 'L''argent dépensée ici ira au créateur du jeton. Si vous ne voulez pas soutenir ce jeton and vous êtes interessé au plus bas prix, utilisez l''option <a href="%path%">trade</a> '
+donation.nonrefund:
 donation.currency: Devise
 donation.currency.select: 'Selectionner la devise'
 donation.balance: 'Solde:'
@@ -678,6 +676,7 @@ donation.diff_number: 'La quantité de jetons que vous recevrez peut légèremen
 donation.receive: 'Vous recevrez approximativement:'
 donation.fee: 'Frais d''achat: %fee%%'
 donation.buy: Acheter
+donation.sell:
 donation.modal.1: 'Le quantité donnée excède la valeur des jetons disponible à vendre. Vous pouvez continuer ou annuler et ajuster le montant de la donation. Alternativement; vous pouvez demander au créateur du jeton de définir plus d''ordres de vente sur le marché, puis réessayer la donation.'
 donation.modal.2: 'Voulez-vous faire une donation %amountToDonate% de %amountToReceive% valant %worth%?'
 donation.successfully_made: 'Félicitations! Achat effectué avec succès. Vous avez reçu %amount% jetons'

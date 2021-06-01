@@ -658,9 +658,7 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.header.buy:
-donation.header.sell:
-donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no deseas apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>'
+donation.nonrefund:
 donation.currency: Moneda
 donation.currency.select: 'Seleccionar moneda'
 donation.balance: 'Su saldo:'
@@ -674,6 +672,7 @@ donation.diff_number: 'La cantidad de tokens que recibirá puede variar ligerame
 donation.receive: 'Recibirá aproximadamente:'
 donation.fee: 'Comisión por compra: %fee%%'
 donation.buy: Comprar
+donation.sell:
 donation.modal.1: 'La cantidad donada excede el valor de los tokens disponibles para la venta. Puede continuar, o cancelar y ajustar la cantidad a donar. Alternativamente, puede comunicarse con el creador del token y pedirle que agregue más órdenes de venta al mercado y hacer la donación luego.'
 donation.modal.2: '¿Desea donar %amountToDonate% por %amountToReceive% que valen %worth%?'
 donation.button_all: Todo
