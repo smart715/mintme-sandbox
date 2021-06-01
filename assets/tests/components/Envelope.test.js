@@ -58,7 +58,7 @@ describe('Envelope', () => {
             },
         });
 
-        expect(wrapper.find('font-awesome-icon').attributes('icon')).toBe('envelope');
+        expect(wrapper.find('font-awesome-icon-stub').attributes('icon')).toBe('envelope');
     });
 
     it('should compute showEnvelope correctly', () => {

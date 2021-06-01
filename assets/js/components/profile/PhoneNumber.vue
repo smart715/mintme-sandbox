@@ -1,14 +1,16 @@
 <template>
     <div class="phone-number">
-        <maz-phone-number-input
-            ref="phoneNumberInput"
+        <vue-phone-number-input
             v-model="phone"
             @update="updatePhone"
             :translations="translations"
             :default-country-code="countryCode"
             dark
-            showCodeOnList
-            noValidation
+            show-code-on-list
+            no-validator-state
+            clearable
+            :border-radius="0"
+            :countries-height="32"
         />
         <div v-if="showValidationMessage" class="text-danger text-center">
             {{ $t('phone_number.wrong') }}
@@ -17,12 +19,13 @@
 </template>
 
 <script>
-import {MazPhoneNumberInput} from 'maz-ui';
+import VuePhoneNumberInput from 'vue-phone-number-input';
+import 'vue-phone-number-input/dist/vue-phone-number-input.css';
 
 export default {
     name: 'PhoneNumber',
     components: {
-        MazPhoneNumberInput,
+        VuePhoneNumberInput,
     },
     data() {
         return {
@@ -60,7 +63,7 @@ export default {
         updatePhone: function(data) {
             this.isValidNumber = data.isValid;
             this.$emit('is-valid-phone', this.isValidNumber);
-            this.phoneNumberModel = data.e164 || this.$refs.phoneNumberInput.asYouTypeNumber;
+            this.phoneNumberModel = data.e164 || data.phoneNumber;
         },
     },
 };

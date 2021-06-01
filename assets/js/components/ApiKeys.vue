@@ -58,14 +58,23 @@
 </template>
 
 <script>
+    import {library} from '@fortawesome/fontawesome-svg-core';
+    import {faCopy} from '@fortawesome/free-regular-svg-icons';
+    import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
     import ConfirmModal from './modal/ConfirmModal';
     import CopyLink from './CopyLink';
     import {LoggerMixin, NotificationMixin} from '../mixins';
 
+    library.add(faCopy);
+
     export default {
         name: 'ApiKeys',
         mixins: [NotificationMixin, LoggerMixin],
-        components: {ConfirmModal, CopyLink},
+        components: {
+            ConfirmModal,
+            CopyLink,
+            FontAwesomeIcon,
+        },
         props: {
             apiKeys: {type: [Object, Array], required: true},
         },

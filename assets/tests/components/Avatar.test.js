@@ -6,7 +6,6 @@ import Avatar from '../../js/components/Avatar';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {template: ''});
     return localVue;
 }
 

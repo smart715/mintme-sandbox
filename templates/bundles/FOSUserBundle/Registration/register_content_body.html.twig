@@ -10,7 +10,7 @@
 <div id="register-form-password-container">
     <passwordmeter :password="password" @toggle-error="toggleError">
                 <span @click="togglePassword()" class="show-password">
-                    <i class="far fa-eye"></i>
+                    <font-awesome-icon icon="eye"></font-awesome-icon>
                 </span>
         {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
     </passwordmeter>

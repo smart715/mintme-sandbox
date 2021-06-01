@@ -27,13 +27,19 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
 import {tokenDeploymentStatus} from '../../../utils/constants';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TokenDeployIcon',
     components: {
         Guide,
+        FontAwesomeIcon,
     },
     props: {
         isMintme: Boolean,

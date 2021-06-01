@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 
+
 {% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/home') }}
+{% endblock %}
 
 {% block bgclass %}index-bg{% endblock %}
 
@@ -249,5 +255,5 @@
 {% block messageClass %}d-none{% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('home') }}
+    {{ encore_entry_script_tags('pages/home') }}
 {% endblock %}

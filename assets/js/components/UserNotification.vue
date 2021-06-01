@@ -58,14 +58,25 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import NotificationBell from 'vue-notification-bell';
 import VueScroll from 'vuescroll';
 import {mixin as clickaway} from 'vue-clickaway';
 import NotificationType from './NotificationType';
 import {LoggerMixin} from '../mixins';
 
+library.add(faCircleNotch);
+
 const MAX_NOTIFICATIONS = 90;
 export default {
+    components: {
+        NotificationBell,
+        VueScroll,
+        NotificationType,
+        FontAwesomeIcon,
+    },
     mixins: [clickaway, LoggerMixin],
     data() {
         return {
@@ -78,11 +89,6 @@ export default {
                 },
             },
         };
-    },
-    components: {
-        NotificationBell,
-        VueScroll,
-        NotificationType,
     },
     created() {
         this.fetchUserNotifications();

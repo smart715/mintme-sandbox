@@ -16,7 +16,6 @@ function mockVue() {
             Vue.prototype.$routing = {generate: (val) => val};
         },
     });
-    localVue.directive('b-tooltip', {});
     return localVue;
 }
 

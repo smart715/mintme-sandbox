@@ -59,7 +59,11 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
 import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol, webEthSymbol, webUsdcSymbol} from '../../utils/constants';
@@ -72,8 +76,17 @@ import {
     OrderMixin,
 } from '../../mixins/';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'TradingHistory',
+    components: {
+        BTable,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         FiltersMixin,
         LazyScrollTableMixin,

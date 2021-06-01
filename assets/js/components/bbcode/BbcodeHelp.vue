@@ -149,7 +149,6 @@
 </template>
 
 <script>
-
 import Guide from '../Guide';
 import bbob from '@bbob/core';
 import {render} from '@bbob/html';
