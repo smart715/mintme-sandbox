@@ -1397,11 +1397,11 @@ activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% jetons distribué
 activity_1_message: '<a href="%tokenUrl%">%token%</a> début de l''airdrop'
 activity_2_message: 'Fin de l''airdrop pour <a href="%tokenUrl%">%token%</a>'
 activity_3_message: '<a href="%tokenUrl%">%token%</a> a reçu une donation valant %amount% %symbol%'
-activity_4_message: '<a href="%tokenUrl%">%token%</a> a ajouté un nouveau post'
+activity_4_message: '<a href="%tokenUrl%">%token%</a> a ajouté un nouveau post <a href="%postUrl%">%post%</a>'
 activity_5_message: '<a href="%tokenUrl%">%token%</a> a été crée'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> a été déployé'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> a été déposé par <a href="%userUrl%">%user%</a> valant %amount% %symbol%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> a été vendu de <a href="%sellerUrl%">%seller%</a> à <a href="%buyerUrl%">%buyer%</a> valant %amount% %symbol%'
+activity_8_message:
 activity_9_message: '<a href="%tokenUrl%">%token%</a> a été retiré par <a href="%userUrl%">%user%</a> valant %amount% %symbol%'
 token.intro.deployed_modal.paragraph_1.head: 'De nouvelles fonctions sont disponibles pour votre jeton:'
 token.intro.deployed_modal.paragraph_1.part_1: 'Cela peut être retiré et déposé'
