@@ -33,12 +33,11 @@
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
                         <div
-                            class="col-xl-5"
                             :class="isCurrencySelected && loggedIn ? 'col-lg-8' : 'col-lg-12'"
                         >
                             <div class="d-sm-flex">
                                 <b-dropdown
-                                    v-if="isBuyMode"
+                                    v-show="isBuyMode"
                                     id="donation_currency"
                                     :text="dropdownText"
                                     variant="primary"
@@ -135,7 +134,8 @@
                                         fixed-width
                                     />
                                     <span v-else class="text-nowrap">
-                                        {{ amountToReceive }} tokens
+                                        {{ amountToReceive | toMoney(currencySubunit) }}
+                                        {{ isBuyMode ? 'tokens' : 'MintMe' }}
                                         <guide
                                             :placement="'right-start'"
                                             :max-width="'200px'"
@@ -203,6 +203,7 @@ import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import debounce from 'lodash/debounce';
 import {BDropdown, BDropdownItem} from 'bootstrap-vue';
+import {mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
 import {
     CheckInputMixin,
@@ -235,8 +236,8 @@ import PriceConverterInput from './PriceConverterInput';
 
 library.add(faCircleNotch);
 
-const BUY_MODE = 1;
-const SELL_MODE = 2;
+const BUY_MODE = 'buy';
+const SELL_MODE = 'sell';
 
 export default {
     name: 'QuickTrade',
@@ -280,11 +281,9 @@ export default {
             selectedCurrency: null,
             amountToDonate: 0,
             amountToReceive: 0,
-            tokensWorth: 0,
-            sellOrdersSummary: 0,
+            worth: 0,
+            ordersSummary: 0,
             donationChecking: false,
-            balanceLoaded: false,
-            balance: 0,
             donationInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
@@ -296,6 +295,18 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('tradeBalance', {
+            balances: 'getBalances',
+        }),
+        balance: function() {
+            return this.balances ?
+                this.balances[this.selectedCurrency].available:
+                null
+            ;
+        },
+        balanceLoaded: function() {
+            return this.balance !== null;
+        },
         isBuyMode: function() {
             return this.tradeMode === BUY_MODE;
         },
@@ -309,7 +320,7 @@ export default {
           return {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
             amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
-            worth: formatMoney(toMoney(this.tokensWorth, this.currencySubunit)),
+            worth: formatMoney(toMoney(this.worth, this.currencySubunit)),
           };
         },
         donationCurrency: function() {
@@ -321,7 +332,10 @@ export default {
             });
         },
         isCurrencySelected: function() {
-            return Object.values(this.options).includes(this.selectedCurrency);
+            return this.isBuyMode ?
+                Object.values(this.options).includes(this.selectedCurrency):
+                this.selectedCurrency === this.market.quote.symbol
+            ;
         },
         dropdownText: function() {
             return this.isCurrencySelected
@@ -417,23 +431,22 @@ export default {
     },
     methods: {
         setTradeMode: function(mode) {
+            if (this.tradeMode === mode) {
+                return;
+            }
+
             this.tradeMode = mode;
+
+            if (mode === SELL_MODE) {
+                this.onSelect(this.market.quote.symbol);
+            } else {
+                this.onSelect(webSymbol);
+            }
         },
         onSelect: function(newCurrency) {
             if (this.selectedCurrency !== newCurrency) {
-                this.balanceLoaded = false;
                 this.selectedCurrency = newCurrency;
             }
-        },
-        getTokenBalance: function() {
-            this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))
-                .then((res) => {
-                    this.balance = res.data;
-                    this.balanceLoaded = true;
-                })
-                .catch((error) => {
-                    this.sendLogs('error', 'Can not load crypto balance.', error);
-                });
         },
         checkAmountInput: function() {
             return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
@@ -451,13 +464,14 @@ export default {
             this.$axios.retry.get(this.$routing.generate('check_donation', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
+                mode: this.tradeMode,
                 currency: this.selectedCurrency,
                 amount: this.amountToDonate,
             }))
                 .then((res) => {
                     this.amountToReceive = res.data.amountToReceive;
-                    this.tokensWorth = res.data.tokensWorth;
-                    this.sellOrdersSummary = res.data.sellOrdersSummary;
+                    this.worth = res.data.worth;
+                    this.ordersSummary = res.data.ordersSummary;
                 })
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
@@ -492,8 +506,6 @@ export default {
                     );
 
                     this.resetAmount();
-                    this.balanceLoaded = false;
-                    this.getTokenBalance();
                 })
                 .catch((error) => {
                     if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
@@ -557,7 +569,7 @@ export default {
                 return;
             }
 
-            if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersSummary)) {
+            if ((new Decimal(this.amountToDonate)).greaterThan(this.ordersSummary)) {
                 this.showModal = true;
             } else {
                 this.makeDonation();
@@ -580,7 +592,6 @@ export default {
     watch: {
         selectedCurrency: function() {
             if (this.isCurrencySelected) {
-                this.getTokenBalance();
                 this.resetAmount();
             }
         },

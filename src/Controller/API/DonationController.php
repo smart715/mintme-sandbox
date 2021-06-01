@@ -3,30 +3,39 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
+use App\Entity\Token\Token;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Logger\DonationLogger;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Money\Exchange\FixedExchange;
 
 /**
  * @Rest\Route("/api/donate")
  */
 class DonationController extends AbstractFOSRestController
 {
+    const BUY = 'buy';
+    const SELL = 'sell';
+
     protected DonationHandlerInterface $donationHandler;
     protected MarketHandlerInterface $marketHandler;
     protected DonationLogger $logger;
     protected EventDispatcherInterface $eventDispatcher;
+    private MoneyWrapperInterface $moneyWrapper;
 
     private LockFactory $lockFactory;
 
@@ -35,22 +44,23 @@ class DonationController extends AbstractFOSRestController
         MarketHandlerInterface $marketHandler,
         DonationLogger $logger,
         LockFactory $lockFactory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MoneyWrapperInterface $moneyWrapper
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
         $this->logger = $logger;
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
+        $this->moneyWrapper = $moneyWrapper;
     }
 
     /**
      * @Rest\View()
      * @Rest\Get(
-     *     "/{base}/{quote}/check/{currency}/{amount}",
+     *     "/{base}/{quote}/check/{mode}/{currency}/{amount}",
      *     name="check_donation",
      *     options={"expose"=true},
-     *     requirements={"currency"="^(WEB|BTC|ETH|USDC)$"}
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
@@ -58,32 +68,95 @@ class DonationController extends AbstractFOSRestController
      *     allowBlank=false,
      *     description="Selected currency to donate."
      * )
+     * @Rest\RequestParam(
+     *     name="mode",
+     *     allowBlank=false,
+     *     requirements="^(sell|buy)$"),
+     *     description="Trade mode"
      */
     public function checkDonation(
         Market $market,
         string $currency,
-        string $amount
+        string $amount,
+        string $mode
     ): View {
         try {
             /** @var User|null $user */
             $user = $this->getUser();
 
-            $checkDonationResult = $this->donationHandler->checkDonation(
-                $market,
-                $currency,
-                $amount,
-                $user
-            );
+            if ($mode === self::BUY) {
+                $checkDonationResult = $this->donationHandler->checkDonation(
+                    $market,
+                    $currency,
+                    $amount,
+                    $user
+                );
 
-            $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
-            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
-            $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary, $currency);
+                $tokensWorth = $this->donationHandler->getTokensWorth($checkDonationResult->getTokensWorth(), $currency);
+                $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
+                $sellOrdersSummary = $this->donationHandler->getTokensWorth($sellOrdersSummary, $currency);
 
-            return $this->view([
-                'amountToReceive' => $checkDonationResult->getExpectedTokens(),
-                'tokensWorth' => $tokensWorth,
-                'sellOrdersSummary' => $sellOrdersSummary,
-            ]);
+                return $this->view([
+                    'amountToReceive' => $checkDonationResult->getExpectedTokens(),
+                    'worth' => $tokensWorth,
+                    'ordersSummary' => $sellOrdersSummary,
+                ]);
+            } elseif ($mode === self::SELL) {
+                $tradable = $market->getQuote();
+
+                $quoteSymbol = $tradable instanceof Token ?
+                    Symbols::TOK :
+                    $tradable->getSymbol();
+
+                $baseSymbol = $market->getBase()->getSymbol();
+
+                $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, 0, 100);
+
+                $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol); 
+
+                $quoteWorth = $this->moneyWrapper->parse('0', $quoteSymbol);
+
+                $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
+                
+                foreach ($pendingBuyOrders as $bid) {
+                    if ($quoteLeft->isZero()) {
+                        break;
+                    }
+
+                    if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
+                        $orderAmount = $this->moneyWrapper->convertByRatio(
+                            $bid->getAmount(),
+                            $bid->getPrice()->getCurrency()->getCode(),
+                            $this->moneyWrapper->format($bid->getPrice())
+                        ); 
+
+                        $amountToReceive = $amountToReceive->add($orderAmount);
+                        $quoteWorth = $quoteWorth->add($bid->getAmount());
+                        $quoteLeft = $quoteLeft->subtract($bid->getAmount());
+                    } else {
+                        $portionOrderTotal = $this->moneyWrapper->convertByRatio(
+                            $quoteLeft,
+                            $bid->getPrice()->getCurrency()->getCode(),
+                            $this->moneyWrapper->format($bid->getPrice())
+                        ); 
+                        
+                        $amountToReceive = $amountToReceive->add($portionOrderTotal);
+                        $quoteWorth = $quoteWorth->add($quoteLeft);
+                        $quoteLeft = $quoteLeft->subtract($quoteLeft);
+                    }
+                }
+                
+                $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
+
+                return $this->view([
+                    'amountToReceive' => $amountToReceive,
+                    'worth' => $quoteWorth,
+                    'ordersSummary' => $buyOrdersSummary,
+                ]);
+            } else {
+                throw new ApiBadRequestException('Trade mode is invalid' . $mode);
+            }
+
         } catch (ApiBadRequestException $ex) {
             return $this->view([
                 'message' => $ex->getMessage(),
