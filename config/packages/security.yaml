@@ -53,6 +53,8 @@ security:
             pattern:    ^/oauth/v2/token
             security:   false
 
+    hide_user_not_found: false
+
     role_hierarchy:
         ROLE_AUTENTICATED:
             - ROLE_USER
