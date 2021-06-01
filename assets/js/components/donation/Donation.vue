@@ -2,9 +2,28 @@
     <div v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled">
         <div class="card h-100">
                 <div class="card-header">
-                    <span>
-                        {{ $t('donation.header.logged', {token: market.quote.name}) }}
-                    </span>
+                    <ul class="nav quick-trade-nav">
+                      <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            :class="{'active': tradeMode === BUY_MODE}"
+                            href="#"
+                            @click.prevent="setTradeMode(BUY_MODE)"
+                        >
+                            {{ $t('donation.header.buy') }}
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            :class="{'active': tradeMode === SELL_MODE}"
+                            href="#"
+                            @click.prevent="setTradeMode(SELL_MODE)"
+                        >
+                            {{ $t('donation.header.sell') }}
+                        </a>
+                      </li>
+                    </ul>
                 </div>
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
@@ -208,6 +227,9 @@ import PriceConverterInput from '../PriceConverterInput';
 
 library.add(faCircleNotch);
 
+const BUY_MODE = 1;
+const SELL_MODE = 2;
+
 export default {
     name: 'Donation',
     components: {
@@ -261,6 +283,7 @@ export default {
             showForms: false,
             addPhoneModalMessageType: 'donation',
             addPhoneModalProfileNickName: this.profileNickname,
+            tradeMode: BUY_MODE,
         };
     },
     computed: {
@@ -343,6 +366,11 @@ export default {
             return JSON.parse(this.disabledServicesConfig);
         },
     },
+    created() {
+        // non-reactive data (constants)
+        this.BUY_MODE = BUY_MODE;
+        this.SELL_MODE = SELL_MODE;
+    },
     mounted() {
         if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
             this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
@@ -373,6 +401,9 @@ export default {
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
+        setTradeMode: function(mode) {
+            this.tradeMode = mode;
+        },
         onSelect: function(newCurrency) {
             if (this.selectedCurrency !== newCurrency) {
                 this.balanceLoaded = false;

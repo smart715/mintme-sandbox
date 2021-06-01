@@ -662,8 +662,8 @@ bbcode.help.image: Image
 bbcode.help.images: Images
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Vidéo YouTube'
-donation.header.logged: Acheter
-donation.header.not_logged: 'Pour acheter des jetons, souscrivez ou connectez vous'
+donation.header.buy:
+donation.header.sell:
 donation.nonrefund: 'L''argent dépensée ici ira au créateur du jeton. Si vous ne voulez pas soutenir ce jeton and vous êtes interessé au plus bas prix, utilisez l''option <a href="%path%">trade</a> '
 donation.currency: Devise
 donation.currency.select: 'Selectionner la devise'
