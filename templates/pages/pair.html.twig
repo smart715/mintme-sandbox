@@ -129,7 +129,7 @@
             >
                 {% if isTokenPage and showDonation %}
                     <div class="row">
-                        <donation
+                        <quick-trade
                             class="col-12 mb-3"
                             :market="{{ market | json_encode }}"
                             :logged-in="{{ loggedIn }}"
@@ -139,7 +139,7 @@
                             disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                             profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                         >
-                        </donation>
+                        </quick-trade>
                     </div>
                 {% endif %}
                 <token-ongoing-airdrop-campaign

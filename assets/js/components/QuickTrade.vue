@@ -204,11 +204,11 @@ import {
     RebrandingFilterMixin,
     WebSocketMixin,
     AddPhoneAlertMixin,
-} from '../../mixins';
-import ConfirmModal from '../modal/ConfirmModal';
-import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
-import Guide from '../Guide';
-import {formatMoney, toMoney} from '../../utils';
+} from '../mixins';
+import ConfirmModal from './modal/ConfirmModal';
+import AddPhoneAlertModal from './modal/AddPhoneAlertModal';
+import Guide from './Guide';
+import {formatMoney, toMoney} from '../utils';
 import {
     webSymbol,
     btcSymbol,
@@ -222,8 +222,8 @@ import {
     USDC,
     digitsLimits,
     currencyModes,
-} from '../../utils/constants';
-import PriceConverterInput from '../PriceConverterInput';
+} from '../utils/constants';
+import PriceConverterInput from './PriceConverterInput';
 
 library.add(faCircleNotch);
 
@@ -231,14 +231,14 @@ const BUY_MODE = 1;
 const SELL_MODE = 2;
 
 export default {
-    name: 'Donation',
+    name: 'QuickTrade',
     components: {
         BDropdown,
         BDropdownItem,
         PriceConverterInput,
         Guide,
         ConfirmModal,
-        LoginSignupSwitcher: () => import('../LoginSignupSwitcher').then((data) => data.default),
+        LoginSignupSwitcher: () => import('./LoginSignupSwitcher').then((data) => data.default),
         AddPhoneAlertModal,
         FontAwesomeIcon,
     },
