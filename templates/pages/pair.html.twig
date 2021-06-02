@@ -127,22 +127,20 @@
                 class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
                 v-model="tabIndex"
             >
-                {% if isTokenPage and showDonation %}
-                    <div class="row">
-                        <quick-trade
-                            class="col-12 mb-3"
-                            :market="{{ market | json_encode }}"
-                            :logged-in="{{ loggedIn }}"
-                            :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                            :donation-params="{{ donation_params | json_encode }}"
-                            websocket-url="{{ global_websocket_url }}"
-                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
-                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                        >
-                        </quick-trade>
-                    </div>
-                {% endif %}
+                <div class="row">
+                    <quick-trade
+                        class="col-12 mb-3"
+                        :market="{{ market | json_encode }}"
+                        :logged-in="{{ loggedIn }}"
+                        :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                        :donation-params="{{ donation_params | json_encode }}"
+                        websocket-url="{{ global_websocket_url }}"
+                        disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                        profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                        :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                    >
+                    </quick-trade>
+                </div>
                 <token-ongoing-airdrop-campaign
                     v-if="{{ showAirdropCampaign }}"
                     :logged-in="{{ loggedIn }}"

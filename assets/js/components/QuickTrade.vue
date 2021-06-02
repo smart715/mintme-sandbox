@@ -135,7 +135,7 @@
                                     />
                                     <span v-else class="text-nowrap">
                                         {{ amountToReceive | toMoney(currencySubunit) }}
-                                        {{ isBuyMode ? 'tokens' : 'MintMe' }}
+                                        {{ assetToReceive }}
                                         <guide
                                             :placement="'right-start'"
                                             :max-width="'200px'"
@@ -307,6 +307,13 @@ export default {
         balanceLoaded: function() {
             return this.balance !== null;
         },
+        assetToReceive: function() {
+            const asset = this.isBuyMode ?
+                this.market.quote.symbol:
+                this.market.base.symbol;
+
+            return this.rebrandingFunc(asset);
+        },
         isBuyMode: function() {
             return this.tradeMode === BUY_MODE;
         },
@@ -426,7 +433,7 @@ export default {
             }, null, 'Donation');
         }
 
-        this.selectedCurrency = webSymbol;
+        this.selectedCurrency = this.isToken ? webSymbol : this.market.base.symbol;
         this.debouncedCheck = debounce(this.checkDonation, 500);
     },
     methods: {
@@ -437,10 +444,11 @@ export default {
 
             this.tradeMode = mode;
 
-            if (mode === SELL_MODE) {
-                this.onSelect(this.market.quote.symbol);
+            if (mode === BUY_MODE) {
+                this.onSelect(this.isToken ? webSymbol : this.market.base.symbol);
             } else {
-                this.onSelect(webSymbol);
+
+                this.onSelect(this.market.quote.symbol);
             }
         },
         onSelect: function(newCurrency) {
