@@ -117,13 +117,20 @@
                                 <div
                                     v-if="insufficientFundsError"
                                     class="mt-1 text-danger">
-                                    {{
-                                        $t('donation.min_amount', {
-                                          donationCurrency:donationCurrency,
-                                          currencyMinAmount:currencyMinAmount
-                                        })
-                                    }}
+                                    {{ $t('donation.min_amount', translationsContext) }}
                                 </div>
+                                <div
+                                    v-if="sellAmountExceeds"
+                                    class="mt-1 text-danger"
+                                >
+                                    <template v-if="isOrdersSummaryZero">
+                                        {{ $t('donation.order.buy.empty') }}
+                                    </template>
+                                    <template v-else>
+                                        {{ $t('donation.amount.sell_exceeds', translationsContext) }}
+                                    </template>
+                                </div>
+
                                 <p class="m-0 mt-1">
                                     {{ $t('donation.receive') }}
                                     <font-awesome-icon
@@ -289,6 +296,7 @@ export default {
             tokensAvailabilityChanged: false,
             USD,
             showForms: false,
+            alreadyChecked: false,
             addPhoneModalMessageType: 'donation',
             addPhoneModalProfileNickName: this.profileNickname,
             tradeMode: BUY_MODE,
@@ -320,6 +328,11 @@ export default {
         isSellMode: function() {
             return this.tradeMode === SELL_MODE;
         },
+        isOrdersSummaryZero: function() {
+            const summary = new Decimal(this.ordersSummary)
+
+            return summary.isZero();
+        },
         currencyMode: function() {
             return localStorage.getItem('_currency_mode');
         },
@@ -328,6 +341,10 @@ export default {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
             amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
             worth: formatMoney(toMoney(this.worth, this.currencySubunit)),
+            ordersSummary: toMoney(this.ordersSummary, this.currencySubunit),
+            currency: this.selectedCurrency,
+            donationCurrency: this.donationCurrency,
+            currencyMinAmount: this.currencyMinAmount,
           };
         },
         donationCurrency: function() {
@@ -378,17 +395,29 @@ export default {
         insufficientFundsError: function() {
             return this.loggedIn && this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
         },
+        sellAmountExceeds: function () {
+            const amountToDonate = new Decimal(this.amountToDonate || 0);
+
+            return this.alreadyChecked &&
+                this.isSellMode &&
+                !this.donationChecking &&
+                !amountToDonate.isZero() &&
+                amountToDonate.greaterThan(this.ordersSummary);
+        },
         isAmountValid: function() {
             return !!parseFloat(this.amountToDonate)
                 && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return (this.loggedIn &&
-                (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
-                || !this.isCurrencySelected
-                || !parseFloat(this.amountToDonate)
-                || this.donationChecking
-                || this.donationInProgress;
+            const insufficientFunds = this.insufficientFunds ||
+                this.insufficientFundsError ||
+                !parseFloat(this.balance);
+
+            return insufficientFunds ||
+                !this.isCurrencySelected ||
+                !parseFloat(this.amountToDonate) ||
+                this.donationChecking ||
+                this.donationInProgress;
         },
         nonrefundHtml: function() {
             return this.$t('donation.nonrefund', {
@@ -475,6 +504,7 @@ export default {
                     this.amountToReceive = res.data.amountToReceive;
                     this.worth = res.data.worth;
                     this.ordersSummary = res.data.ordersSummary;
+                    this.alreadyChecked = true;
                 })
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);

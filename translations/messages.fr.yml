@@ -675,6 +675,7 @@ donation.deposit: dépôt
 donation.first: premier
 donation.insufficient_funds: 'Fonds insuffisant pour l''achat,'
 donation.amount: 'Montant:'
+donation.amount.sell_exeeds:
 donation.min_amount: 'Quantité minimale de %donationCurrency% %currencyMinAmount%'
 donation.diff_number: 'La quantité de jetons que vous recevrez peut légèrement varier à cause de l''activité des traders.'
 donation.receive: 'Vous recevrez approximativement:'
@@ -688,6 +689,7 @@ donation.tokens_availability_changed: 'La disponibilité des jetons a changée. 
 donation.button_all: Tout
 donation.order.donation: Donation
 donation.order.buy: 'Acheter (donation)'
+donation.order.buy.empty:
 donation.order.sell: 'Vendre (donation)'
 confirm_modal.body: 'ÊTES-VOUS SÛR?'
 confirm_modal.confirm: Confirmer

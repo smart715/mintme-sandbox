@@ -671,6 +671,7 @@ donation.deposit: deposite
 donation.first: primero
 donation.insufficient_funds: 'Fondos insuficientes para comprar,'
 donation.amount: 'Cantidad:'
+donation.amount.sell_exceeds:
 donation.min_amount: 'Cantidad mínima de %donationCurrency% %currencyMinAmount%'
 donation.diff_number: 'La cantidad de tokens que recibirá puede variar ligeramente, dependiendo de la actividad de otros traders.'
 donation.receive: 'Recibirá aproximadamente:'
@@ -682,6 +683,7 @@ donation.modal.2: '¿Desea donar %amountToDonate% por %amountToReceive% que vale
 donation.button_all: Todo
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
+donation.order.buy.empty:
 donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
