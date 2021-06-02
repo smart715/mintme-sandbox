@@ -104,54 +104,64 @@ class DonationController extends AbstractFOSRestController
             } elseif ($mode === self::SELL) {
                 $tradable = $market->getQuote();
 
+                $baseSymbol = $market->getBase()->getSymbol();
+
                 $quoteSymbol = $tradable instanceof Token ?
                     Symbols::TOK :
                     $tradable->getSymbol();
 
-                $baseSymbol = $market->getBase()->getSymbol();
+                $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
 
-                $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, 0, 100);
-
-                $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol); 
+                $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
 
                 $quoteWorth = $this->moneyWrapper->parse('0', $quoteSymbol);
 
-                $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
-                
-                foreach ($pendingBuyOrders as $bid) {
-                    if ($quoteLeft->isZero()) {
-                        break;
+                $offset = 0;
+                $limit = 100;
+
+                do {
+                    $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit);
+                    $shouldContinue = count($pendingBuyOrders) >= $limit;
+                    $offset += $limit;
+
+                    foreach ($pendingBuyOrders as $bid) {
+                        if ($quoteLeft->isZero()) {
+                            $shouldContinue = false;
+                            break;
+                        }
+
+                        if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
+                            $orderAmount = $this->moneyWrapper->convertByRatio(
+                                $bid->getAmount(),
+                                $bid->getPrice()->getCurrency()->getCode(),
+                                $this->moneyWrapper->format($bid->getPrice())
+                            );
+
+                            $amountToReceive = $amountToReceive->add($orderAmount);
+                            $quoteWorth = $quoteWorth->add($bid->getAmount());
+                            $quoteLeft = $quoteLeft->subtract($bid->getAmount());
+                        } else {
+                            $portionOrderTotal = $this->moneyWrapper->convertByRatio(
+                                $quoteLeft,
+                                $bid->getPrice()->getCurrency()->getCode(),
+                                $this->moneyWrapper->format($bid->getPrice())
+                            );
+
+                            $amountToReceive = $amountToReceive->add($portionOrderTotal);
+                            $quoteWorth = $quoteWorth->add($quoteLeft);
+                            $quoteLeft = $quoteLeft->subtract($quoteLeft);
+                        }
                     }
 
-                    if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
-                        $orderAmount = $this->moneyWrapper->convertByRatio(
-                            $bid->getAmount(),
-                            $bid->getPrice()->getCurrency()->getCode(),
-                            $this->moneyWrapper->format($bid->getPrice())
-                        ); 
+                } while ($shouldContinue);
 
-                        $amountToReceive = $amountToReceive->add($orderAmount);
-                        $quoteWorth = $quoteWorth->add($bid->getAmount());
-                        $quoteLeft = $quoteLeft->subtract($bid->getAmount());
-                    } else {
-                        $portionOrderTotal = $this->moneyWrapper->convertByRatio(
-                            $quoteLeft,
-                            $bid->getPrice()->getCurrency()->getCode(),
-                            $this->moneyWrapper->format($bid->getPrice())
-                        ); 
-                        
-                        $amountToReceive = $amountToReceive->add($portionOrderTotal);
-                        $quoteWorth = $quoteWorth->add($quoteLeft);
-                        $quoteLeft = $quoteLeft->subtract($quoteLeft);
-                    }
-                }
-                
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
 
                 return $this->view([
                     'amountToReceive' => $amountToReceive,
                     'worth' => $quoteWorth,
                     'ordersSummary' => $buyOrdersSummary,
+                    'calls' => $offset / 100
                 ]);
             } else {
                 throw new ApiBadRequestException('Trade mode is invalid' . $mode);
