@@ -229,6 +229,10 @@ class ContractHandler implements ContractHandlerInterface
 
     private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet, array $transaction = []): Money
     {
+        if (isset($transaction['tokenFee']) && isset($transaction['token'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['token']));
+        }
+
         if (!$tradeble) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
@@ -237,8 +241,8 @@ class ContractHandler implements ContractHandlerInterface
             return $wallet->getDepositInfo($tradeble)->getFee();
         }
 
-        if (isset($transaction['tokenFee']) && isset($transaction['token'])) {
-            return new Money($transaction['tokenFee'], new Currency($transaction['token']));
+        if ($tradeble instanceof Crypto) {
+            return $tradeble->getFee();
         }
 
         /** @var Token $tradeble */
@@ -264,8 +268,6 @@ class ContractHandler implements ContractHandlerInterface
                 $this->logger->info("[contract-handler] traedable name not exist ($tokenName)");
             }
 
-            $fee = $this->getFee($tradeble, $transaction['type'], $wallet, $transaction);
-
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 (string)$transaction['hash'],
@@ -275,7 +277,12 @@ class ContractHandler implements ContractHandlerInterface
                     $transaction['amount'],
                     new Currency($cryptoToken ? $cryptoToken->getSymbol() : Symbols::TOK)
                 ),
-                $fee,
+                $this->getFee(
+                    $tradeble,
+                    $transaction['type'],
+                    $wallet,
+                    $transaction
+                ),
                 $tradeble,
                 Status::fromString($transaction['status']),
                 Type::fromString($transaction['type'])

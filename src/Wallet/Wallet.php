@@ -94,6 +94,7 @@ class Wallet implements WalletInterface
         $depositHistory = $this->depositCommunicator->getTransactions($user, 0, $gatewayLimit);
         $withdrawHistory = $this->withdrawGateway->getHistory($user, 0, $gatewayLimit);
         $tokenTransactionHistory = $this->contractHandler->getTransactions($this, $user, 0, $gatewayLimit);
+
         $history = array_merge($depositHistory, $withdrawHistory, $tokenTransactionHistory);
 
         usort($history, function (Transaction $first, Transaction $second) {
@@ -122,7 +123,6 @@ class Wallet implements WalletInterface
         }
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
-
         $tokenEthFee = $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('token_withdraw_fee'),
             Symbols::ETH
