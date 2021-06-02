@@ -438,11 +438,8 @@ export default {
     },
     methods: {
         setTradeMode: function(mode) {
-            if (this.tradeMode === mode) {
-                return;
-            }
-
             this.tradeMode = mode;
+            this.showForms = false;
 
             if (mode === BUY_MODE) {
                 this.onSelect(this.isToken ? webSymbol : this.market.base.symbol);
@@ -452,9 +449,7 @@ export default {
             }
         },
         onSelect: function(newCurrency) {
-            if (this.selectedCurrency !== newCurrency) {
-                this.selectedCurrency = newCurrency;
-            }
+            this.selectedCurrency = newCurrency;
         },
         checkAmountInput: function() {
             return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
