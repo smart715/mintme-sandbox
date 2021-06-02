@@ -483,6 +483,10 @@ mail.new_investor_bought_token.msg: 'compró su token.'
 mail.new_investor_check_hostory: 'Chequee el Historial de comercio'
 mail.new_device.login.msg: 'Nuestro sistema ha detectado un nuevo intento de acceso'
 mail.new_device.new_ip.msg: 'desde una nueva dirección IP o dispositivo'
+mail.new_investor.actively_social_media_token_1:
+mail.new_investor.actively_social_media_token_2:
+mail.join_mintme_hosting:
+mail.new_investor.create_token_here:
 new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%">aquí.</a>'
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
