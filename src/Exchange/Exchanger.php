@@ -332,7 +332,6 @@ class Exchanger implements ExchangerInterface
         $balanceResult = $this->bh->balance($user, $tradeble);
 
         if ($tradeble instanceof Crypto) {
-
             return $balanceResult->getAvailable();
         }
 
