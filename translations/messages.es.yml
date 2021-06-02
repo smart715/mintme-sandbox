@@ -483,6 +483,10 @@ mail.new_investor_bought_token.msg: 'compró su token.'
 mail.new_investor_check_hostory: 'Chequee el Historial de comercio'
 mail.new_device.login.msg: 'Nuestro sistema ha detectado un nuevo intento de acceso'
 mail.new_device.new_ip.msg: 'desde una nueva dirección IP o dispositivo'
+mail.new_investor.actively_social_media_token_1:
+mail.new_investor.actively_social_media_token_2:
+mail.join_mintme_hosting:
+mail.new_investor.create_token_here:
 new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%">aquí.</a>'
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
@@ -1380,11 +1384,11 @@ activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% %symbol% lanzado(
 activity_1_message: '<a href="%tokenUrl%">%token%</a> inició un airdrop'
 activity_2_message: ' Airdrop para <a href="%tokenUrl%">%token%</a> finalizado'
 activity_3_message: '<a href="%tokenUrl%">%token%</a> recibió una donación por valor de %amount% %symbol%'
-activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación'
+activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publicación <a href="%postUrl%">%post%</a>'
 activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> fue vendido por <a href="%sellerUrl%">%seller%</a> a <a href="%buyerUrl%">%buyer%</a> por un valor de %amount% %symbol%'
+activity_8_message:
 activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado

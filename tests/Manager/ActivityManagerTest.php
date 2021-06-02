@@ -41,10 +41,10 @@ class ActivityManagerTest extends TestCase
             ->willReturn($activities);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->exactly(5))
+        $em->expects($this->exactly(6))
             ->method('refresh')
-            ->withConsecutive([$a0], [$a3], [$a7], [$a8], [$a9])
-            ->willReturnOnConsecutiveCalls($a0, $a3, $a7, $a8, $a9);
+            ->withConsecutive([$a0], [$a3], [$a4], [$a7], [$a8], [$a9])
+            ->willReturnOnConsecutiveCalls($a0, $a3, $a4, $a7, $a8, $a9);
 
         $am = new ActivityManager($em, $ar);
         $this->assertEquals($activities, $am->getLast(9));
