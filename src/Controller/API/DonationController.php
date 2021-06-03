@@ -114,8 +114,6 @@ class DonationController extends AbstractFOSRestController
 
                 $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
 
-                $quoteWorth = $this->moneyWrapper->parse('0', $quoteSymbol);
-
                 $offset = 0;
                 $limit = 100;
 
@@ -138,7 +136,6 @@ class DonationController extends AbstractFOSRestController
                             );
 
                             $amountToReceive = $amountToReceive->add($orderAmount);
-                            $quoteWorth = $quoteWorth->add($bid->getAmount());
                             $quoteLeft = $quoteLeft->subtract($bid->getAmount());
                         } else {
                             $portionOrderTotal = $this->moneyWrapper->convertByRatio(
@@ -148,7 +145,6 @@ class DonationController extends AbstractFOSRestController
                             );
 
                             $amountToReceive = $amountToReceive->add($portionOrderTotal);
-                            $quoteWorth = $quoteWorth->add($quoteLeft);
                             $quoteLeft = $quoteLeft->subtract($quoteLeft);
                         }
                     }
@@ -159,9 +155,8 @@ class DonationController extends AbstractFOSRestController
 
                 return $this->view([
                     'amountToReceive' => $amountToReceive,
-                    'worth' => $quoteWorth,
+                    'worth' => '0',
                     'ordersSummary' => $buyOrdersSummary,
-                    'calls' => $offset / 100
                 ]);
             } else {
                 throw new ApiBadRequestException('Trade mode is invalid' . $mode);

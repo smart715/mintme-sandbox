@@ -61,7 +61,7 @@
                                         @paste="checkAmountInput"
                                         @keyup="onKeyup"
                                         :from="selectedCurrency"
-                                        :to="USD.symbol"
+                                        :to="currencies.USD.symbol"
                                         :subunit="4"
                                         symbol="$"
                                         :show-converter="currencyMode === currencyModes.usd.value"
@@ -114,23 +114,24 @@
                                 </div>
                             </div>
                             <div class="mt-1">
-                                <div
-                                    v-if="insufficientFundsError"
-                                    class="mt-1 text-danger">
-                                    {{ $t('donation.min_amount', translationsContext) }}
-                                </div>
-                                <div
-                                    v-if="sellAmountExceeds"
-                                    class="mt-1 text-danger"
-                                >
-                                    <template v-if="isOrdersSummaryZero">
-                                        {{ $t('donation.order.buy.empty') }}
-                                    </template>
-                                    <template v-else>
-                                        {{ $t('donation.amount.sell_exceeds', translationsContext) }}
-                                    </template>
-                                </div>
-
+                                <template v-if="firstInteraction">
+                                    <div
+                                        v-if="!isAmountValid"
+                                        class="mt-1 text-danger">
+                                        {{ $t('donation.min_amount', translationsContext) }}
+                                    </div>
+                                    <div
+                                        v-if="sellAmountExceeds"
+                                        class="mt-1 text-danger"
+                                    >
+                                        <template v-if="isOrdersSummaryZero">
+                                            {{ $t('donation.order.buy.empty') }}
+                                        </template>
+                                        <template v-else>
+                                            {{ $t('donation.amount.sell_exceeds', translationsContext) }}
+                                        </template>
+                                    </div>
+                                </template>
                                 <p class="m-0 mt-1">
                                     {{ $t('donation.receive') }}
                                     <font-awesome-icon
@@ -141,8 +142,8 @@
                                         fixed-width
                                     />
                                     <span v-else class="text-nowrap">
-                                        {{ amountToReceive | toMoney(currencySubunit) }}
-                                        {{ assetToReceive }}
+                                        {{ amountToReceive | toMoney(assetToReceiveSubunit) }}
+                                        {{ assetToReceive | rebranding }}
                                         <guide
                                             :placement="'right-start'"
                                             :max-width="'200px'"
@@ -231,11 +232,7 @@ import {
     ethSymbol,
     usdcSymbol,
     HTTP_BAD_REQUEST,
-    BTC,
-    MINTME,
-    USD,
-    ETH,
-    USDC,
+    currencies,
     digitsLimits,
     currencyModes,
 } from '../utils/constants';
@@ -294,9 +291,8 @@ export default {
             donationInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
-            USD,
             showForms: false,
-            alreadyChecked: false,
+            firstInteraction: false,
             addPhoneModalMessageType: 'donation',
             addPhoneModalProfileNickName: this.profileNickname,
             tradeMode: BUY_MODE,
@@ -316,11 +312,9 @@ export default {
             return this.balance !== null;
         },
         assetToReceive: function() {
-            const asset = this.isBuyMode ?
+             return this.isBuyMode ?
                 this.market.quote.symbol:
                 this.market.base.symbol;
-
-            return this.rebrandingFunc(asset);
         },
         isBuyMode: function() {
             return this.tradeMode === BUY_MODE;
@@ -329,7 +323,7 @@ export default {
             return this.tradeMode === SELL_MODE;
         },
         isOrdersSummaryZero: function() {
-            const summary = new Decimal(this.ordersSummary)
+            const summary = new Decimal(this.ordersSummary);
 
             return summary.isZero();
         },
@@ -341,8 +335,8 @@ export default {
             amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
             amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
             worth: formatMoney(toMoney(this.worth, this.currencySubunit)),
-            ordersSummary: toMoney(this.ordersSummary, this.currencySubunit),
-            currency: this.selectedCurrency,
+            ordersSummary: toMoney(this.ordersSummary, this.assetToReceiveSubunit),
+            currency: this.rebrandingFunc(this.selectedCurrency),
             donationCurrency: this.donationCurrency,
             currencyMinAmount: this.currencyMinAmount,
           };
@@ -367,7 +361,14 @@ export default {
                 : this.$t('donation.currency.select');
         },
         currencySubunit: function() {
-            return ({BTC, MINTME, ETH, USDC}[this.selectedCurrency] || MINTME).subunit;
+            const symbol = currencies[this.selectedCurrency];
+
+            return symbol ? symbol.subunit : currencies.WEB.subunit;
+        },
+        assetToReceiveSubunit: function() {
+            const symbol = currencies[this.assetToReceive];
+
+            return symbol ? symbol.subunit : currencies.WEB.subunit;
         },
         currencyMinAmount: function() {
             switch (this.selectedCurrency) {
@@ -392,30 +393,26 @@ export default {
                     (this.amountToDonate > 0 && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
                 );
         },
-        insufficientFundsError: function() {
-            return this.loggedIn && this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
-        },
-        sellAmountExceeds: function () {
+        sellAmountExceeds: function() {
             const amountToDonate = new Decimal(this.amountToDonate || 0);
 
-            return this.alreadyChecked &&
-                this.isSellMode &&
+            return this.isSellMode &&
                 !this.donationChecking &&
                 !amountToDonate.isZero() &&
                 amountToDonate.greaterThan(this.ordersSummary);
         },
         isAmountValid: function() {
-            return !!parseFloat(this.amountToDonate)
-                && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
+            const amountToDonate = new Decimal(this.amountToDonate);
+
+            return !amountToDonate.isZero()
+                && amountToDonate.greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            const insufficientFunds = this.insufficientFunds ||
-                this.insufficientFundsError ||
-                !parseFloat(this.balance);
-
-            return insufficientFunds ||
+            return this.insufficientFunds ||
+                !this.isAmountValid ||
                 !this.isCurrencySelected ||
                 !parseFloat(this.amountToDonate) ||
+                this.sellAmountExceeds ||
                 this.donationChecking ||
                 this.donationInProgress;
         },
@@ -432,9 +429,10 @@ export default {
         },
     },
     created() {
-        // non-reactive data (constants)
+        // non-reactive data (constants accesible from template)
         this.BUY_MODE = BUY_MODE;
         this.SELL_MODE = SELL_MODE;
+        this.currencies = currencies;
     },
     mounted() {
         if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
@@ -467,13 +465,17 @@ export default {
     },
     methods: {
         setTradeMode: function(mode) {
+            if (this.tradeMode === mode) {
+                return;
+            }
+
             this.tradeMode = mode;
             this.showForms = false;
+            this.firstInteraction = false;
 
             if (mode === BUY_MODE) {
                 this.onSelect(this.isToken ? webSymbol : this.market.base.symbol);
             } else {
-
                 this.onSelect(this.market.quote.symbol);
             }
         },
@@ -481,7 +483,11 @@ export default {
             this.selectedCurrency = newCurrency;
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
+            this.firstInteraction = true;
+
+            const digitLimits = digitsLimits[this.selectedCurrency] || currencies.WEB.digits;
+
+            return this.checkInput(this.currencySubunit, digitLimits);
         },
         onKeyup: function() {
             this.debouncedCheck();
@@ -504,7 +510,6 @@ export default {
                     this.amountToReceive = res.data.amountToReceive;
                     this.worth = res.data.worth;
                     this.ordersSummary = res.data.ordersSummary;
-                    this.alreadyChecked = true;
                 })
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
