@@ -60,14 +60,16 @@
       opacity: 1
       font-size: 0.8rem
 
-    @include media-breakpoint-up(md)
+    @include media-breakpoint-down(md)
       width: 45vw
 
-    @include media-breakpoint-up(lg)
-      width: 15rem
+    @include media-breakpoint-down(lg)
+      width: 10rem
 
-    @include media-breakpoint-up(xl)
-      width: 25rem
+    @include media-breakpoint-down(xl)
+      width: 15rem
+    @media screen and (min-width: 1400px)
+        width: 25rem
 
   .search-icon
     width: 28px
