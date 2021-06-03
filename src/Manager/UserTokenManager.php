@@ -27,16 +27,21 @@ class UserTokenManager implements UserTokenManagerInterface
         $this->logger = $logger;
     }
 
+    public function findByUserToken(User $user, Token $token): ?UserToken
+    {
+        return $this->repository->findByUserToken(
+            $user->getId(),
+            $token->getId()
+        );
+    }
+
     public function updateRelation(User $user, Token $token, Money $balance): void
     {
         if (!$token->getId()) {
             return;
         }
 
-        $userToken = $this->repository->findByUserToken(
-            $user->getId(),
-            $token->getId()
-        );
+        $userToken = $this->findByUserToken($user, $token);
 
         $this->logger->info('usertoken', [
             'email' => $user->getEmailAuthRecipient(),
