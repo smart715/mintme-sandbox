@@ -199,6 +199,7 @@ class ContractHandler implements ContractHandlerInterface
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
                 'tokenFee' => $fee && $fee->getAmount() ? $fee->getAmount() : '0',
+                'tokenFeeCurrency' => $fee && $fee->getCurrency() ? $fee->getCurrency()->getCode() : 'TOK',
             ]
         );
 
@@ -229,8 +230,8 @@ class ContractHandler implements ContractHandlerInterface
 
     private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet, array $transaction = []): Money
     {
-        if (isset($transaction['tokenFee']) && isset($transaction['token'])) {
-            return new Money($transaction['tokenFee'], new Currency($transaction['token']));
+        if (isset($transaction['tokenFee']) && isset($transaction['tokenFeeCurrency'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['tokenFeeCurrency']));
         }
 
         if (!$tradeble) {

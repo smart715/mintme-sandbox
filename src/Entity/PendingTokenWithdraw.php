@@ -76,12 +76,19 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
      */
     private string $fee;
 
-    public function __construct(User $user, Token $token, Amount $amount, Address $address)
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private string $feeCurrency;
+
+    public function __construct(User $user, Token $token, Amount $amount, Address $address, Money $fee)
     {
         $this->user = $user;
         $this->token = $token;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+        $this->fee = $fee->getAmount();
+        $this->feeCurrency = $fee->getCurrency()->getCode();
     }
 
     public function getId(): int
@@ -138,15 +145,11 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return $this;
     }
 
-    public function getFee(): string
+    public function getFee(): Money
     {
-        return $this->fee;
-    }
-
-    public function setFee(string $fee): self
-    {
-        $this->fee = $fee;
-
-        return $this;
+        return new Money(
+            $this->fee,
+            new Currency($this->feeCurrency ?: Symbols::TOK)
+        );
     }
 }

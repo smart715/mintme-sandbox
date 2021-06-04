@@ -23,7 +23,7 @@ final class Version20210517105218 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE pending_withdraw ADD fee VARCHAR(255) DEFAULT '0'");
-        $this->addSql("ALTER TABLE pending_token_withdraw ADD fee VARCHAR(255) DEFAULT '0'");
+        $this->addSql("ALTER TABLE pending_token_withdraw ADD fee VARCHAR(255) DEFAULT '0', ADD fee_currency VARCHAR(255) DEFAULT 'TOK'");
     }
 
     public function down(Schema $schema) : void
@@ -31,7 +31,7 @@ final class Version20210517105218 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE pending_token_withdraw DROP fee');
+        $this->addSql('ALTER TABLE pending_token_withdraw DROP fee, DROP fee_currency');
         $this->addSql('ALTER TABLE pending_withdraw DROP fee');
     }
 }

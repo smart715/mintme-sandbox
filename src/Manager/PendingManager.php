@@ -28,10 +28,8 @@ class PendingManager implements PendingManagerInterface
     public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, Money $fee): PendingWithdrawInterface
     {
         $pending = $tradable instanceof Token
-            ? new PendingTokenWithdraw($user, $tradable, $amount, $address)
-            : new PendingWithdraw($user, $tradable, $amount, $address);
-
-        $pending->setFee($fee->getAmount());
+            ? new PendingTokenWithdraw($user, $tradable, $amount, $address, $fee)
+            : new PendingWithdraw($user, $tradable, $amount, $address, $fee);
 
         $this->em->persist($pending);
         $this->em->flush();

@@ -73,12 +73,14 @@ class PendingWithdraw implements PendingWithdrawInterface
      */
     private string $fee;
 
-    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
+
+    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address, Money $fee)
     {
         $this->user = $user;
         $this->crypto = $crypto;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+        $this->fee = $fee->getAmount();
     }
 
     public function getId(): int
@@ -135,15 +137,11 @@ class PendingWithdraw implements PendingWithdrawInterface
         return $this;
     }
 
-    public function getFee(): string
+    public function getFee(): Money
     {
-        return $this->fee;
-    }
-
-    public function setFee(string $fee): self
-    {
-        $this->fee = $fee;
-
-        return $this;
+        return new Money(
+            $this->fee,
+            new Currency($this->crypto->getSymbol())
+        );
     }
 }
