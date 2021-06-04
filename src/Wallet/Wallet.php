@@ -137,12 +137,12 @@ class Wallet implements WalletInterface
             }
         }
 
-        $balanceResult = $this->balanceHandler->balance($user, $tradeble);
+        $balanceResult = $this->balanceHandler->balance($user, $tradable);
 
-        if ($tradeble instanceof Token) {
+        if ($tradable instanceof Token) {
             $balanceResult = $this->tokenManager->getRealBalance(
-                $tradeble,
-                $this->balanceHandler->balance($user, $tradeble)
+                $tradable,
+                $this->balanceHandler->balance($user, $tradable)
             );
         }
 
