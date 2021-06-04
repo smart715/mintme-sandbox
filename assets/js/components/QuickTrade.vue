@@ -407,7 +407,7 @@ export default {
                 amountToDonate.greaterThan(this.ordersSummary);
         },
         isAmountValid: function() {
-            const amountToDonate = new Decimal(this.amountToDonate);
+            const amountToDonate = new Decimal(this.amountToDonate || 0);
 
             return !amountToDonate.isZero()
                 && amountToDonate.greaterThanOrEqualTo(this.currencyMinAmount);
