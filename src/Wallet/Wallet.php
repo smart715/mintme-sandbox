@@ -113,11 +113,9 @@ class Wallet implements WalletInterface
         Amount $amount,
         TradebleInterface $tradable
     ): PendingWithdrawInterface {
-        if ($tradable instanceof Crypto) {
-            $crypto = $tradable;
-        } else {
-            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
-        }
+        $crypto = $tradable instanceof Crypto
+            ??
+            $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
         $tokenEthFee = $this->moneyWrapper->parse(
