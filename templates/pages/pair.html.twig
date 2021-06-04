@@ -138,6 +138,9 @@
                         disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                         profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
                         :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                        {% if isTokenPage %}
+                            :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                        {% endif %}
                     >
                     </quick-trade>
                 </div>

@@ -179,7 +179,7 @@
                                 <span class="d-block text-danger font-size-90">
                                     {{ $t('donation.insufficient_funds') }}
                                 </span>
-                                <span class="d-block">
+                                <span v-if="isBuyMode || isTokenDeployed" class="d-block">
                                     {{ $t('donation.make') }}
                                     <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
                                     {{ $t('donation.first') }}
@@ -235,6 +235,7 @@ import {
     currencies,
     digitsLimits,
     currencyModes,
+    tokenDeploymentStatus,
 } from '../utils/constants';
 import PriceConverterInput from './PriceConverterInput';
 
@@ -272,6 +273,10 @@ export default {
         disabledServicesConfig: String,
         profileNickname: String,
         isToken: Boolean,
+        deploymentStatus: {
+            type: String,
+            default: null,
+        },
     },
     data() {
         return {
@@ -415,6 +420,10 @@ export default {
                 this.sellAmountExceeds ||
                 this.donationChecking ||
                 this.donationInProgress;
+        },
+        isTokenDeployed: function() {
+            return this.isToken &&
+                this.deploymentStatus === tokenDeploymentStatus.deployed;
         },
         nonrefundHtml: function() {
             return this.$t('donation.nonrefund', {
