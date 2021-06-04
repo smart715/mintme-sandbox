@@ -881,4 +881,9 @@ class Token implements TradebleInterface, ImagineInterface
     {
         return $this->votings->toArray();
     }
+
+    public function getShowSubunit(): int
+    {
+        return self::TOKEN_SUBUNIT;
+    }
 }
