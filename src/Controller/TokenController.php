@@ -489,7 +489,7 @@ class TokenController extends Controller
             throw new NotFoundTokenException();
         }
 
-        if ($this->tokenManager->isPredefined($token)) {
+        if (null !== $this->cryptoManager->findBySymbol($token->getSymbol())) {
             throw new RedirectException(
                 $this->redirectToRoute('coin', [
                     'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),

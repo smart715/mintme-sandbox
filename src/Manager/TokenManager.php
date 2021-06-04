@@ -120,22 +120,6 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->findTokensByPattern($pattern);
     }
 
-    /** {@inheritdoc} */
-    public function findAllPredefined(): array
-    {
-        return array_map(
-            function (Crypto $crypto) {
-                return (new Token())->setName($crypto->getSymbol());
-            },
-            $this->cryptoManager->findAll()
-        );
-    }
-
-    public function isPredefined(Token $token): bool
-    {
-        return in_array($token, $this->findAllPredefined());
-    }
-
     /**
      * {@inheritdoc}
      *
