@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exchange\CheckTrade;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
@@ -102,60 +103,13 @@ class DonationController extends AbstractFOSRestController
                     'ordersSummary' => $sellOrdersSummary,
                 ]);
             } elseif ($mode === self::SELL) {
-                $tradable = $market->getQuote();
-
-                $baseSymbol = $market->getBase()->getSymbol();
-
-                $quoteSymbol = $tradable instanceof Token ?
-                    Symbols::TOK :
-                    $tradable->getSymbol();
-
-                $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
-
-                $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
-
-                $offset = 0;
-                $limit = 100;
-
-                do {
-                    $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit);
-                    $shouldContinue = count($pendingBuyOrders) >= $limit;
-                    $offset += $limit;
-
-                    foreach ($pendingBuyOrders as $bid) {
-                        if ($quoteLeft->isZero()) {
-                            $shouldContinue = false;
-                            break;
-                        }
-
-                        if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
-                            $orderAmount = $this->moneyWrapper->convertByRatio(
-                                $bid->getAmount(),
-                                $bid->getPrice()->getCurrency()->getCode(),
-                                $this->moneyWrapper->format($bid->getPrice())
-                            );
-
-                            $amountToReceive = $amountToReceive->add($orderAmount);
-                            $quoteLeft = $quoteLeft->subtract($bid->getAmount());
-                        } else {
-                            $portionOrderTotal = $this->moneyWrapper->convertByRatio(
-                                $quoteLeft,
-                                $bid->getPrice()->getCurrency()->getCode(),
-                                $this->moneyWrapper->format($bid->getPrice())
-                            );
-
-                            $amountToReceive = $amountToReceive->add($portionOrderTotal);
-                            $quoteLeft = $quoteLeft->subtract($quoteLeft);
-                        }
-                    }
-
-                } while ($shouldContinue);
+                $checkSell = $this->checkSell($market, $amount);
 
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
 
                 return $this->view([
-                    'amountToReceive' => $amountToReceive,
-                    'worth' => '0',
+                    'amountToReceive' => $checkSell->getExpectedAmount(),
+                    'worth' => $checkSell->getWorth() ?? '0',
                     'ordersSummary' => $buyOrdersSummary,
                 ]);
             } else {
@@ -202,7 +156,7 @@ class DonationController extends AbstractFOSRestController
      *     description="Expected tokens count to receive."
      * )
      */
-    public function makeDonation(Market $market, ParamFetcherInterface $request): View
+    public function makeDonation(Market $market, string $mode, ParamFetcherInterface $request): View
     {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
@@ -270,5 +224,59 @@ class DonationController extends AbstractFOSRestController
         }
 
         return $user;
+    }
+
+    private function checkSell(Market $market, string $amount): CheckTrade
+    {
+        $tradable = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getSymbol();
+
+        $quoteSymbol = $tradable instanceof Token ?
+            Symbols::TOK :
+            $tradable->getSymbol();
+
+        $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
+
+        $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingBuyOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingBuyOrders as $bid) {
+                if ($quoteLeft->isZero()) {
+                    $shouldContinue = false;
+                    break;
+                }
+
+                if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
+                    $orderAmount = $this->moneyWrapper->convertByRatio(
+                        $bid->getAmount(),
+                        $bid->getPrice()->getCurrency()->getCode(),
+                        $this->moneyWrapper->format($bid->getPrice())
+                    );
+
+                    $amountToReceive = $amountToReceive->add($orderAmount);
+                    $quoteLeft = $quoteLeft->subtract($bid->getAmount());
+                } else {
+                    $portionOrderTotal = $this->moneyWrapper->convertByRatio(
+                        $quoteLeft,
+                        $bid->getPrice()->getCurrency()->getCode(),
+                        $this->moneyWrapper->format($bid->getPrice())
+                    );
+
+                    $amountToReceive = $amountToReceive->add($portionOrderTotal);
+                    $quoteLeft = $quoteLeft->subtract($quoteLeft);
+                }
+            }
+
+        } while ($shouldContinue);
+
+        return new CheckTrade($amountToReceive);
     }
 }
