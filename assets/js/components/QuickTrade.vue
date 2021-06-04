@@ -179,7 +179,7 @@
                                 <span class="d-block text-danger font-size-90">
                                     {{ $t('donation.insufficient_funds') }}
                                 </span>
-                                <span v-if="isBuyMode || isTokenDeployed" class="d-block">
+                                <span v-if="shouldShowDepositMore" class="d-block">
                                     {{ $t('donation.make') }}
                                     <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
                                     {{ $t('donation.first') }}
@@ -421,9 +421,11 @@ export default {
                 this.donationChecking ||
                 this.donationInProgress;
         },
-        isTokenDeployed: function() {
-            return this.isToken &&
-                this.deploymentStatus === tokenDeploymentStatus.deployed;
+        shouldShowDepositMore: function() {
+            return !this.isToken ||
+                this.isBuyMode ||
+                this.deploymentStatus === tokenDeploymentStatus.deployed
+            ;
         },
         nonrefundHtml: function() {
             return this.$t('donation.nonrefund', {
