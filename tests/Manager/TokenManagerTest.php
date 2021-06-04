@@ -199,52 +199,6 @@ class TokenManagerTest extends TestCase
         ];
     }
 
-    public function testFindAllPredefined(): void
-    {
-        $tokenManager = new TokenManager(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(ProfileFetcherInterface::class),
-            $this->createMock(TokenStorageInterface::class),
-            $this->mockCryptoManager([
-                $this->mockCrypto('foo'),
-                $this->mockCrypto('bar'),
-            ]),
-            $this->mockConfig(0)
-        );
-
-        $toks = $tokenManager->findAllPredefined();
-
-        $this->assertCount(2, $toks);
-        $this->assertEquals(['foo', 'bar'], [
-            $toks[0]->getSymbol(),
-            $toks[1]->getSymbol(),
-        ]);
-    }
-
-    public function testIsPredefined(): void
-    {
-        $tokenManager = new TokenManager(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(ProfileFetcherInterface::class),
-            $this->createMock(TokenStorageInterface::class),
-            $this->mockCryptoManager([
-                $this->mockCrypto('foo'),
-                $this->mockCrypto('bar'),
-            ]),
-            $this->mockConfig(0)
-        );
-
-        $fooTok = $this->mockToken('foo');
-        $blahTok = $this->mockToken('blah');
-
-        $toks = array_map(function ($item) {
-            return $item->getName();
-        }, $tokenManager->findAllPredefined());
-
-        $this->assertContains($fooTok->getName(), $toks);
-        $this->assertNotContains($blahTok, $toks);
-    }
-
     public function testGetUserDeployTokensReward(): void
     {
         /** @var User|MockObject $user */
