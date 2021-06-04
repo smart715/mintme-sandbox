@@ -17,6 +17,7 @@ use App\Manager\UserManagerInterface;
 use App\Manager\UserTokenManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
