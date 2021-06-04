@@ -115,10 +115,8 @@ class Wallet implements WalletInterface
     ): PendingWithdrawInterface {
         if ($tradable instanceof Crypto) {
             $crypto = $tradable;
-            $token = (new Token())->setName($crypto->getSymbol());
         } else {
             $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
-            $token = $tradable;
         }
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
@@ -141,11 +139,16 @@ class Wallet implements WalletInterface
             }
         }
 
-        $available = $this->tokenManager->getRealBalance(
-            $token,
-            $this->balanceHandler->balance($user, $token)
-        )->getAvailable();
+        $balanceResult = $this->balanceHandler->balance($user, $tradeble);
 
+        if ($tradeble instanceof Token) {
+            $balanceResult = $this->tokenManager->getRealBalance(
+                $tradeble,
+                $this->balanceHandler->balance($user, $tradeble)
+            );
+        }
+
+        $available = $balanceResult->getAvailable();
         $this->logger->info(
             "Created a new withdraw request for '{$user->getEmail()}' to
             send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
@@ -167,7 +170,9 @@ class Wallet implements WalletInterface
             throw new NotEnoughAmountException();
         }
 
-        $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($fee));
+        if ($tradable instanceof Token && !$tradable->getFee()) {
+            $this->balanceHandler->withdraw($user, $tradable, $amount->getAmount()->add($fee));
+        }
 
         if ($tradable instanceof Token && !$tradable->getFee()) {
             $this->balanceHandler->withdraw(
