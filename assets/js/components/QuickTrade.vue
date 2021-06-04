@@ -523,6 +523,7 @@ export default {
             this.$axios.single.post(this.$routing.generate('make_donation', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
+                mode: this.tradeMode,
             }), {
                 currency: this.selectedCurrency,
                 amount: this.amountToDonate,

@@ -7,11 +7,14 @@ use App\Entity\Token\Token;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
-use App\Exchange\CheckTrade;
+use App\Exchange\CheckTradeResult;
 use App\Exchange\Donation\DonationHandler;
+use App\Exchange\ExchangerInterface;
+use App\Exchange\Trade\TradeResult;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Logger\DonationLogger;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
@@ -37,6 +40,7 @@ class DonationController extends AbstractFOSRestController
     protected DonationLogger $logger;
     protected EventDispatcherInterface $eventDispatcher;
     private MoneyWrapperInterface $moneyWrapper;
+    private ExchangerInterface $exchanger;
 
     private LockFactory $lockFactory;
 
@@ -46,7 +50,8 @@ class DonationController extends AbstractFOSRestController
         DonationLogger $logger,
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ExchangerInterface $exchanger
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
@@ -54,6 +59,7 @@ class DonationController extends AbstractFOSRestController
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->moneyWrapper = $moneyWrapper;
+        $this->exchanger = $exchanger;
     }
 
     /**
@@ -75,12 +81,8 @@ class DonationController extends AbstractFOSRestController
      *     requirements="^(sell|buy)$"),
      *     description="Trade mode"
      */
-    public function checkDonation(
-        Market $market,
-        string $currency,
-        string $amount,
-        string $mode
-    ): View {
+    public function checkDonation(Market $market, string $mode, string $currency, string $amount): View
+    {
         try {
             /** @var User|null $user */
             $user = $this->getUser();
@@ -142,11 +144,10 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{base}/{quote}/make", name="make_donation", options={"expose"=true})
+     * @Rest\Post("/{base}/{quote}/{mode}/make", name="make_donation", options={"expose"=true})
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC|ETH|USDC)",
      *     description="Selected currency to donate."
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
@@ -173,19 +174,39 @@ class DonationController extends AbstractFOSRestController
         }
 
         try {
-            $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
+            if ($mode === self::BUY) {
+                $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
 
-            $donation = $this->donationHandler->makeDonation(
-                $market,
-                $request->get('currency'),
-                (string)$request->get('amount'),
-                (string)$request->get('expected_count_to_receive'),
-                $user,
-                $sellOrdersSummary
-            );
+                $donation = $this->donationHandler->makeDonation(
+                        $market,
+                        $request->get('currency'),
+                        (string)$request->get('amount'),
+                        (string)$request->get('expected_count_to_receive'),
+                        $user,
+                        $sellOrdersSummary
+                );
 
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
+
+            } elseif ($mode === self::SELL) {
+
+                $amount = (string)$request->get('amount');
+                $expectedAmount = (string)$request->get('expected_count_to_receive');
+
+                $tradeResult = $this->makeSell(
+                    $user,
+                    $market,
+                    $amount,
+                    $expectedAmount
+                );
+
+                if (TradeResult::SUCCESS !== $tradeResult->getResult()) {
+                    throw new ApiBadRequestException($tradeResult->getMessage());
+                }
+            } else {
+                throw new ApiBadRequestException('Trade mode is invalid' . $mode);
+            }
 
             return $this->view(null, Response::HTTP_OK);
         } catch (ApiBadRequestException $ex) {
@@ -226,15 +247,15 @@ class DonationController extends AbstractFOSRestController
         return $user;
     }
 
-    private function checkSell(Market $market, string $amount): CheckTrade
+    private function checkSell(Market $market, string $amount): CheckTradeResult
     {
-        $tradable = $market->getQuote();
+        $quote = $market->getQuote();
 
         $baseSymbol = $market->getBase()->getSymbol();
 
-        $quoteSymbol = $tradable instanceof Token ?
+        $quoteSymbol = $quote instanceof Token ?
             Symbols::TOK :
-            $tradable->getSymbol();
+            $quote->getSymbol();
 
         $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
 
@@ -277,6 +298,36 @@ class DonationController extends AbstractFOSRestController
 
         } while ($shouldContinue);
 
-        return new CheckTrade($amountToReceive);
+        return new CheckTradeResult($amountToReceive);
+    }
+
+    private function makeSell(User $user, Market $market, string $amount, string $expectedAmount): TradeResult
+    {
+        $quote = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getSymbol();
+
+        $quoteSymbol = $quote instanceof Token ?
+            Symbols::TOK :
+            $quote->getSymbol();
+
+        $expectedAmount = $this->moneyWrapper->parse($expectedAmount, $baseSymbol);
+
+        $checkResult = $this->checkSell($market, $amount);
+
+        if (!$expectedAmount->equals($checkResult->getExpectedAmount())) {
+            throw new ApiBadRequestException('Token availability changed.');
+        }
+
+        $minPrice = 1 / (int)str_pad('1', $quote->getShowSubunit() + 1, '0');
+
+        return $this->exchanger->placeOrder(
+            $user,
+            $market,
+            $amount,
+            (string)$minPrice,
+            false,
+            Order::SELL_SIDE
+        );
     }
 }
