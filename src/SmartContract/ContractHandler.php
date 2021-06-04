@@ -198,8 +198,8 @@ class ContractHandler implements ContractHandlerInterface
                 'to' => $address,
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
-                'tokenFee' => $fee && $fee->getAmount() ? $fee->getAmount() : '0',
-                'tokenFeeCurrency' => $fee && $fee->getCurrency() ? $fee->getCurrency()->getCode() : 'TOK',
+                'tokenFee' => $fee ? $fee->getAmount() : '0',
+                'tokenFeeCurrency' => $fee ? $fee->getCurrency()->getCode() : 'TOK',
             ]
         );
 
