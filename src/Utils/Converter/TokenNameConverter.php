@@ -23,8 +23,14 @@ class TokenNameConverter implements TokenNameConverterInterface
 
     public function convert(TradebleInterface $tradable): string
     {
-        return $tradable instanceof Token && !$this->cryptoManager->findBySymbol(strtoupper($tradable->getName()))
-            ? 'TOK'.str_pad((string)($tradable->getId() + $this->config->getOffset()), 12, '0', STR_PAD_LEFT)
+        return $tradable instanceof Token
+            && !$this->cryptoManager->findBySymbol(strtoupper($tradable->getName()))
+            ? 'TOK'.str_pad(
+                (string)($tradable->getId() + $this->config->getOffset()),
+                12,
+                '0',
+                STR_PAD_LEFT
+            )
             : $tradable->getName();
     }
 }
