@@ -404,7 +404,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $predefined = $balanceHandler->balances(
             $user,
-            $this->tokenManager->findAllPredefined()
+            $this->cryptoManager->findAll()
         );
 
         return $this->view([
