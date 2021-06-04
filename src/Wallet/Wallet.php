@@ -29,7 +29,6 @@ use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
