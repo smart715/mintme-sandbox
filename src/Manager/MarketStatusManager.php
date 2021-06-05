@@ -200,6 +200,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 break;
             case self::SORT_RANK:
                 $result[] = 'deployed_on_mintme';
+                $result[] = 'to_number(ms.monthVolume)';
 
                 break;
             case self::SORT_HOLDERS:
