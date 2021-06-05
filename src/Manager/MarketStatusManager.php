@@ -198,6 +198,10 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $result[] = 'to_number(ms.buyDepth)';
 
                 break;
+            case self::SORT_RANK:
+                $result[] = 'deployed_on_mintme';
+
+                break;
             case self::SORT_HOLDERS:
                 $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
                 $result[] = 'holders';
