@@ -198,12 +198,6 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $result[] = 'to_number(ms.buyDepth)';
 
                 break;
-            case self::SORT_RANK:
-                $queryBuilder->addSelect('CASE WHEN qt.deployed = 1 AND qt.crypto IS NULL THEN 1 ELSE 0 END AS HIDDEN deployed_on_mintme');
-                $result[] = 'deployed_on_mintme';
-                $result[] = 'to_number(ms.monthVolume)';
-
-                break;
             case self::SORT_HOLDERS:
                 $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
                 $result[] = 'holders';
@@ -248,7 +242,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getMarketsInfo(
         int $offset,
         int $limit,
-        string $sort = "monthVolume",
+        string $sort = "rank",
         string $order = "DESC",
         int $filter = 1,
         ?int $userId = null
@@ -470,7 +464,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $sql = "SELECT * FROM (
                     SELECT ms.id,
                     qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
-                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
+                    ROW_NUMBER() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC) AS rank
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
