@@ -93,7 +93,7 @@ class TokenManager implements TokenManagerInterface
     {
         $token = $this->findByName($name);
 
-        return $token && $token->getCryptoSymbol() === $cryptoSymbol
+        return null !== $token && $token->getCryptoSymbol() === $cryptoSymbol
             ? $token
             : null;
     }
