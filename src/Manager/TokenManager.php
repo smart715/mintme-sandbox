@@ -92,10 +92,10 @@ class TokenManager implements TokenManagerInterface
 
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token
     {
-        $token = $this->findByName($name);
+        $tradable = $this->findByName($name);
 
-        return $token->getCryptoSymbol() === $cryptoSymbol
-            ? $token
+        return $tradable instanceof Token && $token->getCryptoSymbol() === $cryptoSymbol
+            ? $tradable
             : null;
     }
 
