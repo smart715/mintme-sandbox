@@ -37,7 +37,7 @@ class TokenManagerTest extends TestCase
             $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
-            $this->mockCryptoManager([$this->mockCrypto($name)]),
+            $this->mockCryptoManager([$this->mockCrypto('CRYPTO')]),
             $this->mockConfig(0)
         );
 
