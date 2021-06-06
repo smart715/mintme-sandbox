@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\DeployTokenReward;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Config\Config;
@@ -66,7 +67,7 @@ class TokenManager implements TokenManagerInterface
         return $this->repository->find($id - $this->config->getOffset());
     }
 
-    public function findByName(string $name): ?Token
+    public function findByName(string $name): ?TradebleInterface
     {
         $name = Symbols::MINTME === strtoupper($name)
             ? Symbols::WEB
@@ -86,9 +87,7 @@ class TokenManager implements TokenManagerInterface
             return $token ?? $this->repository->findByUrl($name);
         }
 
-        return (new Token())->setName(strtoupper($name))->setCrypto(
-            $this->cryptoManager->findBySymbol(strtoupper($name))
-        );
+        return $this->cryptoManager->findBySymbol(strtoupper($name));
     }
 
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token
