@@ -228,10 +228,15 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet, array $transaction = []): Money
-    {
-        if (isset($transaction['tokenFee']) && isset($transaction['tokenFeeCurrency'])) {
-            return new Money($transaction['tokenFee'], new Currency($transaction['tokenFeeCurrency']));
+    private function getFee(
+        ?TradebleInterface $tradeble,
+        string $type,
+        WalletInterface $wallet,
+        array $transaction = []
+    ): Money {
+        if (isset($transaction['tokenFee']) && (isset($transaction['tokenFeeCurrency']) || $transaction['token'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['tokenFeeCurrency'] ?:
+                $transaction['token']));
         }
 
         if (!$tradeble) {

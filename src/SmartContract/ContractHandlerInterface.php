@@ -26,7 +26,13 @@ interface ContractHandlerInterface
 
     public function getDepositInfo(string $symbol): DepositInfo;
 
-    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token, ?Money $fee = null): void;
+    public function withdraw(
+        User $user,
+        Money $balance,
+        string $address,
+        TradebleInterface $token,
+        ?Money $fee = null
+    ): void;
 
     public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
 

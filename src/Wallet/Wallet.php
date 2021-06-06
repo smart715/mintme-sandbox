@@ -132,7 +132,7 @@ class Wallet implements WalletInterface
                 $crypto->getFee() :
                 $this->moneyWrapper->parse(
                     (string)$this->parameterBag->get('token_withdraw_fee'),
-                    Symbols::TOK
+                    Symbols::ETH
                 ));
 
         if (!$crypto) {
