@@ -3,14 +3,13 @@
 namespace App\Manager;
 
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResult;
 use Money\Money;
 
 interface TokenManagerInterface
 {
-    public function findByName(string $name): ?TradebleInterface;
+    public function findByName(string $name): ?Token;
 
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token;
 
