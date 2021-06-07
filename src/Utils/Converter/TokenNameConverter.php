@@ -9,15 +9,11 @@ use App\Manager\CryptoManagerInterface;
 
 class TokenNameConverter implements TokenNameConverterInterface
 {
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
     /** @var Config */
     private $config;
 
-    public function __construct(CryptoManagerInterface $cryptoManager, Config $config)
+    public function __construct(Config $config)
     {
-        $this->cryptoManager = $cryptoManager;
         $this->config = $config;
     }
 
