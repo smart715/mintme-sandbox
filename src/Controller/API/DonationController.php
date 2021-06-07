@@ -275,23 +275,32 @@ class DonationController extends AbstractFOSRestController
                     break;
                 }
 
+                $fee = $this->moneyWrapper->format($bid->getFee());
+
+                $orderAmountWithFee = $bid->getAmount()->subtract(
+                    $bid->getAmount()->multiply($fee)
+                );
+
                 if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
-                    $orderAmount = $this->moneyWrapper->convertByRatio(
-                        $bid->getAmount(),
+
+                    $baseWorth = $this->moneyWrapper->convertByRatio(
+                        $orderAmountWithFee,
                         $bid->getPrice()->getCurrency()->getCode(),
                         $this->moneyWrapper->format($bid->getPrice())
                     );
 
-                    $amountToReceive = $amountToReceive->add($orderAmount);
+                    $amountToReceive = $amountToReceive->add($baseWorth);
                     $quoteLeft = $quoteLeft->subtract($bid->getAmount());
                 } else {
-                    $portionOrderTotal = $this->moneyWrapper->convertByRatio(
-                        $quoteLeft,
+                    $quoteLeftWithFee = $quoteLeft->subtract($quoteLeft->multiply($fee));
+
+                    $baseWorth = $this->moneyWrapper->convertByRatio(
+                        $quoteLeftWithFee,
                         $bid->getPrice()->getCurrency()->getCode(),
                         $this->moneyWrapper->format($bid->getPrice())
                     );
 
-                    $amountToReceive = $amountToReceive->add($portionOrderTotal);
+                    $amountToReceive = $amountToReceive->add($baseWorth);
                     $quoteLeft = $quoteLeft->subtract($quoteLeft);
                 }
             }
