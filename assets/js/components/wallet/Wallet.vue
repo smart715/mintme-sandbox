@@ -263,7 +263,7 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
+import {tokSymbol, btcSymbol, webSymbol, ethSymbol, tokEthSymbol, ethCryptoTokens} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
@@ -529,7 +529,9 @@ export default {
 
             this.depositAddress = (isToken
                 ? this.depositAddresses[tokSymbol + crypto]
-                : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
+                : ethCryptoTokens.includes(currency)
+                        ? this.depositAddresses[tokEthSymbol]
+                        : this.depositAddresses[currency]
                 ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;

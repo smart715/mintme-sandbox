@@ -193,6 +193,11 @@ export const currencyModes = {
     },
 };
 
+export const ethCryptoTokens = [
+    ethSymbol,
+    bnbSymbol,
+];
+
 export const currencies = {
     WEB,
     MINTME,
