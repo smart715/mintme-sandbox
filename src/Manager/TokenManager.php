@@ -2,7 +2,6 @@
 
 namespace App\Manager;
 
-use App\Entity\Crypto;
 use App\Entity\DeployTokenReward;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -34,9 +33,6 @@ class TokenManager implements TokenManagerInterface
     /** @var TokenStorageInterface */
     private $storage;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
     /** @var Config */
     private $config;
 
@@ -44,7 +40,6 @@ class TokenManager implements TokenManagerInterface
         EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
-        CryptoManagerInterface $cryptoManager,
         Config $config
     ) {
         /** @var TokenRepository $repository */
@@ -55,7 +50,6 @@ class TokenManager implements TokenManagerInterface
         $this->deployTokenRewardRepository = $deployTokenRewardRepository;
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
-        $this->cryptoManager = $cryptoManager;
         $this->config = $config;
     }
 
