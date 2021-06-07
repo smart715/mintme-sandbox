@@ -9,11 +9,11 @@
                     <div class="row coin-markets">
                         <div v-for="(market, index) in this.sanitizedMarketsOnTop"
                              :key="market.pair"
-                             class="col-12 col-lg-6 my-2"
+                             class="col-12 col-lg-6 my-2 px-0"
                              v-bind:class="{'market-border': Number.isInteger(index/2) || 0 === index}"
                         >
-                            <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block text-center col-2">
+                            <a :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
+                                <div class="d-inline-block text-center col-2 pr-0 pl-4">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
                                 <div class="crypto-pair d-inline-block align-middle col-3 px-0">
@@ -34,12 +34,15 @@
                                     {{ market.change }}
                                 </div>
                             </div>
-                            <div class="d-inline-block col-4 align-middle market-data float-right float-lg-none">
+                            <div class="d-inline-block col-4 align-middle market-data float-right float-lg-none px-0">
                                 <span>{{ $t('trading.table.volume_30d') }}</span>
                                 <span class="float-lg-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
                                 <span>{{ $t('trading.table.volume_24h') }}</span>
                                 <span class="float-lg-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
+                                <br/>
+                                <span>{{ $t('trading.table.market_cap') }}</span>
+                                <span class="float-lg-right">{{ ( showUsd ? market.marketCapUSD : market.marketCap ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>

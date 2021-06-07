@@ -152,11 +152,6 @@ class CreateBlockchainTokenCommand extends Command
             $io->error('Cryptos don\'t exist');
         }
 
-        if (self::BNB_BLOCKCHAIN === $blockchain && !$withdrawalFee) {
-            $hasErrors = true;
-            $io->error('Binance token should have withdrawal fee parameter');
-        }
-
         if (!$profile) {
             $hasErrors = true;
             $io->error('email doesn\'t exist');

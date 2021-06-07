@@ -47,7 +47,7 @@
                             :expiration-time="{{ withdraw_expiration_time }}"
                             disabled-crypto="{{ disabledBlockchain | json_encode }}"
                             disabled-services-config="{{ disabledServicesConfig | json_encode }}"
-                            token-withdraw-fee="{{ global_token_withdraw_fee }}"
+                            :token-withdraw-fee="{{ global_token_withdraw_fee }}"
                             {% if app.user.isBlocked %}
                             is-user-blocked
                             {% endif %}

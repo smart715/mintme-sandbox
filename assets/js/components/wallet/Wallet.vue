@@ -492,20 +492,17 @@ export default {
                 return;
             }
 
-            let isHiddenCrypto = !(crypto in this.predefinedTokens);
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
             this.withdraw.fee = fee ? toMoney(fee) : null;
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
-                isToken && !isHiddenCrypto
+                isToken
                     ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
                     : 0
             );
-            this.withdraw.availableBase = !isHiddenCrypto
-                ? this.predefinedTokens[crypto || webSymbol].available
-                : 0;
+            this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },

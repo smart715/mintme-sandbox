@@ -1132,6 +1132,7 @@ trading.table.change: Echanger
 trading.table.last_price: 'Dernier prix'
 trading.table.volume_24h: 'Volume en 24 heures'
 trading.table.volume_30d: 'Volume en 30j'
+trading.table.market_cap:
 trading.mintme_markets: 'Marchés MINTME'
 trading.tokens: Jetons
 trading.currency.usd: USD

@@ -180,6 +180,7 @@ parameters:
         - BTC
         - ETH
         - USDC
+        - BNB
 
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB

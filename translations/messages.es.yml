@@ -1124,6 +1124,7 @@ trading.table.change: Cambio
 trading.table.last_price: 'Último Precio'
 trading.table.volume_24h: 'Volúmen de 24h'
 trading.table.volume_30d: 'Volúmen de 30d'
+trading.table.market_cap:
 trading.mintme_markets: 'Mercados MINTME'
 trading.tokens: Tokens
 trading.currency.usd: USD
