@@ -483,19 +483,19 @@ class TokenController extends Controller
             $dashedName = Symbols::WEB;
         }
 
+        if (null !== $this->cryptoManager->findBySymbol($name)) {
+            throw new RedirectException(
+                $this->redirectToRoute('coin', [
+                    'base'=> (Symbols::WEB == $name ? Symbols::BTC : $name),
+                    'quote'=> Symbols::MINTME,
+                ])
+            );
+        }
+
         $token = $this->tokenManager->findByName($dashedName);
 
         if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
-        }
-
-        if (null !== $this->cryptoManager->findBySymbol($token->getSymbol())) {
-            throw new RedirectException(
-                $this->redirectToRoute('coin', [
-                    'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
-                    'quote'=> Symbols::MINTME,
-                ])
-            );
         }
 
         return $token;
