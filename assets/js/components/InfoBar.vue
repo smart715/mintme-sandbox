@@ -24,7 +24,7 @@
             </span>
             <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
             <b-button
-                v-if="'dev' !== environment && isIssueBranch || !backendServiceStatus"
+                v-if="'dev' !== environment && isIssueBranch"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
                 :disabled="null === backendServiceStatus || managingBackendService"
@@ -152,7 +152,7 @@ export default {
     },
     computed: {
         isIssueBranch: function() {
-            return this.infoData.panelBranch.startsWith('v');
+            return ('-' !== this.infoData.panelBranch && this.infoData.panelBranch.startsWith('v'));
         },
         getButtonName: function() {
             if (this.managingBackendService) {
