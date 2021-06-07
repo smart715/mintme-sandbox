@@ -30,7 +30,6 @@ class TokenNameConverterTest extends TestCase
             [ 321, 0, 'TOK000000000321' ],
             [ 99999999999999, 0, 'TOK99999999999999' ],
             [ -1, 0, 'TOK0000000000-1' ],
-            [ 777, 0, 'WEB' ],
             [ 1, 5, 'TOK000000000006' ],
         ];
     }
