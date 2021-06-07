@@ -114,7 +114,8 @@
                        </tr>
                     </thead>
                     <tbody role="rowgroup" class="trading-body">
-                        {% for market in markets|slice(3) %}
+                        {# slice on count of all predefined cryptos #}
+                        {% for market in markets|slice(4) %}
                            <tr role="row">
                               <td aria-colindex="1" role="cell" class="pair-cell-trading">
                                  <div>
