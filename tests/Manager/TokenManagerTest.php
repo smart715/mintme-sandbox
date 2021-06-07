@@ -29,9 +29,15 @@ class TokenManagerTest extends TestCase
     public function testFindByNameWithCrypto(): void
     {
         $name = 'TOKEN';
+        $token = $this->createMock(Token::class);
+
+        /** @var MockObject|TokenRepository $tokenRepository */
+        $tokenRepository = $this->createMock(TokenRepository::class);
+        $tokenRepository->method('findByName')->with($name)->willReturn($token);
 
         /** @var MockObject|EntityManagerInterface $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getRepository')->willReturn($tokenRepository);
 
         $tokenManager = new TokenManager(
             $entityManager,
