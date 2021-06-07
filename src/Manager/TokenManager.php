@@ -72,21 +72,9 @@ class TokenManager implements TokenManagerInterface
             ? Symbols::WEB
             : strtoupper($name);
 
-        if (!in_array(strtoupper($name), array_map(
-            static function (Crypto $crypto) {
-                return $crypto->getSymbol();
-            },
-            $this->cryptoManager->findAll()
-        ), true)
-        ) {
-            $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
-            $token = $this->repository->findByName($name);
-
-            return $token ?? $this->repository->findByUrl($name);
-        }
-
-        return null;
+        return $this->repository->findByName($name);
     }
 
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token
