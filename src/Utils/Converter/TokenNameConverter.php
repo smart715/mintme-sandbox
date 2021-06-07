@@ -5,7 +5,6 @@ namespace App\Utils\Converter;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Exchange\Config\Config;
-use App\Manager\CryptoManagerInterface;
 
 class TokenNameConverter implements TokenNameConverterInterface
 {
