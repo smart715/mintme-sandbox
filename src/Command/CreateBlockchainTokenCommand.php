@@ -141,7 +141,7 @@ class CreateBlockchainTokenCommand extends Command
         }
 
         $profile = $this->profileManager->findByEmail($email);
-        $this->crypto = $this->cryptoManager->findBySymbol($blockchain, true);
+        $this->crypto = $this->cryptoManager->findBySymbol($blockchain);
         $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($tokenName)
             ?? $this->tokenManager->findByAddress($tokenAddress);

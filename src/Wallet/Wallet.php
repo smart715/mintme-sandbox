@@ -117,7 +117,7 @@ class Wallet implements WalletInterface
             $crypto = $tradable;
             $token = Token::getFromCrypto($tradable);
         } else {
-            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
+            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
             $token = $tradable;
         }
 

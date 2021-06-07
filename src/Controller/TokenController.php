@@ -508,7 +508,7 @@ class TokenController extends Controller
         ?string $modal = null,
         array $extraData = []
     ): Response {
-        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol(), true);
+        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
         $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
         $market = $exchangeCrypto
             ? $this->marketManager->create($exchangeCrypto, $token)
