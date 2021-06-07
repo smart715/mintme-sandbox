@@ -26,32 +26,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class TokenManagerTest extends TestCase
 {
-    public function testFindByNameWithCrypto(): void
-    {
-        $name = 'TOKEN';
-        $token = $this->createMock(Token::class);
-
-        /** @var MockObject|TokenRepository $tokenRepository */
-        $tokenRepository = $this->createMock(TokenRepository::class);
-        $tokenRepository->method('findByName')->with($name)->willReturn($token);
-
-        /** @var MockObject|EntityManagerInterface $entityManager */
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->method('getRepository')->willReturn($tokenRepository);
-
-        $tokenManager = new TokenManager(
-            $entityManager,
-            $this->createMock(ProfileFetcherInterface::class),
-            $this->mockTokenStorage(),
-            $this->mockCryptoManager([$this->mockCrypto('CRYPTO')]),
-            $this->mockConfig(0)
-        );
-
-        $this->assertEquals($name, $tokenManager->findByName($name)->getCrypto()->getName());
-        $this->assertEquals($name, $tokenManager->findByName($name)->getName());
-        $this->assertNotSame($tokenManager->findByName($name), $tokenManager->findByName($name));
-    }
-
     public function testFindByName(): void
     {
         $name = 'TOKEN';
