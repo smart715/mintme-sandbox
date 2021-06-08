@@ -208,6 +208,90 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    public function executeOrder(
+        User $user,
+        Market $market,
+        string $amountInput,
+        string $expectedToReceive,
+        int $side
+    ): TradeResult {
+        $isSellSide = Order::SELL_SIDE === $side;
+
+        if ($isSellSide && $this->exceedAvailableReleased(
+            $user,
+            $market->getQuote()->getSymbol(),
+            $amountInput
+        )) {
+            return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
+        }
+
+        $AvgPrice = $this->mw->parse(
+            $expectedToReceive,
+            $market->getBase()->getSymbol()
+        )->divide($amountInput);
+
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $this->mw->format($AvgPrice),
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
+        }
+
+        $amount = $this->mw->parse(
+            $this->parseAmount($amountInput, $market),
+            $this->getSymbol($market->getQuote())
+        );
+
+        $fee = $this->mw->parse(
+            (string)($isSellSide ? $this->bag->get('maker_fee_rate') : $this->bag->get('taker_fee_rate')),
+            $this->getSymbol($market->getQuote())
+        );
+
+        $order = new Order(
+            null,
+            $user,
+            null,
+            $market,
+            $amount,
+            $side,
+            $AvgPrice,
+            Order::PENDING_STATUS,
+            $fee,
+            null,
+            null,
+            $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
+        );
+
+        $tradeResult = $this->trader->executeOrder($order);
+
+        try {
+            $this->mp->send($market);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
+            );
+        }
+
+        $this->logger->info(
+            sprintf('Excecute %s order', Order::BUY_SIDE === $side ? 'buy' : 'sell'),
+            [
+                'base' => $market->getBase()->getSymbol(),
+                'quote' => $market->getQuote()->getSymbol(),
+                'amount' => $amount->getAmount(),
+                'received' => $expectedToReceive,
+            ]
+        );
+
+        return $tradeResult;
+    }
+
     private function parseAmount(string $amount, Market $market, bool $useBase = false): string
     {
         /** @var Crypto $crypto */

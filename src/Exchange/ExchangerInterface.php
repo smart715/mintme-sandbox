@@ -16,5 +16,13 @@ interface ExchangerInterface
         int $side
     ): TradeResult;
 
+    public function executeOrder(
+        User $user,
+        Market $market,
+        string $amountInput,
+        string $expectedToReceive,
+        int $side
+    ): TradeResult;
+
     public function cancelOrder(Market $market, Order $order): TradeResult;
 }

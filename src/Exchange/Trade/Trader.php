@@ -74,6 +74,44 @@ class Trader implements TraderInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function executeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
+    {
+        $result = $this->fetcher->executeOrder(
+            $order->getMaker()->getId(),
+            $this->marketNameConverter->convert($order->getMarket()),
+            $order->getSide(),
+            $this->moneyWrapper->format($order->getAmount()),
+            (string)$this->config->getTakerFeeRate(),
+            $order->getReferralId() ?: 0,
+            $this->referralFee ? (string)$this->referralFee : '0'
+        );
+
+        $quote = $order->getMarket()->getQuote();
+
+        if (TradeResult::SUCCESS === $result->getResult()) {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
+
+            if ($updateTokenOrCrypto) {
+                if ($quote instanceof Token) {
+                    $this->updateUserTokenReferencer($order->getMaker(), $quote);
+                } elseif ($quote instanceof Crypto) {
+                    $this->updateUserCrypto($order->getMaker(), $quote);
+                }
+            }
+        } elseif (TradeResult::FAILED === $result->getResult()) {
+            $this->logger->error(
+                "Failed to execute order for user {$order->getMaker()->getEmail()}.
+                Reason: {$result->getMessage()}",
+                (array)$this->normalizer->normalize($result, null, [
+                    'groups' => ['Default'],
+                ])
+            );
+        }
+
+        return $result;
+    }
+
     public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
     {
         $result = $this->fetcher->placeOrder(

@@ -328,14 +328,13 @@ class DonationController extends AbstractFOSRestController
             throw new ApiBadRequestException('Token availability changed.');
         }
 
-        $minPrice = 1 / (int)str_pad('1', $quote->getShowSubunit() + 1, '0');
+        // todo: check if amount is higher than orders summary
 
-        return $this->exchanger->placeOrder(
+        return $this->exchanger->executeOrder(
             $user,
             $market,
             $amount,
-            (string)$minPrice,
-            false,
+            $this->moneyWrapper->format($expectedAmount),
             Order::SELL_SIDE
         );
     }
