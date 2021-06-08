@@ -14,11 +14,9 @@ class UserTokenManager implements UserTokenManagerInterface
     private UserTokenRepository $repository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, UserTokenRepository $repository)
     {
         $this->entityManager = $entityManager;
-        /** @var UserTokenRepository $repository */
-        $repository = $this->entityManager->getRepository(UserToken::class);
         $this->repository = $repository;
     }
 
