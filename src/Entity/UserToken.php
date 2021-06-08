@@ -34,6 +34,11 @@ class UserToken implements UserTradebleInterface
     protected $user;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHolder;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="users")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      * @var Token
@@ -84,6 +89,18 @@ class UserToken implements UserTradebleInterface
     public function setCreatedValue(): self
     {
         $this->created = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function isHolder(): bool
+    {
+        return $this->isHolder;
+    }
+
+    public function setIsHolder(bool $isHolder): self
+    {
+        $this->isHolder = $isHolder;
 
         return $this;
     }

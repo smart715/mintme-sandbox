@@ -37,17 +37,20 @@ class UserTokenManager implements UserTokenManagerInterface
         }
 
         $userToken = $this->findByUserToken($user, $token);
+        $isCreator = $user->getId() === $token->getProfile()->getId();
 
-        if (!$userToken && !$balance->isZero()) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
+        if (!$userToken && ($isCreator || !$balance->isZero())) {
+            $userToken = (new UserToken())
+                ->setToken($token)
+                ->setUser($user)
+                ->setIsHolder(!$balance->isZero());
             $this->entityManager->persist($userToken);
             $user->addToken($userToken);
             $this->entityManager->persist($user);
             $this->entityManager->flush();
-        } elseif ($userToken && $balance->isZero()) {
-            $this->entityManager->remove($userToken);
-            $user->removeToken($userToken);
-            $this->entityManager->persist($user);
+        } elseif ($userToken) {
+            $userToken = $userToken->setIsHolder(!$balance->isZero());
+            $this->entityManager->persist($userToken);
             $this->entityManager->flush();
         }
     }
