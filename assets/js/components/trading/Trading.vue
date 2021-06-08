@@ -576,7 +576,7 @@ export default {
                 && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
-            this.sortBy = '';
+            this.sortBy = 'rank';
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },

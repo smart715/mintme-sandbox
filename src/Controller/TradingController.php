@@ -38,7 +38,7 @@ class TradingController extends Controller
         $btcCrypto = $cryptoManager->findBySymbol(Symbols::BTC);
         $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
 
-        $sort = MarketStatusManager::SORT_MONTH_VOLUME;
+        $sort = MarketStatusManager::SORT_RANK;
         $order = 'DESC';
         $filter = MarketStatusManager::FILTER_DEPLOYED_ONLY_MINTME;
         $tokensOnPage = (int)$this->getParameter('tokens_on_page');
@@ -46,7 +46,7 @@ class TradingController extends Controller
         $markets = $marketStatusManager->getMarketsInfo(
             $tokensOnPage * ($page - 1),
             $tokensOnPage,
-            'monthVolume',
+            'rank',
             'DESC',
             $filter,
             null
