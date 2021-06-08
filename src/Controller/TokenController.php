@@ -10,6 +10,7 @@ use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ForbiddenException;
+use App\Exception\NotFoundAirdropException;
 use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
 use App\Exception\NotFoundVotingException;
@@ -54,7 +55,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -65,7 +65,6 @@ use Throwable;
  */
 class TokenController extends Controller
 {
-
     protected EntityManagerInterface $em;
     protected ProfileManagerInterface $profileManager;
     protected BlacklistManagerInterface $blacklistManager;
@@ -448,6 +447,46 @@ class TokenController extends Controller
         $response->headers->setCookie(new Cookie('referral-type', 'airdrop'));
 
         return $response;
+    }
+
+    /**
+     * @Route("/{name}/airdrop/{airdropId}/embeded",
+     *     name="airdrop_embeded",
+     *     options={"expose"=true},
+     *     requirements={"airdropId"="\d+"}
+     * )
+     */
+    public function airdropEmbeded(
+        string $name,
+        int $airdropId,
+        AirdropReferralCodeManagerInterface $arcManager,
+        Request $request
+    ): Response {
+        /** @var  User|null $user */
+        $user = $this->getUser();
+        $token = $this->fetchToken($request, $name);
+        $airdrop = $token->getAirdrop($airdropId);
+        $referralCode = null;
+
+        if (!$airdrop) {
+            throw new NotFoundAirdropException();
+        }
+
+        if ($user && $airdrop->getToken()->getOwner()->getId() !== $user->getId()) {
+            $referralCode = $arcManager->getByAirdropAndUser($airdrop, $user)
+                ?? $arcManager->create($airdrop, $user);
+            $referralCode = $arcManager->encode($referralCode);
+        }
+
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
+        return $this->render('pages/airdrop_embeded.html.twig', [
+            'airdrop' => $this->normalize($airdrop, ['API']),
+            'referralCode' => $referralCode,
+            'token' => $token,
+            'isOwner' => $user && $token->isOwner($user->getProfile()->getTokens()),
+            'userAlreadyClaimed' => $userAlreadyClaimed,
+        ]);
     }
 
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse

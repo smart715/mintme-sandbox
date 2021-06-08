@@ -7,6 +7,8 @@
         hide-footer
         :no-close-on-backdrop="noClose"
         :no-close-on-esc="noClose"
+        :modal-class="{'modal-embeded': embeded}"
+        :no-fade="embeded"
     >
         <div slot="modal-header" class="d-flex flex-nowrap justify-content-between">
             <span class="text-truncate d-block flex-grow-1 modal-title pl-4">
@@ -40,6 +42,10 @@ export default {
         size: String,
         noClose: Boolean,
         withoutPadding: {type: Boolean, default: false},
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         paddingClass: function() {
