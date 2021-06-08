@@ -199,8 +199,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::SORT_RANK:
-                $queryBuilder->addSelect('CASE WHEN qt.deployed = 1 AND qt.crypto IS NULL THEN 1 ELSE 0 END AS HIDDEN deployed_on_mintme');
-                $result[] = 'deployed_on_mintme';
+                $queryBuilder->addSelect('CASE WHEN qt.deployed = 1 AND qt.crypto IS NULL THEN 1 ELSE 0 END AS HIDDEN rank_deployed_on_mintme');
+                $result[] = 'rank_deployed_on_mintme';
                 $result[] = 'to_number(ms.monthVolume)';
 
                 break;
@@ -248,7 +248,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getMarketsInfo(
         int $offset,
         int $limit,
-        string $sort = "monthVolume",
+        string $sort = "rank",
         string $order = "DESC",
         int $filter = 1,
         ?int $userId = null
