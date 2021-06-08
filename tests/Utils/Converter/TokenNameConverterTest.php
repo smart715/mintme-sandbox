@@ -3,6 +3,7 @@
 namespace App\Tests\Utils\Converter;
 
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Exchange\Config\Config;
 use App\Utils\Converter\TokenNameConverter;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,7 +20,7 @@ class TokenNameConverterTest extends TestCase
             $this->mockConfig($offset)
         );
 
-        $this->assertEquals($tokenName, $converter->convert($this->mockToken($tokenId, $tokenName)));
+        $this->assertEquals($tokenName, $converter->convert($this->mockTradebleInterface($tokenId, $tokenName)));
     }
 
     public function convertProvider(): array
@@ -45,9 +46,9 @@ class TokenNameConverterTest extends TestCase
     }
 
     /**
-     * @return Token|MockObject
+     * @return TradebleInterface|MockObject
      */
-    private function mockToken(int $value, string $name): Token
+    private function mockTradebleInterface(int $value, string $name): TradebleInterface
     {
         $token = $this->createMock(Token::class);
 
