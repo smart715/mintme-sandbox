@@ -693,6 +693,15 @@ class Token implements TradebleInterface, ImagineInterface
             : $activeAirdrop->first();
     }
 
+    public function getAirdrop(int $id): ?Airdrop
+    {
+        $airdrops = $this->getAirdrops()->filter(fn(Airdrop $a) => $id === $a->getId());
+
+        return $airdrops->isEmpty()
+            ? null
+            : $airdrops->first();
+    }
+
     /** @codeCoverageIgnore */
     public function addAirdrop(Airdrop $airdrop): self
     {

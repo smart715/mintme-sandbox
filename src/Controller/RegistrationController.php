@@ -123,7 +123,7 @@ class RegistrationController extends FOSRegistrationController
     }
 
     /**
-     * @Route("/register", name="register", options = {"expose": true})
+     * @Route("/register/{page}", name="register", options = {"expose": true}, defaults={"page"=null})
      */
     public function registerAction(Request $request): Response
     {
