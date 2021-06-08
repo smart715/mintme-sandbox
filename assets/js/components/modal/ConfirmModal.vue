@@ -1,7 +1,9 @@
 <template>
     <modal
         :visible="visible"
-        @close="closeModal">
+        :embeded="embeded"
+        @close="closeModal"
+    >
         <template slot="body">
             <div class="text-center">
                 <div v-if="showImage">
@@ -14,6 +16,7 @@
                 </slot>
                 <div class="pt-2">
                     <button
+                        v-if="showConfirmButton"
                         class="btn btn-primary"
                         :tabindex="9"
                         @click="onConfirm"
@@ -44,6 +47,10 @@ export default {
     },
     props: {
         visible: Boolean,
+        showConfirmButton: {
+            type: Boolean,
+            default: true,
+        },
         showCancelButton: {
             type: Boolean,
             default: true,
@@ -57,6 +64,10 @@ export default {
             default: false,
         },
         modelConfirmProp: String,
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         modalConfirm: function() {

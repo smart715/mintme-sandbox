@@ -78,35 +78,37 @@ if (document.getElementById('notifications')) {
     });
 }
 
-new Vue({
-    el: '#navbar',
-    i18n,
-    directives: {
-        onClickaway,
-    },
-    data() {
-        return {
-            items: [],
-            showNavbarMenu: false,
-            showProfileMenu: false,
-        };
-    },
-    components: {
-        TokenSearcher,
-        Avatar,
-        UserNotification,
-        NavEnvelope,
-    },
-    methods: {
-        toggleNavbarMenu: function() {
-            this.showNavbarMenu = !this.showNavbarMenu;
+if (document.getElementById('navbar')) {
+    new Vue({
+        el: '#navbar',
+        i18n,
+        directives: {
+            onClickaway,
         },
-        toggleProfileMenu: function() {
-            this.showProfileMenu = !this.showProfileMenu;
+        data() {
+            return {
+                items: [],
+                showNavbarMenu: false,
+                showProfileMenu: false,
+            };
         },
-        hideProfileMenu: function() {
-            this.showProfileMenu = false;
+        components: {
+            TokenSearcher,
+            Avatar,
+            UserNotification,
+            NavEnvelope,
         },
-    },
-});
+        methods: {
+            toggleNavbarMenu: function() {
+                this.showNavbarMenu = !this.showNavbarMenu;
+            },
+            toggleProfileMenu: function() {
+                this.showProfileMenu = !this.showProfileMenu;
+            },
+            hideProfileMenu: function() {
+                this.showProfileMenu = false;
+            },
+        },
+    });
+}
 

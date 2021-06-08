@@ -765,6 +765,7 @@ comment.liked: 'Comentario que gustó.'
 comment.load_error: 'Error al cargar los comentarios'
 comment.min_amount: 'Se necesita %amount% %token% para ver los comentarios.'
 like.removed: 'Me gusta eliminado '
+airdrop.embed_title:
 voting.voting:
 voting.information:
 voting.propositions:
@@ -836,6 +837,7 @@ ongoing_airdrop.confirm_message.logged_in: 'Tiene que ingresar para poder recibi
 ongoing_airdrop.confirm_message.cant_participate: 'Disculpe, usted no puede participar en su propio airdrop.'
 ongoing_airdrop.confirm_message: '¿Está seguro que quiere recibir %airdropReward% %tokenName%?'
 ongoing_airdrop.ended: 'Disculpe, este airdrop ha finalizado.'
+ongoing_airdrop.ended_embeded:
 ongoing_airdrop.submit_url: 'Enviar dirección'
 ongoing_airdrop.actions.message: '¡%tokenName% esta lanzando su token! Visite %tokenUrl% para conocer mas sobre el token y su airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Para completar esta acción se requiere autenticación en YouTube.'
@@ -1330,6 +1332,7 @@ mail.verification_code: 'Su código de verificación:'
 404.profile: 'PERFIL NO EXISTE'
 404.token: 'TOKEN NO ENCONTRADO'
 404.pair: 'PAR NO ENCONTRADO'
+404.airdrop:
 404.voting:
 mail.mintme_host.1: 'Puede utilizar un <strong>hosting web dedicado</strong> para sus proyectos en mintme en:'
 mail.mintme_host.2: 'Que está hecho por el <strong>equipo de mintMe</strong>, puede probarlo completamente gratis durante %freeDays% días y el precio del primer año del hosting web con tráfico ilimitado para tu proyecto es de sólo <strong>%price% USD/AÑO</strong>'
@@ -1432,3 +1435,4 @@ modal.add_phone_alert_token_create.message: 'Para crear un token'
 modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
 modal.add_phone_alert_donation.message: 'Para hacer donaciones'
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
+browser.storage.error:
