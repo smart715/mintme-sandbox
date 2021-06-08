@@ -771,6 +771,7 @@ comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
 comment.min_amount: 'You need %amount% %token% to see comments.'
 like.removed: 'Mention aimé retirée.'
+airdrop.embed_title:
 voting.voting:
 voting.information:
 voting.propositions:
@@ -844,6 +845,7 @@ ongoing_airdrop.confirm_message.cant_participate: 'Désolé, vous ne pouvez part
 ongoing_airdrop.confirm_message: 'Voulez-vous vraiment réclamer %airdropReward% %tokenName%?'
 ongoing_airdrop.actions_message: 'Pour réclamer %airdropReward% %tokenName% vous devez éffectuer ces %tasksAmount% tâches:'
 ongoing_airdrop.ended: 'Désolé, cet airdrop est terminé.'
+ongoing_airdrop.ended_embeded:
 ongoing_airdrop.submit_url: 'Soumettre l''URL'
 ongoing_airdrop.actions.message: 'Airdrop en cours du jeton %tokenName%. Visiter %tokenUrl% pour en savoir plus à propos du jeton et de l''airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Authentification Youtube requise pour compléter cette action.'
@@ -1341,6 +1343,7 @@ mail.verification_code: 'Votre code de vérification:'
 404.profile: 'Profil inexistant'
 404.token: 'Jeton introuvable'
 404.pair: 'Paire introuvable'
+404.airdrop:
 404.voting:
 text.time.year: année(s)
 mail.mintme_host.1: 'Vous pouvez utiliser <strong>des hébergements dédiés spéciaux</strong> pour votre projet mintme à:'
@@ -1434,3 +1437,4 @@ modal.add_phone_alert_token_create.message: 'To create a token'
 modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawals'
 modal.add_phone_alert_donation.message: 'To make donations'
 api.add_phone_number_message: 'you need to add phone number in your profile'
+browser.storage.error:

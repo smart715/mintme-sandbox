@@ -6,6 +6,10 @@
     {{ include("@FOSUser/Registration/register_content.html.twig") }}
 {% endblock fos_user_content %}
 
+{% block contentclass %}
+    {% if isEmbeded() %}bg-secondary{% endif %}
+{% endblock %}
+
 {% block pagescripts %}
     {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
     {{ encore_entry_script_tags('pages/register') }}
