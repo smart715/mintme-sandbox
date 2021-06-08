@@ -36,14 +36,13 @@ describe('TokenOngoingAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        'amount': '125.2365',
-                        'participants': 110,
-                        'actualParticipants': 11,
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 3,
+                    amount: '125.2365',
+                    participants: 110,
+                    actualParticipants: 11,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
@@ -59,37 +58,36 @@ describe('TokenOngoingAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        reward: '3',
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 0,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
             },
         });
 
-        expect(wrapper.vm.airdropReward).toBe(0);
-        expect(wrapper.vm.halfReward).toBe(0);
+        expect(wrapper.vm.airdropReward).toBe('0');
+        expect(wrapper.vm.halfReward).toBe('0');
+        wrapper.vm.airdropCampaign = {
+            reward: 3,
+        };
         wrapper.vm.loaded = true;
         expect(wrapper.vm.airdropReward).toBe('3');
         expect(wrapper.vm.halfReward).toBe('1.5');
     });
-
 
     it('should format airdrop end date/time properly', () => {
         let dateNow = moment();
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        endDate: dateNow,
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 0,
+                    endDate: dateNow,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
@@ -155,7 +153,8 @@ describe('TokenOngoingAirdropCampaign', () => {
             data() {
                 return {
                     airdropCampaign: {
-                        'endDate': new Date(),
+                        reward: 0,
+                        endDate: new Date(),
                     },
                 };
             },
@@ -219,13 +218,10 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loggedIn: true,
                 tokenName: 'test1',
                 userAlreadyClaimed: false,
-            },
-            data() {
-                return {
-                    airdropCampaign: {
-                        'id': 5,
-                    },
-                };
+                airdropCampaignProp: {
+                    id: 5,
+                    reward: 0,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},

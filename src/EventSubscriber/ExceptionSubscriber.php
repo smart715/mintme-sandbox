@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Exception\ApiExceptionInterface;
 use App\Exception\ForbiddenException;
+use App\Exception\NotFoundAirdropException;
 use App\Exception\NotFoundKnowledgeBaseException;
 use App\Exception\NotFoundPairException;
 use App\Exception\NotFoundPostException;
@@ -61,6 +62,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
                     'error_message' => $exception->getMessage(),
                 ]),
                 403
+            ));
+        }
+
+        if ($exception instanceof NotFoundAirdropException) {
+            $event->setResponse(new Response(
+                $this->template->render('pages/404.html.twig', [
+                    'error_message' => $this->translator->trans('404.airdrop'),
+                ]),
+                404
             ));
         }
 
