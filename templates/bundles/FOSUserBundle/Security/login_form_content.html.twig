@@ -1,5 +1,9 @@
+{% set isEmbeded = isEmbeded() %}
+{% set specificPage = isEmbeded ? 'embeded' : '' %}
+
 {% trans_default_domain 'FOSUserBundle' %}
-<form action="{{ path("login") }}" method="post" id="login">
+<form action="{{ path('login', {'page': specificPage}) }}" method="post" id="login">
+    <input type="hidden" name="go_to" value="{{app.request.uri }}"/>
     {% if app.session.flashbag.peekAll() is not empty %}
         <div class="row">
             {% for label, messages in app.flashes %}
@@ -78,12 +82,16 @@
                 value="{% trans %}security.login.submit{% endtrans %}"
             >
             <span class="px-2">or</span>
-            <a id="signup-button" href="{{ path('fos_user_registration_register') }}" class="btn-cancel px-0">{% trans %}form.signup.submit{% endtrans %}</a>
+            <a id="signup-button" href="{{ path('register', {'page': specificPage}) }}" class="btn-cancel px-0">
+                {% trans %}form.signup.submit{% endtrans %}
+            </a>
         </div>
     </div>
+    {% if not isEmbeded %}
     <div class="text-left text-white">
         <a href="{{ path('fos_user_resetting_request') }}">{% trans %}form.login.forgot{% endtrans %}</a>
     </div>
+    {% endif %}
     {% if csrf_token %}
         <input type="hidden" id="fos_user_registration_login__token" name="_csrf_token" value="{{ csrf_token }}" />
     {% endif %}
