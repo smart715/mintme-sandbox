@@ -1,6 +1,10 @@
-{% extends 'base.html.twig' %}
+{% set isEmbeded = isEmbeded() %}
+{% extends isEmbeded ? 'base_embeded.html.twig' : 'base.html.twig' %}
+{% set specificPage = isEmbeded ? 'embeded' : '' %}
 
-{% block contentClass %}wrap-main-form py-4{% endblock %}
+{% block contentclass %}
+    {% if isEmbeded %}bg-secondary{% else %}wrap-main-form py-4{% endif %}
+{% endblock %}
 
 {% set formHeader = '2fa.login.title'|trans %}
 
@@ -21,7 +25,7 @@
                             </div>
                         {% endif %}
                         {% block formBody %}
-                            <form action="{{ path("2fa_login_check") }}" method="post">
+                            <form action="{{ path("2fa_login_check", {'page': specificPage}) }}" method="post">
                                 <div class="form-group">
                                     <label for="code">{% trans %}2fa.verification_code{% endtrans %}</label>
                                     <input

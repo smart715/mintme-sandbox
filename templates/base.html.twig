@@ -24,6 +24,9 @@
                 <meta property="og:description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents success of your project.">
             {% endblock %}
             {% include 'head.html.twig' %}
+            {% block headscripts %}
+                {% include 'head_scripts.html.twig' %}
+            {% endblock %}
             <title>
                 {% block title %}mintMe{% endblock %}
             </title>

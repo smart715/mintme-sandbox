@@ -11,6 +11,7 @@ framework:
         handler_id: ~
         cookie_secure: true
         cookie_httponly: true
+        cookie_samesite: 'none'
 
     #esi: true
     #fragments: true
