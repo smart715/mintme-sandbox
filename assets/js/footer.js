@@ -7,13 +7,14 @@ import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 
 library.add(faCookieBite);
 
-new Vue({
-    el: '#footer',
-    i18n,
-    components: {
-        FontAwesomeIcon,
-        LocaleSwitcher,
-        CurrencyModeSwitcher,
-    },
-});
-
+if (document.getElementById('footer')) {
+    new Vue({
+        el: '#footer',
+        i18n,
+        components: {
+            FontAwesomeIcon,
+            LocaleSwitcher,
+            CurrencyModeSwitcher,
+        },
+    });
+}
