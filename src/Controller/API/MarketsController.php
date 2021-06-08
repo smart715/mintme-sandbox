@@ -45,7 +45,7 @@ class MarketsController extends APIController
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
      * @Rest\QueryParam(name="filter", default=0)
-     * @Rest\QueryParam(name="sort", default="monthVolume")
+     * @Rest\QueryParam(name="sort", default="rank")
      * @Rest\QueryParam(name="order", default="DESC")
      */
     public function getMarketsInfo(
