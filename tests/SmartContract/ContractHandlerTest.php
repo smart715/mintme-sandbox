@@ -205,6 +205,8 @@ class ContractHandlerTest extends TestCase
                     'value' => '1',
                     'userId' => 1,
                     'crypto' => '',
+                    'tokenFee' => '1',
+                    'tokenFeeCurrency' => 'TOK',
                 ]
             );
 
@@ -221,7 +223,8 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed')
+            $this->mockToken(true, '0x123', 'deployed'),
+            new Money('1', new Currency(Symbols::TOK))
         );
     }
 
@@ -246,7 +249,8 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'not-deployed')
+            $this->mockToken(true, '0x123', 'not-deployed'),
+            new Money('1', new Currency(Symbols::WEB))
         );
     }
 
@@ -262,6 +266,8 @@ class ContractHandlerTest extends TestCase
                     'value' => '1',
                     'userId' => 1,
                     'crypto' => '',
+                    'tokenFee' => '1',
+                    'tokenFeeCurrency' => 'TOK',
                 ]
             )->willReturn($this->mockResponse(true));
 
@@ -280,7 +286,8 @@ class ContractHandlerTest extends TestCase
             $this->mockUser(1),
             new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed')
+            $this->mockToken(true, '0x123', 'deployed'),
+            new Money('1', new Currency(Symbols::TOK))
         );
     }
 
@@ -306,6 +313,8 @@ class ContractHandlerTest extends TestCase
                     'status' => 'paid',
                     'type' => 'withdraw',
                     'crypto' => 'WEB',
+                    'tokenFee' => '1000000000000',
+                    'tokenFeeCurrency' => 'TOK',
                 ],
                 [
                     'hash' => 'hash',
@@ -317,6 +326,8 @@ class ContractHandlerTest extends TestCase
                     'status' => 'paid',
                     'type' => 'deposit',
                     'crypto' => 'WEB',
+                    'tokenFee' => '1000000000000',
+                    'tokenFeeCurrency' => 'TOK',
                 ],
             ]));
 
