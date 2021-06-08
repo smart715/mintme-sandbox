@@ -31,6 +31,7 @@
             :addresses="addresses"
             :addresses-signature="addressesSignature"
             :refresh-token="refreshToken"
+            :predefined-tokens="predefinedTokens"
             @close="modalVisible = false"
         />
     </div>
@@ -56,6 +57,7 @@ export default {
         coinifyCryptoCurrencies: Array,
         addresses: Object,
         addressesSignature: Object,
+        predefinedTokens: Array,
     },
     data() {
         return {

@@ -7,6 +7,7 @@
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
             :addresses-signature="addressesSignature"
+            :predefined-tokens="predefinedItems"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -19,7 +20,7 @@
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
                     <div class="first-field">
-                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        <a :href="data.item.url" class="text-white truncate-name">
                             {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                         </a>
                     </div>
@@ -373,7 +374,10 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens || {});
+            return this.tokensToArray(this.predefinedTokens || {}).map((item) => {
+                item.url = this.rebrandingFunc(this.generateCoinUrl(item));
+                return item;
+            });
         },
         items: function() {
             return this.tokensToArray(this.tokens || {}).filter((token) => !(!token.deployed && token.available <= 0));
