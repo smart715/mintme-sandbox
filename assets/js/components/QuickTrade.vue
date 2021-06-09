@@ -38,7 +38,7 @@
                             <div class="d-sm-flex">
                                 <b-dropdown
                                     v-show="isBuyMode"
-                                    id="donation_currency"
+                                    id="quick_trade_currency"
                                     :text="dropdownText"
                                     variant="primary"
                                     class="mr-2"
@@ -135,7 +135,7 @@
                                 <p class="m-0 mt-1">
                                     {{ $t('quick_trade.receive') }}
                                     <font-awesome-icon
-                                        v-if="donationChecking"
+                                        v-if="isCheckingTrade"
                                         icon="circle-notch"
                                         spin
                                         class="loading-spinner"
@@ -288,13 +288,13 @@ export default {
             amountToReceive: 0,
             worth: 0,
             ordersSummary: 0,
-            donationChecking: false,
-            donationInProgress: false,
+            isCheckingTrade: false,
+            isTradeInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
             showForms: false,
             firstInteraction: false,
-            addPhoneModalMessageType: 'donation',
+            addPhoneModalMessageType: 'quick_trade',
             addPhoneModalProfileNickName: this.profileNickname,
             tradeMode: BUY_MODE,
         };
@@ -393,7 +393,7 @@ export default {
             const amount = new Decimal(this.amount || 0);
 
             return this.isSellMode &&
-                !this.donationChecking &&
+                !this.isCheckingTrade &&
                 !amount.isZero() &&
                 amount.greaterThan(this.ordersSummary);
         },
@@ -409,8 +409,8 @@ export default {
                 !this.isCurrencySelected ||
                 !parseFloat(this.amount) ||
                 this.sellAmountExceeds ||
-                this.donationChecking ||
-                this.donationInProgress;
+                this.isCheckingTrade ||
+                this.isTradeInProgress;
         },
         shouldShowDepositMore: function() {
             return !this.isToken ||
@@ -506,7 +506,7 @@ export default {
                 return;
             }
 
-            this.donationChecking = true;
+            this.isCheckingTrade = true;
 
             this.$axios.retry.get(this.$routing.generate('check_quick_trade', {
                 base: this.market.base.symbol,
@@ -523,10 +523,10 @@ export default {
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 })
-                .then(() => this.donationChecking = false);
+                .then(() => this.isCheckingTrade = false);
         },
         makeDonation: function() {
-            this.donationInProgress = true;
+            this.isTradeInProgress = true;
             this.showModal = false;
 
             this.$axios.single.post(this.$routing.generate('make_quick_trade', {
@@ -569,7 +569,7 @@ export default {
                     }
                     this.sendLogs('error', 'Can not make donation.', error);
                 })
-                .then(() => this.donationInProgress = false);
+                .then(() => this.isTradeInProgress = false);
         },
         all: function() {
             this.amount = toMoney(this.balance, this.currencySubunit);
