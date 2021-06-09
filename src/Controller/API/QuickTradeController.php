@@ -337,12 +337,19 @@ class QuickTradeController extends AbstractFOSRestController
             throw new ApiBadRequestException('Token availability changed.');
         }
 
-        // todo: check if amount is higher than orders summary
+        $amount = $this->moneyWrapper->parse($amount, $quoteSymbol);
+
+        $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
+        $buyOrdersSummary = $this->moneyWrapper->parse($buyOrdersSummary, $quoteSymbol);
+
+        if ($amount->greaterThan($buyOrdersSummary)) {
+            throw new ApiBadRequestException('Exceeding buy orders');
+        }
 
         return $this->exchanger->executeOrder(
             $user,
             $market,
-            $amount,
+            $this->moneyWrapper->format($amount),
             $this->moneyWrapper->format($expectedAmount),
             Order::SELL_SIDE,
             $this->config->getFee()
