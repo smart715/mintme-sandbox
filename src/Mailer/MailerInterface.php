@@ -29,6 +29,7 @@ interface MailerInterface
     public function sendAirdropFeatureMail(Token $token): void;
     public function sendMintmeHostMail(User $user, string $price, string $freeDays, string $mintmeHostPath): void;
     public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void;
+    public function sentMintmeExchangeMail(array $exchangeCryptos): void;
     public function sendAirdropClaimedMail(
         User $user,
         Token $token,

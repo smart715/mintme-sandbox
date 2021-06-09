@@ -8,6 +8,7 @@
             :addresses="depositAddresses"
             :addresses-signature="addressesSignature"
             :predefined-tokens="predefinedItems"
+            :mintme-exchange-mail-sent="mintmeExchangeMailSent"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -312,6 +313,7 @@ export default {
         coinifyCryptoCurrencies: Array,
         cantMakeDepositWithdrawal: Boolean,
         profileNickname: String,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {

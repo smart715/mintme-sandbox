@@ -572,6 +572,11 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
+    public function sentMintmeExchangeMail(array $exchangeCryptos): void
+    {
+        // TODO: Implement sentMintmeExchangeMail() method.
+    }
+
     public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
     {
         $tokenSalesUrl = $this->urlGenerator->generate(

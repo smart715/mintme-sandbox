@@ -58,6 +58,7 @@ export default {
         addresses: Object,
         addressesSignature: Object,
         predefinedTokens: Array,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {
@@ -69,6 +70,13 @@ export default {
         buyCrypto: function() {
             this.modalVisible = true;
             this.getRefreshToken();
+
+            if (!this.mintmeExchangeMailSent) {
+                this.$axios.retry.get(this.$routing.generate('send_exchange_mintme_mail'))
+                    .catch((err) => {
+                            this.sendLogs('error', 'Can not sent exchange cryptos mail', err);
+                        });
+            }
         },
         getRefreshToken: function() {
             if (this.refreshToken) {
