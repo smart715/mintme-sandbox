@@ -666,30 +666,23 @@ bbcode.help.image: Image
 bbcode.help.images: Images
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Vidéo YouTube'
-donation.nonrefund:
-donation.currency: Devise
-donation.currency.select: 'Selectionner la devise'
-donation.balance: 'Solde:'
-donation.make: 's''il vous plaît'
-donation.deposit: dépôt
-donation.first: premier
-donation.insufficient_funds: 'Fonds insuffisant pour l''achat,'
-donation.amount: 'Montant:'
-donation.amount.sell_exeeds:
-donation.min_amount: 'Quantité minimale de %donationCurrency% %currencyMinAmount%'
-donation.diff_number: 'La quantité de jetons que vous recevrez peut légèrement varier à cause de l''activité des traders.'
-donation.receive: 'Vous recevrez approximativement:'
-donation.fee: 'Frais d''achat: %fee%%'
-donation.buy: Acheter
-donation.sell:
-donation.modal.1: 'Le quantité donnée excède la valeur des jetons disponible à vendre. Vous pouvez continuer ou annuler et ajuster le montant de la donation. Alternativement; vous pouvez demander au créateur du jeton de définir plus d''ordres de vente sur le marché, puis réessayer la donation.'
-donation.modal.2: 'Voulez-vous faire une donation %amountToDonate% de %amountToReceive% valant %worth%?'
-donation.successfully_made: 'Félicitations! Achat effectué avec succès. Vous avez reçu %amount% jetons'
-donation.tokens_availability_changed: 'La disponibilité des jetons a changée. Bien vouloir ajuster le montant de l''achat.'
-donation.button_all: Tout
+quick_trade.donation.nonrefund:
+quick_trade.currency.select:
+quick_trade.balance:
+quick_trade.make_deposit:
+quick_trade.insufficient_funds:
+quick_trade.sell_exceeds:
+quick_trade.min_amount:
+quick_trade.diff_number:
+quick_trade.receive:
+quick_trade.donation.modal.1:
+quick_trade.donation.modal.2:
+quick_trade.successfully_made:
+quick_trade.availability_changed:
+quick_trade.button_all:
+quick_trade.order.empty:
 donation.order.donation: Donation
 donation.order.buy: 'Acheter (donation)'
-donation.order.buy.empty:
 donation.order.sell: 'Vendre (donation)'
 confirm_modal.body: 'ÊTES-VOUS SÛR?'
 confirm_modal.confirm: Confirmer

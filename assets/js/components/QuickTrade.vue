@@ -10,7 +10,7 @@
                             href="#"
                             @click.prevent="setTradeMode(BUY_MODE)"
                             >
-                                {{ $t('donation.buy') }}
+                                {{ $t('buy') }}
                             </a>
                         </li>
                         <li class="nav-item">
@@ -20,7 +20,7 @@
                             href="#"
                             @click.prevent="setTradeMode(SELL_MODE)"
                             >
-                                {{ $t('donation.sell') }}
+                                {{ $t('sell') }}
                             </a>
                         </li>
                         <guide v-if="isToken" class="ml-auto">
@@ -72,7 +72,7 @@
                                             class="btn btn-primary all-button"
                                             type="button"
                                         >
-                                            {{ $t('donation.button_all') }}
+                                            {{ $t('quick_trade.button_all') }}
                                         </button>
                                     </div>
                                 </div>
@@ -84,10 +84,10 @@
                                     >
                                         <span :class="{'text-muted': disabledServices.newTradesDisabled}">
                                             <template v-if="isBuyMode">
-                                                {{ $t('donation.buy') }}
+                                                {{ $t('buy') }}
                                             </template>
                                             <template v-if="isSellMode">
-                                                {{ $t('donation.sell') }}
+                                                {{ $t('sell') }}
                                             </template>
                                         </span>
                                     </button>
@@ -98,9 +98,9 @@
                                         @cancel="cancelDonation"
                                         @close="showModal = false">
                                         <p class="text-white modal-title pt-2 pb-4">
-                                            {{ $t('donation.modal.1') }}
+                                            {{ $t('quick_trade.donation.modal.1') }}
                                             <br>
-                                            {{ $t('donation.modal.2', translationsContext) }}
+                                            {{ $t('quick_trade.donation.modal.2', translationsContext) }}
                                         </p>
                                         <template v-slot:confirm>
                                             {{ $t('confirm_modal.continue') }}
@@ -118,22 +118,22 @@
                                     <div
                                         v-if="!isAmountValid"
                                         class="mt-1 text-danger">
-                                        {{ $t('donation.min_amount', translationsContext) }}
+                                        {{ $t('quick_trade.min_amount', translationsContext) }}
                                     </div>
                                     <div
                                         v-if="sellAmountExceeds"
                                         class="mt-1 text-danger"
                                     >
                                         <template v-if="isOrdersSummaryZero">
-                                            {{ $t('donation.order.buy.empty') }}
+                                            {{ $t('quick_trade.order.empty') }}
                                         </template>
                                         <template v-else>
-                                            {{ $t('donation.amount.sell_exceeds', translationsContext) }}
+                                            {{ $t('quick_trade.sell_exceeds', translationsContext) }}
                                         </template>
                                     </div>
                                 </template>
                                 <p class="m-0 mt-1">
-                                    {{ $t('donation.receive') }}
+                                    {{ $t('quick_trade.receive') }}
                                     <font-awesome-icon
                                         v-if="donationChecking"
                                         icon="circle-notch"
@@ -149,7 +149,7 @@
                                             :max-width="'200px'"
                                         >
                                             <template slot="body">
-                                                {{ $t('donation.diff_number') }}
+                                                {{ $t('quick_trade.diff_number') }}
                                             </template>
                                         </guide>
                                     </span>
@@ -163,7 +163,7 @@
                         >
                             <p class="m-0">
                                 <span>
-                                    {{ $t('donation.balance') }}
+                                    {{ $t('quick_trade.balance') }}
                                 </span>
                                 <span v-if="balanceLoaded">
                                     {{ balance | toMoney(currencySubunit) | formatMoney }}
@@ -177,12 +177,10 @@
                             </p>
                             <div v-if="insufficientFunds">
                                 <span class="d-block text-danger font-size-90">
-                                    {{ $t('donation.insufficient_funds') }}
+                                    {{ $t('quick_trade.insufficient_funds') }}
                                 </span>
                                 <span v-if="shouldShowDepositMore" class="d-block">
-                                    {{ $t('donation.make') }}
-                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
-                                    {{ $t('donation.first') }}
+                                    {{ $t('quick_trade.make_deposit', {depositUrl: getDepositLink}) }}
                                 </span>
                             </div>
                         </div>
@@ -337,21 +335,21 @@ export default {
         },
         translationsContext: function() {
           return {
-            amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
+            amountToDonate: this.amountToDonate + ' ' + this.rebrandedCurrency,
             amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
+            assetToReceive: this.rebrandingFunc(this.assetToReceive),
             worth: formatMoney(toMoney(this.worth, this.currencySubunit)),
             ordersSummary: toMoney(this.ordersSummary, this.assetToReceiveSubunit),
-            currency: this.rebrandingFunc(this.selectedCurrency),
-            donationCurrency: this.donationCurrency,
+            currency: this.rebrandedCurrency,
             currencyMinAmount: this.currencyMinAmount,
           };
         },
-        donationCurrency: function() {
+        rebrandedCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
         getDepositLink: function() {
             return this.$routing.generate('wallet', {
-                depositMore: this.donationCurrency,
+                depositMore: this.rebrandedCurrency,
             });
         },
         isCurrencySelected: function() {
@@ -362,8 +360,8 @@ export default {
         },
         dropdownText: function() {
             return this.isCurrencySelected
-                ? this.donationCurrency
-                : this.$t('donation.currency.select');
+                ? this.rebrandedCurrency
+                : this.$t('quick_trade.currency.select');
         },
         currencySubunit: function() {
             const symbol = currencies[this.selectedCurrency];
@@ -428,7 +426,7 @@ export default {
             ;
         },
         nonrefundHtml: function() {
-            return this.$t('donation.nonrefund', {
+            return this.$t('quick_trade.donation.nonrefund', {
                 path: this.$routing.generate('token_show', {
                     name: this.market.quote.name,
                     tab: 'trade',
@@ -550,9 +548,7 @@ export default {
                         return;
                     }
                     this.notifySuccess(
-                        this.$t('donation.successfully_made', {
-                            amount: this.amountToReceive,
-                        })
+                        this.$t('quick_trade.successfully_made', this.translationsContext)
                     );
 
                     this.resetAmount();
@@ -613,7 +609,7 @@ export default {
             }
 
             if (this.tokensAvailabilityChanged) {
-                this.notifyError(this.$t('donation.tokens_availability_changed'));
+                this.notifyError(this.$t('quick_trade.availability_changed'));
                 this.tokensAvailabilityChanged = false;
                 location.reload();
                 return;

@@ -662,28 +662,23 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.nonrefund:
-donation.currency: Moneda
-donation.currency.select: 'Seleccionar moneda'
-donation.balance: 'Su saldo:'
-donation.make: 'por favor'
-donation.deposit: deposite
-donation.first: primero
-donation.insufficient_funds: 'Fondos insuficientes para comprar,'
-donation.amount: 'Cantidad:'
-donation.amount.sell_exceeds:
-donation.min_amount: 'Cantidad mínima de %donationCurrency% %currencyMinAmount%'
-donation.diff_number: 'La cantidad de tokens que recibirá puede variar ligeramente, dependiendo de la actividad de otros traders.'
-donation.receive: 'Recibirá aproximadamente:'
-donation.fee: 'Comisión por compra: %fee%%'
-donation.buy: Comprar
-donation.sell:
-donation.modal.1: 'La cantidad donada excede el valor de los tokens disponibles para la venta. Puede continuar, o cancelar y ajustar la cantidad a donar. Alternativamente, puede comunicarse con el creador del token y pedirle que agregue más órdenes de venta al mercado y hacer la donación luego.'
-donation.modal.2: '¿Desea donar %amountToDonate% por %amountToReceive% que valen %worth%?'
-donation.button_all: Todo
+quick_trade.donation.nonrefund:
+quick_trade.currency.select:
+quick_trade.balance:
+quick_trade.make_deposit:
+quick_trade.insufficient_funds:
+quick_trade.sell_exceeds:
+quick_trade.min_amount:
+quick_trade.diff_number:
+quick_trade.receive:
+quick_trade.donation.modal.1:
+quick_trade.donation.modal.2:
+quick_trade.successfully_made:
+quick_trade.availability_changed:
+quick_trade.button_all:
+quick_trade.order.empty:
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
-donation.order.buy.empty:
 donation.order.sell: 'Venta (Donación)'
 confirm_modal.body: '¿SEGURO?'
 confirm_modal.confirm: Confirmar
