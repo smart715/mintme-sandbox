@@ -55,7 +55,7 @@
                                 <div class="input-group flex-nowrap my-3 my-sm-0">
                                     <price-converter-input
                                         class="d-block flex-grow-1"
-                                        v-model="amountToDonate"
+                                        v-model="amount"
                                         input-id="amount-to-donate"
                                         @keypress="checkAmountInput"
                                         @paste="checkAmountInput"
@@ -284,7 +284,7 @@ export default {
             },
             currencyModes,
             selectedCurrency: null,
-            amountToDonate: 0,
+            amount: 0,
             amountToReceive: 0,
             worth: 0,
             ordersSummary: 0,
@@ -333,7 +333,7 @@ export default {
         },
         translationsContext: function() {
           return {
-            amountToDonate: toMoney(this.amountToDonate, this.currencySubunit),
+            amount: toMoney(this.amount, this.currencySubunit),
             amountToReceive: toMoney(this.amountToReceive, this.assetToReceiveSubunit),
             assetToReceive: this.rebrandingFunc(this.assetToReceive),
             worth: formatMoney(toMoney(this.worth, currencies.WEB.subunit)),
@@ -386,28 +386,28 @@ export default {
                 (
                     (new Decimal(this.balance)).lessThan(this.minTotalPrice)
                     ||
-                    (this.amountToDonate > 0 && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
+                    (this.amount > 0 && (new Decimal(this.amount)).greaterThan(this.balance))
                 );
         },
         sellAmountExceeds: function() {
-            const amountToDonate = new Decimal(this.amountToDonate || 0);
+            const amount = new Decimal(this.amount || 0);
 
             return this.isSellMode &&
                 !this.donationChecking &&
-                !amountToDonate.isZero() &&
-                amountToDonate.greaterThan(this.ordersSummary);
+                !amount.isZero() &&
+                amount.greaterThan(this.ordersSummary);
         },
         isAmountValid: function() {
-            const amountToDonate = new Decimal(this.amountToDonate || 0);
+            const amount = new Decimal(this.amount || 0);
 
-            return !amountToDonate.isZero()
-                && amountToDonate.greaterThanOrEqualTo(this.currencyMinAmount);
+            return !amount.isZero()
+                && amount.greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
             return this.insufficientFunds ||
                 !this.isAmountValid ||
                 !this.isCurrencySelected ||
-                !parseFloat(this.amountToDonate) ||
+                !parseFloat(this.amount) ||
                 this.sellAmountExceeds ||
                 this.donationChecking ||
                 this.donationInProgress;
@@ -447,7 +447,7 @@ export default {
         if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
             this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
             this.$nextTick(() => {
-                this.amountToDonate = window.localStorage.getItem('mintme_donation_amount');
+                this.amount = window.localStorage.getItem('mintme_donation_amount');
                 window.localStorage.removeItem('mintme_donation_amount');
             });
 
@@ -513,7 +513,7 @@ export default {
                 quote: this.market.quote.symbol,
                 mode: this.tradeMode,
                 currency: this.selectedCurrency,
-                amount: this.amountToDonate,
+                amount: this.amount,
             }))
                 .then((res) => {
                     this.amountToReceive = res.data.amountToReceive;
@@ -535,7 +535,7 @@ export default {
                 mode: this.tradeMode,
             }), {
                 currency: this.selectedCurrency,
-                amount: this.amountToDonate,
+                amount: this.amount,
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {
@@ -572,13 +572,13 @@ export default {
                 .then(() => this.donationInProgress = false);
         },
         all: function() {
-            this.amountToDonate = toMoney(this.balance, this.currencySubunit);
+            this.amount = toMoney(this.balance, this.currencySubunit);
             if (!this.insufficientFunds) {
                 this.checkDonation();
             }
         },
         resetAmount: function() {
-            this.amountToDonate = 0;
+            this.amount = 0;
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
@@ -615,7 +615,7 @@ export default {
                 return;
             }
 
-            if ((new Decimal(this.amountToDonate)).greaterThan(this.ordersSummary)) {
+            if ((new Decimal(this.amount)).greaterThan(this.ordersSummary)) {
                 this.showModal = true;
             } else {
                 this.makeDonation();
@@ -627,7 +627,7 @@ export default {
         },
         onLogin() {
             window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
-            window.localStorage.setItem('mintme_donation_amount', this.amountToDonate);
+            window.localStorage.setItem('mintme_donation_amount', this.amount);
             window.localStorage.setItem('mintme_loggedin_from_donation', true);
         },
         onSignup() {
@@ -641,8 +641,8 @@ export default {
                 this.resetAmount();
             }
         },
-        amountToDonate: function() {
-            if (!parseFloat(this.amountToDonate)) {
+        amount: function() {
+            if (!parseFloat(this.amount)) {
                 this.amountToReceive = 0;
             }
         },
