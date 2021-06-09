@@ -72,10 +72,10 @@ export default {
             this.getRefreshToken();
 
             if (!this.mintmeExchangeMailSent) {
-                this.$axios.retry.get(this.$routing.generate('send_exchange_mintme_mail'))
+                this.$axios.single.post(this.$routing.generate('send_exchange_mintme_mail'))
                     .catch((err) => {
-                            this.sendLogs('error', 'Can not sent exchange cryptos mail', err);
-                        });
+                        this.sendLogs('error', 'Can not sent exchange cryptos mail', err);
+                    });
             }
         },
         getRefreshToken: function() {

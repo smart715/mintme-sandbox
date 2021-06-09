@@ -3,6 +3,7 @@
 namespace App\Mailer;
 
 use App\Entity\AirdropCampaign\AirdropReferralCode;
+use App\Entity\Crypto;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -572,9 +573,28 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sentMintmeExchangeMail(array $exchangeCryptos): void
+    public function sentMintmeExchangeMail(User $user, array $exchangeCryptos, string $cryptosList): void
     {
-        // TODO: Implement sentMintmeExchangeMail() method.
+        $body = $this->twigEngine->render("mail/exchange_mintme.html.twig", [
+            'exchangeCryptos' => $exchangeCryptos,
+            'cryptosList' => $cryptosList,
+            'mintmeSymbol' => Symbols::MINTME,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/exchange_mintme.txt.twig", [
+            'exchangeCryptos' => $exchangeCryptos,
+            'cryptosList' => $cryptosList,
+            'mintmeSymbol' => Symbols::MINTME,
+        ]);
+
+        $subject = $this->translator->trans('mail.can_exchange.header');
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
     }
 
     public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void

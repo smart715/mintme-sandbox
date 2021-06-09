@@ -13,6 +13,7 @@ use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Wallet\Model\Address;
@@ -41,6 +42,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     private LockFactory $lockFactory;
     private MailerInterface $mailer;
     private CryptoManagerInterface $cryptoManager;
+    private UserManagerInterface $userManager;
 
     public function __construct(
         TranslatorInterface $translations,
@@ -48,6 +50,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         LockFactory $lockFactory,
         MailerInterface $mailer,
         CryptoManagerInterface $cryptoManager,
+        UserManagerInterface $userManager,
         string $coinifySharedSecret
     ) {
         $this->translations = $translations;
@@ -56,6 +59,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         $this->coinifySharedSecret = $coinifySharedSecret;
         $this->mailer = $mailer;
         $this->cryptoManager = $cryptoManager;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -286,12 +290,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiBadRequestException();
         }
 
-        $exchangeCryptos = array_filter(
-            $this->cryptoManager->findAll(),
-            fn (Crypto $crypto) => Symbols::WEB !== $crypto->getSymbol() && $crypto->isTradable()
-        );
-
-        $this->mailer->sentMintmeExchangeMail($exchangeCryptos);
+        $this->userManager->sendMintmeExchangeMail($user);
 
         return $this->view([], Response::HTTP_NO_CONTENT);
     }
