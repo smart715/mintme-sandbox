@@ -176,12 +176,10 @@
                                 />
                             </p>
                             <div v-if="insufficientFunds">
-                                <span class="d-block text-danger font-size-90">
+                                <div class="text-danger font-size-90">
                                     {{ $t('quick_trade.insufficient_funds') }}
-                                </span>
-                                <span v-if="shouldShowDepositMore" class="d-block">
-                                    {{ $t('quick_trade.make_deposit', {depositUrl: getDepositLink}) }}
-                                </span>
+                                </div>
+                                <div v-if="shouldShowDepositMore" v-html="$sanitize(makeDepositHtml)"></div>
                             </div>
                         </div>
                     </div>
@@ -347,11 +345,6 @@ export default {
         rebrandedCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
-        getDepositLink: function() {
-            return this.$routing.generate('wallet', {
-                depositMore: this.rebrandedCurrency,
-            });
-        },
         isCurrencySelected: function() {
             return this.isBuyMode ?
                 Object.values(this.options).includes(this.selectedCurrency):
@@ -424,6 +417,13 @@ export default {
                 this.isBuyMode ||
                 this.deploymentStatus === tokenDeploymentStatus.deployed
             ;
+        },
+        makeDepositHtml: function() {
+            const depositUrl = this.$routing.generate('wallet', {
+                depositMore: this.rebrandedCurrency
+            });
+
+            return this.$t('quick_trade.make_deposit', {depositUrl});
         },
         nonrefundHtml: function() {
             return this.$t('quick_trade.donation.nonrefund', {
