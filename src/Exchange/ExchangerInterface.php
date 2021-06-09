@@ -21,7 +21,8 @@ interface ExchangerInterface
         Market $market,
         string $amountInput,
         string $expectedToReceive,
-        int $side
+        int $side,
+        ?string $fee
     ): TradeResult;
 
     public function cancelOrder(Market $market, Order $order): TradeResult;

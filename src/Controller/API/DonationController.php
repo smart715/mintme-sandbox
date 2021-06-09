@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\CheckTradeResult;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\ExchangerInterface;
@@ -44,6 +45,8 @@ class DonationController extends AbstractFOSRestController
 
     private LockFactory $lockFactory;
 
+    private QuickTradeConfig $config;
+
     public function __construct(
         DonationHandlerInterface $donationHandler,
         MarketHandlerInterface $marketHandler,
@@ -51,7 +54,8 @@ class DonationController extends AbstractFOSRestController
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher,
         MoneyWrapperInterface $moneyWrapper,
-        ExchangerInterface $exchanger
+        ExchangerInterface $exchanger,
+        QuickTradeConfig $config
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
@@ -60,6 +64,7 @@ class DonationController extends AbstractFOSRestController
         $this->eventDispatcher = $eventDispatcher;
         $this->moneyWrapper = $moneyWrapper;
         $this->exchanger = $exchanger;
+        $this->config = $config;
     }
 
     /**
@@ -261,6 +266,8 @@ class DonationController extends AbstractFOSRestController
 
         $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
 
+        $fee = $this->config->getFee();
+
         $offset = 0;
         $limit = 100;
 
@@ -274,8 +281,6 @@ class DonationController extends AbstractFOSRestController
                     $shouldContinue = false;
                     break;
                 }
-
-                $fee = $this->moneyWrapper->format($bid->getFee());
 
                 $orderAmountWithFee = $bid->getAmount()->subtract(
                     $bid->getAmount()->multiply($fee)
@@ -335,7 +340,8 @@ class DonationController extends AbstractFOSRestController
             $market,
             $amount,
             $this->moneyWrapper->format($expectedAmount),
-            Order::SELL_SIDE
+            Order::SELL_SIDE,
+            $this->config->getFee()
         );
     }
 }

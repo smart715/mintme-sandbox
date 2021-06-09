@@ -213,7 +213,8 @@ class Exchanger implements ExchangerInterface
         Market $market,
         string $amountInput,
         string $expectedToReceive,
-        int $side
+        int $side,
+        ?string $fee = null
     ): TradeResult {
         $isSellSide = Order::SELL_SIDE === $side;
 
@@ -249,8 +250,10 @@ class Exchanger implements ExchangerInterface
             $this->getSymbol($market->getQuote())
         );
 
+        $fee = $fee ?? (string)$this->bag->get($isSellSide ? 'maker_fee_rate' : 'taker_fee_rate');
+
         $fee = $this->mw->parse(
-            (string)($isSellSide ? $this->bag->get('maker_fee_rate') : $this->bag->get('taker_fee_rate')),
+            $fee,
             $this->getSymbol($market->getQuote())
         );
 
