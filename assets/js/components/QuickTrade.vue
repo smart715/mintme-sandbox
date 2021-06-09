@@ -444,15 +444,15 @@ export default {
         this.currencies = currencies;
     },
     mounted() {
-        if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
-            this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
+        if (window.localStorage.getItem('mintme_loggedin_from_quick_trade') !== null) {
+            this.selectedCurrency = window.localStorage.getItem('mintme_quick_trade_currency');
             this.$nextTick(() => {
-                this.amount = window.localStorage.getItem('mintme_donation_amount');
-                window.localStorage.removeItem('mintme_donation_amount');
+                this.amount = window.localStorage.getItem('mintme_quick_trade_amount');
+                window.localStorage.removeItem('mintme_quick_trade_amount');
             });
 
-            window.localStorage.removeItem('mintme_loggedin_from_donation');
-            window.localStorage.removeItem('mintme_donation_currency');
+            window.localStorage.removeItem('mintme_loggedin_from_quick_trade');
+            window.localStorage.removeItem('mintme_quick_trade_currency');
         }
 
         if (this.loggedIn) {
@@ -626,13 +626,13 @@ export default {
             this.resetAmount();
         },
         onLogin() {
-            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
-            window.localStorage.setItem('mintme_donation_amount', this.amount);
-            window.localStorage.setItem('mintme_loggedin_from_donation', true);
+            window.localStorage.setItem('mintme_quick_trade_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_quick_trade_amount', this.amount);
+            window.localStorage.setItem('mintme_loggedin_from_quick_trade', true);
         },
         onSignup() {
-            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
-            window.localStorage.setItem('mintme_signedup_from_donation', true);
+            window.localStorage.setItem('mintme_quick_trade_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_signedup_from_quick_trade', true);
         },
     },
     watch: {

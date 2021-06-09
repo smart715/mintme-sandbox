@@ -389,11 +389,11 @@ export default {
         },
     },
     mounted: function() {
-        if (window.localStorage.getItem('mintme_signedup_from_donation') !== null) {
-            this.depositMore = window.localStorage.getItem('mintme_donation_currency');
+        if (window.localStorage.getItem('mintme_signedup_from_quick_trade') !== null) {
+            this.depositMore = window.localStorage.getItem('mintme_quick_trade_currency');
 
-            window.localStorage.removeItem('mintme_signedup_from_donation');
-            window.localStorage.removeItem('mintme_donation_currency');
+            window.localStorage.removeItem('mintme_signedup_from_quick_trade');
+            window.localStorage.removeItem('mintme_quick_trade_currency');
         }
 
         Promise.all([
