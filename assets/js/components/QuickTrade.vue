@@ -333,10 +333,10 @@ export default {
         },
         translationsContext: function() {
           return {
-            amountToDonate: this.amountToDonate + ' ' + this.rebrandedCurrency,
-            amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
+            amountToDonate: toMoney(this.amountToDonate, this.currencySubunit),
+            amountToReceive: toMoney(this.amountToReceive, this.assetToReceiveSubunit),
             assetToReceive: this.rebrandingFunc(this.assetToReceive),
-            worth: formatMoney(toMoney(this.worth, this.currencySubunit)),
+            worth: formatMoney(toMoney(this.worth, currencies.WEB.subunit)),
             ordersSummary: toMoney(this.ordersSummary, this.assetToReceiveSubunit),
             currency: this.rebrandedCurrency,
             currencyMinAmount: this.currencyMinAmount,
