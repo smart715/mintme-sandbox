@@ -508,7 +508,7 @@ export default {
 
             this.donationChecking = true;
 
-            this.$axios.retry.get(this.$routing.generate('check_donation', {
+            this.$axios.retry.get(this.$routing.generate('check_quick_trade', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
                 mode: this.tradeMode,
@@ -529,7 +529,7 @@ export default {
             this.donationInProgress = true;
             this.showModal = false;
 
-            this.$axios.single.post(this.$routing.generate('make_donation', {
+            this.$axios.single.post(this.$routing.generate('make_quick_trade', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
                 mode: this.tradeMode,

@@ -29,9 +29,9 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Exchange\FixedExchange;
 
 /**
- * @Rest\Route("/api/donate")
+ * @Rest\Route("/api/quick-trade")
  */
-class DonationController extends AbstractFOSRestController
+class QuickTradeController extends AbstractFOSRestController
 {
     const BUY = 'buy';
     const SELL = 'sell';
@@ -70,15 +70,15 @@ class DonationController extends AbstractFOSRestController
     /**
      * @Rest\View()
      * @Rest\Get(
-     *     "/{base}/{quote}/check/{mode}/{currency}/{amount}",
-     *     name="check_donation",
+     *     "/check/{base}/{quote}/{mode}/{currency}/{amount}",
+     *     name="check_quick_trade",
      *     options={"expose"=true},
      * )
-     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
+     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to invest.")
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     description="Selected currency to donate."
+     *     description="Selected currency to trade."
      * )
      * @Rest\RequestParam(
      *     name="mode",
@@ -86,7 +86,7 @@ class DonationController extends AbstractFOSRestController
      *     requirements="^(sell|buy)$"),
      *     description="Trade mode"
      */
-    public function checkDonation(Market $market, string $mode, string $currency, string $amount): View
+    public function checkTrade(Market $market, string $mode, string $currency, string $amount): View
     {
         try {
             /** @var User|null $user */
@@ -120,7 +120,7 @@ class DonationController extends AbstractFOSRestController
                     'ordersSummary' => $buyOrdersSummary,
                 ]);
             } else {
-                throw new ApiBadRequestException('Trade mode is invalid' . $mode);
+                throw new ApiBadRequestException('Trade mode is invalid ' . $mode);
             }
 
         } catch (ApiBadRequestException $ex) {
@@ -149,20 +149,24 @@ class DonationController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("/{base}/{quote}/{mode}/make", name="make_donation", options={"expose"=true})
+     * @Rest\Post(
+     *     "/make/{base}/{quote}/{mode}",
+     *     name="make_quick_trade",
+     *     options={"expose"=true}
+     * )
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     description="Selected currency to donate."
+     *     description="Selected currency to trade."
      * )
-     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
+     * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to invest.")
      * @Rest\RequestParam(
      *     name="expected_count_to_receive",
      *     allowBlank=false,
-     *     description="Expected tokens count to receive."
+     *     description="Expected assets count to receive."
      * )
      */
-    public function makeDonation(Market $market, string $mode, ParamFetcherInterface $request): View
+    public function makeTrade(Market $market, string $mode, ParamFetcherInterface $request): View
     {
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
@@ -210,7 +214,7 @@ class DonationController extends AbstractFOSRestController
                     throw new ApiBadRequestException($tradeResult->getMessage());
                 }
             } else {
-                throw new ApiBadRequestException('Trade mode is invalid' . $mode);
+                throw new ApiBadRequestException('Trade mode is invalid ' . $mode);
             }
 
             return $this->view(null, Response::HTTP_OK);
