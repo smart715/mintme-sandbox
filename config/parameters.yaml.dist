@@ -44,8 +44,11 @@ parameters:
 
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
-    donation:
-        fee: 5
+    quick_trade:
+        # 5%
+        donation_fee: 0.05
+        # 0.2%
+        fee: 0.002
         minBtcAmount: 0.000001
         minMintmeAmount: 0.01
         minEthAmount: 0.0001

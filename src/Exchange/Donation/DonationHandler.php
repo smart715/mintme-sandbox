@@ -8,7 +8,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Config\DonationConfig;
+use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
@@ -40,8 +40,8 @@ class DonationHandler implements DonationHandlerInterface
     /** @var BalanceHandlerInterface */
     private $balanceHandler;
 
-    /** @var DonationConfig */
-    private $donationConfig;
+    /** @var QuickTradeConfig */
+    private $quickTradeConfig;
 
     /** @var EntityManagerInterface */
     private $em;
@@ -53,7 +53,7 @@ class DonationHandler implements DonationHandlerInterface
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
         CryptoManagerInterface $cryptoManager,
         BalanceHandlerInterface $balanceHandler,
-        DonationConfig $donationConfig,
+        QuickTradeConfig $quickTradeConfig,
         EntityManagerInterface $em
     ) {
         $this->donationFetcher = $donationFetcher;
@@ -62,7 +62,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->cryptoManager = $cryptoManager;
         $this->balanceHandler = $balanceHandler;
-        $this->donationConfig = $donationConfig;
+        $this->quickTradeConfig = $quickTradeConfig;
         $this->em = $em;
     }
 
@@ -85,7 +85,7 @@ class DonationHandler implements DonationHandlerInterface
         return $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
             $this->moneyWrapper->format($amountObj),
-            $this->donationConfig->getFee(),
+            $this->quickTradeConfig->getDonationFee(),
             $token->getProfile()->getUser()->getId()
         );
     }
@@ -114,7 +114,7 @@ class DonationHandler implements DonationHandlerInterface
 
         // Amount of tokens which user receive after donation
         $expectedAmount = $this->moneyWrapper->parse($expectedTokensAmount, Symbols::WEB);
-        $minTokensAmount = $this->donationConfig->getMinTokensAmount();
+        $minTokensAmount = $this->quickTradeConfig->getMinTokensAmount();
 
         $donationAmount = $amountInCrypto;
 
@@ -127,7 +127,7 @@ class DonationHandler implements DonationHandlerInterface
         $checkDonationResult = $this->donationFetcher->checkDonation(
             $this->marketNameConverter->convert($market),
             $this->moneyWrapper->format($donationAmount),
-            $this->donationConfig->getFee(),
+            $this->quickTradeConfig->getDonationFee(),
             $tokenCreator->getId()
         );
 
@@ -140,7 +140,9 @@ class DonationHandler implements DonationHandlerInterface
             $checkDonationResult->getTokensWorth(),
             Symbols::WEB
         );
-        $tokensWorthInMintmeWithFee = $tokensWorthInMintme->divide(1 + floatval($this->donationConfig->getFee()));
+        $tokensWorthInMintmeWithFee = $tokensWorthInMintme->divide(
+            1 + floatval($this->quickTradeConfig->getDonationFee())
+        );
 
         // Check expected tokens amount.
         if (!$currentExpectedAmount->equals($expectedAmount)) {
@@ -173,7 +175,7 @@ class DonationHandler implements DonationHandlerInterface
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
                 $this->moneyWrapper->format($tokensWorthInMintme),
-                $this->donationConfig->getFee(),
+                $this->quickTradeConfig->getDonationFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
@@ -205,7 +207,7 @@ class DonationHandler implements DonationHandlerInterface
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
                 $this->moneyWrapper->format($tokensWorthInMintme),
-                $this->donationConfig->getFee(),
+                $this->quickTradeConfig->getDonationFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
@@ -238,7 +240,7 @@ class DonationHandler implements DonationHandlerInterface
                 $donorUser->getId(),
                 $this->marketNameConverter->convert($market),
                 $this->moneyWrapper->format($tokensWorthInMintme),
-                $this->donationConfig->getFee(),
+                $this->quickTradeConfig->getDonationFee(),
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
@@ -372,7 +374,7 @@ class DonationHandler implements DonationHandlerInterface
 
     private function calculateFee(Money $amount): Money
     {
-        return $amount->multiply($this->donationConfig->getFee());
+        return $amount->multiply($this->quickTradeConfig->getDonationFee());
     }
 
     private function checkAmount(?User $user, Money $amount, string $currency, bool $checkBalance = true): void
@@ -385,25 +387,25 @@ class DonationHandler implements DonationHandlerInterface
             : null;
 
         if (Symbols::BTC === $currency) {
-            $minBtcAmount = $this->donationConfig->getMinBtcAmount();
+            $minBtcAmount = $this->quickTradeConfig->getMinBtcAmount();
 
             if ($amount->lessThan($minBtcAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } elseif (Symbols::WEB === $currency) {
-            $minMintmeAmount = $this->donationConfig->getMinMintmeAmount();
+            $minMintmeAmount = $this->quickTradeConfig->getMinMintmeAmount();
 
             if ($amount->lessThan($minMintmeAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } elseif (Symbols::ETH === $currency) {
-            $minEthAmount = $this->donationConfig->getMinEthAmount();
+            $minEthAmount = $this->quickTradeConfig->getMinEthAmount();
 
             if ($amount->lessThan($minEthAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } else {
-            $minUsdcAmount = $this->donationConfig->getMinUsdcAmount();
+            $minUsdcAmount = $this->quickTradeConfig->getMinUsdcAmount();
 
             if ($amount->lessThan($minUsdcAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
@@ -413,7 +415,7 @@ class DonationHandler implements DonationHandlerInterface
 
     private function calculateAmountWithFee(Money $amount): Money
     {
-        $divisor = 1 - (float)$this->donationConfig->getFee();
+        $divisor = 1 - (float)$this->quickTradeConfig->getDonationFee();
 
         return $amount->divide($divisor);
     }

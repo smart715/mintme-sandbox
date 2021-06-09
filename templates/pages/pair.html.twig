@@ -133,7 +133,7 @@
                         :market="{{ market | json_encode }}"
                         :logged-in="{{ loggedIn }}"
                         :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
-                        :donation-params="{{ donation_params | json_encode }}"
+                        :params="{{ quick_trade_params | json_encode }}"
                         websocket-url="{{ global_websocket_url }}"
                         disabled-services-config="{{ disabledServicesConfig | json_encode }}"
                         profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"

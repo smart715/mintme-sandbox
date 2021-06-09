@@ -267,7 +267,7 @@ export default {
         market: Object,
         loggedIn: Boolean,
         googleRecaptchaSiteKey: String,
-        donationParams: Object,
+        params: Object,
         disabledServicesConfig: String,
         profileNickname: String,
         isToken: Boolean,
@@ -376,13 +376,13 @@ export default {
         currencyMinAmount: function() {
             switch (this.selectedCurrency) {
               case btcSymbol:
-                return this.donationParams.minBtcAmount;
+                return this.params.minBtcAmount;
               case ethSymbol:
-                return this.donationParams.minEthAmount;
+                return this.params.minEthAmount;
               case usdcSymbol:
-                return this.donationParams.minUsdcAmount;
+                return this.params.minUsdcAmount;
               default:
-                return this.donationParams.minMintmeAmount;
+                return this.params.minMintmeAmount;
             }
         },
         minTotalPrice: function() {
