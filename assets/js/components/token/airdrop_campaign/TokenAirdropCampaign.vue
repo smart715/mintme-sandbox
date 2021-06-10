@@ -13,6 +13,11 @@
         </div>
         <div v-else-if="hasAirdropCampaign">
             <div>
+                <p>{{ $t('airdrop.embed_title') }}</p>
+                <copy-link
+                    class="form-control"
+                    :content-to-copy="embedCode"
+                >{{ embedCode }}</copy-link>
                 <span
                     class="btn-cancel px-0 c-pointer m-1"
                     @click="showModal = true"
@@ -339,6 +344,7 @@ import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED,
 import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import {requiredIf} from 'vuelidate/lib/validators';
+import CopyLink from '../../CopyLink';
 
 library.add(
     faCircleNotch,
@@ -354,6 +360,7 @@ export default {
     name: 'TokenAirdropCampaign',
     mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
+        CopyLink,
         BCollapse,
         datePicker,
         ConfirmModal,
@@ -375,7 +382,7 @@ export default {
     data() {
         return {
             showModal: false,
-            airdropCampaignId: null,
+            airdrop: null,
             airdropCampaignRemoved: false,
             tokenBalance: 0,
             balanceLoaded: false,
@@ -414,6 +421,17 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
+        airdropCampaignId: function() {
+            return this.airdrop ? this.airdrop.id : null;
+        },
+        embedCode: function() {
+            const src = this.$routing.generate('airdrop_embeded', {
+                name: this.tokenName,
+                airdropId: this.airdropCampaignId,
+            }, true);
+
+            return `<iframe src="${src}" width="500px" height="500px" style="border: none;" scrolling="no"></iframe>`;
+        },
         allOptionsUnChecked: function() {
             return Object.values(this.actions)
                 .every((item) => item === false);
@@ -511,7 +529,7 @@ export default {
             }))
                 .then((result) => {
                     if (result.data.airdrop !== null) {
-                        this.airdropCampaignId = result.data.airdrop.id;
+                        this.airdrop = result.data.airdrop;
                     }
 
                     if (!this.hasAirdropCampaign) {
@@ -555,7 +573,7 @@ export default {
                 tokenName: this.tokenName,
             }), data)
                 .then((result) => {
-                    this.airdropCampaignId = result.data.id;
+                    this.airdrop = result.data;
                     this.loading = false;
                     this.notifySuccess(this.$t('airdrop.msg_created'));
 
@@ -597,7 +615,7 @@ export default {
                 id: this.airdropCampaignId,
             }))
                 .then(() => {
-                    this.airdropCampaignId = null;
+                    this.airdrop = null;
                     this.notifySuccess(this.$t('airdrop.msg_removed'));
                     window.localStorage.removeItem(AIRDROP_DELETED);
                     window.localStorage.setItem(AIRDROP_DELETED, this.tokenName);

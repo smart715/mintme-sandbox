@@ -31,6 +31,10 @@ export default {
     mixins: [LoggerMixin],
     props: {
         googleRecaptchaSiteKey: String,
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -48,6 +52,7 @@ export default {
         loadRegisterForm: function() {
             return this.$axios.retry.get(this.$routing.generate('register', {
                 formContentOnly: true,
+                ...this.embeded ? {page: 'embeded'} : {},
             }))
                 .then((res) => {
                     Register.template = res.data;
@@ -87,6 +92,7 @@ export default {
         loadLoginForm: function() {
             return this.$axios.retry.get(this.$routing.generate('login', {
                 formContentOnly: true,
+                ...this.embeded ? {page: 'embeded'} : {},
             }))
                 .then((res) => {
                     let loginContainer = this.$refs['login-form-container'];

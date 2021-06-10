@@ -9,6 +9,6 @@ use Money\Money;
 
 interface CommunicatorInterface
 {
-    public function sendWithdrawRequest(User $user, Money $balance, string $address, Crypto $crypto): void;
+    public function sendWithdrawRequest(User $user, Money $balance, string $address, Crypto $crypto, ?Money $fee = null): void;
     public function sendRetryMessage(WithdrawCallbackMessage $message): void;
 }

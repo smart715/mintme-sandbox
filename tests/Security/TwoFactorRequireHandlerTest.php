@@ -8,6 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\DependencyInjection\Factory\Security\TwoFactorFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -111,8 +112,12 @@ class TwoFactorRequireHandlerTest extends TestCase
     /** @return MockObject|RouterInterface */
     private function mockRouter(): RouterInterface
     {
+        $headerBag = $this->createMock(HeaderBag::class);
+        $headerBag->method('get')->willReturn('referer');
+
         $router = $this->createMock(RouterInterface::class);
         $router->method('getRouteCollection')->willReturn($this->routeCollection);
+        $router->method('session')->willReturn($headerBag);
 
         return $router;
     }

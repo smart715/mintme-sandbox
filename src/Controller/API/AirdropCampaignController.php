@@ -83,7 +83,11 @@ class AirdropCampaignController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/domain-blacklist-check", name="airdrop_domain_blacklist_check", options={"expose"=true})
+     * @Rest\Get(
+     *     "/domain-blacklist-check",
+     *      name="airdrop_domain_blacklist_check",
+     *      options={"expose"=true}
+     *     )
      * @Rest\QueryParam(name="domain", allowBlank=false)
      * @param ParamFetcherInterface $request
      * @return View
@@ -100,6 +104,7 @@ class AirdropCampaignController extends AbstractFOSRestController
      * @Rest\View()
      * @Rest\Get("/{tokenName}", name="get_airdrop_campaign", options={"expose"=true})
      * @param string $tokenName
+     * @throws ApiBadRequestException
      * @return View
      */
     public function getAirdropCampaign(string $tokenName): View
@@ -119,7 +124,7 @@ class AirdropCampaignController extends AbstractFOSRestController
             $referralCode = $this->arcManager->encode($referralCode);
         }
 
-        return $this->view(['airdrop' => $airdrop, "referral_code" => $referralCode], Response::HTTP_OK);
+        return $this->view(['airdrop' => $airdrop, 'referral_code' => $referralCode], Response::HTTP_OK);
     }
 
     /**
@@ -370,7 +375,11 @@ class AirdropCampaignController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Get("/{tokenName}/completed-actions", name="get_airdrop_completed_actions", options={"expose"=true})
+     * @Rest\Get(
+     *     "/{tokenName}/completed-actions",
+     *      name="get_airdrop_completed_actions",
+     *      options={"expose"=true}
+     *     )
      * @param string $tokenName
      * @return View
      */
@@ -388,7 +397,11 @@ class AirdropCampaignController extends AbstractFOSRestController
 
     /**
      * @Rest\View()
-     * @Rest\Post("{tokenName}/action/post-link/verify", name="verify_post_link_action", options={"expose"=true})
+     * @Rest\Post(
+     *     "{tokenName}/action/post-link/verify",
+     *      name="verify_post_link_action",
+     *      options={"expose"=true}
+     *     )
      * @Rest\RequestParam(
      *     name="url",
      *     allowBlank=false,

@@ -180,7 +180,7 @@ class ContractHandler implements ContractHandlerInterface
         return $response->getResult();
     }
 
-    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void
+    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token, ?Money $fee = null): void
     {
         if ($token instanceof Token && Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
@@ -198,6 +198,8 @@ class ContractHandler implements ContractHandlerInterface
                 'to' => $address,
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
+                'tokenFee' => $fee ? $fee->getAmount() : '0',
+                'tokenFeeCurrency' => $fee ? $fee->getCurrency()->getCode() : 'TOK',
             ]
         );
 
@@ -226,8 +228,17 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
-    {
+    private function getFee(
+        ?TradebleInterface $tradeble,
+        string $type,
+        WalletInterface $wallet,
+        array $transaction = []
+    ): Money {
+        if (isset($transaction['tokenFee']) && (isset($transaction['tokenFeeCurrency']) || $transaction['token'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['tokenFeeCurrency'] ?:
+                $transaction['token']));
+        }
+
         if (!$tradeble) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
@@ -275,7 +286,8 @@ class ContractHandler implements ContractHandlerInterface
                 $this->getFee(
                     $tradeble,
                     $transaction['type'],
-                    $wallet
+                    $wallet,
+                    $transaction
                 ),
                 $tradeble,
                 Status::fromString($transaction['status']),
