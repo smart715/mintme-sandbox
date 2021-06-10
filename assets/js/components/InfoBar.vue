@@ -24,10 +24,10 @@
             </span>
             <b-button v-b-toggle.collapse-3 class="btn-sm float-right mr-5 toggle-btn">{{ $t('info_bar.toggle.title') }}</b-button>
             <b-button
-                v-if="'dev' !== environment && isIssueBranch"
+                v-if="'dev' !== environment"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
-                :disabled="null === backendServiceStatus || managingBackendService"
+                :disabled="null === backendServiceStatus || managingBackendService  && !isIssueBranch"
             >
                 <font-awesome-icon
                     v-if="managingBackendService"
