@@ -576,12 +576,14 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
     public function sentMintmeExchangeMail(User $user, array $exchangeCryptos, string $cryptosList): void
     {
         $body = $this->twigEngine->render("mail/exchange_mintme.html.twig", [
+            'username' => $user->getEmail(),
             'exchangeCryptos' => $exchangeCryptos,
             'cryptosList' => $cryptosList,
             'mintmeSymbol' => Symbols::MINTME,
         ]);
 
         $textBody = $this->twigEngine->render("mail/exchange_mintme.txt.twig", [
+            'username' => $user->getEmail(),
             'exchangeCryptos' => $exchangeCryptos,
             'cryptosList' => $cryptosList,
             'mintmeSymbol' => Symbols::MINTME,

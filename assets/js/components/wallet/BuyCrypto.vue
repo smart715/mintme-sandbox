@@ -64,6 +64,7 @@ export default {
         return {
             modalVisible: false,
             refreshToken: null,
+            isExchangeMailSent: false,
         };
     },
     methods: {
@@ -71,10 +72,13 @@ export default {
             this.modalVisible = true;
             this.getRefreshToken();
 
-            if (!this.mintmeExchangeMailSent) {
+            if (!this.mintmeExchangeMailSent && !this.isExchangeMailSent) {
                 this.$axios.single.post(this.$routing.generate('send_exchange_mintme_mail'))
+                    .then(() => {
+                        this.isExchangeMailSent = true;
+                    })
                     .catch((err) => {
-                        this.sendLogs('error', 'Can not sent exchange cryptos mail', err);
+                        this.sendLogs('error', 'Can not send exchange cryptos mail', err);
                     });
             }
         },
