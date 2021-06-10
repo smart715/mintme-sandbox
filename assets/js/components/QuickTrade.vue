@@ -94,8 +94,8 @@
                                     <confirm-modal
                                         :visible="showModal"
                                         :show-image="false"
-                                        @confirm="makeDonation"
-                                        @cancel="cancelDonation"
+                                        @confirm="makeTrade"
+                                        @cancel="cancelTrade"
                                         @close="showModal = false">
                                         <p class="text-white modal-title pt-2 pb-4">
                                             {{ $t('quick_trade.donation.modal.1') }}
@@ -158,8 +158,8 @@
                         </div>
                         <div
                             v-if="isCurrencySelected && loggedIn"
-                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
                             id="show-balance"
+                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
                         >
                             <p class="m-0">
                                 <span>
@@ -305,7 +305,7 @@ export default {
         }),
         balance: function() {
             return this.balances ?
-                this.balances[this.selectedCurrency].available:
+                this.balances[this.selectedCurrency].available :
                 null
             ;
         },
@@ -420,7 +420,7 @@ export default {
         },
         makeDepositHtml: function() {
             const depositUrl = this.$routing.generate('wallet', {
-                depositMore: this.rebrandedCurrency
+                depositMore: this.rebrandedCurrency,
             });
 
             return this.$t('quick_trade.make_deposit', {depositUrl});
@@ -442,6 +442,8 @@ export default {
         this.BUY_MODE = BUY_MODE;
         this.SELL_MODE = SELL_MODE;
         this.currencies = currencies;
+
+        this.selectedCurrency = this.isToken ? webSymbol : this.market.base.symbol;
     },
     mounted() {
         if (window.localStorage.getItem('mintme_loggedin_from_quick_trade') !== null) {
@@ -466,11 +468,10 @@ export default {
                 if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }
-            }, null, 'Donation');
+            }, null, 'QuickTrade');
         }
 
-        this.selectedCurrency = this.isToken ? webSymbol : this.market.base.symbol;
-        this.debouncedCheck = debounce(this.checkDonation, 500);
+        this.debouncedCheck = debounce(this.checkTrade, 500);
     },
     methods: {
         setTradeMode: function(mode) {
@@ -501,7 +502,7 @@ export default {
         onKeyup: function() {
             this.debouncedCheck();
         },
-        checkDonation: function() {
+        checkTrade: function() {
             if (!this.isAmountValid) {
                 return;
             }
@@ -525,7 +526,7 @@ export default {
                 })
                 .then(() => this.isCheckingTrade = false);
         },
-        makeDonation: function() {
+        makeTrade: function() {
             this.isTradeInProgress = true;
             this.showModal = false;
 
@@ -574,7 +575,7 @@ export default {
         all: function() {
             this.amount = toMoney(this.balance, this.currencySubunit);
             if (!this.insufficientFunds) {
-                this.checkDonation();
+                this.checkTrade();
             }
         },
         resetAmount: function() {
@@ -618,10 +619,10 @@ export default {
             if ((new Decimal(this.amount)).greaterThan(this.ordersSummary)) {
                 this.showModal = true;
             } else {
-                this.makeDonation();
+                this.makeTrade();
             }
         },
-        cancelDonation: function() {
+        cancelTrade: function() {
             this.showModal = false;
             this.resetAmount();
         },
