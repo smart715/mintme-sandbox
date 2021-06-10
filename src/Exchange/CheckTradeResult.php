@@ -1,18 +1,17 @@
 <?php declare(strict_types = 1);
 
 namespace App\Exchange;
+
 use Money\Money;
 
 /** @codeCoverageIgnore */
 class CheckTradeResult
 {
-    /** @var string */
-    private $expectedAmount;
+    private Money $expectedAmount;
 
-    /** @var string */
-    private $worth;
+    private ?Money $worth;
 
-    public function __construct(Money $expectedAmount, Money $worth = null)
+    public function __construct(Money $expectedAmount, ?Money $worth = null)
     {
         $this->expectedAmount = $expectedAmount;
         $this->worth = $worth;

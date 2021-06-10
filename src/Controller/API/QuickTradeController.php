@@ -2,39 +2,39 @@
 
 namespace App\Controller\API;
 
-use App\Entity\User;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
-use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\CheckTradeResult;
+use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\DonationHandler;
-use App\Exchange\ExchangerInterface;
-use App\Exchange\Trade\TradeResult;
 use App\Exchange\Donation\DonationHandlerInterface;
+use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\Trade\TradeResult;
 use App\Logger\DonationLogger;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Money\Exchange\FixedExchange;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use App\Wallet\Money\MoneyWrapperInterface;
-use Money\Exchange\FixedExchange;
 
 /**
  * @Rest\Route("/api/quick-trade")
  */
 class QuickTradeController extends AbstractFOSRestController
 {
-    const BUY = 'buy';
-    const SELL = 'sell';
+    public const BUY = 'buy';
+    public const SELL = 'sell';
 
     protected DonationHandlerInterface $donationHandler;
     protected MarketHandlerInterface $marketHandler;
@@ -92,7 +92,7 @@ class QuickTradeController extends AbstractFOSRestController
             /** @var User|null $user */
             $user = $this->getUser();
 
-            if ($mode === self::BUY) {
+            if (self::BUY === $mode) {
                 $checkDonationResult = $this->donationHandler->checkDonation(
                     $market,
                     $currency,
@@ -109,7 +109,7 @@ class QuickTradeController extends AbstractFOSRestController
                     'worth' => $tokensWorth,
                     'ordersSummary' => $sellOrdersSummary,
                 ]);
-            } elseif ($mode === self::SELL) {
+            } elseif (self::SELL === $mode) {
                 $checkSell = $this->checkSell($market, $amount);
 
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
@@ -122,7 +122,6 @@ class QuickTradeController extends AbstractFOSRestController
             } else {
                 throw new ApiBadRequestException('Trade mode is invalid ' . $mode);
             }
-
         } catch (ApiBadRequestException $ex) {
             return $this->view([
                 'message' => $ex->getMessage(),
@@ -183,23 +182,21 @@ class QuickTradeController extends AbstractFOSRestController
         }
 
         try {
-            if ($mode === self::BUY) {
+            if (self::BUY === $mode) {
                 $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
 
                 $donation = $this->donationHandler->makeDonation(
-                        $market,
-                        $request->get('currency'),
-                        (string)$request->get('amount'),
-                        (string)$request->get('expected_count_to_receive'),
-                        $user,
-                        $sellOrdersSummary
+                    $market,
+                    $request->get('currency'),
+                    (string)$request->get('amount'),
+                    (string)$request->get('expected_count_to_receive'),
+                    $user,
+                    $sellOrdersSummary
                 );
 
                 /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
-
-            } elseif ($mode === self::SELL) {
-
+            } elseif (self::SELL === $mode) {
                 $amount = (string)$request->get('amount');
                 $expectedAmount = (string)$request->get('expected_count_to_receive');
 
@@ -283,6 +280,7 @@ class QuickTradeController extends AbstractFOSRestController
             foreach ($pendingBuyOrders as $bid) {
                 if ($quoteLeft->isZero()) {
                     $shouldContinue = false;
+
                     break;
                 }
 
@@ -291,7 +289,6 @@ class QuickTradeController extends AbstractFOSRestController
                 );
 
                 if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
-
                     $baseWorth = $this->moneyWrapper->convertByRatio(
                         $orderAmountWithFee,
                         $bid->getPrice()->getCurrency()->getCode(),
@@ -313,7 +310,6 @@ class QuickTradeController extends AbstractFOSRestController
                     $quoteLeft = $quoteLeft->subtract($quoteLeft);
                 }
             }
-
         } while ($shouldContinue);
 
         return new CheckTradeResult($amountToReceive);
