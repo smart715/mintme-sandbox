@@ -1,11 +1,10 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import '../vueI18nfix.js';
-import Donation from '../../js/components/donation/Donation';
+import QuickTrade from '../../js/components/QuickTrade';
 import moxios from 'moxios';
 import axios from 'axios';
 import Vuex from 'vuex';
 import {webSymbol, btcSymbol, tokSymbol, MINTME, ethSymbol} from '../../js/utils/constants';
-import {AddPhoneAlertMixin} from '../../js/mixins';
 
 /**
  * @return {Wrapper<Vue>}
@@ -25,7 +24,73 @@ function mockVue() {
     return localVue;
 }
 
-describe('Donation', () => {
+const localVue = mockVue();
+localVue.use(Vuex);
+
+const store = new Vuex.Store({
+    modules: {
+        websocket: {
+            namespaced: true,
+            actions: {
+                addOnOpenHandler: () => {},
+                addMessageHandler: () => {},
+            },
+        },
+        tradeBalance: {
+            namespaced: true,
+            getters: {
+                getBalances: function() {
+                    return {
+                        BTC: {available: '10'},
+                        ETH: {available: '10'},
+                        WEB: {available: '10'},
+                        USDC: {available: '10'},
+                        foo: {available: '10'},
+                        bar: {available: '10'},
+                    };
+                },
+            },
+        },
+    },
+});
+
+/**
+ * @param {Object} props
+ * @return {Wrapper}
+ */
+function mockQuickTrade(props = {}) {
+    return shallowMount(QuickTrade, {
+        store,
+        localVue,
+        propsData: {
+            loggedIn: true,
+            isToken: true,
+            websocketUrl: '',
+            params: {
+                donation_fee: .01,
+            },
+            market: {
+                base: {
+                    name: 'bar',
+                    symbol: 'bar',
+                },
+                quote: {
+                    name: 'foo',
+                    symbol: 'foo',
+                },
+                identifier: 'bar',
+            },
+            disabledServicesConfig: `{
+                "depositDisabled": false,
+                "withdrawalsDisabled": false,
+                "deployDisabled": false
+            }`,
+            ...props,
+        },
+    });
+}
+
+describe('QuickTrade', () => {
     beforeEach(() => {
         moxios.install();
     });
@@ -34,171 +99,62 @@ describe('Donation', () => {
         moxios.uninstall();
     });
 
-    const localVue = mockVue();
-    localVue.use(Vuex);
-
-    const store = new Vuex.Store({
-        modules: {
-            websocket: {
-                namespaced: true,
-                actions: {
-                    addOnOpenHandler: () => {},
-                    addMessageHandler: () => {},
-                },
-            },
-        },
-    });
-
     it('should render correctly for logged in user', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                    identifier: 'bar',
-                    quote: {
-                        name: 'bar',
-                    },
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
-
+        const wrapper = mockQuickTrade();
         expect(wrapper.vm.dropdownText).toBe(MINTME.symbol);
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
-        expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
+        expect(wrapper.find('.all-button').exists()).toBe(true);
+        expect(wrapper.find('#show-balance').exists()).toBe(true);
     });
 
     it('should renders correctly for not logged in user', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: false,
-                donationParams: {fee: .01},
-                market: {
-                    identifier: 'bar',
-                    quote: {
-                        name: 'bar',
-                    },
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
+        const wrapper = mockQuickTrade({
+            loggedIn: false,
         });
 
+        expect(wrapper.vm.dropdownText).toBe(MINTME.symbol);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.vm.dropdownText).toBe(MINTME.symbol);
         expect(wrapper.find('.all-button').exists()).toBe(false);
         expect(wrapper.find('#show-balance').exists()).toBe(false);
     });
 
     it('should renders correctly for logged in user and load balance for selected currency', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+        const wrapper = mockQuickTrade();
 
+        // WEB (default)
         expect(wrapper.vm.dropdownText).toBe('MINTME');
         expect(wrapper.vm.isCurrencySelected).toBe(true);
         expect(wrapper.vm.buttonDisabled).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
-        expect(wrapper.find('.card-header span').text()).toBe('donation.header.logged');
         expect(wrapper.find('b-dropdown-stub').exists()).toBe(true);
 
         // Select ETH
         wrapper.vm.onSelect(ethSymbol);
         expect(wrapper.vm.isCurrencySelected).toBe(true);
-        expect(wrapper.vm.balanceLoaded).toBe(false);
+        expect(wrapper.vm.balanceLoaded).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.vm.selectedCurrency).toBe(ethSymbol);
 
         // Select BTC
         wrapper.vm.onSelect(btcSymbol);
         expect(wrapper.vm.isCurrencySelected).toBe(true);
-        expect(wrapper.vm.balanceLoaded).toBe(false);
+        expect(wrapper.vm.balanceLoaded).toBe(true);
         expect(wrapper.vm.isAmountValid).toBe(false);
         expect(wrapper.vm.selectedCurrency).toBe(btcSymbol);
     });
 
     it('should rebrand selected currency WEB -> MINTME', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+        const wrapper = mockQuickTrade();
 
         wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.donationCurrency).toBe(MINTME.symbol);
-
-        wrapper.vm.selectedCurrency = btcSymbol;
-        expect(wrapper.vm.donationCurrency).toBe(btcSymbol);
-
-        wrapper.vm.selectedCurrency = tokSymbol;
-        expect(wrapper.vm.donationCurrency).toBe(tokSymbol);
-    });
-
-    it('should generate link to wallet for selected currency', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
-
-        wrapper.vm.selectedCurrency = webSymbol;
-        expect(wrapper.vm.getDepositLink).toBe('wallet');
-
-        wrapper.vm.selectedCurrency = btcSymbol;
-        expect(wrapper.vm.getDepositLink).toBe('wallet');
+        expect(wrapper.vm.rebrandedCurrency).toBe(MINTME.symbol);
     });
 
     it('should properly check if currency selected', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+        const wrapper = mockQuickTrade();
 
         wrapper.vm.selectedCurrency = '';
         expect(wrapper.vm.isCurrencySelected).toBe(false);
@@ -214,101 +170,57 @@ describe('Donation', () => {
     });
 
     it('should properly check insufficient funds', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                    base: {
-                        subunit: 4,
-                    },
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+        const wrapper = mockQuickTrade();
 
-        wrapper.vm.balanceLoaded = false;
-        expect(wrapper.vm.insufficientFunds).toBe(false);
-
-        wrapper.vm.balanceLoaded = true;
+        wrapper.vm.amount = '100';
         expect(wrapper.vm.insufficientFunds).toBe(true);
 
-        wrapper.vm.balance = '0.5';
+        wrapper.vm.amount = '5';
         expect(wrapper.vm.insufficientFunds).toBe(false);
-
-        wrapper.vm.amountToDonate = '0.55';
-        expect(wrapper.vm.insufficientFunds).toBe(true);
     });
 
     it('should properly check amount to donate', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {
-                    fee: 1,
-                    minBtcAmount: 0.000001,
-                    minMintmeAmount: 0.0001,
-                },
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+        const wrapper = mockQuickTrade({
+            params: {
+                donation_fee: 1,
+                minBtcAmount: 0.000001,
+                minMintmeAmount: 0.0001,
             },
         });
 
-        wrapper.vm.amountToDonate = '';
+        wrapper.vm.amount = '';
         expect(wrapper.vm.isAmountValid).toBe(false);
 
-        wrapper.vm.amountToDonate = '0.0';
+        wrapper.vm.amount = '0.0';
         expect(wrapper.vm.isAmountValid).toBe(false);
 
-        wrapper.vm.amountToDonate = '0.001';
+        wrapper.vm.amount = '0.001';
         expect(wrapper.vm.isAmountValid).toBe(true);
 
-        wrapper.vm.amountToDonate = '0.0000';
+        wrapper.vm.amount = '0.0000';
         expect(wrapper.vm.isAmountValid).toBe(false);
 
-        wrapper.vm.amountToDonate = '0.0001';
+        wrapper.vm.amount = '0.0001';
         expect(wrapper.vm.isAmountValid).toBe(true);
 
         wrapper.vm.selectedCurrency = btcSymbol;
-        wrapper.vm.amountToDonate = 0.0000001;
+        wrapper.vm.amount = 0.0000001;
         expect(wrapper.vm.isAmountValid).toBe(false);
-        wrapper.vm.amountToDonate = 0.000001;
+        wrapper.vm.amount = 0.000001;
         expect(wrapper.vm.isAmountValid).toBe(true);
 
         wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.amountToDonate = 0.00001;
+        wrapper.vm.amount = 0.00001;
         expect(wrapper.vm.isAmountValid).toBe(false);
-        wrapper.vm.amountToDonate = 0.0001;
+        wrapper.vm.amount = 0.0001;
         expect(wrapper.vm.isAmountValid).toBe(true);
     });
 
     it('should properly disable button', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: false,
-                market: {
-                    quote: {name: 'foo'},
-                    base: {
-                        subunit: 4,
-                    },
-                },
-                donationParams: {
-                    fee: .01,
-                    minMintmeAmount: 0.0001,
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+        const wrapper = mockQuickTrade({
+            params: {
+                donation_fee: .01,
+                minMintmeAmount: 0.0001,
             },
         });
 
@@ -320,255 +232,111 @@ describe('Donation', () => {
         wrapper.vm.selectedCurrency = webSymbol;
         expect(wrapper.vm.buttonDisabled).toBe(true);
 
-        wrapper.vm.balanceLoaded = true;
-        wrapper.vm.balance = '20';
+        wrapper.vm.amount = '100';
         expect(wrapper.vm.buttonDisabled).toBe(true);
 
-        wrapper.vm.amountToDonate = '5';
+        wrapper.vm.amount = '5';
         expect(wrapper.vm.buttonDisabled).toBe(false);
 
-        wrapper.vm.donationChecking = true;
+        wrapper.vm.isCheckingTrade = true;
         expect(wrapper.vm.buttonDisabled).toBe(true);
 
-        wrapper.vm.donationChecking = false;
-        wrapper.vm.donationInProgress = true;
+        wrapper.vm.isCheckingTrade = false;
+        wrapper.vm.isTradeInProgress = true;
         expect(wrapper.vm.buttonDisabled).toBe(true);
     });
 
-    it('can select currency', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+    // renames done
+    it('can check trade if logged in and currency selected and amount null', (done) => {
+        const wrapper = mockQuickTrade({
+            params: {
+                minBtcAmount: '0.000001',
+                minMintmeAmount: '0.0001',
             },
         });
 
-        wrapper.vm.balanceLoaded = true;
-        wrapper.vm.onSelect(ethSymbol);
-        expect(wrapper.vm.selectedCurrency).toBe(ethSymbol);
-        expect(wrapper.vm.balanceLoaded).toBe(false);
-
-        wrapper.vm.balanceLoaded = true;
-        wrapper.vm.onSelect(btcSymbol);
-        expect(wrapper.vm.selectedCurrency).toBe(btcSymbol);
-        expect(wrapper.vm.balanceLoaded).toBe(false);
-    });
-
-    it('can load token balance', (done) => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {
-                    minMintmeAmount: .0001,
-                    fee: .01,
-                },
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
-
-        wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.getTokenBalance();
-
-        moxios.wait(() => {
-            let request = moxios.requests.mostRecent();
-            request.respondWith({
-                status: 200,
-                response: 111,
-            }).then(() => {
-                expect(wrapper.vm.balance).toBe(111);
-                expect(wrapper.vm.balanceLoaded).toBe(true);
-                done();
-            });
-        });
-    });
-
-    it('can check donation if logged in and currency selected and amount to donate not null', (done) => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                market: {
-                    base: {
-                        symbol: webSymbol,
-                    },
-                    quote: {
-                        name: 'foo',
-                        symbol: 'TOK00011122233',
-                    },
-                },
-                donationParams: {
-                    minBtcAmount: '0.000001',
-                    minMintmeAmount: '0.0001',
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
-
-        moxios.stubRequest('check_donation', {
+        moxios.stubRequest('check_quick_trade', {
             status: 200,
             response: {
                 amountToReceive: '2.5674',
+                worth: '0',
+                ordersSummary: '0',
             },
         });
 
-        wrapper.vm.amountToDonate = 50;
-        wrapper.vm.checkDonation();
-        expect(wrapper.vm.donationChecking).toBe(true);
+        wrapper.vm.amount = '50';
+        wrapper.vm.checkTrade();
+        expect(wrapper.vm.isCheckingTrade).toBe(true);
 
         moxios.wait(() => {
             expect(wrapper.vm.amountToReceive).toBe('2.5674');
-            expect(wrapper.vm.donationChecking).toBe(false);
+            expect(wrapper.vm.isCheckingTrade).toBe(false);
             done();
         });
     });
 
-    it('can make donation if logged in and currency selected and amount to donate/receive not null', (done) => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {
-                    fee: .01,
-                },
-                market: {
-                    base: {
-                        symbol: webSymbol,
-                    },
-                    quote: {
-                        name: 'foo',
-                        symbol: 'TOK00011122233',
-                    },
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+    it('can make trade if logged in and currency selected and amount/amount to receive not null', (done) => {
+        const wrapper = mockQuickTrade();
 
         wrapper.setData({
             selectedCurrency: webSymbol,
-            amountToDonate: 20,
+            amount: 5,
             amountToReceive: 2,
-            balance: 220,
         });
 
-        moxios.stubRequest('make_donation', {
+        moxios.stubRequest('make_quick_trade', {
             status: 200, response: {},
         });
 
-        wrapper.vm.makeDonation();
-        expect(wrapper.vm.donationInProgress).toBe(true);
+        wrapper.vm.makeTrade();
+        expect(wrapper.vm.isTradeInProgress).toBe(true);
 
         moxios.wait(() => {
-            expect(wrapper.vm.amountToDonate).toBe(0);
+            expect(wrapper.vm.amount).toBe(0);
             expect(wrapper.vm.amountToReceive).toBe(0);
-            expect(wrapper.vm.balanceLoaded).toBe(false);
             wrapper.vm.$nextTick(() => {
-                expect(wrapper.vm.donationInProgress).toBe(false);
+                expect(wrapper.vm.isTradeInProgress).toBe(false);
                 done();
             });
         });
     });
 
-    it('can use all funds to donate', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                market: {
-                    base: {
-                        subunit: 4,
-                    },
-                    quote: {
-                        name: 'foo',
-                        symbol: 'TOK3333322221111',
-                    },
-                },
-                donationParams: {
-                    minBtcAmount: '0.000001',
-                    minMintmeAmount: '0.0001',
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
+    it('can use all funds to trade', () => {
+        const wrapper = mockQuickTrade({
+            params: {
+                minBtcAmount: '0.000001',
+                minMintmeAmount: '0.0001',
             },
         });
 
         wrapper.vm.selectedCurrency = webSymbol;
-        wrapper.vm.balance = 100;
-        wrapper.vm.amountToDonate = 20;
+        wrapper.vm.amount = 5;
         wrapper.vm.all();
 
-        expect(wrapper.vm.amountToDonate).toBe('100');
+        expect(wrapper.vm.amount).toBe('10');
 
         // Insufficient funds
-        wrapper.vm.balance = 100;
-        wrapper.vm.amountToDonate = 120;
+        wrapper.vm.amount = 5;
         wrapper.vm.all();
 
-        expect(wrapper.vm.amountToDonate).toBe('100');
+        expect(wrapper.vm.amount).toBe('10');
     });
 
-    it('should reset amount to donate and amount to receive on calling resetAmount()', () => {
-        const wrapper = shallowMount(Donation, {
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                market: {
-                    quote: {name: 'foo'},
-                },
-                websocketUrl: '',
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
+    it('should reset amount and amount to receive on calling resetAmount()', () => {
+        const wrapper = mockQuickTrade();
 
-        wrapper.vm.amountToDonate = 50;
+        wrapper.vm.amount = 50;
         wrapper.vm.amountToReceive = 7;
         wrapper.vm.resetAmount();
 
-        expect(wrapper.vm.amountToDonate).toBe(0);
+        expect(wrapper.vm.amount).toBe(0);
         expect(wrapper.vm.amountToReceive).toBe(0);
     });
 
     it('should show phone verify modal if user is not totally authenticated', () => {
-        const wrapper = shallowMount(Donation, {
-            mixins: [AddPhoneAlertMixin],
-            store,
-            localVue,
-            propsData: {
-                loggedIn: true,
-                donationParams: {fee: .01},
-                websocketUrl: '',
-                market: {
-                    base: {
-                        symbol: webSymbol,
-                    },
-                    quote: {
-                        name: 'foo',
-                        symbol: 'TOK00011122233',
-                    },
-                },
-                disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
-            },
-        });
-        moxios.stubRequest('make_donation', {
+        const wrapper = mockQuickTrade();
+
+        moxios.stubRequest('make_quick_trade', {
             status: 200,
             response: {
                 error: true,
@@ -576,7 +344,7 @@ describe('Donation', () => {
             },
         });
 
-        wrapper.vm.makeDonation();
+        wrapper.vm.makeTrade();
 
         moxios.wait(() => {
             done();
