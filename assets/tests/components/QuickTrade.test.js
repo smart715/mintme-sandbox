@@ -246,7 +246,6 @@ describe('QuickTrade', () => {
         expect(wrapper.vm.buttonDisabled).toBe(true);
     });
 
-    // renames done
     it('can check trade if logged in and currency selected and amount null', (done) => {
         const wrapper = mockQuickTrade({
             params: {
