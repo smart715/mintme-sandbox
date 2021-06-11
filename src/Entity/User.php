@@ -236,6 +236,11 @@ class User extends BaseUser implements
      */
     protected ?Airdrop $airdropReferrer;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $exchangeCryptoMailSent = false; // phpcs:ignore
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -634,5 +639,17 @@ class User extends BaseUser implements
     public function getAirdropReferrerUser(): ?User
     {
         return $this->airdropReferrerUser;
+    }
+
+    public function isExchangeCryptoMailSent(): bool
+    {
+        return $this->exchangeCryptoMailSent;
+    }
+
+    public function setExchangeCryptoMailSent(bool $exchangeCryptoMailSent): self
+    {
+        $this->exchangeCryptoMailSent = $exchangeCryptoMailSent;
+
+        return $this;
     }
 }
