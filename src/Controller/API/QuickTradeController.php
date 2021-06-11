@@ -291,7 +291,7 @@ class QuickTradeController extends AbstractFOSRestController
                 if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
                     $baseWorth = $this->moneyWrapper->convertByRatio(
                         $orderAmountWithFee,
-                        $bid->getPrice()->getCurrency()->getCode(),
+                        $baseSymbol,
                         $this->moneyWrapper->format($bid->getPrice())
                     );
 
@@ -302,7 +302,7 @@ class QuickTradeController extends AbstractFOSRestController
 
                     $baseWorth = $this->moneyWrapper->convertByRatio(
                         $quoteLeftWithFee,
-                        $bid->getPrice()->getCurrency()->getCode(),
+                        $baseSymbol,
                         $this->moneyWrapper->format($bid->getPrice())
                     );
 
