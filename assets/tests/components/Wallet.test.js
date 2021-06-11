@@ -57,9 +57,9 @@ let propsForTestCorrectlyRenders = {
     disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
-const assertData = {foo: {name: 'foo', available: 1}, bar: {name: 'bar', available: 1}, baz: {name: 'baz', available: 0}};
-const expectData = [{name: 'foo', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
-const expectedTokenData = [{name: 'foo', available: 1}, {name: 'bar', available: 1}];
+const assertData = {WEB: {name: 'WEB', available: 1}, bar: {name: 'bar', available: 1}, baz: {name: 'baz', available: 0}};
+const expectData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
+const expectedTokenData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}];
 
 let assertTokens = {};
 assertTokens['oTokenName'] = {};
