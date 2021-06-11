@@ -125,7 +125,6 @@ class Trader implements TraderInterface
             $this->referralFee ? (string)$this->referralFee : '0'
         );
 
-
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
