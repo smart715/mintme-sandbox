@@ -15,6 +15,7 @@ use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
 use App\Manager\UserManagerInterface;
+use App\Manager\UserTokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,6 +53,8 @@ class BalanceHandler implements BalanceHandlerInterface
     /** @var LoggerInterface */
     private LoggerInterface $logger;
 
+    private UserTokenManagerInterface $userTokenManager;
+
     /**
      * BalanceHandler constructor.
      *
@@ -72,7 +75,8 @@ class BalanceHandler implements BalanceHandlerInterface
         BalancesArrayFactoryInterface $balanceArrayFactory,
         MoneyWrapperInterface $moneyWrapper,
         TraderBalanceViewFactoryInterface $traderBalanceViewFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UserTokenManagerInterface $userTokenManager
     ) {
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
@@ -82,6 +86,7 @@ class BalanceHandler implements BalanceHandlerInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->traderBalanceViewFactory = $traderBalanceViewFactory;
         $this->logger = $logger;
+        $this->userTokenManager = $userTokenManager;
     }
 
     public function deposit(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void
@@ -194,21 +199,10 @@ class BalanceHandler implements BalanceHandlerInterface
 
     public function updateUserTokenRelation(User $user, Token $token): void
     {
-        if ($token->getId()) {
-            $tokenExist = array_filter($user->getTokens(), static function (Token $userToken) use ($token) {
-                return $userToken->getId() === $token->getId();
-            });
+        $balance = $this->balance($user, $token)->getAvailable();
 
-            if (!$tokenExist) {
-                $userToken = (new UserToken())->setToken($token)->setUser($user);
-                $this->entityManager->persist($userToken);
-                $user->addToken($userToken);
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-            }
-        }
+        $this->userTokenManager->updateRelation($user, $token, $balance);
     }
-
     /**
      * @param array[] $balances
      * @param TradebleInterface $tradable

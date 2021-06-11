@@ -6,6 +6,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandler;
 use App\Exchange\Order;
@@ -23,7 +24,7 @@ use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class TraderTest extends TestCase
@@ -40,16 +41,10 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
+        $trader = $this->mockTrader(
             $trader,
-            $this->mockLimitOrderConfig(1, 2),
+            null,
             $this->mockEm($this->once()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -78,16 +73,10 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
+        $trader = $this->mockTrader(
             $trader,
-            $this->mockLimitOrderConfig(1, 2),
+            null,
             $this->mockEm($this->exactly(2)),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -119,16 +108,10 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
+        $trader = $this->mockTrader(
             $trader,
-            $this->mockLimitOrderConfig(1, 2),
+            null,
             $this->mockEm($this->once()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
         );
 
         $quote = $this->mockToken('BAR', false);
@@ -156,16 +139,8 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->never()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
+        $trader = $this->mockTrader(
+            $trader
         );
 
         $quote = $this->mockToken('BAR', true);
@@ -194,16 +169,8 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->never()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
+        $trader = $this->mockTrader(
+            $trader
         );
 
         $trader->cancelOrder(
@@ -226,16 +193,8 @@ class TraderTest extends TestCase
                 )
             );
 
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->never()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
+        $trader = $this->mockTrader(
+            $trader
         );
 
         $trader->cancelOrder(
@@ -262,16 +221,8 @@ class TraderTest extends TestCase
                 ]]
             );
 
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->never()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
+        $trader = $this->mockTrader(
+            $trader
         );
 
         $user = $this->mockUser(2);
@@ -316,16 +267,8 @@ class TraderTest extends TestCase
                 ]]
             );
 
-        $trader = new Trader(
-            $trader,
-            $this->mockLimitOrderConfig(1, 2),
-            $this->mockEm($this->never()),
-            $this->mockMoneyWrapper(),
-            $this->mockMarketNameConverter(),
-            $this->createMock(NormalizerInterface::class),
-            $this->createMock(LoggerInterface::class),
-            0.5,
-            $this->mockEvenDispatcher(),
+        $trader = $this->mockTrader(
+            $trader
         );
 
         $user = $this->mockUser(2);
@@ -450,8 +393,34 @@ class TraderTest extends TestCase
         return $mw;
     }
 
-    private function mockEvenDispatcher(): EventDispatcher
+    private function mockEvenDispatcher(): EventDispatcherInterface
     {
-        return $this->createMock(EventDispatcher::class);
+        return $this->createMock(EventDispatcherInterface::class);
+    }
+
+    private function mockTrader(
+        ?TraderFetcherInterface $fetcher = null,
+        ?LimitOrderConfig $config = null,
+        ?EntityManagerInterface $entityManager = null,
+        ?MoneyWrapperInterface $moneyWrapper = null,
+        ?MarketNameConverterInterface $marketNameConverter = null,
+        ?NormalizerInterface $normalizer = null,
+        ?LoggerInterface $logger = null,
+        ?float $referralFee = null,
+        ?EventDispatcherInterface $eventDispatcher = null,
+        ?BalanceHandlerInterface $balanceHandler = null
+    ): Trader {
+        return new Trader(
+            $fetcher ?? $this->mockTraderFetcher(),
+            $config ?? $this->mockLimitOrderConfig(1, 2),
+            $entityManager ?? $this->mockEm($this->never()),
+            $moneyWrapper ?? $this->mockMoneyWrapper(),
+            $marketNameConverter ?? $this->mockMarketNameConverter(),
+            $normalizer ?? $this->createMock(NormalizerInterface::class),
+            $logger ?? $this->createMock(LoggerInterface::class),
+            $referralFee ?? 0.5,
+            $eventDispatcher ?? $this->mockEvenDispatcher(),
+            $balanceHandler ?? $this->createMock(BalanceHandlerInterface::class)
+        );
     }
 }
