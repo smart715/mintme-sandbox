@@ -1206,6 +1206,8 @@ wallet.trading_history.table.price: Prix
 wallet.trading_history.table.total_cost: 'Coût total'
 wallet.trading_history.table.fee: Frais
 wallet.buy_crypto: 'Acheter crypto'
+wallet.buy_crypto.can_exchange:
+mail.can_exchange.header:
 chat.chat_widget.direct_messages: 'Messages directs'
 chat.chat_contacts.select_contact: 'Selectionner un contact'
 chat.chat_contacts.no_contacts: 'Aucun contact'

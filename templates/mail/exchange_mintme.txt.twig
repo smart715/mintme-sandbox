@@ -1,0 +1,12 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{% trans %} hello {% endtrans %}
+{{ username }}
+{% trans with {'%cryptosList%': cryptosList} %} wallet.buy_crypto.can_exchange {% endtrans %}
+{% for crypto in exchangeCryptos %}
+    {{ absolute_url(path('coin', {'quote': mintmeSymbol, 'base': crypto.symbol })) }}
+{% endfor %}
+
+{% endblock %}
+
