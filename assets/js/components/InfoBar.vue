@@ -27,7 +27,7 @@
                 v-if="'dev' !== environment"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
-                :disabled="null === backendServiceStatus || managingBackendService  && !isIssueBranch"
+                :disabled="null === backendServiceStatus || managingBackendService || (!isIssueBranch && backendServiceStatus)"
             >
                 <font-awesome-icon
                     v-if="managingBackendService"
