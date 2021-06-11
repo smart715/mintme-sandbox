@@ -91,18 +91,12 @@ class Trader implements TraderInterface
             $this->referralFee ? (string)$this->referralFee : '0'
         );
 
-        $quote = $order->getMarket()->getQuote();
-
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
             if ($updateTokenOrCrypto) {
-                if ($quote instanceof Token) {
-                    $this->updateUserTokenReferencer($order->getMaker(), $quote);
-                } elseif ($quote instanceof Crypto) {
-                    $this->updateUserCrypto($order->getMaker(), $quote);
-                }
+                $this->updateUserTradableRelation($order);
             }
         } elseif (TradeResult::FAILED === $result->getResult()) {
             $this->logger->error(
@@ -131,24 +125,13 @@ class Trader implements TraderInterface
             $this->referralFee ? (string)$this->referralFee : '0'
         );
 
-        $quote = $order->getMarket()->getQuote();
 
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
             if ($updateTokenOrCrypto) {
-                $userMaker = $order->getMaker();
-
-                if ($quote instanceof Token) {
-                    $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
-
-                    if ($referencer = $userMaker->getReferencer()) {
-                        $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
-                    }
-                } elseif ($quote instanceof Crypto) {
-                    $this->updateUserCrypto($userMaker, $quote);
-                }
+                $this->updateUserTradableRelation($order);
             }
         }
 
@@ -182,13 +165,25 @@ class Trader implements TraderInterface
             );
         }
 
+        $this->updateUserTradableRelation($order);
+
+        return $result;
+    }
+
+    private function updateUserTradableRelation(Order $order): void
+    {
+        $user = $order->getMaker();
         $quote = $order->getMarket()->getQuote();
 
         if ($quote instanceof Token) {
-            $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
-        }
+            $this->balanceHandler->updateUserTokenRelation($user, $quote);
 
-        return $result;
+            if ($referencer = $user->getReferencer()) {
+                $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
+            }
+        } elseif ($quote instanceof Crypto) {
+            $this->updateUserCrypto($user, $quote);
+        }
     }
 
     /**
