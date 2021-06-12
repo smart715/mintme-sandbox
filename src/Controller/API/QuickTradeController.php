@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exception\QuickTradeException;
 use App\Exchange\CheckTradeResult;
 use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\DonationHandler;
@@ -27,6 +28,7 @@ use FOS\RestBundle\View\View;
 use Money\Exchange\FixedExchange;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/quick-trade")
@@ -40,12 +42,12 @@ class QuickTradeController extends AbstractFOSRestController
     protected MarketHandlerInterface $marketHandler;
     protected DonationLogger $logger;
     protected EventDispatcherInterface $eventDispatcher;
+
     private MoneyWrapperInterface $moneyWrapper;
     private ExchangerInterface $exchanger;
-
     private LockFactory $lockFactory;
-
     private QuickTradeConfig $config;
+    private TranslatorInterface $translator;
 
     public function __construct(
         DonationHandlerInterface $donationHandler,
@@ -55,7 +57,8 @@ class QuickTradeController extends AbstractFOSRestController
         EventDispatcherInterface $eventDispatcher,
         MoneyWrapperInterface $moneyWrapper,
         ExchangerInterface $exchanger,
-        QuickTradeConfig $config
+        QuickTradeConfig $config,
+        TranslatorInterface $translator
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
@@ -65,6 +68,7 @@ class QuickTradeController extends AbstractFOSRestController
         $this->moneyWrapper = $moneyWrapper;
         $this->exchanger = $exchanger;
         $this->config = $config;
+        $this->translator = $translator;
     }
 
     /**
@@ -120,20 +124,21 @@ class QuickTradeController extends AbstractFOSRestController
                     'ordersSummary' => $buyOrdersSummary,
                 ]);
             } else {
-                throw new ApiBadRequestException('Trade mode is invalid ' . $mode);
+                throw QuickTradeException::invalidMode($mode);
             }
-        } catch (ApiBadRequestException $ex) {
-            return $this->view([
-                'message' => $ex->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
         } catch (\Throwable $ex) {
+            if ($response = $this->handleException($ex)) {
+                return $response;
+            }
+
             $message = $ex->getMessage();
 
             $this->logger->error(
-                '[check_donation] Failed to check donation.',
+                '[check_quick_trade] Failed to check trade.',
                 [
                     'message' => $message,
                     'code' => $ex->getCode(),
+                    'mode' => $mode,
                     'market' => $market,
                     'currency' => $currency,
                     'amount' => $amount,
@@ -211,29 +216,28 @@ class QuickTradeController extends AbstractFOSRestController
                     throw new ApiBadRequestException($tradeResult->getMessage());
                 }
             } else {
-                throw new ApiBadRequestException('Trade mode is invalid ' . $mode);
+                throw QuickTradeException::invalidMode($mode);
             }
 
             return $this->view(null, Response::HTTP_OK);
-        } catch (ApiBadRequestException $ex) {
+        } catch (\Throwable $ex) {
             $lock->release();
 
-            return $this->view([
-                'message' => $ex->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
-        } catch (\Throwable $ex) {
+            if ($response = $this->handleException($ex)) {
+                return $response;
+            }
+
             $message = $ex->getMessage();
 
             $this->logger->error(
-                '[make_donation] Failed to make donation.',
+                '[make_quick_trade] Failed to make trade.',
                 [
                     'message' => $message,
                     'code' => $ex->getCode(),
+                    'mode' => $mode,
                     'market' => $market,
                 ]
             );
-
-            $lock->release();
 
             return $this->view([
                 'error' => $message,
@@ -329,17 +333,15 @@ class QuickTradeController extends AbstractFOSRestController
 
         $checkResult = $this->checkSell($market, $amount);
 
-        if (!$expectedAmount->equals($checkResult->getExpectedAmount())) {
-            throw new ApiBadRequestException('Token availability changed.');
-        }
-
         $amount = $this->moneyWrapper->parse($amount, $quoteSymbol);
 
         $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
         $buyOrdersSummary = $this->moneyWrapper->parse($buyOrdersSummary, $quoteSymbol);
 
-        if ($amount->greaterThan($buyOrdersSummary)) {
-            throw new ApiBadRequestException('Exceeding buy orders');
+        if (!$expectedAmount->equals($checkResult->getExpectedAmount()) ||
+            $amount->greaterThan($buyOrdersSummary)
+        ) {
+            throw QuickTradeException::availabilityChanged();
         }
 
         return $this->exchanger->executeOrder(
@@ -350,5 +352,24 @@ class QuickTradeController extends AbstractFOSRestController
             Order::SELL_SIDE,
             $this->config->getSellFee()
         );
+    }
+
+    private function handleException(\Throwable $ex): ?View
+    {
+        if ($ex instanceof QuickTradeException) {
+            $key = $ex->getKey();
+            $message = $this->translator->trans($key, $ex->getContext());
+
+            return $this->view([
+                'message' => $message,
+                'reload' => QuickTradeException::AVAILABILITY_CHANGED_KEY === $key,
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($ex instanceof ApiBadRequestException) {
+            return $this->view(['message' => $ex->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return null;
     }
 }

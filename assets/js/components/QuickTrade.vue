@@ -548,23 +548,17 @@ export default {
                         this.addPhoneModalVisible = true;
                         return;
                     }
-                    this.notifySuccess(
-                        this.$t('quick_trade.successfully_made', this.translationsContext)
-                    );
 
+                    this.notifySuccess(this.$t('quick_trade.successfully_made', this.translationsContext));
                     this.resetAmount();
                 })
                 .catch((error) => {
-                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
+                    if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
 
-                        if ('Tokens availability changed. Please adjust donation amount.' ===
-                            error.response.data.message
-                        ) {
+                        if (error.response.data.reload) {
                             location.reload();
                         }
-                    } else if (error.response.data.message) {
-                        this.notifyError(error.response.data.message);
                     } else {
                         this.notifyError('An error has occurred, please try again later.');
                     }

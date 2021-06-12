@@ -725,6 +725,7 @@ quick_trade.successfully_made: 'Congratulations! Trade has been successfully mad
 quick_trade.availability_changed: 'Orders availability changed. Reloading page...'
 quick_trade.button_all: 'All'
 quick_trade.order.empty: 'There are no orders available.'
+quick_trade.invalid_mode: 'Invalid trade mode: %mode%.'
 donation.order.donation: 'Donation'
 donation.order.buy: 'Buy (donation)'
 donation.order.sell: 'Sell (donation)'
