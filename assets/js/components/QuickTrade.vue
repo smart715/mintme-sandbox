@@ -227,7 +227,6 @@ import {
     btcSymbol,
     ethSymbol,
     usdcSymbol,
-    HTTP_BAD_REQUEST,
     currencies,
     digitsLimits,
     currencyModes,
