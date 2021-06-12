@@ -28,9 +28,9 @@ class QuickTradeConfig
         return (string)$fee;
     }
 
-    public function getFee(): string
+    public function getSellFee(): string
     {
-        $fee = $this->params['fee'] ?? 0;
+        $fee = $this->params['sell_fee'] ?? 0;
 
         return (string)$fee;
     }

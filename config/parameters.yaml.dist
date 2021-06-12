@@ -48,7 +48,7 @@ parameters:
         # 5%
         donation_fee: 0.05
         # 0.2%
-        fee: 0.002
+        sell_fee: 0.002
         minBtcAmount: 0.000001
         minMintmeAmount: 0.01
         minEthAmount: 0.0001

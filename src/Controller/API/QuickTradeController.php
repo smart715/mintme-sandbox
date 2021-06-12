@@ -267,7 +267,7 @@ class QuickTradeController extends AbstractFOSRestController
 
         $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
 
-        $fee = $this->config->getFee();
+        $fee = $this->config->getSellFee();
 
         $offset = 0;
         $limit = 100;
@@ -348,7 +348,7 @@ class QuickTradeController extends AbstractFOSRestController
             $this->moneyWrapper->format($amount),
             $this->moneyWrapper->format($expectedAmount),
             Order::SELL_SIDE,
-            $this->config->getFee()
+            $this->config->getSellFee()
         );
     }
 }
