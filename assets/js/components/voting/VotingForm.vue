@@ -50,7 +50,7 @@
 
 <script>
 import moment from 'moment';
-import DatePicker from 'vue-bootstrap-datetimepicker';
+import DatePicker from '../DatePicker';
 import BbcodeEditor from '../bbcode/BbcodeEditor';
 import BbcodeHelp from '../bbcode/BbcodeHelp';
 import {CheckInputMixin, NotificationMixin} from '../../mixins';

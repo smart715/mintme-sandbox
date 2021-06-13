@@ -127,12 +127,16 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import Decimal from 'decimal.js';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
 import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
 import {mapGetters} from 'vuex';
 import {USD, usdSign, currencyModes} from '../../utils/constants.js';
-import Decimal from 'decimal.js';
 import {GENERAL} from '../../utils/constants';
 import {
     WebSocketMixin,
@@ -142,8 +146,18 @@ import {
     OrderMixin,
 } from '../../mixins/';
 
+library.add(faCircleNotch, faTimes);
+
 export default {
     name: 'TradeTradeHistory',
+    components: {
+        BTable,
+        Guide,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -154,9 +168,6 @@ export default {
     props: {
         market: Object,
         currencyMode: String,
-    },
-    components: {
-        Guide,
     },
     data() {
         return {

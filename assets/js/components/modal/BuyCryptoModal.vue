@@ -9,6 +9,15 @@
                 <p class="word-break-all">{{ $t('wallet.buy_crypto') }}</p>
             </template>
             <template slot="body">
+                <div class="pl-2 pt-2">
+                    <span>
+                        {{ $t('wallet.buy_crypto.can_exchange', translationContext) }}
+                    </span>
+                    <div v-for="crypto in cryptoToExchangeWithMintme" :key="crypto.name">
+                        <a :href="crypto.url" target="_blank" v-html="generatePairText(crypto.name)">
+                        </a>
+                    </div>
+                </div>
                 <iframe
                     v-if="paramsLoaded"
                     ref="coinifyIframe"
@@ -32,8 +41,14 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Modal from './Modal';
 import {primaryColor} from '../../utils/constants';
+import {webSymbol, MINTME} from '../../utils/constants';
+
+library.add(faCircleNotch);
 
 const ADDRESS_CHANGED_EVENT = 'trade.receive-account-changed';
 const RECEIVED_ACCOUNT_CONFIRMED_EVENT = 'trade.receive-account-confirmed';
@@ -42,6 +57,7 @@ export default {
     name: 'BuyCryptoModal',
     components: {
         Modal,
+        FontAwesomeIcon,
     },
     props: {
         visible: Boolean,
@@ -51,8 +67,27 @@ export default {
         refreshToken: String,
         addresses: Object,
         addressesSignature: Object,
+        predefinedTokens: Array,
     },
     computed: {
+        cryptoToExchangeWithMintme: function() {
+            return this.predefinedTokens.filter((crypto) => crypto.cryptoSymbol !== webSymbol);
+        },
+        // example of return: "BNB, BTC, ETH and USDC"
+        cryptoListForTranslation: function() {
+            return this.cryptoToExchangeWithMintme.reduce((listStr, currentValue, index) => {
+                return index === this.cryptoToExchangeWithMintme.length - 1
+                    ? listStr + ' '+ this.$t('and') +' ' + currentValue.cryptoSymbol
+                    : ('' === listStr
+                        ? currentValue.cryptoSymbol
+                        : listStr + ', ' + currentValue.cryptoSymbol);
+            }, '');
+        },
+        translationContext: function() {
+            return {
+                cryptosList: this.cryptoListForTranslation,
+            };
+        },
         coinifyAddress: function() {
             return Object.keys(this.addresses)
                 .filter((key) => this.cryptoCurrencies.includes(key))
@@ -88,6 +123,9 @@ export default {
         },
     },
     methods: {
+        generatePairText: function(name) {
+            return `${MINTME.symbol}/${name}`;
+        },
         listenForEvents: function() {
             window.addEventListener('message', (event) => {
                 if (event.origin === this.uiUrl && ADDRESS_CHANGED_EVENT === event.data.event) {

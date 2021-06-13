@@ -7,6 +7,8 @@
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
             :addresses-signature="addressesSignature"
+            :predefined-tokens="predefinedItems"
+            :mintme-exchange-mail-sent="mintmeExchangeMailSent"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -19,7 +21,7 @@
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
                     <div class="first-field">
-                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        <a :href="data.item.url" class="text-white truncate-name">
                             {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                         </a>
                     </div>
@@ -265,11 +267,13 @@ import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import BuyCrypto from './BuyCrypto';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 
-library.add(depositIcon);
-library.add(withdrawIcon);
+library.add(depositIcon, withdrawIcon, faCircleNotch);
 
 export default {
     name: 'Wallet',
@@ -283,10 +287,15 @@ export default {
         AddPhoneAlertMixin,
     ],
     components: {
+        BTable,
         BuyCrypto,
         WithdrawModal,
         DepositModal,
         AddPhoneAlertModal,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         withdrawUrl: {type: String, required: true},
@@ -304,6 +313,7 @@ export default {
         coinifyCryptoCurrencies: Array,
         cantMakeDepositWithdrawal: Boolean,
         profileNickname: String,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {
@@ -366,7 +376,10 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens || {});
+            return this.tokensToArray(this.predefinedTokens || {}).map((item) => {
+                item.url = this.rebrandingFunc(this.generateCoinUrl(item));
+                return item;
+            });
         },
         items: function() {
             return this.tokensToArray(this.tokens || {}).filter((token) => !(!token.deployed && token.available <= 0));

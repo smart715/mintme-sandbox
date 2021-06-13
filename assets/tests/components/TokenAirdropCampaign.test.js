@@ -17,9 +17,6 @@ window.location = {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('b-toggle', {});
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-collapse', {});
     localVue.use(Vuex);
     localVue.use(Vuelidate);
     localVue.use({
@@ -69,7 +66,7 @@ describe('TokenAirdropCampaign', () => {
             },
             data() {
                 return {
-                    airdropCampaignId: null,
+                    airdrop: null,
                     actions: {
                         twitterMessage: false,
                         twitterRetweet: false,
@@ -89,7 +86,7 @@ describe('TokenAirdropCampaign', () => {
         });
 
         expect(wrapper.vm.hasAirdropCampaign).toBe(false);
-        wrapper.vm.airdropCampaignId = 2;
+        wrapper.vm.airdrop = {id: 2, actions: {}};
         expect(wrapper.vm.hasAirdropCampaign).toBe(true);
     });
 
@@ -378,6 +375,7 @@ describe('TokenAirdropCampaign', () => {
             response: {
                 airdrop: {
                     id: 4,
+                    actions: {},
                 },
             },
         });
@@ -403,7 +401,7 @@ describe('TokenAirdropCampaign', () => {
             },
             data() {
                 return {
-                    airdropCampaignId: null,
+                    airdrop: null,
                     tokenBalance: 500,
                     tokensAmount: '100',
                     participantsAmount: 100,
@@ -494,7 +492,7 @@ describe('TokenAirdropCampaign', () => {
             },
             data() {
                 return {
-                    airdropCampaignId: 3,
+                    airdrop: {id: 3, actions: {}},
                     actions: {
                         twitterMessage: false,
                         twitterRetweet: false,
@@ -562,5 +560,35 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.tokensAmount).toBe(100);
         expect(wrapper.vm.participantsAmount).toBe(100);
         expect(wrapper.vm.isDateValid).toBe(true);
+    });
+
+    it('should generate iframe code correctly', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenAirdropCampaign, {
+            store: getStore(),
+            localVue,
+            propsData: {
+                airdropParams,
+            },
+            data() {
+                return {
+                    airdrop: {
+                        id: 1,
+                        actions: {
+                            foo: true,
+                            bar: true,
+                        },
+                    },
+                };
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
+        });
+
+        expect(wrapper.vm.embedCode).toBe(
+            '<iframe src="airdrop_embeded" width="500px" height="500px" style="border: none;" scrolling="no"></iframe>'
+        );
     });
 });

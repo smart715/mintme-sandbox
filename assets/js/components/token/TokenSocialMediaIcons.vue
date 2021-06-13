@@ -118,17 +118,45 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faGlobe, faShare, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {
+    faYoutube,
+    faFacebook,
+    faDiscord,
+    faTelegram,
+    faTwitter,
+    faLinkedin,
+    faReddit,
+} from '@fortawesome/free-brands-svg-icons';
 import {directive as onClickaway} from 'vue-clickaway';
+
+library.add(
+    faGlobe,
+    faShare,
+    faEnvelope,
+    faYoutube,
+    faFacebook,
+    faDiscord,
+    faTelegram,
+    faTwitter,
+    faLinkedin,
+    faReddit
+);
 
 let SocialSharing = require('vue-social-sharing');
 
 if (typeof Vue !== 'undefined') {
+    SocialSharing.components['font-awesome-icon'] = FontAwesomeIcon;
     Vue.use(SocialSharing);
 }
 
 export default {
     name: 'TokenSocialMediaIcons',
+    components: {
+        FontAwesomeIcon,
+    },
     directives: {
         onClickaway,
     },
@@ -140,9 +168,6 @@ export default {
         tokenUrl: String,
         websiteUrl: String,
         youtubeChannelId: String,
-    },
-    components: {
-        FontAwesomeIcon,
     },
     data() {
         return {

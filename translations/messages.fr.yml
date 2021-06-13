@@ -483,6 +483,10 @@ mail.new_investor_bought_token.msg: 'a acheté votre jeton.'
 mail.new_investor_check_hostory: 'Consulter l''historique d''échanges'
 mail.new_device.login.msg: 'Notre système a détecté une nouvelle tentative de connexion'
 mail.new_device.new_ip.msg: 'd''une nouvelle adresse IP ou d''un nouvel appareil '
+mail.new_investor.actively_social_media_token_1:
+mail.new_investor.actively_social_media_token_2:
+mail.join_mintme_hosting:
+mail.new_investor.create_token_here:
 new_post.msg: '%tokenName% a crée un nouveau post. Lisez le <a href="%urlToken%">ici.</a>'
 mail.new_post.msg: 'créer un nouveau post'
 mail.new_post.text_link: 'Lire cela ici!'
@@ -766,6 +770,7 @@ comment.liked: 'Commentaire aimé.'
 comment.load_error: 'Erreur de chargement des commentaires'
 comment.min_amount: 'You need %amount% %token% to see comments.'
 like.removed: 'Mention aimé retirée.'
+airdrop.embed_title:
 voting.voting:
 voting.information:
 voting.propositions:
@@ -839,6 +844,7 @@ ongoing_airdrop.confirm_message.cant_participate: 'Désolé, vous ne pouvez part
 ongoing_airdrop.confirm_message: 'Voulez-vous vraiment réclamer %airdropReward% %tokenName%?'
 ongoing_airdrop.actions_message: 'Pour réclamer %airdropReward% %tokenName% vous devez éffectuer ces %tasksAmount% tâches:'
 ongoing_airdrop.ended: 'Désolé, cet airdrop est terminé.'
+ongoing_airdrop.ended_embeded:
 ongoing_airdrop.submit_url: 'Soumettre l''URL'
 ongoing_airdrop.actions.message: 'Airdrop en cours du jeton %tokenName%. Visiter %tokenUrl% pour en savoir plus à propos du jeton et de l''airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Authentification Youtube requise pour compléter cette action.'
@@ -1199,6 +1205,8 @@ wallet.trading_history.table.price: Prix
 wallet.trading_history.table.total_cost: 'Coût total'
 wallet.trading_history.table.fee: Frais
 wallet.buy_crypto: 'Acheter crypto'
+wallet.buy_crypto.can_exchange:
+mail.can_exchange.header:
 chat.chat_widget.direct_messages: 'Messages directs'
 chat.chat_contacts.select_contact: 'Selectionner un contact'
 chat.chat_contacts.no_contacts: 'Aucun contact'
@@ -1335,6 +1343,7 @@ mail.verification_code: 'Votre code de vérification:'
 404.profile: 'Profil inexistant'
 404.token: 'Jeton introuvable'
 404.pair: 'Paire introuvable'
+404.airdrop:
 404.voting:
 text.time.year: année(s)
 mail.mintme_host.1: 'Vous pouvez utiliser <strong>des hébergements dédiés spéciaux</strong> pour votre projet mintme à:'
@@ -1393,11 +1402,11 @@ activity_0_message: '<a href="%tokenUrl%">%token%</a> %amount% jetons distribué
 activity_1_message: '<a href="%tokenUrl%">%token%</a> début de l''airdrop'
 activity_2_message: 'Fin de l''airdrop pour <a href="%tokenUrl%">%token%</a>'
 activity_3_message: '<a href="%tokenUrl%">%token%</a> a reçu une donation valant %amount% %symbol%'
-activity_4_message: '<a href="%tokenUrl%">%token%</a> a ajouté un nouveau post'
+activity_4_message: '<a href="%tokenUrl%">%token%</a> a ajouté un nouveau post <a href="%postUrl%">%post%</a>'
 activity_5_message: '<a href="%tokenUrl%">%token%</a> a été crée'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> a été déployé'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> a été déposé par <a href="%userUrl%">%user%</a> valant %amount% %symbol%'
-activity_8_message: '<a href="%tokenUrl%">%token%</a> a été vendu de <a href="%sellerUrl%">%seller%</a> à <a href="%buyerUrl%">%buyer%</a> valant %amount% %symbol%'
+activity_8_message:
 activity_9_message: '<a href="%tokenUrl%">%token%</a> a été retiré par <a href="%userUrl%">%user%</a> valant %amount% %symbol%'
 token.intro.deployed_modal.paragraph_1.head: 'De nouvelles fonctions sont disponibles pour votre jeton:'
 token.intro.deployed_modal.paragraph_1.part_1: 'Cela peut être retiré et déposé'
@@ -1428,3 +1437,4 @@ modal.add_phone_alert_token_create.message: 'To create a token'
 modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawals'
 modal.add_phone_alert_donation.message: 'To make donations'
 api.add_phone_number_message: 'you need to add phone number in your profile'
+browser.storage.error:

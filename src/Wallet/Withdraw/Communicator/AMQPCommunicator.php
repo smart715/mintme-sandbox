@@ -38,15 +38,20 @@ class AMQPCommunicator implements CommunicatorInterface
         $this->service = $service;
     }
 
-    public function sendWithdrawRequest(User $user, Money $balance, string $address, Crypto $crypto): void
-    {
+    public function sendWithdrawRequest(
+        User $user,
+        Money $balance,
+        string $address,
+        Crypto $crypto,
+        ?Money $fee = null
+    ): void {
         $this->paymentProducer->publish(
             $this->createPayload(
                 $user->getId(),
                 $this->moneyWrapper->format($balance),
                 $address,
                 $crypto->getSymbol(),
-                $this->moneyWrapper->format($crypto->getFee())
+                $this->moneyWrapper->format($fee ?? $crypto->getFee())
             ),
             '',
             $this->createMessageOptions()

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultController extends Controller
 {
@@ -36,6 +37,31 @@ class DefaultController extends Controller
     public function manifest(): Response
     {
         return $this->render('manifest.json.twig', [], new JsonResponse());
+    }
+
+    /**
+     * @Rest\Route("/translations.js", name="translations-ui")
+     */
+    public function getTranslations(TranslatorInterface $translator): Response
+    {
+        $filepath = $this->getParameter('ui_trans_keys_filepath');
+
+        $keys = file_exists($filepath) ?
+            json_decode(file_get_contents($filepath) ?: '[]'):
+            [];
+
+        $parsedKeys = [];
+
+        foreach ($keys as $key) {
+            $parsedKeys[$key] = $translator->trans($key);
+        }
+
+        $content = 'window.translations=' . json_encode($parsedKeys) . ';';
+
+        $response = new Response($content, Response::HTTP_OK);
+        $response->headers->set('Content-Type', 'text/javascript');
+
+        return $response;
     }
 
     /**

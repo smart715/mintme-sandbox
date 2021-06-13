@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/wallet') }}
+{% endblock %}
+
 {% block title %}{% trans %}page.wallet.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}wallet{% endblock %}
@@ -51,6 +56,7 @@
                             :coinify-crypto-currencies="{{ global_coinify_crypto_currencies | json_encode }}"
                             :cant-make-deposit-withdrawal="{{ error ? 'true' : 'false' }}"
                             profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                            :mintme-exchange-mail-sent="{{ app.user.exchangeCryptoMailSent ? 'true' : 'false' }}"
                         >
                         </wallet>
                     </b-tab>
@@ -88,5 +94,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('wallet') }}
+    {{ encore_entry_script_tags('pages/wallet') }}
 {% endblock %}

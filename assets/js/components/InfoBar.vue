@@ -85,10 +85,25 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Decimal from 'decimal.js';
+import {BButton, BCollapse, VBTooltip, VBToggle} from 'bootstrap-vue';
+
+library.add(faCircleNotch, faTimesCircle);
 
 export default {
     name: 'InfoBar',
+    components: {
+        BButton,
+        BCollapse,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+        'b-toggle': VBToggle,
+    },
     props: {
         username: String,
         authCode: String,

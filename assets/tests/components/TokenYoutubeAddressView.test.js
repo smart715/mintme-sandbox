@@ -7,7 +7,6 @@ localVue.use({
         Vue.prototype.$t = (val) => val;
     },
 });
-localVue.directive('b-tooltip', () => {});
 
 let objectForTestCorrectlyMouning = {
     localVue,
@@ -20,6 +19,7 @@ let objectForTestCorrectlyMouning = {
         channelId: 'testChannelId',
         clientId: 'testClientId',
     },
+    sync: false,
  };
 
 describe('TokenYoutubeAddressView', () => {

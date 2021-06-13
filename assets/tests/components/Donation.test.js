@@ -12,9 +12,6 @@ import {AddPhoneAlertMixin} from '../../js/mixins';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-dropdown', {});
-    localVue.component('b-dropdown-item', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$sanitize = (val) => val;

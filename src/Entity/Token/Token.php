@@ -330,9 +330,15 @@ class Token implements TradebleInterface, ImagineInterface
      */
     public function getHoldersCount(): int
     {
-        return $this->users
-            ? $this->users->count()
-            : 0;
+        if ($this->users) {
+            $holders = $this->users->filter(function ($userToken) {
+                return $userToken->isHolder();
+            });
+
+            return $holders->count();
+        }
+
+        return 0;
     }
 
     /** {@inheritdoc} */
@@ -696,6 +702,15 @@ class Token implements TradebleInterface, ImagineInterface
         return $activeAirdrop->isEmpty()
             ? null
             : $activeAirdrop->first();
+    }
+
+    public function getAirdrop(int $id): ?Airdrop
+    {
+        $airdrops = $this->getAirdrops()->filter(fn(Airdrop $a) => $id === $a->getId());
+
+        return $airdrops->isEmpty()
+            ? null
+            : $airdrops->first();
     }
 
     /** @codeCoverageIgnore */

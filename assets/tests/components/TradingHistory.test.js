@@ -4,8 +4,6 @@ import axios from 'axios';
 
 describe('TradingHistory', () => {
     const localVue = createLocalVue();
-    localVue.component('b-table', {});
-    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
