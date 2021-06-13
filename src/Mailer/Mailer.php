@@ -314,7 +314,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'slug' => $slug,
         ]);
 
-        $subject = $this->translator->trans('email.new_post');
+        $subject = $this->translator->trans('email.new_post', ['%tokenName%' => $tokenName]);
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())

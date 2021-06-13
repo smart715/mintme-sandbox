@@ -66,6 +66,7 @@ import VueScroll from 'vuescroll';
 import {mixin as clickaway} from 'vue-clickaway';
 import NotificationType from './NotificationType';
 import {LoggerMixin} from '../mixins';
+import {notificationTypes} from '../utils/constants';
 
 library.add(faCircleNotch);
 
@@ -80,6 +81,7 @@ export default {
     mixins: [clickaway, LoggerMixin],
     data() {
         return {
+            notificationTypes,
             showUserNotifications: false,
             userNotifications: null,
             userNotificationsFiltered: [],
@@ -134,10 +136,41 @@ export default {
             this.showUserNotifications = false;
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
         },
+        groupPosts: function() {
+            let postsNotifications = [];
+            let postToDelete = [];
+
+            this.userNotifications.forEach((item) => {
+                if ('new_post' === item.type && !item.viewed) {
+                    let jsonData = JSON.parse(item.jsonData);
+
+                    const index = postsNotifications.findIndex(function(post) {
+                        let jsonPost = JSON.parse(post.jsonData);
+
+                        return jsonPost.tokenName === jsonData.tokenName;
+                    });
+
+                    if (-1 === index) {
+                        item.number = 1;
+                        postsNotifications.push(item);
+                    } else {
+                        postsNotifications[index].number += 1;
+                    }
+
+                    postToDelete.push(item);
+                }
+            });
+
+            this.userNotifications = this.userNotifications.filter((post) => !postToDelete.includes(post));
+            postsNotifications.forEach((item) => {
+                this.userNotifications.unshift(item);
+            });
+        },
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
                 .then((res) => {
                     this.userNotifications = res.data;
+                    this.groupPosts();
                     this.loadNotifications();
                 })
                 .catch((err) => {

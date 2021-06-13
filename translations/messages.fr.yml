@@ -487,7 +487,7 @@ mail.new_investor.actively_social_media_token_1:
 mail.new_investor.actively_social_media_token_2:
 mail.join_mintme_hosting:
 mail.new_investor.create_token_here:
-new_post.msg: '%tokenName% a crée un nouveau post. Lisez le <a href="%urlToken%">ici.</a>'
+new_post.msg: ''
 mail.new_post.msg: 'créer un nouveau post'
 mail.new_post.text_link: 'Lire cela ici!'
 deployed.msg: '%tokenName% a été déployé sur la chaîne de blocs! Visiter <a href="%urlToken%">page du jeton</a>.'
@@ -537,7 +537,7 @@ email.withdraw.confirm: 'Confirmez votre retrait!'
 email.withdraw.body: 'Vous pouvez confirmer votre retrait en cliquant sur le lien suivant:'
 email.verification_code: 'Votre code de vérification:'
 email.confirm_authentication: 'Confirmer l''authenfication'
-email.new_post: 'Nouveau Post'
+email.new_post:
 email.new_investor: 'Nouveau Investisseur'
 email.new_login_from_new_ip: 'Nouvelle tentative de connexion d''une nouvelle adresse IP ou appareil'
 email.what_now: 'Et maintenant?'
