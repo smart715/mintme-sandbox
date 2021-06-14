@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
 use App\Events\OrderEvent;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
@@ -52,6 +53,8 @@ class Trader implements TraderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    private BalanceHandlerInterface $balanceHandler;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
@@ -61,7 +64,8 @@ class Trader implements TraderInterface
         NormalizerInterface $normalizer,
         LoggerInterface $logger,
         float $referralFee,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
@@ -72,6 +76,7 @@ class Trader implements TraderInterface
         $this->logger = $logger;
         $this->referralFee = $referralFee;
         $this->eventDispatcher = $eventDispatcher;
+        $this->balanceHandler = $balanceHandler;
     }
 
     public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
@@ -95,10 +100,16 @@ class Trader implements TraderInterface
             $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
             if ($updateTokenOrCrypto) {
+                $userMaker = $order->getMaker();
+
                 if ($quote instanceof Token) {
-                    $this->updateUserTokenReferencer($order->getMaker(), $quote);
+                    $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
+
+                    if ($referencer = $userMaker->getReferencer()) {
+                        $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
+                    }
                 } elseif ($quote instanceof Crypto) {
-                    $this->updateUserCrypto($order->getMaker(), $quote);
+                    $this->updateUserCrypto($userMaker, $quote);
                 }
             }
         }
@@ -118,17 +129,25 @@ class Trader implements TraderInterface
 
     public function cancelOrder(Order $order): TradeResult
     {
+        $userMaker = $order->getMaker();
+
         $result = $this->fetcher->cancelOrder(
-            $order->getMaker()->getId(),
+            $userMaker->getId(),
             $this->marketNameConverter->convert($order->getMarket()),
             $order->getId() ?? 0
         );
 
         if (TradeResult::FAILED === $result->getResult()) {
             $this->logger->error(
-                "Failed to cancel order '{$order->getId()}' for user {$order->getMaker()->getEmail()}. 
+                "Failed to cancel order '{$order->getId()}' for user {$userMaker->getEmail()}. 
                 Reason: {$result->getMessage()}"
             );
+        }
+
+        $quote = $order->getMarket()->getQuote();
+
+        if ($quote instanceof Token) {
+            $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
         }
 
         return $result;
@@ -176,27 +195,6 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $records);
-    }
-
-    private function updateUserTokenReferencer(User $user, Token $token): void
-    {
-        $referencer = $user->getReferencer();
-
-        if (!in_array($user, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
-            $this->entityManager->persist($userToken);
-            $user->addToken($userToken);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-        }
-
-        if ($referencer && !in_array($referencer, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($referencer);
-            $this->entityManager->persist($userToken);
-            $referencer->addToken($userToken);
-            $this->entityManager->persist($referencer);
-            $this->entityManager->flush();
-        }
     }
 
     private function updateUserCrypto(User $user, Crypto $crypto): void
