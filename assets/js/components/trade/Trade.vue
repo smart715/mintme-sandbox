@@ -312,7 +312,9 @@ export default {
                         if (isSell) {
                             this.totalSellOrders = this.totalSellOrders.add(data.amount);
                         } else {
-                            this.totalBuyOrders = this.totalBuyOrders.add(data.price);
+                            this.totalBuyOrders = this.totalBuyOrders.add(
+                                new Decimal(data.price).mul(data.amount)
+                            );
                         }
 
                         this.saveOrders(orders, isSell);
@@ -341,7 +343,9 @@ export default {
                     if (isSell) {
                       this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
                     } else {
-                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(data.price);
+                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(
+                          new Decimal(data.price).mul(data.amount)
+                      );
                     }
 
                     this.ordersUpdated = true;
@@ -357,7 +361,9 @@ export default {
                     if (isSell) {
                       this.totalSellOrders = this.totalSellOrders.sub(order.amount);
                     } else {
-                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price);
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(data.price).mul(data.amount)
+                      );
                     }
 
                     break;
