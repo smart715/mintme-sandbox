@@ -152,7 +152,7 @@ export default {
     },
     computed: {
         isIssueBranch: function() {
-            return ('-' === this.infoData.panelBranch || !this.infoData.panelBranch.startsWith('v'));
+            return ('-' === this.infoData.panelBranch || !this.infoData.panelBranch.match('/^[V-v]{1}[0-9]{1}+$/'));
         },
         getButtonName: function() {
             if (this.managingBackendService) {
