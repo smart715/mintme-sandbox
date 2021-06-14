@@ -194,8 +194,7 @@ export const currencyModes = {
 };
 
 export const ethCryptoTokens = [
-    ethSymbol,
-    bnbSymbol,
+    usdcSymbol,
 ];
 
 export const currencies = {
