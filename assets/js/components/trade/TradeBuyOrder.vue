@@ -49,8 +49,8 @@
                                 :show-converter="currencyMode === currencyModes.usd.value"
                             />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
-                                {{ $t('trade.buy_order.your.header') }}
-                                <span>
+                                 {{ $t('trade.buy_order.your.header') }}
+                                 <span>
                                     <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
                                         <span class="text-white">
                                             <span class="text-nowrap">
@@ -67,13 +67,12 @@
                                         </template>
                                     </guide>
                                 </span>
-                                <p class="text-nowrap">
-                                    <a
-                                        v-if="showDepositMoreLink"
-                                        :href="depositMoreLink"
-                                        tabindex="1"
-                                    >{{ $t('trade.buy_order.deposit_more') }}</a>
-                                </p>
+                                 <a
+                                     v-if="showDepositMoreLink"
+                                     :href="depositMoreLink"
+                                     class="d-block text-nowrap"
+                                     tabindex="1"
+                                 >{{ $t('trade.buy_order.deposit_more') }}</a>
                             </div>
                         </div>
                     </div>
