@@ -8,7 +8,6 @@ use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\QuickTradeException;
-use App\Exchange\CheckTradeResult;
 use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\ExchangerInterface;
@@ -114,13 +113,17 @@ class QuickTradeController extends AbstractFOSRestController
             }
 
             if (self::SELL === $mode) {
-                $checkSell = $this->checkSell($market, $amount);
+                $checkResult = $this->marketHandler->getExpectedSellResult(
+                    $market,
+                    $amount,
+                    $this->config->getSellFee()
+                );
 
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
 
                 return $this->view([
-                    'amountToReceive' => $checkSell->getExpectedAmount(),
-                    'worth' => $checkSell->getWorth() ?? '0',
+                    'amountToReceive' => $checkResult->getExpectedAmount(),
+                    'worth' => $checkResult->getWorth() ?? '0',
                     'ordersSummary' => $buyOrdersSummary,
                 ]);
             }
@@ -261,68 +264,6 @@ class QuickTradeController extends AbstractFOSRestController
         return $user;
     }
 
-    private function checkSell(Market $market, string $amount): CheckTradeResult
-    {
-        $quote = $market->getQuote();
-
-        $baseSymbol = $market->getBase()->getSymbol();
-
-        $quoteSymbol = $quote instanceof Token ?
-            Symbols::TOK :
-            $quote->getSymbol();
-
-        $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
-
-        $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
-
-        $fee = $this->config->getSellFee();
-
-        $offset = 0;
-        $limit = 100;
-
-        do {
-            $pendingBuyOrders = $this->marketHandler->getPendingBuyOrders($market, $offset, $limit);
-            $shouldContinue = count($pendingBuyOrders) >= $limit;
-            $offset += $limit;
-
-            foreach ($pendingBuyOrders as $bid) {
-                if ($quoteLeft->isZero()) {
-                    $shouldContinue = false;
-
-                    break;
-                }
-
-                $orderAmountWithFee = $bid->getAmount()->subtract(
-                    $bid->getAmount()->multiply($fee)
-                );
-
-                if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
-                    $baseWorth = $this->moneyWrapper->convertByRatio(
-                        $orderAmountWithFee,
-                        $baseSymbol,
-                        $this->moneyWrapper->format($bid->getPrice())
-                    );
-
-                    $amountToReceive = $amountToReceive->add($baseWorth);
-                    $quoteLeft = $quoteLeft->subtract($bid->getAmount());
-                } else {
-                    $quoteLeftWithFee = $quoteLeft->subtract($quoteLeft->multiply($fee));
-
-                    $baseWorth = $this->moneyWrapper->convertByRatio(
-                        $quoteLeftWithFee,
-                        $baseSymbol,
-                        $this->moneyWrapper->format($bid->getPrice())
-                    );
-
-                    $amountToReceive = $amountToReceive->add($baseWorth);
-                    $quoteLeft = $quoteLeft->subtract($quoteLeft);
-                }
-            }
-        } while ($shouldContinue);
-
-        return new CheckTradeResult($amountToReceive);
-    }
-
     private function makeSell(User $user, Market $market, string $amount, string $expectedAmount): TradeResult
     {
         $quote = $market->getQuote();
@@ -335,7 +276,11 @@ class QuickTradeController extends AbstractFOSRestController
 
         $expectedAmount = $this->moneyWrapper->parse($expectedAmount, $baseSymbol);
 
-        $checkResult = $this->checkSell($market, $amount);
+        $checkResult = $this->marketHandler->getExpectedSellResult(
+            $market,
+            $amount,
+            $this->config->getSellFee()
+        );
 
         $amount = $this->moneyWrapper->parse($amount, $quoteSymbol);
 

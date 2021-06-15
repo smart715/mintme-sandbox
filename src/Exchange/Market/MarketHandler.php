@@ -7,6 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\CheckTradeResult;
 use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
@@ -202,6 +203,67 @@ class MarketHandler implements MarketHandlerInterface
 
         return $orders;
     }
+
+    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult
+    {
+        $quote = $market->getQuote();
+
+        $baseSymbol = $market->getBase()->getSymbol();
+
+        $quoteSymbol = $quote instanceof Token ?
+            Symbols::TOK :
+            $quote->getSymbol();
+
+        $amountToReceive = $this->moneyWrapper->parse('0', $baseSymbol);
+
+        $quoteLeft = $this->moneyWrapper->parse($amount, $quoteSymbol);
+
+        $offset = 0;
+        $limit = 100;
+
+        do {
+            $pendingBuyOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $shouldContinue = count($pendingBuyOrders) >= $limit;
+            $offset += $limit;
+
+            foreach ($pendingBuyOrders as $bid) {
+                if ($quoteLeft->isZero()) {
+                    $shouldContinue = false;
+
+                    break;
+                }
+
+                $orderAmountWithFee = $bid->getAmount()->subtract(
+                    $bid->getAmount()->multiply($fee)
+                );
+
+                if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
+                    $baseWorth = $this->moneyWrapper->convertByRatio(
+                        $orderAmountWithFee,
+                        $baseSymbol,
+                        $this->moneyWrapper->format($bid->getPrice())
+                    );
+
+                    $amountToReceive = $amountToReceive->add($baseWorth);
+                    $quoteLeft = $quoteLeft->subtract($bid->getAmount());
+                } else {
+                    $quoteLeftWithFee = $quoteLeft->subtract($quoteLeft->multiply($fee));
+
+                    $baseWorth = $this->moneyWrapper->convertByRatio(
+                        $quoteLeftWithFee,
+                        $baseSymbol,
+                        $this->moneyWrapper->format($bid->getPrice())
+                    );
+
+                    $amountToReceive = $amountToReceive->add($baseWorth);
+                    $quoteLeft = $quoteLeft->subtract($quoteLeft);
+                }
+            }
+        } while ($shouldContinue);
+
+        return new CheckTradeResult($amountToReceive);
+    }
+
 
     /** {@inheritdoc} */
     public function getKLineStatDaily(Market $market): array

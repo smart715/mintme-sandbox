@@ -4,6 +4,7 @@ namespace App\Exchange\Market;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\CheckTradeResult;
 use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\BuyOrdersSummaryResult;
@@ -89,6 +90,8 @@ interface MarketHandlerInterface
         int $limit = 50,
         bool $reverseBaseQuote = false
     ): array;
+
+    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult;
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
 
