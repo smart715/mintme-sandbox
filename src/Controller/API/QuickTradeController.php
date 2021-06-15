@@ -10,7 +10,6 @@ use App\Exception\ApiBadRequestException;
 use App\Exception\QuickTradeException;
 use App\Exchange\CheckTradeResult;
 use App\Exchange\Config\QuickTradeConfig;
-use App\Exchange\Donation\DonationHandler;
 use App\Exchange\Donation\DonationHandlerInterface;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
@@ -25,7 +24,6 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
-use Money\Exchange\FixedExchange;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -113,7 +111,9 @@ class QuickTradeController extends AbstractFOSRestController
                     'worth' => $tokensWorth,
                     'ordersSummary' => $sellOrdersSummary,
                 ]);
-            } elseif (self::SELL === $mode) {
+            }
+
+            if (self::SELL === $mode) {
                 $checkSell = $this->checkSell($market, $amount);
 
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
@@ -123,9 +123,9 @@ class QuickTradeController extends AbstractFOSRestController
                     'worth' => $checkSell->getWorth() ?? '0',
                     'ordersSummary' => $buyOrdersSummary,
                 ]);
-            } else {
-                throw QuickTradeException::invalidMode($mode);
             }
+
+            throw QuickTradeException::invalidMode($mode);
         } catch (\Throwable $ex) {
             if ($response = $this->handleException($ex)) {
                 return $response;
@@ -187,24 +187,28 @@ class QuickTradeController extends AbstractFOSRestController
         }
 
         try {
+            $amount = (string)$request->get('amount');
+            $expectedAmount = (string)$request->get('expected_count_to_receive');
+
             if (self::BUY === $mode) {
                 $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
 
                 $donation = $this->donationHandler->makeDonation(
                     $market,
                     $request->get('currency'),
-                    (string)$request->get('amount'),
-                    (string)$request->get('expected_count_to_receive'),
+                    $amount,
+                    $expectedAmount,
                     $user,
                     $sellOrdersSummary
                 );
 
                 /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
-            } elseif (self::SELL === $mode) {
-                $amount = (string)$request->get('amount');
-                $expectedAmount = (string)$request->get('expected_count_to_receive');
 
+                return $this->view(null, Response::HTTP_OK);
+            }
+
+            if (self::SELL === $mode) {
                 $tradeResult = $this->makeSell(
                     $user,
                     $market,
@@ -215,11 +219,11 @@ class QuickTradeController extends AbstractFOSRestController
                 if (TradeResult::SUCCESS !== $tradeResult->getResult()) {
                     throw new ApiBadRequestException($tradeResult->getMessage());
                 }
-            } else {
-                throw QuickTradeException::invalidMode($mode);
+
+                return $this->view(null, Response::HTTP_OK);
             }
 
-            return $this->view(null, Response::HTTP_OK);
+            throw QuickTradeException::invalidMode($mode);
         } catch (\Throwable $ex) {
             $lock->release();
 

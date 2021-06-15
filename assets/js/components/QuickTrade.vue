@@ -5,20 +5,20 @@
                     <ul class="nav quick-trade-nav">
                         <li class="nav-item">
                             <a
-                            class="nav-link"
-                            :class="{'active': isBuyMode}"
-                            href="#"
-                            @click.prevent="setTradeMode(BUY_MODE)"
+                                class="nav-link"
+                                :class="{'active': isBuyMode}"
+                                href="#"
+                                @click.prevent="setTradeMode(BUY_MODE)"
                             >
                                 {{ $t('buy') }}
                             </a>
                         </li>
                         <li class="nav-item">
                             <a
-                            class="nav-link"
-                            :class="{'active': isSellMode}"
-                            href="#"
-                            @click.prevent="setTradeMode(SELL_MODE)"
+                                class="nav-link"
+                                :class="{'active': isSellMode}"
+                                href="#"
+                                @click.prevent="setTradeMode(SELL_MODE)"
                             >
                                 {{ $t('sell') }}
                             </a>
