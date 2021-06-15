@@ -677,6 +677,7 @@ quick_trade.successfully_made:
 quick_trade.availability_changed:
 quick_trade.button_all:
 quick_trade.order.empty:
+quick_trade.invalid_mode:
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
