@@ -490,6 +490,7 @@ mail.new_investor.create_token_here:
 new_post.msg: ''
 mail.new_post.msg: 'créer un nouveau post'
 mail.new_post.text_link: 'Lire cela ici!'
+mail.grouped_posts.msg:
 deployed.msg: '%tokenName% a été déployé sur la chaîne de blocs! Visiter <a href="%urlToken%">page du jeton</a>.'
 mail.deployed.msg: '<strong>%tokenName%</strong> a été déployé sur la chaîne de blocs'
 mail.deployed.text_link: 'Visiter la page du jeton'
@@ -549,6 +550,7 @@ email.confirm_withdraw: 'Confirmer le retrait'
 email.completed: Terminé
 email.password_changed: 'Votre mot de passe a été modifié'
 email.password_reset: 'Votre mot de passe a été réinitialiser'
+email.grouped_posts:
 log_in: Connexion
 sign_up: 'S''inscrire'
 log_out: Déconnexion

@@ -490,6 +490,7 @@ mail.new_investor.create_token_here:
 new_post.msg: ''
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
+mail.grouped_posts.msg:
 deployed.msg: '¡%tokenName% ha sido desplegado a la blockchain! Visítelo <a href="%urlToken%">aquí</a>.'
 mail.deployed.msg: '<strong>%tokenName%</strong> ha sido desplegado en la blockchain                                                                                                                                                                                             '
 mail.deployed.text_link: 'Visite la página del token'
@@ -547,6 +548,7 @@ email.confirm_withdraw: 'Confirmación de retiro'
 email.completed: Completado
 email.password_changed: 'Su contraseña ha sido cambiada'
 email.password_reset: 'Su contraseña ha sido restablecida'
+email.grouped_posts:
 log_in: 'Iniciar Sesión'
 sign_up: Registrarse
 log_out: 'Cerrar Sesión'

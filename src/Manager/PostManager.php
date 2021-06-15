@@ -59,4 +59,9 @@ class PostManager implements PostManagerInterface
 
         return $this->repository->findRecentPostsByTokens($tokens, $page);
     }
+
+    public function getCreatedPostsToday(): array
+    {
+        return $this->repository->getCreatedPostsToday();
+    }
 }

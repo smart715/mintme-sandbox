@@ -141,7 +141,7 @@ export default {
             let postToDelete = [];
 
             this.userNotifications.forEach((item) => {
-                if ('new_post' === item.type && !item.viewed) {
+                if (notificationTypes.newPost === item.type && !item.viewed) {
                     let jsonData = JSON.parse(item.jsonData);
 
                     const index = postsNotifications.findIndex(function(post) {

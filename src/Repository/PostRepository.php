@@ -21,4 +21,15 @@ class PostRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getCreatedPostsToday(): array
+    {
+        return $this->createQueryBuilder('post')
+            ->andWhere('post.createdAt BETWEEN :from AND :to')
+            ->setParameter('from', date('Y-m-d', strtotime('-2 days')).' 00:00:00')
+            ->setParameter('to', date('Y-m-d', strtotime('-2 days')).' 23:59:59')
+            ->orderBy('post.token', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
