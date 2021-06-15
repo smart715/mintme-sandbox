@@ -43,5 +43,10 @@
     "new_post.msg",
     "deployed.msg",
     "token_marketing_tips.msg",
-    "phone_confirmation.msg"
+    "phone_confirmation.msg",
+    "modal.add_phone_alert_airdrop.message",
+    "modal.add_phone_alert_make_orders.message",
+    "modal.add_phone_alert_token_create.message",
+    "modal.add_phone_alert_deposit_withdrawal.message",
+    "modal.add_phone_alert_donation.message"
 ]
