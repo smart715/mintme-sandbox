@@ -298,11 +298,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 new FilterUserResponseEvent(
                     $user,
                     $request,
-                    $this->renderSettings(
-                        $passwordForm,
-                        $apiKey,
-                        $user->GetApiClients()
-                    )
+                    new Response(Response::HTTP_OK)
                 ),
                 FOSUserEvents::CHANGE_PASSWORD_COMPLETED
             );
