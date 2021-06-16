@@ -619,6 +619,7 @@ info_bar.token.title: 'Token:'
 info_bar.mintme.title: 'MINTME:'
 info_bar.eth.title: 'ETH:'
 info_bar.btc.title: 'BTC:'
+info_bar.bnb.title:
 info_bar.usdc.title: 'USDC:'
 info_bar.code.title: 'Code:'
 info_bar.toggle.title: Toggle
