@@ -671,7 +671,9 @@ class MarketHandler implements MarketHandlerInterface
 
         /** @var Money $buyOrdersSum */
         $buyOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
-            return $order->getPrice()->add($sum);
+            return $sum->add(
+                $order->getPrice()->multiply($this->moneyWrapper->format($order->getAmount()))
+            );
         }, $zeroDepthBase);
 
         $buyOrdersSum = $this->moneyWrapper->format($buyOrdersSum);
