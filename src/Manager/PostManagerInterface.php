@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\Post;
+use App\Entity\Token\Token;
 use App\Entity\User;
 
 interface PostManagerInterface
@@ -16,4 +17,6 @@ interface PostManagerInterface
      * @return Post[]
      */
     public function getRecentPost(User $user, int $page): array;
+    public function getCreatedPostsToday(): array;
+    public function getCreatedPostsTodayByToken(Token $token): array;
 }

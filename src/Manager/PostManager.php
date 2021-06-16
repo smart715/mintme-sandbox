@@ -10,6 +10,7 @@ use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
+use App\Entity\Token\Token;
 
 class PostManager implements PostManagerInterface
 {
@@ -63,5 +64,10 @@ class PostManager implements PostManagerInterface
     public function getCreatedPostsToday(): array
     {
         return $this->repository->getCreatedPostsToday();
+    }
+
+    public function getCreatedPostsTodayByToken(Token $token): array
+    {
+        return $this->repository->getCreatedPostsTodayByToken($token);
     }
 }
