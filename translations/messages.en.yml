@@ -1478,7 +1478,7 @@ mail.airdrop_claimed.message_2: 'Use an airdrop referral link and earn more for 
 mail.airdrop_claimed.message_3: 'You can also earn by sharing the <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">posts</a> with a set reward.'
 modal.add_phone_alert: '%messageType% you need to add a phone number in your <a href="%profileUrl%">profile</a>.'
 modal.add_phone_alert_airdrop.message: 'To collect the reward'
-modal.add_phone_alert_make_orders.message: 'To make orders'
+modal.add_phone_alert_action.message: 'To perform that action'
 modal.add_phone_alert_token_create.message: 'To create a token'
 modal.add_phone_alert_deposit_withdrawal.message: 'To make deposit or withdrawals'
 modal.add_phone_alert_donation.message: 'To make donations'
