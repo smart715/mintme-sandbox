@@ -186,6 +186,7 @@ parameters:
     liip_data_root: '%kernel.project_dir%/public'
     ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
     ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+    auth_make_disable_sell: false
     auth_make_disable_trading: false
     auth_make_disable_token_creation: false
     auth_make_disable_withdrawals_and_deposit: false
