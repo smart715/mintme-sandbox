@@ -1,0 +1,31 @@
+{% extends 'mail/layout.html.twig' %}
+{% block content %}
+    <div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
+            <tr>
+                <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+                    <img alt="Post" src="{{ absolute_url(asset('build/images/Post.png')) }}" width="120" style="width:120px;height:auto;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
+                    <p style="Margin:0 0 18px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;line-height:30px;color:#2199e8;">{{ tokenName }} {% trans %} mail.grouped_posts.msg {% endtrans %}
+                    </p>
+
+                    {% for post in posts %}
+                        <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{{ post.title }}</p>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+        {% set post_tab = absolute_url(path('token_show', {'name': tokenName, 'tab': 'posts' })) %}
+        {% set vars = {'href': post_tab, 'text': 'mail.new_post.text_link' } %}
+        {% include 'mail/mail_block_button.html.twig' with vars %}
+        <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+            <tr>
+                <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:10px;height:10px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

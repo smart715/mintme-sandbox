@@ -324,10 +324,10 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendGroupedPosts(string $user, String $tokenName, array $posts): void
+    public function sendGroupedPosts(User $user, String $tokenName, array $posts): void
     {
         $body = $this->twigEngine->render("mail/grouped_posts.html.twig", [
-            'username' => $user,
+            'username' => $user->getUsername(),
             'tokenName' => $tokenName,
             'posts' => $posts,
         ]);
@@ -342,7 +342,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             '%tokenName%' => $tokenName]);
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
-            ->setTo($user)
+            ->setTo($user->getEmail())
             ->setBody($body, 'text/html')
             ->addPart($textBody, 'text/plain');
 

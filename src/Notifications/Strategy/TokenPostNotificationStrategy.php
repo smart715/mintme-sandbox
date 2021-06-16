@@ -45,6 +45,8 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
             $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
+        // I should check if there is a created posts
+        
         if ($this->userNotificationManager->isNotificationAvailable(
             $user,
             $this->type,
