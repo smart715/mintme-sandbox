@@ -259,7 +259,9 @@ class OrdersController extends DevApiController
 
         $this->denyAccessUnlessGranted('not-blocked', $quote);
 
-        if (!$this->isGranted('make-order', $market)) {
+        if (!$this->isGranted('make-order', $market)
+            ||(Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
             return $this->view([
                 'message' => $this->translator->trans('api.add_phone_number_message'),
             ], Response::HTTP_OK);

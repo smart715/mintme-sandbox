@@ -27,7 +27,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -44,7 +44,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <add-phone-alert-modal
@@ -150,7 +150,6 @@ export default {
             buyPage: 2,
             buyDepth: null,
             ordersUpdated: false,
-            addPhoneModalMessageType: 'make_orders',
             addPhoneModalProfileNickName: this.profileNickname,
         };
     },
@@ -377,6 +376,9 @@ export default {
             } else {
                 this.buyOrders = orders;
             }
+        },
+        preventAction() {
+            this.addPhoneModalVisible = true;
         },
     },
 };

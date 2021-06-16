@@ -2,7 +2,7 @@ export default {
     data() {
         return {
             addPhoneModalVisible: false,
-            addPhoneModalMessageType: '',
+            addPhoneModalMessageType: 'action',
             addPhoneModalProfileNickName: '',
         };
     },
@@ -13,8 +13,8 @@ export default {
                     nickname: this.addPhoneModalProfileNickName,
                     edit: 1,
                 }),
-                messageType: this.$t('modal.add_phone_alert_' + this.addPhoneModalMessageType + '.message'),
+                messageType: this.$t(`modal.add_phone_alert_${this.addPhoneModalMessageType}.message`),
             });
         },
     },
-    };
+};
