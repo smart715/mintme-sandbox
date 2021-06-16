@@ -1432,7 +1432,7 @@ ongoing_airdrop.claim.login_to_complete: 'To complete claiming airdrop please si
 ongoing_airdrop.claim: Claim
 modal.add_phone_alert: '%messageType% you need to add a phone number in your <a href="%profileUrl%">profile</a>.'
 modal.add_phone_alert_airdrop.message: 'To collect the reward'
-modal.add_phone_alert_make_orders.message: 'To make orders'
+modal.add_phone_alert_action.message:
 modal.add_phone_alert_token_create.message: 'To create a token'
 modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawals'
 modal.add_phone_alert_donation.message: 'To make donations'

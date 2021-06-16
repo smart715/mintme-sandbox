@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Market;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -13,8 +15,10 @@ class TradingVoter extends Voter
 {
     private ContainerInterface $container;
     private const MAKE_ORDER = 'make-order';
+    private const SELL_ORDER = 'sell-order';
     private const ACTIONS = [
         self::MAKE_ORDER,
+        self::SELL_ORDER,
     ];
     private AccessDecisionManagerInterface $decisionManager;
 
@@ -47,12 +51,32 @@ class TradingVoter extends Voter
             return $this->canMakeOrder($token);
         }
 
+        if (self::SELL_ORDER === $attribute) {
+            return $this->canSellOrder($token, $subject);
+        }
+
         return false;
     }
 
     private function canMakeOrder(TokenInterface $token): bool
     {
         if ($this->container->getParameter('auth_make_disable_trading')) {
+            return $this->decisionManager->decide($token, [User::ROLE_AUTHENTICATED]);
+        }
+
+        return true;
+    }
+
+    private function canSellOrder(TokenInterface $token, Market $market): bool
+    {
+        /** @var Token|Crypto $tradable */
+        $tradable = $market->getQuote();
+
+        /** @var User $user */
+        $user = $token->getUser();
+
+        if (($tradable instanceof Crypto || $tradable->getOwner()->getId() !== $user->getId())
+            && $this->container->getParameter('auth_make_disable_sell')) {
             return $this->decisionManager->decide($token, [User::ROLE_AUTHENTICATED]);
         }
 
