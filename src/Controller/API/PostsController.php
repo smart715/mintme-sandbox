@@ -387,7 +387,8 @@ class PostsController extends AbstractFOSRestController
                 $this->mailer,
                 $token,
                 $extraData,
-                $notificationType
+                $notificationType,
+                $this->postManager
             );
             $notificationContext = new NotificationContext($strategy);
 

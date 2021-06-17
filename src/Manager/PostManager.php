@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\Post;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\PostRepository;
@@ -10,7 +11,6 @@ use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use App\Entity\Token\Token;
 
 class PostManager implements PostManagerInterface
 {

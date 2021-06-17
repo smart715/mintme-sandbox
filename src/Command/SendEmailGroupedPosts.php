@@ -6,8 +6,8 @@ use App\Entity\Post;
 use App\Entity\Token\Token;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
+use App\Manager\TokenManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,15 +16,15 @@ class SendEmailGroupedPosts extends Command
 {
     private MailerInterface $mail;
     private PostManagerInterface $postManager;
-    private EntityRepository $tokenRepository;
+    private TokenManagerInterface $tokenManager;
 
     public function __construct(
         MailerInterface $mail,
         PostManagerInterface $postManager,
-        EntityManagerInterface $entityManager
+        TokenManagerInterface $tokenManager
     ) {
         $this->postManager = $postManager;
-        $this->tokenRepository = $entityManager->getRepository(Token::class);
+        $this->tokenManager = $tokenManager;
         $this->mail = $mail;
         parent::__construct();
     }
@@ -38,27 +38,30 @@ class SendEmailGroupedPosts extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('Email has been sent');
-
         $posts = $this->postManager->getCreatedPostsToday();
 
         $data = [];
 
         /** @var Post $post */
         foreach ($posts as $post) {
-            $data[$post->getToken()->getName()]['posts'][] = $post;
+            $data[$post->getToken()->getName()][] = $post;
         }
 
-        foreach ($data as $tokenName => $posts) {
-            $token = $this->tokenRepository->findByName($tokenName);
+        foreach ($data as $tokenName => $groupedPosts) {
+            $token = $this->tokenManager->findByName($tokenName);
             $users = $token->getUsers();
 
             foreach ($users as $user) {
                 if ($user->getEmail() !== $token->getOwner()->getEmail()) {
-                    $this->mail->sendGroupedPosts($user, $tokenName, $posts);
+                    if (2 < count($groupedPosts)) {
+                        array_pop($groupedPosts);
+                        $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
+                    }
                 }
             }
         }
+
+        $output->writeln('Emails has been sent');
 
         return 0;
     }

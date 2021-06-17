@@ -5,9 +5,9 @@ namespace App\Notifications\Strategy;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Mailer\MailerInterface;
+use App\Manager\PostManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
-use App\Manager\PostManagerInterface;
 
 class TokenPostNotificationStrategy implements NotificationStrategyInterface
 {
