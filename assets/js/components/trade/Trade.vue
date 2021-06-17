@@ -335,16 +335,18 @@ export default {
                     }
 
                     let index = orders.indexOf(order);
+                    let deltaAmount = (new Decimal(order.amount)).sub(data.left);
+
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
 
                     if (isSell) {
-                      this.totalSellOrders = this.totalSellOrders.sub(data.amount).add(order.amount);
+                      this.totalSellOrders = this.totalSellOrders.sub(deltaAmount);
                     } else {
-                      this.totalBuyOrders = this.totalBuyOrders.sub(order.price).add(
-                          new Decimal(data.price).mul(data.amount)
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(data.price).mul(deltaAmount)
                       );
                     }
 
@@ -362,7 +364,7 @@ export default {
                       this.totalSellOrders = this.totalSellOrders.sub(order.amount);
                     } else {
                       this.totalBuyOrders = this.totalBuyOrders.sub(
-                          new Decimal(data.price).mul(data.amount)
+                          new Decimal(order.price).mul(order.amount)
                       );
                     }
 
