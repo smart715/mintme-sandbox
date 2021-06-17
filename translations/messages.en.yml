@@ -1484,3 +1484,6 @@ modal.add_phone_alert_deposit_withdrawal.message: 'To make deposit or withdrawal
 modal.add_phone_alert_donation.message: 'To make donations'
 api.add_phone_number_message: 'you need to add phone number in your profile'
 browser.storage.error: 'Error when trying to access storage, please avoid using incognito windows'
+deposit_modal.accept_bep20: 'We only accept Binance coins from Binance smart chain (BEP20). We do not accept BEP2. If you send via BEP2, you will not be credited!'
+withdraw_modal.bnb_address_label: 'BEP20 address:'
+withdraw_modal.bep20_message: 'Withdrawals are only possible to Binance smart chain (BEP20). We do not make withdrawals to BEP2. You need to provide proper wallet address for BEP20.'
