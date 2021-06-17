@@ -2,13 +2,9 @@
 
 {% block title %}Links | mintMe{% endblock %}
 
-{% block pagestyles %}
-    <style>
-        #links a, #links a:hover {
-            color: #fff;
-            display:block;
-        }
-    </style>
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/links') }}
 {% endblock %}
 
 {% block bodyclass %}document{% endblock %}

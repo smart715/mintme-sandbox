@@ -125,8 +125,10 @@ class OrdersController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
 
-        if (!$this->isGranted('make-order', $market)) {
-             return $this->view(['error' => true, 'type' => 'make_orders'], Response::HTTP_OK);
+        if (!$this->isGranted('make-order', $market)
+            || (Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
+             return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
         }
 
         /** @var User $currentUser */

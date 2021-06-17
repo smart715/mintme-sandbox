@@ -1430,7 +1430,7 @@ mail.airdrop_claimed.message_2: 'Utilice un enlace de referencia del airdrop y g
 mail.airdrop_claimed.message_3: 'También puede ganar compartiendo las <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family: Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">publicaciones</a> con una recompensa establecida.'
 modal.add_phone_alert: '%messageType% es necesario que agregue un número de teléfono en su <a href="%profileUrl%">perfil</a>.'
 modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
-modal.add_phone_alert_make_orders.message: 'Para emitir órdenes'
+modal.add_phone_alert_action.message:
 modal.add_phone_alert_token_create.message: 'Para crear un token'
 modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
 modal.add_phone_alert_quick_trade.message:
