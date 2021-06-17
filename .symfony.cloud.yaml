@@ -1,0 +1,3 @@
+cron:
+    spec: 0 0 * * *
+    cmd: make send_grouped_posts
