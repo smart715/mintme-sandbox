@@ -51,14 +51,14 @@
             </button>
         </div>
         <div class="order-2 collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
-            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 ml-xl-4">
+            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-auto">
                 <token-searcher
                     class="flex-nowrap justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
                     search-url="{{ path('token_search') }}"
                 ></token-searcher>
                 <div class="v-cloak--flex justify-content-center align-items-center ml-1">
                     <input
-                        class="search-input form-control no-bg-img ml-2"
+                        class="search-input form-control no-bg-img"
                         placeholder="Search for the token"
                         type="text"
                     >
