@@ -309,10 +309,10 @@ export default {
                         orders.push(res.data);
 
                         if (isSell) {
-                            this.totalSellOrders = this.totalSellOrders.add(data.amount);
+                            this.totalSellOrders = this.totalSellOrders.add(data.left);
                         } else {
                             this.totalBuyOrders = this.totalBuyOrders.add(
-                                new Decimal(data.price).mul(data.amount)
+                                new Decimal(data.price).mul(data.left)
                             );
                         }
 
