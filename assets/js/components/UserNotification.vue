@@ -138,16 +138,14 @@ export default {
         },
         groupPosts: function() {
             let postsNotifications = [];
-            let postToDelete = [];
+            let postsToDelete = [];
 
             this.userNotifications.forEach((item) => {
                 if (notificationTypes.newPost === item.type && !item.viewed) {
                     let jsonData = JSON.parse(item.jsonData);
 
-                    const index = postsNotifications.findIndex(function(post) {
-                        let jsonPost = JSON.parse(post.jsonData);
-
-                        return jsonPost.tokenName === jsonData.tokenName;
+                    const index = postsNotifications.findIndex((post) => {
+                        return JSON.parse(post.jsonData).tokenName === jsonData.tokenName;
                     });
 
                     if (-1 === index) {
@@ -157,11 +155,11 @@ export default {
                         postsNotifications[index].number += 1;
                     }
 
-                    postToDelete.push(item);
+                  postsToDelete.push(item);
                 }
             });
 
-            this.userNotifications = this.userNotifications.filter((post) => !postToDelete.includes(post));
+            this.userNotifications = this.userNotifications.filter((post) => !postsToDelete.includes(post));
             postsNotifications.forEach((item) => {
                 this.userNotifications.unshift(item);
             });

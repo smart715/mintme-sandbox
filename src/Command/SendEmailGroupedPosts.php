@@ -3,11 +3,9 @@
 namespace App\Command;
 
 use App\Entity\Post;
-use App\Entity\Token\Token;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,10 +48,11 @@ class SendEmailGroupedPosts extends Command
         foreach ($data as $tokenName => $groupedPosts) {
             $token = $this->tokenManager->findByName($tokenName);
             $users = $token->getUsers();
+            $groupedPostsCount = count($groupedPosts);
 
             foreach ($users as $user) {
                 if ($user->getEmail() !== $token->getOwner()->getEmail()) {
-                    if (2 < count($groupedPosts)) {
+                    if (2 < $groupedPostsCount) {
                         array_pop($groupedPosts);
                         $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
                     }
