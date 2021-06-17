@@ -51,7 +51,7 @@
             </button>
         </div>
         <div class="order-2 collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
-            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 ml-2-xl">
+            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 ml-xl-4">
                 <token-searcher
                     class="flex-nowrap justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
                     search-url="{{ path('token_search') }}"
@@ -84,7 +84,7 @@
                     </svg>
                 </div>
             </form>
-            <ul class="navbar-nav ml-x">
+            <ul class="navbar-nav ml-auto">
                 {% if show_links %}
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">
                         <a href="{{ path('token_create') }}" class="nav-link">
