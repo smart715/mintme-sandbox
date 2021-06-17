@@ -30,7 +30,7 @@
                 v-if="'dev' !== environment"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
-                :disabled="null === backendServiceStatus || managingBackendService"
+                :disabled="null === backendServiceStatus || managingBackendService || (!isIssueBranch && backendServiceStatus)"
             >
                 <font-awesome-icon
                     v-if="managingBackendService"
@@ -154,6 +154,9 @@ export default {
         }
     },
     computed: {
+        isIssueBranch: function() {
+            return ('-' === this.infoData.panelBranch || !this.infoData.panelBranch.match('^v[0-9]+$'));
+        },
         getButtonName: function() {
             if (this.managingBackendService) {
                 return this.$t('info_bar.backend_service.in_progress');
