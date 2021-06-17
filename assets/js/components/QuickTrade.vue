@@ -492,8 +492,6 @@ export default {
             this.selectedCurrency = newCurrency;
         },
         checkAmountInput: function() {
-            this.firstInteraction = true;
-
             const digitLimits = digitsLimits[this.selectedCurrency] || currencies.WEB.digits;
 
             return this.checkInput(this.currencySubunit, digitLimits);
@@ -523,7 +521,10 @@ export default {
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 })
-                .then(() => this.isCheckingTrade = false);
+                .then(() => {
+                    this.firstInteraction = true;
+                    this.isCheckingTrade = false;
+                });
         },
         makeTrade: function() {
             this.isTradeInProgress = true;
@@ -567,9 +568,7 @@ export default {
         },
         all: function() {
             this.amount = toMoney(this.balance, this.currencySubunit);
-            if (!this.insufficientFunds) {
-                this.checkTrade();
-            }
+            this.checkTrade();
         },
         resetAmount: function() {
             this.amount = 0;
