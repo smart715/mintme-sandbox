@@ -585,6 +585,7 @@ hacker_menu.crypto.web: 'Add 100 MINTME'
 hacker_menu.crypto.eth: 'Add 0.05 ETH'
 hacker_menu.crypto.btc: 'Add 0.001 BTC'
 hacker_menu.crypto.usdc: 'Add 10 USDC'
+hacker_menu.crypto.bnb:
 hacker_menu.quick_registration: 'Quick registration'
 api_clients.id.title: 'ID:'
 api_clients.secret.title: 'Código:'
