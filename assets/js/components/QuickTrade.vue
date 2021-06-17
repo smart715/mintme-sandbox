@@ -293,7 +293,7 @@ export default {
             tokensAvailabilityChanged: false,
             showForms: false,
             firstInteraction: false,
-            addPhoneModalMessageType: 'quick_trade',
+            addPhoneModalMessageType: 'action',
             addPhoneModalProfileNickName: this.profileNickname,
             tradeMode: BUY_MODE,
         };
@@ -544,7 +544,7 @@ export default {
                         response.data.hasOwnProperty('error') &&
                         response.data.hasOwnProperty('type')
                     ) {
-                        this.errorType = response.data.type;
+                        this.addPhoneModalMessageType = response.data.type;
                         this.addPhoneModalVisible = true;
                         return;
                     }

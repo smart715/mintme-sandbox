@@ -179,10 +179,6 @@ class QuickTradeController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('trading');
         $user = $this->getCurrentUser();
 
-        if (!$this->isGranted('make-donation')) {
-            return $this->view(['error' => true, 'type' => 'donation'], Response::HTTP_OK);
-        }
-
         $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
 
         if (!$lock->acquire()) {
@@ -194,6 +190,10 @@ class QuickTradeController extends AbstractFOSRestController
             $expectedAmount = (string)$request->get('expected_count_to_receive');
 
             if (self::BUY === $mode) {
+                if (!$this->isGranted('make-donation')) {
+                    return $this->view(['error' => true, 'type' => 'donation'], Response::HTTP_OK);
+                }
+
                 $sellOrdersSummary = $this->marketHandler->getSellOrdersSummary($market)->getBaseAmount();
 
                 $donation = $this->donationHandler->makeDonation(
@@ -212,6 +212,10 @@ class QuickTradeController extends AbstractFOSRestController
             }
 
             if (self::SELL === $mode) {
+                if (!$this->isGranted('sell-order', $market)) {
+                    return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
+                }
+
                 $tradeResult = $this->makeSell(
                     $user,
                     $market,
