@@ -295,6 +295,8 @@ parameters:
     ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
 
     # list to allow / non-allow services for not fully authenticated users
+    # disable sell except for the token that created by trader
+    auth_make_disable_sell: true
     auth_make_disable_trading: false
     auth_make_disable_token_creation: false
     auth_make_disable_withdrawals_and_deposit: false
