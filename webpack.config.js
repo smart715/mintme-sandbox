@@ -34,6 +34,7 @@ Encore
     .addEntry('pages/login', './assets/js/pages/login.js')
     .addEntry('pages/user_home', './assets/js/pages/user_home.js')
     .addEntry('pages/voting', './assets/js/pages/voting.js')
+    .addEntry('pages/links', './assets/js/pages/links.js')
     .addEntry('pages/airdrop_embeded', './assets/js/pages/airdrop_embeded.js')
 
     .splitEntryChunks()
