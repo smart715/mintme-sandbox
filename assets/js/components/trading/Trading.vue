@@ -40,9 +40,6 @@
                                 <br/>
                                 <span>{{ $t('trading.table.volume_24h') }}</span>
                                 <span class="float-lg-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
-                                <br/>
-                                <span>{{ $t('trading.table.market_cap') }}</span>
-                                <span class="float-lg-right">{{ ( showUsd ? market.marketCapUSD : market.marketCap ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>
