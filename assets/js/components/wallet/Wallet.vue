@@ -536,6 +536,10 @@ export default {
                 return;
             }
 
+            if (isToken && !this.tokens[currency].deployed) {
+                return;
+            }
+
             this.depositAddress = (isToken
                 ? this.depositAddresses[tokSymbol + crypto]
                 : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
@@ -565,19 +569,26 @@ export default {
             this.showDepositModal = false;
         },
         openDepositMore: function() {
-            const asset = this.predefinedTokens[this.depositMore] || this.tokens[this.depositMore];
+            const isToken = !!this.tokens[this.depositMore];
 
-            if (asset &&
-                this.depositAddresses.hasOwnProperty(this.depositMore) &&
-                !this.isUserBlocked
-            ) {
+            const asset = isToken ?
+                this.tokens[this.depositMore] :
+                this.predefinedTokens[this.depositMore]
+            ;
+
+            if (asset && !this.isUserBlocked) {
                 if (window.history.replaceState) {
                     window.history.replaceState(
                         {}, '', location.href.split('?')[0]
                     );
                 }
 
-                this.openDeposit(this.depositMore, asset.subunit);
+                this.openDeposit(this.depositMore,
+                    asset.subunit,
+                    isToken,
+                    asset.blocked,
+                    asset.cryptoSymbol
+                );
             }
         },
         updateBalances: function(data) {
