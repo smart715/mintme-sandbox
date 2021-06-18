@@ -1426,7 +1426,7 @@ modal.add_phone_alert.airdrop: 'Afin de collecter des récompenses vous devez aj
 confirm_modal.continue: Continue
 ongoing_airdrop.claim.login_to_complete: 'To complete claiming airdrop please sign up or log in'
 ongoing_airdrop.claim: Claim
-modal.add_phone_alert: '%messageType% you need to add a phone number in your <a href="%profileUrl%">profile</a>.'
+modal.add_phone_alert: '%messageType% you need to add a phone number in your <a href="%profileUrl%" %extraAttributes%>profile</a>.'
 modal.add_phone_alert_airdrop.message: 'To collect the reward'
 modal.add_phone_alert_action.message:
 modal.add_phone_alert_token_create.message: 'To create a token'
@@ -1434,3 +1434,4 @@ modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawa
 modal.add_phone_alert_quick_trade.message: 'To buy or sell'
 api.add_phone_number_message: 'you need to add phone number in your profile'
 browser.storage.error:
+page.reload:
