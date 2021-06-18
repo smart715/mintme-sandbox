@@ -265,7 +265,7 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
+import {tokSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
