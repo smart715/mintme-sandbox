@@ -265,7 +265,15 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol, tokEthSymbol, ethCryptoTokens} from '../../utils/constants';
+import {
+    tokSymbol,
+    btcSymbol,
+    webSymbol,
+    ethSymbol,
+    tokEthSymbol,
+    ethCryptoTokens,
+    bnbSymbol,
+} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
@@ -565,7 +573,7 @@ export default {
         },
         openDepositMore: function() {
             if (
-                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
+                [webSymbol, btcSymbol, ethSymbol, bnbSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore) &&

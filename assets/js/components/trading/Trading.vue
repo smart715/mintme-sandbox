@@ -781,7 +781,7 @@ export default {
             let hiddenName = this.findHiddenName(token);
 
             return {
-                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol].includes(token)
+                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol, BNB.symbol].includes(token)
                     ? `${token}/${currency}`
                     : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
