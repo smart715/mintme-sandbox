@@ -13,7 +13,7 @@
                              v-bind:class="{'market-border': Number.isInteger(index/2) || 0 === index}"
                         >
                             <a :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block text-center col-2 pr-0 pl-4">
+                                <div class="d-inline-block text-center col-2 pr-0 pl-0 pl-sm-4">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
                                 <div class="crypto-pair d-inline-block align-middle col-3 px-0">
@@ -23,7 +23,7 @@
                                     </div>
                                 </div>
                             </a>
-                            <div class="d-inline-block align-middle col-2">
+                            <div class="d-inline-block align-middle col-2 px-0">
                                 <div v-if="parseFloat(market.change) > 0" class="market-up text-center">
                                     &#9650;+{{ market.change }}
                                 </div>
