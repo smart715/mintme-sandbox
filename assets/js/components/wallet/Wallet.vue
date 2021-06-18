@@ -565,10 +565,9 @@ export default {
             this.showDepositModal = false;
         },
         openDepositMore: function() {
-            if (
-                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
-                null !== this.predefinedTokens &&
-                this.predefinedTokens.hasOwnProperty(this.depositMore) &&
+            const asset = this.predefinedTokens[this.depositMore] || this.tokens[this.depositMore];
+
+            if (asset &&
                 this.depositAddresses.hasOwnProperty(this.depositMore) &&
                 !this.isUserBlocked
             ) {
@@ -578,10 +577,7 @@ export default {
                     );
                 }
 
-                this.openDeposit(
-                    this.depositMore,
-                    this.predefinedTokens[this.depositMore].subunit
-                );
+                this.openDeposit(this.depositMore, asset.subunit);
             }
         },
         updateBalances: function(data) {
