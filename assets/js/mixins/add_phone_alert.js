@@ -1,4 +1,10 @@
 export default {
+    props: {
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
+    },
     data() {
         return {
             addPhoneModalVisible: false,
@@ -13,6 +19,7 @@ export default {
                     nickname: this.addPhoneModalProfileNickName,
                     edit: 1,
                 }),
+                extraAttributes: this.embeded ? 'target="_blank"' : '',
                 messageType: this.$t(`modal.add_phone_alert_${this.addPhoneModalMessageType}.message`),
             });
         },
