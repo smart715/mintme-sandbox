@@ -56,13 +56,16 @@
                         :visible="showModal"
                         :button-disabled="!isOwner && !userAlreadyClaimed && !actionsCompleted"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed && !embeded"
-                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed"
+                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim"
                         :show-image="false"
                         @confirm="modalOnConfirm"
                         @close="closeModal"
                         :embeded="embeded"
                     >
                         <p v-if="alreadyClaimed">{{ $t('airdrop_backend.already_claimed') }}</p>
+                        <p v-else-if="claim">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
+                        </p>
                         <div v-else-if="airdropCampaign.status" class="d-flex flex-column align-items-center">
                             <p class="text-white modal-title pt-2 pb-4">
                                 {{ confirmModalMessage }}
@@ -209,7 +212,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
+                            <div v-if="!embeded && loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
                                 <div>
                                     {{ $t('ongoing_airdrop.referral', {tokenName, halfReward}) }}
                                 </div>
@@ -253,6 +256,7 @@
         <add-phone-alert-modal
             :visible="addPhoneModalVisible"
             :message="addPhoneModalMessage"
+            :embeded="embeded"
             @close="addPhoneModalVisible = false"
         />
         <modal
@@ -359,6 +363,7 @@ export default {
             loaded: false,
             btnDisabled: false,
             alreadyClaimed: this.userAlreadyClaimed,
+            claim: false,
             timeElapsed: false,
             showDuration: true,
             postLinkUrl: '',
@@ -384,7 +389,10 @@ export default {
     },
     computed: {
         airdropEndedText() {
-            return this.$t('ongoing_airdrop.ended_embeded', {mintmeUrl: this.$routing.generate('homepage')});
+            return this.$t('ongoing_airdrop.ended_embeded', {
+                mintmeUrl: this.$routing.generate('homepage'),
+                extraAttributes: this.embeded ? 'target="_blank"' : '',
+            });
         },
         actionsLength() {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
@@ -601,8 +609,7 @@ export default {
                 return;
             }
 
-           this.alreadyClaimed = true;
-
+            this.claim = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -619,6 +626,7 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
+                    this.alreadyClaimed = true;
                 })
                 .catch((err) => {
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
@@ -629,12 +637,12 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
-                        this.alreadyClaimed = false;
                         this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
-                });
+                })
+                .then(() => this.claim = false);
         },
         claimAction(action) {
             if (action.done) {
