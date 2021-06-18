@@ -1430,7 +1430,7 @@ mail.airdrop_claimed.subject: '¡Gane más con el airdrop!'
 mail.airdrop_claimed.message_1: 'Ha recibido <strong>%airdropReward%</strong> %tokenName% del airdrop. ¿Quiere más?'
 mail.airdrop_claimed.message_2: 'Utilice un enlace de referencia del airdrop y gane más por cada persona que se registre y complete con éxito la reclamación del airdrop. <a href="%airdropReferralLink%">%airdropReferralLink%</a>'
 mail.airdrop_claimed.message_3: 'También puede ganar compartiendo las <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family: Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">publicaciones</a> con una recompensa establecida.'
-modal.add_phone_alert: '%messageType% es necesario que agregue un número de teléfono en su <a href="%profileUrl%">perfil</a>.'
+modal.add_phone_alert: '%messageType% es necesario que agregue un número de teléfono en su <a href="%profileUrl%" %extraAttributes%>perfil</a>.'
 modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
 modal.add_phone_alert_action.message:
 modal.add_phone_alert_token_create.message: 'Para crear un token'
@@ -1438,3 +1438,4 @@ modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retir
 modal.add_phone_alert_donation.message: 'Para hacer donaciones'
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
 browser.storage.error:
+page.reload:

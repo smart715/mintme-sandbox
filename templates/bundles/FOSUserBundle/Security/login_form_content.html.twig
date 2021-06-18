@@ -3,7 +3,7 @@
 
 {% trans_default_domain 'FOSUserBundle' %}
 <form action="{{ path('login', {'page': specificPage}) }}" method="post" id="login">
-    <input type="hidden" name="go_to" value="{{app.request.uri }}"/>
+    <input type="hidden" name="go_to" value="{{app.request.pathInfo }}"/>
     {% if app.session.flashbag.peekAll() is not empty %}
         <div class="row">
             {% for label, messages in app.flashes %}
