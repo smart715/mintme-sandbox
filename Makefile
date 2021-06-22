@@ -50,5 +50,3 @@ all:
 generate_translations:
 	php bin/console app:load-translations-ui
 
-send_grouped_posts:
-	php bin/console app:send-grouped-posts
