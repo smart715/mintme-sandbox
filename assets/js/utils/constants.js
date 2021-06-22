@@ -129,6 +129,11 @@ export const MINTME = {
     subunit: 4,
 };
 
+export const BNB = {
+    symbol: 'BNB',
+    subunit: 8,
+};
+
 export const sanitizeOptions = {
     allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p', 'iframe', 'div'],
     allowedAttributes: {
@@ -187,6 +192,10 @@ export const currencyModes = {
         text: 'Crypto',
     },
 };
+
+export const ethCryptoTokens = [
+    usdcSymbol,
+];
 
 export const currencies = {
     WEB,

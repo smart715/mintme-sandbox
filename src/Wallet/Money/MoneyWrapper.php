@@ -49,7 +49,6 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 [
                     Symbols::TOK => self::TOK_SUBUNIT,
                     Symbols::USD => self::USD_SUBUNIT,
-                    Symbols::BNB => self::TOK_SUBUNIT,
                 ]
             )
         );
