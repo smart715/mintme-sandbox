@@ -51,7 +51,7 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
 
         $posts = $this->postManager->getCreatedPostsTodayByToken($this->token);
 
-        if (0 < count($posts)) {
+        if (1 < count($posts)) {
             return;
         }
 
