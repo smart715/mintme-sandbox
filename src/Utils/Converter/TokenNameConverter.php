@@ -25,6 +25,6 @@ class TokenNameConverter implements TokenNameConverterInterface
                 '0',
                 STR_PAD_LEFT
             )
-            : $tradable->getName();
+            : $tradable->getSymbol();
     }
 }
