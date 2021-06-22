@@ -5,10 +5,13 @@
         @close="closeModal">
         <template slot="body">
             <div class="text-center overflow-wrap-break-word word-break-all">
-                <h3 class="col-12 modal-title">{{ $t('withdraw_modal.title') }}({{ currency | rebranding}})</h3>
+                <h3 class="col-12 modal-title">{{ $t('withdraw_modal.title') }} ({{ currency | rebranding}})</h3>
                 <div class="col-12 pt-2">
+                    <div v-if="showWithdrawInfoMessage" class="text-break pb-3">
+                        {{ $t('withdraw_modal.bep20_message') }}
+                    </div>
                     <label for="address" class="d-block text-left">
-                        {{ $t('withdraw_modal.address') }}
+                        {{ addressLabel }}
                     </label>
                     <input
                         v-model="$v.address.$model"
@@ -118,6 +121,7 @@ import {
     twoFACode,
     USD,
     currencyModes,
+    bnbSymbol,
 } from '../../utils/constants';
 import {
     CheckInputMixin,
@@ -195,6 +199,16 @@ export default {
                 currency: this.rebrandingFunc(this.currency),
                 minAmount: this.minAmount,
             };
+        },
+        addressLabel: function() {
+            return this.$t(
+                this.showWithdrawInfoMessage
+                    ? 'withdraw_modal.bnb_address_label'
+                    : 'withdraw_modal.address'
+            );
+        },
+        showWithdrawInfoMessage: function() {
+            return bnbSymbol === this.currency;
         },
     },
     methods: {

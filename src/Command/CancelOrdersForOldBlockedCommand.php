@@ -55,7 +55,7 @@ class CancelOrdersForOldBlockedCommand extends Command
 
         foreach ($this->tokenRepository->findBy(['isBlocked' => true]) as $token) {
             $tokenMarket = $this->marketFactory->create(
-                $this->cryptoManager->findBySymbol((string)$token->getCryptoSymbol(), true),
+                $this->cryptoManager->findBySymbol((string)$token->getCryptoSymbol()),
                 $token
             );
             $this->blockTokenCommand->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);

@@ -585,6 +585,7 @@ hacker_menu.crypto.web: 'Add 100 MINTME'
 hacker_menu.crypto.eth: 'Add 0.05 ETH'
 hacker_menu.crypto.btc: 'Add 0.001 BTC'
 hacker_menu.crypto.usdc: 'Add 10 USDC'
+hacker_menu.crypto.bnb:
 hacker_menu.quick_registration: 'Quick registration'
 api_clients.id.title: 'ID:'
 api_clients.secret.title: 'Código:'
@@ -619,6 +620,7 @@ info_bar.token.title: 'Token:'
 info_bar.mintme.title: 'MINTME:'
 info_bar.eth.title: 'ETH:'
 info_bar.btc.title: 'BTC:'
+info_bar.bnb.title:
 info_bar.usdc.title: 'USDC:'
 info_bar.code.title: 'Code:'
 info_bar.toggle.title: Toggle
@@ -1123,6 +1125,7 @@ trading.table.change: Cambio
 trading.table.last_price: 'Último Precio'
 trading.table.volume_24h: 'Volúmen de 24h'
 trading.table.volume_30d: 'Volúmen de 30d'
+trading.table.market_cap:
 trading.mintme_markets: 'Mercados MINTME'
 trading.tokens: Tokens
 trading.currency.usd: USD
@@ -1437,3 +1440,6 @@ modal.add_phone_alert_quick_trade.message:
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
 browser.storage.error: 'Error al intentar acceder al almacenamiento, por favor evite usar ventanas de incógnito'
 page.reload: recargar
+deposit_modal.accept_bep20:
+withdraw_modal.bnb_address_label:
+withdraw_modal.bep20_message:

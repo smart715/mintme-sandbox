@@ -46,6 +46,13 @@ class DonationHandler implements DonationHandlerInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    private const ANOTHER_DONATION_SYMBOLS = [
+        Symbols::BTC,
+        Symbols::ETH,
+        Symbols::USDC,
+        Symbols::BNB,
+    ];
+
     public function __construct(
         DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
@@ -78,7 +85,7 @@ class DonationHandler implements DonationHandlerInterface
 
         $this->checkAmount($donorUser, $amountObj, $currency, false);
 
-        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
+        if (in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true)) {
             $amountObj = $this->getCryptoWorthInMintme($amountObj, $currency);
         }
 
@@ -118,7 +125,7 @@ class DonationHandler implements DonationHandlerInterface
 
         $donationAmount = $amountInCrypto;
 
-        if (Symbols::BTC === $currency || Symbols::ETH === $currency || Symbols::USDC === $currency) {
+        if (in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true)) {
             // Convert sum of donation in any Crypto to MINTME
             $donationAmount = $this->getCryptoWorthInMintme($donationAmount, $currency);
         }
@@ -402,6 +409,12 @@ class DonationHandler implements DonationHandlerInterface
             $minEthAmount = $this->quickTradeConfig->getMinEthAmount();
 
             if ($amount->lessThan($minEthAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
+                throw new ApiBadRequestException('Invalid donation amount.');
+            }
+        } elseif (Symbols::BNB === $currency) {
+            $minBnbAmount = $this->quickTradeConfig->getMinBnbAmount();
+
+            if ($amount->lessThan($minBnbAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } else {

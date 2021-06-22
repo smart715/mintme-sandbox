@@ -95,6 +95,7 @@ parameters:
         - BTC
         - ETH
         - USDC
+        - BNB
     blockchain_disabled: null
     disable_deposits: false
     disable_withdrawals: false

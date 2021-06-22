@@ -7,6 +7,9 @@
         <template slot="body">
             <div class="text-center">
                 <h3 class="modal-title overflow-wrap-break-word">{{ $t('deposit_modal.title') }} ({{ currency|rebranding }})</h3>
+                <div v-if="showAcceptInfoMessage" class="col-12 px-0 py-2">
+                    {{ $t('deposit_modal.accept_bep20') }}
+                </div>
                 <div class="col-12 pt-2">
                     <code class="wallet-code text-blue" id="walletaddress">
                         <span>
@@ -51,7 +54,7 @@ import {BRow, BCol} from 'bootstrap-vue';
 import Modal from './Modal.vue';
 import CopyLink from '../CopyLink';
 import {RebrandingFilterMixin} from '../../mixins';
-import {webSymbol} from '../../utils/constants';
+import {webSymbol, bnbSymbol} from '../../utils/constants';
 
 library.add(faCopy);
 
@@ -78,6 +81,9 @@ export default {
     computed: {
       feeCurrency: function() {
           return this.isToken ? webSymbol : this.currency;
+      },
+      showAcceptInfoMessage: function() {
+          return bnbSymbol === this.currency;
       },
     },
     methods: {

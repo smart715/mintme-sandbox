@@ -19,37 +19,23 @@ class CryptoManager implements CryptoManagerInterface
         $this->repository = $repository;
     }
 
-    public function findBySymbol(string $symbol, bool $showHidden = false): ?Crypto
+    public function findBySymbol(string $symbol): ?Crypto
     {
-        return $this->repository->getBySymbol(strtoupper($symbol), $showHidden);
+        return $this->repository->getBySymbol(strtoupper($symbol));
     }
 
     /** {@inheritdoc} */
-    public function findAll(bool $showHidden = false): array
+    public function findAll(): array
     {
-        $cryptoArray = $this->repository->findAll();
-
-        if (!$showHidden) {
-            $cryptoArray = array_filter(
-                $cryptoArray,
-                static fn (Crypto $crypto) => $crypto->isExchangeble() || $crypto->isTradable()
-            );
-        }
-
-        return $cryptoArray;
+        return $this->repository->findAll();
     }
 
-    public function findAllIndexed(string $index, bool $array = false, bool $showHidden = false): array
+    public function findAllIndexed(string $index, bool $array = false): array
     {
-        $query = $this->repository->createQueryBuilder('c', "c.{$index}");
-
-        if (!$showHidden) {
-            $query
-                ->andWhere('c.tradable = 1 OR c.exchangeble = 1');
-        }
+        $query = $this->repository->createQueryBuilder('c', "c.{$index}")->getQuery();
 
         return $array
-            ? $query->getQuery()->getArrayResult()
-            : $query->getQuery()->getResult();
+            ? $query->getArrayResult()
+            : $query->getResult();
     }
 }

@@ -67,6 +67,14 @@ class QuickTradeConfig
         );
     }
 
+    public function getMinBnbAmount(): Money
+    {
+        return $this->moneyWrapper->parse(
+            (string)($this->params['minBnbAmount'] ?? 0),
+            Symbols::BNB
+        );
+    }
+
     public function getMinTokensAmount(): Money
     {
         return $this->moneyWrapper->parse(

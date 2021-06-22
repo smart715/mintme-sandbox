@@ -265,7 +265,13 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
+import {
+    tokSymbol,
+    webSymbol,
+    ethSymbol,
+    tokEthSymbol,
+    ethCryptoTokens,
+} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
@@ -498,20 +504,17 @@ export default {
                 return;
             }
 
-            let isHiddenCrypto = !(crypto in this.predefinedTokens);
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
             this.withdraw.fee = fee ? toMoney(fee) : null;
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
-                isToken && !isHiddenCrypto
+                isToken
                     ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
                     : 0
             );
-            this.withdraw.availableBase = !isHiddenCrypto
-                ? this.predefinedTokens[crypto || webSymbol].available
-                : 0;
+            this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
@@ -542,7 +545,9 @@ export default {
 
             this.depositAddress = (isToken
                 ? this.depositAddresses[tokSymbol + crypto]
-                : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
+                : ethCryptoTokens.includes(currency)
+                        ? this.depositAddresses[tokEthSymbol]
+                        : this.depositAddresses[currency]
                 ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;
