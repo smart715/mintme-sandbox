@@ -1,4 +1,4 @@
-by:
+by: por
 navbar.my_token: 'Mi Token'
 navbar.token_show_modal: 'Ajustes del token'
 navbar.trading: Mercados
@@ -8,7 +8,7 @@ navbar.referrals: Referencias
 navbar.help: Ayuda
 navbar.profile: Perfil
 navbar.settings: Ajustes
-navbar.home:
+navbar.home: Inicio
 footer.cookies: 'Esta página web usa cookies'
 footer.press: Press
 footer.wallet: Billetera
@@ -48,13 +48,13 @@ form.token.initial_order: 'Coloque órdenes de venta iniciales '
 form.token.initial_order.guide: 'El 15% de sus tokens serán colocados en venta a precios que van desde 0.1 a 10 MINTME. Sí usted desmarca esta casilla, por favor asegúrese de que se agreguen órdenes de venta manualmente en la sección de Trade de su token.'
 form.token.characters_used: 'Caracteres usados:'
 form.token.min: min.
-form.validation.option.required:
-form.validation.option.max:
-form.validation.title.min:
-form.validation.title.max:
-form.validation.description.min:
-form.validation.description.max:
-form.validation.description.required:
+form.validation.option.required: 'El campo de opción no puede estar vacío'
+form.validation.option.max: 'La opción no puede tener más de %length% caracteres'
+form.validation.title.min: 'El título debe tener al menos %length% caracteres'
+form.validation.title.max: 'El título no puede tener más de %length% caracteres'
+form.validation.description.min: 'La descripción debe tener al menos %length% caracteres'
+form.validation.description.max: 'La descripción no puede tener más de %length% caracteres'
+form.validation.description.required: 'La descripción no puede estar vacía o contener sólo bbcodes y espacios en blanco'
 page.settings.title: Ajustes
 page.settings.account.header: 'Ajustes de la cuenta'
 page.settings.account.submit: Guardar
@@ -232,9 +232,9 @@ page.privacy.7.1: '7.1. No tenemos la intención de solicitar o recopilar inform
 page.privacy.8: '8. Cambios en la política de privacidad'
 page.privacy.8.1: '8.1. MintMe.com tiene la potestad de actualizar esta Política en cualquier momento. El uso continuado del servicio después de que publiquemos cualquier modificación de la Política de Privacidad en esta página constituirá su reconocimiento de las modificaciones y su consentimiento para cumplir y estar obligado por la Política de Privacidad modificada.'
 page.privacy.8.2: '8.2. Si realizamos algún cambio material en esta Política de Privacidad, le notificaremos a través de la dirección de correo electrónico que nos haya proporcionado o colocando un aviso destacado en la Plataforma Tecnológica. Usted reconoce y acepta que es su responsabilidad revisar esta Política de Privacidad periódicamente y estar al tanto de las modificaciones.'
-page.privacy.9:
-page.privacy.9.1:
-page.privacy.9.2:
+page.privacy.9: 'Servicios API de YouTube'
+page.privacy.9.1: '9.1. La función de enlace a las redes sociales de Youtube utiliza los servicios de la API de YouTube y la política de privacidad de Google está disponible en <a href="https://policies.google.com/privacy">google.com/policies/privacy</a>.'
+page.privacy.9.2: '9.2. MintMe accede a los servicios de la API de Youtube en el ámbito de sólo lectura para comprobar y almacenar el ID del canal. Para revocar el acceso de MintMe a sus datos de Youtube, vaya a <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.'
 page.privacy.10: '10. Contactar con nosotros'
 page.privacy.10.1: '10.1. Si tiene alguna pregunta sobre esta Política de Privacidad, desea ejercer alguno de sus derechos sobre su Información Personal o presentar una queja, por favor contáctenos en:'
 page.privacy.address: 'ABC Hosting Ltd<br/>Calle 7B Neal Pen<br/> Cuidad de Belice, Belice<br/> Correo electrónico:'
@@ -408,14 +408,14 @@ page.terms.content.14.3a: '(a) no está actuando como su corredor, intermediario
 page.terms.content.14.3b: '(b) no está actuando como una parte de la transferencia de un criptoactivo en particular.'
 page.terms.content.14.4: '14.4. Tarifas Comerciales. Cada orden comercial colocada crea diferentes tasas de intercambios de mercado. Usted reconoce y acepta que la información de las tarifas puestas a disposición a través de MintMe pueden diferir de tasas vigentes disponibles a través de otras fuentes externas de la Plataforma Tecnológica.'
 page.terms.content.14.5: '14.5. Inestabilidad de Mercado. Particularmente durante períodos de alto volúmen, iliquidez, movimiento rápido o inestabilidad en los mercados para cualquier criptoactivo, la tasa real de mercado al que se ejecuta una transacción comercial de mercado puede ser diferente desde la tasa vigente indicada a través de MintMe en el momento de su operación Comercial. Usted entiende que no somos responsables de cualquiera de las fluctuaciones de la tasas.'
-page.terms.content.14.6:
+page.terms.content.14.6: '14.6. Los tokens que consideremos ofensivos o inapropiados se ocultarán de la lista de mercados de la página de negociación.'
 page.terms.content.15: '15. COMISIONES de MintMe'
 page.terms.content.15.1: '15.1. Cantidad de Comisiones. Usted acepta pagar las comisiones por transferencias realizadas a través de MintMe ("Comisiones") definidos por Nosotros la cual puede cambiar cada cierto tiempo. Los cambios en las Comisiones son efectivos así como la fecha real indicada en la publicación de las comisiones revisadas y se aplicarán respectivamente a cualquier transacción que tome lugar después de la fecha efectiva de dichas Comisiones revisadas.'
 page.terms.content.15.2: '15.2. Pago de Comisiones. Usted nos autoriza a Nosotros o a nuestro procesador de pago designado a cargar o deducir criptoactivos de su cuenta MintMe para cualquiera de las debidas Comisiones aplicables en relación a las transacciones que usted realice a través de nuestra Plataforma.'
 page.terms.content.16: '16. CONTENIDO DE TERCEROS'
 page.terms.content.16.1: 'Mientras se encuentre usando nuestra Plataforma Tecnológica usted puede visualizar Contenido de Terceros. Nosotros no controlamos, respaldamos o adoptamos (aunque sin embargo expresamente instaurado por Nosotros) cualquier Contenido de Terceros y no tendremos responsabilidad por el Contenido de Terceros, incluyendo sin limitación esencial que pueda ser desviada, incompleta, errónea, ofensiva, indecente o en caso tal cuestionable. Además, su relación de negocio o correspondencia con terceras partes son exclusivamente entre usted y terceros. Nosotros no somos responsables o sujetos por cualquier pérdida o daño de cualquier índole como resultado de tales relaciones, y usted entiende que su uso del Contenido de Terceros, y sus interacciones con terceros, están bajo su propio riesgo.'
-page.terms.content.17:
-page.terms.content.17.1:
+page.terms.content.17: '17. Servicios API de YouTube'
+page.terms.content.17.1: 'Al utilizar la función de enlace a las redes sociales de YouTube, el usuario acepta quedar vinculado por las <a href="https://www.youtube.com/t/terms">Condiciones de servicio de YouTube</a>.'
 page.token_creation.title: 'Creación del token'
 page.token_creation.form_header: 'Cree su propio token'
 page.token_creation.error.taken: 'Ya existe un token con ese nombre'
@@ -446,7 +446,7 @@ post.tab.content: 'El contenido no puede estar vacío o contener sólo bbcodes y
 post.required: 'Cantidad requerida de tokens:'
 post.not_any_post: 'El creador del token no ha añadido ninguna publicación todavía.'
 post.created: 'Su publicación fue creada.'
-post.no_recent_posts:
+post.no_recent_posts: 'No hay más publicaciones para mostrar en este momento.'
 post.comments: Comentarios
 post.no_one_commented: 'Sin comentarios.'
 post.likes: 'Me gusta'
@@ -483,10 +483,10 @@ mail.new_investor_bought_token.msg: 'compró su token.'
 mail.new_investor_check_hostory: 'Chequee el Historial de comercio'
 mail.new_device.login.msg: 'Nuestro sistema ha detectado un nuevo intento de acceso'
 mail.new_device.new_ip.msg: 'desde una nueva dirección IP o dispositivo'
-mail.new_investor.actively_social_media_token_1:
-mail.new_investor.actively_social_media_token_2:
-mail.join_mintme_hosting:
-mail.new_investor.create_token_here:
+mail.new_investor.actively_social_media_token_1: 'Recuerde que debe promocionar activamente su token en las redes sociales y'
+mail.new_investor.actively_social_media_token_2: 'en todo lo que pueda para que tenga éxito.'
+mail.join_mintme_hosting: 'Únase al hosting de MintMe'
+mail.new_investor.create_token_here: '¿No tiene un token? Qué espera para hacerlo? Créelo <a href="https://www.mintme.com/es/token" target="_blank">aquí</a>'
 new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%">aquí.</a>'
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
@@ -765,32 +765,32 @@ comment.liked: 'Comentario que gustó.'
 comment.load_error: 'Error al cargar los comentarios'
 comment.min_amount: 'Se necesita %amount% %token% para ver los comentarios.'
 like.removed: 'Me gusta eliminado '
-airdrop.embed_title:
-voting.voting:
-voting.information:
-voting.propositions:
-voting.new_proposition:
-voting.create:
-voting.form.title:
-voting.form.description:
-voting.form.start_date:
-voting.form.end_date:
-voting.form.created_by:
-voting.options:
-voting.add_option:
-voting.publish:
-voting.vote:
-voting.votes:
-voting.current_results:
-voting.no_propositions:
-voting.proposition.info:
-voting.proposition.active:
-voting.proposition.closed:
-voting.added_successfully:
-voting.already_voted:
-voting.creator_vot_not_allowed:
-voting.create.min_amount_required:
-voting.vote.zero_balance:
+airdrop.embed_title: 'Mediante este código podrá incrustar el airdrop en su sitio web:'
+voting.voting: Votaciones
+voting.information: Información
+voting.propositions: Propuestas
+voting.new_proposition: 'Nueva propuesta'
+voting.create: 'Crear votación'
+voting.form.title: 'Título:'
+voting.form.description: 'Descripción:'
+voting.form.start_date: 'Fecha de inicio:'
+voting.form.end_date: 'Fecha de finalización:'
+voting.form.created_by: 'Creada por:'
+voting.options: Opciones
+voting.add_option: 'Agregar opción'
+voting.publish: Publicar
+voting.vote: Votar
+voting.votes: Votos
+voting.current_results: 'Resultados actuales'
+voting.no_propositions: 'Todavía no hay propuestas'
+voting.proposition.info: 'Por %nickname% inicio %startDate% fin %endDate%'
+voting.proposition.active: Activa
+voting.proposition.closed: Cerrada
+voting.added_successfully: 'Propuesta agregada con éxito'
+voting.already_voted: 'Usted ya ha votado'
+voting.creator_vot_not_allowed: 'El creador de la proposición no puede votar'
+voting.create.min_amount_required: 'Para poder crear proposiciones se necesita al menos %amount% %currency%.'
+voting.vote.zero_balance: 'Para poder votar se necesita más de %amount% %currency%.'
 airdrop.end: 'Finalizar este airdrop'
 airdrop.amount_tokens: 'Cantidad de tokens para el airdrop:'
 airdrop.insufficient_funds: 'Fondos insuficientes para la campaña de airdrop.'
@@ -837,7 +837,7 @@ ongoing_airdrop.confirm_message.logged_in: 'Tiene que ingresar para poder recibi
 ongoing_airdrop.confirm_message.cant_participate: 'Disculpe, usted no puede participar en su propio airdrop.'
 ongoing_airdrop.confirm_message: '¿Está seguro que quiere recibir %airdropReward% %tokenName%?'
 ongoing_airdrop.ended: 'Disculpe, este airdrop ha finalizado.'
-ongoing_airdrop.ended_embeded:
+ongoing_airdrop.ended_embeded: 'El airdrop ya ha terminado. Puede visitar <a href="%mintmeUrl%" %extraAttributes%>mintme.com</a> y consultar otros airdrops.'
 ongoing_airdrop.submit_url: 'Enviar dirección'
 ongoing_airdrop.actions.message: '¡%tokenName% esta lanzando su token! Visite %tokenUrl% para conocer mas sobre el token y su airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Para completar esta acción se requiere autenticación en YouTube.'
@@ -1199,8 +1199,8 @@ wallet.trading_history.table.price: Precio
 wallet.trading_history.table.total_cost: 'Costo total'
 wallet.trading_history.table.fee: Comisión
 wallet.buy_crypto: 'Comprar cripto'
-wallet.buy_crypto.can_exchange:
-mail.can_exchange.header:
+wallet.buy_crypto.can_exchange: 'Puedes intercambiar %cryptosList% a MINTME aquí:'
+mail.can_exchange.header: 'Intercambiar MINTME'
 chat.chat_widget.direct_messages: 'Mensajes directos'
 chat.chat_contacts.select_contact: 'Seleccione el contacto'
 chat.chat_contacts.no_contacts: 'No hay contactos'
@@ -1214,7 +1214,7 @@ place_order.failed: 'La orden ha fallado. Intente de nuevo más tarde'
 place_order.insufficient_balance: 'Fondos insuficientes'
 place_order.not_found: 'No se ha encontrado la orden'
 place_order.not_match: 'No coincide con esta orden'
-place_order.too_small: ''
+place_order.too_small: 'El valor mínimo de la orden debe ser de %valueInUsd% USD. En este momento es %valueInMintme% MINTME.'
 mixin.websocket.hash_not_set: 'El hash no está listo. No se puede autorizar al usuario'
 mixin.websocket.authorize_failed: 'Falló la autorización del usuario actual. El servidor respondió con estatus fallido'
 mixin.websocket.server_not_respond: 'El servidor no responde'
@@ -1269,7 +1269,7 @@ api.wallet.not_found_currency: 'Criptomoneda no encontrada'
 api.wallet.withdrawal_failed: 'El retiro falló'
 api.wallet.not_found: 'No encontrado'
 api.tokens.token_not_exists: 'El token no existe'
-api.tokens.user_not_created_token:
+api.tokens.user_not_created_token: 'El usuario actual no ha creado un token'
 api.tokens.you_need_all_tokens_to_change_name: 'Usted necesita todos sus tokens para cambiar el nombre'
 api.tokens.deploying: 'El Token se está desplegando o se ha desplegado.'
 api.tokens.forbidden_name: 'Nombre no permitido, por favor intente otro'
@@ -1334,8 +1334,8 @@ mail.verification_code: 'Su código de verificación:'
 404.profile: 'PERFIL NO EXISTE'
 404.token: 'TOKEN NO ENCONTRADO'
 404.pair: 'PAR NO ENCONTRADO'
-404.airdrop:
-404.voting:
+404.airdrop: 'NO SE HA ENCONTRADO EL AIRDROP'
+404.voting: 'VOTACIÓN NO ENCONTRADA'
 mail.mintme_host.1: 'Puede utilizar un <strong>hosting web dedicado</strong> para sus proyectos en mintme en:'
 mail.mintme_host.2: 'Que está hecho por el <strong>equipo de mintMe</strong>, puede probarlo completamente gratis durante %freeDays% días y el precio del primer año del hosting web con tráfico ilimitado para tu proyecto es de sólo <strong>%price% USD/AÑO</strong>'
 mail.mintme_host.3: 'Incluso puede pagar con <strong>MintMe coins</strong> por ello, aunque también admitimos <strong>Paypal</strong> y otros métodos de pago, Todo el dinero irá directamente al desarrollo de <a href="https://www.mintme.com" style="color:#2199e8;font-family:Helvetica,Arial,sans-serif;font-weight:400;line-height:1.3;padding:0;text-align:left;text-decoration:none"><strong>mintme.com</strong></a>.'
@@ -1393,7 +1393,7 @@ activity_4_message: '<a href="%tokenUrl%">%token%</a> ha añadido una nueva publ
 activity_5_message: '<a href="%tokenUrl%">%token%</a> ha sido creado'
 activity_6_message: '<a href="%tokenUrl%">%token%</a> fue desplegado'
 activity_7_message: '<a href="%tokenUrl%">%token%</a> fue depositado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
-activity_8_message:
+activity_8_message: '<a href="%buyerUrl%">%buyer%</a> ha comprado <a href="%tokenUrl%">%token%</a> por valor de %amount% %symbol%'
 activity_9_message: '<a href="%tokenUrl%">%token%</a> fue retirado por <a href="%userUrl%">%user%</a> por un valor de %amount% %symbol%'
 phone_confirmation.incorrect_code: 'Código incorrecto, el código debería ser de 6 dígitos'
 phone_confirmation.sent: Enviado
@@ -1432,10 +1432,10 @@ mail.airdrop_claimed.message_2: 'Utilice un enlace de referencia del airdrop y g
 mail.airdrop_claimed.message_3: 'También puede ganar compartiendo las <a href="%tokenPostsLink%" style="Margin:0;padding:0;text-align:center;vertical-align:middle;font-family: Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:26px;color:#2199e8;text-decoration:none;" target="_blank">publicaciones</a> con una recompensa establecida.'
 modal.add_phone_alert: '%messageType% es necesario que agregue un número de teléfono en su <a href="%profileUrl%" %extraAttributes%>perfil</a>.'
 modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
-modal.add_phone_alert_action.message:
+modal.add_phone_alert_action.message: 'Para realizar esa acción'
 modal.add_phone_alert_token_create.message: 'Para crear un token'
 modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
 modal.add_phone_alert_donation.message: 'Para hacer donaciones'
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
-browser.storage.error:
-page.reload:
+browser.storage.error: 'Error al intentar acceder al almacenamiento, por favor evite usar ventanas de incógnito'
+page.reload: recargar
