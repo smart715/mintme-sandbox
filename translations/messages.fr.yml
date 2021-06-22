@@ -589,6 +589,7 @@ hacker_menu.crypto.web: 'Ajouter 100 MINTME'
 hacker_menu.crypto.eth: 'Ajouter 0.05 ETH'
 hacker_menu.crypto.btc: 'Ajouter 0.001 BTC'
 hacker_menu.crypto.usdc: 'Ajouter 10 USDC'
+hacker_menu.crypto.bnb:
 hacker_menu.quick_registration: 'Enregistrement rapide'
 api_clients.id.title: 'ID:'
 api_clients.secret.title: 'Code secret:'
@@ -623,6 +624,7 @@ info_bar.token.title: 'Jeton:'
 info_bar.mintme.title: 'MINTME:'
 info_bar.eth.title: 'ETH:'
 info_bar.btc.title: 'BTC:'
+info_bar.bnb.title:
 info_bar.usdc.title: USDC
 info_bar.code.title: 'Code:'
 info_bar.toggle.title: Basculer
@@ -1134,6 +1136,7 @@ trading.table.change: Echanger
 trading.table.last_price: 'Dernier prix'
 trading.table.volume_24h: 'Volume en 24 heures'
 trading.table.volume_30d: 'Volume en 30j'
+trading.table.market_cap:
 trading.mintme_markets: 'Marchés MINTME'
 trading.tokens: Jetons
 trading.currency.usd: USD
@@ -1439,3 +1442,6 @@ modal.add_phone_alert_donation.message: 'To make donations'
 api.add_phone_number_message: 'you need to add phone number in your profile'
 browser.storage.error:
 page.reload:
+deposit_modal.accept_bep20:
+withdraw_modal.bnb_address_label:
+withdraw_modal.bep20_message:

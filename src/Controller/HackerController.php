@@ -67,9 +67,26 @@ class HackerController extends AbstractController
 
         $symbol = $crypto->getSymbol();
 
-        $amount = Symbols::BTC === $symbol
-            ? '0.001'
-            : (Symbols::ETH === $symbol ? '0.05' :  (Symbols::USDC === $symbol ? '10' : '100'));
+        switch ($symbol) {
+            case Symbols::BTC:
+                $amount = '0.001';
+
+                break;
+            case Symbols::ETH:
+                $amount = '0.05';
+
+                break;
+            case Symbols::USDC:
+                $amount = '10';
+
+                break;
+            case Symbols::BNB:
+                $amount = '0.1';
+
+                break;
+            default:
+                $amount = '100';
+        }
 
         /** @var User $user*/
         $user = $this->getUser();
