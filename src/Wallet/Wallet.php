@@ -117,7 +117,7 @@ class Wallet implements WalletInterface
             $crypto = $tradable;
             $token = Token::getFromCrypto($tradable);
         } else {
-            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
+            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
             $token = $tradable;
         }
 
@@ -141,7 +141,7 @@ class Wallet implements WalletInterface
 
         $cryptoSymbol = $crypto->getSymbol();
 
-        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB], true)) {
+        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB, Symbols::BNB], true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
                 !$this->withdrawGateway->isContractAddress($address->getAddress(), $cryptoSymbol)
             ) {

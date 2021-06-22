@@ -76,6 +76,10 @@ export default {
                           href: this.$routing.generate('hacker-add-crypto', {crypto: 'usdc'}),
                           title: this.$t('hacker_menu.crypto.usdc'),
                         },
+                        {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'bnb'}),
+                            title: this.$t('hacker_menu.crypto.bnb'),
+                        },
                     ],
                 },
             ],
