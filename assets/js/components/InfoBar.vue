@@ -19,6 +19,9 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
                 <b>{{ $t('info_bar.btc.title') }}</b> {{ btcBalance }}
             </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
+                <b>{{ $t('info_bar.bnb.title') }}</b> {{ bnbBalance }}
+            </span>
             <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
                 <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
@@ -174,6 +177,9 @@ export default {
         },
         usdcBalance: function() {
           return this.balance.USDC ? new Decimal(this.balance.USDC.available).toFixed(this.balance.USDC.subunit) : '-';
+        },
+        bnbBalance: function() {
+            return this.balance.BNB ? new Decimal(this.balance.BNB.available).toFixed(this.balance.BNB.subunit) : '-';
         },
     },
     methods: {

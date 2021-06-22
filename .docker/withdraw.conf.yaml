@@ -37,6 +37,13 @@ parameters:
         username: user
         password: null
     etherium_transfer_options: {  }
+    binance_wallet_address: '0xFd134EDa83a3A21690084fce5984aAFc1Ed68a62'
+    binance_rpc_url: 'http://212.32.255.99:8575'
+    binance_auth:
+        type: digest
+        username: user
+        password: null
+    binance_transfer_options: {  }
     bitcoin_wallet_password: foobarbaz
     bitcoin_rpc_url: 'http://electrum:7777'
     bitcoin_auth:
