@@ -122,22 +122,8 @@ class Wallet implements WalletInterface
         }
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
-        $tokenEthFee = $this->moneyWrapper->parse(
-            (string)$this->parameterBag->get('eth_token_withdraw_fee'),
-            Symbols::ETH
-        );
-        $tokenBnbFee = $this->moneyWrapper->parse(
-            (string)$this->parameterBag->get('bnb_token_withdraw_fee'),
-            Symbols::BNB
-        );
 
-        $withdrawFee = $tradable->getFee() ??
-            ($crypto->getFee()->isSameCurrency(new Money(0, new Currency('WEB'))) ?
-                $crypto->getFee() :
-                $this->moneyWrapper->parse(
-                    (string)$this->parameterBag->get('token_withdraw_fee'),
-                    Symbols::ETH
-                ));
+        $withdrawFee = $this->getFee($tradable, $crypto);
 
         if (!$crypto) {
             throw new NotFoundTokenException();
@@ -175,7 +161,7 @@ class Wallet implements WalletInterface
 
         if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($crypto, $amount, $user)) {
             throw new NotEnoughAmountException();
-        } elseif (!$tradable->getFee() && !$this->validateTokenFee($user, $crypto, $tokenEthFee)) {
+        } elseif (!$tradable->getFee() && !$this->validateTokenFee($user, $crypto, $withdrawFee)) {
             throw new NotEnoughAmountException();
         }
 
@@ -185,7 +171,7 @@ class Wallet implements WalletInterface
             $this->balanceHandler->withdraw(
                 $user,
                 Token::getFromCrypto($crypto),
-                Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
+                $withdrawFee
             );
         }
 
@@ -319,5 +305,30 @@ class Wallet implements WalletInterface
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;
+    }
+
+    private function getFee(TradebleInterface $tradable, Crypto $crypto): Money
+    {
+        $cryptoFee = $tradable->getFee();
+
+        if ($cryptoFee) {
+            return $cryptoFee;
+        }
+
+        if ($crypto->getFee()->isSameCurrency(new Money(0, new Currency(Symbols::WEB)))) {
+            return $crypto->getFee();
+        }
+
+        if ($tradable instanceof Token && Symbols::BNB === $tradable->getCryptoSymbol()) {
+            return $this->moneyWrapper->parse(
+                (string)$this->parameterBag->get('bnb_token_withdraw_fee'),
+                Symbols::BNB
+            );
+        }
+
+        return $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('eth_token_withdraw_fee'),
+            Symbols::BNB
+        );
     }
 }
