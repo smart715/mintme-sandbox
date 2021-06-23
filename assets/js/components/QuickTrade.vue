@@ -334,7 +334,7 @@ export default {
         },
         translationsContext: function() {
           return {
-            amount: toMoney(this.amount, this.currencySubunit),
+            amount: toMoney(this.amount || 0, this.currencySubunit),
             amountToReceive: toMoney(this.amountToReceive, this.assetToReceiveSubunit),
             assetToReceive: this.rebrandingFunc(this.assetToReceive),
             worth: formatMoney(toMoney(this.worth, currencies.WEB.subunit)),
