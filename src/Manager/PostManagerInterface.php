@@ -17,6 +17,6 @@ interface PostManagerInterface
      * @return Post[]
      */
     public function getRecentPost(User $user, int $page): array;
-    public function getCreatedPostsToday(): array;
-    public function getCreatedPostsTodayByToken(Token $token): array;
+    public function getPostsCreatedToday(): array;
+    public function getPostsCreatedTodayByToken(Token $token): array;
 }

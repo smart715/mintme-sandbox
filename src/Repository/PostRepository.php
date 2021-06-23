@@ -23,7 +23,7 @@ class PostRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getCreatedPostsToday(): array
+    public function getPostsCreatedToday(): array
     {
         return $this->createQueryBuilder('post')
             ->where('post.createdAt BETWEEN :from AND :to')
@@ -34,7 +34,7 @@ class PostRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getCreatedPostsTodayByToken(Token $token): array
+    public function getPostsCreatedTodayByToken(Token $token): array
     {
         return $this->createQueryBuilder('post')
             ->where('post.token = :token')

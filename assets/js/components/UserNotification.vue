@@ -143,7 +143,6 @@ export default {
             this.userNotifications.forEach((item) => {
                 if (notificationTypes.newPost === item.type && !item.viewed) {
                     let jsonData = JSON.parse(item.jsonData);
-
                     const index = postsNotifications.findIndex((post) => {
                         return JSON.parse(post.jsonData).tokenName === jsonData.tokenName;
                     });

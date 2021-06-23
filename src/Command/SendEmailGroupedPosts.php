@@ -6,6 +6,9 @@ use App\Entity\Post;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Utils\NotificationChannels;
+use App\Utils\NotificationTypes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,6 +18,7 @@ class SendEmailGroupedPosts extends Command
     private MailerInterface $mail;
     private PostManagerInterface $postManager;
     private TokenManagerInterface $tokenManager;
+    private UserNotificationManagerInterface $userNotificationManager;
 
     public function __construct(
         MailerInterface $mail,
@@ -36,7 +40,7 @@ class SendEmailGroupedPosts extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $posts = $this->postManager->getCreatedPostsToday();
+        $posts = $this->postManager->getPostsCreatedToday();
 
         $data = [];
 
@@ -51,10 +55,17 @@ class SendEmailGroupedPosts extends Command
             $groupedPostsCount = count($groupedPosts);
 
             foreach ($users as $user) {
-                if ($user->getEmail() !== $token->getOwner()->getEmail()) {
-                    if (2 < $groupedPostsCount) {
-                        array_pop($groupedPosts);
-                        $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
+                if ($this->userNotificationManager->isNotificationAvailable(
+                    $user,
+                    NotificationTypes::TOKEN_NEW_POST,
+                    NotificationChannels::EMAIL
+                )
+                ) {
+                    if ($user->getEmail() !== $token->getOwner()->getEmail()) {
+                        if (2 < $groupedPostsCount) {
+                            array_pop($groupedPosts);
+                            $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
+                        }
                     }
                 }
             }

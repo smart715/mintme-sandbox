@@ -49,7 +49,7 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
             $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
-        $posts = $this->postManager->getCreatedPostsTodayByToken($this->token);
+        $posts = $this->postManager->getPostsCreatedTodayByToken($this->token);
 
         if (1 < count($posts)) {
             return;
