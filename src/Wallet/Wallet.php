@@ -123,8 +123,12 @@ class Wallet implements WalletInterface
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
         $tokenEthFee = $this->moneyWrapper->parse(
-            (string)$this->parameterBag->get('token_withdraw_fee'),
+            (string)$this->parameterBag->get('eth_token_withdraw_fee'),
             Symbols::ETH
+        );
+        $tokenBnbFee = $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('bnb_token_withdraw_fee'),
+            Symbols::BNB
         );
 
         $withdrawFee = $tradable->getFee() ??
