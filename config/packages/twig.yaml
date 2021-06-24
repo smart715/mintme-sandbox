@@ -42,5 +42,6 @@ twig:
         global_coinify_crypto_currencies: '%coinify_crypto_currencies%'
         global_translation_flags: '%translation_flags%'
         global_eth_token_withdraw_fee: '%eth_token_withdraw_fee%'
+        global_bnb_token_withdraw_fee: '%bnb_token_withdraw_fee%'
         mercure_hub_url: '%env(MERCURE_PUBLISH_URL)%'
         global_mintme_explorer_url: '%mintme_explorer_url%'

@@ -119,15 +119,15 @@ class Wallet implements WalletInterface
         } else {
             $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
             $token = $tradable;
+
+            if (!$crypto) {
+                throw new NotFoundTokenException();
+            }
         }
 
         $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
 
         $withdrawFee = $this->getFee($tradable, $crypto);
-
-        if (!$crypto) {
-            throw new NotFoundTokenException();
-        }
 
         $cryptoSymbol = $crypto->getSymbol();
 
