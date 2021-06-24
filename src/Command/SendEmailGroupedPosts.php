@@ -63,7 +63,7 @@ class SendEmailGroupedPosts extends Command
                     NotificationChannels::EMAIL
                 )
                 ) {
-                    if ($user->getEmail() !== $token->getOwner()->getEmail()) {
+                    if ($user->getId() !== $token->getOwner()->getId()) {
                         if (2 < $groupedPostsCount) {
                             array_pop($groupedPosts);
                             $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);

@@ -49,4 +49,3 @@ all:
 
 generate_translations:
 	php bin/console app:load-translations-ui
-
