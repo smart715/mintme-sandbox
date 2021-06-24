@@ -246,8 +246,8 @@ parameters:
     # token withdraw fee in ETH (0.003, 0.1 etc)
     eth_token_withdraw_fee: 0.01
 
-    # token withdraw fee in ETH (0.003, 0.1 etc)
-    bnb_token_withdraw_fee: 0.1
+    # token withdraw fee in BNB (0.003, 0.1 etc)
+    bnb_token_withdraw_fee: 0.01
 
     #max amount of active orders allowed per user
     max_allowed_active_orders: 100
