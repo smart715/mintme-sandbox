@@ -23,11 +23,13 @@ class SendEmailGroupedPosts extends Command
     public function __construct(
         MailerInterface $mail,
         PostManagerInterface $postManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        UserNotificationManagerInterface $userNotificationManager
     ) {
         $this->postManager = $postManager;
         $this->tokenManager = $tokenManager;
         $this->mail = $mail;
+        $this->userNotificationManager = $userNotificationManager;
         parent::__construct();
     }
 
