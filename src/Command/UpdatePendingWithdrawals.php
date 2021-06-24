@@ -134,10 +134,6 @@ class UpdatePendingWithdrawals extends Command
             $itemsCount = count($items);
             $pendingCount = 0;
             $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
-            $ethTokenFeeInCrypto = $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('token_withdraw_fee'),
-                Symbols::ETH
-            );
 
             /** @var PendingTokenWithdraw $item */
             foreach ($items as $item) {
@@ -148,7 +144,12 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->beginTransaction();
                     $fee = $token->isMintmeToken()
                         ? $mintmeCrypto->getFee()
-                        : $ethTokenFeeInCrypto;
+                        : $this->moneyWrapper->parse(
+                            (string)$this->parameterBag->get(
+                                strtolower($token->getCryptoSymbol()) . '_token_withdraw_fee'
+                            ),
+                            $token->getCryptoSymbol()
+                        );
 
                     $feeToken = Token::getFromCrypto($token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto());
                     $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();

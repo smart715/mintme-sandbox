@@ -68,10 +68,12 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
             throw new NotFoundTokenException();
         }
 
-        $fee = Symbols::ETH === $crypto->getSymbol()
+        $cryptoSymbol = $crypto->getSymbol();
+
+        $fee = in_array($cryptoSymbol, [Symbols::ETH, Symbols::BNB])
             ? $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('token_withdraw_fee'),
-                Symbols::ETH
+                (string)$this->parameterBag->get(strtolower($cryptoSymbol) . '_token_withdraw_fee'),
+                $cryptoSymbol
             ) : $crypto->getFee();
 
         if (!$token->getFee()) {

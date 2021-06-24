@@ -332,7 +332,10 @@ class PaymentConsumerTest extends TestCase
     {
         $pb = $this->createMock(ParameterBagInterface::class);
         $pb->method('get')
-            ->with('token_withdraw_fee')
+            ->with('eth_token_withdraw_fee')
+            ->willReturn('0.01')
+            ->method('get')
+            ->with('bnb_token_withdraw_fee')
             ->willReturn('0.01');
 
         return $pb;

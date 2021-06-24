@@ -252,11 +252,11 @@ class ContractHandler implements ContractHandlerInterface
         }
 
         /** @var Token $tradeble */
-        return in_array($tradeble->getCryptoSymbol(), [Symbols::ETH, Symbols::BNB], true)
+        return in_array($cryptoSymbol = $tradeble->getCryptoSymbol(), [Symbols::ETH, Symbols::BNB], true)
             ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('token_withdraw_fee'),
-                Symbols::ETH
-            ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
+                (string)$this->parameterBag->get(strtolower($cryptoSymbol) . '_token_withdraw_fee'),
+                $cryptoSymbol
+            ) : $this->cryptoManager->findBySymbol($cryptoSymbol)->getFee();
     }
 
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
