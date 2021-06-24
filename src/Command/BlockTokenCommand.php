@@ -232,7 +232,7 @@ class BlockTokenCommand extends Command
         $user = $token->getOwner();
         $coinMarkets = $this->marketFactory->getCoinMarkets();
         $tokenMarket = $this->marketFactory->create(
-            $this->cryptoManager->findBySymbol($token->getCryptoSymbol(), true),
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $token
         );
 
