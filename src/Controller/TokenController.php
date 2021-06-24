@@ -522,7 +522,7 @@ class TokenController extends Controller
             $dashedName = Symbols::WEB;
         }
 
-        if (null !== $this->cryptoManager->findBySymbol($name)) {
+        if ($this->cryptoManager->findBySymbol($name)) {
             throw new RedirectException(
                 $this->redirectToRoute('coin', [
                     'base'=> (Symbols::WEB == $name ? Symbols::BTC : $name),
