@@ -205,4 +205,5 @@ export const currencies = {
     USD,
     ETH,
     USDC,
+    BNB,
 };
