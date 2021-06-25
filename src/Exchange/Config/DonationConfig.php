@@ -67,6 +67,14 @@ class DonationConfig
         );
     }
 
+    public function getMinBnbAmount(): Money
+    {
+        return $this->moneyWrapper->parse(
+            (string)($this->donationParams['minBnbAmount'] ?? 0),
+            Symbols::BNB
+        );
+    }
+
     public function getMinTokensAmount(): Money
     {
         return $this->moneyWrapper->parse(

@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use Doctrine\ORM\EntityManagerInterface;
+use Money\Money;
 
 class PendingManager implements PendingManagerInterface
 {
@@ -24,11 +25,11 @@ class PendingManager implements PendingManagerInterface
     }
 
     /** @param Crypto|Token $tradable */
-    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable): PendingWithdrawInterface
+    public function create(User $user, Address $address, Amount $amount, TradebleInterface $tradable, Money $fee): PendingWithdrawInterface
     {
         $pending = $tradable instanceof Token
-            ? new PendingTokenWithdraw($user, $tradable, $amount, $address)
-            : new PendingWithdraw($user, $tradable, $amount, $address);
+            ? new PendingTokenWithdraw($user, $tradable, $amount, $address, $fee)
+            : new PendingWithdraw($user, $tradable, $amount, $address, $fee);
 
         $this->em->persist($pending);
         $this->em->flush();

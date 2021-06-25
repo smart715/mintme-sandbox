@@ -37,6 +37,13 @@ class DonationHandler implements DonationHandlerInterface
     private ParameterBagInterface $parameterBag;
     private TraderInterface $trader;
 
+    private const ANOTHER_DONATION_SYMBOLS = [
+        Symbols::BTC,
+        Symbols::ETH,
+        Symbols::USDC,
+        Symbols::BNB,
+    ];
+
     public function __construct(
         DonationFetcherInterface $donationFetcher,
         MarketNameConverterInterface $marketNameConverter,
@@ -76,14 +83,14 @@ class DonationHandler implements DonationHandlerInterface
         $this->checkAmount($donorUser, $amountObj, $currency, false);
         $isDonationInMintme = Symbols::WEB === $currency;
 
-        if (!$isDonationInMintme) {
+        if (in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true)) {
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders(
                 new Market(
                     $this->cryptoManager->findBySymbol($currency),
                     $this->cryptoManager->findBySymbol(Symbols::WEB)
                 )
             );
-            $amountObj = $this->getCryptoWorthInMintme($pendingSellOrders, $amountObj);
+            $amountObj = $this->getCryptoWorthInMintme($amountObj, $currency);
         }
 
         return $this->donationFetcher->checkDonation(
@@ -130,7 +137,7 @@ class DonationHandler implements DonationHandlerInterface
             $this->cryptoManager->findBySymbol(Symbols::WEB)
         );
 
-        if (!$isDonationInMintme) {
+        if (in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true)) {
             // Convert sum of donation in any Crypto to MINTME
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders($cryptoMarket);
             $donationMintmeAmount = $this->getCryptoWorthInMintme($pendingSellOrders, $donationMintmeAmount);
@@ -467,6 +474,12 @@ class DonationHandler implements DonationHandlerInterface
             $minEthAmount = $this->donationConfig->getMinEthAmount();
 
             if ($amount->lessThan($minEthAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
+                throw new ApiBadRequestException('Invalid donation amount.');
+            }
+        } elseif (Symbols::BNB === $currency) {
+            $minBnbAmount = $this->donationConfig->getMinBnbAmount();
+
+            if ($amount->lessThan($minBnbAmount) || ($checkBalance && $user && $amount->greaterThan($balance))) {
                 throw new ApiBadRequestException('Invalid donation amount.');
             }
         } else {

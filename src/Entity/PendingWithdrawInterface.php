@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
+use Money\Money;
 
 interface PendingWithdrawInterface
 {
@@ -16,4 +17,6 @@ interface PendingWithdrawInterface
     public function getUser(): User;
 
     public function getSymbol(): string;
+
+    public function getFee(): Money;
 }

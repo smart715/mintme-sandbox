@@ -597,13 +597,23 @@ class MarketHandler implements MarketHandlerInterface
         $paginatedOrders = [];
 
         do {
-            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $pendingOrders = $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                self::SELL
+            );
+
+            $moreOrders = $this->parsePendingOrders(
+                $pendingOrders,
+                $market
+            );
+
             $paginatedOrders[] = $moreOrders;
             $offset += $limit;
         } while (count($moreOrders) >= $limit);
 
         $orders = array_merge([], ...$paginatedOrders);
-
         $zeroDepthBase = $this->moneyWrapper->parse(
             '0',
             $this->getSymbol($market->getBase())
@@ -652,7 +662,18 @@ class MarketHandler implements MarketHandlerInterface
         $paginatedBuyOrders = [];
 
         do {
-            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
+            $pendingOrders = $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                self::BUY
+            );
+
+            $moreOrders = $this->parsePendingOrders(
+                $pendingOrders,
+                $market
+            );
+
             $paginatedBuyOrders[] = $moreOrders;
             $offset += $limit;
         } while (count($moreOrders) >= $limit);
@@ -666,7 +687,9 @@ class MarketHandler implements MarketHandlerInterface
 
         /** @var Money $buyOrdersSum */
         $buyOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
-            return $order->getPrice()->add($sum);
+            return $sum->add(
+                $order->getPrice()->multiply($this->moneyWrapper->format($order->getAmount()))
+            );
         }, $zeroDepthBase);
 
         $buyOrdersSum = $this->moneyWrapper->format($buyOrdersSum);
@@ -701,7 +724,6 @@ class MarketHandler implements MarketHandlerInterface
             $limit,
             $side
         );
-
         $ordersGroupedCount = count($pricesKeys);
 
         foreach ($pendingOrders as $pendingOrder) {

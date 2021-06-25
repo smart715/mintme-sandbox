@@ -19,6 +19,9 @@
             <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
                 <b>{{ $t('info_bar.btc.title') }}</b> {{ btcBalance }}
             </span>
+            <span class="pr-2 pr-sm-5" v-b-tooltip.hover title="Bitcoin balance">
+                <b>{{ $t('info_bar.bnb.title') }}</b> {{ bnbBalance }}
+            </span>
             <span v-if="authCode" class="pr-2 pr-sm-5" v-b-tooltip.hover title="Current email verification code">
                 <b>{{ $t('info_bar.code.title') }}</b> {{ authCode }}
             </span>
@@ -27,7 +30,7 @@
                 v-if="'dev' !== environment"
                 @click="manageBackendService"
                 class="btn-sm float-right mr-4 toggle-btn"
-                :disabled="null === backendServiceStatus || managingBackendService"
+                :disabled="null === backendServiceStatus || managingBackendService || (!isIssueBranch && backendServiceStatus)"
             >
                 <font-awesome-icon
                     v-if="managingBackendService"
@@ -85,10 +88,25 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Decimal from 'decimal.js';
+import {BButton, BCollapse, VBTooltip, VBToggle} from 'bootstrap-vue';
+
+library.add(faCircleNotch, faTimesCircle);
 
 export default {
     name: 'InfoBar',
+    components: {
+        BButton,
+        BCollapse,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+        'b-toggle': VBToggle,
+    },
     props: {
         username: String,
         authCode: String,
@@ -136,6 +154,9 @@ export default {
         }
     },
     computed: {
+        isIssueBranch: function() {
+            return ('-' === this.infoData.panelBranch || !this.infoData.panelBranch.match('^v[0-9]+$'));
+        },
         getButtonName: function() {
             if (this.managingBackendService) {
                 return this.$t('info_bar.backend_service.in_progress');
@@ -156,6 +177,9 @@ export default {
         },
         usdcBalance: function() {
           return this.balance.USDC ? new Decimal(this.balance.USDC.available).toFixed(this.balance.USDC.subunit) : '-';
+        },
+        bnbBalance: function() {
+            return this.balance.BNB ? new Decimal(this.balance.BNB.available).toFixed(this.balance.BNB.subunit) : '-';
         },
     },
     methods: {

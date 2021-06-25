@@ -113,7 +113,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->join('ms.quoteToken', 'qt')
             ->leftJoin('qt.crypto', 'c')
             ->where('qt IS NOT NULL')
-            ->andWhere('qt.isBlocked=false');
+            ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false');
 
         switch ($filter) {
             case self::FILTER_DEPLOYED_ONLY_MINTME:
@@ -121,15 +122,15 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::FILTER_DEPLOYED_ONLY_ETH:
-                $queryBuilder->andWhere(
-                    "qt.deployed = 1 AND c.symbol = :eth"
-                )->setParameter('eth', Symbols::ETH);
+                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :eth")
+                             ->setParameter('eth', Symbols::ETH);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
@@ -158,7 +159,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
-                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE);
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND qt.crypto IS NULL");
 
                 break;
         }
@@ -197,8 +199,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
                 break;
             case self::SORT_RANK:
-                $queryBuilder->addSelect('CASE WHEN qt.deployed = 1 AND qt.crypto IS NULL THEN 1 ELSE 0 END AS HIDDEN deployed_on_mintme');
-                $result[] = 'deployed_on_mintme';
+                $queryBuilder->addSelect('CASE WHEN qt.deployed = 1 AND qt.crypto IS NULL THEN 1 ELSE 0 END AS HIDDEN rank_deployed_on_mintme');
+                $result[] = 'rank_deployed_on_mintme';
                 $result[] = 'to_number(ms.monthVolume)';
 
                 break;
@@ -246,7 +248,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getMarketsInfo(
         int $offset,
         int $limit,
-        string $sort = "monthVolume",
+        string $sort = "rank",
         string $order = "DESC",
         int $filter = 1,
         ?int $userId = null
@@ -259,12 +261,13 @@ class MarketStatusManager implements MarketStatusManagerInterface
             ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false')
             ->groupBy('ms')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            $queryBuilder->andWhere('u.user = :id')
                 ->setParameter('id', $userId);
         }
 
@@ -471,6 +474,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
+                    AND qt.is_hidden = false
                 ) AS r
                 WHERE r.id IN (:ids)";
 

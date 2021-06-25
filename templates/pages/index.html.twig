@@ -1,6 +1,12 @@
 {% extends 'base.html.twig' %}
 
+
 {% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/home') }}
+{% endblock %}
 
 {% block bgclass %}index-bg{% endblock %}
 
@@ -183,8 +189,8 @@
                         <span slot="title">
                             {% trans %}page.index.faq.q1.header{% endtrans %}
                         </span>
-                            <span slot="body">
-                            {% trans %}page.index.faq.q1.body{% endtrans %}
+                        <span slot="body">
+                        {% trans %}page.index.faq.q1.body{% endtrans %}
                         </span>
                         </faq-item>
                     </div>
@@ -194,7 +200,7 @@
                             {% trans %}page.index.faq.q2.header{% endtrans %}
                         </span>
                         <span slot="body">
-                            {% trans %}page.index.faq.q2.body{% endtrans %}
+                        {% trans %}page.index.faq.q2.body{% endtrans %}
                         </span>
                         </faq-item>
                     </div>
@@ -249,6 +255,5 @@
 {% block messageClass %}d-none{% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('home') }}
+    {{ encore_entry_script_tags('pages/home') }}
 {% endblock %}
-

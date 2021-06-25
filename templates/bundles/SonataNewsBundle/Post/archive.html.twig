@@ -5,15 +5,17 @@
     {% endspaceless %}
 {% endblock %}
 
-{% block head %}
-        <noscript>
-            <style>
-                [data-aos] {
-                    opacity: 1 !important;
-                    transform: translate(0) scale(1) !important;
-                }
-            </style>
-        </noscript>
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/news') }}
+    <noscript>
+        <style>
+            [data-aos] {
+                opacity: 1 !important;
+                transform: translate(0) scale(1) !important;
+            }
+        </style>
+    </noscript>
 {% endblock %}
 
 {% block content %}
@@ -86,5 +88,5 @@
     </div>
 {% endblock %}
 {% block pagescripts %}
-    {{ encore_entry_script_tags('news') }}
+    {{ encore_entry_script_tags('pages/news') }}
 {% endblock %}

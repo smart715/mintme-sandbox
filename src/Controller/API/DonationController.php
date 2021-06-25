@@ -50,7 +50,7 @@ class DonationController extends AbstractFOSRestController
      *     "/{base}/{quote}/check/{currency}/{amount}",
      *     name="check_donation",
      *     options={"expose"=true},
-     *     requirements={"currency"="^(WEB|BTC|ETH|USDC)$"}
+     *     requirements={"currency"="^(WEB|BTC|ETH|USDC|BNB)$"}
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")
      * @Rest\RequestParam(
@@ -113,7 +113,7 @@ class DonationController extends AbstractFOSRestController
      * @Rest\RequestParam(
      *     name="currency",
      *     allowBlank=false,
-     *     requirements="(WEB|BTC|ETH|USDC)",
+     *     requirements="(WEB|BTC|ETH|USDC|BNB)",
      *     description="Selected currency to donate."
      * )
      * @Rest\RequestParam(name="amount", allowBlank=false, description="Amount to donate.")

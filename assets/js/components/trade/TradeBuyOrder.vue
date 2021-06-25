@@ -49,8 +49,8 @@
                                 :show-converter="currencyMode === currencyModes.usd.value"
                             />
                              <div v-if="loggedIn && immutableBalance" class="w-50 m-auto pl-4">
-                                {{ $t('trade.buy_order.your.header') }}
-                                <span>
+                                 {{ $t('trade.buy_order.your.header') }}
+                                 <span>
                                     <span class="c-pointer" @click="balanceClicked">{{ market.base.symbol | rebranding }}:
                                         <span class="text-white">
                                             <span class="text-nowrap">
@@ -67,13 +67,12 @@
                                         </template>
                                     </guide>
                                 </span>
-                                <p class="text-nowrap">
-                                    <a
-                                        v-if="showDepositMoreLink"
-                                        :href="depositMoreLink"
-                                        tabindex="1"
-                                    >{{ $t('trade.buy_order.deposit_more') }}</a>
-                                </p>
+                                 <a
+                                     v-if="showDepositMoreLink"
+                                     :href="depositMoreLink"
+                                     class="d-block text-nowrap"
+                                     tabindex="1"
+                                 >{{ $t('trade.buy_order.deposit_more') }}</a>
                             </div>
                         </div>
                     </div>
@@ -176,6 +175,12 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Decimal from 'decimal.js';
+import {VBTooltip} from 'bootstrap-vue';
+import {mapMutations, mapGetters} from 'vuex';
 import Guide from '../Guide';
 import {
     WebSocketMixin,
@@ -188,13 +193,21 @@ import {
     FiltersMixin,
 } from '../../mixins/';
 import {toMoney} from '../../utils';
-import Decimal from 'decimal.js';
-import {mapMutations, mapGetters} from 'vuex';
 import {USD, currencyModes} from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'TradeBuyOrder',
+    components: {
+        Guide,
+        PriceConverterInput,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         PlaceOrder,
@@ -205,10 +218,6 @@ export default {
         LoggerMixin,
         FiltersMixin,
     ],
-    components: {
-        Guide,
-        PriceConverterInput,
-    },
     props: {
         loginUrl: String,
         signupUrl: String,

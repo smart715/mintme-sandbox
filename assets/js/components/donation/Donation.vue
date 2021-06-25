@@ -171,7 +171,12 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import debounce from 'lodash/debounce';
+import {BDropdown, BDropdownItem} from 'bootstrap-vue';
+import Decimal from 'decimal.js';
 import {
     CheckInputMixin,
     MoneyFilterMixin,
@@ -184,14 +189,13 @@ import {
 import ConfirmModal from '../modal/ConfirmModal';
 import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 import Guide from '../Guide';
-import LoginSignupSwitcher from '../LoginSignupSwitcher';
-import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {
     webSymbol,
     btcSymbol,
     ethSymbol,
     usdcSymbol,
+    bnbSymbol,
     HTTP_BAD_REQUEST,
     BTC,
     MINTME,
@@ -203,8 +207,20 @@ import {
 } from '../../utils/constants';
 import PriceConverterInput from '../PriceConverterInput';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'Donation',
+    components: {
+        BDropdown,
+        BDropdownItem,
+        PriceConverterInput,
+        Guide,
+        ConfirmModal,
+        LoginSignupSwitcher: () => import('../LoginSignupSwitcher').then((data) => data.default),
+        AddPhoneAlertModal,
+        FontAwesomeIcon,
+    },
     mixins: [
         CheckInputMixin,
         MoneyFilterMixin,
@@ -214,13 +230,6 @@ export default {
         WebSocketMixin,
         AddPhoneAlertMixin,
     ],
-    components: {
-        PriceConverterInput,
-        Guide,
-        ConfirmModal,
-        LoginSignupSwitcher,
-        AddPhoneAlertModal,
-    },
     props: {
         market: Object,
         loggedIn: Boolean,
@@ -236,6 +245,7 @@ export default {
                 btcSymbol,
                 ethSymbol,
                 usdcSymbol,
+                bnbSymbol,
             },
             currencyModes,
             selectedCurrency: null,

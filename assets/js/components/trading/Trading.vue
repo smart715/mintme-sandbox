@@ -9,35 +9,37 @@
                     <div class="row coin-markets">
                         <div v-for="(market, index) in this.sanitizedMarketsOnTop"
                              :key="market.pair"
-                             class="col-12 col-lg-4 my-2 px-1"
-                             v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
+                             class="col-12 col-lg-6 my-2 px-0"
+                             v-bind:class="{'market-border': Number.isInteger(index/2) || 0 === index}"
                         >
-                            <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block pl-md-2 pr-md-2 py-2">
+                            <a :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
+                                <div class="d-inline-block text-center col-2 pr-0 pl-0 pl-sm-4">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
-                                <div class="crypto-pair d-inline-block align-middle">
+                                <div class="crypto-pair d-inline-block align-middle col-3 px-0">
                                     <div class="text-center">{{ market.pair|rebranding }}</div>
-                                    <div v-if="parseFloat(market.change) > 0" class="market-up text-center">
-                                        &#9650;+{{ market.change }}
-                                    </div>
-                                    <div v-else-if="parseFloat(market.change) < 0" class="market-down text-center">
-                                        &#9660;{{ market.change }}
-                                    </div>
-                                    <div class="text-center" v-else>
-                                        {{ market.change }}
-                                    </div>
                                     <div class="text-center">
                                         {{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}
                                     </div>
                                 </div>
                             </a>
-                            <div class="d-inline-block pl-2 pt-2 pt-lg-0 align-middle market-data float-right float-lg-none">
+                            <div class="d-inline-block align-middle col-2 px-0">
+                                <div v-if="parseFloat(market.change) > 0" class="market-up text-center">
+                                    &#9650;+{{ market.change }}
+                                </div>
+                                <div v-else-if="parseFloat(market.change) < 0" class="market-down text-center">
+                                    &#9660;{{ market.change }}
+                                </div>
+                                <div class="text-center" v-else>
+                                    {{ market.change }}
+                                </div>
+                            </div>
+                            <div class="d-inline-block col-4 align-middle market-data float-right float-lg-none px-0">
                                 <span>{{ $t('trading.table.volume_30d') }}</span>
-                                <span class="float-lg-right pl-1 pl-sm-4 pl-lg-0">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
                                 <span>{{ $t('trading.table.volume_24h') }}</span>
-                                <span class="float-lg-right pl-1 pl-sm-4 pl-lg-0">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>
@@ -285,7 +287,18 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import _ from 'lodash';
+import {
+    BDropdown,
+    BDropdownItem,
+    BTable,
+    BLink,
+    BPagination,
+    VBTooltip,
+} from 'bootstrap-vue';
 import Guide from '../Guide';
 import Avatar from '../Avatar';
 import {
@@ -296,12 +309,27 @@ import {
   LoggerMixin,
 } from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD, WEB, BTC, MINTME, USDC, ETH} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME, USDC, ETH, BNB} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
 import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'Trading',
+    components: {
+        BDropdown,
+        BDropdownItem,
+        BTable,
+        BLink,
+        BPagination,
+        Guide,
+        Avatar,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -323,10 +351,6 @@ export default {
         perPage: Number,
         rowsProp: Number,
     },
-    components: {
-        Guide,
-        Avatar,
-    },
     data() {
         return {
             MINTME: MINTME,
@@ -342,6 +366,7 @@ export default {
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
                 {currency: USDC.symbol, token: WEB.symbol},
+                {currency: BNB.symbol, token: WEB.symbol},
             ],
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
@@ -520,8 +545,14 @@ export default {
                 && this.currentPage === totalPages;
         },
         marketFiltersOptions: function() {
-            return Object.values(this.marketFilters.options)
-                .filter((filter) => 'user' !== filter.key || 'user' === filter.key && this.userId);
+            const options = Object.values(this.marketFilters.options);
+            const allKey = this.marketFilters.options.all.key;
+            const userKey = this.marketFilters.options.user.key;
+
+            return options.filter((filter) =>
+                (userKey !== filter.key || this.userId) &&
+                allKey !== filter.key
+            );
         },
     },
     mounted() {
@@ -542,7 +573,7 @@ export default {
                 && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
-            this.sortBy = '';
+            this.sortBy = 'rank';
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },
@@ -747,7 +778,7 @@ export default {
             let hiddenName = this.findHiddenName(token);
 
             return {
-                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol].includes(token)
+                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol, BNB.symbol].includes(token)
                     ? `${token}/${currency}`
                     : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',

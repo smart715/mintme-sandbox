@@ -117,7 +117,7 @@ class Wallet implements WalletInterface
             $crypto = $tradable;
             $token = Token::getFromCrypto($tradable);
         } else {
-            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol(), true);
+            $crypto = $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
             $token = $tradable;
         }
 
@@ -127,13 +127,21 @@ class Wallet implements WalletInterface
             Symbols::ETH
         );
 
+        $withdrawFee = $tradable->getFee() ??
+            ($crypto->getFee()->isSameCurrency(new Money(0, new Currency('WEB'))) ?
+                $crypto->getFee() :
+                $this->moneyWrapper->parse(
+                    (string)$this->parameterBag->get('token_withdraw_fee'),
+                    Symbols::ETH
+                ));
+
         if (!$crypto) {
             throw new NotFoundTokenException();
         }
 
         $cryptoSymbol = $crypto->getSymbol();
 
-        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB], true)) {
+        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB, Symbols::BNB], true)) {
             if (!$this->validateEtheriumAddress($address->getAddress()) ||
                 !$this->withdrawGateway->isContractAddress($address->getAddress(), $cryptoSymbol)
             ) {
@@ -177,7 +185,7 @@ class Wallet implements WalletInterface
             );
         }
 
-        return $this->pendingManager->create($user, $address, $amount, $tradable);
+        return $this->pendingManager->create($user, $address, $amount, $tradable, $withdrawFee);
     }
 
     /**
@@ -202,9 +210,9 @@ class Wallet implements WalletInterface
 
         try {
             if ($tradable instanceof Crypto && !$tradable->isToken()) {
-                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $pendingWithdraw->getFee());
             } else {
-                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $pendingWithdraw->getFee());
             }
 
             $this->em->remove($pendingWithdraw);

@@ -27,7 +27,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -44,7 +44,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <add-phone-alert-modal
@@ -150,7 +150,6 @@ export default {
             buyPage: 2,
             buyDepth: null,
             ordersUpdated: false,
-            addPhoneModalMessageType: 'make_orders',
             addPhoneModalProfileNickName: this.profileNickname,
         };
     },
@@ -298,7 +297,6 @@ export default {
             const isSell = WSAPI.order.type.SELL === parseInt(data.side);
             let orders = isSell ? this.sellOrders : this.buyOrders;
             let order = orders.find((order) => data.id === order.id);
-            let totalOrders = isSell ? this.totalSellOrders : this.totalBuyOrders;
 
             switch (type) {
                 case WSAPI.order.status.PUT:
@@ -309,8 +307,16 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
-                        totalOrders = isSell ? totalOrders.add(data.amount) : totalOrders.add(data.price);
-                        this.saveOrders(orders, isSell, totalOrders);
+
+                        if (isSell) {
+                            this.totalSellOrders = this.totalSellOrders.add(data.left);
+                        } else {
+                            this.totalBuyOrders = this.totalBuyOrders.add(
+                                new Decimal(data.price).mul(data.left)
+                            );
+                        }
+
+                        this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
                     })
                     .catch((err) => {
@@ -328,15 +334,19 @@ export default {
                     }
 
                     let index = orders.indexOf(order);
+                    let deltaAmount = (new Decimal(order.amount)).sub(data.left);
+
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
 
-                    if (totalOrders) {
-                        totalOrders = isSell
-                            ? totalOrders.sub(order.amount).add(data.amount)
-                            : totalOrders.sub(order.price).add(data.price);
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(deltaAmount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(data.price).mul(deltaAmount)
+                      );
                     }
 
                     this.ordersUpdated = true;
@@ -349,27 +359,28 @@ export default {
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
 
-                    if (totalOrders) {
-                      totalOrders = isSell ? totalOrders.sub(order.amount) : totalOrders.sub(order.price);
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(order.price).mul(order.amount)
+                      );
                     }
 
                     break;
             }
 
-            this.saveOrders(orders, isSell, totalOrders);
+            this.saveOrders(orders, isSell);
         },
-        saveOrders: function(orders, isSell, totalOrders) {
+        saveOrders: function(orders, isSell) {
             if (isSell) {
                 this.sellOrders = orders;
-                if (totalOrders) {
-                  this.totalSellOrders = totalOrders;
-                }
             } else {
                 this.buyOrders = orders;
-                 if (totalOrders) {
-                    this.totalBuyOrders = totalOrders;
-                }
             }
+        },
+        preventAction() {
+            this.addPhoneModalVisible = true;
         },
     },
 };

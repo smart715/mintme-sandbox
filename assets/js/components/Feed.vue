@@ -25,6 +25,7 @@ import {toMoney} from '../utils';
 import {currencies, TOK} from '../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {downArrow} from '../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {RebrandingFilterMixin} from '../mixins';
 import TruncateFilterMixin from '../mixins/filters/truncate';
 
@@ -32,6 +33,9 @@ library.add(downArrow);
 
 export default {
     name: 'Feed',
+    components: {
+        FontAwesomeIcon,
+    },
     mixins: [
         TruncateFilterMixin,
         RebrandingFilterMixin,
@@ -86,8 +90,8 @@ export default {
                 amount: item.amount ? toMoney(item.amount, subunit) : null,
                 buyer: item.buyer ? this.truncateFunc(item.buyer.profile.nickname, 12) : null,
                 buyerUrl: item.buyer ? this.$routing.generate('profile-view', {nickname: item.buyer.profile.nickname}) : null,
-                seller: item.seller ? this.truncateFunc(item.seller.profile.nickname, 12) : null,
-                sellerUrl: item.seller ? this.$routing.generate('profile-view', {nickname: item.seller.profile.nickname}) : null,
+                post: item.post ? `"${this.truncateFunc(item.post.title, 32)}"` : '',
+                postUrl: item.post ? this.$routing.generate('show_post', {id: item.post.id}) : '',
                 symbol,
             };
         },

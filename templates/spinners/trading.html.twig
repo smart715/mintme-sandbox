@@ -7,7 +7,7 @@
                 </span>
             </div>
             <div class="row coin-markets d-flex justify-content-center align-items-center">
-                   <span class="vld-icon"></span>
+                <div class="icon-loading"></div>
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
             <div slot="title" class="card-title font-weight-bold pl-3 pt-3 pb-1">
                 <span class="float-left">
                     {{ tokensCount }} {% trans %} trading.tokens_and_market_cap {% endtrans %}
-                    <span class="vld-icon"></span>
+                    <div class="icon-loading"></div>
                 </span>
             </div>
             <div class="trading-table table-responsive text-nowrap">
@@ -114,7 +114,8 @@
                        </tr>
                     </thead>
                     <tbody role="rowgroup" class="trading-body">
-                        {% for market in markets|slice(3) %}
+                        {# slice on count of all predefined cryptos #}
+                        {% for market in markets|slice(4) %}
                            <tr role="row">
                               <td aria-colindex="1" role="cell" class="pair-cell-trading">
                                  <div>
@@ -134,19 +135,16 @@
                                  </div>
                               </td>
                               <td aria-colindex="2" role="cell" class="">
-                                    <span class="vld-icon ml-2"></span>
+                                    <div class="icon-loading ml-2"></div>
                               </td>
                               <td aria-colindex="3" role="cell" class="">
-                                  {# {{ market.lastPrice|toMoney(8, false) }} {{ market.base.symbol }} #}
-                                    <span class="vld-icon ml-2"></span>
+                                    <div class="icon-loading ml-2"></div>
                               </td>
                               <td aria-colindex="4" role="cell" class="">
-                                  {# {{ market.monthVolume|toMoney(8, false) }} {{ market.base.symbol }} #}
-                                    <span class="vld-icon ml-2"></span>
+                                    <div class="icon-loading ml-2"></div>
                               </td>
                               <td aria-colindex="5" role="cell" class="">
-                                  {# {{ market.buyDepth|toMoney(8, false) }} {{ market.base.symbol }} #}
-                                    <span class="vld-icon ml-2"></span>
+                                    <div class="icon-loading ml-2"></div>
                               </td>
                               <td aria-colindex="6" role="cell" class="">
                                   {{ market.quote.holdersCount }}

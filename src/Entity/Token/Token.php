@@ -267,6 +267,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $isBlocked = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHidden = false; // phpcs:ignore
+
+    /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
      * @var int
      */
@@ -325,9 +330,15 @@ class Token implements TradebleInterface, ImagineInterface
      */
     public function getHoldersCount(): int
     {
-        return $this->users
-            ? $this->users->count()
-            : 0;
+        if ($this->users) {
+            $holders = $this->users->filter(function ($userToken) {
+                return $userToken->isHolder();
+            });
+
+            return $holders->count();
+        }
+
+        return 0;
     }
 
     /** {@inheritdoc} */
@@ -693,6 +704,15 @@ class Token implements TradebleInterface, ImagineInterface
             : $activeAirdrop->first();
     }
 
+    public function getAirdrop(int $id): ?Airdrop
+    {
+        $airdrops = $this->getAirdrops()->filter(fn(Airdrop $a) => $id === $a->getId());
+
+        return $airdrops->isEmpty()
+            ? null
+            : $airdrops->first();
+    }
+
     /** @codeCoverageIgnore */
     public function addAirdrop(Airdrop $airdrop): self
     {
@@ -737,6 +757,18 @@ class Token implements TradebleInterface, ImagineInterface
     public function setIsBlocked(bool $isBlocked): self
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    public function setIsHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
 
         return $this;
     }

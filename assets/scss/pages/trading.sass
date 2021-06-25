@@ -1,0 +1,110 @@
+@import '../variables'
+@import '../mixins'
+
+.trading-head
+  tr
+    th
+      outline: none
+
+.token-trading-title
+  height: 38px
+  @media(max-width: 480px)
+    height: 74px
+  @media(max-width: 393px)
+    height: 116px
+
+  .chat-envelope
+    background: $secondary
+
+  .div-container-avatar
+    background: $secondary
+    padding-left: 5px
+    padding-right: 17px
+
+.dropdown-item:hover
+  background-color: darkgray
+
+.market-down
+  color: #ff5b5b
+
+.market-up
+  color: #8fd88f
+
+.market-border
+  border-right: 1px solid $ghost-light
+  @include media-breakpoint-down(md)
+    border: none
+
+.coin-markets
+  .col-12
+    .crypto-pair
+      @media (max-width: 410px)
+        font-size: smaller
+      @media (max-width: 344px)
+        font-size: 9px
+
+.crypto-pair
+  font-size: 13px
+
+.market-data
+  font-size: smaller
+  width: 47%
+  @include media-breakpoint-down(md)
+    width: 40%
+
+.market-change
+  width: 20%
+  @include media-breakpoint-down(md)
+    width: 15%
+    font-size: smaller
+
+.coin-markets
+  margin-right: 0
+  margin-left: 0
+  min-height: 74px
+  @include media-breakpoint-down(xs)
+    font-size: 13px
+
+.truncate-pair
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  display: inline-block
+  max-width: 90%
+  vertical-align: middle
+
+.trading-table
+  overflow: auto
+
+  @media (min-width: 576px)
+    .table
+      thead
+        th:first-child
+          display: table-cell !important
+
+      tbody
+        tr
+          td:first-child
+            display: table-cell !important
+
+.trading-page-options
+  display: inline
+  width: 100%
+  @media (max-width: 387px)
+    display: inline-grid
+    margin-left: 8px
+
+    .market-filter
+      margin-top: 8px
+      padding-right: 0 !important
+
+.card-title
+  padding-top: 1rem
+
+a.token-link:hover
+  span.token-link
+    text-decoration: underline !important
+
+.pair-cell-trading
+  max-width: 260px
+  min-width: 260px

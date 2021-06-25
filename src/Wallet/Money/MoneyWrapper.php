@@ -49,7 +49,6 @@ final class MoneyWrapper implements MoneyWrapperInterface
                 [
                     Symbols::TOK => self::TOK_SUBUNIT,
                     Symbols::USD => self::USD_SUBUNIT,
-                    Symbols::BNB => self::TOK_SUBUNIT,
                 ]
             )
         );
@@ -58,6 +57,19 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public function format(Money $money): string
     {
         return $this->getFormatter()->format($money);
+    }
+
+    public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money
+    {
+        $from = $amount->getCurrency()->getCode();
+
+        $exchange = new FixedExchange([
+            $from => [
+                $toCurrency => $ratio,
+            ],
+        ]);
+
+        return $this->convert($amount, new Currency($toCurrency), $exchange);
     }
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string

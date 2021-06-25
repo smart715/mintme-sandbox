@@ -8,14 +8,18 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import VueSidebarMenu from 'vue-sidebar-menu';
+import {SidebarMenu} from 'vue-sidebar-menu';
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTasks, faAnchor, faCubes, faSignInAlt} from '@fortawesome/free-solid-svg-icons';
 
-Vue.use(VueSidebarMenu);
+library.add(faTasks, faAnchor, faCubes, faSignInAlt);
 
 export default {
     name: 'AdminMenu',
+    components: {
+        SidebarMenu,
+    },
     props: {
         isUserLogged: Boolean,
     },
@@ -72,6 +76,10 @@ export default {
                           href: this.$routing.generate('hacker-add-crypto', {crypto: 'usdc'}),
                           title: this.$t('hacker_menu.crypto.usdc'),
                         },
+                        {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'bnb'}),
+                            title: this.$t('hacker_menu.crypto.bnb'),
+                        },
                     ],
                 },
             ],
@@ -123,6 +131,7 @@ export default {
 
     .v-sidebar-menu {
         background: $secondary !important;
+        z-index: 1040;
     }
 
     .v-sidebar-menu .vsm-dropdown>.vsm-list {

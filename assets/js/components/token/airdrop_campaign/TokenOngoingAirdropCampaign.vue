@@ -1,7 +1,11 @@
 <template>
     <div
         ref="ongoing-airdrop-campaign"
+        :class="{'h-100': embeded}"
         class="airdrop-container card col-12 mb-3 px-0 py-lg-2">
+        <p v-if="storageError" class="p-3">
+            {{ $t('browser.storage.error') }}
+        </p>
         <div v-if="loaded" class="container">
             <div class="row py-2 py-md-2 py-xl-0">
                 <div class="d-inline-block col-lg-10 col-md-12 pr-lg-0 align-self-center">
@@ -51,12 +55,18 @@
                     <confirm-modal
                         :visible="showModal"
                         :button-disabled="!isOwner && !userAlreadyClaimed && !actionsCompleted"
-                        :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed"
+                        :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed && !embeded"
+                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim"
                         :show-image="false"
                         @confirm="modalOnConfirm"
-                        @close="showModal = false"
+                        @close="closeModal"
+                        :embeded="embeded"
                     >
-                        <div class="d-flex flex-column align-items-center">
+                        <p v-if="alreadyClaimed">{{ $t('airdrop_backend.already_claimed') }}</p>
+                        <p v-else-if="claim">
+                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
+                        </p>
+                        <div v-else-if="airdropCampaign.status" class="d-flex flex-column align-items-center">
                             <p class="text-white modal-title pt-2 pb-4">
                                 {{ confirmModalMessage }}
                             </p>
@@ -202,7 +212,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
+                            <div v-if="!embeded && loggedIn && !isOwner && loaded" class="align-self-start text-left mt-4 word-break">
                                 <div>
                                     {{ $t('ongoing_airdrop.referral', {tokenName, halfReward}) }}
                                 </div>
@@ -217,6 +227,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p v-else v-html="airdropEndedText"></p>
                         <template v-if="isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
@@ -224,7 +235,7 @@
                 </div>
             </div>
         </div>
-        <div v-else class="text-center py-1">
+        <div v-else-if="!storageError" class="text-center py-1">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
         </div>
         <confirm-modal
@@ -245,21 +256,34 @@
         <add-phone-alert-modal
             :visible="addPhoneModalVisible"
             :message="addPhoneModalMessage"
+            :embeded="embeded"
             @close="addPhoneModalVisible = false"
         />
-        <modal :visible="loginShowModal" @close="loginShowModal = false">
+        <modal
+            :visible="loginShowModal"
+            :embeded="embeded"
+            @close="loginShowModal = false"
+        >
             <div slot="header">
                 {{ $t('ongoing_airdrop.claim') }}
             </div>
             <div slot="body">
                 <p>{{ $t('ongoing_airdrop.claim.login_to_complete') }}</p>
-                <login-signup-switcher :google-recaptcha-site-key="googleRecaptchaSiteKey"/>
+                <login-signup-switcher
+                    :embeded="embeded"
+                    :google-recaptcha-site-key="googleRecaptchaSiteKey"
+                />
             </div>
         </modal>
     </div>
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faCircle, faGlobe, faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
+import {faTwitter, faFacebookF, faLinkedinIn, faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import LoginSignupSwitcher from '../../../components/LoginSignupSwitcher';
 import moment from 'moment';
 import Decimal from 'decimal.js';
@@ -272,6 +296,18 @@ import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
 import CopyLink from '../../CopyLink';
 import AddPhoneAlertModal from '../../modal/AddPhoneAlertModal';
+
+library.add(
+    faCircleNotch,
+    faCircle,
+    faGlobe,
+    faExclamationCircle,
+    faTwitter,
+    faFacebookF,
+    faLinkedinIn,
+    faYoutube,
+    faCopy
+);
 
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly';
@@ -291,6 +327,8 @@ export default {
         Modal,
         CopyLink,
         AddPhoneAlertModal,
+        FontAwesomeIcon,
+        FontAwesomeLayers,
     },
     props: {
         loggedIn: Boolean,
@@ -304,15 +342,28 @@ export default {
         showAirdropModal: Boolean,
         profileNickname: String,
         googleRecaptchaSiteKey: String,
+        airdropCampaignProp: {
+            type: Object,
+            default: () => null,
+        },
+        referralCodeProp: {
+            type: String,
+            default: '',
+        },
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             showModal: false,
             loginShowModal: false,
-            airdropCampaign: null,
+            airdropCampaign: this.airdropCampaignProp,
             loaded: false,
             btnDisabled: false,
             alreadyClaimed: this.userAlreadyClaimed,
+            claim: false,
             timeElapsed: false,
             showDuration: true,
             postLinkUrl: '',
@@ -320,18 +371,29 @@ export default {
             checkingBlackListedDomain: true,
             blackListedDomain: false,
             checkDomainTimeout: null,
-            referralCode: null,
+            referralCode: this.referralCodeProp,
             addPhoneModalProfileNickName: this.profileNickname,
             addPhoneModalMessageType: 'airdrop',
+            storageError: false,
         };
     },
     mounted: function() {
+        if (this.storageError) {
+            return;
+        }
+
         if (null !== this.currentLocale) {
             moment.locale(this.currentLocale);
         }
         this.showModal = this.showAirdropModal;
     },
     computed: {
+        airdropEndedText() {
+            return this.$t('ongoing_airdrop.ended_embeded', {
+                mintmeUrl: this.$routing.generate('homepage'),
+                extraAttributes: this.embeded ? 'target="_blank"' : '',
+            });
+        },
         actionsLength() {
             return Object.keys((this.airdropCampaign || {}).actions || {}).length;
         },
@@ -532,9 +594,14 @@ export default {
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
+        closeModal: function() {
+            if (!this.embeded) {
+                this.showModal = false;
+            }
+        },
         modalOnConfirm: function() {
             if (!this.loggedIn) {
-                this.showModal = false;
+                this.closeModal();
                 this.loginShowModal = true;
                 return;
             }
@@ -542,8 +609,7 @@ export default {
                 return;
             }
 
-           this.alreadyClaimed = true;
-
+            this.claim = true;
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -560,6 +626,7 @@ export default {
                     if (this.airdropCampaign.actualParticipants < this.airdropCampaign.participants) {
                         this.airdropCampaign.actualParticipants++;
                     }
+                    this.alreadyClaimed = true;
                 })
                 .catch((err) => {
                     if (HTTP_BAD_REQUEST === err.response.status && err.response.data.message) {
@@ -570,12 +637,12 @@ export default {
                     } else if (HTTP_NOT_FOUND === err.response.status && err.response.data.message) {
                         location.href = this.$routing.generate('trading');
                     } else {
-                        this.alreadyClaimed = false;
                         this.notifyError(this.$t('toasted.error.try_reload'));
                     }
 
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
-                });
+                })
+                .then(() => this.claim = false);
         },
         claimAction(action) {
             if (action.done) {
@@ -734,9 +801,27 @@ export default {
                 this.checkingBlackListedDomain = false;
             }).catch((err) => this.sendLogs('error', 'airdrop_domain_blacklist_check', err));
         },
+        checkStorageError: function() {
+            try {
+                window.localStorage;
+            } catch (e) {
+                this.storageError = true;
+            }
+        },
     },
     created() {
-        this.getAirdropCampaign();
+        this.checkStorageError();
+
+        if (this.storageError) {
+            return;
+        }
+
+        if (!this.airdropCampaign) {
+            this.getAirdropCampaign();
+        } else {
+            this.loaded = true;
+        }
+
         this.loadYoutubeClient();
     },
     validations() {

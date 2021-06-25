@@ -141,7 +141,7 @@ class CreateBlockchainTokenCommand extends Command
         }
 
         $profile = $this->profileManager->findByEmail($email);
-        $this->crypto = $this->cryptoManager->findBySymbol($blockchain, true);
+        $this->crypto = $this->cryptoManager->findBySymbol($blockchain);
         $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
         $token = $this->tokenManager->findByName($tokenName)
             ?? $this->tokenManager->findByAddress($tokenAddress);
@@ -150,11 +150,6 @@ class CreateBlockchainTokenCommand extends Command
         if (!$this->crypto || !$this->exchangeCrypto) {
             $hasErrors = true;
             $io->error('Cryptos don\'t exist');
-        }
-
-        if (self::BNB_BLOCKCHAIN === $blockchain && !$withdrawalFee) {
-            $hasErrors = true;
-            $io->error('Binance token should have withdrawal fee parameter');
         }
 
         if (!$profile) {

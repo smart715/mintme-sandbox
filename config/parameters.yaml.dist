@@ -50,6 +50,7 @@ parameters:
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
         minUsdcAmount: 0.1
+        minBnbAmount: 0.001
         minTokensAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-22'
@@ -180,6 +181,7 @@ parameters:
         - BTC
         - ETH
         - USDC
+        - BNB
 
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
@@ -288,7 +290,15 @@ parameters:
     # folder for cached images
     liip_data_root: '%kernel.project_dir%/public'
 
+    # filepath of the extra ui translation keys (not parsed by the command)
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+
+    # filepath of the auto generated ui translation keys
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+
     # list to allow / non-allow services for not fully authenticated users
+    # disable sell except for the token that created by trader
+    auth_make_disable_sell: true
     auth_make_disable_trading: false
     auth_make_disable_token_creation: false
     auth_make_disable_withdrawals_and_deposit: false

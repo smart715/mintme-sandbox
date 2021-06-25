@@ -11,7 +11,7 @@
                     :fields="fields"
                 >
                     <template v-slot:cell(trader)="row">
-                        <holder-name :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
+                        <elastic-text :value="row.value" :img="row.item.traderAvatar" :url="row.item.url"/>
                     </template>
                 </b-table>
             </div>
@@ -28,15 +28,23 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTable} from 'bootstrap-vue';
 import {formatMoney} from '../../utils';
 import {FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin} from '../../mixins';
-import HolderName from './HolderName';
+import ElasticText from '../ElasticText';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TopHolders',
     mixins: [FiltersMixin, LoggerMixin, NotificationMixin, WebSocketMixin],
     components: {
-        HolderName,
+        BTable,
+        ElasticText,
+        FontAwesomeIcon,
     },
     props: {
         tokenName: String,

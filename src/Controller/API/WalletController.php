@@ -7,11 +7,13 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserManagerInterface;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
 use App\Wallet\Model\Address;
@@ -38,17 +40,26 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     private TranslatorInterface $translations;
     private string $coinifySharedSecret;
     private LockFactory $lockFactory;
+    private MailerInterface $mailer;
+    private CryptoManagerInterface $cryptoManager;
+    private UserManagerInterface $userManager;
 
     public function __construct(
         TranslatorInterface $translations,
         UserActionLogger $userActionLogger,
         LockFactory $lockFactory,
+        MailerInterface $mailer,
+        CryptoManagerInterface $cryptoManager,
+        UserManagerInterface $userManager,
         string $coinifySharedSecret
     ) {
         $this->translations = $translations;
         $this->userActionLogger = $userActionLogger;
         $this->lockFactory = $lockFactory;
         $this->coinifySharedSecret = $coinifySharedSecret;
+        $this->mailer = $mailer;
+        $this->cryptoManager = $cryptoManager;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -90,11 +101,9 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      */
     public function withdraw(
         ParamFetcherInterface $request,
-        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MoneyWrapperInterface $moneyWrapper,
-        WalletInterface $wallet,
-        MailerInterface $mailer
+        WalletInterface $wallet
     ): View {
         /** @var User $user*/
         $user = $this->getUser();
@@ -108,7 +117,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createAccessDeniedException();
         }
 
-        $tradable = $cryptoManager->findBySymbol($request->get('crypto'))
+        $tradable = $this->cryptoManager->findBySymbol($request->get('crypto'))
             ?? $tokenManager->findByName($request->get('crypto'));
 
         if (!$tradable) {
@@ -157,7 +166,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         } else {
-            $mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
+            $this->mailer->sendWithdrawConfirmationMail($user, $pendingWithdraw);
 
             $this->userActionLogger->info(
                 'Sent withdrawal email for'. " " .$tradable->getSymbol(),
@@ -177,16 +186,14 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
      * @Rest\View()
      * @Rest\Get("/addresses/signature", name="deposit_addresses_signature", options={"expose"=true})
      */
-    public function getDepositAddressesSignature(
-        WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager
-    ): View {
+    public function getDepositAddressesSignature(WalletInterface $depositCommunicator): View
+    {
         $this->denyAccessUnlessGranted('deposit');
 
         /** @var User $user*/
         $user = $this->getUser();
 
-        $allCrypto = $cryptoManager->findAll();
+        $allCrypto = $this->cryptoManager->findAll();
         $crypto = array_filter($allCrypto, fn(Crypto $crypto) => !$crypto->isToken());
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
@@ -224,13 +231,12 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     public function getDepositInfo(
         string $crypto,
         WalletInterface $depositCommunicator,
-        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager
     ): View {
         $this->denyAccessUnlessGranted('deposit');
 
         /** @var TradebleInterface|null $tradable */
-        $tradable = $cryptoManager->findBySymbol($crypto) ?? $tokenManager->findByName($crypto);
+        $tradable = $this->cryptoManager->findBySymbol($crypto) ?? $tokenManager->findByName($crypto);
 
         if (!$tradable) {
             return $this->view([
@@ -269,5 +275,23 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             'balance' => $referralBalance->add($referralReward),
             'token' => $webToken,
         ]);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Post("/sent-exchange-mintme-mail", name="send_exchange_mintme_mail", options={"expose"=true})
+     */
+    public function sendExchangeMintmeMail(): View
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->isExchangeCryptoMailSent()) {
+            throw new ApiBadRequestException();
+        }
+
+        $this->userManager->sendMintmeExchangeMail($user);
+
+        return $this->view([], Response::HTTP_NO_CONTENT);
     }
 }

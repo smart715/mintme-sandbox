@@ -19,6 +19,8 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
 {
+    public const MAIN_REDIRECT_ROUTE = 'trading';
+
     /** @var ContainerInterface $container */
     protected $container;
 
@@ -50,7 +52,7 @@ class SecurityController extends FOSSecurityController
         $this->refererRequestHandler = $refererRequestHandler;
     }
 
-    /** @Route("/login", name="login", options={"expose"=true}) */
+    /** @Route("/login/{page}", name="login", options={"expose"=true}, defaults={"page"=null}) */
     public function loginAction(Request $request): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
@@ -120,7 +122,7 @@ class SecurityController extends FOSSecurityController
             return $this->redirect($referer);
         }
 
-        return $this->redirectToRoute("trading");
+        return $this->redirectToRoute(self::MAIN_REDIRECT_ROUTE);
     }
 
     /**

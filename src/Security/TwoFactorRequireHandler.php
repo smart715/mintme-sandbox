@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Security\Request\RefererRequestHandlerInterface;
+use App\TwigExtension\IsEmbededExtension;
 use Scheb\TwoFactorBundle\Security\Http\Authentication\AuthenticationRequiredHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,6 +57,16 @@ class TwoFactorRequireHandler implements AuthenticationRequiredHandlerInterface
             $this->session->set('login_referer', $this->httpUtils->generateUri($request, $routeName));
         }
 
-        return $this->httpUtils->createRedirectResponse($request, $this->urlGenerator->generate('2fa_login'));
+        $params = preg_match(
+            IsEmbededExtension::EMBEDED_REGEX,
+            $request->headers->get('referer') ?? ''
+        ) || preg_match(IsEmbededExtension::EMBEDED_REGEX, $uri)
+            ? ['page' => 'embeded']
+            : [];
+
+        return $this->httpUtils->createRedirectResponse(
+            $request,
+            $this->urlGenerator->generate('2fa_login', $params)
+        );
     }
 }

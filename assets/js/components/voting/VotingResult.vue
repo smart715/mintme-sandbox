@@ -1,5 +1,5 @@
 <template>
-    <div class="card h-100">
+    <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <slot name="title">{{ $t('voting.current_results') }}</slot>
@@ -28,12 +28,17 @@
 </template>
 
 <script>
+import {BProgress, BProgressBar} from 'bootstrap-vue';
 import {mapGetters} from 'vuex';
 import {RebrandingFilterMixin} from '../../mixins';
 import {toMoney} from '../../utils';
 
 export default {
     name: 'VotingResult',
+    components: {
+        BProgress,
+        BProgressBar,
+    },
     mixins: [
         RebrandingFilterMixin,
     ],

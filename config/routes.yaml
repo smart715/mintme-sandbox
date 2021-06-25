@@ -26,10 +26,15 @@ fos_user_registration:
     resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
     prefix: /register
 
-
 fos_user_registration_confirm:
     controller: "fos_user.registration.controller:confirmAction"
     path: /register/confirm/{token}
+    schemes: [https]
+
+fos_user_registration_check_email:
+    controller: App\Controller\RegistrationController:checkEmailAction
+    path: /register/check-email/{page}
+    defaults: { page: null }
     schemes: [https]
 
 app_user_resetting:
@@ -48,11 +53,13 @@ fos_user_resetting_request:
     schemes: [https]
 
 2fa_login:
-    path: /2fa
+    path: /2fa/{page}
+    defaults: { page: null }
     controller: "scheb_two_factor.form_controller::form"
 
 2fa_login_check:
-    path: /2fa_check
+    path: /2fa_check/{page}
+    defaults: { page: null }
 
 api_controllers:
     resource: ../src/Controller/API/

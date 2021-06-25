@@ -125,8 +125,10 @@ class OrdersController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
 
-        if (!$this->isGranted('make-order', $market)) {
-             return $this->view(['error' => true, 'type' => 'make_orders'], Response::HTTP_OK);
+        if (!$this->isGranted('make-order', $market)
+            || (Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
+             return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
         }
 
         /** @var User $currentUser */
@@ -212,13 +214,13 @@ class OrdersController extends AbstractFOSRestController
 
     /**
      * @Rest\Get(
-     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=0}, options={"expose"=true}
+     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=1}, options={"expose"=true}
      * )
      * @Rest\View()
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
     }
 
     /**
