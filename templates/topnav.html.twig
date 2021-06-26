@@ -51,75 +51,40 @@
             </button>
         </div>
         <div class="order-2 collapse navbar-collapse" :class="{ 'show': showNavbarMenu }">
-            {% if not app.user %}
-                <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-mx-4">
-                    <token-searcher
+            <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 {{ app.user ? 'ml-mx-5' : 'ml-mx-4' }}">
+                <token-searcher
                         class="flex-nowrap justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
+                        is-logged-in="{{ if app.user ? 'true': 'false' }}"
                         search-url="{{ path('token_search') }}"
-                    ></token-searcher>
-                    <div class="v-cloak--flex justify-content-center align-items-center ml-1">
-                        <input
-                            class="search-input form-control  no-bg-img"
-                            placeholder="Search for the token"
-                            type="text"
-                        >
-                        <svg
-                            width="19.5"
-                            height="19.5"
-                            aria-hidden="true"
-                            focusable="false"
-                            data-prefix="fas"
-                            data-icon="search"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 512 512"
-                            class="search-icon fa-search"
-                        >
-                            <path
-                                d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7
-                                44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0
-                                92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4
-                                33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128
-                                0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
-                            ></path>
-                        </svg>
-                    </div>
-                </form>
-            {% else %}
-                <form class="form-inline justify-content-center py-3 py-lg-0 pr-0 pr-lg-3 ml-mx-5">
-                    <token-searcher
-                            class="flex-nowrap justify-content-center pr-0 align-items-center v-cloak--hidden mr-1"
-                            search-url="{{ path('token_search') }}"
-                    ></token-searcher>
-                    <div class="v-cloak--flex justify-content-center align-items-center ml-1">
-                        <input
-                                class="research-input form-control  no-bg-img"
-                                placeholder="Search for the token"
-                                type="text"
-                        >
-                        <svg
-                                width="19.5"
-                                height="19.5"
-                                aria-hidden="true"
-                                focusable="false"
-                                data-prefix="fas"
-                                data-icon="search"
-                                role="img"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 512 512"
-                                class="search-icon fa-search"
-                        >
-                            <path
-                                    d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7
-                                    44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0
-                                    92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4
-                                    33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128
-                                    0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
-                            ></path>
-                        </svg>
-                    </div>
-                </form>
-            {% endif %}
+                ></token-searcher>
+                <div class="v-cloak--flex justify-content-center align-items-center ml-1">
+                    <input
+                        class="research-input form-control no-bg-img"
+                        placeholder="Search for the token"
+                        type="text"
+                    >
+                    <svg
+                        width="19.5"
+                        height="19.5"
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fas"
+                        data-icon="search"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 512 512"
+                        class="search-icon fa-search"
+                    >
+                        <path
+                            d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7
+                            44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0
+                            92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4
+                            33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128
+                            0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"
+                        ></path>
+                    </svg>
+                </div>
+            </form>
             <ul class="navbar-nav ml-auto">
                 {% if show_links %}
                     <li class="nav-item menu-token align-self-center text-lg-left text-center {{ route starts with 'token' ? 'active' : '' }}">

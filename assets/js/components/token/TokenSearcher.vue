@@ -45,9 +45,10 @@ export default {
         Autocomplete,
         FontAwesomeIcon,
     },
-    props: {
-        searchUrl: {type: String, required: true},
-    },
+  props: {
+    searchUrl: {type: String, required: true},
+    isLoggedIn: Boolean,
+  },
     data() {
         return {
             validName: true,
@@ -102,7 +103,7 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return 'search-input px-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
+            return 'research-input form-control no-bg-img' + (this.isLoggedIn ? '' : 'search-input form-control no-bg-img');
         },
     },
 };
