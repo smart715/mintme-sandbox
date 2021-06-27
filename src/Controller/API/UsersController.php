@@ -212,8 +212,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            $event,
-            FOSUserEvents::CHANGE_PASSWORD_COMPLETED
+            $event
         );
 
         return $response;
