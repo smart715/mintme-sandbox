@@ -2,10 +2,11 @@
 
 namespace App\SmartContract;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 
 interface DeploymentFacadeInterface
 {
-    public function execute(User $user, Token $token): void;
+    public function execute(User $user, Token $token, Crypto $crypto): void;
 }
