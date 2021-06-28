@@ -10,7 +10,7 @@ import TokenAvatar from '../components/token/TokenAvatar';
 import TopHolders from '../components/trade/TopHolders';
 import {NotificationMixin, LoggerMixin} from '../mixins/';
 import Trade from '../components/trade/Trade';
-import {tokenDeploymentStatus, HTTP_OK, tabs, tabsArr} from '../utils/constants';
+import {tokenDeploymentStatus, HTTP_OK, tabs, tabsArr, webSymbol} from '../utils/constants';
 import {mapGetters, mapMutations} from 'vuex';
 import {BTabs, BTab, VBTooltip} from 'bootstrap-vue';
 import Avatar from '../components/Avatar';
@@ -76,6 +76,7 @@ new Vue({
             showDeployedOnBoard: null,
             tokenDeployedDate: null,
             tokenTxHashAddress: null,
+            tokenCrypto: null,
         };
     },
     mounted: function() {
@@ -166,6 +167,7 @@ new Vue({
                             this.tokenDeployed = true;
                             this.tokenPending = false;
                             this.showDeployedOnBoard = true;
+                            this.tokenCrypto = response.data.crypto;
                             this.fetchAddress();
                             this.getTxHash();
                             this.getDeployedDate();
@@ -231,6 +233,14 @@ new Vue({
             return this.tokenDeployed
                 ? tokenDeploymentStatus.deployed
                 : (this.tokenPending ? tokenDeploymentStatus.pending : status);
+        },
+        getTokenCrypto: function(crypto) {
+            return this.tokenCrypto ?? crypto;
+        },
+        getIsMintmeToken: function(isMintmeToken) {
+            return this.tokenCrypto
+                ? webSymbol === this.tokenCrypto.symbol
+                : isMintmeToken;
         },
         facebookUpdated: function(val) {
             this.tokenFacebook = val;

@@ -1,6 +1,5 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% set explorerUrl = global_mintme_explorer_url ~ '/tx/' ~ txHash %}
 {% trans with {'%explorerUrl%': explorerUrl} %}mail.token_deployed.p_1{% endtrans %}
 {% trans %}mail.token_deployed.p_1.1{% endtrans %}
 {% trans %}mail.token_deployed.p_1.2{% endtrans %}

@@ -76,8 +76,12 @@ parameters:
     mintme_coin_link: 'https://www.mintme.com/coin/'
 
     # the cost of deploying token to blockchain in USD
-    deploy_cost: 99
-    deploy_cost_referral_reward: 0.1
+    deploy_cost_mintme: 99
+    deploy_cost_eth: 99
+    deploy_cost_bnb: 99
+    deploy_cost_referral_reward_mintme: 0.1
+    deploy_cost_referral_reward_eth: 0.1
+    deploy_cost_referral_reward_bnb: 0.1
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
 
@@ -289,6 +293,12 @@ parameters:
 
     # mintme explorer url
     mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # eth explorer url
+    eth_explorer_url: 'https://goerli.etherscan.io'
+
+    # bnb explorer url
+    bnb_explorer_url: 'https://testnet.bscscan.com'
 
     # folder for cached images
     liip_data_root: '%kernel.project_dir%/public'
