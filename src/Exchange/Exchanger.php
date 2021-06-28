@@ -3,7 +3,6 @@
 namespace App\Exchange;
 
 use App\Communications\AMQP\MarketAMQPInterface;
-use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
@@ -22,7 +21,6 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -244,10 +242,11 @@ class Exchanger implements ExchangerInterface
 
     private function exceedAvailableReleased(
         User $user,
-        string $token,
+        string $tokenName,
         string $amount
     ): bool {
-        $token = $this->tm->findByName($token);
+        /** @var Token $token */
+        $token = $this->tm->findByName($tokenName);
         $profile = $token->getProfile();
 
         if ($profile && $user === $profile->getUser()) {

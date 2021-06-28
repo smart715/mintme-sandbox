@@ -120,6 +120,21 @@ class BalanceHandler implements BalanceHandlerInterface
             }, $tokens));
     }
 
+    public function indexedBalances(User $user, array $tokens): array
+    {
+        $indexedBalances = [];
+        $balances = $this->balances(
+            $user,
+            $tokens,
+        );
+
+        foreach ($tokens as $token) {
+            $indexedBalances[$token->getSymbol()] = $balances->get($this->converter->convert($token));
+        }
+
+        return $indexedBalances;
+    }
+
     public function balance(User $user, Token $token): BalanceResult
     {
         return $this->balances($user, [$token])
