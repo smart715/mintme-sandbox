@@ -10,13 +10,13 @@ use App\Entity\Profile;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
 use App\Utils\Symbols;
 use App\Wallet\Model\DepositInfo;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Money\Currencies;
@@ -25,7 +25,6 @@ use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ContractHandlerTest extends TestCase
 {
@@ -52,7 +51,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $handler->deploy($this->mockToken(true));
@@ -70,7 +69,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -101,7 +100,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -129,7 +128,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $handler->updateMintDestination(
@@ -150,7 +149,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -182,7 +181,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -216,7 +215,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $handler->withdraw(
@@ -240,7 +239,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -277,7 +276,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -343,7 +342,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $cryptoManager,
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $result = $handler->getTransactions(
@@ -393,7 +392,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $this->expectException(FetchException::class);
@@ -423,7 +422,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $expectedMinDeposit = new Money('1000000000000', new Currency(Symbols::TOK));
@@ -449,7 +448,7 @@ class ContractHandlerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface()
+            $this->mockTokenConfig()
         );
 
         $result = $handler->getDepositCredentials(
@@ -588,16 +587,8 @@ class ContractHandlerTest extends TestCase
         return $tm;
     }
 
-    public function mockParameterBagInterface(): ParameterBagInterface
+    public function mockTokenConfig(): TokenConfig
     {
-        $pb = $this->createMock(ParameterBagInterface::class);
-        $pb->method('get')
-            ->with('eth_token_withdraw_fee')
-            ->willReturn('0.01')
-            ->method('get')
-            ->with('bnb_token_withdraw_fee')
-            ->willReturn('0.01');
-
-        return $pb;
+        return $this->createMock(TokenConfig::class);
     }
 }

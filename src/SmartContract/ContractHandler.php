@@ -22,7 +22,6 @@ use Exception;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ContractHandler implements ContractHandlerInterface
 {
@@ -53,7 +52,6 @@ class ContractHandler implements ContractHandlerInterface
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    private ParameterBagInterface $parameterBag;
     private TokenConfig $tokenConfig;
 
     public function __construct(
@@ -62,7 +60,6 @@ class ContractHandler implements ContractHandlerInterface
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        ParameterBagInterface $parameterBag,
         TokenConfig $tokenConfig
     ) {
         $this->rpc = $rpc;
@@ -70,7 +67,6 @@ class ContractHandler implements ContractHandlerInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
-        $this->parameterBag = $parameterBag;
         $this->tokenConfig = $tokenConfig;
     }
 
