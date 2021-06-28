@@ -258,18 +258,11 @@ class Wallet implements WalletInterface
             : $this->contractHandler->getDepositInfo($symbol);
     }
 
-    private function validateTokenFee(User $user, ?Crypto $crypto, Money $tokenEthFee): bool
+    private function validateTokenFee(User $user, Crypto $crypto, Money $tokenFee): bool
     {
-        if (!$crypto) {
-            throw new NotFoundTokenException();
-        }
-
         $balance = $this->balanceHandler->balance($user, Token::getFromCrypto($crypto));
 
-        if ($balance->getAvailable()->lessThan(
-            Symbols::ETH === $crypto->getSymbol() ? $tokenEthFee : $crypto->getFee()
-        )
-        ) {
+        if ($balance->getAvailable()->lessThan($tokenFee)) {
             $this->logger->warning(
                 "Requested withdraw-gateway balance to pay '{$user->getEmail()}'. Not enough amount to pay fee"
             );
@@ -328,7 +321,7 @@ class Wallet implements WalletInterface
 
         return $this->moneyWrapper->parse(
             (string)$this->parameterBag->get('eth_token_withdraw_fee'),
-            Symbols::BNB
+            Symbols::ETH
         );
     }
 }
