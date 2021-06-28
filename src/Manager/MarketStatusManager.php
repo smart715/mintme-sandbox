@@ -333,6 +333,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
             );
         }
 
+        $this->em->refresh($marketStatus);
+
         $marketInfo = $this->marketHandler->getMarketInfo(
             $market,
             MarketHandler::DAY_PERIOD
