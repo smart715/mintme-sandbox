@@ -47,6 +47,7 @@ export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
 export const bnbSymbol = 'BNB';
+export const bscSymbol = 'BSC';
 export const tokSymbol = 'TOK';
 export const usdcSymbol = 'USDC';
 export const tokEthSymbol = 'TOKETH';

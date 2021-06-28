@@ -120,6 +120,21 @@ class BalanceHandler implements BalanceHandlerInterface
             }, $tradables));
     }
 
+    public function indexedBalances(User $user, array $tokens): array
+    {
+        $indexedBalances = [];
+        $balances = $this->balances(
+            $user,
+            $tokens,
+        );
+
+        foreach ($tokens as $token) {
+            $indexedBalances[$token->getSymbol()] = $balances->get($this->converter->convert($token));
+        }
+
+        return $indexedBalances;
+    }
+
     public function balance(User $user, TradebleInterface $tradable): BalanceResult
     {
         return $this->balances($user, [$tradable])

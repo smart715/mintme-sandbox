@@ -53,6 +53,13 @@ interface BalanceHandlerInterface
      */
     public function balances(User $user, array $tradables): BalanceResultContainer;
 
+    /**
+     * @param User $user
+     * @param Token[] $tokens
+     * @return BalanceResult[]
+     */
+    public function indexedBalances(User $user, array $tokens): array;
+
     public function isNotExchanged(Token $token, int $amount): bool;
 
     /**

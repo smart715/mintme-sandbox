@@ -15,6 +15,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Factory\BalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Exchange\Config\DeployCostConfig;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketHandlerInterface;
@@ -137,7 +138,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token || !$token->isMintmeToken()) {
+        if (!$token || !$token->isControlledToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -289,7 +290,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     ): View {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token || !$token->isMintmeToken()) {
+        if (!$token || !$token->isControlledToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -475,7 +476,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
-        return $this->view(['status' => $token->getDeploymentStatus()], Response::HTTP_OK);
+        return $this->view([
+            'status' => $token->getDeploymentStatus(),
+            'crypto' => $token->getCrypto(),
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -542,7 +546,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token || !$token->isMintmeToken()) {
+        if (!$token || !$token->isControlledToken()) {
             throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
@@ -686,7 +690,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     public function tokenDeployBalances(
         string $name,
         BalanceHandlerInterface $balanceHandler,
-        DeployCostFetcherInterface $costFetcher
+        DeployCostFetcherInterface $costFetcher,
+        DeployCostConfig $deployCostConfig
     ): View {
         $token = $this->tokenManager->findByName($name);
 
@@ -698,24 +703,25 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             /** @var User $user*/
             $user = $this->getUser();
 
-            $balances = [
-                'balance' => $balanceHandler->balance(
+            $data = [
+                'balances' => $balanceHandler->indexedBalances(
                     $user,
-                    Token::getFromSymbol($token->getCryptoSymbol())
-                )->getAvailable(),
-                'webCost' => $costFetcher->getDeployWebCost(),
+                    array_map(fn(string $symbol) => Token::getFromSymbol($symbol), $deployCostConfig->getSymbols()),
+                ),
+                'costs' => $costFetcher->getDeployCosts(),
             ];
         } catch (Throwable $ex) {
             throw new ApiBadRequestException();
         }
 
-        return $this->view($balances, Response::HTTP_OK);
+        return $this->view($data, Response::HTTP_OK);
     }
 
     /**
      * @Rest\View()
      * @Rest\Post("/{name}/deploy", name="token_deploy", options={"expose"=true})
      * @Rest\RequestParam(name="code", nullable=true)
+     * @Rest\RequestParam(name="currency", allowBlank=false, requirements="(WEB|ETH|BNB)")
      * @param string $name
      * @param DeploymentFacadeInterface $deployment
      * @return View
@@ -725,14 +731,15 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
      */
     public function deploy(
         string $name,
+        ParamFetcherInterface $request,
         DeploymentFacadeInterface $deployment
     ): View {
         $this->denyAccessUnlessGranted('deploy');
 
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token || !$token->isMintmeToken()) {
-            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
+        if (!$token || !$token->isControlledToken()) {
+            throw new ApiNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         if (Token::NOT_DEPLOYED !== $token->getDeploymentStatus()) {
@@ -747,11 +754,17 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             throw new ApiUnauthorizedException($this->translator->trans('api.tokens.unathorized'));
         }
 
+        $crypto = $this->cryptoManager->findBySymbol($request->get('currency'));
+
+        if (!$crypto) {
+            throw new ApiBadRequestException();
+        }
+
         try {
             /** @var User $user*/
             $user = $this->getUser();
 
-            $deployment->execute($user, $token);
+            $deployment->execute($user, $token, $crypto);
         } catch (Throwable $ex) {
             throw new ApiBadRequestException($this->translator->trans('api.tokens.internal_error'));
         }
@@ -799,8 +812,8 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     ): View {
         $token = $this->tokenManager->findByName($name);
 
-        if (null === $token || !$token->isMintmeToken()) {
-            throw $this->createNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
+        if (null === $token || !$token->isControlledToken()) {
+            throw new ApiNotFoundException($this->translator->trans('api.tokens.token_not_exists'));
         }
 
         if (!$this->isGranted('edit', $token)) {
@@ -897,7 +910,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
     {
         $userToken = $this->tokenManager->getOwnTokenByName($tokenName);
 
-        if (!$userToken || !$userToken->isMintmeToken()) {
+        if (!$userToken || !$userToken->isControlledToken()) {
             throw new AccessDeniedException();
         }
 

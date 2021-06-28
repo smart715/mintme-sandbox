@@ -46,7 +46,7 @@
                                     {{ $t('token.intro.statistics.balance') }}
                                 </div>
                                 <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.exchange.header') }}
                                         </div>
@@ -78,7 +78,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.withdraw.header') }}
                                         </div>
@@ -94,7 +94,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1" >
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.sold.header') }}
                                         </div>
@@ -141,7 +141,7 @@
                                     </b-list-group-item>
                                 </b-list-group>
                             </div>
-                            <div v-if="isMintmeToken" class="pt-3">
+                            <div v-if="isControlledToken" class="pt-3">
                                 <div class="font-weight-bold px-3 pb-1">
                                     {{ $t('token.intro.statistics.token_release.header') }}
                                     <guide>
@@ -287,7 +287,7 @@ export default {
         WebSocketMixin,
     ],
     props: {
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         deploymentStatus: String,
         market: Object,
         precision: Number,
@@ -372,7 +372,7 @@ export default {
             this.shouldShowStats = true;
         },
         fetchAllData: function() {
-            if (this.isMintmeToken) {
+            if (this.isControlledToken) {
                 this.getTokenWithdrawn();
                 this.getLockPeriod();
                 this.getTokExchangeAmount();
@@ -398,9 +398,9 @@ export default {
     computed: {
         statisticGuideTranslation: function() {
             return this.$t(
-                this.isMintmeToken
-                    ? 'token.intro.statistics.guide_body.mintme_token'
-                    : 'token.intro.statistics.guide_body.eth_token',
+                this.isControlledToken
+                    ? 'token.intro.statistics.guide_body.controlled'
+                    : 'token.intro.statistics.guide_body.not_controlled',
                 this.translationsContext
             );
         },
@@ -411,7 +411,7 @@ export default {
         },
         loaded: function() {
             if (
-                this.isMintmeToken &&
+                this.isControlledToken &&
                 null === this.tokenWithdrawn &&
                 null === this.tokenExchangeAmount
             ) {

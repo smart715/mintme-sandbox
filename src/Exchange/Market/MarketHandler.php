@@ -440,7 +440,7 @@ class MarketHandler implements MarketHandlerInterface
         $quote = $market->getQuote();
         $soldOnMarket = $this->moneyWrapper->parse('0', $this->getSymbol($market->getBase()));
 
-        if ($quote instanceof Token && $quote->isMintmeToken()) {
+        if ($quote instanceof Token && $quote->isControlledToken()) {
             $soldOnMarket = $this->soldOnMarket($quote);
         }
 
@@ -740,7 +740,7 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        if (!$token->isMintmeToken()) {
+        if (!$token->isControlledToken()) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 

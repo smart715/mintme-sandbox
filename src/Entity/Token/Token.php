@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -849,6 +850,14 @@ class Token implements TradebleInterface, ImagineInterface
     public function isMintmeToken(): bool
     {
         return Symbols::WEB === $this->getCryptoSymbol();
+    }
+
+    /*
+     * @Groups({"Default"})
+     */
+    public function isControlledToken(): bool
+    {
+        return !$this->isDeployed() || ($this->getAddress() && $this->getTxHash());
     }
 
     public function isOwner(array $ownTokens): bool
