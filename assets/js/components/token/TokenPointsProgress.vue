@@ -33,7 +33,7 @@ export default {
         tokenYoutube: String,
         tokenWebsite: String,
         tokenStatus: String,
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         hasReleasePeriod: Boolean,
     },
     components: {
@@ -45,7 +45,7 @@ export default {
             releasePeriod: 'getReleasePeriod',
         }),
         tokenReleasePeriodSet: function() {
-            return this.hasReleasePeriod || (typeof this.releasePeriod === 'number') || !this.isMintmeToken ? 4 : 0;
+            return this.hasReleasePeriod || (typeof this.releasePeriod === 'number') || !this.isControlledToken ? 4 : 0;
         },
         tokenDescriptionSet: function() {
             return this.tokenDescription ? 4 : 0;

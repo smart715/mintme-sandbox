@@ -3,9 +3,11 @@
 namespace App\SmartContract;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Balance\Exception\BalanceException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DeploymentFacade implements DeploymentFacadeInterface
@@ -27,20 +29,28 @@ class DeploymentFacade implements DeploymentFacadeInterface
         $this->contractHandler = $contractHandler;
     }
 
-    public function execute(User $user, Token $token): void
+    public function execute(User $user, Token $token, Crypto $crypto): void
     {
-        $deploymentContext = new DeploymentContext(
-            $token->isMintmeToken()
-                ? new MintmeDeploymentStrategy(
-                    $token,
-                    $this->contractHandler,
-                    $this->em,
-                    $this->balanceHandler,
-                    $this->costFetcher->getDeployWebCost()
-                )
-                : new EthDeploymentStrategy($token, $this->contractHandler, $this->em)
+        $cost = $this->costFetcher->getDeployCost($crypto->getSymbol());
+        $balance = $this->balanceHandler
+            ->balance($token->getOwner(), Token::getFromCrypto($crypto))->getAvailable();
+
+        if ($cost->greaterThan($balance)) {
+            throw new BalanceException('Low balance');
+        }
+
+        $token->setCrypto($crypto);
+        $this->contractHandler->deploy($token);
+
+        $this->balanceHandler->withdraw(
+            $token->getOwner(),
+            Token::getFromCrypto($crypto),
+            $cost
         );
 
-        $deploymentContext->deploy();
+        $token->setPendingDeployment();
+        $token->setDeployCost($cost->getAmount());
+        $this->em->persist($token);
+        $this->em->flush();
     }
 }

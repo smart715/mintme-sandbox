@@ -16,6 +16,7 @@ import AddPhoneAlertMixin from './add_phone_alert';
 import {
     MoneyFilterMixin,
     RebrandingFilterMixin,
+    BnbToBscFilterMixin,
     TruncateFilterMixin as FiltersMixin,
 } from './filters';
 
@@ -33,6 +34,7 @@ export {
     PlaceOrder,
     PricePositionMixin,
     RebrandingFilterMixin,
+    BnbToBscFilterMixin,
     TraderHoveredMixin,
     TwitterMixin,
     WebSocketMixin,
