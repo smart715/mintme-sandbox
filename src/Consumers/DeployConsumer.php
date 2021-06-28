@@ -13,6 +13,7 @@ use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
@@ -114,6 +115,7 @@ class DeployConsumer implements ConsumerInterface
                     $token->setDeployCost(null);
                     $token->setDeployedDate(null);
                     $token->setDeployed(false);
+                    $token->setCrypto(null);
 
                     $this->logger->info(
                         '[deploy-consumer] the money is payed back returned back'
@@ -152,7 +154,7 @@ class DeployConsumer implements ConsumerInterface
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            new DeployCompletedEvent($token, $clbResult->getTxHash()),
+            new DeployCompletedEvent($token),
             TokenEvents::DEPLOYED
         );
 
@@ -164,7 +166,7 @@ class DeployConsumer implements ConsumerInterface
         $referencer = $user->getReferencer();
 
         if ($referencer) {
-            $reward = $this->deployCostFetcher->getDeployCostReferralReward();
+            $reward = $this->deployCostFetcher->getDeployCostReferralReward($token->getCryptoSymbol());
 
             if ($reward->isPositive()) {
                 $userDeployTokenReward = new DeployTokenReward($user, $reward);
@@ -191,7 +193,9 @@ class DeployConsumer implements ConsumerInterface
                         'referredUserId' => $user->getId(),
                         'referrerUserId' => $referencer->getId(),
                         'tokenName' => $token->getName(),
-                        'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
+                        'deployCost' => $this->deployCostFetcher->getDeployCost($token->getCryptoSymbol())
+                            ->getAmount(),
+                        'deployCostCurrency' => $token->getCryptoSymbol(),
                         'rewardAmountInMintme' => $reward->getAmount(),
                     ])
                 );

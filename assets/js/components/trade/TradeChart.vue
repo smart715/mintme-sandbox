@@ -67,7 +67,7 @@
                     <br>
                     {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
-                <div v-if="!isToken || isToken && isMintmeToken" class="my-1 text-center text-lg-right">
+                <div v-if="!isToken || isToken && isControlledToken" class="my-1 text-center text-lg-right">
                     <span>{{ $t('trade.chart.market_cap') }} </span>
                     <guide>
                         <template slot="header">
@@ -132,7 +132,7 @@ export default {
         minimumVolumeForMarketcap: Number,
         buyDepth: String,
         isToken: Boolean,
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -343,7 +343,7 @@ export default {
                     );
                 }
             } else if (this.isToken) {
-                if (!this.isMintmeToken || marketAmount < this.minimumVolumeForMarketcap) {
+                if (!this.isControlledToken || marketAmount < this.minimumVolumeForMarketcap) {
                   monthInfo.marketCap = '-';
                 } else {
                     this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {

@@ -7,7 +7,7 @@ vault_cli_host: 'http://webchain-cli:1920'
 rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
 
 webchaind_url: 'http://webchaind:39573'
-tokenimpladdress: '0x4462181c372ba51c217f568545b7b622c7c0eb4e'
+mintme_imp_address: '0x4462181c372ba51c217f568545b7b622c7c0eb4e'
 mintme_account:   '0x9139413fe7247da35ae0797f9270271ba758d248'
 webchain_gas_limit: 21000
 webchain_withdraw_contract_gas_limit: 90000
@@ -16,6 +16,7 @@ mintme_transfer_gas_limit: 90000
 
 # ethereum rpc server url
 ethereum_daemon_host: 'http://212.32.255.232:8545'
+eth_imp_address:
 # ethereum main wallet addres (send eth tokens from this address)
 eth_account: '0x42e07422fa1bce2090912ddbc0717fa44654ef00'
 ethereum_cli_timeout: 3000
@@ -25,6 +26,7 @@ ethereum_gas_limit_contract: 90000
 
 # binance smart chain
 binance_daemon_host: 'http://212.32.255.99:8575'
+binance_imp_address:
 binance_account: '0xFd134EDa83a3A21690084fce5984aAFc1Ed68a62'
 binance_cli_timeout: 30000
 binance_gas_limit: 21000
