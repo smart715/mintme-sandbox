@@ -46,8 +46,8 @@ export default {
         FontAwesomeIcon,
     },
     props: {
-      searchUrl: {type: String, required: true},
-      isLoggedIn: Boolean,
+        searchUrl: {type: String, required: true},
+        isLoggedIn: Boolean,
     },
     data() {
         return {
