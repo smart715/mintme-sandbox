@@ -187,7 +187,7 @@
                         <br />
                         0 {% trans %}mintme{% endtrans %}
                     </div>
-                    {% if not isTokenPage or isTokenPage and token.isMintmeToken %}
+                    {% if not isTokenPage or isTokenPage and token.isControlledToken %}
                     <div class="my-1 text-center text-lg-right">
                         <span>
                             {% trans %}trade.chart.market_cap{% endtrans %}
