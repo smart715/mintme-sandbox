@@ -7,31 +7,28 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PaymentTokenStrategy implements BalanceStrategyInterface
 {
     private BalanceHandlerInterface $balanceHandler;
-
     private CryptoManagerInterface $cryptoManager;
-
     private MoneyWrapperInterface $moneyWrapper;
-
-    private ParameterBagInterface $parameterBag;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
         MoneyWrapperInterface $moneyWrapper,
-        ParameterBagInterface $parameterBag
+        TokenConfig $tokenConfig
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
         $this->moneyWrapper = $moneyWrapper;
-        $this->parameterBag = $parameterBag;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** @param Token $tradeble */
@@ -71,10 +68,8 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
         $cryptoSymbol = $crypto->getSymbol();
 
         $fee = in_array($cryptoSymbol, [Symbols::ETH, Symbols::BNB])
-            ? $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get(strtolower($cryptoSymbol) . '_token_withdraw_fee'),
-                $cryptoSymbol
-            ) : $crypto->getFee();
+            ? $this->tokenConfig->getWithdrawFeeByCryptoSymbol($cryptoSymbol)
+            : $crypto->getFee();
 
         if (!$token->getFee()) {
             $this->balanceHandler->deposit(

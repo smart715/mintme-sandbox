@@ -11,6 +11,7 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -31,7 +32,6 @@ use Exception;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Throwable;
 
 class Wallet implements WalletInterface
@@ -54,9 +54,9 @@ class Wallet implements WalletInterface
 
     private TokenManagerInterface $tokenManager;
 
-    private ParameterBagInterface $parameterBag;
-
     private MoneyWrapperInterface $moneyWrapper;
+
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         WithdrawGatewayInterface $withdrawGateway,
@@ -68,8 +68,8 @@ class Wallet implements WalletInterface
         ContractHandlerInterface $contractHandler,
         LoggerInterface $logger,
         TokenManagerInterface $tokenManager,
-        ParameterBagInterface $parameterBag,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        TokenConfig $tokenConfig
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
@@ -80,8 +80,8 @@ class Wallet implements WalletInterface
         $this->contractHandler = $contractHandler;
         $this->logger = $logger;
         $this->tokenManager = $tokenManager;
-        $this->parameterBag = $parameterBag;
         $this->moneyWrapper = $moneyWrapper;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** {@inheritdoc} */
@@ -313,15 +313,9 @@ class Wallet implements WalletInterface
         }
 
         if ($tradable instanceof Token && Symbols::BNB === $tradable->getCryptoSymbol()) {
-            return $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('bnb_token_withdraw_fee'),
-                Symbols::BNB
-            );
+            return $this->tokenConfig->getBnbWithdrawFee();
         }
 
-        return $this->moneyWrapper->parse(
-            (string)$this->parameterBag->get('eth_token_withdraw_fee'),
-            Symbols::ETH
-        );
+        return $this->tokenConfig->getEthWithdrawFee();
     }
 }

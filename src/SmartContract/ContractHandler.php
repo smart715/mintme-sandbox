@@ -8,6 +8,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Symbols;
@@ -53,6 +54,7 @@ class ContractHandler implements ContractHandlerInterface
     private $tokenManager;
 
     private ParameterBagInterface $parameterBag;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         JsonRpcInterface $rpc,
@@ -60,7 +62,8 @@ class ContractHandler implements ContractHandlerInterface
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        TokenConfig $tokenConfig
     ) {
         $this->rpc = $rpc;
         $this->logger = $logger;
@@ -68,6 +71,7 @@ class ContractHandler implements ContractHandlerInterface
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->parameterBag = $parameterBag;
+        $this->tokenConfig = $tokenConfig;
     }
 
     public function deploy(Token $token): void
@@ -253,10 +257,8 @@ class ContractHandler implements ContractHandlerInterface
 
         /** @var Token $tradeble */
         return in_array($cryptoSymbol = $tradeble->getCryptoSymbol(), [Symbols::ETH, Symbols::BNB], true)
-            ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get(strtolower($cryptoSymbol) . '_token_withdraw_fee'),
-                $cryptoSymbol
-            ) : $this->cryptoManager->findBySymbol($cryptoSymbol)->getFee();
+            ? $tradeble->getFee() ?? $this->tokenConfig->getWithdrawFeeByCryptoSymbol($cryptoSymbol)
+            : $this->cryptoManager->findBySymbol($cryptoSymbol)->getFee();
     }
 
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
