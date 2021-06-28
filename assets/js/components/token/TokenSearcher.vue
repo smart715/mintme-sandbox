@@ -45,10 +45,10 @@ export default {
         Autocomplete,
         FontAwesomeIcon,
     },
-  props: {
-    searchUrl: {type: String, required: true},
-    isLoggedIn: Boolean,
-  },
+    props: {
+      searchUrl: {type: String, required: true},
+      isLoggedIn: Boolean,
+    },
     data() {
         return {
             validName: true,
@@ -103,7 +103,7 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return this.isLoggedIn ? 'research-input form-control no-bg-img' : 'search-input form-control no-bg-img';
+            return this.isLoggedIn ? 'search-input logged form-control no-bg-img' : 'search-input form-control no-bg-img';
         },
     },
 };
