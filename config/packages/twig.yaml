@@ -45,3 +45,5 @@ twig:
         global_bnb_token_withdraw_fee: '%bnb_token_withdraw_fee%'
         mercure_hub_url: '%env(MERCURE_PUBLISH_URL)%'
         global_mintme_explorer_url: '%mintme_explorer_url%'
+        global_eth_explorer_url: '%eth_explorer_url%'
+        global_bnb_explorer_url: '%bnb_explorer_url%'

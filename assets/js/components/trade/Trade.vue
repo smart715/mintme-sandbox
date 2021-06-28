@@ -9,7 +9,7 @@
                 :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
-                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
             />
         </div>
         <div class="row trade-orders">
@@ -137,7 +137,7 @@ export default {
         isToken: Boolean,
         disabledServicesConfig: String,
         takerFee: Number,
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         profileNickname: String,
     },
     data() {
