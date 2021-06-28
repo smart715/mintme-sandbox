@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Model\BalanceResult;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -64,8 +65,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler($tokenTransactions),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $history = $wallet->getWithdrawDepositHistory($this->mockUser(), 0, 10);
@@ -150,8 +151,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $wallet->withdrawInit(
@@ -174,8 +175,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -204,8 +205,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $wallet->withdrawInit(
@@ -232,8 +233,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(NotFoundTokenException::class);
@@ -262,8 +263,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(NotEnoughUserAmountException::class);
@@ -292,8 +293,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -318,8 +319,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $wallet->withdrawCommit($this->mockPendingWithdraw('1000000000000000000'));
@@ -337,8 +338,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([]),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(NotEnoughAmountException::class);
@@ -358,8 +359,8 @@ class WalletTest extends TestCase
             $this->mockContractHandler([], $this->once()),
             $this->createMock(LoggerInterface::class),
             $this->mockTokenManager(),
-            $this->mockParameterBagInterface(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $wallet->withdrawCommit($this->mockPendingTokenWithdraw('1000000000000'));
@@ -592,17 +593,9 @@ class WalletTest extends TestCase
         return $tm;
     }
 
-    public function mockParameterBagInterface(): ParameterBagInterface
+    public function mockTokenConfig(): TokenConfig
     {
-        $pb = $this->createMock(ParameterBagInterface::class);
-        $pb->method('get')
-            ->with('eth_token_withdraw_fee')
-            ->willReturn('0.01')
-            ->method('get')
-            ->with('bnb_token_withdraw_fee')
-            ->willReturn('0.01');
-
-        return $pb;
+        return $this->createMock(TokenConfig::class);
     }
 
     private function mockMoneyWrapper(): MoneyWrapperInterface
