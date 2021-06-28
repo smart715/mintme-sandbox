@@ -8,6 +8,7 @@ use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\LockFactory;
 use App\Wallet\Model\MarketCallbackMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -20,23 +21,13 @@ class MarketConsumer implements ConsumerInterface
 {
     private const NUMBER_OF_RETRIES = 5;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var MarketStatusManagerInterface */
-    private $statusManager;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var MarketAMQPInterface */
-    private $marketProducer;
-
-    /** @var EntityManagerInterface */
-    private $em;
+    private LoggerInterface $logger;
+    private MarketStatusManagerInterface $statusManager;
+    private CryptoManagerInterface $cryptoManager;
+    private TokenManagerInterface $tokenManager;
+    private MarketAMQPInterface $marketProducer;
+    private EntityManagerInterface $em;
+    private LockFactory $lockFactory;
 
     public function __construct(
         LoggerInterface $logger,
@@ -44,7 +35,8 @@ class MarketConsumer implements ConsumerInterface
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         MarketAMQPInterface $marketProducer,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->statusManager = $statusManager;
@@ -52,6 +44,7 @@ class MarketConsumer implements ConsumerInterface
         $this->tokenManager = $tokenManager;
         $this->marketProducer = $marketProducer;
         $this->em = $em;
+        $this->lockFactory = $lockFactory;
     }
 
     public function execute(AMQPMessage $msg): bool
@@ -90,6 +83,14 @@ class MarketConsumer implements ConsumerInterface
             return true;
         }
 
+        $lock = $this->lockFactory->createLock("market-consumer-{$base->getSymbol()}-{$quote->getSymbol()}");
+
+        if (!$lock->acquire()) {
+            $this->logger->info("[market-consumer] Lock couldn't be acquired, skipping...");
+
+            return true;
+        }
+
         $market = new Market($base, $quote);
 
         try {
@@ -104,6 +105,8 @@ class MarketConsumer implements ConsumerInterface
                 $this->marketProducer->send($market, $clbResult->incrementRetries());
             }
         }
+
+        $lock->release();
 
         return true;
     }
