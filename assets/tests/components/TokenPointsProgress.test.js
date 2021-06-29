@@ -37,7 +37,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -69,7 +69,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -99,7 +99,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -124,7 +124,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -158,7 +158,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: false,
+                isControlledToken: false,
                 profileAnonymously: '',
                 profileDescription: 'Description',
                 profileLastname: 'last name',
@@ -192,7 +192,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: 'description',
                 profileLastname: 'last name',
@@ -216,7 +216,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',
@@ -253,7 +253,7 @@ describe('TokenPointsProgress', () => {
             store,
             localVue,
             propsData: {
-                isMintmeToken: true,
+                isControlledToken: true,
                 profileAnonymously: '',
                 profileDescription: '',
                 profileLastname: 'last name',

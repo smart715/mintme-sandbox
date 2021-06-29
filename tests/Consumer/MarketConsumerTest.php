@@ -10,6 +10,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\LockFactory;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,7 +30,8 @@ class MarketConsumerTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
-            $this->mockEM()
+            $this->mockEM(),
+            $this->createMock(LockFactory::class)
         );
 
         $this->assertTrue(
@@ -47,7 +49,8 @@ class MarketConsumerTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
-            $this->mockEM()
+            $this->mockEM(),
+            $this->createMock(LockFactory::class)
         );
 
         $this->assertTrue(
@@ -65,7 +68,8 @@ class MarketConsumerTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
             $this->mockMarketProducer($this->never()),
-            $this->mockEM()
+            $this->mockEM(),
+            $this->createMock(LockFactory::class)
         );
 
         $this->assertTrue(
@@ -86,7 +90,8 @@ class MarketConsumerTest extends TestCase
             $this->mockCryptoManager(),
             $this->mockTokenManager(),
             $this->mockMarketProducer($this->once()),
-            $this->mockEM()
+            $this->mockEM(),
+            $this->createMock(LockFactory::class)
         );
 
         $this->assertTrue(
