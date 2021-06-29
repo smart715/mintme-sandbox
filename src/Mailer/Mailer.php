@@ -2,12 +2,11 @@
 
 namespace App\Mailer;
 
-use App\Entity\AirdropCampaign\AirdropReferralCode;
-use App\Entity\Crypto;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserLoginInfo;
+use App\SmartContract\Config\ExplorerUrlsConfigInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
@@ -22,21 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /** @codeCoverageIgnore */
 class Mailer implements MailerInterface, AuthCodeMailerInterface
 {
-    /** @var string */
-    protected $mail;
-
-    /** @var Swift_Mailer */
-    protected $mailer;
-
-    /** @var EngineInterface */
-    protected $twigEngine;
-
-    /** @var UrlGeneratorInterface */
-    protected $urlGenerator;
-
+    protected string $mail;
+    protected Swift_Mailer $mailer;
+    protected EngineInterface $twigEngine;
+    protected UrlGeneratorInterface $urlGenerator;
     private TranslatorInterface $translator;
-
     private MoneyWrapperInterface $moneyWrapper;
+    private ExplorerUrlsConfigInterface $explorerUrlConfig;
 
     public function __construct(
         string $mail,
@@ -44,7 +35,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         EngineInterface $twigEngine,
         UrlGeneratorInterface $urlGenerator,
         TranslatorInterface $translator,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        ExplorerUrlsConfigInterface $explorerUrlConfig
     ) {
         $this->mail = $mail;
         $this->mailer = $mailer;
@@ -52,6 +44,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
         $this->moneyWrapper = $moneyWrapper;
+        $this->explorerUrlConfig = $explorerUrlConfig;
     }
 
     public function sendWithdrawConfirmationMail(User $user, PendingWithdrawInterface $withdrawData): void
@@ -624,8 +617,9 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
         $this->mailer->send($msg);
     }
 
-    public function sendOwnTokenDeployedMail(User $user, string $tokenName, string $txHash): void
+    public function sendOwnTokenDeployedMail(Token $token): void
     {
+        $user = $token->getProfile()->getUser();
         $tokenSalesUrl = $this->urlGenerator->generate(
             'kb_show',
             ['url' => 'Time-for-token-sales-how-can-I-make-a-difference'],
@@ -651,11 +645,12 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             ['url' => 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
+        $explorerUrl = $this->explorerUrlConfig->getExplorerUrl($token->getCryptoSymbol(), $token->getTxHash());
 
         $body = $this->twigEngine->render("mail/token_deployed.html.twig", [
             'username' => $user->getUsername(),
-            'tokenName' => $tokenName,
-            'txHash' => $txHash,
+            'tokenName' => $token->getName(),
+            'explorerUrl' => $explorerUrl,
             'tokenSalesUrl' => $tokenSalesUrl,
             'aimingUrl' => $aimingUrl,
             'ideasUrl' => $ideasUrl,
@@ -665,8 +660,8 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $textBody = $this->twigEngine->render("mail/token_deployed.txt.twig", [
             'username' => $user->getUsername(),
-            'tokenName' => $tokenName,
-            'txHash' => $txHash,
+            'tokenName' => $token->getName(),
+            'explorerUrl' => $explorerUrl,
             'tokenSalesUrl' => $tokenSalesUrl,
             'aimingUrl' => $aimingUrl,
             'ideasUrl' => $ideasUrl,

@@ -32,12 +32,14 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public const FILTER_DEPLOYED_ONLY_MINTME = 2;
     public const FILTER_AIRDROP_ONLY = 3;
     public const FILTER_DEPLOYED_ONLY_ETH = 4;
+    public const FILTER_DEPLOYED_ONLY_BNB = 5;
     public const FILTER_AIRDROP_ACTIVE = true;
     public const FILTER_FOR_TOKENS = [
             'deployed_first' => self::FILTER_DEPLOYED_FIRST,
             'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
             'airdrop_only' => self::FILTER_AIRDROP_ONLY,
             'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
+            'deployed_only_bnb' => self::FILTER_DEPLOYED_ONLY_BNB,
         ];
 
     public const SORT_LAST_PRICE = 'lastPrice';
@@ -154,6 +156,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 $queryBuilder->andWhere(
                     "qt.deployed = 1 AND c.symbol = :eth"
                 )->setParameter('eth', Symbols::ETH);
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_BNB:
+                $queryBuilder->andWhere(
+                    "qt.deployed = 1 AND c.symbol = :bnb"
+                )->setParameter('bnb', Symbols::BNB);
 
                 break;
             case self::FILTER_AIRDROP_ONLY:
@@ -332,6 +340,8 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 "Nonexistent market: {$market->getBase()->getSymbol()}/{$market->getQuote()->getSymbol()}"
             );
         }
+
+        $this->em->refresh($marketStatus);
 
         $marketInfo = $this->marketHandler->getMarketInfo(
             $market,

@@ -390,6 +390,10 @@ export default {
                         key: 'deployedEth',
                         label: this.$t('trading.deployed_eth.label'),
                     },
+                    deployedBnb: {
+                        key: 'deployedBnb',
+                        label: this.$t('trading.deployed_bnb.label'),
+                    },
                     airdrop: {
                         key: 'airdrop',
                         label: this.$t('trading.airdrop.label'),
@@ -536,11 +540,17 @@ export default {
         filterDeployedOnlyEth: function() {
             return this.filterForTokens.deployed_only_eth || 0;
         },
+        filterDeployedOnlyBnb: function() {
+            return this.filterForTokens.deployed_only_bnb || 0;
+        },
         shouldShowAll: function() {
             const totalPages = Math.ceil(this.totalRows / this.perPage);
 
-            return (this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
-                    || this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key)
+            return [
+                    this.marketFilters.options.deployed.key,
+                    this.marketFilters.options.deployedEth.key,
+                    this.marketFilters.options.deployedBnb.key,
+                ].includes(this.marketFilters.selectedFilter)
                 && this.tokens.length
                 && this.currentPage === totalPages;
         },
@@ -567,6 +577,7 @@ export default {
                 && (
                     value === this.marketFilters.options.deployed.key
                     || value === this.marketFilters.options.deployedEth.key
+                    || value === this.marketFilters.options.deployedBnb.key
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
@@ -634,6 +645,10 @@ export default {
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
                 ) {
                     params.filter = this.filterDeployedOnlyEth;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedBnb.key
+                ) {
+                    params.filter = this.filterDeployedOnlyBnb;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {

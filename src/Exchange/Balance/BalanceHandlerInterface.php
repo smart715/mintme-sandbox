@@ -48,10 +48,17 @@ interface BalanceHandlerInterface
 
     /**
      * @param User $user
-     * @param array $tokens
+     * @param Token[] $tokens
      * @return BalanceResultContainer
      */
     public function balances(User $user, array $tokens): BalanceResultContainer;
+
+    /**
+     * @param User $user
+     * @param Token[] $tokens
+     * @return BalanceResult[]
+     */
+    public function indexedBalances(User $user, array $tokens): array;
 
     public function isNotExchanged(Token $token, int $amount): bool;
 

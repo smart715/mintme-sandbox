@@ -52,7 +52,7 @@ class UpdateDeployedTokenCommand extends Command
         $count = 0;
 
         foreach ($deployed as $token) {
-            if (!$token->getTxHash() && $token->isMintmeToken() && !$token->isBlocked()) {
+            if (!$token->getTxHash() && $token->isControlledToken() && !$token->isBlocked()) {
                 $token->setTxHash($this->contractHandler->getTxHash($token->getName()));
                 $this->em->persist($token);
                 $count += 1;
