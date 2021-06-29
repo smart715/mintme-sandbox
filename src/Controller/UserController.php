@@ -15,7 +15,6 @@ use App\Manager\TokenManager;
 use App\Manager\TwoFactorManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
