@@ -525,7 +525,7 @@ class TokenController extends Controller
         if ($this->cryptoManager->findBySymbol($name)) {
             throw new RedirectException(
                 $this->redirectToRoute('coin', [
-                    'base'=> (Symbols::WEB == $name ? Symbols::BTC : $name),
+                    'base'=> (Symbols::WEB === $name ? Symbols::BTC : $name),
                     'quote'=> Symbols::MINTME,
                 ])
             );

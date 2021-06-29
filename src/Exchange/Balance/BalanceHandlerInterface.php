@@ -48,14 +48,14 @@ interface BalanceHandlerInterface
 
     /**
      * @param User $user
-     * @param array $tradables
+     * @param TradebleInterface[] $tradables
      * @return BalanceResultContainer
      */
     public function balances(User $user, array $tradables): BalanceResultContainer;
 
     /**
      * @param User $user
-     * @param array $tradables
+     * @param TradebleInterface[] $tradables
      * @return BalanceResult[]
      */
     public function indexedBalances(User $user, array $tradables): array;
