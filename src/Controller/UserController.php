@@ -299,7 +299,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                     $user,
                     $request,
                     new Response(Response::HTTP_OK)
-                )
+                ),
+                'toasted.success.password_updated',
             );
         }
 

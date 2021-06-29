@@ -212,7 +212,8 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
-            $event
+            $event,
+            'toasted.success.password_updated'
         );
 
         return $response;
