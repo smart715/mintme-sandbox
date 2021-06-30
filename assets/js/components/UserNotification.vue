@@ -137,7 +137,7 @@ export default {
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
         },
         groupPosts: function() {
-            let postsNotifications = [];
+            let postsNotifications = {};
             let postsToDelete = [];
 
             this.userNotifications.forEach((item) => {
@@ -146,25 +146,24 @@ export default {
                 }
 
                 let jsonData = JSON.parse(item.jsonData);
-                const index = postsNotifications.findIndex((post) => {
-                    return JSON.parse(post.jsonData).tokenName === jsonData.tokenName;
-                });
 
-                if (-1 === index) {
-                    item.number = 1;
-                    postsNotifications.push(item);
+                if (postsNotifications[jsonData.tokenName] === undefined) {
+                  item.number = 1;
+                  postsNotifications[jsonData.tokenName] = item;
                 } else {
-                    postsNotifications[index].number += 1;
+                  postsNotifications[jsonData.tokenName].number += 1;
                 }
 
                 postsToDelete.push(item);
             });
 
             this.userNotifications = this.userNotifications.filter((post) => !postsToDelete.includes(post));
-            
-            postsNotifications.forEach((item) => {
-                this.userNotifications.unshift(item);
-            });
+
+            for (const notification in postsNotifications) {
+                if (postsNotifications.hasOwnProperty(notification)) {
+                    this.userNotifications.unshift(postsNotifications[notification]);
+                }
+            }
         },
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
