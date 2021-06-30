@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\ApiKey;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
+use App\Events\UserEvents;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
 use App\Form\TwoFactorType;
@@ -299,7 +300,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                     $request,
                     new Response(Response::HTTP_OK)
                 ),
-                'toasted.success.password_updated',
+                UserEvents::PASSWORD_UPDATED
             );
         }
 

@@ -6,6 +6,7 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
+use App\Events\UserEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Form\ChangePasswordType;
@@ -15,7 +16,6 @@ use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -213,7 +213,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
             $event,
-            'toasted.success.password_updated'
+            UserEvents::PASSWORD_UPDATED
         );
 
         return $response;
