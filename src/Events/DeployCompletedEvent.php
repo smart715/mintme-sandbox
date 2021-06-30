@@ -3,28 +3,11 @@
 namespace App\Events;
 
 use App\Entity\Token\Token;
-use App\Entity\User;
 
-class DeployCompletedEvent extends TokenEvent implements TokenEventInterface, UserEventInterface
+class DeployCompletedEvent extends TokenEvent implements TokenEventInterface
 {
-    protected User $user;
-    private string $txHash;
-
-    public function __construct(Token $token, string $txHash)
+    public function __construct(Token $token)
     {
-        $this->user = $token->getProfile()->getUser();
-        $this->txHash = $txHash;
-
         parent::__construct($token);
-    }
-
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function getTxHash(): string
-    {
-        return $this->txHash;
     }
 }

@@ -34,11 +34,11 @@ class DeploySubscriber implements EventSubscriberInterface
 
     public function sendDeployCompletedMail(DeployCompletedEvent $event): void
     {
-        $user = $event->getUser();
+        $user = $event->getToken()->getProfile()->getUser();
 
         try {
             $this->mailer->checkConnection();
-            $this->mailer->sendOwnTokenDeployedMail($user, $event->getToken()->getName(), $event->getTxHash());
+            $this->mailer->sendOwnTokenDeployedMail($event->getToken());
         } catch (\Throwable $e) {
             $this->logger->error(
                 "Couldn't send "
