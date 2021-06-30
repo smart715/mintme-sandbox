@@ -311,7 +311,7 @@ export default {
             ;
         },
         balanceLoaded: function() {
-            return this.balance !== null;
+            return null !== this.balance;
         },
         assetToReceive: function() {
              return this.isBuyMode ?
@@ -319,10 +319,10 @@ export default {
                 this.market.base.symbol;
         },
         isBuyMode: function() {
-            return this.tradeMode === BUY_MODE;
+            return BUY_MODE === this.tradeMode;
         },
         isSellMode: function() {
-            return this.tradeMode === SELL_MODE;
+            return SELL_MODE === this.tradeMode;
         },
         isOrdersSummaryZero: function() {
             const summary = new Decimal(this.ordersSummary);
@@ -476,7 +476,7 @@ export default {
     },
     methods: {
         setTradeMode: function(mode) {
-            if (this.tradeMode === mode) {
+            if (mode === this.tradeMode) {
                 return;
             }
 

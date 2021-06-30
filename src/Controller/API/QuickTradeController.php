@@ -208,6 +208,8 @@ class QuickTradeController extends AbstractFOSRestController
                 /** @psalm-suppress TooManyArguments */
                 $this->eventDispatcher->dispatch(new DonationEvent($donation), TokenEvents::DONATION);
 
+                $lock->release();
+
                 return $this->view(null, Response::HTTP_OK);
             }
 
@@ -226,6 +228,8 @@ class QuickTradeController extends AbstractFOSRestController
                 if (TradeResult::SUCCESS !== $tradeResult->getResult()) {
                     throw new ApiBadRequestException($tradeResult->getMessage());
                 }
+
+                $lock->release();
 
                 return $this->view(null, Response::HTTP_OK);
             }
