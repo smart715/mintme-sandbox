@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Config;
 
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -27,11 +28,17 @@ class TokenConfig
 
     public function getBnbWithdrawFee(): Money
     {
-        return $this->parameterBag->get('bnb_token_withdraw_fee');
+        return $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('bnb_token_withdraw_fee'),
+            Symbols::BNB
+        );
     }
 
     public function getEthWithdrawFee(): Money
     {
-        return $this->parameterBag->get('eth_token_withdraw_fee');
+        return $this->moneyWrapper->parse(
+            (string)$this->parameterBag->get('eth_token_withdraw_fee'),
+            Symbols::ETH
+        );
     }
 }
