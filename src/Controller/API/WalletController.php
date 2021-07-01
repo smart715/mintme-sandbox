@@ -255,7 +255,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         BalanceHandlerInterface $balanceHandler,
         TokenManagerInterface $tokenManager
     ): View {
-        $webToken = $this->cryptoManager->findByName(Symbols::WEB);
+        $webToken = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
         if (!$webToken) {
             throw new InvalidArgumentException();
