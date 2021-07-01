@@ -900,7 +900,7 @@ ongoing_airdrop.twitter_message.confirm: 'By clicking accept, we will post the f
 ongoing_airdrop.accept: 'Accept'
 ongoing_airdrop.referral: 'Earn additional %halfReward% %tokenName% for each referred person that registers and completes claiming airdrop with this link:'
 ongoing_airdrop.claim.login_to_complete: 'To complete claiming airdrop please sign up or log in'
-token.deploy.final_step: 'This is final step for token creation. After you pay for deploying token to blockchain you and others will be able to withdraw tokens from mintme to your wallet.'
+token.deploy.final_step: 'This is the last step for token creation. After paying for token deployment to the blockchain, you and others will be able to withdraw tokens from MintMe to your wallet.'
 token.deploy.frozen: 'MINTME spent here will be inaccessible to anyone (frozen) for 5 years. So you lower MINTME circulating supply with each purchase and increase probability of MINTME price going up.'
 token.deploy.irreversible: 'This process is irreversible, once you confirm payment there is no going back.'
 token.deploy.current_balance: 'Your current balance:'
