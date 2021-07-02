@@ -103,7 +103,7 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return this.isLoggedIn ? 'search-input logged form-control no-bg-img' : 'search-input form-control no-bg-img';
+          return 'search-input form-control no-bg-img' + (this.isLoggedIn ? ' logged ' : '');
         },
     },
 };
