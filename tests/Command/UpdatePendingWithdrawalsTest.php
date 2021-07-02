@@ -9,6 +9,7 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\CryptoRepository;
 use App\Repository\PendingTokenWithdrawRepository;
@@ -53,8 +54,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $handler,
             $cm,
             $this->mockLockFactory(),
-            $this->createMock(ParameterBagInterface::class),
-            $this->createMock(MoneyWrapperInterface::class)
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;
@@ -92,8 +93,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $handler,
             $cm,
             $this->mockLockFactory(),
-            $this->createMock(ParameterBagInterface::class),
-            $this->createMock(MoneyWrapperInterface::class)
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;
