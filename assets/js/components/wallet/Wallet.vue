@@ -312,7 +312,8 @@ export default {
         expirationTime: Number,
         disabledCrypto: String,
         disabledServicesConfig: String,
-        tokenWithdrawFee: Number,
+        ethTokenWithdrawFee: Number,
+        bnbTokenWithdrawFee: Number,
         isUserBlocked: Boolean,
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
@@ -363,6 +364,10 @@ export default {
             deposit: {
                 fee: undefined,
                 min: undefined,
+            },
+            tokenWithdrawFees: {
+                [ethSymbol]: this.ethTokenWithdrawFee,
+                [bnbSymbol]: this.bnbTokenWithdrawFee,
             },
         };
     },
@@ -511,7 +516,9 @@ export default {
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
                 isToken
-                    ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
+                    ? [ethSymbol, bnbSymbol].includes(crypto)
+                        ? this.tokenWithdrawFees[crypto]
+                        : this.predefinedTokens[crypto || webSymbol].fee
                     : 0
             );
             this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
