@@ -90,7 +90,7 @@ class DonationHandler implements DonationHandlerInterface
                     $this->cryptoManager->findBySymbol(Symbols::WEB)
                 )
             );
-            $amountObj = $this->getCryptoWorthInMintme($amountObj, $currency);
+            $amountObj = $this->getCryptoWorthInMintme($pendingSellOrders, $amountObj);
         }
 
         return $this->donationFetcher->checkDonation(
