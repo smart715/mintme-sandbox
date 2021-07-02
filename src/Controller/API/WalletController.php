@@ -25,6 +25,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -43,6 +44,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
     private MailerInterface $mailer;
     private CryptoManagerInterface $cryptoManager;
     private UserManagerInterface $userManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         TranslatorInterface $translations,
@@ -51,6 +53,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         MailerInterface $mailer,
         CryptoManagerInterface $cryptoManager,
         UserManagerInterface $userManager,
+        LoggerInterface $logger,
         string $coinifySharedSecret
     ) {
         $this->translations = $translations;
@@ -60,6 +63,7 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         $this->mailer = $mailer;
         $this->cryptoManager = $cryptoManager;
         $this->userManager = $userManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -144,6 +148,8 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
                 $tradable
             );
         } catch (Throwable $exception) {
+            $this->logger->error('error while withdrawing: ' . json_encode($exception));
+
             return $this->view([
                 'error' => $this->translations->trans('api.wallet.withdrawal_failed'),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
