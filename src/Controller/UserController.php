@@ -287,6 +287,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         /** @var User $user */
         $user = $this->getUser();
         $passwordForm = $this->createForm(ChangePasswordType::class, $user);
+        $passwordCloned = clone $passwordForm;
+
         $passwordForm->handleRequest($request);
 
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
@@ -302,6 +304,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 ),
                 UserEvents::PASSWORD_UPDATED
             );
+
+            $passwordForm = $passwordCloned;
         }
 
         return $passwordForm;
