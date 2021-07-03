@@ -68,13 +68,16 @@
       width: 25rem
 
     &.logged
-      @include media-breakpoint-up(lg)
+      @media screen and (max-width: 1073px) and (min-width: 992px)
         width: 10rem
 
-      @include media-breakpoint-up(xl)
+      @media screen and (max-width: 1200px) and (min-width: 1073px)
+        width: 15rem
+
+      @media screen and (max-width: 1251px) and (min-width: 1200px)
         width: 22rem
 
-      @media screen and (min-width: 1400px)
+      @media screen and (max-width: 1073px) and (min-width: 1251px)
         width: 25rem
 
   .search-icon
