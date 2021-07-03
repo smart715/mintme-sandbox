@@ -10,8 +10,10 @@ use App\Manager\UserNotificationManagerInterface;
 use App\Utils\NotificationChannels;
 use App\Utils\NotificationTypes;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SendEmailGroupedPosts extends Command
 {
@@ -37,12 +39,32 @@ class SendEmailGroupedPosts extends Command
     {
         $this
             ->setName('app:send-grouped-posts')
-            ->setDescription('Send grouped posts to users');
+            ->setDescription('Send grouped posts to users')
+            ->addArgument('date', InputArgument::OPTIONAL, 'Date');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $posts = $this->postManager->getPostsCreatedToday();
+        $io = new SymfonyStyle($input, $output);
+
+        /** @var string $date */
+        $date = $input->getArgument('date');
+
+        if (null !== $date) {
+            if (!is_string($date)) {
+                $io->error('Wrong date argument');
+
+                return 1;
+            }
+
+            if (!$this->validateDate($date)) {
+                $output->writeln('$date: is not a valid date');
+
+                return 1;
+            }
+        }
+
+        $posts = $this->postManager->getPostsCreatedToday($date);
 
         $data = [];
 
@@ -76,5 +98,12 @@ class SendEmailGroupedPosts extends Command
         $output->writeln('Emails has been sent');
 
         return 0;
+    }
+
+    public function validateDate(string $date, string $format = 'Y-m-d'): bool
+    {
+        $dateObject = \DateTime::createFromFormat($format, $date);
+
+        return $dateObject && $dateObject->format($format) == $date;
     }
 }

@@ -23,25 +23,41 @@ class PostRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getPostsCreatedToday(): array
+    public function getPostsCreatedToday(?string $date): array
     {
+        if ($date) {
+            $from = $date.' 00:00:00';
+            $to = $date.' 23:59:59';
+        } else {
+            $from = date('Y-m-d', strtotime('-1 day')).' 00:00:00';
+            $to = date('Y-m-d', strtotime('-1 day')).' 23:59:59';
+        }
+
         return $this->createQueryBuilder('post')
             ->where('post.createdAt BETWEEN :from AND :to')
-            ->setParameter('from', date('Y-m-d', strtotime('-1 day')).' 00:00:00')
-            ->setParameter('to', date('Y-m-d', strtotime('-1 day')).' 23:59:59')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
             ->orderBy('post.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
-    public function getPostsCreatedTodayByToken(Token $token): array
+    public function getPostsCreatedTodayByToken(Token $token, ?string $date): array
     {
+        if ($date) {
+            $from = $date.' 00:00:00';
+            $to = $date.' 23:59:59';
+        } else {
+            $from = date('Y-m-d', strtotime('-1 day')).' 00:00:00';
+            $to = date('Y-m-d', strtotime('-1 day')).' 23:59:59';
+        }
+
         return $this->createQueryBuilder('post')
             ->where('post.token = :token')
             ->andWhere('post.createdAt BETWEEN :from AND :to')
             ->setParameter('token', $token)
-            ->setParameter('from', date('Y-m-d 00:00:00'))
-            ->setParameter('to', date('Y-m-d 23:59:59'))
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
             ->orderBy('post.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
