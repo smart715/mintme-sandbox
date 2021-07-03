@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
 use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
@@ -20,7 +21,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumer implements ConsumerInterface
@@ -46,8 +46,7 @@ class PaymentConsumer implements ConsumerInterface
     private EntityManagerInterface $em;
 
     private EventDispatcherInterface $eventDispatcher;
-
-    private ParameterBagInterface $parameterBag;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
@@ -59,7 +58,7 @@ class PaymentConsumer implements ConsumerInterface
         ClockInterface $clock,
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher,
-        ParameterBagInterface $parameterBag
+        TokenConfig $tokenConfig
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -70,7 +69,7 @@ class PaymentConsumer implements ConsumerInterface
         $this->clock = $clock;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
-        $this->parameterBag = $parameterBag;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** {@inheritdoc} */
@@ -126,7 +125,7 @@ class PaymentConsumer implements ConsumerInterface
                         $this->balanceHandler,
                         $this->cryptoManager,
                         $this->moneyWrapper,
-                        $this->parameterBag
+                        $this->tokenConfig
                     )
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 

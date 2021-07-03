@@ -6,6 +6,7 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
@@ -19,7 +20,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /* Cron job added to DB. */
 class UpdatePendingWithdrawals extends Command
@@ -32,8 +32,8 @@ class UpdatePendingWithdrawals extends Command
     public int $withdrawExpirationTime;
     public int $viabtcResponseTimeout;
     private LockFactory $lockFactory;
-    private ParameterBagInterface $parameterBag;
     private MoneyWrapperInterface $moneyWrapper;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         LoggerInterface $logger,
@@ -42,8 +42,8 @@ class UpdatePendingWithdrawals extends Command
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
         LockFactory $lockFactory,
-        ParameterBagInterface $parameterBag,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        TokenConfig $tokenConfig
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
@@ -51,8 +51,8 @@ class UpdatePendingWithdrawals extends Command
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
         $this->lockFactory = $lockFactory;
-        $this->parameterBag = $parameterBag;
         $this->moneyWrapper = $moneyWrapper;
+        $this->tokenConfig = $tokenConfig;
 
         parent::__construct();
     }
@@ -134,10 +134,6 @@ class UpdatePendingWithdrawals extends Command
             $itemsCount = count($items);
             $pendingCount = 0;
             $mintmeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
-            $ethTokenFeeInCrypto = $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('token_withdraw_fee'),
-                Symbols::ETH
-            );
 
             /** @var PendingTokenWithdraw $item */
             foreach ($items as $item) {
@@ -148,7 +144,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->beginTransaction();
                     $fee = $token->isMintmeToken()
                         ? $mintmeCrypto->getFee()
-                        : $ethTokenFeeInCrypto;
+                        : $this->tokenConfig->getWithdrawFeeByCryptoSymbol($token->getCryptoSymbol());
 
                     $feeToken = Token::getFromCrypto($token->isMintmeToken() ? $mintmeCrypto : $token->getCrypto());
                     $isFeeInCrypto = $token->isMintmeToken() || !$token->getFee();
