@@ -4,7 +4,6 @@ namespace App\Exchange\Market;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\Trade\CheckTradeResult;
 use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\BuyOrdersSummaryResult;
@@ -12,6 +11,7 @@ use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Exchange\Trade\CheckTradeResult;
 use Money\Money;
 
 interface MarketHandlerInterface
