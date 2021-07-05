@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Exchange;
+namespace App\Exchange\Trade;
 
 use Money\Money;
 

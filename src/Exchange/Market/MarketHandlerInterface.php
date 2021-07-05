@@ -4,7 +4,7 @@ namespace App\Exchange\Market;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Exchange\CheckTradeResult;
+use App\Exchange\Trade\CheckTradeResult;
 use App\Exchange\Deal;
 use App\Exchange\Market;
 use App\Exchange\Market\Model\BuyOrdersSummaryResult;

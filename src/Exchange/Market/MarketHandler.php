@@ -7,7 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\CheckTradeResult;
+use App\Exchange\Trade\CheckTradeResult;
 use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
