@@ -62,9 +62,7 @@ class TokenManager implements TokenManagerInterface
 
     public function findByName(string $name): ?Token
     {
-        $name = Symbols::MINTME === strtoupper($name)
-            ? Symbols::WEB
-            : strtoupper($name);
+        $name = strtoupper($name);
 
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
