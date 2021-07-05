@@ -414,8 +414,7 @@ export default {
         shouldShowDepositMore: function() {
             return !this.isToken
                 || this.isBuyMode
-                || this.deploymentStatus === tokenDeploymentStatus.deployed
-            ;
+                || this.deploymentStatus === tokenDeploymentStatus.deployed;
         },
         makeDepositHtml: function() {
             const depositUrl = this.$routing.generate('wallet', {
