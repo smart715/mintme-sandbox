@@ -90,13 +90,11 @@ class DonationHandlerTest extends TestCase
             $fetcher,
             $marketNameConverter,
             $moneyWrapper,
-            $this->mockCryptoRatesFetcher(),
             $this->mockCryptoManager($base),
             $bh,
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(ParameterBagInterface::class),
             $this->createMock(TraderInterface::class)
         );
 
@@ -166,13 +164,11 @@ class DonationHandlerTest extends TestCase
             $fetcher,
             $marketNameConverter,
             $moneyWrapper,
-            $this->mockCryptoRatesFetcher(),
             $cryptoManager,
             $bh,
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(ParameterBagInterface::class),
             $this->createMock(TraderInterface::class)
         );
 
@@ -190,20 +186,6 @@ class DonationHandlerTest extends TestCase
     private function mockToken(): Token
     {
         return $this->createMock(Token::class);
-    }
-
-    /** @return CryptoRatesFetcherInterface|MockObject */
-    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
-    {
-        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
-
-        $crf->method('fetch')->willReturn([
-            Symbols::WEB => [
-                Symbols::BTC => 0.00000008,
-            ],
-        ]);
-
-        return $crf;
     }
 
     /** @return CryptoManagerInterface|MockObject */
