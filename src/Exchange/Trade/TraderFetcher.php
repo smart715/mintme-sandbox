@@ -177,7 +177,7 @@ class TraderFetcher implements TraderFetcherInterface
             : new TradeResult(TradeResult::FAILED, $this->translator);
     }
 
-    public function getExecuteOrderErrorResult(int $errorCode): TradeResult
+    private function getExecuteOrderErrorResult(int $errorCode): TradeResult
     {
         $errorMapping = [
             self::INSUFFICIENT_BALANCE_CODE => TradeResult::INSUFFICIENT_BALANCE,

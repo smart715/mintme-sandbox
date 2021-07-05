@@ -305,18 +305,17 @@ export default {
             balances: 'getBalances',
         }),
         balance: function() {
-            return this.balances ?
-                this.balances[this.selectedCurrency].available :
-                null
-            ;
+            return this.balances
+                ? this.balances[this.selectedCurrency].available
+                : null;
         },
         balanceLoaded: function() {
             return null !== this.balance;
         },
         assetToReceive: function() {
-             return this.isBuyMode ?
-                this.market.quote.symbol:
-                this.market.base.symbol;
+             return this.isBuyMode
+                ? this.market.quote.symbol
+                : this.market.base.symbol;
         },
         isBuyMode: function() {
             return BUY_MODE === this.tradeMode;
@@ -347,10 +346,9 @@ export default {
             return this.rebrandingFunc(this.selectedCurrency);
         },
         isCurrencySelected: function() {
-            return this.isBuyMode ?
-                Object.values(this.options).includes(this.selectedCurrency):
-                this.selectedCurrency === this.market.quote.symbol
-            ;
+            return this.isBuyMode
+                ? Object.values(this.options).includes(this.selectedCurrency)
+                : this.selectedCurrency === this.market.quote.symbol;
         },
         dropdownText: function() {
             return this.isCurrencySelected
@@ -393,10 +391,10 @@ export default {
         sellAmountExceeds: function() {
             const amount = new Decimal(this.amount || 0);
 
-            return this.isSellMode &&
-                !this.isCheckingTrade &&
-                !amount.isZero() &&
-                amount.greaterThan(this.ordersSummary);
+            return this.isSellMode
+                && !this.isCheckingTrade
+                && !amount.isZero()
+                && amount.greaterThan(this.ordersSummary);
         },
         isAmountValid: function() {
             const amount = new Decimal(this.amount || 0);
@@ -405,18 +403,18 @@ export default {
                 && amount.greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return this.insufficientFunds ||
-                !this.isAmountValid ||
-                !this.isCurrencySelected ||
-                !parseFloat(this.amount) ||
-                this.sellAmountExceeds ||
-                this.isCheckingTrade ||
-                this.isTradeInProgress;
+            return this.insufficientFunds
+                || !this.isAmountValid
+                || !this.isCurrencySelected
+                || !parseFloat(this.amount)
+                || this.sellAmountExceeds
+                || this.isCheckingTrade
+                || this.isTradeInProgress;
         },
         shouldShowDepositMore: function() {
-            return !this.isToken ||
-                this.isBuyMode ||
-                this.deploymentStatus === tokenDeploymentStatus.deployed
+            return !this.isToken
+                || this.isBuyMode
+                || this.deploymentStatus === tokenDeploymentStatus.deployed
             ;
         },
         makeDepositHtml: function() {

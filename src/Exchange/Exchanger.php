@@ -224,14 +224,14 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        $AvgPrice = $this->mw->parse(
+        $avgPrice = $this->mw->parse(
             $expectedToReceive,
             $market->getBase()->getSymbol()
         )->divide($amountInput);
 
         $minOrderValidator = $this->vf->createOrderValidator(
             $market,
-            $this->mw->format($AvgPrice),
+            $this->mw->format($avgPrice),
             $amountInput
         );
 
@@ -262,7 +262,7 @@ class Exchanger implements ExchangerInterface
             $market,
             $amount,
             $side,
-            $AvgPrice,
+            $avgPrice,
             Order::PENDING_STATUS,
             $fee,
             null,
