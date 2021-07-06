@@ -35,7 +35,7 @@ class UserTokenManager implements UserTokenManagerInterface
         }
 
         $userToken = $this->findByUserToken($user, $token);
-        $isCreator = $user->getId() === $token->getProfile()->getId();
+        $isCreator = $user->getId() === $token->getProfile()->getUser()->getId();
 
         if (!$userToken && ($isCreator || !$balance->isZero())) {
             $userToken = (new UserToken())
