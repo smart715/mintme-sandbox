@@ -122,8 +122,7 @@ class DonationHandler implements DonationHandlerInterface
         $minTokensAmount = $this->donationConfig->getMinTokensAmount();
 
         $donationMintmeAmount = $amountInCrypto;
-        $pendingSellOrders = [];
-        $isDonationInMintme = in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true);
+        $isDonationInMintme = Symbols::WEB === $currency;
         $cryptoMarket = new Market(
             $this->cryptoManager->findBySymbol($currency),
             $this->cryptoManager->findBySymbol(Symbols::WEB)
