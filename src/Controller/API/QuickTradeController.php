@@ -8,17 +8,15 @@ use App\Events\DonationEvent;
 use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\QuickTradeException;
-use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\DonationHandlerInterface;
-use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
+use App\Exchange\QuickTraderInterface;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\DonationLogger;
 use App\Utils\LockFactory;
 use App\Utils\Symbols;
-use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
@@ -40,11 +38,9 @@ class QuickTradeController extends AbstractFOSRestController
     protected DonationLogger $logger;
     protected EventDispatcherInterface $eventDispatcher;
 
-    private MoneyWrapperInterface $moneyWrapper;
-    private ExchangerInterface $exchanger;
     private LockFactory $lockFactory;
-    private QuickTradeConfig $config;
     private TranslatorInterface $translator;
+    private QuickTraderInterface $quickTrader;
 
     public function __construct(
         DonationHandlerInterface $donationHandler,
@@ -52,20 +48,16 @@ class QuickTradeController extends AbstractFOSRestController
         DonationLogger $logger,
         LockFactory $lockFactory,
         EventDispatcherInterface $eventDispatcher,
-        MoneyWrapperInterface $moneyWrapper,
-        ExchangerInterface $exchanger,
-        QuickTradeConfig $config,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        QuickTraderInterface $quickTrader
     ) {
         $this->donationHandler = $donationHandler;
         $this->marketHandler = $marketHandler;
         $this->logger = $logger;
         $this->lockFactory = $lockFactory;
         $this->eventDispatcher = $eventDispatcher;
-        $this->moneyWrapper = $moneyWrapper;
-        $this->exchanger = $exchanger;
-        $this->config = $config;
         $this->translator = $translator;
+        $this->quickTrader = $quickTrader;
     }
 
     /**
@@ -113,11 +105,7 @@ class QuickTradeController extends AbstractFOSRestController
             }
 
             if (self::SELL === $mode) {
-                $checkResult = $this->marketHandler->getExpectedSellResult(
-                    $market,
-                    $amount,
-                    $this->config->getSellFee()
-                );
+                $checkResult = $this->quickTrader->checkSell($market, $amount);
 
                 $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
 
@@ -218,7 +206,7 @@ class QuickTradeController extends AbstractFOSRestController
                     return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
                 }
 
-                $tradeResult = $this->makeSell(
+                $tradeResult = $this->quickTrader->makeSell(
                     $user,
                     $market,
                     $amount,
@@ -270,45 +258,6 @@ class QuickTradeController extends AbstractFOSRestController
         }
 
         return $user;
-    }
-
-    private function makeSell(User $user, Market $market, string $amount, string $expectedAmount): TradeResult
-    {
-        $quote = $market->getQuote();
-
-        $baseSymbol = $market->getBase()->getSymbol();
-
-        $quoteSymbol = $quote instanceof Token ?
-            Symbols::TOK :
-            $quote->getSymbol();
-
-        $expectedAmount = $this->moneyWrapper->parse($expectedAmount, $baseSymbol);
-
-        $checkResult = $this->marketHandler->getExpectedSellResult(
-            $market,
-            $amount,
-            $this->config->getSellFee()
-        );
-
-        $amount = $this->moneyWrapper->parse($amount, $quoteSymbol);
-
-        $buyOrdersSummary = $this->marketHandler->getBuyOrdersSummary($market)->getQuoteAmount();
-        $buyOrdersSummary = $this->moneyWrapper->parse($buyOrdersSummary, $quoteSymbol);
-
-        if (!$expectedAmount->equals($checkResult->getExpectedAmount()) ||
-            $amount->greaterThan($buyOrdersSummary)
-        ) {
-            throw QuickTradeException::availabilityChanged();
-        }
-
-        return $this->exchanger->executeOrder(
-            $user,
-            $market,
-            $this->moneyWrapper->format($amount),
-            $this->moneyWrapper->format($expectedAmount),
-            Order::SELL_SIDE,
-            $this->config->getSellFee()
-        );
     }
 
     private function handleException(\Throwable $ex): ?View
