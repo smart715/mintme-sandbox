@@ -170,7 +170,7 @@ class DonationHandler implements DonationHandlerInterface
             if (!$isDonationInMintme) {
                 $this->executeMarketOrders(
                     $donorUser,
-                    $donationMintmeAmount,
+                    $amountInCrypto,
                     $cryptoMarket
                 );
             }
