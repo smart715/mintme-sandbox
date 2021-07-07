@@ -333,7 +333,7 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
 
         $subject = $this->translator->trans('email.grouped_posts', [
             '%number%' => count($posts),
-            '%tokenName%' => $tokenName
+            '%tokenName%' => $tokenName,
         ]);
 
         $msg = (new Swift_Message($subject))
