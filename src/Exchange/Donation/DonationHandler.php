@@ -249,17 +249,17 @@ class DonationHandler implements DonationHandlerInterface
                     $currency
                 );
             } else {
-                $this->executeMarketOrders($donorUser, $donationMintmeAmount, $cryptoMarket);
+                $this->executeMarketOrders($donorUser, $amountInCrypto, $cryptoMarket);
                 $donationWithFee = $donationMintmeAmount->multiply($this->donationConfig->getFeeWithOrdersExecution());
 
-//                $this->sendAmountFromUserToUser(
-//                    $donorUser,
-//                    $donationMintmeAmount,
-//                    $tokenCreator,
-//                    $donationMintmeAmount->subtract($donationWithFee),
-//                    Symbols::WEB,
-//                    Symbols::WEB
-//                );
+                $this->sendAmountFromUserToUser(
+                    $donorUser,
+                    $donationMintmeAmount,
+                    $tokenCreator,
+                    $donationMintmeAmount->subtract($donationWithFee),
+                    Symbols::WEB,
+                    Symbols::WEB
+                );
             }
         }
 
@@ -292,7 +292,7 @@ class DonationHandler implements DonationHandlerInterface
             null,
             $market,
             $amountInCrypto,
-            Order::SELL_SIDE,
+            Order::BUY_SIDE,
             $this->moneyWrapper->parse('0', $market->getQuote()->getSymbol()),
             Order::PENDING_STATUS,
             $this->moneyWrapper->parse('0', $market->getQuote()->getSymbol()),

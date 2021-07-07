@@ -122,7 +122,7 @@ class Trader implements TraderInterface
             $this->marketNameConverter->convert($order->getMarket()),
             $order->getSide(),
             $this->moneyWrapper->format($order->getAmount()),
-            (string)$this->config->getTakerFeeRate(),
+            $this->moneyWrapper->format($order->getFee()),
             $order->getReferralId() ?: 0,
             $this->referralFee ? (string)$this->referralFee : '0'
         );
