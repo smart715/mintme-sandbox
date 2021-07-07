@@ -45,6 +45,7 @@
     background-color: $search-input
     color: $white
     border: none
+    width: 60vw
     height: 2.0rem
     transition: all .3s ease
 
@@ -61,6 +62,9 @@
       opacity: 1
       font-size: 0.8rem
 
+    @include media-breakpoint-up(md)
+      width: 45vw
+
     @include media-breakpoint-up(lg)
       width: 15rem
 
@@ -68,6 +72,10 @@
       width: 25rem
 
     &.logged
+
+      @include media-breakpoint-up(md)
+        width: 45vw
+
       @media screen and (max-width: 1073px) and (min-width: 992px)
         width: 10rem
 
