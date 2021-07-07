@@ -331,8 +331,11 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'posts' => $posts,
         ]);
 
-        $subject = $this->translator->trans('email.grouped_posts', ['%number%' => count($posts),
-            '%tokenName%' => $tokenName]);
+        $subject = $this->translator->trans('email.grouped_posts', [
+            '%number%' => count($posts),
+            '%tokenName%' => $tokenName
+        ]);
+
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())

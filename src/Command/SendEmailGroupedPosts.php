@@ -50,7 +50,7 @@ class SendEmailGroupedPosts extends Command
         /** @var string $date */
         $date = $input->getArgument('date');
 
-        if (null !== $date) {
+        if ($date) {
             if (!is_string($date)) {
                 $io->error('Wrong date argument');
 
@@ -104,6 +104,6 @@ class SendEmailGroupedPosts extends Command
     {
         $dateObject = \DateTime::createFromFormat($format, $date);
 
-        return $dateObject && $dateObject->format($format) == $date;
+        return $dateObject && $dateObject->format($format) === $date;
     }
 }
