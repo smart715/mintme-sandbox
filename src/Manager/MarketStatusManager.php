@@ -128,6 +128,11 @@ class MarketStatusManager implements MarketStatusManagerInterface
                              ->setParameter('eth', Symbols::ETH);
 
                 break;
+            case self::FILTER_DEPLOYED_ONLY_BNB:
+                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :bnb")
+                    ->setParameter('bnb', Symbols::BNB);
+
+                break;
             case self::FILTER_AIRDROP_ONLY:
                 $queryBuilder->innerJoin('qt.airdrops', 'a')
                     ->andWhere('a.status = :active')
