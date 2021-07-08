@@ -80,5 +80,5 @@ interface BalanceHandlerInterface
 
     public function update(User $user, TradebleInterface $tradable, Money $amount, string $type, ?int $businessId = null): void;
 
-    public function updateUserTokenRelation(User $user, Token $token): void;
+    public function updateUserTokenRelation(User $user, TradebleInterface $tradable): void;
 }

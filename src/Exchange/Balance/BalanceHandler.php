@@ -212,11 +212,11 @@ class BalanceHandler implements BalanceHandlerInterface
         }
     }
 
-    public function updateUserTokenRelation(User $user, Token $token): void
+    public function updateUserTokenRelation(User $user, TradebleInterface $tradable): void
     {
-        $balance = $this->balance($user, $token)->getAvailable();
+        $balance = $this->balance($user, $tradable)->getAvailable();
 
-        $this->userTokenManager->updateRelation($user, $token, $balance);
+        $this->userTokenManager->updateRelation($user, $tradable, $balance);
     }
     /**
      * @param array[] $balances

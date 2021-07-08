@@ -2,6 +2,7 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
@@ -42,18 +43,16 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             }
 
             $name = $token->getName();
-            $fee = $token->getId()
-                ? $token->getFee()
-                : $token->getCrypto()->getFee();
+            $fee = $token->getFee();
             $subunit = $this->tokenSubunit;
 
             $owner = !is_null($user) && !is_null($token->getProfile())
                 ? $user->getId() === $token->getProfile()->getUser()->getId()
                 : false;
 
-            if (!$token->getId() && $token->getCrypto()) {
-                $name = $token->getCrypto()->getName();
-                $subunit = $token->getCrypto()->getShowSubunit();
+            if ($token instanceof Crypto) {
+                $name = $token->getSymbol();
+                $subunit = $token->getShowSubunit();
             }
 
             $result[$token->getName()] = new BalanceView(

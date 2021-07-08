@@ -2,7 +2,9 @@
 
 namespace App\Manager;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Repository\UserTokenRepository;
@@ -28,9 +30,9 @@ class UserTokenManager implements UserTokenManagerInterface
         );
     }
 
-    public function updateRelation(User $user, Token $token, Money $balance): void
+    public function updateRelation(User $user, TradebleInterface $token, Money $balance): void
     {
-        if (!$token->getId()) {
+        if ($token instanceof Crypto) {
             return;
         }
 
