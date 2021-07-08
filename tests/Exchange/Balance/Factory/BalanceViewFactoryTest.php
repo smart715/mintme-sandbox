@@ -169,7 +169,7 @@ class BalanceViewFactoryTest extends TestCase
             $hasCrypto ? $this->mockCrypto($isHidden) : null
         );
         $tok->method('getId')->willReturn($id);
-        $tok->method('getFee')->willReturn($id ? new Money(1, new Currency('FOO')) : null);
+        $tok->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getFrozenAmount')->willReturn(new Money(1, new Currency('FOO')));
