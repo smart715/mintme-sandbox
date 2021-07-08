@@ -69,11 +69,11 @@ class BalanceViewFactoryTest extends TestCase
         );
 
         $this->assertEquals([
-            'foo' => ['1', '2', '1', 'FOO', 'fooBAR', 4, false, true, false],
-            'bar' => ['1', '2', null, 'FOO', 'barBAR', 4, true, true, false],
+            'foo' => ['1', '1', '1', 'foo', 'fooBAR', 4, false, true, false],
+            'bar' => ['1', '1', null, 'bar', 'barBAR', 4, true, true, false],
             'baz' => ['1', '1', '1', 'baz', 'bazBAR', 4, false, false, false],
             'qux' => ['1', '1', null, 'qux', 'quxBAR', 4, false, false, false],
-            'lok' => ['1', '2', '1', 'FOO', 'lokBAR', 4, true, true, true],
+            'lok' => ['1', '1', '1', 'lok', 'lokBAR', 4, true, true, true],
         ], array_map(function (BalanceView $view): array {
             return [
                 $view->getAvailable()->getAmount(),
