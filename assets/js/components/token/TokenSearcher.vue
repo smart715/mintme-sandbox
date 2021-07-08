@@ -104,13 +104,13 @@ export default {
     computed: {
         inputClass: function() {
             if (this.validName == true) {
-              var checkName = '';
-            }else{
+              let checkName = '';
+            } else {
               checkName = ' is-invalid ';
            }
             if (this.isLoggedIn == true) {
-              var checkLogged  = ' logged ';
-            }else{
+              let checkLogged = ' logged ';
+            } else {
               checkLogged = '';
           }
           return 'search-input form-control no-bg-img'+checkName+checkLogged;
