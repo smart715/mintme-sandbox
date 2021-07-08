@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Donation;
 
-use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Donation;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -10,7 +9,6 @@ use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
-use App\Exchange\ExchangerInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -22,14 +20,12 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class DonationHandler implements DonationHandlerInterface
 {
     private DonationFetcherInterface $donationFetcher;
     private MarketNameConverterInterface $marketNameConverter;
     private MoneyWrapperInterface $moneyWrapper;
-    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
     protected CryptoManagerInterface $cryptoManager;
     private BalanceHandlerInterface $balanceHandler;
     private DonationConfig $donationConfig;
@@ -183,9 +179,6 @@ class DonationHandler implements DonationHandlerInterface
                 $this->moneyWrapper->format($expectedAmount),
                 $tokenCreator->getId()
             );
-
-            $mintmeFee = $this->calculateFee($tokensWorthInMintme);
-            $mintmeAmount = $tokensWorthInMintme->subtract($mintmeFee);
         } elseif (!$isDonationInMintme && $twoWayDonation) {
             // Donate BTC using donation viabtc API AND donation from user to user.
             $this->executeMarketOrders($donorUser, $amountInCrypto, $cryptoMarket);
@@ -199,11 +192,10 @@ class DonationHandler implements DonationHandlerInterface
                 $tokenCreator->getId()
             );
 
-            $feeFromDonationAmount = $this->calculateFee($tokensWorthInMintme);
-            $tokensWorthInMintmeWithSubtractedFee = $tokensWorthInMintme->subtract($feeFromDonationAmount);
-            $amountToDonate = $donationMintmeAmount
-                ->subtract($tokensWorthInMintmeWithSubtractedFee);
             $donationAmountLeft = $donationMintmeAmount->subtract($tokensWorthInMintme);
+            $amountToDonate = $donationMintmeAmount
+                ->subtract($tokensWorthInMintme)
+                ->subtract($this->calculateFee($donationAmountLeft));
 
             $this->sendAmountFromUserToUser(
                 $donorUser,
