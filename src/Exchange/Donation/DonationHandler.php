@@ -250,7 +250,7 @@ class DonationHandler implements DonationHandlerInterface
                 );
             } else {
                 $this->executeMarketOrders($donorUser, $amountInCrypto, $cryptoMarket);
-                $donationWithFee = $donationMintmeAmount->multiply($this->donationConfig->getFeeWithOrdersExecution());
+                $donationWithFee = $donationMintmeAmount->subtract($this->calculateFee($donationMintmeAmount));
 
                 $this->sendAmountFromUserToUser(
                     $donorUser,
@@ -407,7 +407,9 @@ class DonationHandler implements DonationHandlerInterface
 
     private function calculateFee(Money $amount): Money
     {
-        return $amount->multiply($this->donationConfig->getFee());
+        $fee = $this->donationConfig->getFee();
+
+        return $amount->multiply($fee)->divide(1 + (float)$fee);
     }
 
     private function checkAmount(?User $user, Money $amount, string $currency, bool $checkBalance = true): void
