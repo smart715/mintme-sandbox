@@ -11,6 +11,6 @@ use Money\Money;
 
 interface UserTokenManagerInterface
 {
-    public function findByUserToken(User $user, Token $token): ?UserToken;
+    public function findByUserToken(User $user, TradebleInterface $token): ?UserToken;
     public function updateRelation(User $user, TradebleInterface $token, Money $balance): void;
 }

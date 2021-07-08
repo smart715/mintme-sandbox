@@ -22,7 +22,7 @@ class UserTokenManager implements UserTokenManagerInterface
         $this->repository = $repository;
     }
 
-    public function findByUserToken(User $user, Token $token): ?UserToken
+    public function findByUserToken(User $user, TradebleInterface $token): ?UserToken
     {
         return $this->repository->findByUserToken(
             $user->getId(),

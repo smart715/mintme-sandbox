@@ -50,11 +50,6 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 ? $user->getId() === $token->getProfile()->getUser()->getId()
                 : false;
 
-            if ($token instanceof Crypto) {
-                $name = $token->getSymbol();
-                $subunit = $token->getShowSubunit();
-            }
-
             $result[$token->getName()] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
