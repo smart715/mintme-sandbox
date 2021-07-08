@@ -111,7 +111,6 @@ export default {
             if (this.isLoggedIn == true) {
               checkLogged = ' logged ';
             }
-
             return 'search-input form-control no-bg-img' + checkName + checkLogged;
         },
     },
