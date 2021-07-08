@@ -103,17 +103,16 @@ export default {
     },
     computed: {
         inputClass: function() {
-            if (this.validName == true) {
-              let checkName = '';
-            } else {
-              checkName = ' is-invalid ';
-           }
-            if (this.isLoggedIn == true) {
-              let checkLogged = ' logged ';
-            } else {
-              checkLogged = '';
+            let checkName = '';
+            let checkLogged = '';
+          if (this.validName != true) {
+            checkName = 'is-invalid';
           }
-          return 'search-input form-control no-bg-img'+checkName+checkLogged;
+          if (this.isLoggedIn == true) {
+            checkLogged = ' logged ';
+          }
+
+            return 'search-input form-control no-bg-img' + checkName + checkLogged;
         },
     },
 };
