@@ -106,14 +106,14 @@ export default {
             if (this.validName == true) {
               var checkName = '';
             }else{
-              checkName = 'is-invalid';
+              checkName = ' is-invalid ';
            }
             if (this.isLoggedIn == true) {
               var checkLogged  = ' logged ';
             }else{
               checkLogged = '';
           }
-          return 'search-input form-control no-bg-img' + checkName +checkLogged;
+          return 'search-input form-control no-bg-img'+checkName+checkLogged;
         },
     },
 };
