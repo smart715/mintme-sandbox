@@ -10,7 +10,7 @@ security:
 
     firewalls:
         translations:
-            pattern: ^/translations\.js
+            pattern: ^(%translation_prefixes%)?/translations\.js
             security: false
         dev:
             pattern: ^(%translation_prefixes%)?/(_(profiler|wdt)|css|images|js)/
