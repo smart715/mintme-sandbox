@@ -10,6 +10,7 @@ use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
@@ -239,6 +240,16 @@ class User extends BaseUser implements
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
      */
     private bool $exchangeCryptoMailSent = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected ?int $discordId;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRoleUser", mappedBy="user", indexBy="token_id")
+     */
+    protected PersistentCollection $discordRoles;
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
@@ -658,5 +669,46 @@ class User extends BaseUser implements
         $this->exchangeCryptoMailSent = $exchangeCryptoMailSent;
 
         return $this;
+    }
+
+    public function setDiscordId(?int $id): self
+    {
+        $this->discordId = $id;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?int
+    {
+        return $this->discordId;
+    }
+
+    public function isSignedInWithDiscord(): bool
+    {
+        return null !== $this->discordId;
+    }
+
+    public function getDiscordRoles(): Collection
+    {
+        return $this->discordRoles->map(fn (DiscordRoleUser $dru) => $dru->getDiscordRole());
+    }
+
+    public function getDiscordRoleUsers(): Collection
+    {
+        return $this->discordRoles;
+    }
+
+    public function getDiscordRole(Token $token): ?DiscordRole
+    {
+        $dru = $this->discordRoles->get($token->getId());
+
+        return $dru
+            ? $dru->getDiscordRole()
+            : null;
+    }
+
+    public function getDiscordRoleUser(Token $token): ?DiscordRoleUser
+    {
+        return $this->discordRoles->get($token->getId());
     }
 }

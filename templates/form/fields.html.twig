@@ -54,7 +54,7 @@
 {%- endblock form_widget_compound -%}
 
 {%- block button_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%} class="btn btn-primary"
+    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%} class="btn btn-primary {{ attr.class }}"
     {{ block('attributes') }}
 {%- endblock button_attributes -%}
 
