@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -88,7 +89,25 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ? $user->getApiClients()
             : null;
 
-        $passwordForm = $this->getPasswordForm($request, $keys);
+        $passwordForm = $this->getPasswordForm();
+        $passwordForm->handleRequest($request);
+
+        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
+            $this->userManager->updatePassword($user);
+            $this->userManager->updateUser($user);
+            $this->addFlash('success', 'Password was updated successfully');
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new FilterUserResponseEvent(
+                    $user,
+                    $request,
+                    new Response(Response::HTTP_OK)
+                ),
+                UserEvents::PASSWORD_UPDATED
+            );
+
+            return $this->redirectToRoute('settings');
+        }
 
         return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
     }
@@ -282,33 +301,15 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->redirectToRoute('settings');
     }
 
-    private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
+    private function getPasswordForm(): FormInterface
     {
         /** @var User $user */
         $user = $this->getUser();
-        $passwordForm = $this->createForm(ChangePasswordType::class, $user);
-        $passwordCloned = clone $passwordForm;
 
-        $passwordForm->handleRequest($request);
-
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $this->userManager->updatePassword($user);
-            $this->userManager->updateUser($user);
-            $this->addFlash('success', 'Password was updated successfully');
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new FilterUserResponseEvent(
-                    $user,
-                    $request,
-                    new Response(Response::HTTP_OK)
-                ),
-                UserEvents::PASSWORD_UPDATED
-            );
-
-            $passwordForm = $passwordCloned;
-        }
-
-        return $passwordForm;
+        return $this->createForm(ChangePasswordType::class, $user, [
+            'action' => $this->generateUrl('settings'),
+            'method' => 'POST',
+            ]);
     }
 
     private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
