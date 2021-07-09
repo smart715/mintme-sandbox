@@ -252,7 +252,8 @@ class Exchanger implements ExchangerInterface
         if ($profile && $user === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
-                $this->bh->balances($user, [$token])
+                $this->bh->balances($user, [$token]),
+                $user
             )[$token->getSymbol()];
 
             return $this->mw
@@ -335,6 +336,6 @@ class Exchanger implements ExchangerInterface
 
         $balanceResult = $this->bh->balance($user, $token);
 
-        return $this->tm->getRealBalance($token, $balanceResult)->getAvailable();
+        return $this->tm->getRealBalance($token, $balanceResult, $user)->getAvailable();
     }
 }

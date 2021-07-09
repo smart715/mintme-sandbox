@@ -47,7 +47,8 @@ class AirdropClaimedSubscriber implements EventSubscriberInterface
         $user = $event->getUser();
         $airdrop = $event->getAirdrop();
         $airdropReward = $airdrop->getReward();
-        $airdropReferralHash = $this->arcManager->getByAirdropAndUser($airdrop, $user);
+        $airdropReferralHash = $this->arcManager->getByAirdropAndUser($airdrop, $user)
+            ?? $this->arcManager->create($airdrop, $user);
         $airdropReferralCode = $this->arcManager->encode($airdropReferralHash);
 
         $this->mailer->sendAirdropClaimedMail($user, $token, $airdropReward, $airdropReferralCode);

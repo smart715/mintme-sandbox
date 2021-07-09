@@ -50,7 +50,8 @@ class PostManager implements PostManagerInterface
         foreach ($user->getTokens() as $token) {
             $available = $this->tokenManager->getRealBalance(
                 $token,
-                $this->balanceHandler->balance($user, $token)
+                $this->balanceHandler->balance($user, $token),
+                $user
             )->getAvailable();
 
             if ($available->greaterThanOrEqual(new Money(0, new Currency(Symbols::TOK)))) {

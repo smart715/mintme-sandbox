@@ -17,6 +17,7 @@ use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
@@ -485,7 +486,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $sql = "SELECT * FROM (
                     SELECT ms.id,
                     qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
-                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume) DESC, ms.id DESC) AS rank
+                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume, :subunit, :showSubunit) DESC, ms.id DESC) AS rank
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
                     WHERE qt.is_blocked = false
@@ -498,7 +499,9 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $rsm->addScalarResult('rank', 'rank', 'integer');
 
         $query = $this->em->createNativeQuery($sql, $rsm);
-        $query->setParameter('ids', $ids);
+        $query->setParameter('ids', $ids)
+            ->setParameter('subunit', MoneyWrapper::MINTME_SUBUNIT)
+            ->setParameter('showSubunit', MoneyWrapper::MINTME_SHOW_SUBUNIT);
 
         $result = $query->getResult();
 

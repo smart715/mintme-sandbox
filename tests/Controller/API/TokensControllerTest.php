@@ -519,7 +519,8 @@ class TokensControllerTest extends WebTestCase
         foreach ($res as $token) {
             $available = $tokenManager->getRealBalance(
                 $token,
-                $balanceHandler->balance($user, $token)
+                $balanceHandler->balance($user, $token),
+                $user
             )->getAvailable();
 
             if ($available->greaterThanOrEqual(new Money(0, new Currency(Symbols::TOK)))) {
