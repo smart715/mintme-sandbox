@@ -57,16 +57,16 @@ class Post
 
     /**
      * @ORM\Column(type="string")
-     * @Assert\NotBlank
-     * @Assert\Length(
-     *     min = 1,
-     *     max = 100,
-     * )
      */
     protected string $amount = '0'; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *     min = 1,
+     *     max = 100,
+     * )
      */
     protected string $title = ''; // phpcs:ignore
 

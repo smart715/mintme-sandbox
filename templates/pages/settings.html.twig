@@ -74,6 +74,18 @@
                         </button>
                     </div>
                 </div>
+                <div class="card card-featured mt-3">
+                    <div class="card-header">Add Discord</div>
+                    <div class="card-body m-0">
+                        {% if not isSignedInWithDiscord %}
+                            <a href="{{ discordAuthUrl }}" class="btn btn-primary btn-block" role="button">
+                                {% trans %}connect{% endtrans %}
+                            </a>
+                        {% else %}
+                            {{ form(disconnectDiscordForm) }}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row justify-content-center">
