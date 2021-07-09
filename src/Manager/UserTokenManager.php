@@ -2,9 +2,7 @@
 
 namespace App\Manager;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
-use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
 use App\Repository\UserTokenRepository;
@@ -22,7 +20,7 @@ class UserTokenManager implements UserTokenManagerInterface
         $this->repository = $repository;
     }
 
-    public function findByUserToken(User $user, TradebleInterface $token): ?UserToken
+    public function findByUserToken(User $user, Token $token): ?UserToken
     {
         return $this->repository->findByUserToken(
             $user->getId(),
@@ -30,12 +28,8 @@ class UserTokenManager implements UserTokenManagerInterface
         );
     }
 
-    public function updateRelation(User $user, TradebleInterface $token, Money $balance): void
+    public function updateRelation(User $user, Token $token, Money $balance): void
     {
-        if ($token instanceof Crypto) {
-            return;
-        }
-
         $userToken = $this->findByUserToken($user, $token);
         $isCreator = $user->getId() === $token->getProfile()->getUser()->getId();
 
