@@ -48,8 +48,8 @@ class PostRepository extends EntityRepository
             $from = $date.' 00:00:00';
             $to = $date.' 23:59:59';
         } else {
-            $from = date('Y-m-d', strtotime('-1 day')).' 00:00:00';
-            $to = date('Y-m-d', strtotime('-1 day')).' 23:59:59';
+            $from = date('Y-m-d 00:00:00');
+            $to = date('Y-m-d 23:59:59');
         }
 
         return $this->createQueryBuilder('post')
