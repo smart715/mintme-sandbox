@@ -22,17 +22,9 @@ class TokenManager implements TokenManagerInterface
     /** @var TokenRepository */
     private $repository;
 
-    /** @var DeployTokenRewardRepository */
-    private $deployTokenRewardRepository;
-
-    /** @var ProfileFetcherInterface */
-    private $profileFetcher;
-
     /** @var TokenStorageInterface */
     private $storage;
 
-    /** @var Config */
-    private $config;
     private TokenRepository $tokenRepository;
     private DeployTokenRewardRepository $deployTokenRewardRepository;
     private ProfileFetcherInterface $profileFetcher;
@@ -41,7 +33,7 @@ class TokenManager implements TokenManagerInterface
     public function __construct(
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
-        Config $config
+        Config $config,
         TokenRepository $tokenRepository,
         DeployTokenRewardRepository $deployTokenRewardRepository
     ) {
