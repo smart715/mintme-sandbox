@@ -41,6 +41,9 @@
     "dasprid/enum": {
         "version": "1.0.0"
     },
+    "discord/interactions": {
+        "version": "1.0.7"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -235,8 +238,14 @@
     "graze/guzzle-jsonrpc": {
         "version": "3.2.1"
     },
+    "guzzlehttp/command": {
+        "version": "1.0.0"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.5.5"
+    },
+    "guzzlehttp/guzzle-services": {
+        "version": "1.1.3"
     },
     "guzzlehttp/promises": {
         "version": "v1.3.1"
@@ -546,6 +555,9 @@
     "ramsey/uuid": {
         "version": "3.9.3"
     },
+    "restcord/restcord": {
+        "version": "0.5.0"
+    },
     "scheb/two-factor-bundle": {
         "version": "3.16",
         "recipe": {
@@ -573,6 +585,15 @@
         "files": [
             "config/packages/sensio_framework_extra.yaml"
         ]
+    },
+    "simplito/bigint-wrapper-php": {
+        "version": "1.0.0"
+    },
+    "simplito/bn-php": {
+        "version": "1.1.2"
+    },
+    "simplito/elliptic-php": {
+        "version": "1.0.7"
     },
     "sirprize/postal-code-validator": {
         "version": "1.3.6"

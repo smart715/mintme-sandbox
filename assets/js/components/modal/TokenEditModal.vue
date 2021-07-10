@@ -107,6 +107,19 @@
                             </template>
                         </faq-item>
                     </div>
+                    <div class="row faq-block light-border no-decoration mx-0">
+                        <faq-item>
+                            <template slot="title">
+                                {{ $t('discord.rewards.title') }}
+                            </template>
+                            <template slot="body">
+                                <discord-rewards-edit
+                                    :token-name="currentName"
+                                    :auth-url="discordAuthUrl"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
                     <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
@@ -169,6 +182,7 @@ import TokenSocialMediaEdit from '../token/TokenSocialMediaEdit';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
 import {tokenDeploymentStatus} from '../../utils/constants';
+import DiscordRewardsEdit from '../token/discord/DiscordRewardsEdit';
 
 export default {
     name: 'TokenEditModal',
@@ -182,6 +196,7 @@ export default {
         TokenReleaseAddress,
         TokenReleasePeriod,
         TokenSocialMediaEdit,
+        DiscordRewardsEdit,
     },
     directives: {
         'b-tooltip': VBTooltip,
@@ -223,6 +238,7 @@ export default {
         ethExplorerUrl: String,
         bnbExplorerUrl: String,
         tokenCrypto: Object,
+        discordAuthUrl: String,
     },
     data() {
         return {

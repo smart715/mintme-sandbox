@@ -47,6 +47,7 @@
                 :eth-explorer-url="ethExplorerUrl"
                 :bnb-explorer-url="bnbExplorerUrl"
                 :token-crypto="tokenCrypto"
+                :discord-auth-url="discordAuthUrl"
             />
             <token-deploy-icon
                 :is-mintme="isMintmeToken"
@@ -131,6 +132,7 @@ export default {
         ethExplorerUrl: String,
         bnbExplorerUrl: String,
         serviceUnavailable: Boolean,
+        discordAuthUrl: String,
     },
     components: {
         Avatar,
