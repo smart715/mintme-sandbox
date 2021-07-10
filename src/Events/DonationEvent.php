@@ -7,7 +7,7 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class DonationEvent extends Event implements TokenEventInterface, UserEventInterface, DonationEventInterface
+class DonationEvent extends Event implements TokenUserEventInterface, DonationEventInterface
 {
     protected Donation $donation;
 

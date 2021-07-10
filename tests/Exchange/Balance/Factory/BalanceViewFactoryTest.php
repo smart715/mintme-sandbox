@@ -5,6 +5,7 @@ namespace App\Tests\Exchange\Balance\Factory;
 use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
@@ -62,10 +63,13 @@ class BalanceViewFactoryTest extends TestCase
             4
         );
 
+        $user = $this->createMock(User::class);
+
         $view = $factory->create(
             $this->mockBalanceResultContainer(array_map(function (array $tok): string {
                 return $tok['name'];
-            }, $tokens))
+            }, $tokens)),
+            $user
         );
 
         $this->assertEquals([

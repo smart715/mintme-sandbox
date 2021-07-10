@@ -14,13 +14,10 @@ use App\Repository\DeployTokenRewardRepository;
 use App\Repository\TokenRepository;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use App\Utils\Symbols;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class TokenManagerTest extends TestCase
 {
@@ -33,12 +30,7 @@ class TokenManagerTest extends TestCase
         $tokenRepository = $this->createMock(TokenRepository::class);
         $tokenRepository->method('findByName')->with($name)->willReturn($token);
 
-        /** @var MockObject|EntityManagerInterface $entityManager */
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->method('getRepository')->willReturn($tokenRepository);
-
         $tokenManager = new TokenManager(
-            $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockConfig(0)
@@ -59,7 +51,6 @@ class TokenManagerTest extends TestCase
         $profileFetcher->method('fetchProfile')->willReturn($profile);
 
         $tokenManager = new TokenManager(
-            $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
             $this->mockTokenStorage(),
             $this->mockConfig(0)
@@ -76,11 +67,7 @@ class TokenManagerTest extends TestCase
             ->with($expected)
             ->willReturn($this->createMock(Token::class));
 
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturn($repo);
-
         $tokenManager = new TokenManager(
-            $em,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockConfig(1)
@@ -107,15 +94,9 @@ class TokenManagerTest extends TestCase
 
         /** @var MockObject|TokenRepository $tokenRepository */
         $tokenRepository = $this->createMock(TokenRepository::class);
-
         $tokenRepository->method('findByName')->willReturn($fooTok);
 
-        /** @var MockObject|EntityManagerInterface $entityManager */
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->method('getRepository')->willReturn($tokenRepository);
-
         $tokenManager = new TokenManager(
-            $entityManager,
             $this->createMock(ProfileFetcherInterface::class),
             $this->mockTokenStorage(),
             $this->mockConfig(0)
@@ -133,16 +114,17 @@ class TokenManagerTest extends TestCase
         int $eFreeze,
         int $eReferral
     ): void {
+        $user = $token->getProfile()->getUser();
+
         $profile = $this->createMock(Profile::class);
         $profile->method('getToken')->willReturn($token);
-        $profile->method('getUser')->willReturn($token->getProfile()->getUser());
+        $profile->method('getUser')->willReturn($user);
 
         /** @var MockObject|ProfileFetcherInterface $profileFetcher */
         $profileFetcher = $this->createMock(ProfileFetcherInterface::class);
         $profileFetcher->method('fetchProfile')->willReturn($hasProfile ? $profile: null);
 
         $tokenManager = new TokenManager(
-            $this->createMock(EntityManagerInterface::class),
             $profileFetcher,
             $this->mockTokenStorage($token->getProfile()->getUser()),
             $this->mockConfig(0)
@@ -155,7 +137,7 @@ class TokenManagerTest extends TestCase
         $br->method('getFreeze')->willReturn($amount);
         $br->method('getAvailable')->willReturn($amount);
 
-        $res = $tokenManager->getRealBalance($token, $br);
+        $res = $tokenManager->getRealBalance($token, $br, $user);
 
         $this->assertEquals($eAvailable, $res->getAvailable()->getAmount());
         $this->assertEquals($eFreeze, $res->getFreeze()->getAmount());
@@ -185,11 +167,7 @@ class TokenManagerTest extends TestCase
                 new DeployTokenReward($user, new Money(5, new Currency(Symbols::WEB))),
             ]);
 
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturn($repo);
-
         $tokenManager = new TokenManager(
-            $em,
             $this->createMock(ProfileFetcherInterface::class),
             $this->createMock(TokenStorageInterface::class),
             $this->mockConfig(0)

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Communications\DiscordOAuthClientInterface;
 use App\Communications\Exception\ApiFetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -56,6 +57,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -86,6 +88,7 @@ class TokenController extends Controller
     private LimitOrderConfig $orderConfig;
     private DisabledServicesConfig $disabledServicesConfig;
     private MoneyWrapperInterface $moneyWrapper;
+    private DiscordOAuthClientInterface $discordOAuthClient;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -109,7 +112,8 @@ class TokenController extends Controller
         AirdropCampaignManagerInterface $airdropCampaignManager,
         LimitOrderConfig $orderConfig,
         DisabledServicesConfig $disabledServicesConfig,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        DiscordOAuthClientInterface $discordOAuthClient
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -132,6 +136,7 @@ class TokenController extends Controller
         $this->orderConfig = $orderConfig;
         $this->disabledServicesConfig = $disabledServicesConfig;
         $this->moneyWrapper = $moneyWrapper;
+        $this->discordOAuthClient = $discordOAuthClient;
 
         parent::__construct($normalizer);
     }
@@ -588,6 +593,15 @@ class TokenController extends Controller
             }
         }
 
+        $discordCallbackUrl = $this->generateUrl('discord_callback_bot', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $discordAuthUrl = $this->discordOAuthClient->generateAuthUrl(
+            'bot',
+            $discordCallbackUrl,
+            DiscordOAuthClientInterface::BOT_PERMISSIONS_ADMINISTRATOR,
+            (string)$token->getId()
+        );
+
         return $this->render(
             'pages/pair.html.twig',
             array_merge([
@@ -629,6 +643,7 @@ class TokenController extends Controller
                 'post' => null,
                 'comments' => [],
                 'serviceUnavailable' => $serviceUnavailable,
+                'discordAuthUrl' => $discordAuthUrl,
             ], $extraData)
         );
     }

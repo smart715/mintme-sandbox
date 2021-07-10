@@ -31,7 +31,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     }
 
     /** {@inheritdoc} */
-    public function create(BalanceResultContainer $container, ?User $user = null): array
+    public function create(BalanceResultContainer $container, User $user): array
     {
         $result = [];
 
@@ -46,15 +46,14 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             $fee = $token->getFee();
             $subunit = $this->tokenSubunit;
 
-            $owner = !is_null($user) && !is_null($token->getProfile())
-                ? $user->getId() === $token->getProfile()->getUser()->getId()
-                : false;
+            $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
 
             $result[$token->getName()] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
                     $token,
-                    $balanceResult
+                    $balanceResult,
+                    $user
                 )->getAvailable(),
                 $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,

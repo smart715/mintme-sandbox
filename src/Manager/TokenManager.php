@@ -14,10 +14,8 @@ use App\Utils\Converter\String\ParseStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Fetcher\ProfileFetcherInterface;
 use App\Utils\Symbols;
-use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenManager implements TokenManagerInterface
 {
@@ -35,18 +33,19 @@ class TokenManager implements TokenManagerInterface
 
     /** @var Config */
     private $config;
+    private TokenRepository $tokenRepository;
+    private DeployTokenRewardRepository $deployTokenRewardRepository;
+    private ProfileFetcherInterface $profileFetcher;
+    private Config $config;
 
     public function __construct(
-        EntityManagerInterface $em,
         ProfileFetcherInterface $profileFetcher,
         TokenStorageInterface $storage,
         Config $config
+        TokenRepository $tokenRepository,
+        DeployTokenRewardRepository $deployTokenRewardRepository
     ) {
-        /** @var TokenRepository $repository */
-        $repository = $em->getRepository(Token::class);
-        $this->repository = $repository;
-        /** @var DeployTokenRewardRepository $deployTokenRewardRepository */
-        $deployTokenRewardRepository = $em->getRepository(DeployTokenReward::class);
+        $this->tokenRepository = $tokenRepository;
         $this->deployTokenRewardRepository = $deployTokenRewardRepository;
         $this->profileFetcher = $profileFetcher;
         $this->storage = $storage;
@@ -57,7 +56,7 @@ class TokenManager implements TokenManagerInterface
     {
         $id = (int)filter_var($name, FILTER_SANITIZE_NUMBER_INT);
 
-        return $this->repository->find($id - $this->config->getOffset());
+        return $this->tokenRepository->find($id - $this->config->getOffset());
     }
 
     public function findByName(string $name): ?Token
@@ -67,6 +66,11 @@ class TokenManager implements TokenManagerInterface
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
         return $this->repository->findByName($name);
+    }
+
+    public function findById(int $id): ?Token
+    {
+        return $this->tokenRepository->find($id);
     }
 
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token
@@ -85,7 +89,7 @@ class TokenManager implements TokenManagerInterface
 
     public function findByAddress(string $address): ?Token
     {
-        return $this->repository->findByAddress($address);
+        return $this->tokenRepository->findByAddress($address);
     }
 
     /**
@@ -95,7 +99,7 @@ class TokenManager implements TokenManagerInterface
      */
     public function getTokensByPattern(string $pattern): array
     {
-        return $this->repository->findTokensByPattern($pattern);
+        return $this->tokenRepository->findTokensByPattern($pattern);
     }
 
     /**
@@ -105,7 +109,7 @@ class TokenManager implements TokenManagerInterface
      */
     public function findAll(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->findBy([], null, $limit, $offset);
+        return $this->tokenRepository->findBy([], null, $limit, $offset);
     }
 
     public function getOwnMintmeToken(): ?Token
@@ -134,10 +138,14 @@ class TokenManager implements TokenManagerInterface
             : [];
     }
 
-    public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult
+    public function getRealBalance(Token $token, BalanceResult $balanceResult, User $user): BalanceResult
     {
-        if (!$token->isOwner($this->getOwnTokens()) ||
-            $token->getProfile()->getUser() !== $this->getCurrentUser() || !$token->getLockIn()) {
+        $isOwner = $token->isOwner($user->getProfile()->getTokens());
+
+        if (!$isOwner
+            || $token->getProfile()->getUser() !== $user
+            || !$token->getLockIn()
+        ) {
             return $balanceResult;
         }
 
@@ -177,7 +185,7 @@ class TokenManager implements TokenManagerInterface
 
     public function getDeployedTokens(?int $offset = null, ?int $limit = null): array
     {
-        return $this->repository->getDeployedTokens($offset, $limit);
+        return $this->tokenRepository->getDeployedTokens($offset, $limit);
     }
 
     public function getUserDeployTokensReward(User $user): Money
@@ -194,32 +202,21 @@ class TokenManager implements TokenManagerInterface
 
     public function findAllTokensWithEmptyDescription(int $param = 14): ?array
     {
-        return $this->repository->findAllTokensWithEmptyDescription($param);
+        return $this->tokenRepository->findAllTokensWithEmptyDescription($param);
     }
 
     public function getTokensWithoutAirdrops(): array
     {
-        return $this->repository->getTokensWithoutAirdrops();
+        return $this->tokenRepository->getTokensWithoutAirdrops();
     }
 
     public function getTokensWithAirdrops(): array
     {
-        return $this->repository->getTokensWithAirdrops();
+        return $this->tokenRepository->getTokensWithAirdrops();
     }
 
     private function getProfile(): ?Profile
     {
         return $this->profileFetcher->fetchProfile();
-    }
-
-    /** @return mixed */
-    private function getCurrentUser()
-    {
-        $token = $this->storage->getToken();
-
-        /** @psalm-suppress UndefinedDocblockClass */
-        return $token
-            ? $token->getUser()
-            : null;
     }
 }
