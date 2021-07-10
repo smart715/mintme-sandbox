@@ -19,12 +19,6 @@ use Money\Money;
 
 class TokenManager implements TokenManagerInterface
 {
-    /** @var TokenRepository */
-    private $repository;
-
-    /** @var TokenStorageInterface */
-    private $storage;
-
     private TokenRepository $tokenRepository;
     private DeployTokenRewardRepository $deployTokenRewardRepository;
     private ProfileFetcherInterface $profileFetcher;
@@ -32,7 +26,6 @@ class TokenManager implements TokenManagerInterface
 
     public function __construct(
         ProfileFetcherInterface $profileFetcher,
-        TokenStorageInterface $storage,
         Config $config,
         TokenRepository $tokenRepository,
         DeployTokenRewardRepository $deployTokenRewardRepository
@@ -40,7 +33,6 @@ class TokenManager implements TokenManagerInterface
         $this->tokenRepository = $tokenRepository;
         $this->deployTokenRewardRepository = $deployTokenRewardRepository;
         $this->profileFetcher = $profileFetcher;
-        $this->storage = $storage;
         $this->config = $config;
     }
 
@@ -57,7 +49,7 @@ class TokenManager implements TokenManagerInterface
 
         $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
-        return $this->repository->findByName($name);
+        return $this->tokenRepository->findByName($name);
     }
 
     public function findById(int $id): ?Token
