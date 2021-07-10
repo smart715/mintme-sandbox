@@ -30,11 +30,6 @@ interface TokenManagerInterface
     /** @return Token[] */
     public function findAll(?int $offset = null, ?int $limit = null): array;
 
-    /** @return Token[] */
-    public function findAllPredefined(): array;
-
-    public function isPredefined(Token $token): bool;
-
     public function getRealBalance(Token $token, BalanceResult $balanceResult, User $user): BalanceResult;
 
     /** @return Token[] */
