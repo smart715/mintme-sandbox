@@ -485,7 +485,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $sql = "SELECT * FROM (
                     SELECT ms.id,
-                    qt.deployed = 1 AND qt.crypto_id is NULL AS deployed_on_mintme,
+                    qt.deployed = 1 AND c.symbol = :web AS deployed_on_mintme,
                     RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume, :subunit, :showSubunit) DESC, ms.id DESC) AS rank
                     FROM market_status AS ms
                     INNER JOIN token AS qt ON ms.quote_token_id = qt.id
@@ -499,9 +499,12 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $rsm->addScalarResult('rank', 'rank', 'integer');
 
         $query = $this->em->createNativeQuery($sql, $rsm);
-        $query->setParameter('ids', $ids)
+        $query
+            ->setParameter('ids', $ids)
             ->setParameter('subunit', MoneyWrapper::MINTME_SUBUNIT)
-            ->setParameter('showSubunit', MoneyWrapper::MINTME_SHOW_SUBUNIT);
+            ->setParameter('showSubunit', MoneyWrapper::MINTME_SHOW_SUBUNIT)
+            ->setParameter('web', Symbols::WEB)
+        ;
 
         $result = $query->getResult();
 
