@@ -6,6 +6,8 @@ vault_cli_host: 'http://webchain-cli:1920'
 
 rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
 
+deploy_gas: 4700000
+
 webchaind_url: 'http://webchaind:39573'
 mintme_imp_address: '0x4462181c372ba51c217f568545b7b622c7c0eb4e'
 mintme_account:   '0x9139413fe7247da35ae0797f9270271ba758d248'
