@@ -76,6 +76,9 @@ parameters:
     deploy_cost_mintme: 99
     deploy_cost_eth: 99
     deploy_cost_bnb: 99
+    # the fee in crypto(0.01 ETH)
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
     deploy_cost_referral_reward_mintme: 0.1
     deploy_cost_referral_reward_eth: 0.1
     deploy_cost_referral_reward_bnb: 0.1

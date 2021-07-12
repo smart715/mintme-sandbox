@@ -34,7 +34,7 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(49, 1, 1, .01, .01, 0.1),
+            new DeployCostConfig(49, 1, 1, 1, 1, .01, .01, 0.1),
             $this->mockMoneyWrapper($this->once())
         ))->getDeployCost('WEB');
     }
@@ -48,7 +48,7 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(49, 1, 1, .01, .01, 0.1),
+            new DeployCostConfig(49, 1, 1, 1, 1, .01, .01, 0.1),
             $this->mockMoneyWrapper($this->never())
         ))->getDeployCost('WEB');
     }
@@ -72,7 +72,7 @@ class DeployCostFetcherTest extends TestCase
 
         $deployCostReferralReward = (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(100, 1, 1, 0.15, .01, .01),
+            new DeployCostConfig(100, 1, 1, 1, 1, 0.15, .01, .01),
             $this->mockMoneyWrapper($this->once())
         ))->getDeployCostReferralReward('WEB');
 
