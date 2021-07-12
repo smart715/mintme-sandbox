@@ -8,5 +8,5 @@ use App\Exchange\Balance\Model\BalanceResultContainer;
 interface BalanceViewFactoryInterface
 {
     /** @return array<BalanceView> */
-    public function create(BalanceResultContainer $container, ?User $user = null): array;
+    public function create(BalanceResultContainer $container, User $user): array;
 }

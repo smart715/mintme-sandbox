@@ -17,8 +17,10 @@ use Money\Parser\DecimalMoneyParser;
 
 final class MoneyWrapper implements MoneyWrapperInterface
 {
-    private const TOK_SUBUNIT = 12;
-    private const USD_SUBUNIT = 2;
+    public const TOK_SUBUNIT = 12;
+    public const USD_SUBUNIT = 2;
+    public const MINTME_SUBUNIT = 18;
+    public const MINTME_SHOW_SUBUNIT = 4;
 
     /** @var CryptoManagerInterface */
     private $cryptoManager;

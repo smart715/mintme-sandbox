@@ -13,8 +13,10 @@ RUN apt-get update && apt-get install -y \
     netcat \
     iproute2 \
     libicu-dev \
+    libgmp-dev \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install intl
+    && docker-php-ext-install intl \
+    && docker-php-ext-install gmp
 
 RUN yes | pecl install xdebug-2.9.6 \
     && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \

@@ -193,6 +193,29 @@ function openPopup(link) {
     });
 }
 
+/**
+ * @param {array} arr
+ * @param {string} prop
+ * @param {boolean} excludeEmpty
+ * @return {boolean}
+ */
+function assertUniquePropertyValuesInObjectArray(arr, prop, excludeEmpty = true) {
+    let values = {};
+
+    return arr.every((item) => {
+        if (excludeEmpty && item[prop] === '') {
+            return true;
+        }
+
+        if (values[item[prop]]) {
+            return false;
+        }
+
+        values[item[prop]] = true;
+        return true;
+    });
+}
+
 export {
     isValidUrl,
     isValidTelegramUrl,
@@ -209,4 +232,5 @@ export {
     removeSpaces,
     currencyConversion,
     openPopup,
+    assertUniquePropertyValuesInObjectArray,
 };

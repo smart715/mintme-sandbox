@@ -141,7 +141,8 @@ class Wallet implements WalletInterface
 
         $available = $this->tokenManager->getRealBalance(
             $token,
-            $this->balanceHandler->balance($user, $token)
+            $this->balanceHandler->balance($user, $token),
+            $user
         )->getAvailable();
 
         $this->logger->info(

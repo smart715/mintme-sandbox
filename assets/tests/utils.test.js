@@ -1,4 +1,4 @@
-import {deepFlatten, isValidUrl} from '../js/utils';
+import {deepFlatten, isValidUrl, assertUniquePropertyValuesInObjectArray} from '../js/utils';
 
 describe('utils', () => {
     describe('#deepFlatten()', () => {
@@ -37,6 +37,44 @@ describe('utils', () => {
             expect(isValidUrl('example.com:80/foo/bar')).toBe(false);
             expect(isValidUrl('http://example.com:80foo00')).toBe(false);
             expect(isValidUrl('httpp://example.com.ua/foo+bar')).toBe(false);
+        });
+    });
+
+    describe('#assertUniquePropertyValuesInObjectArray()', () => {
+        it('returns true if there are not duplicate values for some property in an object array', () => {
+            let arr = [
+                {foo: 'bar'},
+                {foo: 'baz'},
+            ];
+
+            expect(assertUniquePropertyValuesInObjectArray(arr, 'foo')).toBe(true);
+        });
+
+        it('returns false if there are duplicate values for some property in an object array', () => {
+            let arr = [
+                {foo: 'bar'},
+                {foo: 'bar'},
+            ];
+
+            expect(assertUniquePropertyValuesInObjectArray(arr, 'foo')).toBe(false);
+        });
+
+        it('does not take into account empty values', () => {
+            let arr = [
+                {foo: ''},
+                {foo: ''},
+            ];
+
+            expect(assertUniquePropertyValuesInObjectArray(arr, 'foo')).toBe(true);
+        });
+
+        it('takes into account empty values if excludeEmpty is false', () => {
+            let arr = [
+                {foo: ''},
+                {foo: ''},
+            ];
+
+            expect(assertUniquePropertyValuesInObjectArray(arr, 'foo', false)).toBe(false);
         });
     });
 });

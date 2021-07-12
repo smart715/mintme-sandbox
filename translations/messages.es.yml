@@ -1447,3 +1447,37 @@ page.reload: recargar
 deposit_modal.accept_bep20: 'Sólo aceptamos monedas de Binance provenientes de Binance smart chain (BEP20). No aceptamos BEP2. ¡Si envía a través de BEP2, no se le acreditará!'
 withdraw_modal.bnb_address_label: 'Dirección BEP20:'
 withdraw_modal.bep20_message: 'Los retiros sólo son posibles a Binance smart chain (BEP20). No hacemos retiros a BEP2. Es necesario proporcionar la dirección de la cartera adecuada para BEP20.'
+connect:
+disconnect:
+discord.rewards.title:
+discord.rewards.bot.invite:
+discord.rewards.bot.remove:
+discord.rewards.description:
+discord.rewards.description.guide:
+discord.rewards.special_roles:
+discord.rewards.special_roles.name:
+discord.rewards.special_roles.color:
+discord.rewards.special_roles.required_balance:
+discord.rewards.special_roles.add:
+discord.rewards.guild.removed:
+discord.rewards.guild.removed.error:
+discord.rewards.warning_1:
+discord.rewards.warning_2:
+discord.account.disconnected:
+discord.error:
+discord.error.missing_permissions:
+discord.error.invalid_form:
+discord.error.account_already_used:
+discord.rewards.special_roles.required:
+discord.rewards.special_roles.unique_names:
+discord.rewards.special_roles.unique_balances:
+discord.rewards.special_roles.name.not_empty:
+discord.rewards.special_roles.name.max_length:
+discord.rewards.special_roles.requiredBalance.not_empty:
+discord.rewards.special_roles.requiredBalance.decimal:
+discord.rewards.special_roles.requiredBalance.between:
+discord.rewards.special_roles.color.hex:
+discord.rewards.save.success:
+discord.rewards.need_to_save:
+discord.rewards.guild.remove.confirm_1:
+discord.rewards.guild.remove.confirm_2:

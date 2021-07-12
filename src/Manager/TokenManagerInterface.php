@@ -11,6 +11,8 @@ interface TokenManagerInterface
 {
     public function findByName(string $name): ?Token;
 
+    public function findById(int $id): ?Token;
+
     public function findByNameCrypto(string $name, string $cryptoSymbol): ?Token;
 
     public function findByNameMintme(string $name): ?Token;
@@ -33,7 +35,7 @@ interface TokenManagerInterface
 
     public function isPredefined(Token $token): bool;
 
-    public function getRealBalance(Token $token, BalanceResult $balanceResult): BalanceResult;
+    public function getRealBalance(Token $token, BalanceResult $balanceResult, User $user): BalanceResult;
 
     /** @return Token[] */
     public function getTokensByPattern(string $pattern): array;

@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
-use App\Events\OrderEvent;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -21,7 +20,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -44,9 +42,6 @@ class OrdersController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
     /** @var TranslatorInterface */
     private $translations;
 
@@ -54,13 +49,11 @@ class OrdersController extends AbstractFOSRestController
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translations
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
-        $this->eventDispatcher = $eventDispatcher;
         $this->translations = $translations;
     }
 
@@ -100,9 +93,6 @@ class OrdersController extends AbstractFOSRestController
 
             $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
-
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
 
         return $this->view(Response::HTTP_OK);
