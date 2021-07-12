@@ -8,12 +8,15 @@ use App\Utils\Symbols;
 class DeployCostConfig
 {
     private array $costs;
+    private array $fees;
     private array $rewardCosts;
 
     public function __construct(
         float $deployCostMintme,
         float $deployCostEth,
         float $deployCostBnb,
+        float $deployFeeEth,
+        float $deployFeeBnb,
         float $deployCostRewardMintme,
         float $deployCostRewardEth,
         float $deployCostRewardBnb
@@ -23,11 +26,20 @@ class DeployCostConfig
             Symbols::ETH => $deployCostEth,
             Symbols::BNB => $deployCostBnb,
         ];
+        $this->fees = [
+            Symbols::ETH => $deployFeeEth,
+            Symbols::BNB => $deployFeeBnb,
+        ];
         $this->rewardCosts = [
             Symbols::WEB => $deployCostRewardMintme,
             Symbols::ETH => $deployCostRewardEth,
             Symbols::BNB => $deployCostRewardBnb,
         ];
+    }
+
+    public function getDeployFee(string $symbol): float
+    {
+        return $this->fees[$symbol] ?? 0;
     }
 
     public function getDeployCost(string $symbol): float
