@@ -64,9 +64,9 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
             }
 
             $result[$name] = new BalanceView(
-                $this->tokenNameConverter->convert($token),
+                $this->tokenNameConverter->convert($token ?? $crypto),
                 $this->tokenManager->getRealBalance(
-                    $token,
+                    $token ?? $crypto,
                     $balanceResult,
                     $user
                 )->getAvailable(),
