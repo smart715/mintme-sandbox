@@ -267,3 +267,34 @@
     &:first-child
       .nav-link
         padding: 0 5px 0 0 !important
+
+.discord-role
+  display: flex
+  gap: 5px
+
+  @include media-breakpoint-down(xs)
+    flex-direction: column
+
+  .name-input
+    width: 50%
+
+    @include media-breakpoint-down(xs)
+      width: 100%
+
+  .color-input
+    width: 20%
+
+    @include media-breakpoint-down(xs)
+      width: 100%
+
+  .required-balance-input
+    width: 30%
+
+    @include media-breakpoint-down(xs)
+      width: 100%
+
+  .remove-role-button
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+    padding-bottom: 4px

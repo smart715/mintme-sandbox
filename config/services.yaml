@@ -673,6 +673,8 @@ services:
             $deployCostMintme: '%deploy_cost_mintme%'
             $deployCostEth: '%deploy_cost_eth%'
             $deployCostBnb: '%deploy_cost_bnb%'
+            $deployFeeEth: '%deploy_fee_eth%'
+            $deployFeeBnb: '%deploy_fee_bnb%'
             $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
             $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
             $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'
@@ -715,3 +717,41 @@ services:
             $mintmeExplorerUrl: '%mintme_explorer_url%'
             $ethExplorerUrl: '%eth_explorer_url%'
             $bnbExplorerUrl: '%bnb_explorer_url%'
+
+    RestCord\DiscordClient:
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%'
+            }
+
+    App\Manager\DiscordManager:
+        arguments:
+            $discordForLeaveGuild: '@discord.client.for.leave_guild'
+            $publicKey: '%env(DISCORD_PUBLIC_KEY)%'
+
+    discord.oauth.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_auth_url%'
+            $timeoutSeconds: '%discord_api_timeout%'
+            $headers:
+                Content-Type: application/x-www-form-urlencoded
+
+    App\Communications\DiscordOAuthClient:
+        arguments:
+            $guzzleRestWrapper: '@discord.oauth.client'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $baseAuthUrl: '%discord_base_auth_url%'
+            $clientSecret: '%env(DISCORD_CLIENT_SECRET)%'
+
+    discord.client.for.leave_guild:
+        class: RestCord\DiscordClient
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%',
+                guzzleOptions: {
+                    headers: {
+                        Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+                    }
+                }
+            }

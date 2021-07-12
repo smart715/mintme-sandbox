@@ -79,6 +79,9 @@ parameters:
     deploy_cost_mintme: 99
     deploy_cost_eth: 99
     deploy_cost_bnb: 99
+    # the fee in crypto(0.01 ETH)
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
     deploy_cost_referral_reward_mintme: 0.1
     deploy_cost_referral_reward_eth: 0.1
     deploy_cost_referral_reward_bnb: 0.1
@@ -324,3 +327,6 @@ parameters:
     # minimum order value (USD) to make buy/sell orders
     minimum_order_value_usd: 0.1
 
+    # discord
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_api_timeout: '10'

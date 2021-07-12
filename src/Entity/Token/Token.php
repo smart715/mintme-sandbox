@@ -4,6 +4,7 @@ namespace App\Entity\Token;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\DiscordRole;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
 use App\Entity\Message\Thread;
@@ -16,7 +17,9 @@ use App\Utils\Symbols;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Money\Currency;
 use Money\Money;
 use phpDocumentor\Reflection\Types\This;
@@ -311,6 +314,16 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
      */
     private bool $showDeployedModal = false; // phpcs:ignore
+
+    /**
+     * @ORM\OneToOne(targetEntity="DiscordConfig", mappedBy="token", cascade={"persist", "remove"})
+     */
+    private ?DiscordConfig $discordConfig;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRole", mappedBy="token", cascade={"persist", "remove"})
+     */
+    protected PersistentCollection $discordRoles;
 
     public function __construct()
     {
@@ -909,5 +922,34 @@ class Token implements TradebleInterface, ImagineInterface
     public function getShowSubunit(): int
     {
         return self::TOKEN_SUBUNIT;
+    }
+
+    public function getDiscordConfig(): DiscordConfig
+    {
+        return $this->discordConfig ?? $this->discordConfig = (new DiscordConfig())->setToken($this);
+    }
+
+    public function getDiscordRoles(): array
+    {
+        return $this->discordRoles->toArray();
+    }
+
+    public function getDiscordRolesMatching(Criteria $criteria): Collection
+    {
+        return $this->discordRoles->matching($criteria);
+    }
+
+    public function addDiscordRole(DiscordRole $role): self
+    {
+        $this->discordRoles->add($role);
+
+        return $this;
+    }
+
+    public function removeDiscordRole(DiscordRole $role): self
+    {
+        $this->discordRoles->removeElement($role);
+
+        return $this;
     }
 }
