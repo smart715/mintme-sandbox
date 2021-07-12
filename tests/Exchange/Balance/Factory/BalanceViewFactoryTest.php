@@ -203,7 +203,7 @@ class BalanceViewFactoryTest extends TestCase
     {
         $cm = $this->createMock(CryptoManagerInterface::class);
 
-        $cm->method('findBySymbol')->willReturnCallback($this->mockCrypto(false));
+        $cm->method('findBySymbol')->willReturn($this->mockCrypto(false));
 
         return $cm;
     }
