@@ -2,7 +2,6 @@
 
 namespace App\Exchange\Balance\Factory;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;

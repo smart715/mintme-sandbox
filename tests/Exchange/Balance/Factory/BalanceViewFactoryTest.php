@@ -10,6 +10,7 @@ use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use Money\Currency;
@@ -58,6 +59,7 @@ class BalanceViewFactoryTest extends TestCase
         ];
 
         $factory = new BalanceViewFactory(
+            $this->mockCryptoManager(),
             $this->mockTokenManager($tokens),
             $this->mockTokenNameConverter(),
             4
@@ -195,5 +197,14 @@ class BalanceViewFactoryTest extends TestCase
         $crypto->method('isExchangeble')->willReturn($isHidden ? false : true);
 
         return $crypto;
+    }
+
+    private function mockCryptoManager(): CryptoManagerInterface
+    {
+        $cm = $this->createMock(CryptoManagerInterface::class);
+
+        $cm->method('findBySymbol')->willReturnCallback(mockCrypto(false));
+
+        return $cm;
     }
 }
