@@ -242,13 +242,14 @@ class DonationHandler implements DonationHandlerInterface
                 );
             } else {
                 $this->executeMarketOrders($donorUser, $amountInCrypto, $cryptoMarket);
-                $donationWithFee = $donationMintmeAmount->subtract($this->calculateFee($donationMintmeAmount));
+                $donationWithSubtractedFee = $donationMintmeAmount
+                    ->subtract($this->calculateFee($donationMintmeAmount));
 
                 $this->sendAmountFromUserToUser(
                     $donorUser,
                     $donationMintmeAmount,
                     $tokenCreator,
-                    $donationMintmeAmount->subtract($donationWithFee),
+                    $donationWithSubtractedFee,
                     Symbols::WEB,
                     Symbols::WEB
                 );
