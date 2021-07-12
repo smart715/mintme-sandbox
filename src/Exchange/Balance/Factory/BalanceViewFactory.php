@@ -6,11 +6,15 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
     /** @var TokenManagerInterface */
     private $tokenManager;
 
@@ -21,10 +25,12 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     private $tokenSubunit;
 
     public function __construct(
+        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         TokenNameConverterInterface $tokenNameConverter,
         int $tokenSubunit
     ) {
+        $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->tokenSubunit = $tokenSubunit;
@@ -37,18 +43,28 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
 
         foreach ($container as $key => $balanceResult) {
             $token = $this->tokenManager->findByName($key) ?? $this->tokenManager->findByHiddenName($key);
-
-            if (!$token) {
+            $crypto = $this->cryptoManager->findBySymbol($key);
+            if (!$token && !$crypto) {
                 continue;
             }
 
-            $name = $token->getName();
-            $fee = $token->getFee();
-            $subunit = $this->tokenSubunit;
+            if ($token) {
+                $name = $token->getName();
+                $fee = $token->getFee();
+                $subunit = $this->tokenSubunit;
 
-            $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
+                $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
+            }
 
-            $result[$token->getName()] = new BalanceView(
+            if ($crypto) {
+                $name = $crypto->getSymbol();
+                $fee = $crypto->getFee();
+                $subunit = $crypto->getShowSubunit();
+
+                $owner = false;
+            }
+
+            $result[$name] = new BalanceView(
                 $this->tokenNameConverter->convert($token),
                 $this->tokenManager->getRealBalance(
                     $token,
