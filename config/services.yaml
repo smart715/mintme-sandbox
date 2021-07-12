@@ -673,6 +673,8 @@ services:
             $deployCostMintme: '%deploy_cost_mintme%'
             $deployCostEth: '%deploy_cost_eth%'
             $deployCostBnb: '%deploy_cost_bnb%'
+            $deployFeeEth: '%deploy_fee_eth%'
+            $deployFeeBnb: '%deploy_fee_bnb%'
             $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
             $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
             $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'

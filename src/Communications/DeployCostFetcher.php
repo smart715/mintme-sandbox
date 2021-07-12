@@ -101,6 +101,8 @@ class DeployCostFetcher implements DeployCostFetcherInterface
             new FixedExchange([
                 Symbols::USD => [ $symbol => 1 / $response[self::CRYPTO_IDS[$symbol]]['usd'] ],
             ])
+        )->add(
+            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployFee($symbol), $symbol)
         );
     }
 }
