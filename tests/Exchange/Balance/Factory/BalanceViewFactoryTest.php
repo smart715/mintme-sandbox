@@ -154,7 +154,9 @@ class BalanceViewFactoryTest extends TestCase
     private function mockTokenNameConverter(): TokenNameConverterInterface
     {
         $converter = $this->createMock(TokenNameConverterInterface::class);
-        $converter->method('convert')->willReturn('BAR');
+        $converter->method('convert')->willReturnCallback(function (Token $token): string {
+            return $token->getName().'BAR';
+        });
 
         return $converter;
     }
@@ -201,7 +203,7 @@ class BalanceViewFactoryTest extends TestCase
     {
         $cm = $this->createMock(CryptoManagerInterface::class);
 
-        $cm->method('findBySymbol')->willReturn($this->mockCrypto(false));
+        $cm->method('findBySymbol')->willReturn(null);
 
         return $cm;
     }
