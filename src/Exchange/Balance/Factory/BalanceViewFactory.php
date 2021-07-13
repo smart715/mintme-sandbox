@@ -64,11 +64,13 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
 
             $result[$name] = new BalanceView(
                 $this->tokenNameConverter->convert($token ?? $crypto),
-                $this->tokenManager->getRealBalance(
-                    $token ?? $crypto,
-                    $balanceResult,
-                    $user
-                )->getAvailable(),
+                $token
+                    ? $this->tokenManager->getRealBalance(
+                        $token,
+                        $balanceResult,
+                        $user
+                    )->getAvailable()
+                    : $balanceResult->getAvailable(),
                 $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
                 $fee,
