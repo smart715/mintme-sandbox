@@ -142,6 +142,9 @@ class Trader implements TraderInterface
                 "Failed to cancel order '{$order->getId()}' for user {$userMaker->getEmail()}. 
                 Reason: {$result->getMessage()}"
             );
+        } else {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
 
         $quote = $order->getMarket()->getQuote();

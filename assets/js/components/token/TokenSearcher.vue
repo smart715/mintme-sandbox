@@ -47,6 +47,7 @@ export default {
     },
     props: {
         searchUrl: {type: String, required: true},
+        isLoggedIn: Boolean,
     },
     data() {
         return {
@@ -102,7 +103,9 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return 'search-input px-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
+            let checkName = this.validName ? '' : 'is-invalid';
+            let checkLogged = this.isLoggedIn ? ' logged ' : '';
+            return 'search-input form-control no-bg-img ' + checkName + checkLogged;
         },
     },
 };

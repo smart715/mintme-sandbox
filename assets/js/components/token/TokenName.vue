@@ -41,6 +41,7 @@
                 :eth-explorer-url="ethExplorerUrl"
                 :bnb-explorer-url="bnbExplorerUrl"
                 :token-crypto="tokenCrypto"
+                :discord-auth-url="discordAuthUrl"
             />
             <font-awesome-icon
                 class="icon-default c-pointer align-middle token-edit-icon"
@@ -122,6 +123,7 @@ export default {
         ethExplorerUrl: String,
         bnbExplorerUrl: String,
         tokenCrypto: Object,
+        discordAuthUrl: String,
     },
     data() {
         return {
