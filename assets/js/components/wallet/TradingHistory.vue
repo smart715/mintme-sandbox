@@ -66,7 +66,16 @@ import moment from 'moment';
 import {BTable, VBTooltip} from 'bootstrap-vue';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol, webEthSymbol, webUsdcSymbol} from '../../utils/constants';
+import {
+    GENERAL,
+    WSAPI,
+    BTC,
+    MINTME,
+    webBtcSymbol,
+    webEthSymbol,
+    webUsdcSymbol,
+    TOK,
+} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -248,9 +257,17 @@ export default {
          * @return {string}
          */
         calculateTotalCost: function(history, isDonationOrder) {
+            if (WSAPI.order.type.BUY === history.side && TOK === history.market.base.symbol ) {
+                return toMoney(
+                    (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
+                        .add(history.fee)
+                        .toString(),
+                    history.market.base.subunit
+                );
+            }
+            
             return toMoney(
                 (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
-                    .add(history.fee)
                     .toString(),
                 history.market.base.subunit
             );
