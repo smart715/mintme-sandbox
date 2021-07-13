@@ -71,16 +71,18 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                         $user
                     )->getAvailable()
                     : $balanceResult->getAvailable(),
-                $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
+                $token && $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
                 $fee,
-                null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals(),
-                $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
-                $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
-                Token::DEPLOYED === $token->getDeploymentStatus(),
+                $token
+                    ? null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals()
+                    : false,
+                $token && $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
+                $token && $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
+                $token ? Token::DEPLOYED === $token->getDeploymentStatus() : false,
                 $owner,
-                $token->isBlocked(),
-                $token->getCryptoSymbol(),
+                $token ? $token->isBlocked() : false,
+                $token ? $token->getCryptoSymbol() : false,
             );
         }
 
