@@ -43,6 +43,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
         foreach ($container as $key => $balanceResult) {
             $token = $this->tokenManager->findByName($key) ?? $this->tokenManager->findByHiddenName($key);
             $crypto = $this->cryptoManager->findBySymbol($key);
+
             if (!$token && !$crypto) {
                 continue;
             }
