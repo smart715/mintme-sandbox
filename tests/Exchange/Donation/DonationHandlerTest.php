@@ -40,9 +40,6 @@ class DonationHandlerTest extends TestCase
         ],
     ];
 
-    /** @var float */
-    private $takerFee = 0.002;
-
     public function testCheckDonation(): void
     {
         $base = $this->mockCrypto();
@@ -84,7 +81,7 @@ class DonationHandlerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $moneyWrapper = $this->mockMoneyWrapper();
-        $donationConfig = new DonationConfig($this->donationParams, $this->takerFee, $moneyWrapper);
+        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
 
         $donationHandler = new DonationHandler(
             $fetcher,
@@ -158,7 +155,7 @@ class DonationHandlerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $moneyWrapper = $this->mockMoneyWrapper();
-        $donationConfig = new DonationConfig($this->donationParams, $this->takerFee, $moneyWrapper);
+        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
 
         $donationHandler = new DonationHandler(
             $fetcher,

@@ -639,7 +639,6 @@ services:
     App\Exchange\Config\DonationConfig:
         arguments:
             $donationParams: '%donation%'
-            $ordersFee: '%maker_fee_rate%'
 
     App\Logger\DonationProcessor:
         autowire: true
