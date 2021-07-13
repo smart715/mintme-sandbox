@@ -233,13 +233,9 @@ class MarketHandler implements MarketHandlerInterface
                     break;
                 }
 
-                $orderAmountWithFee = $bid->getAmount()->subtract(
-                    $bid->getAmount()->multiply($fee)
-                );
-
                 if ($quoteLeft->greaterThanOrEqual($bid->getAmount())) {
                     $baseWorth = $this->moneyWrapper->convertByRatio(
-                        $orderAmountWithFee,
+                        $bid->getAmount(),
                         $baseSymbol,
                         $this->moneyWrapper->format($bid->getPrice())
                     );
@@ -247,10 +243,8 @@ class MarketHandler implements MarketHandlerInterface
                     $amountToReceive = $amountToReceive->add($baseWorth);
                     $quoteLeft = $quoteLeft->subtract($bid->getAmount());
                 } else {
-                    $quoteLeftWithFee = $quoteLeft->subtract($quoteLeft->multiply($fee));
-
                     $baseWorth = $this->moneyWrapper->convertByRatio(
-                        $quoteLeftWithFee,
+                        $quoteLeft,
                         $baseSymbol,
                         $this->moneyWrapper->format($bid->getPrice())
                     );
@@ -260,6 +254,10 @@ class MarketHandler implements MarketHandlerInterface
                 }
             }
         } while ($shouldContinue);
+
+        if (!$amountToReceive->isZero()) {
+            $amountToReceive = $amountToReceive->subtract($amountToReceive->multiply($fee));
+        }
 
         return new CheckTradeResult($amountToReceive);
     }
