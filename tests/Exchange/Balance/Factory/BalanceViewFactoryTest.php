@@ -154,9 +154,7 @@ class BalanceViewFactoryTest extends TestCase
     private function mockTokenNameConverter(): TokenNameConverterInterface
     {
         $converter = $this->createMock(TokenNameConverterInterface::class);
-        $converter->method('convert')->willReturnCallback(function (Token $token): string {
-            return $token->getName().'BAR';
-        });
+        $converter->method('convert')->willReturn('BAR');
 
         return $converter;
     }
