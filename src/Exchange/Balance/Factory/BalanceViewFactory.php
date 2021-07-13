@@ -54,9 +54,7 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $subunit = $this->tokenSubunit;
 
                 $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
-            }
-
-            if ($crypto) {
+            } else {
                 $name = $crypto->getSymbol();
                 $fee = $crypto->getFee();
                 $subunit = $crypto->getShowSubunit();
