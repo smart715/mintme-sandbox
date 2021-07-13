@@ -303,6 +303,7 @@ export default {
     computed: {
         ...mapGetters('tradeBalance', {
             balances: 'getBalances',
+            hasQuoteRelation: 'hasQuoteRelation',
         }),
         balance: function() {
             return this.balances
@@ -412,9 +413,9 @@ export default {
                 || this.isTradeInProgress;
         },
         shouldShowDepositMore: function() {
-            return !this.isToken
-                || this.isBuyMode
-                || this.deploymentStatus === tokenDeploymentStatus.deployed;
+            return this.isBuyMode
+                || !this.isToken
+                || (this.deploymentStatus === tokenDeploymentStatus.deployed && this.hasQuoteRelation);
         },
         makeDepositHtml: function() {
             const depositUrl = this.$routing.generate('wallet', {

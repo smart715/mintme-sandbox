@@ -16,8 +16,12 @@ const storage = {
         balances: null,
         sellPriceManuallyEdited: false,
         buyPriceManuallyEdited: false,
+        hasQuoteRelation: false,
     },
     getters: {
+        hasQuoteRelation: function(state) {
+            return state.hasQuoteRelation;
+        },
         getQuoteBalance: function(state) {
             return state.quoteBalance;
         },
@@ -53,6 +57,9 @@ const storage = {
         },
     },
     mutations: {
+        setHasQuoteRelation: function(state, n) {
+            state.hasQuoteRelation= n;
+        },
         setQuoteBalance: function(state, n) {
             state.quoteBalance = n;
 
