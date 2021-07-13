@@ -76,13 +76,13 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
                 $fee,
                 $token
                     ? null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals()
-                    : false,
+                    : $subunit,
                 $token && $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
                 $token && $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
                 $token ? Token::DEPLOYED === $token->getDeploymentStatus() : false,
                 $owner,
                 $token ? $token->isBlocked() : false,
-                $token ? $token->getCryptoSymbol() : false,
+                $token ? $token->getCryptoSymbol() : $name,
             );
         }
 
