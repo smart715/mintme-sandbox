@@ -156,7 +156,6 @@ class DonationHandler implements DonationHandlerInterface
         $twoWayDonation = $expectedAmount->greaterThanOrEqual($minTokensAmount)
             && $expectedAmount->isPositive() && $sellOrdersSummary->lessThan($donationMintmeAmount);
 
-        $mintmeAmount = $donationMintmeAmount;
         $mintmeFee = $this->calculateFee($donationMintmeAmount);
 
         if ($expectedAmount->greaterThanOrEqual($minTokensAmount) &&
@@ -265,7 +264,7 @@ class DonationHandler implements DonationHandlerInterface
             $feeAmount,
             $expectedAmount,
             $token,
-            $mintmeAmount,
+            $donationMintmeAmount,
             $mintmeFee
         );
 
@@ -380,14 +379,12 @@ class DonationHandler implements DonationHandlerInterface
                 $totalSum = $totalSum->add($order);
                 $mintmeWorth = $mintmeWorth->add($sellOrder->getAmount());
             } else {
+                $order = $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()));
+
                 $totalSum = $totalSum->add($sellOrder->getAmount()->multiply(
-                    $this->moneyWrapper->format(
-                        $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()))
-                    )
+                    $this->moneyWrapper->format($order)
                 ));
-                $mintmeWorth = $mintmeWorth->add(
-                    $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()))
-                );
+                $mintmeWorth = $mintmeWorth->add($order);
             }
         }
 
