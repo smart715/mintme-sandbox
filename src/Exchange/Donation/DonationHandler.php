@@ -9,6 +9,7 @@ use App\Exception\ApiBadRequestException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\Model\CheckDonationResult;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Order;
@@ -18,7 +19,6 @@ use App\Utils\Converter\MarketNameConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
 use Money\Money;
 
 class DonationHandler implements DonationHandlerInterface
@@ -26,12 +26,13 @@ class DonationHandler implements DonationHandlerInterface
     private DonationFetcherInterface $donationFetcher;
     private MarketNameConverterInterface $marketNameConverter;
     private MoneyWrapperInterface $moneyWrapper;
-    protected CryptoManagerInterface $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
     private BalanceHandlerInterface $balanceHandler;
     private DonationConfig $donationConfig;
     private EntityManagerInterface $em;
     private MarketHandlerInterface $marketHandler;
     private TraderInterface $trader;
+    private MarketFactoryInterface $marketFactory;
 
     private const ANOTHER_DONATION_SYMBOLS = [
         Symbols::BTC,
@@ -49,7 +50,8 @@ class DonationHandler implements DonationHandlerInterface
         DonationConfig $donationConfig,
         EntityManagerInterface $em,
         MarketHandlerInterface $marketHandler,
-        TraderInterface $trader
+        TraderInterface $trader,
+        MarketFactoryInterface $marketFactory
     ) {
         $this->donationFetcher = $donationFetcher;
         $this->marketNameConverter = $marketNameConverter;
@@ -60,6 +62,7 @@ class DonationHandler implements DonationHandlerInterface
         $this->em = $em;
         $this->marketHandler = $marketHandler;
         $this->trader = $trader;
+        $this->marketFactory = $marketFactory;
     }
 
     public function checkDonation(
@@ -76,7 +79,7 @@ class DonationHandler implements DonationHandlerInterface
 
         if (in_array($currency, self::ANOTHER_DONATION_SYMBOLS, true)) {
             $pendingSellOrders = $this->marketHandler->getAllPendingSellOrders(
-                new Market(
+                $this->marketFactory->create(
                     $this->cryptoManager->findBySymbol($currency),
                     $this->cryptoManager->findBySymbol(Symbols::WEB)
                 )
@@ -119,7 +122,7 @@ class DonationHandler implements DonationHandlerInterface
 
         $donationMintmeAmount = $amountInCrypto;
         $isDonationInMintme = Symbols::WEB === $currency;
-        $cryptoMarket = new Market(
+        $cryptoMarket = $this->marketFactory->create(
             $this->cryptoManager->findBySymbol($currency),
             $this->cryptoManager->findBySymbol(Symbols::WEB)
         );
@@ -362,8 +365,8 @@ class DonationHandler implements DonationHandlerInterface
     private function getCryptoWorthInMintme(array $pendingSellOrders, Money $amount): Money
     {
         $donatinonAmount = $this->moneyWrapper->parse($this->moneyWrapper->format($amount), Symbols::WEB);
-        $totalSum = new Money(0, new Currency(Symbols::WEB));
-        $mintmeWorth = new Money(0, new Currency(Symbols::WEB));
+        $totalSum = $this->moneyWrapper->parse('0', Symbols::WEB);
+        $mintmeWorth = $this->moneyWrapper->parse('0', Symbols::WEB);
 
         foreach ($pendingSellOrders as $sellOrder) {
             if ($totalSum->greaterThanOrEqual($donatinonAmount)) {
@@ -381,9 +384,7 @@ class DonationHandler implements DonationHandlerInterface
             } else {
                 $order = $diff->divide($this->moneyWrapper->format($sellOrder->getPrice()));
 
-                $totalSum = $totalSum->add($sellOrder->getAmount()->multiply(
-                    $this->moneyWrapper->format($order)
-                ));
+                $totalSum = $totalSum->add($diff);
                 $mintmeWorth = $mintmeWorth->add($order);
             }
         }

@@ -12,6 +12,7 @@ use App\Exchange\Config\DonationConfig;
 use App\Exchange\Donation\DonationFetcherInterface;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\ExchangerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TraderInterface;
@@ -92,7 +93,8 @@ class DonationHandlerTest extends TestCase
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(TraderInterface::class)
+            $this->createMock(TraderInterface::class),
+            $this->createMock(MarketFactoryInterface::class)
         );
 
         $this->assertEquals(
@@ -166,7 +168,8 @@ class DonationHandlerTest extends TestCase
             $donationConfig,
             $em,
             $this->createMock(MarketHandlerInterface::class),
-            $this->createMock(TraderInterface::class)
+            $this->createMock(TraderInterface::class),
+            $this->createMock(MarketFactoryInterface::class)
         );
 
         $donationHandler->makeDonation($market, Symbols::BTC, '30000', '20000', $donorUser, '0');
