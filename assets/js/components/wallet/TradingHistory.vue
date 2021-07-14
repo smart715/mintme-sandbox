@@ -265,7 +265,6 @@ export default {
                     history.market.base.subunit
                 );
             }
-            
             return toMoney(
                 (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
                     .toString(),
