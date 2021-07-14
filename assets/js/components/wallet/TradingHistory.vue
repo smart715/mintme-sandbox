@@ -257,7 +257,10 @@ export default {
          * @return {string}
          */
         calculateTotalCost: function(history, isDonationOrder) {
-            if (WSAPI.order.type.BUY === history.side && TOK === history.market.base.symbol ) {
+            if (
+                WSAPI.order.type.BUY === history.side &&
+                ![webBtcSymbol, webEthSymbol, webUsdcSymbol].includes(history.market.identifier)
+            ) {
                 return toMoney(
                     (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
                         .add(history.fee)
