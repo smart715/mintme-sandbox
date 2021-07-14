@@ -74,7 +74,6 @@ import {
     webBtcSymbol,
     webEthSymbol,
     webUsdcSymbol,
-    TOK,
 } from '../../utils/constants';
 import {
     FiltersMixin,
