@@ -13,6 +13,7 @@ class TradeResult
     public const ORDER_NOT_FOUND = 4;
     public const USER_NOT_MATCH = 5;
     public const SMALL_AMOUNT = 11;
+    public const NO_ENOUGH_TRADER = 12;
 
     private const MESSAGES = [
         self::SUCCESS =>
@@ -32,6 +33,9 @@ class TradeResult
 
         self::SMALL_AMOUNT =>
             'place_order.too_small',
+
+        self::NO_ENOUGH_TRADER =>
+            'execute_order.no_enough_trader',
     ];
 
     /** @var int */

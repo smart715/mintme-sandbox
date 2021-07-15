@@ -106,6 +106,21 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
+    public function getAllPendingSellOrders(Market $market): array
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedOrders = [];
+
+        do {
+            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $paginatedOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        return array_merge([], ...$paginatedOrders);
+    }
+
     /** {@inheritdoc} */
     public function getPendingBuyOrders(
         Market $market,
@@ -397,20 +412,31 @@ class MarketHandler implements MarketHandlerInterface
                 return null;
             }
 
+            $isUserDonator = (int)$donation->getDonor()->getId() === $user->getId();
+            $amount = $isUserDonator
+                ? $donation->getAmount()->subtract($donation->getFeeAmount())
+                : ($donation->getMintmeAmount()
+                    ? $donation->getMintmeAmount()->subtract($donation->getMintmeFeeAmount())
+                    : $donation->getAmount()->subtract($donation->getFeeAmount()));
+
             return new Deal(
                 0,
                 $donation->getCreatedAt()->getTimestamp(),
                 (int)$donation->getDonor()->getId(),
-                (int)$donation->getDonor()->getId() === $user->getId() ? self::BUY : self::SELL,
-                (int)$donation->getDonor()->getId() === $user->getId() ? 2 : 1,
-                $donation->getAmount()->subtract($donation->getFeeAmount()),
+                $isUserDonator ? self::BUY : self::SELL,
+                $isUserDonator ? 2 : 1,
+                $amount,
                 $this->moneyWrapper->parse('0', $donation->getCurrency()),
                 $this->moneyWrapper->parse('0', $donation->getCurrency()),
-                $donation->getFeeAmount(),
+                $isUserDonator
+                    ? $donation->getFeeAmount()
+                    : $donation->getMintmeFeeAmount() ?? $donation->getFeeAmount(),
                 0,
                 0,
                 $this->marketFactory->create(
-                    $this->cryptoManager->findBySymbol($donation->getCurrency()),
+                    $this->cryptoManager->findBySymbol(
+                        !$isUserDonator && $donation->getMintmeAmount() ? Symbols::WEB : $donation->getCurrency()
+                    ),
                     $donation->getToken()
                 )
             );
@@ -546,17 +572,7 @@ class MarketHandler implements MarketHandlerInterface
     /** {@inheritdoc} */
     public function getBuyDepth(Market $market): string
     {
-        $offset = 0;
-        $limit = 100;
-        $paginatedOrders = [];
-
-        do {
-            $moreOrders = $this->getPendingBuyOrders($market, $offset, $limit);
-            $paginatedOrders[] = $moreOrders;
-            $offset += $limit;
-        } while (count($moreOrders) >= $limit);
-
-        $orders = array_merge([], ...$paginatedOrders);
+        $orders = $this->getAllPendingSellOrders($market);
 
         $zeroDepth = $this->moneyWrapper->parse(
             '0',
