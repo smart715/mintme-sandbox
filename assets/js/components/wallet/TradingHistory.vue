@@ -74,6 +74,7 @@ import {
     webBtcSymbol,
     webEthSymbol,
     webUsdcSymbol,
+    webBnbSymbol,
 } from '../../utils/constants';
 import {
     FiltersMixin,
@@ -242,7 +243,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(amount, history, isDonationOrder) {
-            if ([webBtcSymbol, webEthSymbol, webUsdcSymbol].includes(history.market.identifier)) {
+            if ([webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol].includes(history.market.identifier)) {
                 return amount + ' ' + (WSAPI.order.type.BUY === history.side
                     ? this.rebrandingFunc(history.market.quote.symbol)
                     : this.rebrandingFunc(history.market.base.symbol));
@@ -258,7 +259,7 @@ export default {
         calculateTotalCost: function(history, isDonationOrder) {
             if (
                 WSAPI.order.type.BUY === history.side &&
-                ![webBtcSymbol, webEthSymbol, webUsdcSymbol].includes(history.market.identifier)
+                ![webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol].includes(history.market.identifier)
             ) {
                 return toMoney(
                     (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
