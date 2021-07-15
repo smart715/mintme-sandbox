@@ -210,3 +210,6 @@ export const currencies = {
     USDC,
     BNB,
 };
+
+export const predefinedMarkets = [webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol];
+

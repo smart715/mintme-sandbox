@@ -72,9 +72,7 @@ import {
     BTC,
     MINTME,
     webBtcSymbol,
-    webEthSymbol,
-    webUsdcSymbol,
-    webBnbSymbol,
+    predefinedMarkets,
 } from '../../utils/constants';
 import {
     FiltersMixin,
@@ -243,7 +241,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(amount, history, isDonationOrder) {
-            if ([webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol].includes(history.market.identifier)) {
+            if ([predefinedMarkets].includes(history.market.identifier)) {
                 return amount + ' ' + (WSAPI.order.type.BUY === history.side
                     ? this.rebrandingFunc(history.market.quote.symbol)
                     : this.rebrandingFunc(history.market.base.symbol));
@@ -257,22 +255,13 @@ export default {
          * @return {string}
          */
         calculateTotalCost: function(history, isDonationOrder) {
-            if (
-                WSAPI.order.type.BUY === history.side &&
-                ![webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol].includes(history.market.identifier)
-            ) {
-                return toMoney(
-                    (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
-                        .add(history.fee)
-                        .toString(),
-                    history.market.base.subunit
-                );
+            let cost = (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount));
+
+            if (WSAPI.order.type.BUY === history.side && ![predefinedMarkets].includes(history.market.identifier)) {
+                cost.add(history.fee);
             }
-            return toMoney(
-                (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
-                    .toString(),
-                history.market.base.subunit
-            );
+
+            return toMoney(cost.toString(), history.market.base.subunit);
         },
         producePrecision(history) {
             if (history.market.identifier !== webBtcSymbol) {
