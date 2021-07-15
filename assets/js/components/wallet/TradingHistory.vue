@@ -241,7 +241,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(amount, history, isDonationOrder) {
-            if ([predefinedMarkets].includes(history.market.identifier)) {
+            if (predefinedMarkets.includes(history.market.identifier)) {
                 return amount + ' ' + (WSAPI.order.type.BUY === history.side
                     ? this.rebrandingFunc(history.market.quote.symbol)
                     : this.rebrandingFunc(history.market.base.symbol));
@@ -257,7 +257,7 @@ export default {
         calculateTotalCost: function(history, isDonationOrder) {
             let cost = (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount));
 
-            if (WSAPI.order.type.BUY === history.side && ![predefinedMarkets].includes(history.market.identifier)) {
+            if (WSAPI.order.type.BUY === history.side && !predefinedMarkets.includes(history.market.identifier)) {
                 cost.add(history.fee);
             }
 
