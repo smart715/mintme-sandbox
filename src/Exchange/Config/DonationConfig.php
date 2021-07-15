@@ -10,10 +10,8 @@ use Money\Money;
 class DonationConfig
 {
     /** @var array<int|float> */
-    private $donationParams;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private array $donationParams;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(array $donationParams, MoneyWrapperInterface $moneyWrapper)
     {
