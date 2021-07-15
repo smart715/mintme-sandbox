@@ -216,11 +216,7 @@ class Exchanger implements ExchangerInterface
     ): TradeResult {
         $isSellSide = Order::SELL_SIDE === $side;
 
-        if ($isSellSide && $this->exceedAvailableReleased(
-            $user,
-            $market->getQuote()->getSymbol(),
-            $amountInput
-        )) {
+        if ($isSellSide && $this->exceedAvailableReleased($user, $market->getQuote()->getSymbol(), $amountInput)) {
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 

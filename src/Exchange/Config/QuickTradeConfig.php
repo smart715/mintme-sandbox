@@ -10,10 +10,8 @@ use Money\Money;
 class QuickTradeConfig
 {
     /** @var array<int|float> */
-    private $params;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private array $params;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(array $params, MoneyWrapperInterface $moneyWrapper)
     {
