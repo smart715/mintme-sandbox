@@ -27,8 +27,6 @@ interface DonationHandlerInterface
         string $sellOrdersSummary
     ): Donation;
 
-    public function getTokensWorth(string $sellOrdersWorth, string $currency): string;
-
     public function saveDonation(
         User $donor,
         User $tokenCreator,
@@ -36,6 +34,8 @@ interface DonationHandlerInterface
         Money $amount,
         Money $feeAmount,
         Money $tokenAmount,
-        Token $token
+        Token $token,
+        Money $mintmeAmount,
+        Money $mintmeFeeAmount
     ): Donation;
 }

@@ -74,6 +74,16 @@ class Donation
      */
     private $token;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $mintmeAmount;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $mintmeFeeAmount;
+
     public function getId(): int
     {
         return $this->id;
@@ -174,5 +184,33 @@ class Donation
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+
+    public function getMintmeAmount(): ?Money
+    {
+        return $this->mintmeAmount
+            ? new Money($this->mintmeAmount, new Currency(Symbols::WEB))
+            : null;
+    }
+
+    public function setMintmeAmount(Money $mintmeAmount): self
+    {
+        $this->mintmeAmount = $mintmeAmount->getAmount();
+
+        return $this;
+    }
+
+    public function getMintmeFeeAmount(): ?Money
+    {
+        return $this->mintmeFeeAmount
+            ? new Money($this->mintmeFeeAmount, new Currency(Symbols::WEB))
+            : null;
+    }
+
+    public function setMintmeFeeAmount(Money $mintmeFeeAmount): self
+    {
+        $this->mintmeFeeAmount = $mintmeFeeAmount->getAmount();
+
+        return $this;
     }
 }
