@@ -123,6 +123,7 @@ class UpdatePendingWithdrawals extends Command
                     $this->em->flush();
                     $this->logger->info(
                         "[withdrawals] $pendingCount Pending withdrawal to {$crypto->getName()} "
+                        ."addr: {$item->getAddress()} "
                         ."(({$item->getAmount()->getAmount()->getAmount()} "
                         ."{$item->getAmount()->getAmount()->getCurrency()->getCode()} + "
                         ."{$fee->getAmount()}{$fee->getCurrency()->getCode()} ), "
