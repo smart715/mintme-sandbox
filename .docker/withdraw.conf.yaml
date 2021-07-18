@@ -43,7 +43,7 @@ parameters:
         type: digest
         username: user
         password: null
-    binance_transfer_options: {  }
+    binance_transfer_options: { }
     bitcoin_wallet_password: foobarbaz
     bitcoin_rpc_url: 'http://electrum:7777'
     bitcoin_auth:
