@@ -6,6 +6,7 @@ use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +42,8 @@ class CryptosController extends APIController
      */
     public function getBalance(
         string $symbol,
-        BalanceHandlerInterface $balanceHandler
+        BalanceHandlerInterface $balanceHandler,
+        CryptoManagerInterface $cryptoManager
     ): View {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -53,7 +55,7 @@ class CryptosController extends APIController
         return $this->view(
             $balanceHandler->balance(
                 $user,
-                Token::getFromSymbol($symbol)
+                $cryptoManager->findBySymbol($symbol)
             )->getAvailable()
         );
     }
