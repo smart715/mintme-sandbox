@@ -55,6 +55,7 @@ export const tokEthSymbol = 'TOKETH';
 export const webBtcSymbol = 'WEBBTC';
 export const webEthSymbol = 'WEBETH';
 export const webUsdcSymbol = 'WEBUSDC';
+export const webBnbSymbol = 'WEBBNB';
 export const usdSign = '$';
 
 export const cryptoSymbols = [
@@ -209,3 +210,6 @@ export const currencies = {
     USDC,
     BNB,
 };
+
+export const predefinedMarkets = [webBtcSymbol, webEthSymbol, webUsdcSymbol, webBnbSymbol];
+
