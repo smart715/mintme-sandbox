@@ -66,7 +66,14 @@ import moment from 'moment';
 import {BTable, VBTooltip} from 'bootstrap-vue';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {GENERAL, WSAPI, BTC, MINTME, webBtcSymbol, webEthSymbol, webUsdcSymbol} from '../../utils/constants';
+import {
+    GENERAL,
+    WSAPI,
+    BTC,
+    MINTME,
+    webBtcSymbol,
+    predefinedMarkets,
+} from '../../utils/constants';
 import {
     FiltersMixin,
     LazyScrollTableMixin,
@@ -234,7 +241,7 @@ export default {
             return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
         createTicker: function(amount, history, isDonationOrder) {
-            if ([webBtcSymbol, webEthSymbol, webUsdcSymbol].includes(history.market.identifier)) {
+            if (predefinedMarkets.includes(history.market.identifier)) {
                 return amount + ' ' + (WSAPI.order.type.BUY === history.side
                     ? this.rebrandingFunc(history.market.quote.symbol)
                     : this.rebrandingFunc(history.market.base.symbol));
@@ -248,12 +255,13 @@ export default {
          * @return {string}
          */
         calculateTotalCost: function(history, isDonationOrder) {
-            return toMoney(
-                (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount))
-                    .add(history.fee)
-                    .toString(),
-                history.market.base.subunit
-            );
+            let cost = (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount));
+
+            if (WSAPI.order.type.BUY === history.side && !predefinedMarkets.includes(history.market.identifier)) {
+                cost.add(history.fee);
+            }
+
+            return toMoney(cost.toString(), history.market.base.subunit);
         },
         producePrecision(history) {
             if (history.market.identifier !== webBtcSymbol) {
