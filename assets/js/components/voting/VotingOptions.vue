@@ -75,14 +75,13 @@ export default {
             this.$axios.single
                 .post(this.$routing.generate('store_voting', {tokenName: this.tokenName}), this.votingData)
                 .then(({data}) => {
-                    this.unshiftVoting(data.voting);
                     this.notifySuccess(this.$t('voting.added_successfully'));
 
                     const routeName = this.isToken ? 'token_show_voting' : 'show_voting';
 
                     window.location.href = this.$routing.generate(routeName, {
                         name: this.tokenName,
-                        id: data.voting.id
+                        id: data.voting.id,
                     });
                 })
                 .catch((err) => {
@@ -97,8 +96,6 @@ export default {
         ...mapActions('voting', [
             'addOption',
             'deleteOption',
-            'unshiftVoting',
-            'resetVotingData',
             'updateVotingOption',
         ]),
     },

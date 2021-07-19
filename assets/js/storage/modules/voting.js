@@ -90,13 +90,6 @@ const storage = {
                 commit('deleteOption', i);
             }
         },
-        unshiftVoting({state}, voting) {
-            state.votings.unshift(voting);
-        },
-        resetVotingData({state}) {
-            Object.keys(newVotingData)
-                .forEach((key) => state[key] = JSON.parse(JSON.stringify(newVotingData[key])));
-        },
         updateEndDate({state}) {
             state.endDate = generateEndDate();
         },
