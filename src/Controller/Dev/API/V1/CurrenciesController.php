@@ -58,15 +58,17 @@ class CurrenciesController extends DevApiController
     {
         $deployres=array();
         $result=$this->tokenManager->getDeployedTokens(
-        (int)$request->get('offset'),
-        (int)$request->get('limit')
-    );
+            (int)$request->get('offset'),
+            (int)$request->get('limit')
+        );
 
         foreach ($result as $item => $subobj) {
+            
             if ($subobj->isDeployed()) {
                 array_push($deployres, $subobj);
             }
         }
+
          return $deployres;
     }
 
