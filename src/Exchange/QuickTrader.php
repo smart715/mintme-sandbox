@@ -14,13 +14,13 @@ use App\Wallet\Money\MoneyWrapperInterface;
 
 class QuickTrader implements QuickTraderInterface
 {
-    private Exchanger $exchanger;
+    private ExchangerInterface $exchanger;
     private QuickTradeConfig $config;
     private MoneyWrapperInterface $moneyWrapper;
     private MarketHandlerInterface $marketHandler;
 
     public function __construct(
-        Exchanger $exchanger,
+        ExchangerInterface $exchanger,
         QuickTradeConfig $config,
         MoneyWrapperInterface $moneyWrapper,
         MarketHandlerInterface $marketHandler
