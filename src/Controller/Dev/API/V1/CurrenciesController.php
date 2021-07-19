@@ -96,4 +96,3 @@ class CurrenciesController extends DevApiController
         return $token;
     }
 }
-
