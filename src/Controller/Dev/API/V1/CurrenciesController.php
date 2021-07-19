@@ -62,9 +62,8 @@ class CurrenciesController extends DevApiController
             (int)$request->get('limit')
         );
 
-        foreach ($result as $item => $subobj) {
-            
-            if ($subobj->isDeployed()) {
+        foreach ($result as $subobj) {
+             if ($subobj->isDeployed()) {
                 array_push($deployres, $subobj);
             }
         }
