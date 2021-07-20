@@ -97,34 +97,4 @@ describe('VotingOptions', () => {
         });
         expect(wrapper.vm.disabledPublish).toBe(false);
     });
-
-    describe('publish', () => {
-        it('should reset/unshift after submitting successfully', (done) => {
-            let unshiftVotingCalled = false;
-            let resetVotingDataCalled = false;
-            const wrapper = createWrapper({
-                actions: {
-                    ...voting.actions,
-                    unshiftVoting: () => unshiftVotingCalled = true,
-                    resetVotingData: () => resetVotingDataCalled = true,
-                },
-            });
-            wrapper.vm.publish();
-
-            moxios.stubRequest('store_voting', {
-                status: 200,
-                response: {
-                    data: {
-                        voting: 'foo',
-                    },
-                },
-            });
-
-            moxios.wait(() => {
-                expect(unshiftVotingCalled).toBe(true);
-                expect(resetVotingDataCalled).toBe(true);
-                done();
-            });
-        });
-    });
 });
