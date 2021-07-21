@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -48,6 +49,7 @@ class DefaultController extends Controller
     {
         $filepath = $this->getParameter('ui_trans_keys_filepath');
 
+        // Internal caching
         $content = $cache->get('translations.js', function (ItemInterface $item) use ($filepath, $translator) {
             $item->expiresAfter(3600);
 
@@ -65,7 +67,11 @@ class DefaultController extends Controller
         });
 
         $response = new Response($content, Response::HTTP_OK);
+
+        // Cache-Control header
+        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
         $response->headers->set('Content-Type', 'text/javascript');
+        $response->headers->set('Cache-Control', 'public, max-age=3600, immutable');
 
         return $response;
     }
