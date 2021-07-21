@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultController extends Controller
@@ -42,21 +44,25 @@ class DefaultController extends Controller
     /**
      * @Rest\Route("/translations.js", name="translations-ui")
      */
-    public function getTranslations(TranslatorInterface $translator): Response
+    public function getTranslations(TranslatorInterface $translator, CacheInterface $cache): Response
     {
         $filepath = $this->getParameter('ui_trans_keys_filepath');
 
-        $keys = file_exists($filepath) ?
-            json_decode(file_get_contents($filepath) ?: '[]'):
-            [];
+        $content = $cache->get('translations.js', function (ItemInterface $item) use ($filepath, $translator) {
+            $item->expiresAfter(3600);
 
-        $parsedKeys = [];
+            $keys = file_exists($filepath) ?
+                json_decode(file_get_contents($filepath) ?: '[]'):
+                [];
 
-        foreach ($keys as $key) {
-            $parsedKeys[$key] = $translator->trans($key);
-        }
+            $parsedKeys = [];
 
-        $content = 'window.translations=' . json_encode($parsedKeys) . ';';
+            foreach ($keys as $key) {
+                $parsedKeys[$key] = $translator->trans($key);
+            }
+
+            return 'window.translations=' . json_encode($parsedKeys) . ';';
+        });
 
         $response = new Response($content, Response::HTTP_OK);
         $response->headers->set('Content-Type', 'text/javascript');
