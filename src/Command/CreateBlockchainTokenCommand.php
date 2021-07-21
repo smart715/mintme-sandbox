@@ -14,6 +14,7 @@ use App\Manager\ProfileManagerInterface;
 use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\NotificationTypes;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -32,11 +33,10 @@ class CreateBlockchainTokenCommand extends Command
 
     private const INIT_BALANCE = '0';
 
-    private const ETH_BLOCKCHAIN = 'ETH';
-    private const BNB_BLOCKCHAIN = 'BNB';
     private const ALLOWED_BLOCKCHAINS = [
-        self::ETH_BLOCKCHAIN,
-        self::BNB_BLOCKCHAIN,
+        Symbols::ETH,
+        Symbols::BNB,
+        Symbols::MINTME,
     ];
 
     private EntityManagerInterface $em;
@@ -52,6 +52,7 @@ class CreateBlockchainTokenCommand extends Command
     private UserActionLogger $logger;
     private ?Crypto $crypto;
     private ?Crypto $exchangeCrypto;
+    private RebrandingConverterInterface $rebrandingConverter;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -64,7 +65,8 @@ class CreateBlockchainTokenCommand extends Command
         MarketFactoryInterface $marketManager,
         MarketStatusManagerInterface $marketStatusManager,
         ContractHandlerInterface $contractHandler,
-        UserActionLogger $logger
+        UserActionLogger $logger,
+        RebrandingConverterInterface $rebrandingConverter
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -77,6 +79,8 @@ class CreateBlockchainTokenCommand extends Command
         $this->marketStatusManager = $marketStatusManager;
         $this->contractHandler = $contractHandler;
         $this->logger = $logger;
+        $this->rebrandingConverter = $rebrandingConverter;
+
         parent::__construct();
     }
 
@@ -122,7 +126,7 @@ class CreateBlockchainTokenCommand extends Command
         /** @var string $blockchain */
         $blockchain = $input->getOption('blockchain');
 
-        if (!$blockchain || !is_string($blockchain) ||  !in_array($blockchain, self::ALLOWED_BLOCKCHAINS)) {
+        if (!$blockchain || !is_string($blockchain) || !in_array($blockchain, self::ALLOWED_BLOCKCHAINS)) {
             $io->error('Wrong blockchain parameter. Allowed: '.implode(', ', self::ALLOWED_BLOCKCHAINS));
 
             return 1;
@@ -140,6 +144,7 @@ class CreateBlockchainTokenCommand extends Command
             return 1;
         }
 
+        $blockchain = $this->rebrandingConverter->reverseConvert($blockchain);
         $profile = $this->profileManager->findByEmail($email);
         $this->crypto = $this->cryptoManager->findBySymbol($blockchain);
         $this->exchangeCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
@@ -248,6 +253,10 @@ class CreateBlockchainTokenCommand extends Command
             ->setFee(
                 $withdrawalFee ? $this->moneyWrapper->parse($withdrawalFee, Symbols::TOK) : null
             );
+
+        if (Symbols::WEB === $token->getCryptoSymbol()) {
+            $token->setIsHidden(true);
+        }
 
         $this->em->persist($token);
         $this->em->flush();
