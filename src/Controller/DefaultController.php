@@ -8,6 +8,7 @@ use App\Manager\ReciprocalLinksManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\Routing\Annotation\Route;
@@ -45,25 +46,38 @@ class DefaultController extends Controller
     /**
      * @Rest\Route("/translations.js", name="translations-ui")
      */
-    public function getTranslations(TranslatorInterface $translator, CacheInterface $cache): Response
-    {
+    public function getTranslations(
+        Request $request,
+        TranslatorInterface $translator,
+        CacheInterface $cache
+    ): Response {
         $filepath = $this->getParameter('ui_trans_keys_filepath');
+        $locale = $request->getLocale();
 
-        $content = $cache->get('translations.js', function (ItemInterface $item) use ($filepath, $translator) {
-            $item->expiresAfter(3600);
+        // Disabling caching in debug mode/while developing
+        $beta = $this->getParameter('kernel.debug') ?
+            INF :
+            null;
 
-            $keys = file_exists($filepath) ?
-                json_decode(file_get_contents($filepath) ?: '[]'):
-                [];
+        $content = $cache->get(
+            "{$locale}_translations.js",
+            function (ItemInterface $item) use ($filepath, $translator) {
+                $item->expiresAfter(3600);
 
-            $parsedKeys = [];
+                $keys = file_exists($filepath) ?
+                    json_decode(file_get_contents($filepath) ?: '[]'):
+                    [];
 
-            foreach ($keys as $key) {
-                $parsedKeys[$key] = $translator->trans($key);
-            }
+                $parsedKeys = [];
 
-            return 'window.translations=' . json_encode($parsedKeys) . ';';
-        });
+                foreach ($keys as $key) {
+                    $parsedKeys[$key] = $translator->trans($key);
+                }
+
+                return 'window.translations=' . json_encode($parsedKeys) . ';';
+            },
+            $beta
+        );
 
         $response = new Response($content, Response::HTTP_OK);
 
