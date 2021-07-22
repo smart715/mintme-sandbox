@@ -160,8 +160,6 @@ class WalletController extends AbstractFOSRestController
      * @SWG\Response(response="400",description="Bad request")
      * @Rest\RequestParam(name="currency", allowBlank=false)
      * @SWG\Tag(name="User Wallet")
-
-
      * @Rest\RequestParam(
      *     name="amount",
      *     allowBlank=false
