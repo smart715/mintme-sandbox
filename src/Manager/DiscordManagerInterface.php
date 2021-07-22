@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Exception\Discord\DiscordException;
 use App\Exception\Discord\MissingPermissionsException;
 use App\Exception\Discord\UnknownRoleException;
+use RestCord\Model\Guild\Guild;
 
 interface DiscordManagerInterface
 {
@@ -74,4 +75,11 @@ interface DiscordManagerInterface
     public function verifyInteraction(string $body, string $signature, string $timestamp): bool;
 
     public function leaveGuild(Token $token): void;
+
+    public function getGuild(Token $token): Guild;
+
+    /**
+     * @return DiscordRole[]
+     */
+    public function getManageableRoles(Guild $guild): array;
 }

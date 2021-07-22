@@ -23,7 +23,7 @@
                         {{ $t('discord.rewards.bot.remove') }}
                     </a>
                 </div>
-                <div>
+                <div class="mt-3">
                     {{ $t('discord.rewards.description') }}
                     <guide>
                         <template slot="body">
@@ -31,7 +31,7 @@
                         </template>
                     </guide>
                 </div>
-                <div>
+                <div class="mt-2">
                     <div class="custom-control custom-checkbox">
                         <input
                             type="checkbox"
@@ -55,17 +55,24 @@
                         @update="updateRole"
                         @remove="removeRole"
                     />
-                    <div>
-                        <button class="btn btn-primary mt-3"
-                            :disabled="saving"
-                            @click="addRole"
+                    <div class="mt-3 d-flex align-items-center">
+                        <button class="btn btn-primary"
+                            :disabled="saving || loadingRoles"
+                            @click="updateRolesFromDiscord"
                         >
                             {{ $t('discord.rewards.special_roles.add') }}
                         </button>
+                        <font-awesome-icon v-show="loadingRoles" icon="circle-notch" spin class="loading-spinner ml-3" fixed-width />
                     </div>
                 </div>
                 <div class="mt-2 text-danger">
                     {{ errorMessage }}
+                </div>
+                <div v-show="showHelp" class="mt-2">
+                    <a href="#" class="text-info" @click="showHelpModal = true">
+                        <font-awesome-icon icon="info-circle" class="text-info" />
+                        {{ $t('discord.rewards.special_roles.help_1') }}
+                    </a>
                 </div>
                 <div v-show="anyChange && !saveDisabled" class="mt-2 text-info">
                     {{ $t('discord.rewards.need_to_save') }}
@@ -95,6 +102,13 @@
                 {{ $t('discord.rewards.guild.remove.confirm_2') }}
             </span>
         </confirm-modal>
+        <modal :visible="showHelpModal" @close="showHelpModal = false">
+            <template slot="body">
+                {{ $t('discord.rewards.special_roles.help_2') }}
+                <br>
+                {{ $t('discord.rewards.special_roles.help_3') }}
+            </template>
+        </modal>
     </div>
 </template>
 
@@ -104,8 +118,13 @@ import {NotificationMixin, LoggerMixin} from '../../../mixins';
 import {toMoney} from '../../../utils';
 import DiscordRoleEdit from './DiscordRoleEdit';
 import ConfirmModal from '../../modal/ConfirmModal';
+import Modal from '../../modal/Modal';
 import {assertUniquePropertyValuesInObjectArray} from '../../../utils';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faInfoCircle, faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {library} from '@fortawesome/fontawesome-svg-core';
+
+library.add(faInfoCircle, faCircleNotch);
 
 export default {
     name: 'DiscordRewardsEdit',
@@ -117,6 +136,7 @@ export default {
         Guide,
         DiscordRoleEdit,
         ConfirmModal,
+        Modal,
         FontAwesomeIcon,
     },
     props: {
@@ -135,6 +155,9 @@ export default {
             guildId: null,
             confirmModalVisible: false,
             anyChange: false,
+            showHelp: false,
+            showHelpModal: false,
+            loadingRoles: false,
         };
     },
     mounted() {
@@ -151,10 +174,6 @@ export default {
         errorMessage() {
             if (!this.$v.roles.required && this.specialRolesEnabled) {
                 return this.$t('discord.rewards.special_roles.required');
-            }
-
-            if (!this.$v.roles.uniqueNames) {
-                return this.$t('discord.rewards.special_roles.unique_names');
             }
 
             if (!this.$v.roles.uniqueBalances) {
@@ -179,21 +198,38 @@ export default {
                     this.guildId = res.data.config.guildId;
                 })
                 .catch((err) => {
-                    this.sendLogs('error', 'can\' load discord info', err);
+                    this.sendLogs('error', 'can\'t load discord info', err);
                     this.notifyError(this.$t('toasted.error.try_later'));
 
                     throw err;
                 });
         },
-        addRole() {
-            this.newRoles.push({
-                id: null,
-                name: '',
-                color: '',
-                requiredBalance: '',
-                valid: false,
-            });
-            this.anyChange = true;
+        updateRolesFromDiscord() {
+            this.loadingRoles = true;
+
+            return this.$axios.single.get(this.$routing.generate('update_discord_roles', {tokenName: this.tokenName}))
+                .then((res) => {
+                    this.currentRoles = res.data.currentRoles.map((role) => {
+                        role.requiredBalance = toMoney(role.requiredBalance);
+                        role.valid = false;
+                        return role;
+                    });
+
+                    this.newRoles = res.data.newRoles.map((role) => {
+                        role.requiredBalance = toMoney(role.requiredBalance);
+                        role.valid = false;
+                        return role;
+                    });
+
+                    this.showHelp = res.data.showHelp;
+                })
+                .catch((err) => {
+                    this.sendLogs('error', 'can\'t update roles from discord', err);
+                })
+                .finally(() => {
+                    this.loadingRoles = false;
+                    this.anyChange = true;
+                });
         },
         save() {
             if (this.saveDisabled) {
@@ -283,7 +319,6 @@ export default {
         return {
             roles: {
                 required: (val) => val.length > 0 || this.removedRoles.length > 0,
-                uniqueNames: (arr) => assertUniquePropertyValuesInObjectArray(arr, 'name'),
                 uniqueBalances: (arr) => assertUniquePropertyValuesInObjectArray(arr, 'requiredBalance'),
                 rolesValid: (arr) => arr.every((item) => item.valid),
             },

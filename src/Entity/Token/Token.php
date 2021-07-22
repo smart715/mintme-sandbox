@@ -321,7 +321,7 @@ class Token implements TradebleInterface, ImagineInterface
     private ?DiscordConfig $discordConfig;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRole", mappedBy="token", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRole", mappedBy="token", cascade={"remove"})
      */
     protected PersistentCollection $discordRoles;
 
@@ -919,9 +919,9 @@ class Token implements TradebleInterface, ImagineInterface
         return $this->discordConfig ?? $this->discordConfig = (new DiscordConfig())->setToken($this);
     }
 
-    public function getDiscordRoles(): array
+    public function getDiscordRoles(): PersistentCollection
     {
-        return $this->discordRoles->toArray();
+        return $this->discordRoles;
     }
 
     public function getDiscordRolesMatching(Criteria $criteria): Collection

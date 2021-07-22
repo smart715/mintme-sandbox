@@ -5,27 +5,17 @@
                 <label :for="`name-input-${i}`">
                     {{ $t('discord.rewards.special_roles.name') }}
                 </label>
-                <input
-                    :value="role.name"
-                    class="form-control w-100"
-                    :id="`name-input-${i}`"
-                    name="name"
-                    type="text"
-                    @input="update('name', $event.target.value)"
-                >
+                <br>
+                <span v-b-tooltip="tooltipConfig">
+                    {{ role.name | truncate(30) }}
+                </span>
             </div>
             <div class="color-input">
                 <label :for="`color-input-${i}`">
                     {{ $t('discord.rewards.special_roles.color') }}
                 </label>
-                <input
-                    :value="role.color"
-                    class="form-control w-100"
-                    :id="`color-input-${i}`"
-                    name="color"
-                    type="text"
-                    @input="update('color', $event.target.value)"
-                >
+                <br>
+                <span>{{ role.color }}</span>
             </div>
             <div class="required-balance-input">
                 <label :for="`required-balance-input-${i}`">
@@ -62,16 +52,15 @@
 
 <script>
 import MoneyFilterMixin from '../../../mixins/filters/money';
-import {CheckInputMixin} from '../../../mixins';
+import {CheckInputMixin, FiltersMixin} from '../../../mixins';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTrash} from '@fortawesome/free-solid-svg-icons';
-import {required, maxLength, decimal, between} from 'vuelidate/lib/validators';
-import {hex} from '../../../utils/constants';
+import {required, decimal, between} from 'vuelidate/lib/validators';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {VBTooltip} from 'bootstrap-vue';
 
 library.add(faTrash);
 
-const maxNameLength = 40;
 const minRequiredBalance = 0.0001;
 const maxRequiredBalance = 1000000;
 
@@ -80,9 +69,13 @@ export default {
     mixins: [
         MoneyFilterMixin,
         CheckInputMixin,
+        FiltersMixin,
     ],
     components: {
         FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         role: Object,
@@ -93,14 +86,6 @@ export default {
     },
     computed: {
         errorMessage() {
-            if (!this.$v.role.name.required && this.role.name.length > 0) {
-                return this.$t('discord.rewards.special_roles.name.not_empty');
-            }
-
-            if (!this.$v.role.name.maxLength) {
-                return this.$t('discord.rewards.special_roles.name.max_length', {max: maxNameLength});
-            }
-
             if (!this.$v.role.requiredBalance.required && this.role.requiredBalance.length > 0) {
                 return this.$t('discord.rewards.special_roles.requiredBalance.not_empty');
             }
@@ -113,14 +98,18 @@ export default {
                 return this.$t('discord.rewards.special_roles.requiredBalance.between', {min: minRequiredBalance, max: maxRequiredBalance});
             }
 
-            if (!this.$v.role.color.hex && this.role.color.length > 0) {
-                return this.$t('discord.rewards.special_roles.color.hex');
-            }
-
             return '';
         },
         valid() {
             return !this.$v.$invalid;
+        },
+        tooltipConfig() {
+            return {
+                title: this.role.name,
+                boundary: 'window',
+                customClass: 'tooltip-custom',
+                disabled: this.role.name.length <= 30,
+            };
         },
     },
     methods: {
@@ -147,18 +136,10 @@ export default {
     validations() {
         return {
             role: {
-                name: {
-                    required: (val) => required(val.trim()),
-                    maxLength: maxLength(maxNameLength),
-                },
                 requiredBalance: {
                     required: (val) => required(val.trim()),
                     decimal,
                     between: between(minRequiredBalance, maxRequiredBalance),
-                },
-                color: {
-                    required: (val) => required(val.trim()),
-                    hex,
                 },
             },
         };
