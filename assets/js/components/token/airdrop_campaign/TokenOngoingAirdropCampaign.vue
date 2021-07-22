@@ -602,6 +602,10 @@ export default {
         modalOnConfirm: function() {
             if (!this.loggedIn) {
                 this.closeModal();
+                if (this.embeded) {
+                    this.loginPopup();
+                    return;
+                }
                 this.loginShowModal = true;
                 return;
             }
@@ -643,6 +647,31 @@ export default {
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
                 })
                 .then(() => this.claim = false);
+        },
+        loginPopup: function() {
+            const w = window.open(
+                this.$routing.generate('login', {page: 'embeded'}),
+                '',
+                'width=500, height=500'
+            );
+
+            const interval = setInterval(() => {
+                const isCheckEmailPath = w.location.pathname.includes('/check-email');
+
+                if ('null' === w.location.origin
+                    || (!isCheckEmailPath
+                        && w.location.origin === window.origin
+                        && w.location.pathname.endsWith('/embeded'))) {
+                    return;
+                }
+
+                setTimeout(() => w.close(), isCheckEmailPath ? 5000 : 0);
+                clearInterval(interval);
+
+                if (!isCheckEmailPath) {
+                    window.location.reload();
+                }
+            }, 100);
         },
         claimAction(action) {
             if (action.done) {
