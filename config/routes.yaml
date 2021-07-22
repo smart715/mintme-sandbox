@@ -31,12 +31,6 @@ fos_user_registration_confirm:
     path: /register/confirm/{token}
     schemes: [https]
 
-fos_user_registration_check_email:
-    controller: App\Controller\RegistrationController:checkEmailAction
-    path: /register/check-email/{page}
-    defaults: { page: null }
-    schemes: [https]
-
 app_user_resetting:
     resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
     prefix: /resetting

@@ -14,7 +14,6 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
 use App\Manager\UserNotificationConfigManagerInterface;
 use App\Security\Request\RefererRequestHandlerInterface;
-use App\TwigExtension\IsEmbededExtension;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -234,35 +233,6 @@ class RegistrationController extends FOSRegistrationController
         return null;
     }
 
-    public function checkEmailAction(Request $request): Response
-    {
-        if (!$request->get('page') && preg_match(
-            IsEmbededExtension::EMBEDED_REGEX,
-            $request->headers->get('referer') ?? ''
-        )) {
-            return $this->redirectToRoute('fos_user_registration_check_email', [
-                'page' => 'embeded',
-            ]);
-        }
-
-        $email = $request->getSession()->get('fos_user_send_confirmation_email/email');
-
-        if (empty($email)) {
-            return new RedirectResponse($this->generateUrl('fos_user_registration_register'));
-        }
-
-        $request->getSession()->remove('fos_user_send_confirmation_email/email');
-        $user = $this->userManager->findUserByEmail($email);
-
-        if (null === $user) {
-            return new RedirectResponse($this->container->get('router')->generate('fos_user_security_login'));
-        }
-
-        return $this->render('@FOSUser/Registration/check_email.html.twig', array(
-            'user' => $user,
-        ));
-    }
-
     public function confirmedAction(Request $request): Response
     {
         /** @var User|null */
@@ -321,11 +291,6 @@ class RegistrationController extends FOSRegistrationController
 
             if ('token_show' === $path['_route'] && 'buy' === $path['tab'] && 'signup' === $path['modal']) {
                 return $this->redirectToRoute('wallet');
-            }
-
-            if (preg_match(IsEmbededExtension::EMBEDED_REGEX, $referer)) {
-                $referer = SecurityController::MAIN_REDIRECT_ROUTE;
-                $this->session->set('login_referer', $referer);
             }
 
             return $this->redirect($referer);
