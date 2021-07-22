@@ -157,16 +157,22 @@ class WalletController extends AbstractFOSRestController
      *
      * @Rest\View()
      * @Rest\Post("/withdraw")
+     * @SWG\Response(response="400",description="Bad request")
      * @Rest\RequestParam(name="currency", allowBlank=false)
+     * @SWG\Tag(name="User Wallet")
+
+
      * @Rest\RequestParam(
      *     name="amount",
      *     allowBlank=false
      * )
-     * @Rest\RequestParam(
+     *     @SWG\Response(response="404", description="Currency not found")
+     *     @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
      *     requirements="^[a-zA-Z0-9]+$"
      * )
+     * @SWG\Response(response="201",description="Returns success message")
      * @SWG\Parameter(
      *      name="body",
      *      in="body",
@@ -180,10 +186,6 @@ class WalletController extends AbstractFOSRestController
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="201",description="Returns success message")
-     * @SWG\Response(response="404",description="Currency not found")
-     * @SWG\Response(response="400",description="Bad request")
-     * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(
         ParamFetcherInterface $request,
