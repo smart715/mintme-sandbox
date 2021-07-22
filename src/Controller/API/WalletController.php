@@ -261,9 +261,9 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
         BalanceHandlerInterface $balanceHandler,
         TokenManagerInterface $tokenManager
     ): View {
-        $webToken = $tokenManager->findByName(Symbols::WEB);
+        $webCrypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
-        if (!$webToken) {
+        if (!$webCrypto) {
             throw new InvalidArgumentException();
         }
 
@@ -274,12 +274,12 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             throw $this->createAccessDeniedException();
         }
 
-        $referralBalance = $balanceHandler->balance($user, $webToken)->getReferral();
+        $referralBalance = $balanceHandler->balance($user, $webCrypto)->getReferral();
         $referralReward = $tokenManager->getUserDeployTokensReward($user);
 
         return $this->view([
             'balance' => $referralBalance->add($referralReward),
-            'token' => $webToken,
+            'token' => $webCrypto,
         ]);
     }
 

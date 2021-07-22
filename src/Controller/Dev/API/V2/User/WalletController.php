@@ -90,12 +90,7 @@ class WalletController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        $cryptos = array_map(
-            static fn (Crypto $crypto) => Token::getFromCrypto($crypto),
-            $this->cryptoManager->findAll()
-        );
-
-        $tradebles = array_merge($cryptos, $user->getTokens());
+        $tradebles = array_merge($this->cryptoManager->findAll(), $user->getTokens());
 
         $balances = $balanceHandler->balances(
             $user,
