@@ -50,7 +50,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
                 self::GET_DEPOSIT_CREDENTIALS_METHOD,
                 [
                     'user_id' => $userId,
-                    'currency' => $token->getName(),
+                    'currency' => $token->getSymbol(),
                 ]
             );
             $credentials[$token->getName()] = $response->hasError() ?

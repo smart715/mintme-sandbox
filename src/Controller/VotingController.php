@@ -70,7 +70,7 @@ class VotingController extends Controller
         $user = $this->getUser();
         $balance = $this->balanceHandler->balance(
             $user,
-            Token::getFromCrypto($this->mintme)
+            $this->mintme
         )->getAvailable();
 
         $min = (float)$this->getParameter('dm_min_amount');

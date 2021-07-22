@@ -86,7 +86,7 @@ class VotingController extends AbstractFOSRestController
 
         $balance = $this->balanceHandler->balance(
             $user,
-            $tradable instanceof Crypto ? Token::getFromCrypto($tradable): $tradable
+            $tradable
         )->getAvailable();
 
         if ((float)$this->moneyWrapper->format($balance) < (float)$this->getParameter('dm_min_amount')) {
@@ -166,7 +166,7 @@ class VotingController extends AbstractFOSRestController
 
         $token = $voting instanceof TokenVoting
             ? $voting->getToken()
-            : Token::getFromCrypto($voting->getCrypto())
+            : $voting->getCrypto()
             ;
 
         $balance = $this->balanceHandler->balance($user, $token)->getAvailable()->getAmount();

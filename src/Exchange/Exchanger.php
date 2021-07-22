@@ -412,13 +412,12 @@ class Exchanger implements ExchangerInterface
 
     private function getBalance(User $user, TradebleInterface $tradeble): Money
     {
-        /** @var Token $token */
-        $token = $tradeble instanceof Crypto
-            ? Token::getFromCrypto($tradeble)
-            : $tradeble;
+        $balanceResult = $this->bh->balance($user, $tradeble);
 
-        $balanceResult = $this->bh->balance($user, $token);
+        if ($tradeble instanceof Token) {
+            return $this->tm->getRealBalance($tradeble, $balanceResult, $user)->getAvailable();
+        }
 
-        return $this->tm->getRealBalance($token, $balanceResult, $user)->getAvailable();
+        return $balanceResult->getAvailable();
     }
 }
