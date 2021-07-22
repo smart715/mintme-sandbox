@@ -728,6 +728,7 @@ services:
         arguments:
             $discordForLeaveGuild: '@discord.client.for.leave_guild'
             $publicKey: '%env(DISCORD_PUBLIC_KEY)%'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
 
     discord.oauth.client:
         class: App\Communications\GuzzleRestWrapper

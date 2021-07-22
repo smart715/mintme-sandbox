@@ -12,9 +12,13 @@ use Discord\Interaction;
 use GuzzleHttp\Command\Exception\CommandClientException;
 use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
+use RestCord\Model\Guild\Guild;
+use RestCord\Model\Permissions\Role;
 
 class DiscordManager implements DiscordManagerInterface
 {
+    private const DEFAULT_ROLE = '@everyone';
+
     private DiscordClient $discord;
     // for some reason the leaveGuild request fails when the Content-Type: application/json header is present
     // and it's present by default on the requests made by RestCord, but it also is needed for the other requests,
@@ -24,6 +28,7 @@ class DiscordManager implements DiscordManagerInterface
     private DiscordRoleManagerInterface $discordRoleManager;
     private DiscordConfigManagerInterface $discordConfigManager;
     private string $publicKey;
+    private string $clientId;
 
     public function __construct(
         DiscordClient $discord,
@@ -31,7 +36,8 @@ class DiscordManager implements DiscordManagerInterface
         LoggerInterface $logger,
         DiscordRoleManagerInterface $discordRoleManager,
         DiscordConfigManagerInterface $discordConfigManager,
-        string $publicKey
+        string $publicKey,
+        string $clientId
     ) {
         $this->discord = $discord;
         $this->discordForLeaveGuild = $discordForLeaveGuild;
@@ -39,6 +45,7 @@ class DiscordManager implements DiscordManagerInterface
         $this->discordRoleManager = $discordRoleManager;
         $this->discordConfigManager = $discordConfigManager;
         $this->publicKey = $publicKey;
+        $this->clientId = $clientId;
     }
 
     public function createRoles(array $roles): void
@@ -164,10 +171,46 @@ class DiscordManager implements DiscordManagerInterface
             return;
         }
 
-        $this->discordForLeaveGuild->user->leaveGuild([
-            'guild.id' => $guildId,
-        ]);
+        $this->discordForLeaveGuild->user->leaveGuild(['guild.id' => $guildId]);
     }
+
+    public function getGuild(Token $token): Guild
+    {
+        $guildId = $token->getDiscordConfig()->getGuildId();
+
+        return $this->discord->guild->getGuild(['guild.id' => $guildId]);
+    }
+
+    public function getManageableRoles(Guild $guild): array
+    {
+        $roles = $guild->roles;
+
+        $botRole = array_filter(
+            $roles,
+            fn ($role) => property_exists($role, 'tags') && $this->clientId === $role->tags->bot_id
+        );
+
+        $botRole = array_pop($botRole);
+
+        // the roles with lower position than our bot's role are the ones our bot can manage
+        $filteredRoles = array_filter(
+            $roles,
+            fn ($role) => $role->position < $botRole->position && self::DEFAULT_ROLE !== $role->name
+        );
+
+        $result = [];
+
+        foreach ($filteredRoles as $role) {
+            $result[$role->id] = (new DiscordRole())
+                ->setName($role->name)
+                ->setColor($role->color)
+                ->setDiscordId((int)$role->id)
+            ;
+        }
+
+        return $result;
+    }
+
 
     private function getError(CommandClientException $e): array
     {

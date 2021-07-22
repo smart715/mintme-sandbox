@@ -1483,3 +1483,6 @@ discord.rewards.save.success:
 discord.rewards.need_to_save:
 discord.rewards.guild.remove.confirm_1:
 discord.rewards.guild.remove.confirm_2:
+discord.rewards.special_roles.help_1:
+discord.rewards.special_roles.help_2:
+discord.rewards.special_roles.help_3:
