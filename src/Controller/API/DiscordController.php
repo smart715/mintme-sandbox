@@ -8,15 +8,12 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
-use App\Exception\Discord\DiscordException;
-use App\Exception\Discord\MissingPermissionsException;
 use App\Form\DiscordRoleType;
 use App\Manager\DiscordConfigManager;
 use App\Manager\DiscordManagerInterface;
 use App\Manager\DiscordRoleManagerInterface;
 use App\Manager\TokenManagerInterface;
 use Discord\InteractionResponseType;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -78,7 +75,7 @@ class DiscordController extends AbstractFOSRestController
 
         return $this->view([
             'config' => $token->getDiscordConfig(),
-            'roles' => $token->getDiscordRoles(),
+            'roles' => $token->getDiscordRoles()->toArray(),
         ], Response::HTTP_OK);
     }
 
@@ -105,40 +102,22 @@ class DiscordController extends AbstractFOSRestController
             throw new ApiBadRequestException();
         }
 
+        $rolesFromDiscord = $this->discordManager->getManageableRoles($this->discordManager->getGuild($token));
+
         $removedRolesData = $request->get('removedRoles');
-        $removedRoles = $this->deleteRoles($token, $removedRolesData);
+        $this->deleteRoles($token, $removedRolesData);
 
         $this->entityManager->flush();
 
         $currentRolesData = $request->get('currentRoles');
-        $editedRoles = $this->editRoles($token, $currentRolesData);
+        $this->editRoles($token, $currentRolesData);
 
         $newRolesData = $request->get('newRoles');
-        $newRoles = $this->addRoles($token, $newRolesData);
+        $this->addRoles($token, $newRolesData, $rolesFromDiscord);
 
-        $rolesCount = count($token->getDiscordRoles());
+        $rolesCount = $token->getDiscordRoles()->count();
         $specialRolesEnabled = $rolesCount && $request->get('specialRolesEnabled');
         $token->getDiscordConfig()->setSpecialRolesEnabled($specialRolesEnabled);
-
-        try {
-            $this->manageRolesOnDiscord($newRoles, $editedRoles, $removedRoles);
-        } catch (MissingPermissionsException $e) {
-            return $this->view([
-                'errors' => true,
-                'enabled' => false,
-                'message' => $this->translator->trans('discord.error.missing_permissions'),
-            ], Response::HTTP_OK);
-        } catch (DiscordException $e) {
-            return $this->view([
-                'errors' => true,
-                'enabled' => true,
-                'message' => $this->translator->trans('discord.error'),
-            ], Response::HTTP_OK);
-        }
-
-        foreach ($newRoles as $role) {
-            $token->addDiscordRole($role);
-        }
 
         $this->entityManager->persist($token);
 
@@ -154,15 +133,16 @@ class DiscordController extends AbstractFOSRestController
         return $this->view(['status' => 'success'], Response::HTTP_OK);
     }
 
-    /**
-     * @return DiscordRole[]
-     */
-    private function addRoles(Token $token, array $rolesData): array
+    private function addRoles(Token $token, array $rolesData, array $rolesFromDiscord): void
     {
-        $roles = [];
-
         foreach ($rolesData as $roleData) {
-            $role = (new DiscordRole())->setToken($token);
+            $role = $rolesFromDiscord[$roleData['discordId']] ?? null;
+
+            if (!$role) {
+                continue;
+            }
+
+            $role->setToken($token);
 
             $form = $this->createForm(DiscordRoleType::class, $role);
             $form->submit($roleData);
@@ -171,27 +151,24 @@ class DiscordController extends AbstractFOSRestController
                 throw new ApiBadRequestException($this->translator->trans('discord.error.invalid_form'));
             }
 
-            $roles[] = $role;
+            $token->addDiscordRole($role);
+            $this->entityManager->persist($role);
         }
-
-        return $roles;
     }
 
-    /**
-     * @return DiscordRole[]
-     */
-    private function editRoles(Token $token, array $rolesData): array
+    private function editRoles(Token $token, array $rolesData): void
     {
-        $roles = [];
+        $currentRoles = $token->getDiscordRoles();
 
         foreach ($rolesData as $roleData) {
-            $criteria = Criteria::create();
-            $criteria->where(
-                Criteria::expr()->eq('id', $roleData['id'])
-            )->getFirstResult();
+            /** @var DiscordRole|null $role */
+            $role = $currentRoles->filter(
+                fn (DiscordRole $r) => $r->getDiscordId() === (int)$roleData['discordId']
+            )->first();
 
-            /** @var DiscordRole $role */
-            $role = $token->getDiscordRolesMatching($criteria)->first();
+            if (!$role) {
+                continue;
+            }
 
             $form = $this->createForm(DiscordRoleType::class, $role);
             $form->submit($roleData);
@@ -200,51 +177,27 @@ class DiscordController extends AbstractFOSRestController
                 throw new ApiBadRequestException($this->translator->trans('discord.error.invalid_form'));
             }
 
-            if ($role->hasChanged()) {
-                $roles[] = $role;
-            }
+            $this->entityManager->persist($role);
         }
-
-        return $roles;
     }
 
-    /**
-     * @return DiscordRole[]
-     */
-    private function deleteRoles(Token $token, array $rolesData): array
+    private function deleteRoles(Token $token, array $rolesData): void
     {
-        $roles = [];
+        $currentRoles = $token->getDiscordRoles();
 
         foreach ($rolesData as $roleData) {
-            $criteria = Criteria::create();
-            $criteria->where(
-                Criteria::expr()->eq('id', $roleData['id'])
-            )->getFirstResult();
+            /** @var DiscordRole|null $role */
+            $role = $currentRoles->filter(
+                fn (DiscordRole $r) => $r->getDiscordId() === (int)$roleData['discordId']
+            )->first();
 
-            /** @var DiscordRole $role */
-            $role = $token->getDiscordRolesMatching($criteria)->first();
+            if (!$role) {
+                continue;
+            }
 
             $token->removeDiscordRole($role);
             $this->entityManager->remove($role);
-
-            $roles[] = $role;
         }
-
-        return $roles;
-    }
-
-    /**
-     * @param DiscordRole[] $newRoles
-     * @param DiscordRole[] $editedRoles
-     * @param DiscordRole[] $deletedRoles
-     * @throws DiscordException
-     * @throws MissingPermissionsException
-     */
-    private function manageRolesOnDiscord(array $newRoles, array $editedRoles, array $deletedRoles): void
-    {
-        $this->discordManager->createRoles($newRoles);
-        $this->discordManager->updateRoles($editedRoles);
-        $this->discordManager->deleteRoles($deletedRoles);
     }
 
     /**
@@ -313,7 +266,7 @@ class DiscordController extends AbstractFOSRestController
             $config = $token->getDiscordConfig();
 
             if ($config->hasGuild() && $guildId !== $config->getGuildId()) {
-                $this->discordRoleManager->removeRoles($token);
+                $this->discordRoleManager->removeAllRoles($token);
             }
 
             $config->setGuildId($guildId)->setEnabled(true);
@@ -373,8 +326,65 @@ class DiscordController extends AbstractFOSRestController
 
         $this->discordConfigManager->disable($config);
 
-        $this->discordRoleManager->removeRoles($token);
+        $this->discordRoleManager->removeAllRoles($token);
 
         return $this->view(['status' => 'success'], Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Get("/{tokenName}/roles/update", name="update_discord_roles", options={"expose"=true})
+     */
+    public function updateRolesFromDiscord(string $tokenName): View
+    {
+        $token = $this->tokenManager->findByName($tokenName);
+
+        if (!$token) {
+            throw new ApiNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted('edit', $token);
+
+        if (!$token->getDiscordConfig()->hasGuild()) {
+            throw new ApiBadRequestException();
+        }
+
+        $guild = $this->discordManager->getGuild($token);
+
+        $rolesFromDiscord = $this->discordManager->getManageableRoles($guild);
+
+        $showHelp = count($guild->roles) - 2 > count($rolesFromDiscord);
+
+        $currentRoles = $token->getDiscordRoles()->toArray();
+
+        $removedRoles = [];
+
+        foreach ($currentRoles as $key => $role) {
+            $discordId = (string)$role->getDiscordId();
+
+            $roleFromDiscord = $rolesFromDiscord[$discordId] ?? null;
+
+            unset($rolesFromDiscord[$discordId]);
+
+            if (!$roleFromDiscord) {
+                $removedRoles[] = $role;
+
+                unset($currentRoles[$key]);
+
+                continue;
+            }
+
+            $role->update($roleFromDiscord);
+        }
+
+        $this->discordRoleManager->removeRoles($removedRoles, false);
+
+        $this->entityManager->flush();
+
+        return $this->view([
+            'currentRoles' => $currentRoles,
+            'newRoles' => array_values($rolesFromDiscord),
+            'showHelp' => $showHelp,
+        ], Response::HTTP_OK);
     }
 }

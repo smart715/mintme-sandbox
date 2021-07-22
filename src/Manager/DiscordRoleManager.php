@@ -36,18 +36,32 @@ class DiscordRoleManager implements DiscordRoleManagerInterface
         return $this->repository->findByTokenAndAmount($token, $balanceResult->getAvailable());
     }
 
-    public function removeRole(DiscordRole $role): void
+    public function removeRole(DiscordRole $role, bool $andFlush = true): void
     {
         $this->entityManager->remove($role);
-        $this->entityManager->flush();
+
+        if ($andFlush) {
+            $this->entityManager->flush();
+        }
     }
 
-    public function removeRoles(Token $token): void
+    public function removeAllRoles(Token $token): void
     {
-        foreach ($token->getDiscordRoles() as $role) {
-            $this->entityManager->remove($role);
+        foreach ($token->getDiscordRoles()->toArray() as $role) {
+            $this->removeRole($role, false);
         }
 
         $this->entityManager->flush();
+    }
+
+    public function removeRoles(array $roles, bool $andFlush = true): void
+    {
+        foreach ($roles as $role) {
+            $this->removeRole($role, false);
+        }
+
+        if ($andFlush) {
+            $this->entityManager->flush();
+        }
     }
 }
