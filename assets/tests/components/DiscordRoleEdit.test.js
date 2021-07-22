@@ -17,7 +17,6 @@ function mockVue() {
     localVue.use(Vuelidate);
     return localVue;
 }
-
 const testRole = {
     id: 1,
     name: 'foo',
@@ -26,69 +25,33 @@ const testRole = {
     valid: true,
 };
 
+/**
+ * @param {Object} props
+ * @param {Object} data
+ * @return {Wrapper<Vue>}
+ */
+function mockDiscordRoleEdit(props = {}, data = {}) {
+    return shallowMount(DiscordRoleEdit, {
+        localVue: mockVue(),
+        directives: {
+            'b-tooltip': {},
+        },
+        propsData: {
+            role: testRole,
+            ...props,
+        },
+        data() {
+            return {
+                ...data,
+            };
+        },
+    });
+}
+
 describe('Discord Role', () => {
     describe('test validations', () => {
-        it('name is required', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
-
-            wrapper.setProps({role: {...testRole, name: '           '}});
-
-            expect(wrapper.vm.$v.$invalid).toBe(true);
-
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.name.not_empty');
-        });
-
-        it('maxNameLength validation', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
-
-            wrapper.setProps({role: {...testRole, name: 'foooooooooooooooooooooooooooooooooooooooo'}});
-
-            expect(wrapper.vm.$v.$invalid).toBe(true);
-
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.name.max_length');
-        });
-
         it('requiredBalance is required', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
+            const wrapper = mockDiscordRoleEdit();
 
             wrapper.setProps({role: {...testRole, requiredBalance: '            '}});
 
@@ -98,20 +61,7 @@ describe('Discord Role', () => {
         });
 
         it('requiredBalance should be decimal', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
+            const wrapper = mockDiscordRoleEdit();
 
             wrapper.setProps({role: {...testRole, requiredBalance: 'foo'}});
 
@@ -121,20 +71,7 @@ describe('Discord Role', () => {
         });
 
         it('between validation', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
+            const wrapper = mockDiscordRoleEdit();
 
             wrapper.setProps({role: {...testRole, requiredBalance: '0'}});
 
@@ -148,63 +85,16 @@ describe('Discord Role', () => {
 
             expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.requiredBalance.between');
         });
-
-        it('color should be hexadecimal code', () => {
-            const localVue = mockVue();
-            const wrapper = shallowMount(DiscordRoleEdit, {
-                localVue,
-                propsData: {
-                    role: testRole,
-                },
-                data() {
-                    return {
-                        maxNameLength: 10,
-                        minRequiredBalance: 1,
-                        maxRequiredBalance: 10,
-                    };
-                },
-            });
-
-            wrapper.setProps({role: {...testRole, color: '          '}});
-
-            expect(wrapper.vm.$v.$invalid).toBe(true);
-
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.color.hex');
-
-            wrapper.setProps({role: {...testRole, color: 'abcdef'}});
-
-            expect(wrapper.vm.$v.$invalid).toBe(true);
-
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.color.hex');
-
-            wrapper.setProps({role: {...testRole, color: '#abcdef'}});
-
-            expect(wrapper.vm.$v.$invalid).toBe(false);
-
-            expect(wrapper.vm.errorMessage).toBe('');
-        });
     });
 
     it('updates valid on mount', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(DiscordRoleEdit, {
-            localVue,
-            propsData: {
-                role: testRole,
-            },
-        });
+        const wrapper = mockDiscordRoleEdit();
 
         expect(wrapper.emitted().update[0]).toEqual([testRole, 'valid', true]);
     });
 
     it('test update', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(DiscordRoleEdit, {
-            localVue,
-            propsData: {
-                role: testRole,
-            },
-        });
+        const wrapper = mockDiscordRoleEdit();
 
         wrapper.vm.update('name', 'foo');
 
@@ -212,13 +102,7 @@ describe('Discord Role', () => {
     });
 
     it('updates valid when role prop changes', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(DiscordRoleEdit, {
-            localVue,
-            propsData: {
-                role: testRole,
-            },
-        });
+        const wrapper = mockDiscordRoleEdit();
 
         let role = {...testRole, valid: false};
 

@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @codeCoverageIgnore
  * @ORM\Table(name="discord_role",
  *     uniqueConstraints={
- *         @ORM\UniqueConstraint(name="UQ_DiscordRole_Token_Name",
- *             columns={"token_id", "name"}
- *         ),
  *         @ORM\UniqueConstraint(name="UQ_DiscordRole_Token_RequiredBalance",
  *             columns={"token_id", "required_balance"}
  *         )
@@ -57,7 +54,7 @@ class DiscordRole
      * @Assert\NotBlank
      * @Assert\Length(
      *     min = 1,
-     *     max = 40,
+     *     max = 100,
      * )
      */
     protected string $name = ''; // phpcs:ignore
@@ -72,9 +69,6 @@ class DiscordRole
      */
     protected PersistentCollection $users;
 
-    /**
-     * @Groups({"Default", "API"})
-     */
     public function getId(): int
     {
         return $this->id;
@@ -87,6 +81,9 @@ class DiscordRole
         return $this;
     }
 
+    /**
+     * @Groups({"Default", "API"})
+     */
     public function getDiscordId(): int
     {
         return $this->discordId;
@@ -167,5 +164,13 @@ class DiscordRole
     public function getUsers(): Collection
     {
         return $this->users->map(fn (DiscordRoleUser $dru) => $dru->getUser());
+    }
+
+    public function update(DiscordRole $role): self
+    {
+        $this->setName($role->getName());
+        $this->setColor($role->getColor());
+
+        return $this;
     }
 }
