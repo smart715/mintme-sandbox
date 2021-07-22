@@ -30,10 +30,6 @@ class UserTokenManager implements UserTokenManagerInterface
 
     public function updateRelation(User $user, Token $token, Money $balance): void
     {
-        if (!$token->getId()) {
-            return;
-        }
-
         $userToken = $this->findByUserToken($user, $token);
         $isCreator = $user->getId() === $token->getProfile()->getUser()->getId();
 

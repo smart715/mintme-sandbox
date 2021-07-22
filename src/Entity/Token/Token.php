@@ -583,11 +583,6 @@ class Token implements TradebleInterface, ImagineInterface
         return self::DEPLOYED === $this->getDeploymentStatus();
     }
 
-    public static function getFromCrypto(Crypto $crypto): self
-    {
-        return (new self())->setName($crypto->getSymbol());
-    }
-
     public static function getFromSymbol(string $symbol): self
     {
         return (new self())->setName($symbol);

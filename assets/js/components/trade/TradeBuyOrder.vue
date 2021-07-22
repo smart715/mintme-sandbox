@@ -424,7 +424,7 @@ export default {
         },
         marketPrice() {
             let tokenAmount = new Decimal(0);
-            let balance = new Decimal(this.immutableBalance);
+            let balance = new Decimal(this.immutableBalance || 0);
 
             let result = this.sellOrders[0] ? this.sellOrders[this.sellOrders.length - 1].price : 0;
 
