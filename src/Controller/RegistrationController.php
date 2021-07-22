@@ -124,7 +124,7 @@ class RegistrationController extends FOSRegistrationController
     }
 
     /**
-     * @Route("/register/{page}", name="register", options = {"expose": true}, defaults={"page"=null})
+     * @Route("/register", name="register", options = {"expose": true})
      */
     public function registerAction(Request $request): Response
     {
