@@ -42,3 +42,15 @@ confirmations: 6
 
 # Should be in normal view, not in decimals (5000000000000). For ex: 0.5, 1, 2.5 etc.
 min_deposit: 1
+
+# Enabled deposits for cryptos
+enabled_deposits:
+  - 'ETH'
+  - 'WEB'
+  - 'BNB'
+
+# Disable processing withdrawals
+enabled_wthdrawals:
+  - 'ETH'
+  - 'WEB'
+  - 'BNB'
