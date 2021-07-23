@@ -232,9 +232,11 @@
                             {{ confirmButtonText }}
                         </template>
                         <p v-if="embeded && isLogginTabOpen">
-                            A new tab opened for you to log into Mintme.com
+                            {{ $t(ongoing_airdrop.embeded.login_tab) }}
                             <br>
-                            <a v-if="!isReloadingFrame" @click.prevent="reloadFrame" href="#">Click here to reload with your account</a>
+                            <a v-if="!isReloadingFrame" @click.prevent="reloadFrame" href="#">
+                                {{ $t(ongoing_airdrop.embeded.reload) }}
+                            </a>
                             <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
                         </p>
                     </confirm-modal>

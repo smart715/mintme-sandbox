@@ -893,6 +893,8 @@ ongoing_airdrop.confirm_message: 'Are you sure you want to claim %airdropReward%
 ongoing_airdrop.actions_message: 'To claim %airdropReward% %tokenName% you need to complete these %tasksAmount% tasks:'
 ongoing_airdrop.ended: 'Sorry, this airdrop has ended.'
 ongoing_airdrop.ended_embeded: 'The airdrop has already ended. You can visit <a href="%mintmeUrl%" %extraAttributes%>mintme.com</a> and check other airdrops.'
+ongoing_airdrop.embeded.login_tab: 'A new tab opened for you to log in or sign up on Mintme.com to claim the reward.'
+ongoing_airdrop.embeded.reload: 'Click here to reload the page after logging in.'
 ongoing_airdrop.submit_url: 'Submit URL'
 ongoing_airdrop.actions.message: '%tokenName% is airdroping his token! Visit %tokenUrl% and learn more about the token and the airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Youtube authentication is required to complete this action.'
