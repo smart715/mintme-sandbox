@@ -149,6 +149,12 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
+            if ($tradable instanceof Token && !$this->security->isGranted('token-deposit')) {
+                $this->logger->info('[deposit-consumer] Token deposits are disabled. Canceled.');
+
+                return true;
+            }
+
             if ($tradable instanceof Crypto) {
                 if (!$this->security->isGranted('not-disabled', $tradable)) {
                     $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');

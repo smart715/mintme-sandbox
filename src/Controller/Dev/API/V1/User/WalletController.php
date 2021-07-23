@@ -250,6 +250,10 @@ class WalletController extends DevApiController
             throw new ApiNotFoundException('Currency not found');
         }
 
+        if ($tradable instanceof Token) {
+            $this->denyAccessUnlessGranted('token-withdraw');
+        }
+
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
 
         if (!($validator = new TradebleDigitsValidator($amount, $tradable))->validate()) {

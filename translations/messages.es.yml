@@ -1241,6 +1241,8 @@ toasted.info.enable_2fa_before: 'Por favor habilite la verificación 2FA antes d
 toasted.error.network: 'Error de red'
 toasted.error.try_reload: 'Algo salió mal. Intente recargar la página.'
 toasted.error.try_later: 'Un error ha ocurrido, por favor intente de nuevo más tarde.'
+toasted.error.withdrawals.disabled:
+toasted.error.deposits.disabled:
 toasted.error.correct_form: 'Corrija sus campos en el formulario'
 toasted.error.do_not_have_enough_web: 'Usted no posee suficiente MINTME para pagar la comisión'
 toasted.error.do_not_have_enough: 'Usted no posee suficiente %currency% para pagar la comisión'
