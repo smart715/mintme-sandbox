@@ -134,7 +134,10 @@
                     >
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="actionButtonClass(isTokenActionDisabled('depositDisabled', data))"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('depositDisabled', data) ||
+                                isTokenActionDisabled('tokenDepositsDisabled', data)
+                            )"
                             @click="openDeposit(
                                 data.item.name,
                                 data.item.subunit,
@@ -147,7 +150,8 @@
                                 <font-awesome-icon
                                     class="icon-default"
                                     :class="{
-                                        'text-muted': isTokenActionDisabled('depositDisabled', data)
+                                        'text-muted': isTokenActionDisabled('depositDisabled', data) ||
+                                            isTokenActionDisabled('tokenDepositsDisabled', data)
                                         }"
                                     :icon="['fac', 'deposit']"
                                 />
@@ -158,7 +162,10 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="actionButtonClass(isTokenActionDisabled('withdrawalsDisabled', data))"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                isTokenActionDisabled('tokenWithdrawalsDisabled', data)
+                            )"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -174,7 +181,8 @@
                                 <font-awesome-icon
                                     class="icon-default"
                                     :class="{
-                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data)
+                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                            isTokenActionDisabled('tokenWithdrawalsDisabled', data)
                                         }"
                                     :icon="['fac', 'withdraw']"
                                 />
@@ -498,8 +506,9 @@ export default {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.withdrawalsDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenWithdrawalsDisabled)
             ) {
-              this.notifyError('Withdrawals are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.withdrawals.disabled'));
 
               return;
             }
@@ -534,8 +543,9 @@ export default {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.depositDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenDepositsDisabled)
             ) {
-              this.notifyError('Deposits are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.deposits.disabled'));
 
               return;
             }
