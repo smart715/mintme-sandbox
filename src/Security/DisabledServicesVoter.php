@@ -10,6 +10,8 @@ class DisabledServicesVoter extends Voter
 {
     private const DEPOSIT = 'deposit';
     private const WITHDRAW = 'withdraw';
+    private const TOKEN_DEPOSIT = 'token-deposit';
+    private const TOKEN_WITHDRAW = 'token-withdraw';
     private const DEPLOY = 'deploy';
     private const NEW_TRADES = 'new-trades';
     private const TRADING = 'trading';
@@ -17,6 +19,8 @@ class DisabledServicesVoter extends Voter
     private const ALL_ACTIONS = [
         self::DEPOSIT,
         self::WITHDRAW,
+        self::TOKEN_DEPOSIT,
+        self::TOKEN_WITHDRAW,
         self::DEPLOY,
         self::NEW_TRADES,
         self::TRADING,
@@ -52,6 +56,10 @@ class DisabledServicesVoter extends Voter
                 return !$this->disbledServicesConfig->isDepositDisabled();
             case self::WITHDRAW:
                 return !$this->disbledServicesConfig->isWithdrawalsDisabled();
+            case self::TOKEN_DEPOSIT:
+                return !$this->disbledServicesConfig->isTokenDepositsDisabled();
+            case self::TOKEN_WITHDRAW:
+                return !$this->disbledServicesConfig->isTokenWithdrawalsDisabled();
             case self::DEPLOY:
                 return !$this->disbledServicesConfig->isDeployDisabled();
             case self::NEW_TRADES:
