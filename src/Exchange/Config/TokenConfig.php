@@ -21,7 +21,7 @@ class TokenConfig
     public function getWithdrawFeeByCryptoSymbol(string $symbol): Money
     {
         return $this->moneyWrapper->parse(
-            $this->parameterBag->get(strtolower($symbol) . '_token_withdraw_fee'),
+            (string)$this->parameterBag->get(strtolower($symbol) . '_token_withdraw_fee'),
             $symbol
         );
     }
