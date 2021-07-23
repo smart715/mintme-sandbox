@@ -137,6 +137,10 @@ class WalletController extends AbstractFOSRestController implements TwoFactorAut
             $this->denyAccessUnlessGranted('not-disabled', $tradable);
         }
 
+        if ($tradable instanceof Token) {
+            $this->denyAccessUnlessGranted('token-withdraw');
+        }
+
         try {
             $pendingWithdraw = $wallet->withdrawInit(
                 $user,

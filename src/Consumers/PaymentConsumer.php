@@ -46,6 +46,7 @@ class PaymentConsumer implements ConsumerInterface
     private EntityManagerInterface $em;
 
     private EventDispatcherInterface $eventDispatcher;
+
     private TokenConfig $tokenConfig;
 
     public function __construct(
