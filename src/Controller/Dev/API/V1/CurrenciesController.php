@@ -56,7 +56,7 @@ class CurrenciesController extends DevApiController
      */
     public function getCurrencies(ParamFetcherInterface $request): array
     {
-        $deployres=array();
+        $deployRes = [];
         $result=$this->tokenManager->getDeployedTokens(
             (int)$request->get('offset'),
             (int)$request->get('limit')
@@ -64,11 +64,11 @@ class CurrenciesController extends DevApiController
 
         foreach ($result as $subobj) {
             if ($subobj->isDeployed()) {
-                array_push($deployres, $subobj);
+                array_push($deployRes, $subobj);
             }
         }
 
-         return $deployres;
+         return $deployRes;
     }
 
     /**
