@@ -2,10 +2,8 @@
 
 namespace App\Tests\Utils\Converter;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Exchange\Config\Config;
-use App\Manager\CryptoManagerInterface;
 use App\Utils\Converter\TokenNameConverter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +16,6 @@ class TokenNameConverterTest extends TestCase
     public function testConvert(int $tokenId, int $offset, string $tokenName): void
     {
         $converter = new TokenNameConverter(
-            $this->mockCryptoManager($this->mockCrypto('WEB')),
             $this->mockConfig($offset)
         );
 
@@ -33,7 +30,6 @@ class TokenNameConverterTest extends TestCase
             [ 321, 0, 'TOK000000000321' ],
             [ 99999999999999, 0, 'TOK99999999999999' ],
             [ -1, 0, 'TOK0000000000-1' ],
-            [ 777, 0, 'WEB' ],
             [ 1, 5, 'TOK000000000006' ],
         ];
     }
@@ -46,33 +42,6 @@ class TokenNameConverterTest extends TestCase
         $config->method('getOffset')->willReturn($offset);
 
         return $config;
-    }
-
-    /** @return MockObject|CryptoManagerInterface */
-    private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
-    {
-        $manager = $this->createMock(CryptoManagerInterface::class);
-
-        $manager
-            ->method('findBySymbol')
-            ->willReturnCallback(function (string $symbol) use ($crypto) {
-                return $crypto->getSymbol() == $symbol
-                    ? $crypto
-                    : null;
-            });
-
-        return $manager;
-    }
-
-    /** @return MockObject|Crypto */
-    private function mockCrypto(string $symbol): Crypto
-    {
-        $crypto = $this->createMock(Crypto::class);
-
-        $crypto->method('getSymbol')->willReturn($symbol);
-        $crypto->method('getName')->willReturn($symbol);
-
-        return $crypto;
     }
 
     /**

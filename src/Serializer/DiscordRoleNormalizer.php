@@ -27,6 +27,7 @@ class DiscordRoleNormalizer implements NormalizerInterface
         $role = $this->normalizer->normalize($object, $format, $context);
 
         $role['color'] = $this->colorTransformer->transform($role['color']);
+        $role['discordId'] = (string)$role['discordId'];
 
         return $role;
     }

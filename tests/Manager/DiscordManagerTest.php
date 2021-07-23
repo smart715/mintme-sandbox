@@ -33,14 +33,7 @@ class DiscordManagerTest extends TestCase
             'color' => 0,
         ]);
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord);
 
         $dm->createRole($dr);
     }
@@ -58,14 +51,7 @@ class DiscordManagerTest extends TestCase
         $dcm = $this->createMock(DiscordConfigManagerInterface::class);
         $dcm->expects($this->once())->method('disable')->with($dr->getToken()->getDiscordConfig());
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $dcm,
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, null, $dcm);
 
         $this->expectException(MissingPermissionsException::class);
 
@@ -83,13 +69,8 @@ class DiscordManagerTest extends TestCase
             'color' => 0,
         ];
 
-        $dm = new DiscordManager(
-            $this->mockDiscord('modifyGuildRole', $with),
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
+        $dm = $this->createDiscordManager(
+            $this->mockDiscord('modifyGuildRole', $with)
         );
 
         $dm->updateRole($dr);
@@ -108,14 +89,7 @@ class DiscordManagerTest extends TestCase
         $dcm = $this->createMock(DiscordConfigManagerInterface::class);
         $dcm->expects($this->once())->method('disable')->with($dr->getToken()->getDiscordConfig());
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $dcm,
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, null, $dcm);
 
         $this->expectException(MissingPermissionsException::class);
 
@@ -135,14 +109,7 @@ class DiscordManagerTest extends TestCase
         $drm = $this->createMock(DiscordRoleManagerInterface::class);
         $drm->expects($this->once())->method('removeRole')->with($dr);
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $drm,
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, $drm);
 
         $this->expectException(UnknownRoleException::class);
 
@@ -158,13 +125,8 @@ class DiscordManagerTest extends TestCase
             'role.id' => 1,
         ];
 
-        $dm = new DiscordManager(
-            $this->mockDiscord('deleteGuildRole', $with),
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
+        $dm = $this->createDiscordManager(
+            $this->mockDiscord('deleteGuildRole', $with)
         );
 
         $dm->deleteRole($dr);
@@ -183,14 +145,7 @@ class DiscordManagerTest extends TestCase
         $dcm = $this->createMock(DiscordConfigManagerInterface::class);
         $dcm->expects($this->once())->method('disable')->with($dr->getToken()->getDiscordConfig());
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $dcm,
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, null, $dcm);
 
         $this->expectException(MissingPermissionsException::class);
 
@@ -210,14 +165,7 @@ class DiscordManagerTest extends TestCase
         $drm = $this->createMock(DiscordRoleManagerInterface::class);
         $drm->expects($this->once())->method('removeRole')->with($dr);
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $drm,
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, $drm);
 
         $this->expectException(UnknownRoleException::class);
 
@@ -235,13 +183,8 @@ class DiscordManagerTest extends TestCase
             'user.id' => 1,
         ];
 
-        $dm = new DiscordManager(
-            $this->mockDiscord('addGuildMemberRole', $with),
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
+        $dm = $this->createDiscordManager(
+            $this->mockDiscord('addGuildMemberRole', $with)
         );
 
         $dm->addGuildMemberRole($u, $dr);
@@ -261,14 +204,7 @@ class DiscordManagerTest extends TestCase
         $dcm = $this->createMock(DiscordConfigManagerInterface::class);
         $dcm->expects($this->once())->method('disable')->with($dr->getToken()->getDiscordConfig());
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $dcm,
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, null, $dcm);
 
         $this->expectException(MissingPermissionsException::class);
 
@@ -289,14 +225,7 @@ class DiscordManagerTest extends TestCase
         $drm = $this->createMock(DiscordRoleManagerInterface::class);
         $drm->expects($this->once())->method('removeRole')->with($dr);
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $drm,
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, $drm);
 
         $this->expectException(UnknownRoleException::class);
 
@@ -314,13 +243,8 @@ class DiscordManagerTest extends TestCase
             'user.id' => 1,
         ];
 
-        $dm = new DiscordManager(
-            $this->mockDiscord('removeGuildMemberRole', $with),
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
+        $dm = $this->createDiscordManager(
+            $this->mockDiscord('removeGuildMemberRole', $with)
         );
 
         $dm->removeGuildMemberRole($u, $dr);
@@ -340,14 +264,7 @@ class DiscordManagerTest extends TestCase
         $dcm = $this->createMock(DiscordConfigManagerInterface::class);
         $dcm->expects($this->once())->method('disable')->with($dr->getToken()->getDiscordConfig());
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $dcm,
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, null, $dcm);
 
         $this->expectException(MissingPermissionsException::class);
 
@@ -368,14 +285,7 @@ class DiscordManagerTest extends TestCase
         $drm = $this->createMock(DiscordRoleManagerInterface::class);
         $drm->expects($this->once())->method('removeRole')->with($dr);
 
-        $dm = new DiscordManager(
-            $discord,
-            $this->createMock(DiscordClient::class),
-            $this->createMock(LoggerInterface::class),
-            $drm,
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager($discord, null, null, $drm);
 
         $this->expectException(UnknownRoleException::class);
 
@@ -392,22 +302,75 @@ class DiscordManagerTest extends TestCase
             'guild.id' => 1,
         ]);
 
-        $dm = new DiscordManager(
-            $this->createMock(DiscordClient::class),
-            $discord,
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(DiscordRoleManagerInterface::class),
-            $this->createMock(DiscordConfigManagerInterface::class),
-            'testPublicKey'
-        );
+        $dm = $this->createDiscordManager(null, $discord);
 
         $dm->leaveGuild($t);
     }
 
+    public function testGetGuild(): void
+    {
+        $guild = $this->createMock(\RestCord\Model\Guild\Guild::class);
+        $t = $this->mockToken(1);
+
+        $discord = $this->mockDiscord(
+            'getGuild',
+            ['guild.id' => 1],
+            null,
+            $guild
+        );
+
+        $dm = $this->createDiscordManager($discord);
+
+        $this->assertEquals($guild, $dm->getGuild($t));
+    }
+
+    public function testGetManageableRoles(): void
+    {
+        $guild = new \RestCord\Model\Guild\Guild();
+
+        $botRole = (object) [
+            'position' => 1,
+            'tags' => (object) [
+                'bot_id' => 'testClientId',
+            ],
+        ];
+
+        $defaultRole = (object) [
+            'name' => '@everyone',
+            'position' => 0,
+        ];
+
+        $manageableRole = (object) [
+            'name' => 'foo',
+            'color' => 0,
+            'position' => 0,
+            'id' => '1',
+        ];
+
+        $nonManageableRole = (object) [
+            'name' => 'baz',
+            'color' => 0,
+            'position' => 2,
+        ];
+
+        $guild->roles = [$botRole, $defaultRole, $manageableRole, $nonManageableRole];
+
+        $dm = $this->createDiscordManager();
+
+        $manageableRoles = $dm->getManageableRoles($guild);
+
+        $this->assertEquals(1, count($manageableRoles));
+        $this->assertEquals('foo', $manageableRoles['1']->getName());
+    }
+
+    /**
+     * @param mixed $returnValue
+     */
     private function mockDiscord(
         string $method,
         ?array $with = null,
-        ?CommandClientException $e = null
+        ?CommandClientException $e = null,
+        $returnValue = null
     ): DiscordClient {
         $role = $this->createMock(Role::class);
         $role->id = 1;
@@ -416,7 +379,11 @@ class DiscordManagerTest extends TestCase
         $m = $guild->expects($this->once())->method($method);
 
         if ($with) {
-            $m->with($with)->willReturn($role);
+            if ($returnValue) {
+                $m->with($with)->willReturn($returnValue);
+            } else {
+                $m->with($with)->willReturn($role);
+            }
         } elseif ($e) {
             $m->willThrowException($e);
         }
@@ -474,5 +441,25 @@ class DiscordManagerTest extends TestCase
         $u->method('getDiscordId')->willReturn($discordId);
 
         return $u;
+    }
+
+    private function createDiscordManager(
+        ?DiscordClient $discord = null,
+        ?DiscordClient $discordForLeaveGuild = null,
+        ?LoggerInterface $logger = null,
+        ?DiscordRoleManagerInterface $drm = null,
+        ?DiscordConfigManagerInterface $dcm = null,
+        string $publicKey = 'testPublicKey',
+        string $clientId = 'testClientId'
+    ): DiscordManagerInterface {
+        return new DiscordManager(
+            $discord ?? $this->createMock(DiscordClient::class),
+            $discordForLeaveGuild ?? $this->createMock(DiscordClient::class),
+            $logger ?? $this->createMock(LoggerInterface::class),
+            $drm ?? $this->createMock(DiscordRoleManagerInterface::class),
+            $dcm ?? $this->createMock(DiscordConfigManagerInterface::class),
+            $publicKey,
+            $clientId
+        );
     }
 }

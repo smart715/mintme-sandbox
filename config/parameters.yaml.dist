@@ -207,6 +207,12 @@ parameters:
     # Disables processing withdrawals and withdraw buttons in wallet
     disable_withdrawals: false
 
+    # Disables processing token's deposits and token deposit buttons in wallet
+    disable_token_deposits: false
+
+    # Disables processing token's withdrawals and token withdraw buttons in wallet
+    disable_token_withdrawals: false
+
     # Disables deploying tokens to blockchain
     disable_deploy_tokens: false
 

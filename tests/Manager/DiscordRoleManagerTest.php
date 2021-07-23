@@ -86,6 +86,6 @@ class DiscordRoleManagerTest extends TestCase
             $em
         );
 
-        $drm->removeRoles($token);
+        $drm->removeAllRoles($token);
     }
 }

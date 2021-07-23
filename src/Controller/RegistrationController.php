@@ -299,7 +299,7 @@ class RegistrationController extends FOSRegistrationController
             try {
                 $this->balanceHandler->deposit(
                     $user,
-                    Token::getFromCrypto($crypto),
+                    $crypto,
                     $this->moneyWrapper->parse(
                         (string)$this->getParameter('landing_web_bonus'),
                         $crypto->getSymbol()

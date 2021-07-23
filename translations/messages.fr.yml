@@ -1243,6 +1243,8 @@ toasted.info.enable_2fa_before: 'Activez la vérification 2FA pour procéder au 
 toasted.error.network: 'Erreur réseau'
 toasted.error.try_reload: 'Un problème est survenu. Rechargez la page.'
 toasted.error.try_later: 'Une erreur est survenue, essayez plus tad.'
+toasted.error.withdrawals.disabled:
+toasted.error.deposits.disabled:
 toasted.error.correct_form: 'Corrigez les champs de votre formulaire'
 toasted.error.do_not_have_enough_web: 'Vous n''avez pas suffisament de MINTME pour payer les frais'
 toasted.error.do_not_have_enough: 'Vous n''avez pas suffisament de %currency% pour payer les frais'
@@ -1477,3 +1479,6 @@ discord.rewards.save.success:
 discord.rewards.need_to_save:
 discord.rewards.guild.remove.confirm_1:
 discord.rewards.guild.remove.confirm_2:
+discord.rewards.special_roles.help_1:
+discord.rewards.special_roles.help_2:
+discord.rewards.special_roles.help_3:

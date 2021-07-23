@@ -126,22 +126,6 @@ describe('Discord Rewards', () => {
         expect(wrapper.vm.roles).toEqual([testRole, testRole]);
     });
 
-    it('test add role', () => {
-        const localVue = mockVue();
-        const wrapper = shallowMount(DiscordRewardsEdit, {
-            localVue,
-            propsData: {
-                tokenName: 'foo',
-                authUrl: 'testAuthUrl',
-            },
-        });
-
-        expect(wrapper.vm.newRoles.length).toBe(0);
-        wrapper.vm.addRole();
-
-        expect(wrapper.vm.newRoles.length).toBe(1);
-    });
-
     it('test remove role', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(DiscordRewardsEdit, {
@@ -178,12 +162,6 @@ describe('Discord Rewards', () => {
             wrapper.setData({specialRolesEnabled: true});
 
             expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.required');
-        });
-
-        describe('when role names are not unique', () => {
-            wrapper.setData({newRoles: [testRole, testRole]});
-
-            expect(wrapper.vm.errorMessage).toBe('discord.rewards.special_roles.unique_names');
         });
 
         describe('when required balances are not unique', () => {
