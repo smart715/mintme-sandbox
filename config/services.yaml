@@ -221,6 +221,8 @@ services:
         arguments:
             $depositDisabled: '%disable_deposits%'
             $withdrawalsDisabled: '%disable_withdrawals%'
+            $tokenDepositDisabled: '%disable_token_deposits%'
+            $tokenWithdrawDisabled: '%disable_token_withdrawals%'
             $deployDisabled: '%disable_deploy_tokens%'
             $newTradesDisabled: '%disable_new_trades%'
             $tradingDisabled: '%disable_trading%'
@@ -728,6 +730,7 @@ services:
         arguments:
             $discordForLeaveGuild: '@discord.client.for.leave_guild'
             $publicKey: '%env(DISCORD_PUBLIC_KEY)%'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
 
     discord.oauth.client:
         class: App\Communications\GuzzleRestWrapper

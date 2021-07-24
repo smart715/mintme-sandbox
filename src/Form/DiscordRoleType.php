@@ -28,16 +28,11 @@ class DiscordRoleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
-            ->add('color', ColorType::class)
             ->add('requiredBalance', TextType::class)
         ;
 
         $builder->get('requiredBalance')
             ->addModelTransformer($this->moneyTransformer);
-
-        $builder->get('color')
-            ->addModelTransformer($this->colorTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -2,7 +2,6 @@
 
 namespace App\Manager;
 
-use App\Entity\Crypto;
 use App\Entity\DeployTokenReward;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
@@ -23,12 +22,10 @@ class TokenManager implements TokenManagerInterface
     private TokenRepository $tokenRepository;
     private DeployTokenRewardRepository $deployTokenRewardRepository;
     private ProfileFetcherInterface $profileFetcher;
-    private CryptoManagerInterface $cryptoManager;
     private Config $config;
 
     public function __construct(
         ProfileFetcherInterface $profileFetcher,
-        CryptoManagerInterface $cryptoManager,
         Config $config,
         TokenRepository $tokenRepository,
         DeployTokenRewardRepository $deployTokenRewardRepository
@@ -36,7 +33,6 @@ class TokenManager implements TokenManagerInterface
         $this->tokenRepository = $tokenRepository;
         $this->deployTokenRewardRepository = $deployTokenRewardRepository;
         $this->profileFetcher = $profileFetcher;
-        $this->cryptoManager = $cryptoManager;
         $this->config = $config;
     }
 
@@ -49,27 +45,11 @@ class TokenManager implements TokenManagerInterface
 
     public function findByName(string $name): ?Token
     {
-        $name = Symbols::MINTME === strtoupper($name)
-            ? Symbols::WEB
-            : strtoupper($name);
+        $name = strtoupper($name);
 
-        if (!in_array(strtoupper($name), array_map(
-            static function (Crypto $crypto) {
-                return $crypto->getSymbol();
-            },
-            $this->cryptoManager->findAll()
-        ), true)
-        ) {
-            $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
+        $name = (new StringConverter(new ParseStringStrategy()))->convert($name);
 
-            $token = $this->tokenRepository->findByName($name);
-
-            return $token ?? $this->tokenRepository->findByUrl($name);
-        }
-
-        return (new Token())->setName(strtoupper($name))->setCrypto(
-            $this->cryptoManager->findBySymbol(strtoupper($name))
-        );
+        return $this->tokenRepository->findByName($name);
     }
 
     public function findById(int $id): ?Token
@@ -81,7 +61,7 @@ class TokenManager implements TokenManagerInterface
     {
         $token = $this->findByName($name);
 
-        return $token->getCryptoSymbol() === $cryptoSymbol
+        return $token && $token->getCryptoSymbol() === $cryptoSymbol
             ? $token
             : null;
     }
@@ -104,22 +84,6 @@ class TokenManager implements TokenManagerInterface
     public function getTokensByPattern(string $pattern): array
     {
         return $this->tokenRepository->findTokensByPattern($pattern);
-    }
-
-    /** {@inheritdoc} */
-    public function findAllPredefined(): array
-    {
-        return array_map(
-            function (Crypto $crypto) {
-                return Token::getFromCrypto($crypto)->setCrypto($crypto);
-            },
-            $this->cryptoManager->findAll()
-        );
-    }
-
-    public function isPredefined(Token $token): bool
-    {
-        return in_array($token, $this->findAllPredefined());
     }
 
     /**

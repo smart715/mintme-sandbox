@@ -33,7 +33,7 @@ class DeploymentFacade implements DeploymentFacadeInterface
     {
         $cost = $this->costFetcher->getDeployCost($crypto->getSymbol());
         $balance = $this->balanceHandler
-            ->balance($token->getOwner(), Token::getFromCrypto($crypto))->getAvailable();
+            ->balance($token->getOwner(), $crypto)->getAvailable();
 
         if ($cost->greaterThan($balance)) {
             throw new BalanceException('Low balance');
@@ -44,7 +44,7 @@ class DeploymentFacade implements DeploymentFacadeInterface
 
         $this->balanceHandler->withdraw(
             $token->getOwner(),
-            Token::getFromCrypto($crypto),
+            $crypto,
             $cost
         );
 

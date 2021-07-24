@@ -10,6 +10,7 @@ use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use Money\Currency;
@@ -58,6 +59,7 @@ class BalanceViewFactoryTest extends TestCase
         ];
 
         $factory = new BalanceViewFactory(
+            $this->mockCryptoManager(),
             $this->mockTokenManager($tokens),
             $this->mockTokenNameConverter(),
             4
@@ -73,11 +75,11 @@ class BalanceViewFactoryTest extends TestCase
         );
 
         $this->assertEquals([
-            'foo' => ['1', '2', '1', 'FOO', 'fooBAR', 4, false, true, false],
-            'bar' => ['1', '2', null, 'FOO', 'barBAR', 4, true, true, false],
+            'foo' => ['1', '1', '1', 'foo', 'fooBAR', 4, false, true, false],
+            'bar' => ['1', '1', null, 'bar', 'barBAR', 4, true, true, false],
             'baz' => ['1', '1', '1', 'baz', 'bazBAR', 4, false, false, false],
             'qux' => ['1', '1', null, 'qux', 'quxBAR', 4, false, false, false],
-            'lok' => ['1', '2', '1', 'FOO', 'lokBAR', 4, true, true, true],
+            'lok' => ['1', '1', '1', 'lok', 'lokBAR', 4, true, true, true],
         ], array_map(function (BalanceView $view): array {
             return [
                 $view->getAvailable()->getAmount(),
@@ -173,7 +175,7 @@ class BalanceViewFactoryTest extends TestCase
             $hasCrypto ? $this->mockCrypto($isHidden) : null
         );
         $tok->method('getId')->willReturn($id);
-        $tok->method('getFee')->willReturn($id ? new Money(1, new Currency('FOO')) : null);
+        $tok->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getFrozenAmount')->willReturn(new Money(1, new Currency('FOO')));
@@ -195,5 +197,14 @@ class BalanceViewFactoryTest extends TestCase
         $crypto->method('isExchangeble')->willReturn($isHidden ? false : true);
 
         return $crypto;
+    }
+
+    private function mockCryptoManager(): CryptoManagerInterface
+    {
+        $cm = $this->createMock(CryptoManagerInterface::class);
+
+        $cm->method('findBySymbol')->willReturn(null);
+
+        return $cm;
     }
 }

@@ -34,6 +34,7 @@
 import VotingOption from './VotingOption';
 import {NotificationMixin, LoggerMixin} from '../../mixins';
 import {mapGetters, mapActions} from 'vuex';
+import {WEB} from '../../utils/constants';
 
 export default {
     name: 'VotingOptions',
@@ -64,6 +65,9 @@ export default {
         disabledPublish() {
             return this.invalidOptions || this.invalidForm || this.requesting;
         },
+        isToken() {
+            return this.tokenName !== WEB.symbol;
+        },
     },
     methods: {
         publish() {
@@ -71,9 +75,14 @@ export default {
             this.$axios.single
                 .post(this.$routing.generate('store_voting', {tokenName: this.tokenName}), this.votingData)
                 .then(({data}) => {
-                    this.unshiftVoting(data.voting);
-                    this.resetVotingData();
                     this.notifySuccess(this.$t('voting.added_successfully'));
+
+                    const routeName = this.isToken ? 'token_show_voting' : 'show_voting';
+
+                    window.location.href = this.$routing.generate(routeName, {
+                        name: this.tokenName,
+                        id: data.voting.id,
+                    });
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_later'));
@@ -87,8 +96,6 @@ export default {
         ...mapActions('voting', [
             'addOption',
             'deleteOption',
-            'unshiftVoting',
-            'resetVotingData',
             'updateVotingOption',
         ]),
     },
