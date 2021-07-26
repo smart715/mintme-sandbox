@@ -56,7 +56,7 @@
                         :visible="showModal"
                         :button-disabled="!isOwner && !userAlreadyClaimed && !actionsCompleted"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed && !embeded"
-                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim && !isLogginTabOpen"
+                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim && !isLoginTabOpen"
                         :show-image="false"
                         @confirm="modalOnConfirm"
                         @close="closeModal"
@@ -231,11 +231,11 @@
                         <template v-if="isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
-                        <p v-if="embeded && isLogginTabOpen">
-                            {{ $t(ongoing_airdrop.embeded.login_tab) }}
+                        <p v-if="embeded && isLoginTabOpen">
+                            {{ $t('ongoing_airdrop.embeded.login_tab') }}
                             <br>
                             <a v-if="!isReloadingFrame" @click.prevent="reloadFrame" href="#">
-                                {{ $t(ongoing_airdrop.embeded.reload) }}
+                                {{ $t('ongoing_airdrop.embeded.reload') }}
                             </a>
                             <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
                         </p>
@@ -381,7 +381,7 @@ export default {
             addPhoneModalProfileNickName: this.profileNickname,
             addPhoneModalMessageType: 'airdrop',
             storageError: false,
-            isLogginTabOpen: false,
+            isLoginTabOpen: false,
             isReloadingFrame: false,
         };
     },
@@ -621,7 +621,7 @@ export default {
                     if (!this.isLoginPageOpen) {
                         openNewTab(this.$routing.generate('login'));
 
-                        this.isLogginTabOpen = true;
+                        this.isLoginTabOpen = true;
                     }
 
                     return;
