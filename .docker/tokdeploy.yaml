@@ -50,7 +50,7 @@ enabled_deposits:
   - 'BNB'
 
 # Disable processing withdrawals
-enabled_wthdrawals:
+enabled_withdrawals:
   - 'ETH'
   - 'WEB'
   - 'BNB'
