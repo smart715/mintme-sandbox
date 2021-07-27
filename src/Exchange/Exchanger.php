@@ -336,21 +336,16 @@ class Exchanger implements ExchangerInterface
     ): bool {
         /** @var Crypto $crypto */
         $crypto = $this->cm->findBySymbol($cryptoName);
-        $profile = $crypto->getProfile();
 
-        if ($profile && $user === $profile->getUser()) {
-            /** @var BalanceView $balanceViewer */
-            $balanceViewer = $this->bvf->create(
-                $this->bh->balances($user, [$crypto]),
-                $user
-            )[$crypto->getSymbol()];
+        /** @var BalanceView $balanceViewer */
+        $balanceViewer = $this->bvf->create(
+            $this->bh->balances($user, [$crypto]),
+            $user
+        )[$crypto->getSymbol()];
 
-            return $this->mw
-                ->parse($amount, Symbols::TOK)
-                ->greaterThan($balanceViewer->getAvailable());
-        }
-
-        return false;
+        return $this->mw
+            ->parse($amount, Symbols::TOK)
+            ->greaterThan($balanceViewer->getAvailable());
     }
 
     private function getMarketPrice(Market $market, User $user, bool $isSellSide): Money
