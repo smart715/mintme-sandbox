@@ -391,7 +391,7 @@ class ExchangerTest extends TestCase
     private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
     {
         $cryptoManager = $this->createMock(CryptoManagerInterface::class);
-        $cryptoManager->method('findByName')->willReturn($crypto);
+        $cryptoManager->method('findBySymbol')->willReturn($crypto);
 
         return $cryptoManager;
     }

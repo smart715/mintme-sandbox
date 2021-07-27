@@ -334,8 +334,8 @@ class Exchanger implements ExchangerInterface
         string $cryptoName,
         string $amount
     ): bool {
-        /** @var Token $token */
-        $crypto = $this->cm->findByName($cryptoName);
+        /** @var Crypto $crypto */
+        $crypto = $this->cm->findBySymbol($cryptoName);
         $profile = $crypto->getProfile();
 
         if ($profile && $user === $profile->getUser()) {
