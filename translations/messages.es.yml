@@ -840,6 +840,8 @@ ongoing_airdrop.confirm_message.cant_participate: 'Disculpe, usted no puede part
 ongoing_airdrop.confirm_message: '¿Está seguro que quiere recibir %airdropReward% %tokenName%?'
 ongoing_airdrop.ended: 'Disculpe, este airdrop ha finalizado.'
 ongoing_airdrop.ended_embeded: 'El airdrop ya ha terminado. Puede visitar <a href="%mintmeUrl%" %extraAttributes%>mintme.com</a> y consultar otros airdrops.'
+ongoing_airdrop.embeded.login_tab:
+ongoing_airdrop.embeded.reload:
 ongoing_airdrop.submit_url: 'Enviar dirección'
 ongoing_airdrop.actions.message: '¡%tokenName% esta lanzando su token! Visite %tokenUrl% para conocer mas sobre el token y su airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Para completar esta acción se requiere autenticación en YouTube.'

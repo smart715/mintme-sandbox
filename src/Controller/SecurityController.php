@@ -52,7 +52,7 @@ class SecurityController extends FOSSecurityController
         $this->refererRequestHandler = $refererRequestHandler;
     }
 
-    /** @Route("/login/{page}", name="login", options={"expose"=true}, defaults={"page"=null}) */
+    /** @Route("/login", name="login", options={"expose"=true}) */
     public function loginAction(Request $request): Response
     {
         $securityContext = $this->container->get('security.authorization_checker');
