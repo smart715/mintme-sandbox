@@ -457,7 +457,7 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/airdrop/{airdropId}/embeded",
      *     name="airdrop_embeded",
-     *     options={"expose"=true},
+     *     options={"expose"=true, "2fa_progress"=false},
      *     requirements={"airdropId"="\d+"}
      * )
      */

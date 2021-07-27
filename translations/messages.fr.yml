@@ -849,6 +849,8 @@ ongoing_airdrop.confirm_message: 'Voulez-vous vraiment réclamer %airdropReward%
 ongoing_airdrop.actions_message: 'Pour réclamer %airdropReward% %tokenName% vous devez éffectuer ces %tasksAmount% tâches:'
 ongoing_airdrop.ended: 'Désolé, cet airdrop est terminé.'
 ongoing_airdrop.ended_embeded: 'The airdrop has already ended. You can visit <a href="%mintmeUrl%" %extraAttributes%>mintme.com</a> and check other airdrops.'
+ongoing_airdrop.embeded.login_tab:
+ongoing_airdrop.embeded.reload:
 ongoing_airdrop.submit_url: 'Soumettre l''URL'
 ongoing_airdrop.actions.message: 'Airdrop en cours du jeton %tokenName%. Visiter %tokenUrl% pour en savoir plus à propos du jeton et de l''airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Authentification Youtube requise pour compléter cette action.'
