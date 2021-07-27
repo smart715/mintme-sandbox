@@ -18,8 +18,6 @@
             :is-owner="{{ isOwner }}"
             :token-name="'{{ token.name | default }}'"
             :user-already-claimed="{{ userAlreadyClaimed }}"
-            login-url="{{ absolute_url(path('fos_user_security_login')) }}"
-            signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
             youtube-client-id="{{ global_youtube_client_id }}"
             current-locale="{{ currentLocale }}"
             :show-airdrop-modal="true"
