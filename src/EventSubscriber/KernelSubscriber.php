@@ -4,7 +4,6 @@ namespace App\EventSubscriber;
 
 use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
-use App\TwigExtension\IsEmbededExtension;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,11 +52,8 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @codeCoverageIgnore */
     public function onResponse(ResponseEvent $event): void
     {
+        //todo: handle this protection through config/packages/nelmio_security.yaml
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
-
-        if (!preg_match(IsEmbededExtension::EMBEDED_REGEX, $event->getRequest()->getRequestUri())) {
-            $event->getResponse()->headers->set('X-Frame-Options', 'deny');
-        }
     }
 
     public function onRequest(RequestEvent $request): void
