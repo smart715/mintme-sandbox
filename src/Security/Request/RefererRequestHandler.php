@@ -38,6 +38,7 @@ class RefererRequestHandler implements RefererRequestHandlerInterface
             'login_success',
             'login',
             'nelmio_security',
+            'airdrop_embeded',
             null,
         ];
     }
