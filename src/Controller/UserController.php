@@ -98,7 +98,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
             $this->userManager->updatePassword($user);
             $this->userManager->updateUser($user);
-            $this->addFlash('success', 'Password was updated successfully');
+            $this->addFlash('success', $this->translator->trans('toasted.success.password_updated'));
+            $this->userActionLogger->info('Password was updated successfully');
+
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(
                 new FilterUserResponseEvent(
