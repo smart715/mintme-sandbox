@@ -40,7 +40,6 @@ security:
                 csrf_token_generator: security.csrf.token_manager
                 default_target_path: login_success
                 always_use_default_target_path: false
-                failure_path_parameter: go_to
             two_factor:
                 provider: fos_userbundle
                 auth_form_path: 2fa_login
