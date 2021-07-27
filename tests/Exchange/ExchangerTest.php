@@ -42,6 +42,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -52,7 +53,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
             $this->mockTranslator()
@@ -77,6 +78,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -87,7 +89,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(false),
             $this->mockTranslator()
@@ -116,6 +118,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $exchanger = new Exchanger(
             $this->mockTrader($tradeResult),
@@ -126,7 +129,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandler([$this->mockOrder(2)], []),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, null),
             $this->mockValidator(true),
             $this->mockTranslator()
@@ -151,6 +154,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $trader = $this->mockTrader($tradeResult);
         $trader->expects($this->once())->method('placeOrder')->with(
@@ -166,7 +170,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandlerForConsecutiveCalls(),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(true),
             $this->mockTranslator()
@@ -191,6 +195,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $trader = $this->mockTrader($tradeResult);
 
@@ -203,7 +208,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandlerForConsecutiveCalls(),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(false),
             $this->mockTranslator()
@@ -229,6 +234,7 @@ class ExchangerTest extends TestCase
     {
         $user = $this->mockUser();
         $tok = $this->mockToken(Symbols::TOK, $user);
+        $crypto = $this->mockCrypto(Symbols::TOK);
         $tradeResult = $this->mockTradeResult();
         $trader = $this->mockTrader($tradeResult);
         $trader->expects($this->once())->method('placeOrder')->with(
@@ -244,7 +250,7 @@ class ExchangerTest extends TestCase
             $this->mockLogger(),
             $this->mockParameterBag(),
             $this->mockMarketHandlerForConsecutiveCalls(),
-            $this->mockCryptoManager($tok),
+            $this->mockCryptoManager($crypto),
             $this->mockTokenManager($tok, $this->mockBalanceResult()),
             $this->mockValidator(true),
             $this->mockTranslator()
