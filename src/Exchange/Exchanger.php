@@ -14,6 +14,7 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
@@ -55,6 +56,9 @@ class Exchanger implements ExchangerInterface
     /** @var TokenManagerInterface */
     private $tm;
 
+    /** @var CryptoManagerInterface */
+    private $cm;
+
     /** @var ValidatorFactoryInterface */
     private $vf;
 
@@ -70,6 +74,7 @@ class Exchanger implements ExchangerInterface
         UserActionLogger $userActionLogger,
         ParameterBagInterface $bag,
         MarketHandlerInterface $marketHandler,
+        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
         TranslatorInterface $translator
@@ -82,6 +87,7 @@ class Exchanger implements ExchangerInterface
         $this->logger = $userActionLogger;
         $this->bag = $bag;
         $this->mh = $marketHandler;
+        $this->cm = $cryptoManager;
         $this->tm = $tokenManager;
         $this->vf = $validatorFactory;
         $this->translator = $translator;
@@ -325,19 +331,19 @@ class Exchanger implements ExchangerInterface
 
     private function exceedAvailableReleased(
         User $user,
-        string $tokenName,
+        string $cryptoName,
         string $amount
     ): bool {
         /** @var Token $token */
-        $token = $this->tm->findByName($tokenName);
-        $profile = $token->getProfile();
+        $crypto = $this->cm->findByName($cryptoName);
+        $profile = $crypto->getProfile();
 
         if ($profile && $user === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
-                $this->bh->balances($user, [$token]),
+                $this->bh->balances($user, [$crypto]),
                 $user
-            )[$token->getSymbol()];
+            )[$crypto->getSymbol()];
 
             return $this->mw
                 ->parse($amount, Symbols::TOK)
