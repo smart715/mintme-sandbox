@@ -104,6 +104,8 @@ parameters:
     blockchain_disabled: null
     disable_deposits: false
     disable_withdrawals: false
+    disable_token_deposits: false
+    disable_token_withdrawals: false
     disable_deploy_tokens: false
     disable_new_trades: false
     disable_trading: false

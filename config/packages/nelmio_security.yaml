@@ -1,7 +1,8 @@
 nelmio_security:
     clickjacking:
         paths:
-            '^/(?!.*/embeded$).*': DENY
+            '^/.*/airdrop/(\d+)/embeded': ALLOW
+            '^/.*': DENY
         content_types: []
     csp:
         hosts: []

@@ -10,6 +10,10 @@ class DisabledServicesConfig
 
     private bool $withdrawalsDisabled;
 
+    private bool $tokenDepositDisabled;
+
+    private bool $tokenWithdrawDisabled;
+
     private bool $deployDisabled;
 
     private bool $newTradesDisabled;
@@ -21,6 +25,8 @@ class DisabledServicesConfig
     public function __construct(
         bool $depositDisabled,
         bool $withdrawalsDisabled,
+        bool $tokenDepositDisabled,
+        bool $tokenWithdrawDisabled,
         bool $deployDisabled,
         bool $newTradesDisabled,
         bool $tradingDisabled,
@@ -28,6 +34,8 @@ class DisabledServicesConfig
     ) {
         $this->depositDisabled = $depositDisabled;
         $this->withdrawalsDisabled = $withdrawalsDisabled;
+        $this->tokenDepositDisabled = $tokenDepositDisabled;
+        $this->tokenWithdrawDisabled = $tokenWithdrawDisabled;
         $this->deployDisabled = $deployDisabled;
         $this->newTradesDisabled = $newTradesDisabled;
         $this->tradingDisabled = $tradingDisabled;
@@ -48,6 +56,22 @@ class DisabledServicesConfig
     public function isWithdrawalsDisabled(): bool
     {
         return $this->withdrawalsDisabled;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isTokenDepositsDisabled(): bool
+    {
+        return $this->tokenDepositDisabled;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isTokenWithdrawalsDisabled(): bool
+    {
+        return $this->tokenWithdrawDisabled;
     }
 
     /**
