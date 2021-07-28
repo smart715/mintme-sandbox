@@ -14,7 +14,6 @@ use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
-use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
@@ -56,9 +55,6 @@ class Exchanger implements ExchangerInterface
     /** @var TokenManagerInterface */
     private $tm;
 
-    /** @var CryptoManagerInterface */
-    private $cm;
-
     /** @var ValidatorFactoryInterface */
     private $vf;
 
@@ -74,7 +70,6 @@ class Exchanger implements ExchangerInterface
         UserActionLogger $userActionLogger,
         ParameterBagInterface $bag,
         MarketHandlerInterface $marketHandler,
-        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
         TranslatorInterface $translator
@@ -87,7 +82,6 @@ class Exchanger implements ExchangerInterface
         $this->logger = $userActionLogger;
         $this->bag = $bag;
         $this->mh = $marketHandler;
-        $this->cm = $cryptoManager;
         $this->tm = $tokenManager;
         $this->vf = $validatorFactory;
         $this->translator = $translator;
@@ -331,21 +325,27 @@ class Exchanger implements ExchangerInterface
 
     private function exceedAvailableReleased(
         User $user,
-        string $cryptoName,
+        string $tokenName,
         string $amount
     ): bool {
-        /** @var Crypto $crypto */
-        $crypto = $this->cm->findBySymbol($cryptoName);
 
-        /** @var BalanceView $balanceViewer */
-        $balanceViewer = $this->bvf->create(
-            $this->bh->balances($user, [$crypto]),
-            $user
-        )[$crypto->getSymbol()];
+        /** @var Token $token */
+        $token = $this->tm->findByName($tokenName);
+        $profile = $token ? $token->getProfile() : false;
 
-        return $this->mw
-            ->parse($amount, Symbols::TOK)
-            ->greaterThan($balanceViewer->getAvailable());
+        if ($profile && $user === $profile->getUser()) {
+            /** @var BalanceView $balanceViewer */
+            $balanceViewer = $this->bvf->create(
+                $this->bh->balances($user, [$token]),
+                $user
+            )[$token->getSymbol()];
+
+            return $this->mw
+                ->parse($amount, Symbols::TOK)
+                ->greaterThan($balanceViewer->getAvailable());
+        }
+
+        return false;
     }
 
     private function getMarketPrice(Market $market, User $user, bool $isSellSide): Money
