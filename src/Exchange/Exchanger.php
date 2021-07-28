@@ -335,7 +335,7 @@ class Exchanger implements ExchangerInterface
             $token->getProfile() :
             false;
 
-        if ($profile && $user === $profile->getUser()) {
+        if ($token && $profile && $user === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
                 $this->bh->balances($user, [$token]),
