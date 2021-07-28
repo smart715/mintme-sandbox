@@ -152,14 +152,14 @@ class WalletController extends AbstractFOSRestController
      *
      * @Rest\View()
      * @Rest\Post("/withdraw")
-     * @SWG\Response(response="400", description="Bad request")
+     * @SWG\Response(response="404", description="Currency not found")
      * @Rest\RequestParam(name="currency", allowBlank=false)
      * @SWG\Tag(name="User Wallet")
      * @Rest\RequestParam(
      *     name="amount",
      *     allowBlank=false
      * )
-     * @SWG\Response(response="404", description="Currency not found")
+     * @SWG\Response(response="400", description="Bad request")
      * @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
