@@ -331,7 +331,9 @@ class Exchanger implements ExchangerInterface
 
         /** @var Token $token */
         $token = $this->tm->findByName($tokenName);
-        $profile = $token ? $token->getProfile() : false;
+        $profile = $token ?
+            $token->getProfile() :
+            false;
 
         if ($profile && $user === $profile->getUser()) {
             /** @var BalanceView $balanceViewer */
