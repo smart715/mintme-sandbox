@@ -3,7 +3,7 @@ navbar.my_token: 'Mi Token'
 navbar.token_show_modal: 'Ajustes del token'
 navbar.trading: Mercados
 navbar.wallet: Billetera
-navbar.news: Noticias
+navbar.news: 'Noticias'
 navbar.referrals: Referencias
 navbar.help: Ayuda
 navbar.profile: Perfil
