@@ -54,7 +54,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/Address")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -75,13 +75,13 @@ class WalletController extends AbstractFOSRestController
      * @Rest\Get("/balances")
      * @SWG\Response(
      *     response="200",
-     *     description="Returns wallet balances related to user",
+     *      description="Returns wallet balances related to user",
      *     @SWG\Schema(
      *         type="array",
      *         @SWG\Items(ref="#/definitions/BalanceResult")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -123,13 +123,13 @@ class WalletController extends AbstractFOSRestController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Response(
      *     response="200",
-     *     description="Returns wallet deposit/withdraw history related to user",
+     *      description="Returns wallet deposit/withdraw history related to user",
      *     @SWG\Schema(
      *         type="array",
      *         @SWG\Items(ref="#/definitions/Transaction")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -152,20 +152,20 @@ class WalletController extends AbstractFOSRestController
      *
      * @Rest\View()
      * @Rest\Post("/withdraw")
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @Rest\RequestParam(name="currency", allowBlank=false)
      * @SWG\Tag(name="User Wallet")
      * @Rest\RequestParam(
      *     name="amount",
      *     allowBlank=false
      * )
-     *     @SWG\Response(response="404", description="Currency not found")
-     *     @Rest\RequestParam(
+     * @SWG\Response(response="404", description="Currency not found")
+     * @Rest\RequestParam(
      *     name="address",
      *     allowBlank=false,
      *     requirements="^[a-zA-Z0-9]+$"
      * )
-     * @SWG\Response(response="201",description="Returns success message")
+     * @SWG\Response(response="201", description="Returns success message")
      * @SWG\Parameter(
      *      name="body",
      *      in="body",
