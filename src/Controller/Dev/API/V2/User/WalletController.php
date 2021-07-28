@@ -75,7 +75,7 @@ class WalletController extends AbstractFOSRestController
      * @Rest\Get("/balances")
      * @SWG\Response(
      *     response="200",
-     *      description="Returns wallet balances related to user",
+     *     description="Returns wallet balances related to user",
      *     @SWG\Schema(
      *         type="array",
      *         @SWG\Items(ref="#/definitions/BalanceResult")
@@ -123,7 +123,7 @@ class WalletController extends AbstractFOSRestController
      * @SWG\Parameter(name="limit", in="query", type="integer", description="Results limit [1-101]")
      * @SWG\Response(
      *     response="200",
-     *      description="Returns wallet deposit/withdraw history related to user",
+     *     description="Returns wallet deposit/withdraw history related to user",
      *     @SWG\Schema(
      *         type="array",
      *         @SWG\Items(ref="#/definitions/Transaction")
