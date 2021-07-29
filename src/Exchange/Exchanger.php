@@ -328,7 +328,6 @@ class Exchanger implements ExchangerInterface
         string $tokenName,
         string $amount
     ): bool {
-
         /** @var Token|null $token */
         $token = $this->tm->findByName($tokenName);
         $profile = $token ?
