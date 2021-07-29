@@ -709,7 +709,7 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
                     $user,
                     array_filter(
                         array_map(fn(string $symbol) => $this->cryptoManager->findBySymbol($symbol), $deployCostConfig->getSymbols()),
-                        fn(?Crypto $crypto) => $crypto
+                        fn(?Crypto $crypto) => null !== $crypto
                     ),
                 ),
                 'costs' => $costFetcher->getDeployCosts(),
