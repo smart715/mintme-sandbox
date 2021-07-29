@@ -706,7 +706,10 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             $data = [
                 'balances' => $balanceHandler->indexedBalances(
                     $user,
-                    array_map(fn(string $symbol) => $this->cryptoManager->findBySymbol($symbol), $deployCostConfig->getSymbols()),
+                    array_filter(
+                        array_map(fn(string $symbol) => $this->cryptoManager->findBySymbol($symbol), $deployCostConfig->getSymbols()),
+                        fn(?Crypto $crypto) => $crypto
+                    ),
                 ),
                 'costs' => $costFetcher->getDeployCosts(),
             ];
