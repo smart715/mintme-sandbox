@@ -3,6 +3,7 @@
 namespace App\Tests\Exchange\Balance\Strategy;
 
 use App\Entity\Token\Token;
+use App\Entity\Crypto;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
@@ -59,11 +60,11 @@ class DepositTokenStrategyTest extends TestCase
         return $mw;
     }
 
-    private function mockCryptoManager(?Crypto $crypto): CryptoManagerInterface
+    private function mockCryptoManager(): CryptoManagerInterface
     {
-        $cm = $this->createMock(CryptoManagerInterface::class);
-        $cm->method('findBySymbol')->willReturn($crypto);
+        $manager = $this->createMock(CryptoManagerInterface::class);
+        $manager->method('findBySymbol')->willReturn((new Crypto()));
 
-        return $cm;
+        return $manager;
     }
 }
