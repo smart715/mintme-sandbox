@@ -74,7 +74,7 @@ class PaymentTokenStrategy implements BalanceStrategyInterface
         if (!$token->getFee()) {
             $this->balanceHandler->deposit(
                 $user,
-                Token::getFromCrypto($crypto),
+                $crypto,
                 $fee
             );
         }

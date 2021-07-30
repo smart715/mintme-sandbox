@@ -11,7 +11,12 @@ interface DiscordRoleManagerInterface
 
     public function findRoleOfUser(User $user, Token $token): ?DiscordRole;
 
-    public function removeRole(DiscordRole $role): void;
+    public function removeRole(DiscordRole $role, bool $andFlush = true): void;
 
-    public function removeRoles(Token $token): void;
+    public function removeAllRoles(Token $token): void;
+
+    /**
+     * @param DiscordRole[] $roles
+     */
+    public function removeRoles(array $roles, bool $andFlush = true): void;
 }

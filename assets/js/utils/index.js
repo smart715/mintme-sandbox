@@ -194,6 +194,17 @@ function openPopup(link) {
 }
 
 /**
+ * @param {string} link
+ * @return {undefined}
+ */
+function openNewTab(link) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank';
+    a.click();
+}
+
+/**
  * @param {array} arr
  * @param {string} prop
  * @param {boolean} excludeEmpty
@@ -232,5 +243,6 @@ export {
     removeSpaces,
     currencyConversion,
     openPopup,
+    openNewTab,
     assertUniquePropertyValuesInObjectArray,
 };

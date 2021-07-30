@@ -457,7 +457,7 @@ class TokenController extends Controller
     /**
      * @Route("/{name}/airdrop/{airdropId}/embeded",
      *     name="airdrop_embeded",
-     *     options={"expose"=true},
+     *     options={"expose"=true, "2fa_progress"=false},
      *     requirements={"airdropId"="\d+"}
      * )
      */
@@ -527,19 +527,19 @@ class TokenController extends Controller
             $dashedName = Symbols::WEB;
         }
 
+        if ($this->cryptoManager->findBySymbol($name)) {
+            throw new RedirectException(
+                $this->redirectToRoute('coin', [
+                    'base'=> (Symbols::WEB === $name ? Symbols::BTC : $name),
+                    'quote'=> Symbols::MINTME,
+                ])
+            );
+        }
+
         $token = $this->tokenManager->findByName($dashedName);
 
         if (!$token || $token->isBlocked()) {
             throw new NotFoundTokenException();
-        }
-
-        if ($this->tokenManager->isPredefined($token)) {
-            throw new RedirectException(
-                $this->redirectToRoute('coin', [
-                    'base'=> (Symbols::WEB == $token->getName() ? Symbols::BTC : $token->getName()),
-                    'quote'=> Symbols::MINTME,
-                ])
-            );
         }
 
         return $token;
