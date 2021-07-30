@@ -62,7 +62,6 @@ class CurrenciesController extends DevApiController
         );
     }
 
-
     /**
      * Get currency info
      *
