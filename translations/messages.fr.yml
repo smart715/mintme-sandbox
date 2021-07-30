@@ -849,8 +849,8 @@ ongoing_airdrop.confirm_message: 'Voulez-vous vraiment réclamer %airdropReward%
 ongoing_airdrop.actions_message: 'Pour réclamer %airdropReward% %tokenName% vous devez éffectuer ces %tasksAmount% tâches:'
 ongoing_airdrop.ended: 'Désolé, cet airdrop est terminé.'
 ongoing_airdrop.ended_embeded: 'The airdrop has already ended. You can visit <a href="%mintmeUrl%" %extraAttributes%>mintme.com</a> and check other airdrops.'
-ongoing_airdrop.embeded.login_tab:
-ongoing_airdrop.embeded.reload:
+ongoing_airdrop.embeded.login_tab: 'A new tab opened for you to log in or sign up on Mintme.com to claim the reward.'
+ongoing_airdrop.embeded.reload: 'Click here to reload the page after logging in.'
 ongoing_airdrop.submit_url: 'Soumettre l''URL'
 ongoing_airdrop.actions.message: 'Airdrop en cours du jeton %tokenName%. Visiter %tokenUrl% pour en savoir plus à propos du jeton et de l''airdrop.'
 ongoing_airdrop.youtube_authentication_required: 'Authentification Youtube requise pour compléter cette action.'
@@ -1251,8 +1251,8 @@ toasted.info.enable_2fa_before: 'Activez la vérification 2FA pour procéder au 
 toasted.error.network: 'Erreur réseau'
 toasted.error.try_reload: 'Un problème est survenu. Rechargez la page.'
 toasted.error.try_later: 'Une erreur est survenue, essayez plus tad.'
-toasted.error.withdrawals.disabled:
-toasted.error.deposits.disabled:
+toasted.error.withdrawals.disabled: 'Withdrawals are disabled. Please try again later'
+toasted.error.deposits.disabled: 'Deposits are disabled. Please try again later'
 toasted.error.correct_form: 'Corrigez les champs de votre formulaire'
 toasted.error.do_not_have_enough_web: 'Vous n''avez pas suffisament de MINTME pour payer les frais'
 toasted.error.do_not_have_enough: 'Vous n''avez pas suffisament de %currency% pour payer les frais'
