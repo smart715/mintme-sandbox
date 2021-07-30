@@ -75,9 +75,13 @@ class WebTestCase extends BaseWebTestCase
             'email' => $email,
         ]);
 
+        /** @var Crypto $crypto */
+        $crypto = new Crypto();
+        $crypto->setSymbol($currency);
+
         $balanceHandler->deposit(
             $user,
-            (new Crypto())->setSymbol($currency),
+            $crypto,
             new Money($amount, new Currency($currency))
         );
     }
