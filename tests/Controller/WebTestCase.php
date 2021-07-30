@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Utils\Symbols;
@@ -76,7 +77,7 @@ class WebTestCase extends BaseWebTestCase
 
         $balanceHandler->deposit(
             $user,
-            Token::getFromSymbol($currency),
+            (new Crypto())->setSymbol($currency),
             new Money($amount, new Currency($currency))
         );
     }
