@@ -9,6 +9,9 @@ security:
             id: App\Security\ApiKeyUserProvider
 
     firewalls:
+        translations:
+            pattern: ^(%translation_prefixes%)?/translations\.js
+            security: false
         dev:
             pattern: ^(%translation_prefixes%)?/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -50,6 +53,8 @@ security:
             pattern:    ^/oauth/v2/token
             security:   false
 
+    hide_user_not_found: false
+
     role_hierarchy:
         ROLE_AUTENTICATED:
             - ROLE_USER
@@ -84,12 +89,15 @@ security:
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/delete$,                 role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/deploy,                  role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/tokens/[a-zA-Z0-9]+/contract/update,         role: ROLE_USER, requires_channel: https }
-        - { path: ^(%translation_prefixes%)/api/posts/comments/delete/[0-9]+,               role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/posts/comments/delete/[0-9]+,                role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/users,                                       role: ROLE_USER, requires_channel: https }
-        - { path: ^(%translation_prefixes%)/api/message,                                          role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/message,                                     role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/voting/store,                                role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/api/voting/vote,                                 role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/api/orders/cancel-order/[a-zA-Z0-9]+/[0-9]+,     role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/token$,                                          role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/chat,                                            role: ROLE_USER, requires_channel: https }
+        - { path: ^(%translation_prefixes%)/voting/create,                                   role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/profile/phone/verify,                            role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/profile$,                                        role: ROLE_USER, requires_channel: https }
         - { path: ^(%translation_prefixes%)/settings,                                        role: ROLE_USER, requires_channel: https }
@@ -105,3 +113,4 @@ security:
         - { path: ^(%translation_prefixes%)/2fa,                                             role: IS_AUTHENTICATED_2FA_IN_PROGRESS, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin,                                           role: ROLE_ADMIN, requires_channel: https }
         - { path: ^(%translation_prefixes%)/admin/_trans,                                    role: ROLE_ADMIN, requires_channel: https}
+        - { path: ^(%translation_prefixes%)/post/home,                                       role: ROLE_USER, requires_channel: https }

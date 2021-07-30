@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserTokenRepository")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Table(
  *     name="user_tokens",
@@ -32,6 +32,11 @@ class UserToken implements UserTradebleInterface
      * @var User
      */
     protected $user;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHolder;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Token\Token", inversedBy="users")
@@ -84,6 +89,18 @@ class UserToken implements UserTradebleInterface
     public function setCreatedValue(): self
     {
         $this->created = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function isHolder(): bool
+    {
+        return $this->isHolder;
+    }
+
+    public function setIsHolder(bool $isHolder): self
+    {
+        $this->isHolder = $isHolder;
 
         return $this;
     }

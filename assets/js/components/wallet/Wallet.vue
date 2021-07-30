@@ -7,6 +7,8 @@
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
             :addresses-signature="addressesSignature"
+            :predefined-tokens="predefinedItems"
+            :mintme-exchange-mail-sent="mintmeExchangeMailSent"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -19,7 +21,7 @@
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
                     <div class="first-field">
-                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        <a :href="data.item.url" class="text-white truncate-name">
                             {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                         </a>
                     </div>
@@ -132,7 +134,10 @@
                     >
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="actionButtonClass(isTokenActionDisabled('depositDisabled', data))"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('depositDisabled', data) ||
+                                isTokenActionDisabled('tokenDepositsDisabled', data)
+                            )"
                             @click="openDeposit(
                                 data.item.name,
                                 data.item.subunit,
@@ -145,7 +150,8 @@
                                 <font-awesome-icon
                                     class="icon-default"
                                     :class="{
-                                        'text-muted': isTokenActionDisabled('depositDisabled', data)
+                                        'text-muted': isTokenActionDisabled('depositDisabled', data) ||
+                                            isTokenActionDisabled('tokenDepositsDisabled', data)
                                         }"
                                     :icon="['fac', 'deposit']"
                                 />
@@ -156,7 +162,10 @@
                         </button>
                         <button
                             class="btn btn-transparent d-flex flex-row pl-2"
-                            :class="actionButtonClass(isTokenActionDisabled('withdrawalsDisabled', data))"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                isTokenActionDisabled('tokenWithdrawalsDisabled', data)
+                            )"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
@@ -172,7 +181,8 @@
                                 <font-awesome-icon
                                     class="icon-default"
                                     :class="{
-                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data)
+                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                            isTokenActionDisabled('tokenWithdrawalsDisabled', data)
                                         }"
                                     :icon="['fac', 'withdraw']"
                                 />
@@ -263,13 +273,23 @@ import {
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol, usdcSymbol, tokEthSymbol} from '../../utils/constants';
+import {
+    tokSymbol,
+    btcSymbol,
+    webSymbol,
+    ethSymbol,
+    tokEthSymbol,
+    ethCryptoTokens,
+    bnbSymbol,
+} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import BuyCrypto from './BuyCrypto';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 
-library.add(depositIcon);
-library.add(withdrawIcon);
+library.add(depositIcon, withdrawIcon, faCircleNotch);
 
 export default {
     name: 'Wallet',
@@ -283,10 +303,15 @@ export default {
         AddPhoneAlertMixin,
     ],
     components: {
+        BTable,
         BuyCrypto,
         WithdrawModal,
         DepositModal,
         AddPhoneAlertModal,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         withdrawUrl: {type: String, required: true},
@@ -297,13 +322,15 @@ export default {
         expirationTime: Number,
         disabledCrypto: String,
         disabledServicesConfig: String,
-        tokenWithdrawFee: Number,
+        ethTokenWithdrawFee: Number,
+        bnbTokenWithdrawFee: Number,
         isUserBlocked: Boolean,
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
         cantMakeDepositWithdrawal: Boolean,
         profileNickname: String,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {
@@ -348,6 +375,10 @@ export default {
                 fee: undefined,
                 min: undefined,
             },
+            tokenWithdrawFees: {
+                [ethSymbol]: this.ethTokenWithdrawFee,
+                [bnbSymbol]: this.bnbTokenWithdrawFee,
+            },
         };
     },
     computed: {
@@ -366,7 +397,10 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens || {});
+            return this.tokensToArray(this.predefinedTokens || {}).map((item) => {
+                item.url = this.rebrandingFunc(this.generateCoinUrl(item));
+                return item;
+            });
         },
         items: function() {
             return this.tokensToArray(this.tokens || {}).filter((token) => !(!token.deployed && token.available <= 0));
@@ -472,8 +506,9 @@ export default {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.withdrawalsDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenWithdrawalsDisabled)
             ) {
-              this.notifyError('Withdrawals are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.withdrawals.disabled'));
 
               return;
             }
@@ -492,7 +527,9 @@ export default {
             this.withdraw.baseSymbol = crypto;
             this.withdraw.baseFee = toMoney(
                 isToken
-                    ? ethSymbol === crypto ? this.tokenWithdrawFee : this.predefinedTokens[crypto || webSymbol].fee
+                    ? [ethSymbol, bnbSymbol].includes(crypto)
+                        ? this.tokenWithdrawFees[crypto]
+                        : this.predefinedTokens[crypto || webSymbol].fee
                     : 0
             );
             this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
@@ -506,8 +543,9 @@ export default {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.depositDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenDepositsDisabled)
             ) {
-              this.notifyError('Deposits are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.deposits.disabled'));
 
               return;
             }
@@ -522,7 +560,9 @@ export default {
 
             this.depositAddress = (isToken
                 ? this.depositAddresses[tokSymbol + crypto]
-                : currency === usdcSymbol ? this.depositAddresses[tokEthSymbol] : this.depositAddresses[currency]
+                : ethCryptoTokens.includes(currency)
+                        ? this.depositAddresses[tokEthSymbol]
+                        : this.depositAddresses[currency]
                 ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;
@@ -550,7 +590,7 @@ export default {
         },
         openDepositMore: function() {
             if (
-                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
+                [webSymbol, btcSymbol, ethSymbol, bnbSymbol].includes(this.depositMore) &&
                 null !== this.predefinedTokens &&
                 this.predefinedTokens.hasOwnProperty(this.depositMore) &&
                 this.depositAddresses.hasOwnProperty(this.depositMore) &&

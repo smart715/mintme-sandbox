@@ -36,7 +36,6 @@ function mockVue() {
 function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed') {
     const localVue = mockVue();
     localVue.use(Axios);
-    localVue.component('font-awesome-icon', {});
     const store = new Vuex.Store({
         modules: {
             tradeBalance,
@@ -63,8 +62,8 @@ function mockTokenDeploy(balanceFetched, isOwner = true, status = 'not-deployed'
     });
 
     if (balanceFetched) {
-        wrapper.vm.balance = 999999;
-        wrapper.vm.webCost = 999;
+        wrapper.vm.balances = {WEB: 999999};
+        wrapper.vm.costs = {WEB: 999};
     }
 
     return wrapper;
@@ -83,12 +82,8 @@ describe('TokenDeploy', () => {
         const wrapper = mockTokenDeploy(false);
         wrapper.setProps({hasReleasePeriod: true});
         expect(wrapper.find('.loading-spinner').exists()).toBe(true);
-        wrapper.setData({
-            webCost: 999,
-            balance: 999,
-        });
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 999;
+        wrapper.vm.balances = {};
+        wrapper.vm.costs = {};
         expect(wrapper.find('.loading-spinner').exists()).toBe(false);
     });
 
@@ -99,32 +94,33 @@ describe('TokenDeploy', () => {
         expect(message.text()).toBe('token.deploy.edit_release_period');
     });
 
-    it('should disabled button if the cost is higher than the balance or is deploying', () => {
-        const wrapper = mockTokenDeploy(true);
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 99;
-        wrapper.vm.deploying = false;
-        expect(wrapper.vm.btnDisabled).toBe(false);
+    describe('deploy btn', () => {
+        it('should disable it if the cost is higher than the balance', () => {
+            const wrapper = mockTokenDeploy(true);
+            wrapper.vm.balances = {WEB: 999};
+            wrapper.vm.costs = {WEB: 9999};
+            wrapper.vm.deploying = false;
+            expect(wrapper.vm.btnDisabled).toBe(true);
+        });
 
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 99;
-        wrapper.vm.deploying = true;
-        expect(wrapper.vm.btnDisabled).toBe(true);
+        it('should disabled it if is deploying', () => {
+            const wrapper = mockTokenDeploy(true);
+            wrapper.vm.deploying = false;
+            expect(wrapper.vm.btnDisabled).toBe(false);
 
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 9999;
-        wrapper.vm.deploying = false;
-        expect(wrapper.vm.btnDisabled).toBe(true);
+            wrapper.vm.deploying = true;
+            expect(wrapper.vm.btnDisabled).toBe(true);
+        });
     });
 
     it('should show exceed cost message if the cost is higher than the balance', () => {
         const wrapper = mockTokenDeploy(true);
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 99;
+        wrapper.vm.balances = {WEB: 999};
+        wrapper.vm.costs = {WEB: 99};
         expect(wrapper.vm.costExceed).toBe(false);
 
-        wrapper.vm.balance = 999;
-        wrapper.vm.webCost = 9999;
+        wrapper.vm.balances = {WEB: 999};
+        wrapper.vm.costs = {WEB: 9999};
         expect(wrapper.vm.costExceed).toBe(true);
     });
 
@@ -145,59 +141,61 @@ describe('TokenDeploy', () => {
         it('should work correctly', (done) => {
             const wrapper = mockTokenDeploy(false);
             wrapper.vm.fetchBalances();
-            expect(wrapper.vm.balance).toBe(null);
-            expect(wrapper.vm.webCost).toBe(null);
+            expect(wrapper.vm.balances).toBe(null);
+            expect(wrapper.vm.costs).toBe(null);
 
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
-                balance: 999,
-                webCost: 99,
-                }});
+                balances: {WEB: {available: 999}},
+                costs: {WEB: 99},
+                },
+            });
 
             moxios.wait(() => {
                 expect(wrapper.vm.balance).toBe(999);
-                expect(wrapper.vm.webCost).toBe(99);
+                expect(wrapper.vm.cost).toBe(99);
                 done();
             });
         });
 
         it('should be called on mounted if isOwner and token is not deployed', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
-                    balance: 999,
-                    webCost: 99,
+                    balances: {WEB: {available: 999}},
+                    costs: {WEB: 99},
                 }});
 
             let wrapper = mockTokenDeploy(false, true, 'not-deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).toBe(999);
-                expect(wrapper.vm.webCost).toBe(99);
+                expect(wrapper.vm.cost).toBe(99);
                 done();
             });
         });
 
         it('should not be called on mounted if isOwner and token is deployed', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
-                    balance: 999,
-                    webCost: 99,
+                    balances: {WEB: {available: 999}},
+                    costs: {WEB: 99},
                 }});
 
             let wrapper = mockTokenDeploy(false, true, 'deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).toBe(0);
-                expect(wrapper.vm.webCost).toBe(0);
+                expect(wrapper.vm.cost).toBe(0);
                 done();
             });
         });
 
         it('should not be called on mounted if is not owner', (done) => {
             moxios.stubRequest('token_deploy_balances', {status: 200, response: {
-                    balance: 999,
-                    webCost: 99,
-                }});
+                    balances: {WEB: {available: 999}},
+                    costs: {WEB: 99},
+                },
+            });
 
             let wrapper = mockTokenDeploy(false, false, 'not-deployed');
             moxios.wait(() => {
                 expect(wrapper.vm.balance).toBe(0);
-                expect(wrapper.vm.webCost).toBe(0);
+                expect(wrapper.vm.cost).toBe(0);
                 done();
             });
         });

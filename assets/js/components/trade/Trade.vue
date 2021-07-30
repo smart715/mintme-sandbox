@@ -9,7 +9,7 @@
                 :buy-depth="buyDepth"
                 :mintme-supply-url="mintmeSupplyUrl"
                 :minimum-volume-for-marketcap="minimumVolumeForMarketcap"
-                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
             />
         </div>
         <div class="row trade-orders">
@@ -27,7 +27,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <div class="col-12 col-lg-6 pl-lg-2 mt-3">
@@ -44,7 +44,7 @@
                     :trade-disabled="tradeDisabled"
                     @check-input="checkInput"
                     :currency-mode="currencyMode"
-                    @making-order-prevented="addPhoneModalVisible = true"
+                    @making-order-prevented="preventAction"
                 />
             </div>
             <add-phone-alert-modal
@@ -60,6 +60,8 @@
                 :orders-updated="ordersUpdated"
                 :buy-orders="buyOrders"
                 :sell-orders="sellOrders"
+                :total-sell-orders="totalSellOrders"
+                :total-buy-orders="totalBuyOrders"
                 :market="market"
                 :user-id="userId"
                 :logged-in="loggedIn"
@@ -98,6 +100,7 @@ import {
 import {mapMutations, mapGetters} from 'vuex';
 import {toMoney, Constants} from '../../utils';
 import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
+import Decimal from 'decimal.js';
 
 const WSAPI = Constants.WSAPI;
 
@@ -134,18 +137,19 @@ export default {
         isToken: Boolean,
         disabledServicesConfig: String,
         takerFee: Number,
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         profileNickname: String,
     },
     data() {
         return {
             buyOrders: null,
             sellOrders: null,
+            totalSellOrders: null,
+            totalBuyOrders: null,
             sellPage: 2,
             buyPage: 2,
             buyDepth: null,
             ordersUpdated: false,
-            addPhoneModalMessageType: 'make_orders',
             addPhoneModalProfileNickName: this.profileNickname,
         };
     },
@@ -246,6 +250,8 @@ export default {
                     })).then((result) => {
                         this.buyOrders = result.data.buy;
                         this.sellOrders = result.data.sell;
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
                         this.buyDepth = toMoney(result.data.buyDepth, this.market.base.subunit);
                         resolve();
                     }).catch((err) => {
@@ -275,6 +281,8 @@ export default {
                                 this.buyPage++;
                                 break;
                         }
+                        this.totalSellOrders = new Decimal(result.data.totalSellOrders);
+                        this.totalBuyOrders = new Decimal(result.data.totalBuyOrders);
 
                         context.resolve();
                         resolve(result.data);
@@ -299,6 +307,15 @@ export default {
                     }))
                     .then((res) => {
                         orders.push(res.data);
+
+                        if (isSell) {
+                            this.totalSellOrders = this.totalSellOrders.add(data.left);
+                        } else {
+                            this.totalBuyOrders = this.totalBuyOrders.add(
+                                new Decimal(data.price).mul(data.left)
+                            );
+                        }
+
                         this.saveOrders(orders, isSell);
                         this.ordersUpdated = true;
                     })
@@ -317,10 +334,21 @@ export default {
                     }
 
                     let index = orders.indexOf(order);
+                    let deltaAmount = (new Decimal(order.amount)).sub(data.left);
+
                     order.amount = data.left;
                     order.price = data.price;
                     order.timestamp = data.mtime;
                     orders[index] = order;
+
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(deltaAmount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(data.price).mul(deltaAmount)
+                      );
+                    }
+
                     this.ordersUpdated = true;
                     break;
                 case WSAPI.order.status.FINISH:
@@ -330,6 +358,15 @@ export default {
 
                     this.ordersUpdated = true;
                     orders.splice(orders.indexOf(order), 1);
+
+                    if (isSell) {
+                      this.totalSellOrders = this.totalSellOrders.sub(order.amount);
+                    } else {
+                      this.totalBuyOrders = this.totalBuyOrders.sub(
+                          new Decimal(order.price).mul(order.amount)
+                      );
+                    }
+
                     break;
             }
 
@@ -341,6 +378,9 @@ export default {
             } else {
                 this.buyOrders = orders;
             }
+        },
+        preventAction() {
+            this.addPhoneModalVisible = true;
         },
     },
 };

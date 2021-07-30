@@ -2,6 +2,11 @@
 
 {% block title %}{% trans %}page.error.404.title{% endtrans %} - {{ error_message | default('')}} {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/error') }}
+{% endblock %}
+
 {% block bodyclass %}errorpage{% endblock %}
 
 {% block messageClass %}d-none{% endblock %}
@@ -21,4 +26,8 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/error') }}
 {% endblock %}

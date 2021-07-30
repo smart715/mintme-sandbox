@@ -8,8 +8,13 @@ use App\Manager\ReciprocalLinksManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultController extends Controller
 {
@@ -36,6 +41,52 @@ class DefaultController extends Controller
     public function manifest(): Response
     {
         return $this->render('manifest.json.twig', [], new JsonResponse());
+    }
+
+    /**
+     * @Rest\Route("/translations.js", name="translations-ui")
+     */
+    public function getTranslations(
+        Request $request,
+        TranslatorInterface $translator,
+        CacheInterface $cache
+    ): Response {
+        $filepath = $this->getParameter('ui_trans_keys_filepath');
+        $locale = $request->getLocale();
+
+        // Disabling caching in debug mode/while developing
+        $beta = $this->getParameter('kernel.debug') ?
+            INF :
+            null;
+
+        $content = $cache->get(
+            "{$locale}_translations.js",
+            function (ItemInterface $item) use ($filepath, $translator) {
+                $item->expiresAfter(3600);
+
+                $keys = file_exists($filepath) ?
+                    json_decode(file_get_contents($filepath) ?: '[]'):
+                    [];
+
+                $parsedKeys = [];
+
+                foreach ($keys as $key) {
+                    $parsedKeys[$key] = $translator->trans($key);
+                }
+
+                return 'window.translations=' . json_encode($parsedKeys) . ';';
+            },
+            $beta
+        );
+
+        $response = new Response($content, Response::HTTP_OK);
+
+        $response->headers->set('Content-Type', 'text/javascript');
+
+        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+        $response->headers->set('Cache-Control', 'public, max-age=3600, immutable');
+
+        return $response;
     }
 
     /**

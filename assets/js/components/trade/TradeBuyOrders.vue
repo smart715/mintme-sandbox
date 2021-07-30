@@ -92,11 +92,15 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Decimal from 'decimal.js';
+import {mapGetters} from 'vuex';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
 import {toMoney, removeSpaces, currencyConversion} from '../../utils';
-import {mapGetters} from 'vuex';
 import {USD, usdSign, currencyModes} from '../../utils/constants.js';
-import Decimal from 'decimal.js';
 import {
     LazyScrollTableMixin,
     MoneyFilterMixin,
@@ -106,8 +110,18 @@ import {
     OrderHighlights,
 } from '../../mixins/';
 
+library.add(faCircleNotch, faTimes);
+
 export default {
     name: 'TradeBuyOrders',
+    components: {
+        BTable,
+        Guide,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         LazyScrollTableMixin,
         MoneyFilterMixin,
@@ -121,6 +135,7 @@ export default {
         ordersList: [Array],
         tokenName: String,
         fields: Array,
+        totalBuyOrders: [Array, Object],
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
@@ -136,9 +151,6 @@ export default {
             currencyModes,
         };
     },
-    components: {
-        Guide,
-    },
     mounted: function() {
         this.startScrollListeningOnce(this.ordersList);
     },
@@ -147,9 +159,13 @@ export default {
             'getRates',
         ]),
         total: function() {
-            return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.sum).add(sum), 0), this.basePrecision
-            );
+            if (this.totalBuyOrders) {
+              return toMoney(this.totalBuyOrders, this.basePrecision);
+            } else {
+              return toMoney(this.tableData.reduce((sum, order) =>
+                  new Decimal(order.sum).add(sum), 0), this.basePrecision
+              );
+            }
         },
         hasOrders: function() {
             return this.tableData.length > 0;

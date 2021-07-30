@@ -46,7 +46,7 @@
                                     {{ $t('token.intro.statistics.balance') }}
                                 </div>
                                 <b-list-group class="flex-wrap text-nowrap odd-item-bg" horizontal="lg">
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.exchange.header') }}
                                         </div>
@@ -78,7 +78,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1">
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1">
                                         <div>
                                             {{ $t('token.intro.statistics.withdraw.header') }}
                                         </div>
@@ -94,7 +94,7 @@
                                             </guide>
                                         </div>
                                     </b-list-group-item>
-                                    <b-list-group-item v-if="isMintmeToken" class="flex-1" >
+                                    <b-list-group-item v-if="isControlledToken" class="flex-1" >
                                         <div>
                                             {{ $t('token.intro.statistics.sold.header') }}
                                         </div>
@@ -141,7 +141,7 @@
                                     </b-list-group-item>
                                 </b-list-group>
                             </div>
-                            <div v-if="isMintmeToken" class="pt-3">
+                            <div v-if="isControlledToken" class="pt-3">
                                 <div class="font-weight-bold px-3 pb-1">
                                     {{ $t('token.intro.statistics.token_release.header') }}
                                     <guide>
@@ -251,35 +251,43 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BListGroup, BListGroupItem, BLink} from 'bootstrap-vue';
+import {mapGetters, mapMutations} from 'vuex';
 import CopyLink from '../../CopyLink';
 import Guide from '../../Guide';
-import {Decimal} from 'decimal.js';
-import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {toMoney} from '../../../utils';
 import {tokenDeploymentStatus} from '../../../utils/constants';
-import {mapGetters, mapMutations} from 'vuex';
 import {
   LoggerMixin,
   MoneyFilterMixin,
   WebSocketMixin,
 } from '../../../mixins';
 
+library.add(faCircleNotch, faCopy);
+
 const defaultValue = '-';
 
 export default {
     name: 'TokenIntroductionStatistics',
+    components: {
+        BListGroup,
+        BListGroupItem,
+        BLink,
+        CopyLink,
+        FontAwesomeIcon,
+        Guide,
+    },
     mixins: [
         MoneyFilterMixin,
         LoggerMixin,
         WebSocketMixin,
     ],
-    components: {
-        CopyLink,
-        FontAwesomeIcon,
-        Guide,
-    },
     props: {
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         deploymentStatus: String,
         market: Object,
         precision: Number,
@@ -293,12 +301,12 @@ export default {
     },
     data() {
         return {
-            pendingSellOrders: null,
             soldOnMarket: null,
             defaultValue: defaultValue,
             tokenWithdrawn: null,
             donationVolume: null,
             shouldShowStats: false,
+            totalPendingSellOrders: null,
         };
     },
     methods: {
@@ -341,7 +349,7 @@ export default {
               base: this.market.base.symbol,
               quote: this.market.quote.symbol,
             }))
-                .then((res) => this.pendingSellOrders = res.data.sell)
+                .then((res) => this.totalPendingSellOrders = res.data.totalSellOrders)
                 .catch((err) => {
                   this.sendLogs('error', 'Can not load statistic data', err);
                 });
@@ -364,7 +372,7 @@ export default {
             this.shouldShowStats = true;
         },
         fetchAllData: function() {
-            if (this.isMintmeToken) {
+            if (this.isControlledToken) {
                 this.getTokenWithdrawn();
                 this.getLockPeriod();
                 this.getTokExchangeAmount();
@@ -389,9 +397,12 @@ export default {
     },
     computed: {
         statisticGuideTranslation: function() {
-            return this.isMintmeToken
-                ? this.$t('token.intro.statistics.guide_body.mintme_token', this.translationsContext)
-                : this.$t('token.intro.statistics.guide_body.eth_token', this.translationsContext);
+            return this.$t(
+                this.isControlledToken
+                    ? 'token.intro.statistics.guide_body.controlled'
+                    : 'token.intro.statistics.guide_body.not_controlled',
+                this.translationsContext
+            );
         },
         translationsContext: function() {
             return {
@@ -400,7 +411,7 @@ export default {
         },
         loaded: function() {
             if (
-                this.isMintmeToken &&
+                this.isControlledToken &&
                 null === this.tokenWithdrawn &&
                 null === this.tokenExchangeAmount
             ) {
@@ -408,21 +419,14 @@ export default {
             }
 
             return null !== this.soldOnMarket &&
-                null !== this.pendingSellOrders &&
+                null !== this.totalPendingSellOrders &&
                 null !== this.donationVolume;
         },
         walletBalance: function() {
             return toMoney(this.tokenExchangeAmount);
         },
         activeOrdersSum: function() {
-            let sum = new Decimal(0);
-            for (let key in this.pendingSellOrders) {
-                if (this.pendingSellOrders.hasOwnProperty(key)) {
-                    let amount = new Decimal(this.pendingSellOrders[key]['amount']);
-                    sum = sum.plus(amount);
-                }
-            }
-            return toMoney(sum.toString());
+            return toMoney(this.totalPendingSellOrders);
         },
         withdrawBalance: function() {
             return toMoney(this.tokenWithdrawn);

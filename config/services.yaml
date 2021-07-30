@@ -221,6 +221,8 @@ services:
         arguments:
             $depositDisabled: '%disable_deposits%'
             $withdrawalsDisabled: '%disable_withdrawals%'
+            $tokenDepositDisabled: '%disable_token_deposits%'
+            $tokenWithdrawDisabled: '%disable_token_withdrawals%'
             $deployDisabled: '%disable_deploy_tokens%'
             $newTradesDisabled: '%disable_new_trades%'
             $tradingDisabled: '%disable_trading%'
@@ -670,8 +672,14 @@ services:
 
     App\Exchange\Config\DeployCostConfig:
         arguments:
-            $deployCost: '%deploy_cost%'
-            $deployCostReward: '%deploy_cost_referral_reward%'
+            $deployCostMintme: '%deploy_cost_mintme%'
+            $deployCostEth: '%deploy_cost_eth%'
+            $deployCostBnb: '%deploy_cost_bnb%'
+            $deployFeeEth: '%deploy_fee_eth%'
+            $deployFeeBnb: '%deploy_fee_bnb%'
+            $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
+            $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
+            $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'
 
     gedmo.listener.sortable:
         class: Gedmo\Sortable\SortableListener
@@ -701,3 +709,13 @@ services:
             $mintmeHostFreeDays: '%freeDays%'
             $mintmeHostPrice: '%price%'
             $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Utils\ValidatorFactory:
+        properties:
+            minimalPriceOrder: '%minimum_order_value_usd%'
+
+    App\SmartContract\Config\ExplorerUrlsConfig:
+        arguments:
+            $mintmeExplorerUrl: '%mintme_explorer_url%'
+            $ethExplorerUrl: '%eth_explorer_url%'
+            $bnbExplorerUrl: '%bnb_explorer_url%'

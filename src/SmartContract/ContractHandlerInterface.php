@@ -26,13 +26,19 @@ interface ContractHandlerInterface
 
     public function getDepositInfo(string $symbol): DepositInfo;
 
-    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void;
+    public function withdraw(
+        User $user,
+        Money $balance,
+        string $address,
+        TradebleInterface $token,
+        ?Money $fee = null
+    ): void;
 
     public function getTransactions(WalletInterface $wallet, User $user, int $offset, int $limit): array;
 
     public function ping(): bool;
 
-    public function getDecimalsContract(string $tokenAddress): int;
+    public function getDecimalsContract(string $tokenAddress, string $blockchain): int;
 
     public function getTxHash(string $tokenName): string;
 }

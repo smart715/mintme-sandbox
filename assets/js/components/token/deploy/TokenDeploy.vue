@@ -9,18 +9,39 @@
                     <p>
                         {{ $t('token.deploy.final_step') }}
                     </p>
-                    <p class="bg-info px-2">
+                    <p v-if="isSelectedMintme" class="bg-info px-2">
                         {{ $t('token.deploy.frozen') }}
                     </p>
                     <p class="bg-info px-2">
                         {{ $t('token.deploy.irreversible') }}
                     </p>
+                    <p>
+                        {{ $t('token.deploy.select_blockchain') }}
+                    </p>
+                    <b-dropdown
+                        :text="selectedNode"
+                        variant="primary"
+                    >
+                        <b-dropdown-item
+                            v-for="currency in currencies"
+                            :key="currency"
+                            :value="currency"
+                            @click="onSelect(currency)"
+                        >
+                            {{ currency | rebranding | bnbToBsc }}
+                        </b-dropdown-item>
+                    </b-dropdown>
                     <p class="mt-5">
-                      {{ $t('token.deploy.current_balance') }} {{ balance | toMoney(precision) | formatMoney }} {{ $t('mintme') }} <br>
+                        {{ $t('token.deploy.current_balance') }}
+                        {{ balance | toMoney(precision) | formatMoney }}
+                        {{ selectedCurrencyRebranded }}
+                        <br>
                         <span v-if="costExceed" class="text-danger mt-0">Insufficient funds</span>
                     </p>
                     <p>
-                        {{ $t('token.deploy.cost') }} {{ webCost | toMoney(precision) | formatMoney }} {{ $t('mintme') }}
+                        {{ $t('token.deploy.cost') }}
+                        {{ cost | toMoney(precision) | formatMoney }}
+                        {{ selectedCurrencyRebranded }}
                     </p>
                     <div class="pt-3">
                         <button
@@ -68,7 +89,7 @@
                     {{ $t('token.deploy.deployed') }}
                 </p>
                 <br>
-                <a v-if="isMintmeDeployed" :href="showContractUrl" target="_blank">
+                <a v-if="isDeployed" :href="showContractUrl" target="_blank">
                     {{ $t('token.deploy.deployed.contract_created', {tokenDeployedDate: deployedDate}) }}
                 </a>
             </div>
@@ -85,15 +106,44 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BDropdown, BDropdownItem} from 'bootstrap-vue';
 import {toMoney, formatMoney} from '../../../utils';
-import {WebSocketMixin, NotificationMixin, LoggerMixin} from '../../../mixins';
+import {
+    WebSocketMixin,
+    NotificationMixin,
+    LoggerMixin,
+    RebrandingFilterMixin,
+    BnbToBscFilterMixin,
+} from '../../../mixins';
 import Decimal from 'decimal.js';
-import {tokenDeploymentStatus, webSymbol, GENERAL} from '../../../utils/constants';
+import {
+    tokenDeploymentStatus,
+    webSymbol,
+    ethSymbol,
+    bnbSymbol,
+    GENERAL,
+} from '../../../utils/constants';
 import moment from 'moment';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TokenDeploy',
-    mixins: [WebSocketMixin, NotificationMixin, LoggerMixin],
+    components: {
+        FontAwesomeIcon,
+        BDropdown,
+        BDropdownItem,
+    },
+    mixins: [
+        WebSocketMixin,
+        NotificationMixin,
+        LoggerMixin,
+        RebrandingFilterMixin,
+        BnbToBscFilterMixin,
+    ],
     props: {
         hasReleasePeriod: Boolean,
         isOwner: Boolean,
@@ -110,16 +160,24 @@ export default {
             type: String,
             default: null,
         },
-        mintmeExplorerUrlProp: String,
-        isMintmeToken: Boolean,
+        mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
+        isControlledToken: Boolean,
     },
     data() {
         return {
-            balance: null,
+            balances: null,
             deploying: false,
             status: this.statusProp,
-            webCost: null,
-            mintmeExplorerUrl: this.mintmeExplorerUrlProp,
+            costs: null,
+            selectedCurrency: webSymbol,
+            currencies: [
+                webSymbol,
+                ethSymbol,
+                bnbSymbol,
+            ],
         };
     },
     computed: {
@@ -144,19 +202,41 @@ export default {
             return this.costExceed || this.deploying;
         },
         visible: function() {
-            return null !== this.webCost || null !== this.balance;
+            return null !== this.costs || null !== this.balances;
+        },
+        cost: function() {
+            return this.costs ? this.costs[this.selectedCurrency] || 0 : 0;
         },
         costExceed: function() {
-            return new Decimal(this.webCost || 0).greaterThan(this.balance || 0);
+            return new Decimal(this.cost).greaterThan(this.balance);
         },
         deployedDate: function() {
             return moment(this.tokenDeployedDate.date).format(GENERAL.dateFormat);
         },
-        isMintmeDeployed: function() {
-            return this.deployed && this.isOwner && this.isMintmeToken && this.tokenDeployedDate;
+        isDeployed: function() {
+            return this.deployed && this.isOwner && this.isControlledToken && this.tokenDeployedDate;
         },
         showContractUrl: function() {
-            return this.mintmeExplorerUrl.concat('/tx/' + this.tokenTxHashAddress);
+            return this.contractUrls[this.tokenCrypto.symbol];
+        },
+        contractUrls: function() {
+            return {
+                WEB: this.getTxUrl(this.mintmeExplorerUrl, this.tokenTxHashAddress),
+                ETH: this.getTxUrl(this.ethExplorerUrl, this.tokenTxHashAddress),
+                BNB: this.getTxUrl(this.bnbExplorerUrl, this.tokenTxHashAddress),
+            };
+        },
+        isSelectedMintme: function() {
+            return webSymbol === this.selectedCurrency;
+        },
+        selectedCurrencyRebranded: function() {
+            return this.rebrandingFunc(this.selectedCurrency);
+        },
+        selectedNode: function() {
+            return this.bnbToBscFunc(this.selectedCurrencyRebranded);
+        },
+        balance: function() {
+            return this.balances ? this.balances[this.selectedCurrency] || 0 : 0;
         },
     },
     methods: {
@@ -165,8 +245,9 @@ export default {
                 name: this.name,
             }))
             .then(({data}) => {
-                this.balance = data.balance;
-                this.webCost = data.webCost;
+                this.costs = data.costs;
+                this.balances = [];
+                this.currencies.forEach((symbol) => this.balances[symbol] = data.balances[symbol].available);
             }).catch((err) => {
                 this.sendLogs('error', 'Can not get token deploy balances', err);
             });
@@ -183,9 +264,10 @@ export default {
             }
 
             this.deploying = true;
-            this.$axios.single.post(this.$routing.generate('token_deploy', {
-                name: this.name,
-            }))
+            this.$axios.single.post(
+                this.$routing.generate('token_deploy', {name: this.name}),
+                {currency: this.selectedCurrency}
+            )
             .then(() => {
                 this.status = tokenDeploymentStatus.pending;
                 this.$emit('pending');
@@ -205,6 +287,12 @@ export default {
             })
             .then(() => this.deploying = false);
         },
+        onSelect: function(newCurrency) {
+            this.selectedCurrency = newCurrency;
+        },
+        getTxUrl: function(url, hash) {
+            return url.concat('/tx/' + hash);
+        },
     },
     mounted() {
         if (this.currentLocale) {
@@ -214,16 +302,17 @@ export default {
         if (this.notDeployed && this.isOwner) {
             this.fetchBalances();
             this.addMessageHandler((response) => {
-                if (
-                    'asset.update' === response.method &&
-                    response.params[0].hasOwnProperty(webSymbol)
-                ) {
-                    this.balance = response.params[0][webSymbol].available;
+                if ('asset.update' === response.method) {
+                    this.currencies.forEach((symbol) => {
+                        if (response.params[0].hasOwnProperty(symbol)) {
+                            this.balances[symbol] = response.params[0][symbol].available;
+                        }
+                    });
                 }
             }, 'trade-buy-order-asset', 'TokenDeploy');
         } else {
-            this.webCost = 0;
-            this.balance = 0;
+            this.costs = [];
+            this.balances = [];
         }
     },
     filters: {

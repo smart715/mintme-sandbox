@@ -21,7 +21,6 @@ use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Money\Currency;
-use Money\Exchange\FixedExchange;
 use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -111,6 +110,9 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function placeOrder(
         User $user,
         Market $market,
@@ -129,8 +131,18 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        if (!$this->vf->createOrderValidator($market, $priceInput, $amountInput)->validate()) {
-            return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $priceInput,
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
         }
 
         $price = $this->mw->parse(
@@ -230,10 +242,11 @@ class Exchanger implements ExchangerInterface
 
     private function exceedAvailableReleased(
         User $user,
-        string $token,
+        string $tokenName,
         string $amount
     ): bool {
-        $token = $this->tm->findByName($token);
+        /** @var Token $token */
+        $token = $this->tm->findByName($tokenName);
         $profile = $token->getProfile();
 
         if ($profile && $user === $profile->getUser()) {

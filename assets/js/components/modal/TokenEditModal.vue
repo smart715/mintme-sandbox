@@ -17,7 +17,7 @@
             <template slot="close"></template>
             <template slot="body">
                 <div class="token-edit p-0">
-                    <div class="row faq-block mx-0 border-bottom border-top">
+                    <div class="row faq-block light-border no-decoration mx-0">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                                 {{ $t('token_edit_modal.add_social_media') }}
@@ -42,7 +42,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                               {{ $t('token_edit_modal.period') }}
@@ -58,7 +58,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.deploy') }}
@@ -77,15 +77,18 @@
                                     :current-locale="currentLocale"
                                     :token-deployed-date="tokenDeployedDate"
                                     :token-tx-hash-address="tokenTxHashAddress"
-                                    :mintme-explorer-url-prop="mintmeExplorerUrl"
-                                    :is-mintme-token="isMintmeToken"
+                                    :mintme-explorer-url="mintmeExplorerUrl"
+                                    :eth-explorer-url="ethExplorerUrl"
+                                    :bnb-explorer-url="bnbExplorerUrl"
+                                    :token-crypto="tokenCrypto"
+                                    :is-controlled-token="isControlledToken"
                                 />
                             </template>
                         </faq-item>
                     </div>
                     <div
                         v-if="isTokenCreated && isOwner"
-                        class="row faq-block mx-0 border-bottom">
+                        class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.airdrop') }}
@@ -104,7 +107,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.change_name') }}
@@ -119,7 +122,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div v-if="isMintmeToken" class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.release_addr') }}
@@ -134,7 +137,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div v-if="isMintmeToken" class="row faq-block mx-0">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.delete') }}
@@ -155,6 +158,7 @@
 </template>
 
 <script>
+import {VBTooltip} from 'bootstrap-vue';
 import FaqItem from '../FaqItem';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
@@ -179,12 +183,15 @@ export default {
         TokenReleasePeriod,
         TokenSocialMediaEdit,
     },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     props: {
         currentName: String,
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenCreated: Boolean,
-        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
         precision: Number,
@@ -213,6 +220,9 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
     },
     data() {
         return {

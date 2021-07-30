@@ -26,7 +26,6 @@ fos_user_registration:
     resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
     prefix: /register
 
-
 fos_user_registration_confirm:
     controller: "fos_user.registration.controller:confirmAction"
     path: /register/confirm/{token}

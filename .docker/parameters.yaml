@@ -44,8 +44,14 @@ parameters:
     mintme_supply: 'https://mintme.com/coin/supply.txt'
     mintme_coin: 'MintMe Coin'
     mintme_coin_link: 'https://www.mintme.com/coin/'
-    deploy_cost: 0
-    deploy_cost_referral_reward: 0.1
+    deploy_cost_mintme: 0
+    deploy_cost_eth: 0
+    deploy_cost_bnb: 0
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
+    deploy_cost_referral_reward_mintme: 0.3
+    deploy_cost_referral_reward_eth: 0.2
+    deploy_cost_referral_reward_bnb: 0.1
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
     token_deletion_confirm_code_expiration_time: 60
@@ -94,9 +100,12 @@ parameters:
         - BTC
         - ETH
         - USDC
+        - BNB
     blockchain_disabled: null
     disable_deposits: false
     disable_withdrawals: false
+    disable_token_deposits: false
+    disable_token_withdrawals: false
     disable_deploy_tokens: false
     disable_new_trades: false
     disable_trading: false
@@ -156,7 +165,8 @@ parameters:
     marketing_airdrop_feature_intervals:
         - '7 day'
     dm_min_amount: 1
-    token_withdraw_fee: 0.01
+    eth_token_withdraw_fee: 0.01
+    bnb_token_withdraw_fee: 0.01
     max_allowed_active_orders: 100
     kb_links:
         - Quickstart-Guide-to-MintMe
@@ -183,8 +193,14 @@ parameters:
         attempts: 3
         interval: 30D
     mintme_explorer_url: 'https://mintme.com/explorer'
+    eth_explorer_url: 'https://goerli.etherscan.io'
+    bnb_explorer_url: 'https://testnet.bscscan.com'
     liip_data_root: '%kernel.project_dir%/public'
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+    auth_make_disable_sell: false
     auth_make_disable_trading: false
     auth_make_disable_token_creation: false
     auth_make_disable_withdrawals_and_deposit: false
     auth_make_disable_donations: false
+    minimum_order_value_usd: 0.1

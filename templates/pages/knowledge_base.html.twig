@@ -2,6 +2,11 @@
 
 {% block title %}{% trans %}page.kb.title{% endtrans %} | mintMe{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/knowledge_base') }}
+{% endblock %}
+
 {% block content %}
     <div id="kb" class="container">
         {% if knowledgeBases is empty %}
@@ -59,4 +64,8 @@
             {% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/knowledge_base') }}
 {% endblock %}

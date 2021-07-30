@@ -11,7 +11,9 @@ use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
 use App\Exchange\Market\MarketFetcherInterface;
 use App\Exchange\Market\MarketHandler;
+use App\Exchange\Market\Model\BuyOrdersSummaryResult;
 use App\Exchange\Market\Model\LineStat;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Order;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\DonationManagerInterface;
@@ -227,8 +229,15 @@ class MarketHandlerTest extends TestCase
             4
         );
 
+        $mockBuySummary = $this->mockBuySummary('100', '200');
+        $mockSellSummary = $this->mockSellSummary('100', '200');
+        $buyPendingSummary = $this->convertBuyPendingSummary('100', '200');
+        $sellPendingSummary = $this->convertSellPendingSummary('100', '200');
+
         $this->assertEquals($this->getPendingOrders(), $this->convertPending($buyOrders));
         $this->assertEquals($this->getPendingOrders(), $this->convertPending($sellOrders));
+        $this->assertEquals($mockBuySummary->getBasePrice(), $buyPendingSummary->getBasePrice());
+        $this->assertEquals($mockSellSummary->getQuoteAmount(), $sellPendingSummary->getQuoteAmount());
     }
 
     public function testGetPendingOrdersByUser(): void
@@ -498,6 +507,34 @@ class MarketHandlerTest extends TestCase
                 'taker_fee'=> $order->getFee()->getAmount(),
             ];
         }, $orders);
+    }
+
+    private function convertBuyPendingSummary(string $basePrice, string $quoteAmount): BuyOrdersSummaryResult
+    {
+        return new BuyOrdersSummaryResult($basePrice, $quoteAmount);
+    }
+
+    private function convertSellPendingSummary(string $baseAmount, string $quoteAmount): SellOrdersSummaryResult
+    {
+        return new SellOrdersSummaryResult($baseAmount, $quoteAmount);
+    }
+
+    private function mockBuySummary(string $basePrice, string $quoteAmount): BuyOrdersSummaryResult
+    {
+        $buySummary = $this->createMock(BuyOrdersSummaryResult::class);
+        $buySummary->method('getBasePrice')->willReturn($basePrice);
+        $buySummary->method('getQuoteAmount')->willReturn($quoteAmount);
+
+        return $buySummary;
+    }
+
+    private function mockSellSummary(string $baseAmount, string $quoteAmount): SellOrdersSummaryResult
+    {
+        $sellSummary = $this->createMock(SellOrdersSummaryResult::class);
+        $sellSummary->method('getBaseAmount')->willReturn($baseAmount);
+        $sellSummary->method('getQuoteAmount')->willReturn($quoteAmount);
+
+        return $sellSummary;
     }
 
     private function mockUser(int $id): User

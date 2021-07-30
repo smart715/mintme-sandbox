@@ -11,6 +11,7 @@ use App\Exchange\Deal;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Factory\MarketSummaryFactory;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\BuyOrdersSummaryResult;
 use App\Exchange\Market\Model\LineStat;
 use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
@@ -439,7 +440,7 @@ class MarketHandler implements MarketHandlerInterface
         $quote = $market->getQuote();
         $soldOnMarket = $this->moneyWrapper->parse('0', $this->getSymbol($market->getBase()));
 
-        if ($quote instanceof Token && $quote->isMintmeToken()) {
+        if ($quote instanceof Token && $quote->isControlledToken()) {
             $soldOnMarket = $this->soldOnMarket($quote);
         }
 
@@ -580,13 +581,23 @@ class MarketHandler implements MarketHandlerInterface
         $paginatedOrders = [];
 
         do {
-            $moreOrders = $this->getPendingSellOrders($market, $offset, $limit);
+            $pendingOrders = $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                self::SELL
+            );
+
+            $moreOrders = $this->parsePendingOrders(
+                $pendingOrders,
+                $market
+            );
+
             $paginatedOrders[] = $moreOrders;
             $offset += $limit;
         } while (count($moreOrders) >= $limit);
 
         $orders = array_merge([], ...$paginatedOrders);
-
         $zeroDepthBase = $this->moneyWrapper->parse(
             '0',
             $this->getSymbol($market->getBase())
@@ -627,6 +638,62 @@ class MarketHandler implements MarketHandlerInterface
         );
     }
 
+    /** {@inheritdoc} */
+    public function getBuyOrdersSummary(Market $market): BuyOrdersSummaryResult
+    {
+        $offset = 0;
+        $limit = 100;
+        $paginatedBuyOrders = [];
+
+        do {
+            $pendingOrders = $this->marketFetcher->getPendingOrders(
+                $this->marketNameConverter->convert($market),
+                $offset,
+                $limit,
+                self::BUY
+            );
+
+            $moreOrders = $this->parsePendingOrders(
+                $pendingOrders,
+                $market
+            );
+
+            $paginatedBuyOrders[] = $moreOrders;
+            $offset += $limit;
+        } while (count($moreOrders) >= $limit);
+
+        $orders = array_merge([], ...$paginatedBuyOrders);
+
+        $zeroDepthBase = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getBase())
+        );
+
+        /** @var Money $buyOrdersSum */
+        $buyOrdersSum = array_reduce($orders, function (Money $sum, Order $order) {
+            return $sum->add(
+                $order->getPrice()->multiply($this->moneyWrapper->format($order->getAmount()))
+            );
+        }, $zeroDepthBase);
+
+        $buyOrdersSum = $this->moneyWrapper->format($buyOrdersSum);
+
+        $zeroDepthQuote = $this->moneyWrapper->parse(
+            '0',
+            $this->getSymbol($market->getQuote())
+        );
+
+        /** @var Money $quoteAmountSummary */
+        $quoteAmountSummary = array_reduce($orders, function (Money $sum, Order $order) {
+            return $order->getAmount()->add($sum);
+        }, $zeroDepthQuote);
+
+        $quoteAmountSummary = $this->moneyWrapper->format($quoteAmountSummary);
+
+        return new BuyOrdersSummaryResult($buyOrdersSum, $quoteAmountSummary);
+    }
+
+
     private function getPendingOrders(
         Market $market,
         int $offset,
@@ -641,7 +708,6 @@ class MarketHandler implements MarketHandlerInterface
             $limit,
             $side
         );
-
         $ordersGroupedCount = count($pricesKeys);
 
         foreach ($pendingOrders as $pendingOrder) {
@@ -674,7 +740,7 @@ class MarketHandler implements MarketHandlerInterface
 
     public function soldOnMarket(Token $token): Money
     {
-        if (!$token->isMintmeToken()) {
+        if (!$token->isControlledToken()) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
 

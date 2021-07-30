@@ -1,4 +1,8 @@
-import {helpers} from 'vuelidate/lib/validators';
+import {helpers, required} from 'vuelidate/lib/validators';
+
+export const requiredBBCText = (val) => required(
+    val.replace(/\[\s*\/?\s*(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim()
+);
 
 // validation for address
 export const addressContain = helpers.regex('address', /^[a-zA-Z0-9]+$/u);
@@ -34,6 +38,7 @@ export const TOKEN_NAME_CHANGED = 'token_name_changed';
 export const GENERAL = {
     precision: 8,
     dateTimeFormat: 'DD.MM.YYYY HH:mm:ss',
+    dateTimeFormatPicker: 'MM.DD.YYYY HH:mm',
     dateFormat: 'MMM D, YYYY',
     timeFormat: 'HH:mm',
 };
@@ -41,6 +46,8 @@ export const GENERAL = {
 export const webSymbol = 'WEB';
 export const btcSymbol = 'BTC';
 export const ethSymbol = 'ETH';
+export const bnbSymbol = 'BNB';
+export const bscSymbol = 'BSC';
 export const tokSymbol = 'TOK';
 export const usdcSymbol = 'USDC';
 export const tokEthSymbol = 'TOKETH';
@@ -123,6 +130,11 @@ export const MINTME = {
     subunit: 4,
 };
 
+export const BNB = {
+    symbol: 'BNB',
+    subunit: 8,
+};
+
 export const sanitizeOptions = {
     allowedTags: ['a', 'img', 'ul', 'li', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h5', 'h6', 'url', 'span', 's', 'p', 'iframe', 'div'],
     allowedAttributes: {
@@ -148,7 +160,17 @@ export const notificationTypes = {
     tokenMarketingTips: 'token_marketing_tips',
 };
 
-export const tabs = ['intro', 'posts', 'trade', 'post'];
+export const tabs = {
+    intro: 'intro',
+    posts: 'posts',
+    trade: 'trade',
+    post: 'post',
+    voting: 'voting',
+    create_voting: 'create-voting',
+    show_voting: 'show-voting',
+};
+
+export const tabsArr = Object.values(tabs);
 
 export const descriptionLength = {
     min: 200,
@@ -172,6 +194,10 @@ export const currencyModes = {
     },
 };
 
+export const ethCryptoTokens = [
+    usdcSymbol,
+];
+
 export const currencies = {
     WEB,
     MINTME,
@@ -180,4 +206,5 @@ export const currencies = {
     USD,
     ETH,
     USDC,
+    BNB,
 };

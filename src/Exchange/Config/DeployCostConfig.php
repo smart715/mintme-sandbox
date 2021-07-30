@@ -2,33 +2,75 @@
 
 namespace App\Exchange\Config;
 
+use App\Utils\Symbols;
+
 /** @codeCoverageIgnore */
 class DeployCostConfig
 {
-    /** @var int $deployCost */
-    private $deployCost;
+    private array $costs;
+    private array $fees;
+    private array $rewardCosts;
 
-    /** @var float */
-    private $deployCostReward;
-
-    public function __construct(int $deployCost, float $deployCostReward)
-    {
-        $this->deployCost = $deployCost;
-        $this->deployCostReward = $deployCostReward;
+    public function __construct(
+        float $deployCostMintme,
+        float $deployCostEth,
+        float $deployCostBnb,
+        float $deployFeeEth,
+        float $deployFeeBnb,
+        float $deployCostRewardMintme,
+        float $deployCostRewardEth,
+        float $deployCostRewardBnb
+    ) {
+        $this->costs = [
+            Symbols::WEB => $deployCostMintme,
+            Symbols::ETH => $deployCostEth,
+            Symbols::BNB => $deployCostBnb,
+        ];
+        $this->fees = [
+            Symbols::ETH => $deployFeeEth,
+            Symbols::BNB => $deployFeeBnb,
+        ];
+        $this->rewardCosts = [
+            Symbols::WEB => $deployCostRewardMintme,
+            Symbols::ETH => $deployCostRewardEth,
+            Symbols::BNB => $deployCostRewardBnb,
+        ];
     }
 
-    public function getDeployCost(): int
+    public function getDeployFee(string $symbol): float
     {
-        return $this->deployCost;
+        return $this->fees[$symbol] ?? 0;
     }
 
-    public function getDeployCostReward(): float
+    public function getDeployCost(string $symbol): float
     {
-        return $this->deployCostReward;
+        if (!isset($this->costs[$symbol])) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $this->costs[$symbol];
     }
 
-    public function getDeployCostRewardPercent(): float
+    public function getDeployCostReward(string $symbol): float
     {
-        return $this->deployCostReward * 100;
+        if (!isset($this->rewardCosts[$symbol])) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $this->rewardCosts[$symbol];
+    }
+
+    public function getDeployCostRewardPercent(string $symbol): float
+    {
+        if (!isset($this->rewardCosts[$symbol])) {
+            throw new \InvalidArgumentException();
+        }
+
+        return $this->rewardCosts[$symbol] * 100;
+    }
+
+    public function getSymbols(): array
+    {
+        return array_keys($this->costs);
     }
 }

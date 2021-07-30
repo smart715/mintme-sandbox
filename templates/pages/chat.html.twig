@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/chat') }}
+{% endblock %}
+
 {% block content %}
     <div id="chat" class="container">
         <chat-widget
@@ -17,5 +22,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    {{ encore_entry_script_tags('chat') }}
+    {{ encore_entry_script_tags('pages/chat') }}
 {% endblock %}

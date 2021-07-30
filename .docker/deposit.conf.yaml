@@ -22,16 +22,16 @@ cryptos:
 
   etherium:
     # etherium rpc server url
-    daemon_host: 'http://openethereum:8545'
+    daemon_host: 'http://212.32.255.232:8545'
 
     # etherium-cli rpc server url
-    vault_cli_host: 'http://openethereum:8545'
+    vault_cli_host: 'http://212.32.255.232:8545'
 
     # etherium rpc server timeout
     vault_cli_timeout: 3000
 
     # Address which will receive investment funds:
-    target_address: '0xc26dcee6092beb24b42ebd789f82bb6f8d63387c'
+    target_address: '0x42e07422fa1bce2090912ddbc0717fa44654ef00'
 
     # Gas limit to pay for transactions
     gas_limit_wei: 21000
@@ -58,6 +58,28 @@ cryptos:
     # bitcoin refresh interval in minutes
     interval_minutes: 5
 
+  binance:
+    # binance rpc server url
+    daemon_host: 'http://212.32.255.99:8575'
+
+    # binance rpc server url
+    vault_cli_host: 'http://212.32.255.99:8575'
+
+    # binance rpc server timeout
+    vault_cli_timeout: 300000
+
+    # Address which will receive investment funds:
+    target_address: '0xFd134EDa83a3A21690084fce5984aAFc1Ed68a62'
+
+    # Gas limit to pay for transactions
+    gas_limit_wei: 21000
+
+    fee: 0
+
+    min_deposit_val: 0.01
+
+    confirmations: 6
+
 rabbitmq_url: 'amqp://guest:guest@rabbitmq:5672'
 
 app_server_port: 3000
@@ -68,3 +90,4 @@ enabled_cryptos:
   - 'web'
   - 'btc'
   - 'eth'
+  - 'bnb'

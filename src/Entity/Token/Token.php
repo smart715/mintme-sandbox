@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -267,6 +268,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $isBlocked = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHidden = false; // phpcs:ignore
+
+    /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
      * @var int
      */
@@ -292,6 +298,16 @@ class Token implements TradebleInterface, ImagineInterface
     private $decimals = 12;
 
     /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\TokenVoting",
+     *     mappedBy="token"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
+
+    /**
      * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
      */
     private bool $showDeployedModal = false; // phpcs:ignore
@@ -315,9 +331,15 @@ class Token implements TradebleInterface, ImagineInterface
      */
     public function getHoldersCount(): int
     {
-        return $this->users
-            ? $this->users->count()
-            : 0;
+        if ($this->users) {
+            $holders = $this->users->filter(function ($userToken) {
+                return $userToken->isHolder();
+            });
+
+            return $holders->count();
+        }
+
+        return 0;
     }
 
     /** {@inheritdoc} */
@@ -683,6 +705,15 @@ class Token implements TradebleInterface, ImagineInterface
             : $activeAirdrop->first();
     }
 
+    public function getAirdrop(int $id): ?Airdrop
+    {
+        $airdrops = $this->getAirdrops()->filter(fn(Airdrop $a) => $id === $a->getId());
+
+        return $airdrops->isEmpty()
+            ? null
+            : $airdrops->first();
+    }
+
     /** @codeCoverageIgnore */
     public function addAirdrop(Airdrop $airdrop): self
     {
@@ -727,6 +758,18 @@ class Token implements TradebleInterface, ImagineInterface
     public function setIsBlocked(bool $isBlocked): self
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    public function setIsHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
 
         return $this;
     }
@@ -814,6 +857,14 @@ class Token implements TradebleInterface, ImagineInterface
         return Symbols::WEB === $this->getCryptoSymbol();
     }
 
+    /*
+     * @Groups({"Default"})
+     */
+    public function isControlledToken(): bool
+    {
+        return !$this->isDeployed() || ($this->getAddress() && $this->getTxHash());
+    }
+
     public function isOwner(array $ownTokens): bool
     {
         /** @var Token $ownToken */
@@ -848,5 +899,10 @@ class Token implements TradebleInterface, ImagineInterface
     public function getTxHash(): ?string
     {
         return $this->txHash;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

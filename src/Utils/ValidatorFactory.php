@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\TradebleInterface;
 use App\Exchange\Market;
 use App\Utils\Validator\AddressValidator;
@@ -10,13 +11,42 @@ use App\Utils\Validator\EthereumAddressValidator;
 use App\Utils\Validator\MinAmountValidator;
 use App\Utils\Validator\MinOrderValidator;
 use App\Utils\Validator\ValidatorInterface;
+use App\Wallet\Money\MoneyWrapperInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore */
 class ValidatorFactory implements ValidatorFactoryInterface
 {
-    public function createOrderValidator(Market $market, string $price, string $amount): ValidatorInterface
-    {
-        return new MinOrderValidator($market->getBase(), $market->getQuote(), $price, $amount);
+    public string $minimalPriceOrder;
+    private TranslatorInterface $translator;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoRatesFetcherInterface $cryptoRatesFetcher;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoRatesFetcherInterface $cryptoRatesFetcher
+    ) {
+        $this->translator = $translator;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoRatesFetcher = $cryptoRatesFetcher;
+    }
+
+    public function createOrderValidator(
+        Market $market,
+        string $price,
+        string $amount
+    ): ValidatorInterface {
+        return new MinOrderValidator(
+            $market->getBase(),
+            $market->getQuote(),
+            $price,
+            $amount,
+            $this->minimalPriceOrder,
+            $this->moneyWrapper,
+            $this->cryptoRatesFetcher,
+            $this->translator
+        );
     }
 
     public function createMinAmountValidator(TradebleInterface $tradeble, string $amount): ValidatorInterface

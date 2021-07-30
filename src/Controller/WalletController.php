@@ -120,6 +120,13 @@ class WalletController extends Controller
             );
         }
 
+        if ($pendingWithdraw instanceof PendingTokenWithdraw && !$this->isGranted('token-withdraw')) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdrawing is not possible. Please try again later'
+            );
+        }
+
         $isBlocked = $pendingWithdraw instanceof PendingWithdraw
             ? $pendingWithdraw->getUser()->isBlocked()
             : ($pendingWithdraw instanceof PendingTokenWithdraw

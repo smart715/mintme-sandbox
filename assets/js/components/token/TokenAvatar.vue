@@ -16,6 +16,7 @@
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-token-created="isTokenCreated"
                 :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
                 :identifier="market.quote.identifier"
                 :name="market.quote.name"
                 :precision="precision"
@@ -43,6 +44,9 @@
                 :token-deployed-date="tokenDeployedDate"
                 :token-tx-hash-address="tokenTxHashAddress"
                 :mintme-explorer-url="mintmeExplorerUrl"
+                :eth-explorer-url="ethExplorerUrl"
+                :bnb-explorer-url="bnbExplorerUrl"
+                :token-crypto="tokenCrypto"
             />
             <token-deploy-icon
                 :is-mintme="isMintmeToken"
@@ -62,7 +66,7 @@
                 :token-youtube="tokenYoutube"
                 :token-website="tokenWebsite"
                 :token-status="statusProp"
-                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
                 :has-release-period="hasReleasePeriodProp"
             />
         </div>
@@ -87,6 +91,7 @@ export default {
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
         isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         market: Object,
         tokenCrypto: Object,
         precision: Number,
@@ -123,6 +128,8 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
         serviceUnavailable: Boolean,
     },
     components: {

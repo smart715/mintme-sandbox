@@ -125,15 +125,16 @@ class OrdersController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
 
-        if (!$this->isGranted('make-order', $market)) {
-             return $this->view(['error' => true, 'type' => 'make_orders'], Response::HTTP_OK);
+        if (!$this->isGranted('make-order', $market)
+            || (Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
+             return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
         }
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
         $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
         $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
-
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
 
         $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
@@ -197,24 +198,29 @@ class OrdersController extends AbstractFOSRestController
             self::PENDING_OFFSET
         );
 
+        $totalSellOrders = $this->marketHandler->getSellOrdersSummary($market)->getQuoteAmount();
+        $totalBuyOrders = $this->marketHandler->getBuyOrdersSummary($market)->getBasePrice();
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
+            'totalSellOrders' => $totalSellOrders,
+            'totalBuyOrders' => $totalBuyOrders,
         ];
     }
 
     /**
      * @Rest\Get(
-     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=0}, options={"expose"=true}
+     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=1}, options={"expose"=true}
      * )
      * @Rest\View()
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
     }
 
     /**

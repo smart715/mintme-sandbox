@@ -8,6 +8,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Symbols;
@@ -21,7 +22,6 @@ use Exception;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ContractHandler implements ContractHandlerInterface
 {
@@ -52,7 +52,7 @@ class ContractHandler implements ContractHandlerInterface
     /** @var TokenManagerInterface */
     private $tokenManager;
 
-    private ParameterBagInterface $parameterBag;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         JsonRpcInterface $rpc,
@@ -60,14 +60,14 @@ class ContractHandler implements ContractHandlerInterface
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
-        ParameterBagInterface $parameterBag
+        TokenConfig $tokenConfig
     ) {
         $this->rpc = $rpc;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
-        $this->parameterBag = $parameterBag;
+        $this->tokenConfig = $tokenConfig;
     }
 
     public function deploy(Token $token): void
@@ -180,7 +180,7 @@ class ContractHandler implements ContractHandlerInterface
         return $response->getResult();
     }
 
-    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token): void
+    public function withdraw(User $user, Money $balance, string $address, TradebleInterface $token, ?Money $fee = null): void
     {
         if ($token instanceof Token && Token::DEPLOYED !== $token->getDeploymentStatus()) {
             $this->logger->error(
@@ -198,6 +198,8 @@ class ContractHandler implements ContractHandlerInterface
                 'to' => $address,
                 'value' => $balance->getAmount(),
                 'crypto' => $token instanceof Token ? $token->getCryptoSymbol() : $token->getSymbol(),
+                'tokenFee' => $fee ? $fee->getAmount() : '0',
+                'tokenFeeCurrency' => $fee ? $fee->getCurrency()->getCode() : 'TOK',
             ]
         );
 
@@ -226,8 +228,17 @@ class ContractHandler implements ContractHandlerInterface
         return $this->parseTransactions($wallet, $response->getResult());
     }
 
-    private function getFee(?TradebleInterface $tradeble, string $type, WalletInterface $wallet): Money
-    {
+    private function getFee(
+        ?TradebleInterface $tradeble,
+        string $type,
+        WalletInterface $wallet,
+        array $transaction = []
+    ): Money {
+        if (isset($transaction['tokenFee']) && (isset($transaction['tokenFeeCurrency']) || $transaction['token'])) {
+            return new Money($transaction['tokenFee'], new Currency($transaction['tokenFeeCurrency'] ?:
+                $transaction['token']));
+        }
+
         if (!$tradeble) {
             return $this->moneyWrapper->parse('0', Symbols::TOK);
         }
@@ -241,11 +252,9 @@ class ContractHandler implements ContractHandlerInterface
         }
 
         /** @var Token $tradeble */
-        return Symbols::ETH === $tradeble->getCryptoSymbol()
-            ? $tradeble->getFee() ?? $this->moneyWrapper->parse(
-                (string)$this->parameterBag->get('token_withdraw_fee'),
-                Symbols::ETH
-            ) : $this->cryptoManager->findBySymbol($tradeble->getCryptoSymbol())->getFee();
+        return in_array($cryptoSymbol = $tradeble->getCryptoSymbol(), [Symbols::ETH, Symbols::BNB], true)
+            ? $tradeble->getFee() ?? $this->tokenConfig->getWithdrawFeeByCryptoSymbol($cryptoSymbol)
+            : $this->cryptoManager->findBySymbol($cryptoSymbol)->getFee();
     }
 
     private function parseTransactions(WalletInterface $wallet, array $transactions): array
@@ -275,7 +284,8 @@ class ContractHandler implements ContractHandlerInterface
                 $this->getFee(
                     $tradeble,
                     $transaction['type'],
-                    $wallet
+                    $wallet,
+                    $transaction
                 ),
                 $tradeble,
                 Status::fromString($transaction['status']),
@@ -312,12 +322,13 @@ class ContractHandler implements ContractHandlerInterface
         );
     }
 
-    public function getDecimalsContract(string $tokenAddress): int
+    public function getDecimalsContract(string $tokenAddress, string $blockchain): int
     {
         $response = $this->rpc->send(
             self::GET_DECIMALS_CONTRACT,
             [
                 'address' => $tokenAddress,
+                'blockchain' => $blockchain,
             ]
         );
 

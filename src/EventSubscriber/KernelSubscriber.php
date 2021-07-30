@@ -52,8 +52,8 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @codeCoverageIgnore */
     public function onResponse(ResponseEvent $event): void
     {
+        //todo: handle this protection through config/packages/nelmio_security.yaml
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
-        $event->getResponse()->headers->set('X-Frame-Options', 'deny');
     }
 
     public function onRequest(RequestEvent $request): void

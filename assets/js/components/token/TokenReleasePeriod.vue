@@ -72,15 +72,31 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faLock, faUnlockAlt} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
+import {BRow, BCol, BButton} from 'bootstrap-vue';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 import {mapMutations} from 'vuex';
 
+library.add(faCircleNotch, faLock, faUnlockAlt);
+
 export default {
     name: 'TokenReleasePeriod',
-    mixins: [NotificationMixin, LoggerMixin],
+    components: {
+        BRow,
+        BCol,
+        BButton,
+        vueSlider,
+        FontAwesomeIcon,
+    },
+    mixins: [
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
@@ -93,9 +109,6 @@ export default {
             releasePeriod: 0,
             hasLockin: false,
         };
-    },
-    components: {
-        vueSlider,
     },
     computed: {
         showAreaUnlockedTokens: function() {

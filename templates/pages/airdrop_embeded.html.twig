@@ -1,0 +1,54 @@
+{% extends 'base_embeded.html.twig' %}
+
+{% set isOwner = isOwner ? 'true' : 'false' %}
+{% set loggedIn = app.user ? 'true' : 'false' %}
+{% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
+{% set currentLocale = app.session.get('_locale') %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/airdrop_embeded') }}
+{% endblock %}
+
+{% block bgclass %}bg-secondary{% endblock %}
+{% block content %}
+    <div id="airdrop-embeded">
+        <token-ongoing-airdrop-campaign
+            :logged-in="{{ loggedIn }}"
+            :is-owner="{{ isOwner }}"
+            :token-name="'{{ token.name | default }}'"
+            :user-already-claimed="{{ userAlreadyClaimed }}"
+            youtube-client-id="{{ global_youtube_client_id }}"
+            current-locale="{{ currentLocale }}"
+            :show-airdrop-modal="true"
+            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+            :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+            :airdrop-campaign-prop="{{ airdrop | json_encode }}"
+            referral-code-prop="{{ referralCode }}"
+            embeded
+        ></token-ongoing-airdrop-campaign>
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block pagescripts %}
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    {% if not app.user %}
+        <script defer src="https://www.google.com/recaptcha/api.js"></script>
+    {% endif %}
+    {{ encore_entry_script_tags('pages/airdrop_embeded') }}
+    <script defer>
+        window.fbAsyncInit = () => {
+            FB.init({
+                appId: '{{ global_facebook_app_id }}',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v3.1',
+            });
+        };
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+{% endblock %}

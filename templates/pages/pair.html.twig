@@ -25,10 +25,16 @@
     {% if token|default %} {% trans with {'%name%': token.name}%}page.pair.title_info{% endtrans %}{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/pair') }}
+{% endblock %}
+
 {% block content %}
 {% set isOwner = isOwner ? 'true' : 'false' %}
 {% set loggedIn = app.user ? 'true' : 'false' %}
 {% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
+{% set isControlledToken = isTokenPage and token.isControlledToken ? 'true' : 'false' %}
 {% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
 {% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
 {% set currentLocale = app.session.get('_locale') %}
@@ -57,9 +63,10 @@
                 :is-owner="{{ isOwner }}"
                 :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
                 :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
-                :is-mintme-token="{{ isMintmeToken }}"
+                :is-mintme-token="getIsMintmeToken({{ isMintmeToken }})"
+                :is-controlled-token="{{ isControlledToken }}"
                 :market="{{ market | json_encode }}"
-                :token-crypto="{{ tokenCrypto | json_encode }}"
+                :token-crypto="getTokenCrypto({{ tokenCrypto | json_encode }})"
                 :precision="{{ precision }}"
                 :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
                 :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
@@ -95,6 +102,8 @@
                 :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.deployedDate | json_encode}})"
                 :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
                 mintme-explorer-url="{{ global_mintme_explorer_url }}"
+                eth-explorer-url="{{ global_eth_explorer_url }}"
+                bnb-explorer-url="{{ global_bnb_explorer_url }}"
                 :service-unavailable="{{ serviceUnavailable ? 'true' : 'false' }}"
             ></token-avatar>
             <token-social-media-icons
@@ -114,7 +123,6 @@
 
     <div class="row mt-1 justify-content-center">
         <div class="col-md-10" v-cloak>
-            {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
             <b-tabs
                 no-key-nav
                 @input="tabUpdated"
@@ -198,7 +206,7 @@
                         </div>
                         <div class="row">
                             <token-introduction-statistics
-                                :is-mintme-token="{{ isMintmeToken }}"
+                                :is-controlled-token="{{ isControlledToken }}"
                                 class="col-12 mt-3"
                                 :market="{{ market | json_encode }}"
                                 :editable="{{ isOwner }}"
@@ -255,7 +263,7 @@
                     >
                         <trade
                             :is-token="{{ isTokenPage ? 'true' : 'false' }}"
-                            :is-mintme-token="{{ isMintmeToken }}"
+                            :is-controlled-token="{{ isControlledToken }}"
                             websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
                             login-url="{{ path('fos_user_security_login') }}"
@@ -312,6 +320,46 @@
                                 </div>
                             </div>
                         </div>
+                    </b-tab>
+                    <b-tab
+                        title="{% trans %}voting.voting{% endtrans %}"
+                        title-link-class="token-voting-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-list
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            :min-amount="{{ dMMinAmount }}"
+                            @go-to-create="goToCreateVoting"
+                            @go-to-show="goToShowVoting"
+                        >
+                        </voting-list>
+                    </b-tab>
+                    <b-tab
+                        title="create-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'create-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-create
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                        >
+                        </voting-create>
+                    </b-tab>
+                    <b-tab
+                        title="show-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'show-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-show
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            {% if voting is defined %}
+                            :voting-prop="{{ voting | json_encode }}"
+                            {% endif %}
+                        >
+                        </voting-show>
                     </b-tab>
                 {% endif %}
                 <template slot="tabs-end">
@@ -375,6 +423,7 @@
 
     </div>
     <token-deployed-modal
+        v-if="showDeployedOnBoard"
         :visible="showDeployedOnBoard"
         token-name="{{ market.quote.name }}"
         @close="closeDeployedModal()"
@@ -397,7 +446,7 @@
     {% if not app.user %}
         <script defer src="https://www.google.com/recaptcha/api.js"></script>
     {% endif %}
-    {{ encore_entry_script_tags('pair') }}
+    {{ encore_entry_script_tags('pages/pair') }}
     <script defer>
         window.fbAsyncInit = () => {
             FB.init({

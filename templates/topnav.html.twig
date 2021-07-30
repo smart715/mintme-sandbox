@@ -2,20 +2,25 @@
 {% set route = app.request.get('_route') %}
 {% set show_info_bar = app.session.get('show_info_bar', true) %}
 
-{% if is_hacker_allowed and show_info_bar %}
-    <div id="info-bar">
-        <info-bar
-            username="{{ app.user.username|default('') }}"
-            auth-code="{{ app.user.EmailAuthCode|default('') }}"
-            environment="{{ app.environment() }}"
-        ></info-bar>
+{% if is_hacker_allowed %}
+    <div id="admin-menu">
+        <admin-menu :is-user-logged="{{ app.user ? 'true' : 'false' }}"></admin-menu>
     </div>
+    {% if show_info_bar %}
+        <div id="info-bar">
+            <info-bar
+                username="{{ app.user.username|default('') }}"
+                auth-code="{{ app.user.EmailAuthCode|default('') }}"
+                environment="{{ app.environment() }}"
+            ></info-bar>
+        </div>
+    {% endif %}
 {% endif %}
 <nav class="navbar top-navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
         <a class="order-first navbar-brand" href="{{ path('homepage') }}">
             {% if is_beta_version %}
-                <div class="badge">{% trans %}beta{% endtrans %}</div>
+                <div class="badge badge-beta">{% trans %}beta{% endtrans %}</div>
             {% endif %}
                 <img
                     {% if is_beta_version %}
@@ -93,6 +98,15 @@
                         {% trans %}navbar.trading{% endtrans %}
                     </a>
                 </li>
+
+                {% if show_links %}
+                    <li class="nav-item align-self-center {{ route == 'show_user_home' ? 'active' : '' }}">
+                        <a href="{{ path('show_user_home') }}" class="nav-link">
+                            {% trans %}navbar.home{% endtrans %}
+                        </a>
+                    </li>
+                {% endif %}
+
                 <li class="nav-item align-self-center {{ route starts with 'sonata_news' ? 'active' : '' }}">
                     <a href="{{ path('sonata_news_home') }}" class="nav-link">
                         {% trans %}navbar.news{% endtrans %}
@@ -108,6 +122,11 @@
                 <li class="nav-item align-self-center {{ route starts with 'kb' ? 'active' : '' }}">
                     <a href="{{ path('kb') }}" class="nav-link">
                         {% trans %}navbar.help{% endtrans %}
+                    </a>
+                </li>
+                <li class="nav-item align-self-center {{ route starts with 'voting' ? 'active' : '' }}">
+                    <a href="{{ path('voting') }}" class="nav-link">
+                        {% trans %}voting.voting{% endtrans %}
                     </a>
                 </li>
                 {% if not app.user %}
@@ -245,9 +264,6 @@
             </div>
         {% endif %}
     </div>
-    {% if is_hacker_allowed %}
-        <admin-menu :is-user-logged="{{ app.user ? 'true' : 'false' }}"></admin-menu>
-    {% endif %}
 </nav>
 {% if app.request.attributes.get('_route') != 'homepage' and
     app.request.attributes.get('_route') != '2fa_login' and

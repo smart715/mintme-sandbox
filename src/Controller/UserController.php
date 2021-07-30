@@ -105,7 +105,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
-            'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
+            'deployCostReward' => $token ? $deployCostConfig->getDeployCostRewardPercent($token->getCryptoSymbol()) : 0,
             'referralsCount' => count($user->getReferrals()),
             'userToken' => $token ? $token->getName() : null,
         ]);
@@ -298,11 +298,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 new FilterUserResponseEvent(
                     $user,
                     $request,
-                    $this->renderSettings(
-                        $passwordForm,
-                        $apiKey,
-                        $user->GetApiClients()
-                    )
+                    new Response(Response::HTTP_OK)
                 ),
                 FOSUserEvents::CHANGE_PASSWORD_COMPLETED
             );

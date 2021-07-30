@@ -8,6 +8,7 @@
                 :is-owner="editable"
                 :is-token-created="isTokenCreated"
                 :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -37,6 +38,9 @@
                 :token-deployed-date="tokenDeployedDate"
                 :token-tx-hash-address="tokenTxHashAddress"
                 :mintme-explorer-url="mintmeExplorerUrl"
+                :eth-explorer-url="ethExplorerUrl"
+                :bnb-explorer-url="bnbExplorerUrl"
+                :token-crypto="tokenCrypto"
             />
             <font-awesome-icon
                 class="icon-default c-pointer align-middle token-edit-icon"
@@ -61,19 +65,33 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
+import {VBTooltip} from 'bootstrap-vue';
 import {WebSocketMixin, FiltersMixin, LoggerMixin} from '../../mixins/';
-import TokenEditModal from '../modal/TokenEditModal';
 import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
 library.add(faEdit);
 
 export default {
     name: 'TokenName',
+    components: {
+        FontAwesomeIcon,
+        TokenEditModal: () => import('../modal/TokenEditModal').then((data) => data.default),
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        clickaway,
+        LoggerMixin,
+    ],
     props: {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
         isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         identifier: String,
         name: String,
         precision: Number,
@@ -101,12 +119,10 @@ export default {
             default: null,
         },
         mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
     },
-    components: {
-        FontAwesomeIcon,
-        TokenEditModal,
-    },
-    mixins: [WebSocketMixin, FiltersMixin, clickaway, LoggerMixin],
     data() {
         return {
             currentName: this.name,

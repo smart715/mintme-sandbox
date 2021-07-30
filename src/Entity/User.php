@@ -18,7 +18,6 @@ use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterf
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
 use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -236,6 +235,11 @@ class User extends BaseUser implements
      */
     protected ?Airdrop $airdropReferrer;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $exchangeCryptoMailSent = false; // phpcs:ignore
+
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
     {
@@ -274,6 +278,14 @@ class User extends BaseUser implements
     public function addToken(UserToken $userToken): self
     {
         $this->tokens->add($userToken);
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function removeToken(UserToken $userToken): self
+    {
+        $this->tokens->removeElement($userToken);
 
         return $this;
     }
@@ -634,5 +646,17 @@ class User extends BaseUser implements
     public function getAirdropReferrerUser(): ?User
     {
         return $this->airdropReferrerUser;
+    }
+
+    public function isExchangeCryptoMailSent(): bool
+    {
+        return $this->exchangeCryptoMailSent;
+    }
+
+    public function setExchangeCryptoMailSent(bool $exchangeCryptoMailSent): self
+    {
+        $this->exchangeCryptoMailSent = $exchangeCryptoMailSent;
+
+        return $this;
     }
 }

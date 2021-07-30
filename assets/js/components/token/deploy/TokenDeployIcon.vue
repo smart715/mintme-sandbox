@@ -27,13 +27,19 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Guide from '../../Guide';
-import {tokenDeploymentStatus} from '../../../utils/constants';
+import {tokenDeploymentStatus, BNB} from '../../../utils/constants';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TokenDeployIcon',
     components: {
         Guide,
+        FontAwesomeIcon,
     },
     props: {
         isMintme: Boolean,
@@ -60,8 +66,13 @@ export default {
             return this.isMintme
                 ? this.$t('token.deploy_icon.body')
                 : this.$t('token.deploy_icon.body_not_mintme', {
-                    baseName: this.tokenCrypto.name,
+                    baseName: this.cryptoChain,
                 });
+        },
+        cryptoChain: function() {
+            return BNB.symbol === this.tokenCrypto.symbol
+                ? 'Binance Smart Chain'
+                : this.tokenCrypto.name;
         },
     },
 };

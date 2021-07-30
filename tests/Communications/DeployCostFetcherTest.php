@@ -5,7 +5,6 @@ namespace App\Tests\Communications;
 use App\Communications\DeployCostFetcher;
 use App\Communications\Exception\FetchException;
 use App\Communications\RestRpcInterface;
-use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -22,6 +21,12 @@ class DeployCostFetcherTest extends TestCase
             'webchain' => [
                 'usd' => .002,
             ],
+            'ethereum' => [
+                'usd' => .002,
+            ],
+            'binancecoin' => [
+                'usd' => .002,
+            ],
         ];
 
         $rpc = $this->createMock(RestRpcInterface::class);
@@ -29,9 +34,9 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(49, 0.1),
+            new DeployCostConfig(49, 1, 1, 1, 1, .01, .01, 0.1),
             $this->mockMoneyWrapper($this->once())
-        ))->getDeployWebCost();
+        ))->getDeployCost('WEB');
     }
 
     public function testGetDeployWebCostWithUnexpectedResponse(): void
@@ -43,15 +48,21 @@ class DeployCostFetcherTest extends TestCase
 
         (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(49, 0.1),
+            new DeployCostConfig(49, 1, 1, 1, 1, .01, .01, 0.1),
             $this->mockMoneyWrapper($this->never())
-        ))->getDeployWebCost();
+        ))->getDeployCost('WEB');
     }
 
     public function testGetDeployCostReferralReward(): void
     {
         $data = [
             'webchain' => [
+                'usd' => .002,
+            ],
+            'ethereum' => [
+                'usd' => .002,
+            ],
+            'binancecoin' => [
                 'usd' => .002,
             ],
         ];
@@ -61,9 +72,9 @@ class DeployCostFetcherTest extends TestCase
 
         $deployCostReferralReward = (new DeployCostFetcher(
             $rpc,
-            new DeployCostConfig(100, 0.15),
+            new DeployCostConfig(100, 1, 1, 1, 1, 0.15, .01, .01),
             $this->mockMoneyWrapper($this->once())
-        ))->getDeployCostReferralReward();
+        ))->getDeployCostReferralReward('WEB');
 
         $this->assertEquals('150000000000000000', $deployCostReferralReward->getAmount());
         $this->assertEquals(Symbols::WEB, $deployCostReferralReward->getCurrency());
