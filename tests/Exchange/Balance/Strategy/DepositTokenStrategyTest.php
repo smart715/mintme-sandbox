@@ -2,8 +2,8 @@
 
 namespace App\Tests\Exchange\Balance\Strategy;
 
-use App\Entity\Token\Token;
 use App\Entity\Crypto;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
