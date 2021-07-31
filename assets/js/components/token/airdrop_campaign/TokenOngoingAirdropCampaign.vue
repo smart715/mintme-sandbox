@@ -56,7 +56,7 @@
                         :visible="showModal"
                         :button-disabled="!isOwner && !userAlreadyClaimed && !actionsCompleted"
                         :show-cancel-button="!isOwner && !alreadyClaimed && !timeElapsed && !embeded"
-                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim"
+                        :show-confirm-button="!!airdropCampaign.status && !alreadyClaimed && !claim && !isLoginTabOpen"
                         :show-image="false"
                         @confirm="modalOnConfirm"
                         @close="closeModal"
@@ -231,6 +231,14 @@
                         <template v-if="isOwner || timeElapsed" v-slot:confirm>
                             {{ confirmButtonText }}
                         </template>
+                        <p v-if="embeded && isLoginTabOpen">
+                            {{ $t('ongoing_airdrop.embeded.login_tab') }}
+                            <br>
+                            <a v-if="!isReloadingFrame" @click.prevent="reloadFrame" href="#">
+                                {{ $t('ongoing_airdrop.embeded.reload') }}
+                            </a>
+                            <font-awesome-icon v-else icon="circle-notch" spin class="loading-spinner text-white" fixed-width />
+                        </p>
                     </confirm-modal>
                 </div>
             </div>
@@ -291,7 +299,7 @@ import ConfirmModal from '../../modal/ConfirmModal';
 import Modal from '../../modal/Modal';
 import {LoggerMixin, NotificationMixin, FiltersMixin, TwitterMixin, AddPhoneAlertMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND} from '../../../utils/constants';
-import {toMoney, openPopup} from '../../../utils';
+import {toMoney, openPopup, openNewTab} from '../../../utils';
 import gapi from 'gapi';
 import {required, url} from 'vuelidate/lib/validators';
 import CopyLink from '../../CopyLink';
@@ -335,8 +343,6 @@ export default {
         isOwner: Boolean,
         tokenName: String,
         userAlreadyClaimed: Boolean,
-        loginUrl: String,
-        signupUrl: String,
         youtubeClientId: String,
         currentLocale: String,
         showAirdropModal: Boolean,
@@ -375,6 +381,8 @@ export default {
             addPhoneModalProfileNickName: this.profileNickname,
             addPhoneModalMessageType: 'airdrop',
             storageError: false,
+            isLoginTabOpen: false,
+            isReloadingFrame: false,
         };
     },
     mounted: function() {
@@ -540,6 +548,12 @@ export default {
         },
     },
     methods: {
+        reloadFrame: function() {
+            if (!this.isReloadingFrame) {
+                this.isReloadingFrame = true;
+                location.reload();
+            }
+        },
         showModalOnClick: function() {
             this.showModal = !this.isOwner;
         },
@@ -602,18 +616,27 @@ export default {
         modalOnConfirm: function() {
             if (!this.loggedIn) {
                 this.closeModal();
+
                 if (this.embeded) {
-                    this.loginPopup();
+                    if (!this.isLoginPageOpen) {
+                        openNewTab(this.$routing.generate('login'));
+
+                        this.isLoginTabOpen = true;
+                    }
+
                     return;
                 }
+
                 this.loginShowModal = true;
                 return;
             }
+
             if (this.isOwner || this.timeElapsed || !this.actionsCompleted) {
                 return;
             }
 
             this.claim = true;
+
             return this.$axios.single.post(this.$routing.generate('claim_airdrop_campaign', {
                 tokenName: this.tokenName,
                 id: this.airdropCampaign.id,
@@ -647,31 +670,6 @@ export default {
                     this.sendLogs('error', 'Can not claim airdrop campaign.', err);
                 })
                 .then(() => this.claim = false);
-        },
-        loginPopup: function() {
-            const w = window.open(
-                this.$routing.generate('login', {page: 'embeded'}),
-                '',
-                'width=500, height=500'
-            );
-
-            const interval = setInterval(() => {
-                const isCheckEmailPath = w.location.pathname.includes('/check-email');
-
-                if ('null' === w.location.origin
-                    || (!isCheckEmailPath
-                        && w.location.origin === window.origin
-                        && w.location.pathname.endsWith('/embeded'))) {
-                    return;
-                }
-
-                setTimeout(() => w.close(), isCheckEmailPath ? 5000 : 0);
-                clearInterval(interval);
-
-                if (!isCheckEmailPath) {
-                    window.location.reload();
-                }
-            }, 100);
         },
         claimAction(action) {
             if (action.done) {
@@ -848,6 +846,10 @@ export default {
         if (!this.airdropCampaign) {
             this.getAirdropCampaign();
         } else {
+            if (!this.loggedIn) {
+                this.updateAirdropActionFromSession();
+            }
+
             this.loaded = true;
         }
 
