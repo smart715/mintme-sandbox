@@ -318,6 +318,6 @@ class WalletController extends DevApiController
 
         return $this->view([
             'message' => "Your transaction has been successfully processed and queued to be sent.",
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_CREATED);
     }
 }

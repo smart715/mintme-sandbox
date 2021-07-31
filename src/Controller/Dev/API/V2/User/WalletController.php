@@ -171,13 +171,13 @@ class WalletController extends AbstractFOSRestController
      *      @SWG\Schema(
      *          type="object",
      *          @SWG\Property(property="currency", type="string", example="MINTME", description="currency to withdraw"),
-     *          @SWG\Property(property="amount", type="string", example="12.33", description="Amount to withdraw"),
+     *         @SWG\Property(property="amount", type="string", example="12.33", description="Amount to withdraw"),
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="404", description="Currency not found")
-     * @SWG\Response(response="400", description="Bad request")
-     * @SWG\Response(response="201", description="Returns success message")
+     * @SWG\Response(response="201",description="Returns success message")
+     * @SWG\Response(response="404",description="Currency not found")
+     * @SWG\Response(response="400",description="Bad request")
      * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(
