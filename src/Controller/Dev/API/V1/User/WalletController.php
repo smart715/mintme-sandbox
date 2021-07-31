@@ -203,7 +203,6 @@ class WalletController extends DevApiController
      *          @SWG\Property(property="currency", type="string", example="MINTME", description="currency to withdraw"),
      *          @SWG\Property(property="amount", type="string", example="12.33", description="Amount to withdraw"),
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
-
      *      )
      * ),
      * @SWG\Response(response="201", description="Returns success message")
