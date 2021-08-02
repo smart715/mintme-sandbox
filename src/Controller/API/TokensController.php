@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Communications\DeployCostFetcherInterface;
 use App\Controller\TwoFactorAuthenticatedInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -703,11 +704,14 @@ class TokensController extends AbstractFOSRestController implements TwoFactorAut
             /** @var User $user*/
             $user = $this->getUser();
 
+            /** @var Crypto[] $deployCryptos*/
+            $deployCryptos = array_map(
+                fn(string $symbol) => $this->cryptoManager->findBySymbol($symbol),
+                $deployCostConfig->getSymbols()
+            );
+
             $data = [
-                'balances' => $balanceHandler->indexedBalances(
-                    $user,
-                    array_map(fn(string $symbol) => Token::getFromSymbol($symbol), $deployCostConfig->getSymbols()),
-                ),
+                'balances' => $balanceHandler->indexedBalances($user, $deployCryptos),
                 'costs' => $costFetcher->getDeployCosts(),
             ];
         } catch (Throwable $ex) {

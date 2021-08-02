@@ -12,6 +12,7 @@ use App\Events\DeployCompletedEvent;
 use App\Events\TokenEvent;
 use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
 use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,13 +42,16 @@ class DeployConsumer implements ConsumerInterface
 
     private EventDispatcherInterface $eventDispatcher;
 
+    private CryptoManagerInterface $cryptoManager;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
         DeployCostFetcherInterface $deployCostFetcher,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
@@ -55,6 +59,7 @@ class DeployConsumer implements ConsumerInterface
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
         $this->eventDispatcher = $eventDispatcher;
+        $this->cryptoManager = $cryptoManager;
     }
 
     /** {@inheritdoc} */
@@ -106,7 +111,7 @@ class DeployConsumer implements ConsumerInterface
 
                     $this->balanceHandler->deposit(
                         $user,
-                        Token::getFromSymbol($token->getCryptoSymbol()),
+                        $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                         $amount
                     );
 
@@ -174,13 +179,13 @@ class DeployConsumer implements ConsumerInterface
 
                 $this->balanceHandler->deposit(
                     $user,
-                    Token::getFromSymbol($token->getCryptoSymbol()),
+                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
                 $this->balanceHandler->deposit(
                     $referencer,
-                    Token::getFromSymbol($token->getCryptoSymbol()),
+                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
