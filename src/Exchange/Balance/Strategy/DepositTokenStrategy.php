@@ -6,6 +6,7 @@ use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -21,14 +22,18 @@ class DepositTokenStrategy implements BalanceStrategyInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    private CryptoManagerInterface $cryptoManager;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         WalletInterface $wallet,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->wallet = $wallet;
         $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoManager = $cryptoManager;
     }
 
     /** @param Token $tradeble */
@@ -57,7 +62,7 @@ class DepositTokenStrategy implements BalanceStrategyInterface
 
         $this->balanceHandler->withdraw(
             $user,
-            Token::getFromSymbol($token->getCryptoSymbol()),
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
             $tokenDepositFee
         );
     }

@@ -328,11 +328,16 @@ class Exchanger implements ExchangerInterface
         string $tokenName,
         string $amount
     ): bool {
-        /** @var Token $token */
+        /** @var Token|null $token */
         $token = $this->tm->findByName($tokenName);
+
+        if (!$token) {
+            return false;
+        }
+
         $profile = $token->getProfile();
 
-        if ($profile && $user === $profile->getUser()) {
+        if ($profile && $user->getId() === $profile->getUser()->getId()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
                 $this->bh->balances($user, [$token]),
