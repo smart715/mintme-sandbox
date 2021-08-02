@@ -64,7 +64,7 @@ class TokenRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('token')
             ->leftJoin('token.crypto', 'crypto')
-            ->where('token.deployed IS NOT NULL')
+            ->where('token.deployed = true')
             ->orderBy('token.crypto', 'ASC');
 
         if (is_int($offset)) {
