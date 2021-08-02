@@ -408,7 +408,7 @@ class DonationHandler implements DonationHandlerInterface
         $balance = $checkBalance && $user
             ? $this->balanceHandler->balance(
                 $user,
-                Token::getFromSymbol($currency)
+                $this->cryptoManager->findBySymbol($currency)
             )->getAvailable()
             : null;
 
