@@ -846,6 +846,10 @@ export default {
         if (!this.airdropCampaign) {
             this.getAirdropCampaign();
         } else {
+            if (!this.loggedIn) {
+                this.updateAirdropActionFromSession();
+            }
+
             this.loaded = true;
         }
 
