@@ -7,10 +7,6 @@
     {{ include('@FOSUser/Security/login_content.html.twig') }}
 {% endblock fos_user_content %}
 
-{% block contentclass %}
-    {% if isEmbeded() %}bg-secondary{% endif %}
-{% endblock %}
-
 {% block messageContainer %} {% endblock %}
 
 {% block pagescripts %}
