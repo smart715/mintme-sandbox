@@ -33,6 +33,7 @@ binance_account: '0xFd134EDa83a3A21690084fce5984aAFc1Ed68a62'
 binance_cli_timeout: 30000
 binance_gas_limit: 21000
 binance_withdraw_contract_gas_limit: 900000
+binance_transfer_gas_limit: 90000
 
 # If estimate gas function returns more than this value, then gateway will throw error and abort transaction
 upper_gas_limit: 200000
