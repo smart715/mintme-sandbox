@@ -138,20 +138,30 @@ export default {
         },
         groupPosts: function() {
             let postsNotifications = {};
+            let viewedPostsNotifications = {};
             let postsToDelete = [];
 
             this.userNotifications.forEach((item) => {
-                if (notificationTypes.newPost !== item.type || item.viewed) {
+                if (notificationTypes.newPost !== item.type && item.viewed) {
                     return;
                 }
 
                 let jsonData = JSON.parse(item.jsonData);
 
+                if (notificationTypes.newPost === item.type && item.viewed) {
+                    if (viewedPostsNotifications[jsonData.tokenName] === undefined) {
+                        item.number = 1;
+                        viewedPostsNotifications[jsonData.tokenName] = item;
+                    } else {
+                        viewedPostsNotifications[jsonData.tokenName].number += 1;
+                    }
+                }
+
                 if (postsNotifications[jsonData.tokenName] === undefined) {
-                  item.number = 1;
-                  postsNotifications[jsonData.tokenName] = item;
+                    item.number = 1;
+                    postsNotifications[jsonData.tokenName] = item;
                 } else {
-                  postsNotifications[jsonData.tokenName].number += 1;
+                    postsNotifications[jsonData.tokenName].number += 1;
                 }
 
                 postsToDelete.push(item);
