@@ -204,3 +204,5 @@ parameters:
     auth_make_disable_withdrawals_and_deposit: false
     auth_make_disable_donations: false
     minimum_order_value_usd: 0.1
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_api_timeout: '10'

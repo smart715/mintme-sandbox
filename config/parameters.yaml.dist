@@ -330,3 +330,6 @@ parameters:
     # minimum order value (USD) to make buy/sell orders
     minimum_order_value_usd: 0.1
 
+    # discord
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_api_timeout: '10'

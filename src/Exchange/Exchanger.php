@@ -206,6 +206,89 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    public function executeOrder(
+        User $user,
+        Market $market,
+        string $amountInput,
+        string $expectedToReceive,
+        int $side,
+        ?string $fee = null
+    ): TradeResult {
+        $isSellSide = Order::SELL_SIDE === $side;
+
+        if ($isSellSide && $this->exceedAvailableReleased($user, $market->getQuote()->getSymbol(), $amountInput)) {
+            return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
+        }
+
+        $avgPrice = $this->mw->parse(
+            $expectedToReceive,
+            $market->getBase()->getSymbol()
+        )->divide($amountInput);
+
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $this->mw->format($avgPrice),
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
+        }
+
+        $amount = $this->mw->parse(
+            $this->parseAmount($amountInput, $market),
+            $this->getSymbol($market->getQuote())
+        );
+
+        $fee = $fee ?? (string)$this->bag->get($isSellSide ? 'maker_fee_rate' : 'taker_fee_rate');
+
+        $fee = $this->mw->parse(
+            $fee,
+            $this->getSymbol($market->getQuote())
+        );
+
+        $order = new Order(
+            null,
+            $user,
+            null,
+            $market,
+            $amount,
+            $side,
+            $avgPrice,
+            Order::PENDING_STATUS,
+            $fee,
+            null,
+            null,
+            $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
+        );
+
+        $tradeResult = $this->trader->executeOrder($order);
+
+        try {
+            $this->mp->send($market);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
+            );
+        }
+
+        $this->logger->info(
+            sprintf('Excecute %s order', Order::BUY_SIDE === $side ? 'buy' : 'sell'),
+            [
+                'base' => $market->getBase()->getSymbol(),
+                'quote' => $market->getQuote()->getSymbol(),
+                'amount' => $amount->getAmount(),
+                'received' => $expectedToReceive,
+            ]
+        );
+
+        return $tradeResult;
+    }
+
     private function parseAmount(string $amount, Market $market, bool $useBase = false): string
     {
         /** @var Crypto $crypto */
@@ -245,14 +328,20 @@ class Exchanger implements ExchangerInterface
         string $tokenName,
         string $amount
     ): bool {
-        /** @var Token $token */
+        /** @var Token|null $token */
         $token = $this->tm->findByName($tokenName);
+
+        if (!$token) {
+            return false;
+        }
+
         $profile = $token->getProfile();
 
-        if ($profile && $user === $profile->getUser()) {
+        if ($profile && $user->getId() === $profile->getUser()->getId()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
-                $this->bh->balances($user, [$token])
+                $this->bh->balances($user, [$token]),
+                $user
             )[$token->getSymbol()];
 
             return $this->mw
@@ -328,13 +417,12 @@ class Exchanger implements ExchangerInterface
 
     private function getBalance(User $user, TradebleInterface $tradeble): Money
     {
-        /** @var Token $token */
-        $token = $tradeble instanceof Crypto
-            ? Token::getFromCrypto($tradeble)
-            : $tradeble;
+        $balanceResult = $this->bh->balance($user, $tradeble);
 
-        $balanceResult = $this->bh->balance($user, $token);
+        if ($tradeble instanceof Token) {
+            return $this->tm->getRealBalance($tradeble, $balanceResult, $user)->getAvailable();
+        }
 
-        return $this->tm->getRealBalance($token, $balanceResult)->getAvailable();
+        return $balanceResult->getAvailable();
     }
 }

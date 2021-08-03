@@ -54,7 +54,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/Address")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -81,7 +81,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/BalanceResult")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -90,12 +90,7 @@ class WalletController extends AbstractFOSRestController
         /** @var User $user */
         $user = $this->getUser();
 
-        $cryptos = array_map(
-            static fn (Crypto $crypto) => Token::getFromCrypto($crypto),
-            $this->cryptoManager->findAll()
-        );
-
-        $tradebles = array_merge($cryptos, $user->getTokens());
+        $tradebles = array_merge($this->cryptoManager->findAll(), $user->getTokens());
 
         $balances = $balanceHandler->balances(
             $user,
@@ -134,7 +129,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/Transaction")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -180,9 +175,9 @@ class WalletController extends AbstractFOSRestController
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="201",description="Returns success message")
-     * @SWG\Response(response="404",description="Currency not found")
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="201", description="Returns success message")
+     * @SWG\Response(response="404", description="Currency not found")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(

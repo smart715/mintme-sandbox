@@ -12,6 +12,7 @@ interface DonationFetcherInterface
         string $fee,
         int $tokenCreatorId
     ): CheckDonationResult;
+
     public function makeDonation(
         int $donorUserId,
         string $marketName,

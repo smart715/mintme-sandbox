@@ -93,30 +93,50 @@ class Trader implements TraderInterface
             $this->referralFee ? (string)$this->referralFee : '0'
         );
 
-        $quote = $order->getMarket()->getQuote();
-
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
             $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
             if ($updateTokenOrCrypto) {
-                $userMaker = $order->getMaker();
-
-                if ($quote instanceof Token) {
-                    $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
-
-                    if ($referencer = $userMaker->getReferencer()) {
-                        $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
-                    }
-                } elseif ($quote instanceof Crypto) {
-                    $this->updateUserCrypto($userMaker, $quote);
-                }
+                $this->updateUserTradableRelation($order);
             }
         }
 
         if (TradeResult::FAILED === $result->getResult()) {
             $this->logger->error(
                 "Failed to place new order for user {$order->getMaker()->getEmail()}. 
+                Reason: {$result->getMessage()}",
+                (array)$this->normalizer->normalize($result, null, [
+                    'groups' => ['Default'],
+                ])
+            );
+        }
+
+        return $result;
+    }
+
+    public function executeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
+    {
+        $result = $this->fetcher->executeOrder(
+            $order->getMaker()->getId(),
+            $this->marketNameConverter->convert($order->getMarket()),
+            $order->getSide(),
+            $this->moneyWrapper->format($order->getAmount()),
+            $this->moneyWrapper->format($order->getFee()),
+            $order->getReferralId() ?: 0,
+            $this->referralFee ? (string)$this->referralFee : '0'
+        );
+
+        if (TradeResult::SUCCESS === $result->getResult()) {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
+
+            if ($updateTokenOrCrypto) {
+                $this->updateUserTradableRelation($order);
+            }
+        } elseif (TradeResult::FAILED === $result->getResult()) {
+            $this->logger->error(
+                "Failed to execute order for user {$order->getMaker()->getEmail()}.
                 Reason: {$result->getMessage()}",
                 (array)$this->normalizer->normalize($result, null, [
                     'groups' => ['Default'],
@@ -142,13 +162,12 @@ class Trader implements TraderInterface
                 "Failed to cancel order '{$order->getId()}' for user {$userMaker->getEmail()}. 
                 Reason: {$result->getMessage()}"
             );
+        } else {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
 
-        $quote = $order->getMarket()->getQuote();
-
-        if ($quote instanceof Token) {
-            $this->balanceHandler->updateUserTokenRelation($userMaker, $quote);
-        }
+        $this->updateUserTradableRelation($order);
 
         return $result;
     }
@@ -195,6 +214,22 @@ class Trader implements TraderInterface
         return array_map(function (array $rawOrder) use ($user, $market) {
             return $this->createOrder($rawOrder, $user, $market, Order::PENDING_STATUS);
         }, $records);
+    }
+
+    private function updateUserTradableRelation(Order $order): void
+    {
+        $user = $order->getMaker();
+        $quote = $order->getMarket()->getQuote();
+
+        if ($quote instanceof Token) {
+            $this->balanceHandler->updateUserTokenRelation($user, $quote);
+
+            if ($referencer = $user->getReferencer()) {
+                $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
+            }
+        } elseif ($quote instanceof Crypto) {
+            $this->updateUserCrypto($user, $quote);
+        }
     }
 
     private function updateUserCrypto(User $user, Crypto $crypto): void

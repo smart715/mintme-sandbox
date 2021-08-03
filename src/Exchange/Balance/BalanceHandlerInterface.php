@@ -22,43 +22,43 @@ interface BalanceHandlerInterface
 {
     /**
      * @param User $user
-     * @param Token $token
+     * @param TradebleInterface $tradable
      * @param Money $amount
      * @param int|null $businessId
      * @throws FetchException
      * @throws BalanceException
      */
-    public function deposit(User $user, Token $token, Money $amount, ?int $businessId = null): void;
+    public function deposit(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void;
 
     /**
      * @param User $user
-     * @param Token $token
+     * @param TradebleInterface $tradable
      * @param Money $amount
      * @param int|null $businessId
      * @throws FetchException
      * @throws BalanceException
      */
-    public function withdraw(User $user, Token $token, Money $amount, ?int $businessId = null): void;
+    public function withdraw(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void;
 
     public function summary(Token $token): SummaryResult;
 
-    public function balance(User $user, Token $token): BalanceResult;
+    public function balance(User $user, TradebleInterface $tradable): BalanceResult;
 
     public function exchangeBalance(User $user, Token $token): Money;
 
     /**
      * @param User $user
-     * @param Token[] $tokens
+     * @param TradebleInterface[] $tradables
      * @return BalanceResultContainer
      */
-    public function balances(User $user, array $tokens): BalanceResultContainer;
+    public function balances(User $user, array $tradables): BalanceResultContainer;
 
     /**
      * @param User $user
-     * @param Token[] $tokens
+     * @param TradebleInterface[] $tradables
      * @return BalanceResult[]
      */
-    public function indexedBalances(User $user, array $tokens): array;
+    public function indexedBalances(User $user, array $tradables): array;
 
     public function isNotExchanged(Token $token, int $amount): bool;
 
@@ -78,7 +78,7 @@ interface BalanceHandlerInterface
         int $max = 40
     ): array;
 
-    public function update(User $user, Token $token, Money $amount, string $type, ?int $businessId = null): void;
+    public function update(User $user, TradebleInterface $tradable, Money $amount, string $type, ?int $businessId = null): void;
 
-    public function updateUserTokenRelation(User $user, Token $token): void;
+    public function updateUserTokenRelation(User $user, TradebleInterface $tradable): void;
 }

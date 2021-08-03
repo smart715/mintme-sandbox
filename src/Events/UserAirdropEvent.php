@@ -5,7 +5,7 @@ namespace App\Events;
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\User;
 
-class UserAirdropEvent extends AirdropEvent implements UserEventInterface
+class UserAirdropEvent extends AirdropEvent implements TokenUserEventInterface
 {
     protected User $user;
 

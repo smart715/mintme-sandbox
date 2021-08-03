@@ -96,7 +96,7 @@ class WalletController extends DevApiController
      *         @SWG\Items(ref="#/definitions/Address")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -161,7 +161,7 @@ class WalletController extends DevApiController
      *         @SWG\Items(ref="#/definitions/Transaction")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -205,9 +205,9 @@ class WalletController extends DevApiController
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="201",description="Returns success message")
-     * @SWG\Response(response="404",description="Currency not found")
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="201", description="Returns success message")
+     * @SWG\Response(response="404", description="Currency not found")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(
@@ -318,6 +318,6 @@ class WalletController extends DevApiController
 
         return $this->view([
             'message' => "Your transaction has been successfully processed and queued to be sent.",
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_CREATED);
     }
 }
