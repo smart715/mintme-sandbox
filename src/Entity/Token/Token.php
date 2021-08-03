@@ -583,11 +583,6 @@ class Token implements TradebleInterface, ImagineInterface
         return self::DEPLOYED === $this->getDeploymentStatus();
     }
 
-    public static function getFromSymbol(string $symbol): self
-    {
-        return (new self())->setName($symbol);
-    }
-
     public function getCreated(): \DateTimeImmutable
     {
         return $this->created;
