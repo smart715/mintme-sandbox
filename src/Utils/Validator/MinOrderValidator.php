@@ -95,7 +95,7 @@ class MinOrderValidator implements ValidatorInterface
             return false;
         }
 
-        if ($this->amount >= $quoteMinimal) {
+        if ($this->amount < $quoteMinimal) {
             $quoteSymbol = $quote instanceof Token
                 ? Symbols::TOK
                 : $quote->getSymbol();
