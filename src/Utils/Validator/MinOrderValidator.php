@@ -6,6 +6,7 @@ use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
@@ -38,6 +39,8 @@ class MinOrderValidator implements ValidatorInterface
 
     private TranslatorInterface $translator;
 
+    private RebrandingConverterInterface $rebranding;
+
     public function __construct(
         ?TradebleInterface $baseTradable,
         ?TradebleInterface $quoteTradable,
@@ -46,7 +49,8 @@ class MinOrderValidator implements ValidatorInterface
         string $minimalPriceOrder,
         MoneyWrapperInterface $moneyWrapper,
         CryptoRatesFetcherInterface $cryptoRatesFetcher,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        RebrandingConverterInterface $rebranding
     ) {
         $this->baseTradable = $baseTradable;
         $this->quoteTradable = $quoteTradable;
@@ -56,6 +60,7 @@ class MinOrderValidator implements ValidatorInterface
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoRatesFetcher = $cryptoRatesFetcher;
         $this->translator = $translator;
+        $this->rebranding = $rebranding;
     }
 
     public function validate(): bool
@@ -68,9 +73,7 @@ class MinOrderValidator implements ValidatorInterface
 
         $baseUnit = $base->getShowSubunit();
 
-        $quoteUnit = $quote instanceof Token
-            ? Token::TOKEN_SUBUNIT
-            : $quote->getShowSubunit();
+        $quoteUnit = $quote->getShowSubunit();
 
         $baseMinimal = $baseUnit > 0
             ? $this->getMinimal($baseUnit)
@@ -80,9 +83,35 @@ class MinOrderValidator implements ValidatorInterface
             ? $this->getMinimal($quoteUnit)
             : 0;
 
-        return $this->price >= $baseMinimal
-            && $this->amount >= $quoteMinimal
-            && $this->validMinUSD($base, $baseUnit);
+        if ($this->price < $baseMinimal) {
+            $this->message = $this->translator->trans(
+                'trade.buy_order.amount_has_to_be',
+                [
+                    '%minTotalPrice%' => (string)$baseMinimal,
+                    '%baseSymbol%' => $this->rebranding->convert($base->getSymbol()),
+                ]
+            );
+
+            return false;
+        }
+
+        if ($this->amount >= $quoteMinimal) {
+            $quoteSymbol = $quote instanceof Token
+                ? Symbols::TOK
+                : $quote->getSymbol();
+
+            $this->message = $this->translator->trans(
+                'trade.buy_order.amount_has_to_be',
+                [
+                    '%minTotalPrice%' => (string)$quoteMinimal,
+                    '%baseSymbol%' => $this->rebranding->convert($quoteSymbol),
+                ]
+            );
+
+            return false;
+        }
+
+        return $this->validMinUSD($base, $baseUnit);
     }
 
     public function getMessage(): string
