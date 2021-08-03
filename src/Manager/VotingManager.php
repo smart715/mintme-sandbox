@@ -20,14 +20,19 @@ class VotingManager implements VotingManagerInterface
         return $this->repository->find($id);
     }
 
+    public function getBySlug(string $slug): ?Voting
+    {
+        return $this->repository->findOneBy(['slug' => $slug]);
+    }
+
     public function getByOptionId(int $optionId): ?Voting
     {
         return $this->repository->getByOptionId($optionId);
     }
 
-    public function getByIdForTradable(int $id, TradebleInterface $tradable): ?Voting
+    public function getBySlugForTradable(string $slug, TradebleInterface $tradable): ?Voting
     {
-        $filtered = array_filter($tradable->getVotings(), static fn(Voting $voting) => $voting->getId() === $id);
+        $filtered = array_filter($tradable->getVotings(), static fn(Voting $voting) => $voting->getSlug() === $slug);
 
         return array_pop($filtered);
     }

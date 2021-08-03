@@ -9,5 +9,5 @@ interface VotingManagerInterface
 {
     public function getById(int $id): ?Voting;
     public function getByOptionId(int $optionId): ?Voting;
-    public function getByIdForTradable(int $id, TradebleInterface $tradable): ?Voting;
+    public function getBySlugForTradable(string $slug, TradebleInterface $tradable): ?Voting;
 }

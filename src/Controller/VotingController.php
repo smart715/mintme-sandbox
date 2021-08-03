@@ -90,11 +90,11 @@ class VotingController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="show_voting", requirements={"id"="\d+"}, options={"expose"=true})
+     * @Route("/{slug}", name="show_voting", requirements={"slug"="\w+"}, options={"expose"=true})
      */
-    public function show(int $id): Response
+    public function show(string $slug): Response
     {
-        $voting = $this->votingManager->getByIdForTradable($id, $this->mintme);
+        $voting = $this->votingManager->getBySlugForTradable($slug, $this->mintme);
 
         if (!$voting) {
             throw new NotFoundVotingException();

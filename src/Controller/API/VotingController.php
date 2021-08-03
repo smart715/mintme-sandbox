@@ -25,6 +25,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -40,6 +41,7 @@ class VotingController extends AbstractFOSRestController
     private BalanceHandlerInterface $balanceHandler;
     private MoneyWrapperInterface $moneyWrapper;
     private TranslatorInterface $translator;
+    private AsciiSlugger $slugger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -59,6 +61,7 @@ class VotingController extends AbstractFOSRestController
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->translator = $translator;
+        $this->slugger = new AsciiSlugger();
     }
 
     /**
@@ -110,6 +113,14 @@ class VotingController extends AbstractFOSRestController
         if (!$form->isValid()) {
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
+
+        $slug = $baseSlug = $this->slugger->slug($voting->getTitle())->toString();
+
+        for ($i = 2; $this->votingManager->getBySlug($slug); $i++) {
+            $slug = $baseSlug . '-' . $i;
+        }
+
+        $voting->setSlug($slug);
 
         $this->entityManager->persist($voting);
         $this->entityManager->flush();
