@@ -7,6 +7,7 @@ use App\Entity\ApiKey;
 use App\Entity\DiscordRoleUser;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
+use App\Events\UserEvents;
 use App\Exception\Discord\DiscordException;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
@@ -21,7 +22,6 @@ use App\Manager\TwoFactorManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,6 +30,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -91,7 +92,28 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ? $user->getApiClients()
             : null;
 
-        $passwordForm = $this->getPasswordForm($request, $keys);
+        $passwordForm = $this->getPasswordForm();
+        $passwordForm->handleRequest($request);
+
+        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
+            $this->userManager->updatePassword($user);
+            $this->userManager->updateUser($user);
+            $this->addFlash('success', $this->translator->trans('toasted.success.password_updated'));
+            $this->userActionLogger->info('Password was updated successfully');
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new FilterUserResponseEvent(
+                    $user,
+                    $request,
+                    new Response(Response::HTTP_OK)
+                ),
+                UserEvents::PASSWORD_UPDATED
+            );
+
+            return $this->redirectToRoute('settings');
+        }
+
         $disconnectDiscordForm = $this->getDisconnectDiscordForm($request);
 
         $this->entityManager->flush();
@@ -289,29 +311,15 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->redirectToRoute('settings');
     }
 
-    private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
+    private function getPasswordForm(): FormInterface
     {
         /** @var User $user */
         $user = $this->getUser();
-        $passwordForm = $this->createForm(ChangePasswordType::class, $user);
-        $passwordForm->handleRequest($request);
 
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $this->userManager->updatePassword($user);
-            $this->userManager->updateUser($user);
-            $this->addFlash('success', 'Password was updated successfully');
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new FilterUserResponseEvent(
-                    $user,
-                    $request,
-                    new Response(Response::HTTP_OK)
-                ),
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
-            );
-        }
-
-        return $passwordForm;
+        return $this->createForm(ChangePasswordType::class, $user, [
+            'action' => $this->generateUrl('settings'),
+            'method' => 'POST',
+            ]);
     }
 
     private function getDisconnectDiscordForm(Request $request): FormInterface

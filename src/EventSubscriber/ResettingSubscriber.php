@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\User;
+use App\Events\UserEvents;
 use App\Mailer\MailerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
@@ -23,7 +24,7 @@ class ResettingSubscriber implements EventSubscriberInterface
     {
         return [
             FOSUserEvents::RESETTING_RESET_COMPLETED => 'sendPasswordResetMail',
-            FOSUserEvents::CHANGE_PASSWORD_COMPLETED => 'sendPasswordResetMail',
+            UserEvents::PASSWORD_UPDATED => 'sendPasswordResetMail',
             FOSUserEvents::RESETTING_RESET_REQUEST => 'resetToken',
         ];
     }
