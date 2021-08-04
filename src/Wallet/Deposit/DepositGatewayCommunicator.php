@@ -4,6 +4,7 @@ namespace App\Wallet\Deposit;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Deposit\Model\DepositCredentials;
@@ -41,19 +42,21 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
+    /** {@inheritdoc} */
+    public function getDepositCredentials(int $userId, array $cryptos): DepositCredentials
     {
         $credentials = [];
 
-        foreach ($predefinedTokens as $token) {
+        /** @var Crypto $crypto */
+        foreach ($cryptos as $crypto) {
             $response = $this->jsonRpc->send(
                 self::GET_DEPOSIT_CREDENTIALS_METHOD,
                 [
                     'user_id' => $userId,
-                    'currency' => $token->getSymbol(),
+                    'currency' => $crypto->getSymbol(),
                 ]
             );
-            $credentials[$token->getName()] = $response->hasError() ?
+            $credentials[$crypto->getSymbol()] = $response->hasError() ?
                 "Address unavailable." :
                 $response->getResult();
         }

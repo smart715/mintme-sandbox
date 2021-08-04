@@ -44,8 +44,8 @@ interface WalletInterface
 
     /**
      * @param User $user
-     * @param array $cryptos
-     * @return array<Address>
+     * @param Crypto[] $cryptos
+     * @return Address[]
      */
     public function getDepositCredentials(User $user, array $cryptos): array;
 
