@@ -32,6 +32,11 @@ class PostManager implements PostManagerInterface
         $this->balanceHandler = $balanceHandler;
     }
 
+    public function getRepository(): PostRepository
+    {
+        return $this->repository;
+    }
+
     public function getById(int $id): ?Post
     {
         return $this->repository->find($id);

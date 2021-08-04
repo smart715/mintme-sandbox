@@ -12,28 +12,32 @@ class VotingManagerTest extends TestCase
 {
     public function testGetByIdForTradableExist(): void
     {
+        $slug = 'some-random-slug';
+
         $tradable = $this->mockTradable([
-            $this->mockVoting(1),
+            $this->mockVoting($slug),
         ]);
+
         $vm = new VotingManager($this->mockRepo());
 
-        $this->assertEquals($vm->getByIdForTradable(1, $tradable)->getId(), 1);
+        $this->assertEquals($vm->getBySlugForTradable($slug, $tradable)->getSlug(), $slug);
     }
 
     public function testGetByIdForTradableNotExist(): void
     {
         $tradable = $this->mockTradable([
-            $this->mockVoting(2),
+            $this->mockVoting('another-ramdom-slug'),
         ]);
+
         $vm = new VotingManager($this->mockRepo());
 
-        $this->assertEquals($vm->getByIdForTradable(1, $tradable), null);
+        $this->assertEquals($vm->getBySlugForTradable('i-am-not-the-same', $tradable), null);
     }
 
-    private function mockVoting(int $id): Voting
+    private function mockVoting(string $slug): Voting
     {
         $voting = $this->createMock(Voting::class);
-        $voting->method('getId')->willReturn($id);
+        $voting->method('getSlug')->willReturn($slug);
 
         return $voting;
     }

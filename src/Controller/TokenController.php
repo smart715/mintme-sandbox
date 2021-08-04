@@ -210,12 +210,12 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/voting/{id}", name="token_show_voting", requirements={"id"="\d+"}, options={"expose"=true})
+     * @Route("/{name}/voting/{slug}", name="token_show_voting", options={"expose"=true})
      */
-    public function showVoting(Request $request, string $name, int $id): Response
+    public function showVoting(Request $request, string $name, string $slug): Response
     {
         $token = $this->fetchToken($request, $name);
-        $voting = $this->votingManager->getByIdForTradable($id, $token);
+        $voting = $this->votingManager->getBySlugForTradable($slug, $token);
 
         if (!$voting) {
             throw new NotFoundVotingException();
