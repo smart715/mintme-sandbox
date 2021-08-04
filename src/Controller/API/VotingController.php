@@ -16,6 +16,7 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\VotingManagerInterface;
 use App\Manager\VotingOptionManagerInterface;
+use App\Utils\Converter\SlugConverterInterface;
 use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,7 +26,6 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -41,7 +41,7 @@ class VotingController extends AbstractFOSRestController
     private BalanceHandlerInterface $balanceHandler;
     private MoneyWrapperInterface $moneyWrapper;
     private TranslatorInterface $translator;
-    private AsciiSlugger $slugger;
+    private SlugConverterInterface $slugger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -51,7 +51,8 @@ class VotingController extends AbstractFOSRestController
         VotingOptionManagerInterface $optionManager,
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        SlugConverterInterface $slugger
     ) {
         $this->entityManager = $entityManager;
         $this->tokenManager = $tokenManager;
@@ -61,7 +62,7 @@ class VotingController extends AbstractFOSRestController
         $this->balanceHandler = $balanceHandler;
         $this->moneyWrapper = $moneyWrapper;
         $this->translator = $translator;
-        $this->slugger = new AsciiSlugger();
+        $this->slugger = $slugger;
     }
 
     /**
@@ -114,11 +115,10 @@ class VotingController extends AbstractFOSRestController
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
 
-        $slug = $baseSlug = $this->slugger->slug($voting->getTitle())->toString();
-
-        for ($i = 2; $this->votingManager->getBySlug($slug); $i++) {
-            $slug = $baseSlug . '-' . $i;
-        }
+        $slug = $this->slugger->convert(
+            $voting->getTitle(),
+            $this->votingManager->getRepository()
+        );
 
         $voting->setSlug($slug);
 

@@ -3,10 +3,8 @@
 namespace App\Tests\Utils\Converter;
 
 use App\Utils\Converter\SlugConverter;
-use App\Repository\VotingRepository;
-use App\Entity\Voting;
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityRepository;
+use PHPUnit\Framework\TestCase;
 
 class SlugConverterTest extends TestCase
 {
@@ -36,7 +34,7 @@ class SlugConverterTest extends TestCase
         
         if ($mockMethod) {
             // true's would be "Entities", false would be "not found"
-            $repo->method('findOneBy')->will($this->onConsecutiveCalls(true , true, false));
+            $repo->method('findOneBy')->will($this->onConsecutiveCalls(true, true, false));
             // slug should end with "-3"
         }
 

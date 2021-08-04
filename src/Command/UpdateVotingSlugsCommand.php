@@ -2,31 +2,28 @@
 
 namespace App\Command;
 
-use App\Manager\VotingManagerInterface;
 use App\Repository\VotingRepository;
+use App\Utils\Converter\SlugConverterInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class UpdateVotingSlugsCommand extends Command
 {
-    private VotingManagerInterface $votingManager;
     private VotingRepository $votingRepository;
     private EntityManagerInterface $entityManager;
-    private AsciiSlugger $slugger;
+    private SlugConverterInterface $slugger;
 
     public function __construct(
-        VotingManagerInterface $votingManager,
         VotingRepository $votingRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SlugConverterInterface $slugger
     ) {
-        $this->votingManager = $votingManager;
         $this->votingRepository = $votingRepository;
         $this->entityManager = $entityManager;
-        $this->slugger = new AsciiSlugger();
+        $this->slugger = $slugger;
 
         parent::__construct();
     }
@@ -49,11 +46,7 @@ class UpdateVotingSlugsCommand extends Command
             $this->entityManager->beginTransaction();
 
             foreach ($votings as $voting) {
-                $slug = $baseSlug = $this->slugger->slug($voting->getTitle())->toString();
-
-                for ($i = 2; $this->votingManager->getBySlug($slug); $i++) {
-                    $slug = $baseSlug . '-' . $i;
-                }
+                $slug = $this->slugger->convert($voting->getTitle(), $this->votingRepository);
 
                 $voting->setSlug($slug);
 

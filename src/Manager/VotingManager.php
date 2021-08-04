@@ -14,6 +14,11 @@ class VotingManager implements VotingManagerInterface
     {
         $this->repository = $repository;
     }
+    
+    public function getRepository(): VotingRepository
+    {
+        return $this->repository;
+    }
 
     public function getById(int $id): ?Voting
     {

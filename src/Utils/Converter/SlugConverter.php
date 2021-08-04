@@ -14,8 +14,11 @@ class SlugConverter implements SlugConverterInterface
         $this->slugger = new AsciiSlugger();
     }
 
-    public function convert(string $from, EntityRepository $repository, $propertyName = 'slug'): string
-    {
+    public function convert(
+        string $from,
+        EntityRepository $repository,
+        string $propertyName = 'slug'
+    ): string {
         $slug = $baseSlug = $this->slugger->slug($from)->toString();
 
         $i = 2;
@@ -30,4 +33,3 @@ class SlugConverter implements SlugConverterInterface
         return $slug;
     }
 }
-
