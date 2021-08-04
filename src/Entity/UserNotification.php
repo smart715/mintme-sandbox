@@ -118,6 +118,9 @@ class UserNotification
         return $this;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getDate(): DateTimeImmutable
     {
         return $this->date;

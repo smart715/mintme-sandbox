@@ -66,7 +66,8 @@ import VueScroll from 'vuescroll';
 import {mixin as clickaway} from 'vue-clickaway';
 import NotificationType from './NotificationType';
 import {LoggerMixin} from '../mixins';
-import {notificationTypes} from '../utils/constants';
+import {notificationTypes, GENERAL} from '../utils/constants';
+import moment from 'moment';
 
 library.add(faCircleNotch);
 
@@ -148,20 +149,22 @@ export default {
 
                 let jsonData = JSON.parse(item.jsonData);
 
-                if (notificationTypes.newPost === item.type && item.viewed) {
-                    if (viewedPostsNotifications[jsonData.tokenName] === undefined) {
-                        item.number = 1;
-                        viewedPostsNotifications[jsonData.tokenName] = item;
-                    } else {
-                        viewedPostsNotifications[jsonData.tokenName].number += 1;
-                    }
-                }
+                if (item.viewed) {
+                    const tokenSlug = jsonData.tokenName + ' ' + moment(item.date, GENERAL.date);
 
-                if (postsNotifications[jsonData.tokenName] === undefined) {
-                    item.number = 1;
-                    postsNotifications[jsonData.tokenName] = item;
+                    if (viewedPostsNotifications[tokenSlug] === undefined) {
+                        item.number = 1;
+                        viewedPostsNotifications[tokenSlug] = item;
+                    } else {
+                          viewedPostsNotifications[tokenSlug].number += 1;
+                    }
                 } else {
-                    postsNotifications[jsonData.tokenName].number += 1;
+                    if (postsNotifications[jsonData.tokenName] === undefined) {
+                        item.number = 1;
+                        postsNotifications[jsonData.tokenName] = item;
+                    } else {
+                        postsNotifications[jsonData.tokenName].number += 1;
+                    }
                 }
 
                 postsToDelete.push(item);
@@ -169,11 +172,21 @@ export default {
 
             this.userNotifications = this.userNotifications.filter((post) => !postsToDelete.includes(post));
 
+            for (const notification in viewedPostsNotifications) {
+                if (viewedPostsNotifications.hasOwnProperty(notification)) {
+                    this.userNotifications.unshift(viewedPostsNotifications[notification]);
+                }
+            }
+
             for (const notification in postsNotifications) {
                 if (postsNotifications.hasOwnProperty(notification)) {
                     this.userNotifications.unshift(postsNotifications[notification]);
                 }
             }
+
+            this.userNotifications.sort(function(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
         },
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
