@@ -90,7 +90,7 @@ class VotingController extends Controller
     }
 
     /**
-     * @Route("/{slug}", name="show_voting", requirements={"slug"="\w+"}, options={"expose"=true})
+     * @Route("/{slug}", name="show_voting", options={"expose"=true})
      */
     public function show(string $slug): Response
     {

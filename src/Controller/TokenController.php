@@ -210,7 +210,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Route("/{name}/voting/{slug}", name="token_show_voting", requirements={"slug"="\w+"}, options={"expose"=true})
+     * @Route("/{name}/voting/{slug}", name="token_show_voting", options={"expose"=true})
      */
     public function showVoting(Request $request, string $name, string $slug): Response
     {
