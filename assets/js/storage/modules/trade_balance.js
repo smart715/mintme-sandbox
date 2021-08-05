@@ -58,7 +58,7 @@ const storage = {
     },
     mutations: {
         setHasQuoteRelation: function(state, n) {
-            state.hasQuoteRelation= n;
+            state.hasQuoteRelation = n;
         },
         setQuoteBalance: function(state, n) {
             state.quoteBalance = n;
