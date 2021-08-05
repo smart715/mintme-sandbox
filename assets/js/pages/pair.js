@@ -211,7 +211,7 @@ new Vue({
                     case tabsArr.indexOf(tabs.show_voting):
                         url = this.$routing.generate('token_show_voting', {
                             name: this.tokenName,
-                            id: this.currentVoting.id,
+                            slug: this.currentVoting.slug,
                         });
 
                         break;
