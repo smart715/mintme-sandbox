@@ -54,6 +54,11 @@ abstract class Voting
     private ?\DateTimeImmutable $endDate = null; // phpcs:ignore
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private ?string $slug = null; // phpcs:ignore
+
+    /**
      * @ORM\OneToMany(
      *     targetEntity="App\Entity\Voting\Option",
      *     mappedBy="voting",
@@ -147,6 +152,21 @@ abstract class Voting
         }
 
         $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }

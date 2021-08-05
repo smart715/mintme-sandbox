@@ -75,7 +75,7 @@ export default {
             this.goToPage(VOTING_PAGES.create_voting);
         },
         goToShowVoting() {
-            this.goToPage(VOTING_PAGES.show_voting, {id: this.voting.id});
+            this.goToPage(VOTING_PAGES.show_voting, {slug: this.voting.slug});
         },
         goToPage(page, params = {}) {
             history.pushState({}, 'Mintme', this.$routing.generate(page, params));
