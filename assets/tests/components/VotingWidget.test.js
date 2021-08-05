@@ -99,7 +99,7 @@ describe('VotingWidget', () => {
             {},
             {
                 getCurrentVoting: () => {
-                    return {id: 1};
+                    return {slug: 'foo'};
                 },
             },
         );

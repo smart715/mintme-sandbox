@@ -78,11 +78,15 @@ export default {
                     this.notifySuccess(this.$t('voting.added_successfully'));
 
                     const routeName = this.isToken ? 'token_show_voting' : 'show_voting';
+                    const routeData = {
+                        slug: data.voting.slug,
+                    };
 
-                    window.location.href = this.$routing.generate(routeName, {
-                        name: this.tokenName,
-                        id: data.voting.id,
-                    });
+                    if (this.isToken) {
+                        routeData.name = this.tokenName;
+                    }
+
+                    window.location.href = this.$routing.generate(routeName, routeData);
                 })
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.try_later'));

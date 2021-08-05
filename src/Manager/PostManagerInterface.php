@@ -4,9 +4,12 @@ namespace App\Manager;
 
 use App\Entity\Post;
 use App\Entity\User;
+use App\Repository\PostRepository;
 
 interface PostManagerInterface
 {
+    public function getRepository(): PostRepository;
+
     public function getById(int $id): ?Post;
     public function getBySlug(string $slug): ?Post;
 
