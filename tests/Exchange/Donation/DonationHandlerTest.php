@@ -8,7 +8,7 @@ use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Config\DonationConfig;
+use App\Exchange\Config\QuickTradeConfig;
 use App\Exchange\Donation\DonationFetcherInterface;
 use App\Exchange\Donation\DonationHandler;
 use App\Exchange\ExchangerInterface;
@@ -82,7 +82,7 @@ class DonationHandlerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $moneyWrapper = $this->mockMoneyWrapper();
-        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
+        $donationConfig = new QuickTradeConfig($this->donationParams, $moneyWrapper);
 
         $donationHandler = new DonationHandler(
             $fetcher,
@@ -157,7 +157,7 @@ class DonationHandlerTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
 
         $moneyWrapper = $this->mockMoneyWrapper();
-        $donationConfig = new DonationConfig($this->donationParams, $moneyWrapper);
+        $donationConfig = new QuickTradeConfig($this->donationParams, $moneyWrapper);
 
         $donationHandler = new DonationHandler(
             $fetcher,

@@ -6,6 +6,7 @@ use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
 use App\Utils\Symbols;
 use App\Utils\Validator\MinOrderValidator;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -30,6 +31,7 @@ class MinOrderValidatorTest extends TestCase
         $moneyWrapper = $this->mockMoneyWrapper();
         $cryptoRatesFetcher = $this->mockCryptoRatesFetcher();
         $translator = $this->mockTranslator();
+        $rebranding = $this->mockRebranding();
 
         $minOrderValidator =  new MinOrderValidator(
             $base,
@@ -39,7 +41,8 @@ class MinOrderValidatorTest extends TestCase
             $minimalPriceOrder,
             $moneyWrapper,
             $cryptoRatesFetcher,
-            $translator
+            $translator,
+            $rebranding
         );
         self::assertEquals($result, $minOrderValidator->validate());
     }
@@ -76,6 +79,11 @@ class MinOrderValidatorTest extends TestCase
         return $isToken
             ? $this->mockToken($cryptoMock)
             : $cryptoMock;
+    }
+
+    private function mockRebranding(): RebrandingConverterInterface
+    {
+        return $this->createMock(RebrandingConverterInterface::class);
     }
 
     /** @return MockObject|Token */

@@ -37,6 +37,37 @@ class TraderFetcher implements TraderFetcherInterface
         $this->translator = $translator;
     }
 
+    public function executeOrder(
+        int $userId,
+        string $market,
+        int $side,
+        string $amount,
+        string $fee,
+        int $referralId,
+        string $referralFee
+    ): TradeResult {
+        try {
+            $response = $this->jsonRpc->send(self::PUT_ORDER_METHOD, [
+                $userId + $this->config->getOffset(),
+                $market,
+                $side,
+                $amount,
+                $fee,
+                '',
+                $referralId + $this->config->getOffset(),
+                $referralFee,
+            ]);
+        } catch (FetchException $e) {
+            return new TradeResult(TradeResult::FAILED, $this->translator);
+        }
+
+        if ($response->hasError()) {
+            return $this->getExecuteOrderErrorResult($response->getError()['code']);
+        }
+
+        return new TradeResult(TradeResult::SUCCESS, $this->translator);
+    }
+
     public function placeOrder(
         int $userId,
         string $tokenName,
@@ -67,37 +98,6 @@ class TraderFetcher implements TraderFetcherInterface
 
         if ($response->hasError()) {
             return $this->getPlaceOrderErrorResult($response->getError()['code']);
-        }
-
-        return new TradeResult(TradeResult::SUCCESS, $this->translator);
-    }
-
-    public function executeOrder(
-        int $userId,
-        string $market,
-        int $side,
-        string $amount,
-        string $fee,
-        int $referralId,
-        string $referralFee
-    ): TradeResult {
-        try {
-            $response = $this->jsonRpc->send(self::PUT_ORDER_METHOD, [
-                $userId + $this->config->getOffset(),
-                $market,
-                $side,
-                $amount,
-                $fee,
-                '',
-                $referralId + $this->config->getOffset(),
-                $referralFee,
-            ]);
-        } catch (FetchException $e) {
-            return new TradeResult(TradeResult::FAILED, $this->translator);
-        }
-
-        if ($response->hasError()) {
-            return $this->getExecuteOrderErrorResult($response->getError()['code']);
         }
 
         return new TradeResult(TradeResult::SUCCESS, $this->translator);

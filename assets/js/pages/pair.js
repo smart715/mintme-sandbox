@@ -1,6 +1,6 @@
 import '../../scss/pages/pair.sass';
 import BalanceInit from '../components/trade/BalanceInit';
-import Donation from '../components/donation/Donation';
+import QuickTrade from '../components/QuickTrade';
 import Posts from '../components/posts/Posts';
 import Post from '../components/posts/Post';
 import TokenIntroductionDescription from '../components/token/introduction/TokenIntroductionDescription';
@@ -30,7 +30,7 @@ new Vue({
         BalanceInit,
         CreatePost: () => import('../components/posts/CreatePost').then((data) => data.default),
         Comments: () => import('../components/posts/Comments').then((data) => data.default),
-        Donation,
+        QuickTrade,
         Post,
         Posts,
         TokenAvatar,
