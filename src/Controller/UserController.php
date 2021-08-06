@@ -130,7 +130,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
-        $token = $user->getProfile()
+        $token = $user
             ? $user->getProfile()->getFirstToken()
             : null;
 
