@@ -30,5 +30,7 @@ interface TradebleInterface
      */
     public function setSymbol(string $symbol);
 
+    public function getShowSubunit(): int;
+
     public function getVotings(): array;
 }

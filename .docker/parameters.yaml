@@ -28,13 +28,14 @@ parameters:
     token_quantity: 10000000
     token_delete_sold_limit: 100000
     referral_fee: 0.5
-    donation:
-        fee: 5
+    quick_trade:
+        donation_fee: 0.05
+        sell_fee: 0.002
         minBtcAmount: 1.0E-6
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
-        minTokensAmount: 0.0001
         minUsdcAmount: 0.1
+        minTokensAmount: 0.0001
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
     token_precision: 4
