@@ -11,6 +11,7 @@ use App\Exchange\Market\Model\SellOrdersSummaryResult;
 use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Exchange\Trade\CheckTradeResult;
 use Money\Money;
 
 interface MarketHandlerInterface
@@ -95,6 +96,8 @@ interface MarketHandlerInterface
         int $limit = 50,
         bool $reverseBaseQuote = false
     ): array;
+
+    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult;
 
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
 

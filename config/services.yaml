@@ -638,9 +638,9 @@ services:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
 
-    App\Exchange\Config\DonationConfig:
+    App\Exchange\Config\QuickTradeConfig:
         arguments:
-            $donationParams: '%donation%'
+            $params: '%quick_trade%'
 
     App\Logger\DonationProcessor:
         autowire: true

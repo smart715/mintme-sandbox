@@ -618,7 +618,6 @@ class TokenController extends Controller
                 'isTokenCreated' => $this->isTokenCreated(),
                 'tab' => $tab,
                 'showTrade' => true,
-                'showDonation' => true,
                 'market' => $this->normalize($market),
                 'tokenHiddenName' => $market ?
                     $this->tokenNameConverter->convert($token) :

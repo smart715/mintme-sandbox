@@ -275,7 +275,6 @@ import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
 import {
     tokSymbol,
-    btcSymbol,
     webSymbol,
     ethSymbol,
     tokEthSymbol,
@@ -416,11 +415,11 @@ export default {
         },
     },
     mounted: function() {
-        if (window.localStorage.getItem('mintme_signedup_from_donation') !== null) {
-            this.depositMore = window.localStorage.getItem('mintme_donation_currency');
+        if (window.localStorage.getItem('mintme_signedup_from_quick_trade') !== null) {
+            this.depositMore = window.localStorage.getItem('mintme_quick_trade_currency');
 
-            window.localStorage.removeItem('mintme_signedup_from_donation');
-            window.localStorage.removeItem('mintme_donation_currency');
+            window.localStorage.removeItem('mintme_signedup_from_quick_trade');
+            window.localStorage.removeItem('mintme_quick_trade_currency');
         }
 
         Promise.all([
@@ -558,6 +557,10 @@ export default {
                 return;
             }
 
+            if (isToken && !this.tokens[currency].deployed) {
+                return;
+            }
+
             this.depositAddress = (isToken
                 ? this.depositAddresses[tokSymbol + crypto]
                 : ethCryptoTokens.includes(currency)
@@ -589,22 +592,25 @@ export default {
             this.showDepositModal = false;
         },
         openDepositMore: function() {
-            if (
-                [webSymbol, btcSymbol, ethSymbol, bnbSymbol].includes(this.depositMore) &&
-                null !== this.predefinedTokens &&
-                this.predefinedTokens.hasOwnProperty(this.depositMore) &&
-                this.depositAddresses.hasOwnProperty(this.depositMore) &&
-                !this.isUserBlocked
-            ) {
+            const isToken = !!this.tokens[this.depositMore];
+
+            const asset = isToken ?
+                this.tokens[this.depositMore] :
+                this.predefinedTokens[this.depositMore]
+            ;
+
+            if (asset && !this.isUserBlocked) {
                 if (window.history.replaceState) {
                     window.history.replaceState(
                         {}, '', location.href.split('?')[0]
                     );
                 }
 
-                this.openDeposit(
-                    this.depositMore,
-                    this.predefinedTokens[this.depositMore].subunit
+                this.openDeposit(this.depositMore,
+                    asset.subunit,
+                    isToken,
+                    asset.blocked,
+                    asset.cryptoSymbol
                 );
             }
         },

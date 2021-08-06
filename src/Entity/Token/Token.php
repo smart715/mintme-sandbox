@@ -909,6 +909,11 @@ class Token implements TradebleInterface, ImagineInterface
         return $this->votings->toArray();
     }
 
+    public function getShowSubunit(): int
+    {
+        return self::TOKEN_SUBUNIT;
+    }
+
     public function getDiscordConfig(): DiscordConfig
     {
         return $this->discordConfig ?? $this->discordConfig = (new DiscordConfig())->setToken($this);

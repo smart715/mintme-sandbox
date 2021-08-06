@@ -28,7 +28,7 @@ twig:
         landing_web_bonus: '%landing_web_bonus%'
         airdrop_params: '%airdrop_params%'
         global_contact_email: '%contact_email%'
-        donation_params: '%donation%'
+        quick_trade_params: '%quick_trade%'
         withdraw_expiration_time: '%withdraw_expiration_time%'
         enable_google_analytics: '%enable_google_analytics%'
         twitter_footer_link: '%twitter_social_media_link%'
