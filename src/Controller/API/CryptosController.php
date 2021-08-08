@@ -30,33 +30,4 @@ class CryptosController extends APIController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-    /**
-     * @Rest\View()
-     * @Rest\Get(
-     *     "/{symbol}/balance",
-     *     name="crypto_balance",
-     *     requirements={"symbol"="(WEB|BTC|ETH|USDC|BNB)"},
-     *     options={"expose"=true}
-     * )
-     */
-    public function getBalance(
-        string $symbol,
-        BalanceHandlerInterface $balanceHandler,
-        CryptoManagerInterface $cryptoManager
-    ): View {
-        /** @var User|null $user */
-        $user = $this->getUser();
-
-        if (!$user) {
-            throw $this->createAccessDeniedException();
-        }
-
-        return $this->view(
-            $balanceHandler->balance(
-                $user,
-                $cryptoManager->findBySymbol($symbol)
-            )->getAvailable()
-        );
-    }
 }

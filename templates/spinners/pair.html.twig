@@ -85,11 +85,9 @@
                 </ul>
             </div>
             <div class="tab-content">
-                {% if showDonation %}
-                    <div class="row">
-                        {{ include('spinners/donation.html.twig') }}
-                    </div>
-                {% endif %}
+                <div class="row">
+                    {{ include('spinners/donation.html.twig') }}
+                </div>
                 {% if tab|default and tab and tab == 'intro' %}
                     <div role="tabpanel" aria-hidden="false" class="tab-pane active">
                         <div class="row">
@@ -248,6 +246,9 @@
             </div>
             {% if is_granted('trading') %}
             <div class="tab-content" id="__BVID__33__BV_tab_container_">
+                <div class="row">
+                    {{ include('spinners/donation.html.twig') }}
+                </div>
                 <div
                     role="tabpanel"
                     aria-hidden="false"

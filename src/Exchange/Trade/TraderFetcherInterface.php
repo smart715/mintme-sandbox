@@ -25,7 +25,7 @@ interface TraderFetcherInterface
         int $referralId,
         string $referralFee
     ): TradeResult;
-    
+
     public function cancelOrder(int $userId, string $marketName, int $orderId): TradeResult;
 
     /** @return mixed[] */

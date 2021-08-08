@@ -670,27 +670,22 @@ bbcode.help.image: Image
 bbcode.help.images: Images
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Vidéo YouTube'
-donation.header.logged: Acheter
-donation.header.not_logged: 'Pour acheter des jetons, souscrivez ou connectez vous'
-donation.nonrefund: 'L''argent dépensée ici ira au créateur du jeton. Si vous ne voulez pas soutenir ce jeton and vous êtes interessé au plus bas prix, utilisez l''option <a href="%path%">trade</a> '
-donation.currency: Devise
-donation.currency.select: 'Selectionner la devise'
-donation.balance: 'Solde:'
-donation.make: 's''il vous plaît'
-donation.deposit: dépôt
-donation.first: premier
-donation.insufficient_funds: 'Fonds insuffisant pour l''achat,'
-donation.amount: 'Montant:'
-donation.min_amount: 'Quantité minimale de %donationCurrency% %currencyMinAmount%'
-donation.diff_number: 'La quantité de jetons que vous recevrez peut légèrement varier à cause de l''activité des traders.'
-donation.receive: 'Vous recevrez approximativement:'
-donation.fee: 'Frais d''achat: %fee%%'
-donation.buy: Acheter
-donation.modal.1: 'Le quantité donnée excède la valeur des jetons disponible à vendre. Vous pouvez continuer ou annuler et ajuster le montant de la donation. Alternativement; vous pouvez demander au créateur du jeton de définir plus d''ordres de vente sur le marché, puis réessayer la donation.'
-donation.modal.2: 'Voulez-vous faire une donation %amountToDonate% de %amountToReceive% valant %worth%?'
-donation.successfully_made: 'Félicitations! Achat effectué avec succès. Vous avez reçu %amount% jetons'
-donation.tokens_availability_changed: 'La disponibilité des jetons a changée. Bien vouloir ajuster le montant de l''achat.'
-donation.button_all: Tout
+quick_trade.donation.nonrefund:
+quick_trade.currency.select:
+quick_trade.balance:
+quick_trade.make_deposit:
+quick_trade.insufficient_funds:
+quick_trade.sell_exceeds:
+quick_trade.min_amount:
+quick_trade.diff_number:
+quick_trade.receive:
+quick_trade.donation.modal.1:
+quick_trade.donation.modal.2:
+quick_trade.successfully_made:
+quick_trade.availability_changed:
+quick_trade.button_all:
+quick_trade.order.empty:
+quick_trade.invalid_mode:
 donation.order.donation: Donation
 donation.order.buy: 'Acheter (donation)'
 donation.order.sell: 'Vendre (donation)'
@@ -1230,6 +1225,7 @@ place_order.insufficient_balance: 'Solde insuffisant'
 place_order.not_found: 'Ordre introuvable'
 place_order.not_match: 'Vous ne correspondez pas à cet ordre'
 place_order.too_small: 'Minimum order value needs to be worth %valueInUsd% USD. At this moment it''s %valueInMintme% MINTME.'
+execute_order.no_enough_trader:
 mixin.websocket.hash_not_set: 'Hash non spécifié. Ne peut autoriser l''utilisateur'
 mixin.websocket.authorize_failed: 'Echec d''authorisation de l''utilisateur actuel. Echec de la réponse du serveur'
 mixin.websocket.server_not_respond: 'Aucune réponse du serveur'
@@ -1446,7 +1442,7 @@ modal.add_phone_alert_airdrop.message: 'To collect the reward'
 modal.add_phone_alert_action.message: 'To perform that action'
 modal.add_phone_alert_token_create.message: 'To create a token'
 modal.add_phone_alert_deposit_withdrawal.message: ' To make deposit or withdrawals'
-modal.add_phone_alert_donation.message: 'To make donations'
+modal.add_phone_alert_quick_trade.message: 'To buy or sell'
 api.add_phone_number_message: 'you need to add phone number in your profile'
 browser.storage.error: 'Error when trying to access storage, please avoid using incognito windows'
 page.reload: reload

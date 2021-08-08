@@ -20,6 +20,7 @@ use App\Manager\TwitterManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use App\Notifications\Strategy\NotificationContext;
 use App\Notifications\Strategy\TokenPostNotificationStrategy;
+use App\Utils\Converter\SlugConverterInterface;
 use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -31,7 +32,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -48,7 +48,7 @@ class PostsController extends AbstractFOSRestController
     private LoggerInterface $logger;
     private UserNotificationManagerInterface $userNotificationManager;
     private MailerInterface $mailer;
-    private AsciiSlugger $slugger;
+    private SlugConverterInterface $slugger;
     private TwitterManagerInterface $twitterManager;
     private EventDispatcherInterface $eventDispatcher;
 
@@ -61,7 +61,8 @@ class PostsController extends AbstractFOSRestController
         UserNotificationManagerInterface $userNotificationManager,
         MailerInterface $mailer,
         TwitterManagerInterface $twitterManager,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        SlugConverterInterface $slugger
     ) {
         $this->tokenManager = $tokenManager;
         $this->entityManager = $entityManager;
@@ -70,7 +71,7 @@ class PostsController extends AbstractFOSRestController
         $this->logger = $logger;
         $this->userNotificationManager = $userNotificationManager;
         $this->mailer = $mailer;
-        $this->slugger = new AsciiSlugger();
+        $this->slugger = $slugger;
         $this->twitterManager = $twitterManager;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -361,11 +362,10 @@ class PostsController extends AbstractFOSRestController
             return $this->view($form, Response::HTTP_BAD_REQUEST);
         }
 
-        $slug = $baseSlug = $this->slugger->slug($post->getTitle())->toString();
-
-        for ($i = 2; $this->postManager->getBySlug($slug); $i++) {
-            $slug = $baseSlug.'-'.$i;
-        }
+        $slug = $this->slugger->convert(
+            $post->getTitle(),
+            $this->postManager->getRepository()
+        );
 
         $post->setSlug($slug);
 

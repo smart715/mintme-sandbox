@@ -53,7 +53,7 @@
             "name": "WEBBTC",
             "stock": {
                 "name": "WEB",
-                "prec": 8
+                "prec": 4
             },
             "money": {
                 "name": "BTC",
@@ -65,7 +65,7 @@
           "name": "WEBETH",
           "stock": {
             "name": "WEB",
-            "prec": 8
+            "prec": 4
           },
           "money": {
             "name": "ETH",
@@ -77,7 +77,7 @@
             "name": "WEBUSDC",
             "stock": {
                 "name": "WEB",
-                "prec": 8
+                "prec": 4
             },
             "money": {
                 "name": "USDC",

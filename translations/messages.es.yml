@@ -666,25 +666,22 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-donation.header.logged: 'Comprar %token%'
-donation.header.not_logged: 'Para comprar tokens, tiene que registrarse o ingresar'
-donation.nonrefund: 'El dinero que se gaste aquí irá al creador del token. Si no deseas apoyar este token y estás interesado en el precio más bajo posible, usa la opción <a href="%path%">trade</a>'
-donation.currency: Moneda
-donation.currency.select: 'Seleccionar moneda'
-donation.balance: 'Su saldo:'
-donation.make: 'por favor'
-donation.deposit: deposite
-donation.first: primero
-donation.insufficient_funds: 'Fondos insuficientes para comprar,'
-donation.amount: 'Cantidad:'
-donation.min_amount: 'Cantidad mínima de %donationCurrency% %currencyMinAmount%'
-donation.diff_number: 'La cantidad de tokens que recibirá puede variar ligeramente, dependiendo de la actividad de otros traders.'
-donation.receive: 'Recibirá aproximadamente:'
-donation.fee: 'Comisión por compra: %fee%%'
-donation.buy: Comprar
-donation.modal.1: 'La cantidad donada excede el valor de los tokens disponibles para la venta. Puede continuar, o cancelar y ajustar la cantidad a donar. Alternativamente, puede comunicarse con el creador del token y pedirle que agregue más órdenes de venta al mercado y hacer la donación luego.'
-donation.modal.2: '¿Desea donar %amountToDonate% por %amountToReceive% que valen %worth%?'
-donation.button_all: Todo
+quick_trade.donation.nonrefund:
+quick_trade.currency.select:
+quick_trade.balance:
+quick_trade.make_deposit:
+quick_trade.insufficient_funds:
+quick_trade.sell_exceeds:
+quick_trade.min_amount:
+quick_trade.diff_number:
+quick_trade.receive:
+quick_trade.donation.modal.1:
+quick_trade.donation.modal.2:
+quick_trade.successfully_made:
+quick_trade.availability_changed:
+quick_trade.button_all:
+quick_trade.order.empty:
+quick_trade.invalid_mode:
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
@@ -1224,6 +1221,7 @@ place_order.insufficient_balance: 'Fondos insuficientes'
 place_order.not_found: 'No se ha encontrado la orden'
 place_order.not_match: 'No coincide con esta orden'
 place_order.too_small: 'El valor mínimo de la orden debe ser de %valueInUsd% USD. En este momento es %valueInMintme% MINTME.'
+execute_order.no_enough_trader:
 mixin.websocket.hash_not_set: 'El hash no está listo. No se puede autorizar al usuario'
 mixin.websocket.authorize_failed: 'Falló la autorización del usuario actual. El servidor respondió con estatus fallido'
 mixin.websocket.server_not_respond: 'El servidor no responde'
@@ -1446,7 +1444,7 @@ modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
 modal.add_phone_alert_action.message: 'Para realizar esa acción'
 modal.add_phone_alert_token_create.message: 'Para crear un token'
 modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
-modal.add_phone_alert_donation.message: 'Para hacer donaciones'
+modal.add_phone_alert_quick_trade.message:
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
 browser.storage.error: 'Error al intentar acceder al almacenamiento, por favor evite usar ventanas de incógnito'
 page.reload: recargar
