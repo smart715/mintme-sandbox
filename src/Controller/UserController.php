@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Communications\DiscordOAuthClientInterface;
 use App\Entity\ApiKey;
 use App\Entity\DiscordRoleUser;
+use App\Entity\Token\Token;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
 use App\Events\UserEvents;
@@ -34,6 +35,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -130,9 +132,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
-        $token = $user
-            ? $user->getProfile()->getFirstToken()
-            : null;
+        $token = $user->getProfile()->getFirstToken();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
@@ -150,7 +150,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         string $userToken,
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
+
+        /** @var Token $token */
         $token = $this->tokenManager->findByName($userToken);
+
+        if (!$token) {
+            throw new NotFoundHttpException();
+        }
+
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('token_show', ['name' => $userToken], 301)
