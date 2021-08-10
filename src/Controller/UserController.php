@@ -150,11 +150,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         string $userToken,
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
-
-        /** @var Token $token */
         $token = $this->tokenManager->findByName($userToken);
 
-        if (!$token) {
+        if (null === $token) {
             throw new NotFoundHttpException();
         }
 
