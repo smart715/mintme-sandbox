@@ -2,19 +2,43 @@
     <div v-if="!disabledServices.allServicesDisabled && !disabledServices.tradingDisabled">
         <div class="card h-100">
                 <div class="card-header">
-                    <span>
-                        {{ $t('donation.header.logged', {token: market.quote.name}) }}
-                    </span>
+                    <ul class="nav quick-trade-nav">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                :class="{'active': isBuyMode}"
+                                href="#"
+                                @click.prevent="setTradeMode(BUY_MODE)"
+                            >
+                                {{ $t('buy') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                :class="{'active': isSellMode}"
+                                href="#"
+                                @click.prevent="setTradeMode(SELL_MODE)"
+                            >
+                                {{ $t('sell') }}
+                            </a>
+                        </li>
+                        <guide v-if="isToken" class="ml-auto">
+                            <template slot="body">
+                                <span v-html="$sanitize(nonrefundHtml)"></span>
+                            </template>
+                        </guide>
+                    </ul>
                 </div>
                 <div class="card-body">
                     <div v-show="!showForms" class="row">
                         <div
-                            class="col-xl-5"
                             :class="isCurrencySelected && loggedIn ? 'col-lg-8' : 'col-lg-12'"
                         >
                             <div class="d-sm-flex">
                                 <b-dropdown
-                                    id="donation_currency"
+                                    v-show="isBuyMode"
+                                    id="quick_trade_currency"
                                     :text="dropdownText"
                                     variant="primary"
                                     class="mr-2"
@@ -31,13 +55,13 @@
                                 <div class="input-group flex-nowrap my-3 my-sm-0">
                                     <price-converter-input
                                         class="d-block flex-grow-1"
-                                        v-model="amountToDonate"
+                                        v-model="amount"
                                         input-id="amount-to-donate"
                                         @keypress="checkAmountInput"
                                         @paste="checkAmountInput"
                                         @keyup="onKeyup"
                                         :from="selectedCurrency"
-                                        :to="USD.symbol"
+                                        :to="currencies.USD.symbol"
                                         :subunit="4"
                                         symbol="$"
                                         :show-converter="currencyMode === currencyModes.usd.value"
@@ -48,7 +72,7 @@
                                             class="btn btn-primary all-button"
                                             type="button"
                                         >
-                                            {{ $t('donation.button_all') }}
+                                            {{ $t('quick_trade.button_all') }}
                                         </button>
                                     </div>
                                 </div>
@@ -59,19 +83,24 @@
                                         class="btn btn-primary btn-donate ml-sm-2"
                                     >
                                         <span :class="{'text-muted': disabledServices.newTradesDisabled}">
-                                            {{ $t('donation.buy') }}
+                                            <template v-if="isBuyMode">
+                                                {{ $t('buy') }}
+                                            </template>
+                                            <template v-if="isSellMode">
+                                                {{ $t('sell') }}
+                                            </template>
                                         </span>
                                     </button>
                                     <confirm-modal
                                         :visible="showModal"
                                         :show-image="false"
-                                        @confirm="makeDonation"
-                                        @cancel="cancelDonation"
+                                        @confirm="makeTrade"
+                                        @cancel="cancelTrade"
                                         @close="showModal = false">
                                         <p class="text-white modal-title pt-2 pb-4">
-                                            {{ $t('donation.modal.1') }}
+                                            {{ $t('quick_trade.donation.modal.1') }}
                                             <br>
-                                            {{ $t('donation.modal.2', translationsContext) }}
+                                            {{ $t('quick_trade.donation.modal.2', translationsContext) }}
                                         </p>
                                         <template v-slot:confirm>
                                             {{ $t('confirm_modal.continue') }}
@@ -85,33 +114,42 @@
                                 </div>
                             </div>
                             <div class="mt-1">
-                                <div
-                                    v-if="insufficientFundsError"
-                                    class="mt-1 text-danger">
-                                    {{
-                                        $t('donation.min_amount', {
-                                          donationCurrency:donationCurrency,
-                                          currencyMinAmount:currencyMinAmount
-                                        })
-                                    }}
-                                </div>
+                                <template v-if="firstInteraction">
+                                    <div
+                                        v-if="!isAmountValid"
+                                        class="mt-1 text-danger">
+                                        {{ $t('quick_trade.min_amount', translationsContext) }}
+                                    </div>
+                                    <div
+                                        v-if="sellAmountExceeds"
+                                        class="mt-1 text-danger"
+                                    >
+                                        <template v-if="isOrdersSummaryZero">
+                                            {{ $t('quick_trade.order.empty') }}
+                                        </template>
+                                        <template v-else>
+                                            {{ $t('quick_trade.sell_exceeds', translationsContext) }}
+                                        </template>
+                                    </div>
+                                </template>
                                 <p class="m-0 mt-1">
-                                    {{ $t('donation.receive') }}
+                                    {{ $t('quick_trade.receive') }}
                                     <font-awesome-icon
-                                        v-if="donationChecking"
+                                        v-if="isCheckingTrade"
                                         icon="circle-notch"
                                         spin
                                         class="loading-spinner"
                                         fixed-width
                                     />
                                     <span v-else class="text-nowrap">
-                                        {{ amountToReceive }} tokens
+                                        {{ amountToReceive | toMoney(assetToReceiveSubunit) }}
+                                        {{ assetToReceive | rebranding }}
                                         <guide
                                             :placement="'right-start'"
                                             :max-width="'200px'"
                                         >
                                             <template slot="body">
-                                                {{ $t('donation.diff_number') }}
+                                                {{ $t('quick_trade.diff_number') }}
                                             </template>
                                         </guide>
                                     </span>
@@ -120,12 +158,12 @@
                         </div>
                         <div
                             v-if="isCurrencySelected && loggedIn"
-                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
                             id="show-balance"
+                            class="col-lg-4 col-xl-auto col-donation-balance mt-3 mt-lg-0 pl-lg-0"
                         >
                             <p class="m-0">
                                 <span>
-                                    {{ $t('donation.balance') }}
+                                    {{ $t('quick_trade.balance') }}
                                 </span>
                                 <span v-if="balanceLoaded">
                                     {{ balance | toMoney(currencySubunit) | formatMoney }}
@@ -138,18 +176,11 @@
                                 />
                             </p>
                             <div v-if="insufficientFunds">
-                                <span class="d-block text-danger font-size-90">
-                                    {{ $t('donation.insufficient_funds') }}
-                                </span>
-                                <span class="d-block">
-                                    {{ $t('donation.make') }}
-                                    <a :href="getDepositLink">{{ $t('donation.deposit') }}</a>
-                                    {{ $t('donation.first') }}
-                                </span>
+                                <div class="text-danger font-size-90">
+                                    {{ $t('quick_trade.insufficient_funds') }}
+                                </div>
+                                <div v-if="shouldShowDepositMore" v-html="$sanitize(makeDepositHtml)"></div>
                             </div>
-                        </div>
-                        <div class="col mt-3 mt-xl-0 pl-xl-0">
-                            <p class="info m-0" v-html="$sanitize(nonrefundHtml)"></p>
                         </div>
                     </div>
                     <div v-if="!loggedIn" class="d-flex justify-content-center">
@@ -176,6 +207,7 @@ import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import debounce from 'lodash/debounce';
 import {BDropdown, BDropdownItem} from 'bootstrap-vue';
+import {mapGetters} from 'vuex';
 import Decimal from 'decimal.js';
 import {
     CheckInputMixin,
@@ -185,39 +217,38 @@ import {
     RebrandingFilterMixin,
     WebSocketMixin,
     AddPhoneAlertMixin,
-} from '../../mixins';
-import ConfirmModal from '../modal/ConfirmModal';
-import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
-import Guide from '../Guide';
-import {formatMoney, toMoney} from '../../utils';
+} from '../mixins';
+import ConfirmModal from './modal/ConfirmModal';
+import AddPhoneAlertModal from './modal/AddPhoneAlertModal';
+import Guide from './Guide';
+import {formatMoney, toMoney} from '../utils';
 import {
     webSymbol,
     btcSymbol,
     ethSymbol,
     usdcSymbol,
     bnbSymbol,
-    HTTP_BAD_REQUEST,
-    BTC,
-    MINTME,
-    USD,
-    ETH,
-    USDC,
+    currencies,
     digitsLimits,
     currencyModes,
-} from '../../utils/constants';
-import PriceConverterInput from '../PriceConverterInput';
+    tokenDeploymentStatus,
+} from '../utils/constants';
+import PriceConverterInput from './PriceConverterInput';
 
 library.add(faCircleNotch);
 
+const BUY_MODE = 'buy';
+const SELL_MODE = 'sell';
+
 export default {
-    name: 'Donation',
+    name: 'QuickTrade',
     components: {
         BDropdown,
         BDropdownItem,
         PriceConverterInput,
         Guide,
         ConfirmModal,
-        LoginSignupSwitcher: () => import('../LoginSignupSwitcher').then((data) => data.default),
+        LoginSignupSwitcher: () => import('./LoginSignupSwitcher').then((data) => data.default),
         AddPhoneAlertModal,
         FontAwesomeIcon,
     },
@@ -234,9 +265,14 @@ export default {
         market: Object,
         loggedIn: Boolean,
         googleRecaptchaSiteKey: String,
-        donationParams: Object,
+        params: Object,
         disabledServicesConfig: String,
         profileNickname: String,
+        isToken: Boolean,
+        deploymentStatus: {
+            type: String,
+            default: null,
+        },
     },
     data() {
         return {
@@ -249,62 +285,97 @@ export default {
             },
             currencyModes,
             selectedCurrency: null,
-            amountToDonate: 0,
+            amount: 0,
             amountToReceive: 0,
-            tokensWorth: 0,
-            sellOrdersSummary: 0,
-            donationChecking: false,
-            balanceLoaded: false,
-            balance: 0,
-            donationInProgress: false,
+            worth: 0,
+            ordersSummary: 0,
+            isCheckingTrade: false,
+            isTradeInProgress: false,
             showModal: false,
             tokensAvailabilityChanged: false,
-            USD,
             showForms: false,
-            addPhoneModalMessageType: 'donation',
+            firstInteraction: false,
+            addPhoneModalMessageType: 'action',
             addPhoneModalProfileNickName: this.profileNickname,
+            tradeMode: BUY_MODE,
         };
     },
     computed: {
+        ...mapGetters('tradeBalance', {
+            balances: 'getBalances',
+            hasQuoteRelation: 'hasQuoteRelation',
+        }),
+        balance: function() {
+            return this.balances
+                ? this.balances[this.selectedCurrency].available
+                : null;
+        },
+        balanceLoaded: function() {
+            return null !== this.balance;
+        },
+        assetToReceive: function() {
+             return this.isBuyMode
+                ? this.market.quote.symbol
+                : this.market.base.symbol;
+        },
+        isBuyMode: function() {
+            return BUY_MODE === this.tradeMode;
+        },
+        isSellMode: function() {
+            return SELL_MODE === this.tradeMode;
+        },
+        isOrdersSummaryZero: function() {
+            const summary = new Decimal(this.ordersSummary);
+
+            return summary.isZero();
+        },
         currencyMode: function() {
             return localStorage.getItem('_currency_mode');
         },
         translationsContext: function() {
           return {
-            amountToDonate: this.amountToDonate + ' ' + this.donationCurrency,
-            amountToReceive: this.amountToReceive + ' ' + this.market.quote.name,
-            worth: formatMoney(toMoney(this.tokensWorth, this.currencySubunit)),
+            amount: toMoney(this.amount || 0, this.currencySubunit),
+            amountToReceive: toMoney(this.amountToReceive, this.assetToReceiveSubunit),
+            assetToReceive: this.rebrandingFunc(this.assetToReceive),
+            worth: formatMoney(toMoney(this.worth, currencies.WEB.subunit)),
+            ordersSummary: toMoney(this.ordersSummary, this.assetToReceiveSubunit),
+            currency: this.rebrandedCurrency,
+            currencyMinAmount: this.currencyMinAmount,
           };
         },
-        donationCurrency: function() {
+        rebrandedCurrency: function() {
             return this.rebrandingFunc(this.selectedCurrency);
         },
-        getDepositLink: function() {
-            return this.$routing.generate('wallet', {
-                depositMore: this.donationCurrency,
-            });
-        },
         isCurrencySelected: function() {
-            return Object.values(this.options).includes(this.selectedCurrency);
+            return this.isBuyMode
+                ? Object.values(this.options).includes(this.selectedCurrency)
+                : this.selectedCurrency === this.market.quote.symbol;
         },
         dropdownText: function() {
             return this.isCurrencySelected
-                ? this.donationCurrency
-                : this.$t('donation.currency.select');
+                ? this.rebrandedCurrency
+                : this.$t('quick_trade.currency.select');
         },
         currencySubunit: function() {
-            return ({BTC, MINTME, ETH, USDC}[this.selectedCurrency] || MINTME).subunit;
+            const symbol = currencies[this.selectedCurrency];
+
+            return symbol ? symbol.subunit : currencies.WEB.subunit;
+        },
+        assetToReceiveSubunit: function() {
+            const symbol = currencies[this.assetToReceive];
+
+            return symbol ? symbol.subunit : currencies.WEB.subunit;
         },
         currencyMinAmount: function() {
             switch (this.selectedCurrency) {
               case btcSymbol:
-                return this.donationParams.minBtcAmount;
+                return this.params.minBtcAmount;
               case ethSymbol:
-                return this.donationParams.minEthAmount;
+                return this.params.minEthAmount;
               case usdcSymbol:
-                return this.donationParams.minUsdcAmount;
+                return this.params.minUsdcAmount;
               default:
-                return this.donationParams.minMintmeAmount;
+                return this.params.minMintmeAmount;
             }
         },
         minTotalPrice: function() {
@@ -315,26 +386,46 @@ export default {
                 (
                     (new Decimal(this.balance)).lessThan(this.minTotalPrice)
                     ||
-                    (this.amountToDonate > 0 && (new Decimal(this.amountToDonate)).greaterThan(this.balance))
+                    (this.amount > 0 && (new Decimal(this.amount)).greaterThan(this.balance))
                 );
         },
-        insufficientFundsError: function() {
-            return this.loggedIn && this.balanceLoaded && !this.isAmountValid && !this.insufficientFunds;
+        sellAmountExceeds: function() {
+            const amount = new Decimal(this.amount || 0);
+
+            return this.isSellMode
+                && !this.isCheckingTrade
+                && !amount.isZero()
+                && amount.greaterThan(this.ordersSummary);
         },
         isAmountValid: function() {
-            return !!parseFloat(this.amountToDonate)
-                && (new Decimal(this.amountToDonate)).greaterThanOrEqualTo(this.currencyMinAmount);
+            const amount = new Decimal(this.amount || 0);
+
+            return !amount.isZero()
+                && amount.greaterThanOrEqualTo(this.currencyMinAmount);
         },
         buttonDisabled: function() {
-            return (this.loggedIn &&
-                (this.insufficientFunds || this.insufficientFundsError || !parseFloat(this.balance)))
+            return this.insufficientFunds
+                || !this.isAmountValid
                 || !this.isCurrencySelected
-                || !parseFloat(this.amountToDonate)
-                || this.donationChecking
-                || this.donationInProgress;
+                || !parseFloat(this.amount)
+                || this.sellAmountExceeds
+                || this.isCheckingTrade
+                || this.isTradeInProgress;
+        },
+        shouldShowDepositMore: function() {
+            return this.isBuyMode
+                || !this.isToken
+                || (this.deploymentStatus === tokenDeploymentStatus.deployed && this.hasQuoteRelation);
+        },
+        makeDepositHtml: function() {
+            const depositUrl = this.$routing.generate('wallet', {
+                depositMore: this.rebrandedCurrency,
+            });
+
+            return this.$t('quick_trade.make_deposit', {depositUrl});
         },
         nonrefundHtml: function() {
-            return this.$t('donation.nonrefund', {
+            return this.$t('quick_trade.donation.nonrefund', {
                 path: this.$routing.generate('token_show', {
                     name: this.market.quote.name,
                     tab: 'trade',
@@ -345,16 +436,24 @@ export default {
             return JSON.parse(this.disabledServicesConfig);
         },
     },
+    created() {
+        // non-reactive data (constants accesible from template)
+        this.BUY_MODE = BUY_MODE;
+        this.SELL_MODE = SELL_MODE;
+        this.currencies = currencies;
+
+        this.selectedCurrency = this.isToken ? webSymbol : this.market.base.symbol;
+    },
     mounted() {
-        if (window.localStorage.getItem('mintme_loggedin_from_donation') !== null) {
-            this.selectedCurrency = window.localStorage.getItem('mintme_donation_currency');
+        if (window.localStorage.getItem('mintme_loggedin_from_quick_trade') !== null) {
+            this.selectedCurrency = window.localStorage.getItem('mintme_quick_trade_currency');
             this.$nextTick(() => {
-                this.amountToDonate = window.localStorage.getItem('mintme_donation_amount');
-                window.localStorage.removeItem('mintme_donation_amount');
+                this.amount = window.localStorage.getItem('mintme_quick_trade_amount');
+                window.localStorage.removeItem('mintme_quick_trade_amount');
             });
 
-            window.localStorage.removeItem('mintme_loggedin_from_donation');
-            window.localStorage.removeItem('mintme_donation_currency');
+            window.localStorage.removeItem('mintme_loggedin_from_quick_trade');
+            window.localStorage.removeItem('mintme_quick_trade_currency');
         }
 
         if (this.loggedIn) {
@@ -368,68 +467,76 @@ export default {
                 if (!this.tokensAvailabilityChanged && 'order.update' === response.method) {
                     this.tokensAvailabilityChanged = true;
                 }
-            }, null, 'Donation');
+            }, null, 'QuickTrade');
         }
 
-        this.selectedCurrency = webSymbol;
-        this.debouncedCheck = debounce(this.checkDonation, 500);
+        this.debouncedCheck = debounce(this.checkTrade, 500);
     },
     methods: {
-        onSelect: function(newCurrency) {
-            if (this.selectedCurrency !== newCurrency) {
-                this.balanceLoaded = false;
-                this.selectedCurrency = newCurrency;
+        setTradeMode: function(mode) {
+            if (mode === this.tradeMode) {
+                return;
+            }
+
+            this.tradeMode = mode;
+            this.showForms = false;
+            this.firstInteraction = false;
+
+            if (mode === BUY_MODE) {
+                this.onSelect(this.isToken ? webSymbol : this.market.base.symbol);
+            } else {
+                this.onSelect(this.market.quote.symbol);
             }
         },
-        getTokenBalance: function() {
-            this.$axios.retry.get(this.$routing.generate('crypto_balance', {symbol: this.selectedCurrency}))
-                .then((res) => {
-                    this.balance = res.data;
-                    this.balanceLoaded = true;
-                })
-                .catch((error) => {
-                    this.sendLogs('error', 'Can not load crypto balance.', error);
-                });
+        onSelect: function(newCurrency) {
+            this.selectedCurrency = newCurrency;
         },
         checkAmountInput: function() {
-            return this.checkInput(this.currencySubunit, digitsLimits[this.selectedCurrency]);
+            const digitLimits = digitsLimits[this.selectedCurrency] || currencies.WEB.digits;
+
+            return this.checkInput(this.currencySubunit, digitLimits);
         },
         onKeyup: function() {
             this.debouncedCheck();
         },
-        checkDonation: function() {
+        checkTrade: function() {
             if (!this.isAmountValid) {
                 return;
             }
 
-            this.donationChecking = true;
+            this.isCheckingTrade = true;
 
-            this.$axios.retry.get(this.$routing.generate('check_donation', {
+            this.$axios.retry.get(this.$routing.generate('check_quick_trade', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
+                mode: this.tradeMode,
                 currency: this.selectedCurrency,
-                amount: this.amountToDonate,
+                amount: this.amount,
             }))
                 .then((res) => {
                     this.amountToReceive = res.data.amountToReceive;
-                    this.tokensWorth = res.data.tokensWorth;
-                    this.sellOrdersSummary = res.data.sellOrdersSummary;
+                    this.worth = res.data.worth;
+                    this.ordersSummary = res.data.ordersSummary;
                 })
                 .catch((error) => {
                     this.sendLogs('error', 'Can not to calculate approximate amount of tokens.', error);
                 })
-                .then(() => this.donationChecking = false);
+                .then(() => {
+                    this.firstInteraction = true;
+                    this.isCheckingTrade = false;
+                });
         },
-        makeDonation: function() {
-            this.donationInProgress = true;
+        makeTrade: function() {
+            this.isTradeInProgress = true;
             this.showModal = false;
 
-            this.$axios.single.post(this.$routing.generate('make_donation', {
+            this.$axios.single.post(this.$routing.generate('make_quick_trade', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
+                mode: this.tradeMode,
             }), {
                 currency: this.selectedCurrency,
-                amount: this.amountToDonate,
+                amount: this.amount,
                 expected_count_to_receive: this.amountToReceive,
             })
                 .then((response) => {
@@ -437,46 +544,34 @@ export default {
                         response.data.hasOwnProperty('error') &&
                         response.data.hasOwnProperty('type')
                     ) {
-                        this.errorType = response.data.type;
+                        this.addPhoneModalMessageType = response.data.type;
                         this.addPhoneModalVisible = true;
                         return;
                     }
-                    this.notifySuccess(
-                        this.$t('donation.successfully_made', {
-                            amount: this.amountToReceive,
-                        })
-                    );
 
+                    this.notifySuccess(this.$t('quick_trade.successfully_made', this.translationsContext));
                     this.resetAmount();
-                    this.balanceLoaded = false;
-                    this.getTokenBalance();
                 })
                 .catch((error) => {
-                    if (HTTP_BAD_REQUEST === error.response.status && error.response.data.message) {
+                    if (error.response.data.message) {
                         this.notifyError(error.response.data.message);
 
-                        if ('Tokens availability changed. Please adjust donation amount.' ===
-                            error.response.data.message
-                        ) {
+                        if (error.response.data.reload) {
                             location.reload();
                         }
-                    } else if (error.response.data.message) {
-                        this.notifyError(error.response.data.message);
                     } else {
                         this.notifyError('An error has occurred, please try again later.');
                     }
                     this.sendLogs('error', 'Can not make donation.', error);
                 })
-                .then(() => this.donationInProgress = false);
+                .then(() => this.isTradeInProgress = false);
         },
         all: function() {
-            this.amountToDonate = toMoney(this.balance, this.currencySubunit);
-            if (!this.insufficientFunds) {
-                this.checkDonation();
-            }
+            this.amount = toMoney(this.balance, this.currencySubunit);
+            this.checkTrade();
         },
         resetAmount: function() {
-            this.amountToDonate = 0;
+            this.amount = 0;
             this.amountToReceive = 0;
         },
         showConfirmationModal: function() {
@@ -507,41 +602,40 @@ export default {
             }
 
             if (this.tokensAvailabilityChanged) {
-                this.notifyError(this.$t('donation.tokens_availability_changed'));
+                this.notifyError(this.$t('quick_trade.availability_changed'));
                 this.tokensAvailabilityChanged = false;
                 location.reload();
                 return;
             }
 
-            if ((new Decimal(this.amountToDonate)).greaterThan(this.sellOrdersSummary)) {
+            if ((new Decimal(this.amount)).greaterThan(this.ordersSummary)) {
                 this.showModal = true;
             } else {
-                this.makeDonation();
+                this.makeTrade();
             }
         },
-        cancelDonation: function() {
+        cancelTrade: function() {
             this.showModal = false;
             this.resetAmount();
         },
         onLogin() {
-            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
-            window.localStorage.setItem('mintme_donation_amount', this.amountToDonate);
-            window.localStorage.setItem('mintme_loggedin_from_donation', true);
+            window.localStorage.setItem('mintme_quick_trade_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_quick_trade_amount', this.amount);
+            window.localStorage.setItem('mintme_loggedin_from_quick_trade', true);
         },
         onSignup() {
-            window.localStorage.setItem('mintme_donation_currency', this.selectedCurrency);
-            window.localStorage.setItem('mintme_signedup_from_donation', true);
+            window.localStorage.setItem('mintme_quick_trade_currency', this.selectedCurrency);
+            window.localStorage.setItem('mintme_signedup_from_quick_trade', true);
         },
     },
     watch: {
         selectedCurrency: function() {
             if (this.isCurrencySelected) {
-                this.getTokenBalance();
                 this.resetAmount();
             }
         },
-        amountToDonate: function() {
-            if (!parseFloat(this.amountToDonate)) {
+        amount: function() {
+            if (!parseFloat(this.amount)) {
                 this.amountToReceive = 0;
             }
         },

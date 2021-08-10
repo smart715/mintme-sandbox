@@ -61,6 +61,7 @@ export default {
             'setBalances',
             'setQuoteBalance',
             'setBaseBalance',
+            'setHasQuoteRelation',
         ]),
         updateAssets: function() {
             if (!this.loggedIn) {
@@ -74,6 +75,8 @@ export default {
 
                     if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
                         this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
+                    } else {
+                        this.setHasQuoteRelation(true);
                     }
 
                     this.authorize()
