@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Communications\DiscordOAuthClientInterface;
 use App\Entity\ApiKey;
 use App\Entity\DiscordRoleUser;
-use App\Entity\Token\Token;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
 use App\Events\UserEvents;
@@ -132,7 +131,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
-        $token = $user->getProfile()->getFirstToken();
+        $token =  $user->getProfile()->getFirstToken();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
