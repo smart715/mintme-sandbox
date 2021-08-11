@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -149,6 +150,11 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
         $token = $this->tokenManager->findByName($userToken);
+
+        if (null === $token) {
+            throw new NotFoundHttpException();
+        }
+
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
             ? $this->redirectToRoute('token_show', ['name' => $userToken], 301)
