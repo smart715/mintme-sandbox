@@ -49,7 +49,7 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
             $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
-        $posts = $this->postManager->getPostsCreatedTodayByToken($this->token, null);
+        $posts = $this->postManager->getPostsCreatedByTokenAt($this->token, \DateTimeImmutable::createFromFormat('Y-m-d', date('Y-m-d')));
 
         if (1 < count($posts)) {
             return;

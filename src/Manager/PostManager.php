@@ -67,13 +67,13 @@ class PostManager implements PostManagerInterface
         return $this->repository->findRecentPostsByTokens($tokens, $page);
     }
 
-    public function getPostsCreatedToday(?string $date): array
+    public function getPostsCreatedAt(?\DateTimeImmutable $date): array
     {
-        return $this->repository->getPostsCreatedToday($date);
+        return $this->repository->getPostsCreatedAt($date);
     }
 
-    public function getPostsCreatedTodayByToken(Token $token, ?string $date): array
+    public function getPostsCreatedByTokenAt(Token $token, ?\DateTimeImmutable $date): array
     {
-        return $this->repository->getPostsCreatedTodayByToken($token, $date);
+        return $this->repository->getPostsCreatedByTokenAt($token, $date);
     }
 }

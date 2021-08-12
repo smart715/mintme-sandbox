@@ -487,7 +487,7 @@ mail.new_investor.actively_social_media_token_1: 'Remember that you have to acti
 mail.new_investor.actively_social_media_token_2: 'everywhere you can to make it successful.'
 mail.join_mintme_hosting: 'Join MintMe hosting'
 mail.new_investor.create_token_here: 'You don''t have a token? What are you waiting for? Create it <a href="https://www.mintme.com/token" target="_blank">here</a>'
-new_post.msg: '%tokenName% a crée un nouveau post. Lisez le <a href="%urlToken%">ici.</a>'
+new_post.msg:
 mail.new_post.msg: 'créer un nouveau post'
 mail.new_post.text_link: 'Lire cela ici!'
 mail.grouped_posts.msg:

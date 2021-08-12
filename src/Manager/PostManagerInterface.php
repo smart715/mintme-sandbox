@@ -24,10 +24,10 @@ interface PostManagerInterface
     /**
      * @return Post[]
      */
-    public function getPostsCreatedToday(?string $date): array;
+    public function getPostsCreatedAt(?\DateTimeImmutable $date): array;
 
     /**
      * @return Post[]
      */
-    public function getPostsCreatedTodayByToken(Token $token, ?string $date): array;
+    public function getPostsCreatedByTokenAt(Token $token, ?\DateTimeImmutable $date): array;
 }

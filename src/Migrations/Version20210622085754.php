@@ -23,7 +23,7 @@ final class Version20210622085754 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('INSERT INTO cron_job (name, command, schedule, description, enabled) 
-            VALUE ("send-grouped-posts", "app:send-grouped-posts", "0 0 * * *", "This command updates withdrawals", 1);');
+            VALUE ("send-grouped-posts", "app:send-grouped-posts", "0 0 * * *", "This command send grouped posts to client", 1);');
     }
 
     public function down(Schema $schema) : void

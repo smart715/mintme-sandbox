@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Post;
+use App\Entity\User;
 use App\Mailer\MailerInterface;
 use App\Manager\PostManagerInterface;
 use App\Manager\TokenManagerInterface;
@@ -64,11 +65,14 @@ class SendEmailGroupedPosts extends Command
             }
         }
 
-        $posts = $this->postManager->getPostsCreatedToday($date);
+        $date = $date
+            ? \DateTimeImmutable::createFromFormat('Y-m-d', $date)
+            : null;
+
+        $posts = $this->postManager->getPostsCreatedAt($date);
 
         $data = [];
 
-        /** @var Post $post */
         foreach ($posts as $post) {
             $data[$post->getToken()->getName()][] = $post;
         }
@@ -79,12 +83,7 @@ class SendEmailGroupedPosts extends Command
             $groupedPostsCount = count($groupedPosts);
 
             foreach ($users as $user) {
-                if ($this->userNotificationManager->isNotificationAvailable(
-                    $user,
-                    NotificationTypes::TOKEN_NEW_POST,
-                    NotificationChannels::EMAIL
-                )
-                ) {
+                if ($this->isNotificationAvailable($user)) {
                     if ($user->getId() !== $token->getOwner()->getId()) {
                         if (2 < $groupedPostsCount) {
                             array_pop($groupedPosts);
@@ -98,6 +97,15 @@ class SendEmailGroupedPosts extends Command
         $output->writeln('Emails has been sent');
 
         return 0;
+    }
+
+    private function isNotificationAvailable(User $user): bool
+    {
+        return $this->userNotificationManager->isNotificationAvailable(
+            $user,
+            NotificationTypes::TOKEN_NEW_POST,
+            NotificationChannels::EMAIL
+        );
     }
 
     public function validateDate(string $date, string $format = 'Y-m-d'): bool
