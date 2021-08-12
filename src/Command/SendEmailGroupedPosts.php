@@ -69,7 +69,7 @@ class SendEmailGroupedPosts extends Command
             ? \DateTimeImmutable::createFromFormat('Y-m-d', $date) ?? null
             : null;
 
-        $posts = $this->postManager->getPostsCreatedAt($date );
+        $posts = $this->postManager->getPostsCreatedAt($date);
 
         $data = [];
 
