@@ -1451,38 +1451,38 @@ withdraw_modal.bnb_address_label: 'Dirección BEP20:'
 withdraw_modal.bep20_message: 'Los retiros sólo son posibles a Binance smart chain (BEP20). No hacemos retiros a BEP2. Es necesario proporcionar la dirección de la cartera adecuada para BEP20.'
 connect: Conectar
 disconnect: Desconectar
-discord.rewards.title: null
-discord.rewards.bot.invite: null
-discord.rewards.bot.remove: null
-discord.rewards.description: null
+discord.rewards.title: 'Recompensas en Discord'
+discord.rewards.bot.invite: 'Invitar al Bot'
+discord.rewards.bot.remove: 'Quitar servidor'
+discord.rewards.description: 'Habilite las recompensas en Discord para los propietarios de los tokens'
 discord.rewards.description.guide: null
-discord.rewards.special_roles: null
-discord.rewards.special_roles.name: null
-discord.rewards.special_roles.color: null
-discord.rewards.special_roles.required_balance: null
-discord.rewards.special_roles.add: null
-discord.rewards.guild.removed: null
-discord.rewards.guild.removed.error: null
-discord.rewards.warning_1: null
-discord.rewards.warning_2: null
+discord.rewards.special_roles: 'Roles especiales'
+discord.rewards.special_roles.name: 'Nombre del rol'
+discord.rewards.special_roles.color: 'Color del rol'
+discord.rewards.special_roles.required_balance: 'Saldo requerido'
+discord.rewards.special_roles.add: 'Cargar roles desde Discord'
+discord.rewards.guild.removed: 'Servidor retirado'
+discord.rewards.guild.removed.error: 'Error al retirar servidor'
+discord.rewards.warning_1: 'Sus recompensas en Discord fueron deshabilitadas porque se ha detectado algo que salió mal'
+discord.rewards.warning_2: 'Para habilitarlas invite a nuestro Bot a su servidor de nuevo. También vaya a los ajustes del servidor y asegurese que el rol del Bot tenga la más alta jerarquía.'
 discord.account.disconnected: 'Cuenta en Discord desconectada'
 discord.error: 'Ocurrió un error durante la conexión con Discord. Intente nuevamente'
-discord.error.missing_permissions: null
-discord.error.invalid_form: null
-discord.error.account_already_used: null
-discord.rewards.special_roles.required: null
-discord.rewards.special_roles.unique_names: null
-discord.rewards.special_roles.unique_balances: null
-discord.rewards.special_roles.name.not_empty: null
-discord.rewards.special_roles.name.max_length: null
-discord.rewards.special_roles.requiredBalance.not_empty: null
-discord.rewards.special_roles.requiredBalance.decimal: null
-discord.rewards.special_roles.requiredBalance.between: null
-discord.rewards.special_roles.color.hex: null
-discord.rewards.save.success: null
-discord.rewards.need_to_save: null
-discord.rewards.guild.remove.confirm_1: null
-discord.rewards.guild.remove.confirm_2: null
-discord.rewards.special_roles.help_1: null
-discord.rewards.special_roles.help_2: null
-discord.rewards.special_roles.help_3: null
+discord.error.missing_permissions: 'El Bot no se encuentra en el servidor o no tiene suficiente permisos'
+discord.error.invalid_form: 'información inválida '
+discord.error.account_already_used: 'Esta cuenta en Discord ya se encuentra asociada a otra cuenta en mintMe'
+discord.rewards.special_roles.required: 'Para habilitar los roles especiales ud. debe crear al menos un rol'
+discord.rewards.special_roles.unique_names: 'Los nombres del rol deben ser unicos'
+discord.rewards.special_roles.unique_balances: 'Saldos requeridos deben ser unicos'
+discord.rewards.special_roles.name.not_empty: 'El nombre no puede estar vacío '
+discord.rewards.special_roles.name.max_length: 'El nombre no puede tener más de %max% caracteres'
+discord.rewards.special_roles.requiredBalance.not_empty: 'Saldo requerido no debe estar vacío'
+discord.rewards.special_roles.requiredBalance.decimal: 'El balance requerido debe ser decimal'
+discord.rewards.special_roles.requiredBalance.between: 'El balance requerido debe estar entre %min% y %max% tokens'
+discord.rewards.special_roles.color.hex: 'El color debe ser un código hexadecimal comenzando con #'
+discord.rewards.save.success: 'Cambios guardados'
+discord.rewards.need_to_save: 'Los cambios no se guardan hasta que oprima el boton guardar '
+discord.rewards.guild.remove.confirm_1: 'Ud. quiere retirar este servidor'
+discord.rewards.guild.remove.confirm_2: 'está seguro?'
+discord.rewards.special_roles.help_1: 'Mis roles no aparecen'
+discord.rewards.special_roles.help_2: 'Asegurese que el rol de nuestro Bot en su servidor tenga mayor jerarquía que el resto de roles que ud. desee que sean gestionados por MintMe'
+discord.rewards.special_roles.help_3: 'Para hacerlo, vaya a a la sección de roles en la configuración de su servidor'
