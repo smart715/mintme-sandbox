@@ -22,7 +22,7 @@
 <script>
 import moment from 'moment';
 import {toMoney} from '../utils';
-import {currencies, TOK} from '../utils/constants';
+import {currencies, TOK, WSAPI} from '../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {downArrow} from '../utils/icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
@@ -55,9 +55,12 @@ export default {
     },
     mounted() {
         const es = new EventSource(this.mercureHubUrl + '?topic=' + encodeURIComponent(this.topic));
+        this.items = this.groupedFeed;
+
         es.onmessage = (e) => {
             let data = JSON.parse(e.data);
             this.items.unshift(data);
+            this.items = this.groupedFeed;
         };
     },
     computed: {
@@ -75,6 +78,42 @@ export default {
         itemsToShow() {
             let max = this.showMore ? this.max : this.min;
             return Math.min(max, this.items.length);
+        },
+        groupedFeed() {
+            let temp = [];
+
+            for (let index = 0; index < this.items.length; index++) {
+                let exists = false;
+                const item = this.items[index];
+
+                if (WSAPI.order.type.DONATION !== item.type && WSAPI.order.type.TOKEN_TRADED !== item.type) {
+                    temp.push(item);
+                    continue;
+                }
+
+                for (let tempIndex = 0; tempIndex < temp.length; tempIndex++) {
+                    const tempItem = temp[tempIndex];
+
+                    if (tempItem.type !== item.type) {
+                        continue;
+                    }
+
+                    if ((WSAPI.order.type.DONATION === tempItem.type && tempItem.token.name === item.token.name)
+                        ||(WSAPI.order.type.TOKEN_TRADED && tempItem.token.name === item.token.name
+                            && tempItem.buyer.id === item.buyer.id)) {
+                        const amount = parseFloat(temp[tempIndex].amount) + parseFloat(item.amount);
+                        temp[tempIndex].amount = amount.toString();
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    temp.push(item);
+                }
+            }
+
+            return temp;
         },
     },
     methods: {
