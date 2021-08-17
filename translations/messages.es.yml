@@ -664,21 +664,21 @@ bbcode.help.image: Imagen
 bbcode.help.images: Imágenes
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Video YouTube'
-quick_trade.donation.nonrefund: null
-quick_trade.currency.select: null
-quick_trade.balance: null
-quick_trade.make_deposit: null
-quick_trade.insufficient_funds: null
-quick_trade.sell_exceeds: null
-quick_trade.min_amount: null
-quick_trade.diff_number: null
-quick_trade.receive: null
-quick_trade.donation.modal.1: null
-quick_trade.donation.modal.2: null
-quick_trade.successfully_made: null
-quick_trade.availability_changed: null
-quick_trade.button_all: null
-quick_trade.order.empty: null
+quick_trade.donation.nonrefund: 'Cuando ud. compra a través de esta opción, el dinero irá directamente al dueño del token. Sí ud. no quiere apoyar este token y le interesa el menor precio posible use la opción de <a href="%path%">trade</a>'
+quick_trade.currency.select: 'Seleccione la moneda '
+quick_trade.balance: 'Su saldo:'
+quick_trade.make_deposit: 'Por favor realice un<a href="%depositUrl%">deposito</a> primero'
+quick_trade.insufficient_funds: 'Fondos insuficientes'
+quick_trade.sell_exceeds: 'Ud. no puede vender más de  %ordersSummary% %currency%.'
+quick_trade.min_amount: 'Cantidad mínima de %currency% %currencyMinAmount%'
+quick_trade.diff_number: 'La cantidad que ud. recibirá puede variar ligeramente debido a la actividad de otros traders'
+quick_trade.receive: 'Ud. recibirá aproximadamente: '
+quick_trade.donation.modal.1: 'La cantidad donada supera en valor a los tokens disponibles para la venta. Ud. puede continuar o cancelar y cambiar la cantidad que desea donar. También pudiera pedir al dueño del token para que coloque mas ordenes de venta en el mercado y así pueda intentar nuevamente'
+quick_trade.donation.modal.2: '¿Ud. quiere donar %amount% %currency% por %amountToReceive% %assetToReceive% que tienen un valor de  %worth% MINTME?'
+quick_trade.successfully_made: '¡Felicidades! la transacción ha sido exitosa. Ud. ha recibido %amountToReceive% %assetToReceive%.'
+quick_trade.availability_changed: 'La disponibilidad de ordenes cambió, Página cargando...'
+quick_trade.button_all: Todo
+quick_trade.order.empty: 'No hay ordenes disponibles'
 quick_trade.invalid_mode: null
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
@@ -1219,7 +1219,7 @@ place_order.insufficient_balance: 'Fondos insuficientes'
 place_order.not_found: 'No se ha encontrado la orden'
 place_order.not_match: 'No coincide con esta orden'
 place_order.too_small: 'El valor mínimo de la orden debe ser de %valueInUsd% USD. En este momento es %valueInMintme% MINTME.'
-execute_order.no_enough_trader: null
+execute_order.no_enough_trader: 'No hay suficientes traders para ejecutar su orden'
 mixin.websocket.hash_not_set: 'El hash no está listo. No se puede autorizar al usuario'
 mixin.websocket.authorize_failed: 'Falló la autorización del usuario actual. El servidor respondió con estatus fallido'
 mixin.websocket.server_not_respond: 'El servidor no responde'
@@ -1442,7 +1442,7 @@ modal.add_phone_alert_airdrop.message: 'Para obtener la recompensa'
 modal.add_phone_alert_action.message: 'Para realizar esa acción'
 modal.add_phone_alert_token_create.message: 'Para crear un token'
 modal.add_phone_alert_deposit_withdrawal.message: 'Para hacer depósitos o retiros'
-modal.add_phone_alert_quick_trade.message: null
+modal.add_phone_alert_quick_trade.message: 'Comprar o Vender'
 api.add_phone_number_message: 'es necesario añadir el número de teléfono en su perfil'
 browser.storage.error: 'Error al intentar acceder al almacenamiento, por favor evite usar ventanas de incógnito'
 page.reload: recargar
