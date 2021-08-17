@@ -65,13 +65,9 @@ class SendEmailGroupedPosts extends Command
             }
         }
 
-        $dateTimeObject = $date
-            ? \DateTime::createFromFormat('Y-m-d', $date)
-            : false;
-
-        $dateTimeImmutable = false !== $dateTimeObject
-            ? \DateTimeImmutable::createFromMutable($dateTimeObject)
-            : null;
+        $dateTimeImmutable = $date
+            ? \DateTimeImmutable::createFromFormat('Y-m-d', $date)
+            : \DateTimeImmutable::createFromFormat('Y-m-d', date('Y-m-d', strtotime('-1 day')));
 
         $posts = $this->postManager->getPostsCreatedAt($dateTimeImmutable);
 
@@ -87,13 +83,12 @@ class SendEmailGroupedPosts extends Command
             $groupedPostsCount = count($groupedPosts);
 
             foreach ($users as $user) {
-                if ($this->isNotificationAvailable($user)) {
-                    if ($user->getId() !== $token->getOwner()->getId()) {
-                        if (2 < $groupedPostsCount) {
-                            array_pop($groupedPosts);
-                            $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
-                        }
-                    }
+                if ($this->isNotificationAvailable($user)
+                    && $user->getId() !== $token->getOwner()->getId()
+                    && 2 < $groupedPostsCount
+                ) {
+                    array_pop($groupedPosts);
+                    $this->mail->sendGroupedPosts($user, $tokenName, $groupedPosts);
                 }
             }
         }

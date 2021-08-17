@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Token\Token;
 use Doctrine\ORM\EntityRepository;
-use PHP_CodeSniffer\Tokenizers\PHP;
 
 class PostRepository extends EntityRepository
 {
@@ -24,15 +23,10 @@ class PostRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getPostsCreatedAt(?\DateTimeImmutable $date): array
+    public function getPostsCreatedAt(\DateTimeImmutable $date): array
     {
-        $from = $date
-            ? $date->setTime(0, 0)->format('Y-m-d H:i:s')
-            : date('Y-m-d', strtotime('-1 day')).' 00:00:00';
-
-        $to = $date
-            ? $date->setTime(23, 59, 59)->format('Y-m-d H:i:s')
-            : date('Y-m-d', strtotime('-1 day')).' 23:59:59';
+        $from = $date->setTime(0, 0)->format('Y-m-d H:i:s');
+        $to = $date->setTime(23, 59, 59)->format('Y-m-d H:i:s');
 
         return $this->createQueryBuilder('post')
             ->where('post.createdAt BETWEEN :from AND :to')
@@ -43,15 +37,10 @@ class PostRepository extends EntityRepository
             ->getResult();
     }
 
-    public function getPostsCreatedByTokenAt(Token $token, ?\DateTimeImmutable $date): array
+    public function getPostsCreatedAtByToken(Token $token, \DateTimeImmutable $date): array
     {
-        $from = null !== $date
-            ? $date->setTime(0, 0)->format('Y-m-d H:i:s')
-            : date('Y-m-d', strtotime('-1 day')).' 00:00:00';
-
-        $to = null !== $date
-            ? $date->setTime(23, 59, 59)->format('Y-m-d H:i:s')
-            : date('Y-m-d', strtotime('-1 day')).' 23:59:59';
+        $from = $date->setTime(0, 0)->format('Y-m-d H:i:s');
+        $to = $date->setTime(23, 59, 59)->format('Y-m-d H:i:s');
 
         return $this->createQueryBuilder('post')
             ->where('post.token = :token')

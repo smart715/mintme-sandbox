@@ -49,13 +49,9 @@ class TokenPostNotificationStrategy implements NotificationStrategyInterface
             $this->userNotificationManager->createNotification($user, $this->type, $jsonData);
         }
 
-        $dateTimeObject = \DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
-
-        $dateTimeImmutable = false !== $dateTimeObject
-            ? \DateTimeImmutable::createFromMutable($dateTimeObject)
-            : null;
-
-        $posts = $this->postManager->getPostsCreatedByTokenAt($this->token, $dateTimeImmutable);
+        $datetime = date('Y-m-d');
+        $dateTimeImmutable = \DateTimeImmutable::createFromFormat('Y-m-d', $datetime);
+        $posts = $this->postManager->getPostsCreatedAtByToken($this->token, $dateTimeImmutable);
 
         if (1 < count($posts)) {
             return;
