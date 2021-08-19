@@ -21,6 +21,7 @@
 
 <script>
 import moment from 'moment';
+import Decimal from 'decimal.js';
 import {toMoney} from '../utils';
 import {currencies, TOK, WSAPI} from '../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
@@ -55,12 +56,12 @@ export default {
     },
     mounted() {
         const es = new EventSource(this.mercureHubUrl + '?topic=' + encodeURIComponent(this.topic));
-        this.items = this.groupedFeed;
+        this.items = this.groupedItems;
 
         es.onmessage = (e) => {
             let data = JSON.parse(e.data);
             this.items.unshift(data);
-            this.items = this.groupedFeed;
+            this.items = this.groupedItems;
         };
     },
     computed: {
@@ -79,14 +80,14 @@ export default {
             let max = this.showMore ? this.max : this.min;
             return Math.min(max, this.items.length);
         },
-        groupedFeed() {
+        groupedItems() {
             let temp = [];
 
             for (let index = 0; index < this.items.length; index++) {
-                let exists = false;
+                let grouped = false;
                 const item = this.items[index];
 
-                if (WSAPI.order.type.DONATION !== item.type && WSAPI.order.type.TOKEN_TRADED !== item.type) {
+                if (!this.isGroupableType(item)) {
                     temp.push(item);
                     continue;
                 }
@@ -98,17 +99,15 @@ export default {
                         continue;
                     }
 
-                    if ((WSAPI.order.type.DONATION === tempItem.type && tempItem.token.name === item.token.name)
-                        ||(WSAPI.order.type.TOKEN_TRADED && tempItem.token.name === item.token.name
-                            && tempItem.buyer.id === item.buyer.id)) {
-                        const amount = parseFloat(temp[tempIndex].amount) + parseFloat(item.amount);
-                        temp[tempIndex].amount = amount.toString();
-                        exists = true;
+                    if (this.isDonation(tempItem, item) || this.isTrade(tempItem, item)) {
+                        const amount = new Decimal(temp[tempIndex].amount).add(item.amount);
+                        temp[tempIndex].amount = amount.toFixed();
+                        grouped = true;
                         break;
                     }
                 }
 
-                if (!exists) {
+                if (!grouped) {
                     temp.push(item);
                 }
             }
@@ -117,6 +116,19 @@ export default {
         },
     },
     methods: {
+        isDonation(savedItem, receivedItem) {
+            return WSAPI.order.type.DONATION === savedItem.type
+                && savedItem.token.name === receivedItem.token.name;
+        },
+        isTrade(savedItem, receivedItem) {
+            return WSAPI.order.type.TOKEN_TRADED === savedItem.type
+                && savedItem.token.name === receivedItem.token.name
+                && savedItem.buyer.id === receivedItem.buyer.id;
+        },
+        isGroupableType(item) {
+            return WSAPI.order.type.DONATION === item.type
+                || WSAPI.order.type.TOKEN_TRADED === item.type;
+        },
         createTranslationContext(item) {
             let subunit = item.currency ? currencies[item.currency].subunit : TOK.subunit;
             let symbol = this.rebrandingFunc(TOK.symbol === item.currency ? 'tokens' : item.currency);
