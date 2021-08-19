@@ -34,6 +34,7 @@ class RegistrationType extends AbstractType
                         'size' => 'normal',
                         'type'  => 'image',
                         'injectScript' => false,
+                        'defer' => true,
                     ],
                 ],
                 'mapped' => false,
