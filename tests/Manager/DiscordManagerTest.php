@@ -12,6 +12,7 @@ use App\Manager\DiscordConfigManagerInterface;
 use App\Manager\DiscordManager;
 use App\Manager\DiscordManagerInterface;
 use App\Manager\DiscordRoleManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Command\Exception\CommandClientException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -449,6 +450,7 @@ class DiscordManagerTest extends TestCase
         ?LoggerInterface $logger = null,
         ?DiscordRoleManagerInterface $drm = null,
         ?DiscordConfigManagerInterface $dcm = null,
+        ?EntityManagerInterface $em = null,
         string $publicKey = 'testPublicKey',
         string $clientId = 'testClientId'
     ): DiscordManagerInterface {
@@ -458,6 +460,7 @@ class DiscordManagerTest extends TestCase
             $logger ?? $this->createMock(LoggerInterface::class),
             $drm ?? $this->createMock(DiscordRoleManagerInterface::class),
             $dcm ?? $this->createMock(DiscordConfigManagerInterface::class),
+            $em ?? $this->createMock(EntityManagerInterface::class),
             $publicKey,
             $clientId
         );

@@ -596,7 +596,7 @@ class TokenController extends Controller
         $discordCallbackUrl = $this->generateUrl('discord_callback_bot', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $discordAuthUrl = $this->discordOAuthClient->generateAuthUrl(
-            'bot',
+            'bot applications.commands',
             $discordCallbackUrl,
             DiscordOAuthClientInterface::BOT_PERMISSIONS_ADMINISTRATOR,
             (string)$token->getId()
