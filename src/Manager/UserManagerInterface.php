@@ -29,6 +29,7 @@ interface UserManagerInterface extends \FOS\UserBundle\Model\UserManagerInterfac
     public function getRepository(): UserRepository;
     public function getUsersByDomains(array $domains): ?array;
     public function findByDomain(string $domain): array;
+    public function findByDiscordId(int $discordId): ?User;
     public function checkExistCanonicalEmail(string $email): bool;
     public function sendMintmeExchangeMail(User $user): void;
 }

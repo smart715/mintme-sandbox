@@ -20,21 +20,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
 {
-
-    private EntityManagerInterface $entityManager;
-    private DiscordRoleManagerInterface $discordRoleManager;
     private DiscordManagerInterface $discordManager;
     private array $map = []; // phpcs:ignore
     private array $users;
     private array $tokens;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        DiscordRoleManagerInterface $discordRoleManager,
         DiscordManagerInterface $discordManager
     ) {
-        $this->entityManager = $entityManager;
-        $this->discordRoleManager = $discordRoleManager;
         $this->discordManager = $discordManager;
     }
 
@@ -57,7 +50,7 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
         $token = $event->getToken();
         $user = $event->getUser();
 
-        $this->changeRole($user, $token);
+        $this->discordManager->updateRoleOfUser($user, $token);
     }
 
     public function handleTransactionEvent(TransactionCompletedEvent $event): void
@@ -70,7 +63,7 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
 
         $user = $event->getUser();
 
-        $this->changeRole($user, $token);
+        $this->discordManager->updateRoleOfUser($user, $token);
     }
 
     public function handleOrderEvent(OrderEventInterface $event): void
@@ -88,10 +81,10 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
         $taker = $order->getTaker();
         $maker = $order->getMaker();
 
-        $this->changeRole($maker, $token);
+        $this->discordManager->updateRoleOfUser($maker, $token);
 
         if ($taker) {
-            $this->changeRole($taker, $token);
+            $this->discordManager->updateRoleOfUser($taker, $token);
         }
     }
 
@@ -121,7 +114,7 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
                 $user = $this->users[$userId];
                 $token = $this->tokens[$tokenId];
 
-                $this->changeRole($user, $token);
+                $this->discordManager->updateRoleOfUser($user, $token);
             }
         }
     }
@@ -143,56 +136,5 @@ class ChangeDiscordRoleSubscriber implements EventSubscriberInterface
         if (!in_array($token->getId(), $this->map[$user->getId()], true)) {
             $this->map[$user->getId()][] = $token->getId();
         }
-    }
-
-    private function changeRole(User $user, Token $token): void
-    {
-        if (!$token->getDiscordConfig()->getEnabled()
-            || !$token->getDiscordConfig()->getSpecialRolesEnabled()
-            || !$user->isSignedInWithDiscord()
-            || $token->isOwner($user->getProfile()->getTokens())
-        ) {
-            return;
-        }
-
-        $this->entityManager->refresh($user);
-
-        $dru = $user->getDiscordRoleUser($token);
-
-        $currentRole = $dru
-            ? $dru->getDiscordRole()
-            : null;
-
-        $newRole = $this->discordRoleManager->findRoleOfUser($user, $token);
-
-        if ($currentRole === $newRole) {
-            return;
-        }
-
-        if ($currentRole) {
-            try {
-                $this->discordManager->removeGuildMemberRole($user, $currentRole);
-            } catch (\Throwable $e) {
-                return;
-            }
-        }
-
-        if ($newRole) {
-            try {
-                $this->discordManager->addGuildMemberRole($user, $newRole);
-            } catch (\Throwable $e) {
-                return;
-            }
-
-            $dru = $dru
-                ? $dru->setDiscordRole($newRole)
-                : (new DiscordRoleUser())->setDiscordRole($newRole)->setUser($user);
-
-            $this->entityManager->persist($dru);
-        } else {
-            $this->entityManager->remove($dru);
-        }
-
-        $this->entityManager->flush();
     }
 }

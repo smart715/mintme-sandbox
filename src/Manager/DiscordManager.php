@@ -3,12 +3,14 @@
 namespace App\Manager;
 
 use App\Entity\DiscordRole;
+use App\Entity\DiscordRoleUser;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exception\Discord\DiscordException;
 use App\Exception\Discord\MissingPermissionsException;
 use App\Exception\Discord\UnknownRoleException;
 use Discord\Interaction;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Command\Exception\CommandClientException;
 use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
@@ -27,6 +29,7 @@ class DiscordManager implements DiscordManagerInterface
     private LoggerInterface $logger;
     private DiscordRoleManagerInterface $discordRoleManager;
     private DiscordConfigManagerInterface $discordConfigManager;
+    private EntityManagerInterface $entityManager;
     private string $publicKey;
     private string $clientId;
 
@@ -36,6 +39,7 @@ class DiscordManager implements DiscordManagerInterface
         LoggerInterface $logger,
         DiscordRoleManagerInterface $discordRoleManager,
         DiscordConfigManagerInterface $discordConfigManager,
+        EntityManagerInterface $entityManager,
         string $publicKey,
         string $clientId
     ) {
@@ -44,6 +48,7 @@ class DiscordManager implements DiscordManagerInterface
         $this->logger = $logger;
         $this->discordRoleManager = $discordRoleManager;
         $this->discordConfigManager = $discordConfigManager;
+        $this->entityManager = $entityManager;
         $this->publicKey = $publicKey;
         $this->clientId = $clientId;
     }
@@ -211,6 +216,64 @@ class DiscordManager implements DiscordManagerInterface
         return $result;
     }
 
+    public function updateRoleOfUser(User $user, Token $token, bool $updateOnDiscordIfSame = false): void
+    {
+        if (!$token->getDiscordConfig()->getEnabled()
+            || !$token->getDiscordConfig()->getSpecialRolesEnabled()
+            || !$user->isSignedInWithDiscord()
+            || $token->isOwner($user->getProfile()->getTokens())
+        ) {
+            return;
+        }
+
+        $this->entityManager->refresh($user);
+
+        $dru = $user->getDiscordRoleUser($token);
+
+        $currentRole = $dru
+            ? $dru->getDiscordRole()
+            : null;
+
+        $newRole = $this->discordRoleManager->findRoleOfUser($user, $token);
+
+        if ($currentRole === $newRole) {
+            if ($updateOnDiscordIfSame) {
+                try {
+                    $this->addGuildMemberRole($user, $currentRole);
+                } catch (\Throwable $e) {
+                    return;
+                }
+            }
+
+            return;
+        }
+
+        if ($currentRole) {
+            try {
+                $this->removeGuildMemberRole($user, $currentRole);
+            } catch (\Throwable $e) {
+                return;
+            }
+        }
+
+        if ($newRole) {
+            try {
+                $this->addGuildMemberRole($user, $newRole);
+            } catch (\Throwable $e) {
+                return;
+            }
+
+            $dru = $dru
+                ? $dru->setDiscordRole($newRole)
+                : (new DiscordRoleUser())->setDiscordRole($newRole)->setUser($user);
+
+            $this->entityManager->persist($dru);
+        } else {
+            $this->entityManager->remove($dru);
+        }
+
+        $this->entityManager->flush();
+    }
 
     private function getError(CommandClientException $e): array
     {
