@@ -74,6 +74,14 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->findUserBy(['email' => $email]);
     }
 
+    public function findByDiscordId(int $discordId): ?User
+    {
+        /** @var User|null $user */
+        $user = $this->findUserBy(['discordId' => $discordId]);
+
+        return $user;
+    }
+
     public function checkExistCanonicalEmail(string $email): bool
     {
         return $this->getRepository()->checkExistCanonicalEmail($email);
