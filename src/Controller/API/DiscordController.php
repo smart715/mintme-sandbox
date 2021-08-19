@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Communications\DiscordOAuthClientInterface;
+use App\Discord\SlashCommandsHandlerInterface;
 use App\Entity\DiscordRole;
 use App\Entity\Token\Token;
 use App\Entity\User;
@@ -20,6 +21,7 @@ use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
+use Psr\Log\LoggerInterface;
 use RestCord\DiscordClient;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,6 +42,8 @@ class DiscordController extends AbstractFOSRestController
     private EntityManagerInterface $entityManager;
     private TranslatorInterface $translator;
     private DiscordOAuthClientInterface $discordOAuthClient;
+    private LoggerInterface $logger;
+    private SlashCommandsHandlerInterface $slashCommandsHandler;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
@@ -48,7 +52,9 @@ class DiscordController extends AbstractFOSRestController
         DiscordConfigManager $discordConfigManager,
         EntityManagerInterface $entityManager,
         TranslatorInterface $translator,
-        DiscordOAuthClientInterface $discordOAuthClient
+        DiscordOAuthClientInterface $discordOAuthClient,
+        LoggerInterface $logger,
+        SlashCommandsHandlerInterface $slashCommandsHandler
     ) {
         $this->tokenManager = $tokenManager;
         $this->discordManager = $discordManager;
@@ -57,6 +63,8 @@ class DiscordController extends AbstractFOSRestController
         $this->entityManager = $entityManager;
         $this->translator = $translator;
         $this->discordOAuthClient = $discordOAuthClient;
+        $this->logger = $logger;
+        $this->slashCommandsHandler = $slashCommandsHandler;
     }
 
     /**
@@ -288,13 +296,19 @@ class DiscordController extends AbstractFOSRestController
 
         $headers = $request->headers;
 
-        $signature = $headers->get('HTTP-X-SIGNATURE-ED25519');
-        $timestamp = $headers->get('HTTP-X-SIGNATURE-TIMESTAMP');
+        $signature = $headers->get('X-SIGNATURE-ED25519');
+        $timestamp = $headers->get('X-SIGNATURE-TIMESTAMP');
+
+        $this->logger->error('discord interaction', [
+            'body' => $body,
+            'signature' => $signature,
+            'timestamp' => $timestamp,
+        ]);
 
         $isInteractionValid = $this->discordManager->verifyInteraction($body, $signature, $timestamp);
 
         if (!$isInteractionValid) {
-            return $this->view(['message' => 'invalid request signature', Response::HTTP_UNAUTHORIZED]);
+            return $this->view(['message' => 'invalid request signature'], Response::HTTP_UNAUTHORIZED);
         }
 
         $params = \json_decode($body, true, 512, JSON_THROW_ON_ERROR);
@@ -303,7 +317,7 @@ class DiscordController extends AbstractFOSRestController
             return $this->view(['type' => InteractionResponseType::PONG], Response::HTTP_OK);
         }
 
-        return $this->view([]); // @TODO
+        return $this->view($this->slashCommandsHandler->handleInteraction($params), Response::HTTP_OK);
     }
 
     /**

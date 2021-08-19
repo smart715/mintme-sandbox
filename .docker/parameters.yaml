@@ -206,4 +206,5 @@ parameters:
     auth_make_disable_donations: false
     minimum_order_value_usd: 0.1
     discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_base_commands_url: 'https://discord.com/api/v8/applications/'
     discord_api_timeout: '10'

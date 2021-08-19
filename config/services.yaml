@@ -758,3 +758,17 @@ services:
                     }
                 }
             }
+
+    discord.command.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_commands_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Content-Type: application/json
+                Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+
+    App\Command\CreateDiscordCommand:
+        arguments:
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $guzzleRestWrapper: '@discord.command.client'

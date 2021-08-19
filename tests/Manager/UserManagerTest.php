@@ -54,6 +54,26 @@ class UserManagerTest extends TestCase
         $this->assertEquals($user, $manager->findByReferralCode('foo'));
     }
 
+    public function testFindByDiscordId(): void
+    {
+        $user = $this->mockUser();
+
+        $manager = new UserManager(
+            $this->mockPasswordUpdater(),
+            $this->mockCanonicalFieldsUpdater(),
+            $this->mockObjectManager(
+                $this->mockRepository($user)
+            ),
+            'Foo',
+            $this->mockCryptoManagerInterface(),
+            $this->mockMailerInterface(),
+            $this->mockEntityManagerInterface(),
+            $this->mockTranslatorInterface()
+        );
+
+        $this->assertEquals($user, $manager->findByDiscordId(1));
+    }
+
     private function mockPasswordUpdater(): PasswordUpdaterInterface
     {
         return $this->createMock(PasswordUpdaterInterface::class);
