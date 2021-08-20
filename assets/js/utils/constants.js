@@ -91,6 +91,7 @@ export const WSAPI = {
             SELL: 1,
             BUY: 2,
             DONATION: 3,
+            TOKEN_TRADED: 8,
         },
     },
 };
