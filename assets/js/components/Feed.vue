@@ -118,7 +118,8 @@ export default {
     methods: {
         isDonation(savedItem, receivedItem) {
             return WSAPI.order.type.DONATION === savedItem.type
-                && savedItem.token.name === receivedItem.token.name;
+                && savedItem.token.name === receivedItem.token.name
+                && savedItem.currency === receivedItem.currency;
         },
         isTrade(savedItem, receivedItem) {
             return WSAPI.order.type.TOKEN_TRADED === savedItem.type
