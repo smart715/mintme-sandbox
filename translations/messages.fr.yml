@@ -668,22 +668,22 @@ bbcode.help.image: Image
 bbcode.help.images: Images
 bbcode.help.youtube: YouTube
 bbcode.help.youtube_video: 'Vidéo YouTube'
-quick_trade.donation.nonrefund:
-quick_trade.currency.select:
-quick_trade.balance:
-quick_trade.make_deposit:
-quick_trade.insufficient_funds:
-quick_trade.sell_exceeds:
-quick_trade.min_amount:
-quick_trade.diff_number:
-quick_trade.receive:
-quick_trade.donation.modal.1:
-quick_trade.donation.modal.2:
-quick_trade.successfully_made:
-quick_trade.availability_changed:
-quick_trade.button_all:
-quick_trade.order.empty:
-quick_trade.invalid_mode:
+quick_trade.donation.nonrefund: 'When buying here, money will go directly to the token creator. If you don''t want to support this token and you are interested in the lowest possible price, use the <a href="%path%">trade</a> option.'
+quick_trade.currency.select: 'Select currency'
+quick_trade.balance: 'Your balance:'
+quick_trade.make_deposit: 'Please make <a href="%depositUrl%">deposit</a> first'
+quick_trade.insufficient_funds: 'Insufficient funds'
+quick_trade.sell_exceeds: 'You can''t sell more than %ordersSummary% %currency%.'
+quick_trade.min_amount: 'Minimum amount of %currency% %currencyMinAmount%'
+quick_trade.diff_number: 'The amount you will receive may vary slightly, because of other traders'' activity.'
+quick_trade.receive: 'You will receive approximately:'
+quick_trade.donation.modal.1: 'Amount donated exceeds the worth of tokens available for sell. You can continue or cancel and adjust donation amount. Alternatively, you could ask token creator to set more sell orders on the market and then retry donation.'
+quick_trade.donation.modal.2: 'Do you want to donate %amount% %currency% for %amountToReceive% %assetToReceive% worth %worth% MINTME?'
+quick_trade.successfully_made: 'Congratulations! Trade has been successfully made. You have received %amountToReceive% %assetToReceive%.'
+quick_trade.availability_changed: 'Orders availability changed. Reloading page...'
+quick_trade.button_all: All
+quick_trade.order.empty: 'There are no orders available.'
+quick_trade.invalid_mode: 'Invalid trade mode: %mode%.'
 donation.order.donation: Donation
 donation.order.buy: 'Acheter (donation)'
 donation.order.sell: 'Vendre (donation)'
@@ -1223,7 +1223,7 @@ place_order.insufficient_balance: 'Solde insuffisant'
 place_order.not_found: 'Ordre introuvable'
 place_order.not_match: 'Vous ne correspondez pas à cet ordre'
 place_order.too_small: 'Minimum order value needs to be worth %valueInUsd% USD. At this moment it''s %valueInMintme% MINTME.'
-execute_order.no_enough_trader:
+execute_order.no_enough_trader: 'There are no enough traders to execute your order from.'
 mixin.websocket.hash_not_set: 'Hash non spécifié. Ne peut autoriser l''utilisateur'
 mixin.websocket.authorize_failed: 'Echec d''authorisation de l''utilisateur actuel. Echec de la réponse du serveur'
 mixin.websocket.server_not_respond: 'Aucune réponse du serveur'
@@ -1447,40 +1447,40 @@ page.reload: reload
 deposit_modal.accept_bep20: 'We only accept Binance coins from Binance smart chain (BEP20). We do not accept BEP2. If you send via BEP2, you will not be credited!'
 withdraw_modal.bnb_address_label: 'BEP20 address:'
 withdraw_modal.bep20_message: 'Withdrawals are only possible to Binance smart chain (BEP20). We do not make withdrawals to BEP2. You need to provide proper wallet address for BEP20.'
-connect:
-disconnect:
-discord.rewards.title:
-discord.rewards.bot.invite:
-discord.rewards.bot.remove:
-discord.rewards.description:
-discord.rewards.description.guide:
-discord.rewards.special_roles:
-discord.rewards.special_roles.name:
-discord.rewards.special_roles.color:
-discord.rewards.special_roles.required_balance:
-discord.rewards.special_roles.add:
-discord.rewards.guild.removed:
-discord.rewards.guild.removed.error:
-discord.rewards.warning_1:
-discord.rewards.warning_2:
-discord.account.disconnected:
-discord.error:
-discord.error.missing_permissions:
-discord.error.invalid_form:
-discord.error.account_already_used:
-discord.rewards.special_roles.required:
-discord.rewards.special_roles.unique_names:
-discord.rewards.special_roles.unique_balances:
-discord.rewards.special_roles.name.not_empty:
-discord.rewards.special_roles.name.max_length:
-discord.rewards.special_roles.requiredBalance.not_empty:
-discord.rewards.special_roles.requiredBalance.decimal:
-discord.rewards.special_roles.requiredBalance.between:
-discord.rewards.special_roles.color.hex:
-discord.rewards.save.success:
-discord.rewards.need_to_save:
-discord.rewards.guild.remove.confirm_1:
-discord.rewards.guild.remove.confirm_2:
-discord.rewards.special_roles.help_1:
-discord.rewards.special_roles.help_2:
-discord.rewards.special_roles.help_3:
+connect: Connect
+disconnect: Disconnect
+discord.rewards.title: 'Discord Rewards'
+discord.rewards.bot.invite: 'Invite bot'
+discord.rewards.bot.remove: 'Remove guild'
+discord.rewards.description: 'Enable discord rewards for token holders'
+discord.rewards.description.guide: 'Reward token holders with special roles on Discord depending on the amount of your tokens they have.'
+discord.rewards.special_roles: 'Special roles'
+discord.rewards.special_roles.name: 'Role name:'
+discord.rewards.special_roles.color: 'Role color:'
+discord.rewards.special_roles.required_balance: 'Required balance:'
+discord.rewards.special_roles.add: 'Load roles from Discord'
+discord.rewards.guild.removed: 'Guild removed'
+discord.rewards.guild.removed.error: 'Error removing guild'
+discord.rewards.warning_1: 'Your discord rewards were disabled because we detected something was wrong.'
+discord.rewards.warning_2: 'To enable them, invite our bot to your guild again. Also, go to your server settings and make sure the role of the bot has highest hierarchy.'
+discord.account.disconnected: 'Discord account disconnected'
+discord.error: 'There was an error while communicating with discord. Try again.'
+discord.error.missing_permissions: 'The bot is not on the guild or doesn''t have enough permissions'
+discord.error.invalid_form: 'Invalid data'
+discord.error.account_already_used: 'This discord account has already been linked to another mintMe account'
+discord.rewards.special_roles.required: 'To enable special roles, you need to create at least one role'
+discord.rewards.special_roles.unique_names: 'Role names must be unique'
+discord.rewards.special_roles.unique_balances: 'Required balances must be unique'
+discord.rewards.special_roles.name.not_empty: 'Name must not be empty'
+discord.rewards.special_roles.name.max_length: 'Name must be less than %max% characters long'
+discord.rewards.special_roles.requiredBalance.not_empty: 'Required balance must not be empty'
+discord.rewards.special_roles.requiredBalance.decimal: 'Required balance must be decimal'
+discord.rewards.special_roles.requiredBalance.between: 'Required balance must be between %min% and %max% tokens'
+discord.rewards.special_roles.color.hex: 'Color must be an hexadecimal code starting with #'
+discord.rewards.save.success: 'Changes saved'
+discord.rewards.need_to_save: 'Changes are not saved until you click the Save button'
+discord.rewards.guild.remove.confirm_1: 'You want to remove this guild:'
+discord.rewards.guild.remove.confirm_2: 'Are you sure?'
+discord.rewards.special_roles.help_1: 'My roles are not showing up'
+discord.rewards.special_roles.help_2: 'Make sure the role of our bot on your server has higher hierarchy than the roles you want to be managed by MintMe.'
+discord.rewards.special_roles.help_3: 'To do so, go to the ''Roles'' section on you server''s settings.'
