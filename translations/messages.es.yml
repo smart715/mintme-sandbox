@@ -679,7 +679,7 @@ quick_trade.successfully_made: '¡Felicidades! la transacción ha sido exitosa. 
 quick_trade.availability_changed: 'La disponibilidad de ordenes cambió, Página cargando...'
 quick_trade.button_all: Todo
 quick_trade.order.empty: 'No hay ordenes disponibles'
-quick_trade.invalid_mode: null
+quick_trade.invalid_mode: 'Modo de trade inválido: %mode%.'
 donation.order.donation: Donación
 donation.order.buy: 'Compra (Donación)'
 donation.order.sell: 'Venta (Donación)'
@@ -1455,7 +1455,7 @@ discord.rewards.title: 'Recompensas en Discord'
 discord.rewards.bot.invite: 'Invitar al Bot'
 discord.rewards.bot.remove: 'Quitar servidor'
 discord.rewards.description: 'Habilite las recompensas en Discord para los propietarios de los tokens'
-discord.rewards.description.guide: null
+discord.rewards.description.guide: 'Premia a los poseedores de tokens con funciones especiales en Discord en función de la cantidad de fichas que tengan.'
 discord.rewards.special_roles: 'Roles especiales'
 discord.rewards.special_roles.name: 'Nombre del rol'
 discord.rewards.special_roles.color: 'Color del rol'
