@@ -573,7 +573,7 @@ export default {
             return pair.indexOf('/') !== -1;
         },
         toggleFilter: function(value) {
-            let page = (this.marketFilters.selectedFilter !== this.marketFilters.options.user.key)
+            let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
                 && (
                     value === this.marketFilters.options.deployed.key
                     || value === this.marketFilters.options.deployedEth.key
