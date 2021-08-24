@@ -3,6 +3,7 @@
 namespace App\Manager;
 
 use App\Entity\Post;
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Repository\PostRepository;
@@ -64,5 +65,15 @@ class PostManager implements PostManagerInterface
         }
 
         return $this->repository->findRecentPostsByTokens($tokens, $page);
+    }
+
+    public function getPostsCreatedAt(\DateTimeImmutable $date): array
+    {
+        return $this->repository->getPostsCreatedAt($date);
+    }
+
+    public function getPostsCreatedAtByToken(Token $token, \DateTimeImmutable $date): array
+    {
+        return $this->repository->getPostsCreatedAtByToken($token, $date);
     }
 }

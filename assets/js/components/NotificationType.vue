@@ -42,10 +42,10 @@ export default {
             if (this.notificationTypes.newPost === notification.type) {
                 let jsonData = JSON.parse(notification.jsonData);
                 return {
+                  date: notification.date,
                   tokenName: jsonData.tokenName,
-                  urlToken: jsonData.hasOwnProperty('slug')
-                      ? this.$routing.generate('new_show_post', {name: jsonData.tokenName, slug: jsonData.slug})
-                      : this.$routing.generate('token_show', {name: jsonData.tokenName, tab: tabs.posts}),
+                  number: notification.number ?? 1,
+                  urlToken: this.$routing.generate('token_show', {name: jsonData.tokenName, tab: tabs.posts}),
                 };
             }
 

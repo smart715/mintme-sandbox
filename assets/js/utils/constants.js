@@ -42,6 +42,7 @@ export const GENERAL = {
     dateTimeFormatPicker: 'MM.DD.YYYY HH:mm',
     dateFormat: 'MMM D, YYYY',
     timeFormat: 'HH:mm',
+    date: 'MM-DD-YYYY',
 };
 
 export const webSymbol = 'WEB';

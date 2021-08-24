@@ -66,6 +66,8 @@ import VueScroll from 'vuescroll';
 import {mixin as clickaway} from 'vue-clickaway';
 import NotificationType from './NotificationType';
 import {LoggerMixin} from '../mixins';
+import {notificationTypes, GENERAL} from '../utils/constants';
+import moment from 'moment';
 
 library.add(faCircleNotch);
 
@@ -80,6 +82,7 @@ export default {
     mixins: [clickaway, LoggerMixin],
     data() {
         return {
+            notificationTypes,
             showUserNotifications: false,
             userNotifications: null,
             userNotificationsFiltered: [],
@@ -134,10 +137,62 @@ export default {
             this.showUserNotifications = false;
             this.$refs['notificationsScroll'].scrollTo({y: 0}, 0, 'easeInQuad');
         },
+        groupPosts: function() {
+            let postsNotifications = {};
+            let viewedPostsNotifications = {};
+            let postsToDelete = [];
+
+            this.userNotifications.forEach((item) => {
+                if (notificationTypes.newPost !== item.type && item.viewed) {
+                    return;
+                }
+
+                let jsonData = JSON.parse(item.jsonData);
+
+                if (item.viewed) {
+                    const tokenSlug = jsonData.tokenName + ' ' + moment(item.date, GENERAL.date);
+
+                    if (viewedPostsNotifications[tokenSlug] === undefined) {
+                        item.number = 1;
+                        viewedPostsNotifications[tokenSlug] = item;
+                    } else {
+                          viewedPostsNotifications[tokenSlug].number += 1;
+                    }
+                } else {
+                    if (postsNotifications[jsonData.tokenName] === undefined) {
+                        item.number = 1;
+                        postsNotifications[jsonData.tokenName] = item;
+                    } else {
+                        postsNotifications[jsonData.tokenName].number += 1;
+                    }
+                }
+
+                postsToDelete.push(item);
+            });
+
+            this.userNotifications = this.userNotifications.filter((post) => !postsToDelete.includes(post));
+
+            for (const notification in viewedPostsNotifications) {
+                if (viewedPostsNotifications.hasOwnProperty(notification)) {
+                    this.userNotifications.unshift(viewedPostsNotifications[notification]);
+                }
+            }
+
+            for (const notification in postsNotifications) {
+                if (postsNotifications.hasOwnProperty(notification)) {
+                    this.userNotifications.unshift(postsNotifications[notification]);
+                }
+            }
+
+            this.userNotifications.sort(function(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
+        },
         fetchUserNotifications: function() {
             this.$axios.retry.get(this.$routing.generate('user_notifications'))
                 .then((res) => {
                     this.userNotifications = res.data;
+                    this.groupPosts();
                     this.loadNotifications();
                 })
                 .catch((err) => {

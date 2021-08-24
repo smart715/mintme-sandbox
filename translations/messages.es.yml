@@ -487,9 +487,10 @@ mail.new_investor.actively_social_media_token_1: 'Recuerde que debe promocionar 
 mail.new_investor.actively_social_media_token_2: 'en todo lo que pueda para que tenga éxito.'
 mail.join_mintme_hosting: 'Únase al hosting de MintMe'
 mail.new_investor.create_token_here: '¿No tiene un token? ¿Qué espera para hacerlo? Créelo <a href="https://www.mintme.com/es/token" target="_blank">aquí</a>'
-new_post.msg: '%tokenName% ha creado una nueva publicación. Léala <a href="%urlToken%">aquí.</a>'
+new_post.msg:
 mail.new_post.msg: 'Nueva publicación creada.'
 mail.new_post.text_link: '¡Léalo aquí!'
+mail.grouped_posts.msg:
 deployed.msg: '¡%tokenName% ha sido desplegado a la blockchain! Visítelo <a href="%urlToken%">aquí</a>.'
 mail.deployed.msg: '<strong>%tokenName%</strong> ha sido desplegado en la blockchain                                                                                                                                                                                             '
 mail.deployed.text_link: 'Visite la página del token'
@@ -535,7 +536,7 @@ email.withdraw.confirm: '¡Confirme su retiro!'
 email.withdraw.body: 'Puede confirmar su retiro haciendo click en el siguiente enlace:'
 email.verification_code: 'Su código de verificación:'
 email.confirm_authentication: 'Confirme la autenticidad '
-email.new_post: 'Nueva Publicación'
+email.new_post:
 email.new_investor: 'Nuevo Inversor'
 email.new_login_from_new_ip: 'Intento de ingreso desde un nuevo dispositivo o dirección IP nueva'
 email.what_now: '¿Ahora qué?'
@@ -547,6 +548,7 @@ email.confirm_withdraw: 'Confirmación de retiro'
 email.completed: Completado
 email.password_changed: 'Su contraseña ha sido cambiada'
 email.password_reset: 'Su contraseña ha sido restablecida'
+email.grouped_posts:
 log_in: 'Iniciar Sesión'
 sign_up: Registrarse
 log_out: 'Cerrar Sesión'
