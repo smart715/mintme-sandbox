@@ -1,0 +1,10 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{{ tokenName }} {% trans %} mail.grouped_posts.msg {% endtrans %}
+
+{% trans %} mail.new_post.text_link {% endtrans %}
+
+{{ absolute_url(path('token_show', {'name': tokenName, 'tab': 'posts' })) }}
+
+{% endblock %}

@@ -307,7 +307,35 @@ class Mailer implements MailerInterface, AuthCodeMailerInterface
             'slug' => $slug,
         ]);
 
-        $subject = $this->translator->trans('email.new_post');
+        $subject = $this->translator->trans('email.new_post', ['%tokenName%' => $tokenName]);
+        $msg = (new Swift_Message($subject))
+            ->setFrom([$this->mail => 'Mintme'])
+            ->setTo($user->getEmail())
+            ->setBody($body, 'text/html')
+            ->addPart($textBody, 'text/plain');
+
+        $this->mailer->send($msg);
+    }
+
+    public function sendGroupedPosts(User $user, String $tokenName, array $posts): void
+    {
+        $body = $this->twigEngine->render("mail/grouped_posts.html.twig", [
+            'username' => $user->getUsername(),
+            'tokenName' => $tokenName,
+            'posts' => $posts,
+        ]);
+
+        $textBody = $this->twigEngine->render("mail/grouped_posts.txt.twig", [
+            'username' => $user,
+            'tokenName' => $tokenName,
+            'posts' => $posts,
+        ]);
+
+        $subject = $this->translator->trans('email.grouped_posts', [
+            '%number%' => count($posts),
+            '%tokenName%' => $tokenName,
+        ]);
+
         $msg = (new Swift_Message($subject))
             ->setFrom([$this->mail => 'Mintme'])
             ->setTo($user->getEmail())

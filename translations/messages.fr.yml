@@ -487,9 +487,10 @@ mail.new_investor.actively_social_media_token_1: 'Remember that you have to acti
 mail.new_investor.actively_social_media_token_2: 'everywhere you can to make it successful.'
 mail.join_mintme_hosting: 'Join MintMe hosting'
 mail.new_investor.create_token_here: 'You don''t have a token? What are you waiting for? Create it <a href="https://www.mintme.com/token" target="_blank">here</a>'
-new_post.msg: '%tokenName% a crée un nouveau post. Lisez le <a href="%urlToken%">ici.</a>'
+new_post.msg:
 mail.new_post.msg: 'créer un nouveau post'
 mail.new_post.text_link: 'Lire cela ici!'
+mail.grouped_posts.msg:
 deployed.msg: '%tokenName% a été déployé sur la chaîne de blocs! Visiter <a href="%urlToken%">page du jeton</a>.'
 mail.deployed.msg: '<strong>%tokenName%</strong> a été déployé sur la chaîne de blocs'
 mail.deployed.text_link: 'Visiter la page du jeton'
@@ -537,7 +538,7 @@ email.withdraw.confirm: 'Confirmez votre retrait!'
 email.withdraw.body: 'Vous pouvez confirmer votre retrait en cliquant sur le lien suivant:'
 email.verification_code: 'Votre code de vérification:'
 email.confirm_authentication: 'Confirmer l''authenfication'
-email.new_post: 'Nouveau Post'
+email.new_post:
 email.new_investor: 'Nouveau Investisseur'
 email.new_login_from_new_ip: 'Nouvelle tentative de connexion d''une nouvelle adresse IP ou appareil'
 email.what_now: 'Et maintenant?'
@@ -549,6 +550,7 @@ email.confirm_withdraw: 'Confirmer le retrait'
 email.completed: Terminé
 email.password_changed: 'Votre mot de passe a été modifié'
 email.password_reset: 'Votre mot de passe a été réinitialiser'
+email.grouped_posts:
 log_in: Connexion
 sign_up: 'S''inscrire'
 log_out: Déconnexion

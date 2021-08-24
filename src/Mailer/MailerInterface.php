@@ -36,4 +36,5 @@ interface MailerInterface
         Money $airdropReward,
         string $airdropReferralCode
     ): void;
+    public function sendGroupedPosts(User $user, String $tokenName, array $posts): void;
 }
