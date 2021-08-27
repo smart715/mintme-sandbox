@@ -33,6 +33,7 @@ RUN echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini \
     && echo 'extension=intl' >> /usr/local/etc/php/php.ini
 
 # NodeJs
+RUN printf "Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 1000\n" > /etc/apt/preferences.d/nodesource
 RUN rm -rf /var/lib/apt/lists/ && wget -qO- https://deb.nodesource.com/setup_10.x | bash -
 
 RUN apt-get install -y nodejs

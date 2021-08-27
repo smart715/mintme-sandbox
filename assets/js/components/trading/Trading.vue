@@ -581,7 +581,7 @@ export default {
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
-                && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
+                && this.tokens.some((token) => token.tokenized) ? 1 : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
             this.sortBy = 'rank';
