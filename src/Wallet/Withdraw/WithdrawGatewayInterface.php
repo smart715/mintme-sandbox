@@ -11,7 +11,13 @@ use Money\Money;
 
 interface WithdrawGatewayInterface extends RowsFetcherInterface
 {
-    public function withdraw(User $user, Money $balance, string $address, Crypto $crypto): void;
+    public function withdraw(
+        User $user,
+        Money $balance,
+        string $address,
+        Crypto $crypto,
+        ?Money $fee = null
+    ): void;
 
     public function retryWithdraw(WithdrawCallbackMessage $callbackMessage): void;
 
@@ -19,4 +25,6 @@ interface WithdrawGatewayInterface extends RowsFetcherInterface
 
     /** @return Transaction[] */
     public function getHistory(User $user, int $offset = 0, int $limit = 50): array;
+
+    public function isContractAddress(string $address, string $crypto): bool;
 }

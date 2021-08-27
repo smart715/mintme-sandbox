@@ -7,7 +7,7 @@ use App\Communications\RestRpcInterface;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Repository\MarketStatusRepository;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -63,13 +63,17 @@ class MarketCapCalculator
         $this->minimumVolumeForMarketcap = $minimumVolumeForMarketcap;
     }
 
-    public function calculate(string $base = Token::BTC_SYMBOL): string
+    public function calculate(string $base = Symbols::BTC): string
     {
-        if (MoneyWrapper::USD_SYMBOL === $base) {
+        if (Symbols::USD === $base) {
             # We'll calculate it as if it was BTC, and will convert the final amount to USD. Pretty nice hack, not so obvious, but I liked it
-            $calculatingUSD = Token::BTC_SYMBOL;
-        } elseif (Token::BTC_SYMBOL !== $base && Token::WEB_SYMBOL !== $base && Token::ETH_SYMBOL !== $base) {
-            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH or USD');
+            $calculatingUSD = Symbols::BTC;
+        } elseif (Symbols::BTC !== $base &&
+            Symbols::WEB !== $base &&
+            Symbols::ETH !== $base &&
+            Symbols::USDC !== $base
+        ) {
+            throw new \DomainException('Parameter $base can only be WEB, BTC, ETH, USDC or USD');
         }
 
         # Calculate MarketCap for WEB/token markets
@@ -89,7 +93,7 @@ class MarketCapCalculator
         if (isset($calculatingUSD)) {
             $marketCap = $this->moneyWrapper->convert(
                 $marketCap,
-                new Currency(MoneyWrapper::USD_SYMBOL)
+                new Currency(Symbols::USD)
             );
         }
 
@@ -104,12 +108,14 @@ class MarketCapCalculator
     {
         $tokenMarkets = $this->repository->getTokenWEBMarkets();
         // do not show market cap for markets with 30d volume of value less than min_web_cap MINTME
+        // and for not deployed tokens
 
         return array_reduce($tokenMarkets, function ($marketCap, $market) {
-            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume())
+            return $market->getMonthVolume()->lessThan($this->getMinimumMonthVolume()) ||
+                !$market->getQuote()->getDeployed()
                 ? $marketCap
                 : $market->getLastPrice()->multiply($this->tokenSupply)->add($marketCap);
-        }, $this->getZero(Token::WEB_SYMBOL));
+        }, $this->getZero(Symbols::WEB));
     }
 
     private function getZero(string $base): Money
@@ -172,7 +178,7 @@ class MarketCapCalculator
         }
 
         $rates = $this->cryptoRatesFetcher->fetch();
-        $rates[Token::WEB_SYMBOL][Token::WEB_SYMBOL] = 1;
+        $rates[Symbols::WEB][Symbols::WEB] = 1;
 
         return $this->exchange = new FixedExchange($rates);
     }
@@ -184,6 +190,6 @@ class MarketCapCalculator
 
     private function getMinimumMonthVolume(): Money
     {
-        return $this->moneyWrapper->parse((string)$this->minimumVolumeForMarketcap, Token::WEB_SYMBOL);
+        return $this->moneyWrapper->parse((string)$this->minimumVolumeForMarketcap, Symbols::WEB);
     }
 }

@@ -5,18 +5,18 @@ namespace App\SmartContract\Model;
 /** @codeCoverageIgnore */
 class DeployCallbackMessage
 {
-    /** @var string */
-    private $tokenName;
-
-    /** @var string */
-    private $address;
+    private string $tokenName;
+    private string $address;
+    private string $txHash;
 
     private function __construct(
         string $tokenName,
-        string $address
+        string $address,
+        string $txHash
     ) {
         $this->tokenName = $tokenName;
         $this->address = $address;
+        $this->txHash = $txHash;
     }
 
     public function getTokenName(): string
@@ -29,12 +29,17 @@ class DeployCallbackMessage
         return $this->address;
     }
 
+    public function getTxHash(): string
+    {
+        return $this->txHash;
+    }
 
     public static function parse(array $data): self
     {
         return new self(
             $data['tokenName'],
-            $data['address']
+            $data['address'],
+            $data['txHash']
         );
     }
 
@@ -43,6 +48,7 @@ class DeployCallbackMessage
         return [
             'tokenName' => $this->getTokenName(),
             'address' => $this->getAddress(),
+            'txHash' => $this->txHash,
         ];
     }
 }

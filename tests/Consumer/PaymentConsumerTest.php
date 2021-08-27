@@ -7,6 +7,7 @@ use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
@@ -20,6 +21,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentConsumerTest extends TestCase
@@ -36,7 +38,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -63,7 +66,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -90,7 +94,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -117,7 +122,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -148,7 +154,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertFalse(
@@ -179,7 +186,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -210,7 +218,8 @@ class PaymentConsumerTest extends TestCase
             $this->mockMoneyWrapper(),
             $this->createMock(ClockInterface::class),
             $this->mockEM(),
-            $this->mockEventDispatcher()
+            $this->mockEventDispatcher(),
+            $this->mockTokenConfig()
         );
 
         $this->assertTrue(
@@ -285,6 +294,7 @@ class PaymentConsumerTest extends TestCase
     {
         $token = $this->createMock(Token::class);
         $token->method('getSymbol')->willReturn($name);
+        $token->method('getCryptoSymbol')->willReturn('WEB');
 
         return $token;
     }
@@ -317,5 +327,10 @@ class PaymentConsumerTest extends TestCase
         );
 
         return $em;
+    }
+
+    public function mockTokenConfig(): TokenConfig
+    {
+        return $this->createMock(TokenConfig::class);
     }
 }

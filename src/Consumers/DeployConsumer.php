@@ -8,14 +8,20 @@ use App\Entity\DeployTokenReward;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\DeployCompletedEvent;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Manager\CryptoManagerInterface;
 use App\SmartContract\Model\DeployCallbackMessage;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DeployConsumer implements ConsumerInterface
 {
@@ -34,18 +40,26 @@ class DeployConsumer implements ConsumerInterface
     /** @var DeployCostFetcherInterface */
     private $deployCostFetcher;
 
+    private EventDispatcherInterface $eventDispatcher;
+
+    private CryptoManagerInterface $cryptoManager;
+
     public function __construct(
         LoggerInterface $logger,
         int $coinbaseApiTimeout,
         EntityManagerInterface $em,
         BalanceHandlerInterface $balanceHandler,
-        DeployCostFetcherInterface $deployCostFetcher
+        DeployCostFetcherInterface $deployCostFetcher,
+        EventDispatcherInterface $eventDispatcher,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->logger = $logger;
         $this->coinbaseApiTimeout = $coinbaseApiTimeout;
         $this->em = $em;
         $this->balanceHandler = $balanceHandler;
         $this->deployCostFetcher = $deployCostFetcher;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->cryptoManager = $cryptoManager;
     }
 
     /** {@inheritdoc} */
@@ -93,17 +107,20 @@ class DeployConsumer implements ConsumerInterface
 
             if (!$clbResult->getAddress()) {
                 if (null !== $token->getDeployCost()) {
-                    $amount = new Money($token->getDeployCost(), new Currency(Token::WEB_SYMBOL));
+                    $amount = new Money($token->getDeployCost(), new Currency($token->getCryptoSymbol()));
 
                     $this->balanceHandler->deposit(
                         $user,
-                        Token::getFromSymbol(Token::WEB_SYMBOL),
+                        $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                         $amount
                     );
 
                     $token->setAddress('');
+                    $token->setTxHash(null);
                     $token->setDeployCost(null);
-                    $token->setDeployed(null);
+                    $token->setDeployedDate(null);
+                    $token->setDeployed(false);
+                    $token->setCrypto(null);
 
                     $this->logger->info(
                         '[deploy-consumer] the money is payed back returned back'
@@ -117,10 +134,13 @@ class DeployConsumer implements ConsumerInterface
             } else {
                 $lockIn->setReleasedAtStart($lockIn->getReleasedAmount()->getAmount());
                 $lockIn->setAmountToRelease($lockIn->getFrozenAmount());
-                $token->setDeployed(new \DateTimeImmutable());
+                $token->setDeployedDate(new \DateTimeImmutable());
+                $token->setDeployed(true);
                 $token->setAddress($clbResult->getAddress());
+                $token->setShowDeployedModal(true);
+                $token->setTxHash($clbResult->getTxHash());
 
-                $this->setDeployCostReward($user, $token->getName());
+                $this->setDeployCostReward($user, $token);
             }
 
             $this->em->persist($lockIn);
@@ -137,15 +157,21 @@ class DeployConsumer implements ConsumerInterface
             return false;
         }
 
+        /** @psalm-suppress TooManyArguments */
+        $this->eventDispatcher->dispatch(
+            new DeployCompletedEvent($token),
+            TokenEvents::DEPLOYED
+        );
+
         return true;
     }
 
-    private function setDeployCostReward(User $user, string $tokenName): void
+    private function setDeployCostReward(User $user, Token $token): void
     {
         $referencer = $user->getReferencer();
 
         if ($referencer) {
-            $reward = $this->deployCostFetcher->getDeployCostReferralReward();
+            $reward = $this->deployCostFetcher->getDeployCostReferralReward($token->getCryptoSymbol());
 
             if ($reward->isPositive()) {
                 $userDeployTokenReward = new DeployTokenReward($user, $reward);
@@ -153,13 +179,13 @@ class DeployConsumer implements ConsumerInterface
 
                 $this->balanceHandler->deposit(
                     $user,
-                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
                 $this->balanceHandler->deposit(
                     $referencer,
-                    Token::getFromSymbol(Token::WEB_SYMBOL),
+                    $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
                     $reward
                 );
 
@@ -171,8 +197,10 @@ class DeployConsumer implements ConsumerInterface
                     . json_encode([
                         'referredUserId' => $user->getId(),
                         'referrerUserId' => $referencer->getId(),
-                        'tokenName' => $tokenName,
-                        'deployCostInMintme' => $this->deployCostFetcher->getDeployWebCost()->getAmount(),
+                        'tokenName' => $token->getName(),
+                        'deployCost' => $this->deployCostFetcher->getDeployCost($token->getCryptoSymbol())
+                            ->getAmount(),
+                        'deployCostCurrency' => $token->getCryptoSymbol(),
                         'rewardAmountInMintme' => $reward->getAmount(),
                     ])
                 );

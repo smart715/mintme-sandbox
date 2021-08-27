@@ -4,6 +4,7 @@ namespace App\Wallet\Deposit;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Deposit\Model\DepositCredentials;
@@ -41,19 +42,21 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
+    /** {@inheritdoc} */
+    public function getDepositCredentials(int $userId, array $cryptos): DepositCredentials
     {
         $credentials = [];
 
-        foreach ($predefinedTokens as $token) {
+        /** @var Crypto $crypto */
+        foreach ($cryptos as $crypto) {
             $response = $this->jsonRpc->send(
                 self::GET_DEPOSIT_CREDENTIALS_METHOD,
                 [
                     'user_id' => $userId,
-                    'currency' => $token->getName(),
+                    'currency' => $crypto->getSymbol(),
                 ]
             );
-            $credentials[$token->getName()] = $response->hasError() ?
+            $credentials[$crypto->getSymbol()] = $response->hasError() ?
                 "Address unavailable." :
                 $response->getResult();
         }
@@ -83,7 +86,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return $this->parseTransactions($response->getResult(), $user);
+        return $this->parseTransactions($response->getResult());
     }
 
     public function getDepositInfo(string $crypto): DepositInfo
@@ -104,14 +107,14 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         );
     }
 
-    private function parseTransactions(array $transactions, User $user): array
+    private function parseTransactions(array $transactions): array
     {
-        return array_map(function (array $transaction) use ($user) {
+        return array_map(function (array $transaction) {
             return new Transaction(
                 (new \DateTime())->setTimestamp($transaction['timestamp']),
                 $transaction['hash'],
                 $transaction['from'],
-                !$user->isBlocked() ? $transaction['to'] : '',
+                $transaction['to'],
                 new Money(
                     $this->moneyWrapper->convertToDecimalIfNotation($transaction['amount'], $transaction['crypto']),
                     new Currency($transaction['crypto'])

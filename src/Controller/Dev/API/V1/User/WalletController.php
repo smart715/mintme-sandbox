@@ -3,21 +3,26 @@
 namespace App\Controller\Dev\API\V1\User;
 
 use App\Controller\Dev\API\V1\DevApiController;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\LockFactory;
+use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
+use App\Utils\Validator\TradebleDigitsValidator;
 use App\Utils\ValidatorFactoryInterface;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -25,9 +30,10 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -53,8 +59,9 @@ class WalletController extends DevApiController
     /** @var ValidatorFactoryInterface */
     private $vf;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    private TranslatorInterface $translator;
 
     public function __construct(
         WalletInterface $wallet,
@@ -63,7 +70,8 @@ class WalletController extends DevApiController
         CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         ValidatorFactoryInterface $validatorFactory,
-        EventDispatcherInterface $eventDispatcher
+        UserNotificationManagerInterface $userNotificationManager,
+        TranslatorInterface $translator
     ) {
         $this->wallet = $wallet;
         $this->userActionLogger = $userActionLogger;
@@ -71,7 +79,8 @@ class WalletController extends DevApiController
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->vf = $validatorFactory;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->userNotificationManager = $userNotificationManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -87,7 +96,7 @@ class WalletController extends DevApiController
      *         @SWG\Items(ref="#/definitions/Address")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -95,17 +104,22 @@ class WalletController extends DevApiController
     {
         $this->denyAccessUnlessGranted('deposit');
 
+        if (!$this->isGranted('make-deposit')) {
+            return [
+                'status' => 'error',
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ];
+        }
+
         /** @var User $user */
         $user = $this->getUser();
 
         $cryptoDepositAddresses = !$user->isBlocked() ? $depositCommunicator->getDepositCredentials(
             $user,
-            $this->cryptoManager->findAll()
+            $crypto = array_filter($this->cryptoManager->findAll(), fn(Crypto $crypto) => !$crypto->isToken())
         ) : [];
 
-        $isBlockedToken = $user->getProfile()->getToken()
-            ? $user->getProfile()->getToken()->isBlocked()
-            : false;
+        $isBlockedToken = $user->getProfile()->hasBlockedTokens();
 
         $tokenDepositAddress = !$isBlockedToken ? $depositCommunicator->getTokenDepositCredentials($user) : [];
 
@@ -147,7 +161,7 @@ class WalletController extends DevApiController
      *         @SWG\Items(ref="#/definitions/Transaction")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -191,17 +205,33 @@ class WalletController extends DevApiController
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="201",description="Returns success message")
-     * @SWG\Response(response="404",description="Currency not found")
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="201", description="Returns success message")
+     * @SWG\Response(response="404", description="Currency not found")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(
         ParamFetcherInterface $request,
         MoneyWrapperInterface $moneyWrapper,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        LockFactory $lockFactory
     ): View {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $lock = $lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire()) {
+            throw new AccessDeniedException();
+        }
+
         $this->denyAccessUnlessGranted('withdraw');
+
+        if (!$this->isGranted('make-withdrawal')) {
+            return $this->view([
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ], Response::HTTP_OK);
+        }
 
         $currency = $request->get('currency');
         $amount = $request->get('amount');
@@ -220,7 +250,15 @@ class WalletController extends DevApiController
             throw new ApiNotFoundException('Currency not found');
         }
 
+        if ($tradable instanceof Token) {
+            $this->denyAccessUnlessGranted('token-withdraw');
+        }
+
         $this->denyAccessUnlessGranted('not-blocked', $tradable instanceof Token ? $tradable : null);
+
+        if (!($validator = new TradebleDigitsValidator($amount, $tradable))->validate()) {
+            throw new ApiBadRequestException($validator->getMessage());
+        }
 
         $validator = $this->vf->createMinAmountValidator($tradable, $amount);
 
@@ -251,7 +289,7 @@ class WalletController extends DevApiController
                 new Address(trim((string)$address)),
                 new Amount($moneyWrapper->parse(
                     $amount,
-                    $tradable instanceof Token ? MoneyWrapper::TOK_SYMBOL : $tradable->getSymbol()
+                    $tradable instanceof Token ? Symbols::TOK : $tradable->getSymbol()
                 )),
                 $tradable
             );
@@ -263,19 +301,23 @@ class WalletController extends DevApiController
             throw new ApiBadRequestException('Withdrawal failed');
         }
 
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
-            UserNotificationEvent::NAME
+        $notificationType = NotificationTypes::WITHDRAWAL;
+        $strategy = new WithdrawalNotificationStrategy(
+            $this->userNotificationManager,
+            $notificationType
         );
+        $notificationContext = new NotificationContext($strategy);
+        $notificationContext->sendNotification($user);
 
         $this->userActionLogger->info("Withdraw funds from API for {$pendingWithdraw->getSymbol()}.", [
             'address' => $pendingWithdraw->getAddress()->getAddress(),
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
 
+        $lock->release();
+
         return $this->view([
             'message' => "Your transaction has been successfully processed and queued to be sent.",
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_CREATED);
     }
 }

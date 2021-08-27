@@ -4,11 +4,13 @@ namespace App\Controller\API;
 
 use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\User;
+use App\Manager\UserNotificationConfigManagerInterface;
 use App\Manager\UserNotificationManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,17 +21,22 @@ class UserNotificationsController extends AbstractFOSRestController implements T
     private const NOTIFICATION_LIMIT = 90;
 
     /** @var UserManagerInterface */
-    protected $userManager;
+    protected UserManagerInterface $userManager;
 
     /** @var UserNotificationManagerInterface */
-    private $userNotificationManager;
+    private UserNotificationManagerInterface $userNotificationManager;
+
+    /** @var UserNotificationConfigManagerInterface */
+    private UserNotificationConfigManagerInterface $userNotificationsConfigManager;
 
     public function __construct(
         UserManagerInterface $userManager,
-        UserNotificationManagerInterface $userNotificationManager
+        UserNotificationManagerInterface $userNotificationManager,
+        UserNotificationConfigManagerInterface $userNotificationsConfigManager
     ) {
         $this->userManager = $userManager;
         $this->userNotificationManager = $userNotificationManager;
+        $this->userNotificationsConfigManager = $userNotificationsConfigManager;
     }
 
     /**
@@ -44,7 +51,7 @@ class UserNotificationsController extends AbstractFOSRestController implements T
 
         return $this->view(
             $this->userNotificationManager->getNotifications($user, self::NOTIFICATION_LIMIT),
-            Response::HTTP_ACCEPTED
+            Response::HTTP_OK
         );
     }
 
@@ -58,8 +65,42 @@ class UserNotificationsController extends AbstractFOSRestController implements T
         /** @var User $user */
         $user = $this->getUser();
 
-        $this->userNotificationManager->updateNotifications($user);
+        $this->userNotificationManager->updateNotifications($user, self::NOTIFICATION_LIMIT);
 
-        return new Response(Response::HTTP_ACCEPTED);
+        return new Response(Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\Get("/config", name="user_notifications_config", options={"expose"=true})
+     * @Rest\View()
+     * @return View
+     */
+    public function getUserNotificationsConfig(): View
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->view(
+            $this->userNotificationsConfigManager->getUserNotificationsConfig($user),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * @Rest\Post("/config/update", name="update_notifications_config", options={"expose"=true})
+     * @Rest\View()
+     * @param Request $request
+     * @return Response
+     */
+    public function updateUserNotificationsConfig(Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $configToStore = $request->request->all();
+
+        $this->userNotificationsConfigManager->updateUserNotificationsConfig($user, $configToStore);
+
+        return new Response(Response::HTTP_OK);
     }
 }

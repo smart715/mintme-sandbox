@@ -1,6 +1,11 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
-{% trans with {'%urlToken%':absolute_url(path('token_show', {'name': tokenName })), '%tokenName%': tokenName} %}no_orders.msg{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans %} mail.no_orders.msg {% endtrans %} {{ tokenName }}.
+
+{% trans %} mail.no_orders.add_them {% endtrans %}:
+{{ absolute_url(path('token_show', {'name': tokenName })) }}
+
 {% endblock %}
+

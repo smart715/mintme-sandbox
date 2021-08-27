@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/edit_post') }}
+{% endblock %}
+
 {% block title %}
 	{% trans %}edit_post{% endtrans %} | mintMe
 {% endblock %}
@@ -10,11 +15,12 @@
 	        <edit-post edit
 	            class="col-12 col-md-10 col-lg-8"
 	            :post="{{ post | json_encode }}"
+	            :subunit="{{ decimals }}"
 	        />
     	</div>
     </div>
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/edit_post.js') }}"></script>
+	{{ encore_entry_script_tags('pages/edit_post') }}
 {% endblock %}

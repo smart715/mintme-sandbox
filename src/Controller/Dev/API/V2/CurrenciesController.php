@@ -23,7 +23,7 @@ class CurrenciesController extends DevApiController
      * @Rest\Get()
      * @SWG\Response(
      *     response="200",
-     *     description="Returns currencies list",
+     *     description="Returns deployed mintme currencies and eth tokens list",
      *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Сurrency"))
      * )
      * @SWG\Response(response="400",description="Bad request")

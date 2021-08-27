@@ -13,13 +13,14 @@ class TradeResult
     public const ORDER_NOT_FOUND = 4;
     public const USER_NOT_MATCH = 5;
     public const SMALL_AMOUNT = 11;
+    public const NO_ENOUGH_TRADER = 12;
 
     private const MESSAGES = [
         self::SUCCESS =>
             'place_order.created',
 
         self::FAILED =>
-            'place_order.failed.',
+            'place_order.failed',
 
         self::INSUFFICIENT_BALANCE =>
             'place_order.insufficient_balance',
@@ -32,6 +33,9 @@ class TradeResult
 
         self::SMALL_AMOUNT =>
             'place_order.too_small',
+
+        self::NO_ENOUGH_TRADER =>
+            'execute_order.no_enough_trader',
     ];
 
     /** @var int */
@@ -40,19 +44,22 @@ class TradeResult
     /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(int $result, TranslatorInterface $translator)
+    private ?string $translatedMessage;
+
+    public function __construct(int $result, TranslatorInterface $translator, ?string $translatedMessage = null)
     {
-        if (!in_array($result, array_keys(self::MESSAGES))) {
+        if (!array_key_exists($result, self::MESSAGES) && !$translatedMessage) {
             throw new Exception('Undefined error message');
         }
 
         $this->result = $result;
         $this->translator = $translator;
+        $this->translatedMessage = $translatedMessage;
     }
 
     public function getMessage(): string
     {
-        return $this->translator->trans(self::MESSAGES[$this->result]);
+        return $this->translatedMessage ?? $this->translator->trans(self::MESSAGES[$this->result]);
     }
 
     public function getResult(): int

@@ -42,7 +42,8 @@
           transition: all .3s ease;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('build/base_main.css') }}">
+    {{ encore_entry_link_tags('base_main') }}
+    {{ encore_entry_link_tags('pages/api') }}
 {% endblock stylesheets %}
 
 {% block javascripts %}
@@ -53,7 +54,7 @@
     {% include 'base_scripts.html.twig' %}
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
     <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-    <script src="{{ asset('build/api.js') }}"></script>
+    {{ encore_entry_script_tags('pages/api') }}
     {% endapply %}
 {% endblock javascripts %}
 
@@ -124,14 +125,14 @@
                                 <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
                                     {% if version != 'v1' %}
                                     <p>
-                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.v2.body.2{% endtrans %}
+                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.v2.body.2{% endtrans %}
                                     </p>
                                     <p>
                                         {% trans %}api.page.v2.body.3{% endtrans %}
                                     </p>
                                     {% else %}
                                     <p>
-                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">settings</a> {% trans %}api.page.body.2{% endtrans %}
+                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.body.2{% endtrans %}
                                     </p>
                                     {% endif %}
                                     <p>
@@ -154,7 +155,7 @@
                                     <p>
                                         {% if app.user is not null %}
                                             {% trans %}api.page.body.10{% endtrans %}
-                                            <a href="{{ path('settings') }}">settings</a>
+                                            <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a>
                                             {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
                                         {% else %}
                                             {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}
@@ -183,4 +184,8 @@
     %}
     {% include 'head.html.twig' %}
     {% endapply %}
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/doc') }}
 {% endblock %}

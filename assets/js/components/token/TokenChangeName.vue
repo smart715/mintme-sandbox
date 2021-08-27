@@ -12,7 +12,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameExists"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.taken') }}
@@ -21,7 +21,7 @@
                 <div class="float-right">
                     <div
                         v-if="tokenNameInBlacklist"
-                        class="alert alert-danger alert-token-name-exists"
+                        class="alert alert-danger alert-float"
                     >
                         <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
                         {{ $t('page.token_creation.error.forbidden') }}
@@ -78,6 +78,9 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons';
 import TwoFactorModal from '../modal/TwoFactorModal';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {
@@ -87,15 +90,17 @@ import {
     tokenNoSpaceBetweenDashes,
     FORBIDDEN_WORDS,
     HTTP_OK,
-    HTTP_ACCEPTED,
 } from '../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
+
+library.add(faExclamationCircle);
 
 export default {
     name: 'TokenChangeName',
     mixins: [NotificationMixin, LoggerMixin],
     components: {
         TwoFactorModal,
+        FontAwesomeIcon,
     },
     props: {
         isTokenExchanged: Boolean,
@@ -218,15 +223,14 @@ export default {
                 code: code,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        this.currentName = response.data['tokenName'];
+                    if (response.status === HTTP_OK) {
                         this.notifySuccess(this.$t('token.change_name.changed_successfully'));
 
                         this.showTwoFactorModal = false;
                         this.closeModal();
 
                         location.href = this.$routing.generate('token_show', {
-                            name: this.currentName,
+                            name: response.data['tokenName'],
                         });
                     }
                 }, (error) => {

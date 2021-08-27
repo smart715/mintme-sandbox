@@ -28,19 +28,26 @@
 </template>
 
 <script>
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTimes, faSearch} from '@fortawesome/free-solid-svg-icons';
 import Autocomplete from 'v-autocomplete';
-import {LoggerMixin, NotificationMixin} from '../../mixins';
+import {LoggerMixin} from '../../mixins';
+
+library.add(faTimes, faSearch);
 
 const tokenRegEx = new RegExp('^[a-zA-Z0-9\\-\\s]*$');
 
 export default {
     name: 'TokenSearcher',
-    mixins: [NotificationMixin, LoggerMixin],
+    mixins: [LoggerMixin],
     components: {
         Autocomplete,
+        FontAwesomeIcon,
     },
     props: {
         searchUrl: {type: String, required: true},
+        isLoggedIn: Boolean,
     },
     data() {
         return {
@@ -63,7 +70,6 @@ export default {
                     return token.name;
                 });
             }).catch((error) => {
-                this.notifyError(this.$t('toasted.error.service_timeout'));
                 this.sendLogs('error', 'Service timeout error', error);
             });
         },
@@ -97,7 +103,9 @@ export default {
     },
     computed: {
         inputClass: function() {
-            return 'search-input px-3 no-bg-img ' + (this.validName ? '' : 'is-invalid');
+            let checkName = this.validName ? '' : 'is-invalid';
+            let checkLogged = this.isLoggedIn ? ' logged ' : '';
+            return 'search-input form-control no-bg-img ' + checkName + checkLogged;
         },
     },
 };

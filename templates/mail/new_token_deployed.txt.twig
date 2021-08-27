@@ -1,6 +1,13 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
-{% trans with {'%urlToken%':absolute_url(path('token_show', {'name': tokenName })), '%tokenName%': tokenName} %}deployed.msg{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans with {'%tokenName%': tokenName} %} mail.deployed.msg {% endtrans %}
+
+
+{% trans %} mail.deployed.text_link {% endtrans %}
+
+{{ absolute_url(path('token_show', {'name': tokenName })) }}
+
 {% endblock %}
+

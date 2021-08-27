@@ -1,6 +1,11 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}}
-{% trans with {'%urlWallet%':urlWallet}%}deposit.msg{% endtrans %}
+
+{% trans %} hello {% endtrans %}, {{ username }}!
+{% trans %} mail.deposit_complete.msg {% endtrans %}.
+
+{% trans %} mail.deposit_complete.text_link {% endtrans %}:
+{{ urlWallet }}
+
 {% endblock %}
+

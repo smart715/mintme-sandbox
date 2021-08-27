@@ -3,15 +3,22 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
+use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
+use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\MessageManagerInterface;
 use App\Manager\ThreadManagerInterface;
+use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/message")
@@ -22,15 +29,18 @@ class MessageController extends AbstractFOSRestController
     private ThreadManagerInterface $threadManager;
     private MessageManagerInterface $messageManager;
     private UserActionLogger $userActionLogger;
+    private TranslatorInterface $translation;
 
     public function __construct(
         ThreadManagerInterface $threadManager,
         MessageManagerInterface $messageManager,
-        UserActionLogger $userActionLogger
+        UserActionLogger $userActionLogger,
+        TranslatorInterface $translation
     ) {
         $this->threadManager = $threadManager;
         $this->messageManager = $messageManager;
         $this->userActionLogger = $userActionLogger;
+        $this->translation = $translation;
     }
 
     /**
@@ -41,7 +51,9 @@ class MessageController extends AbstractFOSRestController
      */
     public function sendDMMessage(
         int $threadId,
-        ParamFetcherInterface $request
+        ParamFetcherInterface $request,
+        MoneyWrapperInterface $moneyWrapper,
+        BalanceHandlerInterface $balanceHandler
     ): View {
         /** @var User $user */
         $user = $this->getUser();
@@ -49,7 +61,21 @@ class MessageController extends AbstractFOSRestController
         $thread = $this->threadManager->find($threadId);
 
         if (!$thread || !$thread->hasParticipant($user)) {
-            throw new ApiNotFoundException();
+            throw new ApiNotFoundException(
+                $this->translation->trans('api.not_found')
+            );
+        }
+
+        $availableBalance = $balanceHandler->balance(
+            $user,
+            $thread->getToken()
+        )->getAvailable();
+        $dmMinAmount = (float)$this->getParameter('dm_min_amount');
+
+        if ((float)$moneyWrapper->format($availableBalance) < $dmMinAmount) {
+            throw new ApiBadRequestException(
+                $this->translation->trans('api.no_enough_amount')
+            );
         }
 
         $messageBody = $request->get('body');
@@ -59,7 +85,7 @@ class MessageController extends AbstractFOSRestController
             "send a message user: {$user->getUsername()}, token: {$thread->getToken()->getName()}, message: {$messageBody}"
         );
 
-        return $this->view([], Response::HTTP_ACCEPTED);
+        return $this->view([], Response::HTTP_OK);
     }
 
     /**
@@ -82,7 +108,9 @@ class MessageController extends AbstractFOSRestController
         $thread = $this->threadManager->find($threadId);
 
         if (!$thread || !$thread->hasParticipant($user)) {
-            throw new ApiNotFoundException();
+            throw new ApiNotFoundException(
+                $this->translation->trans('api.not_found')
+            );
         }
 
         $messages = $this->messageManager->getMessages(
@@ -116,7 +144,9 @@ class MessageController extends AbstractFOSRestController
         $thread = $this->threadManager->find($threadId);
 
         if (!$thread || !$thread->hasParticipant($user)) {
-            throw new ApiNotFoundException();
+            throw new ApiNotFoundException(
+                $this->translation->trans('api.not_found')
+            );
         }
 
         $messages = $this->messageManager->getNewMessages(
@@ -145,5 +175,40 @@ class MessageController extends AbstractFOSRestController
         $count = $this->messageManager->getUnreadCount($user);
 
         return $this->view($count, Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\GET(
+     *     "/{threadId<^[1-9][0-9]*$>}/market",
+     *      name="get_thread_market",
+     *      options={"expose"=true}
+     *     )
+     */
+    public function getThreadMarket(
+        int $threadId,
+        CryptoManagerInterface $cryptoManager,
+        MarketFactoryInterface $marketManager
+    ): View {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $thread = $this->threadManager->find($threadId);
+
+        if ((!$thread || !$thread->hasParticipant($user))) {
+            throw new ApiNotFoundException(
+                $this->translation->trans('api.not_found')
+            );
+        }
+
+        $webCrypto = $cryptoManager->findBySymbol(Symbols::WEB);
+
+        if (!$webCrypto) {
+            throw new ApiNotFoundException(
+                $this->translation->trans('api.not_found')
+            );
+        }
+
+        return $this->view($marketManager->create($webCrypto, $thread->getToken()), Response::HTTP_OK);
     }
 }

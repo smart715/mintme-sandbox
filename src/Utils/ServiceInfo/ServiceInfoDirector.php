@@ -16,7 +16,7 @@ class ServiceInfoDirector implements ServiceInfoDirectorInterface
 
     public function build(): ServiceInfo
     {
-        $this->infoBuilder->addTokenInfo();
+        $this->infoBuilder->addMintmeTokenInfo();
         $this->infoBuilder->addGitInfo();
         $this->infoBuilder->addConsumersInfo();
         $this->infoBuilder->addServicesStatus();

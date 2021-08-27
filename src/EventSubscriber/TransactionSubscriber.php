@@ -2,19 +2,23 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Events\DepositCompletedEvent;
 use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\Mailer\MailerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Manager\UserNotificationManagerInterface;
+use App\Notifications\Strategy\DepositNotificationStrategy;
+use App\Notifications\Strategy\NotificationContext;
+use App\Notifications\Strategy\WithdrawalNotificationStrategy;
+use App\Utils\NotificationChannels;
+use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
 use Money\Money;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TransactionSubscriber implements EventSubscriberInterface
@@ -31,16 +35,21 @@ class TransactionSubscriber implements EventSubscriberInterface
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var UserNotificationManagerInterface */
+    private UserNotificationManagerInterface $userNotificationManager;
+
     public function __construct(
         MailerInterface $mailer,
         MoneyWrapperInterface $moneyWrapper,
         LoggerInterface $logger,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        UserNotificationManagerInterface $userNotificationManager
     ) {
         $this->mailer = $mailer;
         $this->moneyWrapper = $moneyWrapper;
         $this->logger = $logger;
         $this->em = $em;
+        $this->userNotificationManager = $userNotificationManager;
     }
 
     public static function getSubscribedEvents(): array
@@ -59,31 +68,39 @@ class TransactionSubscriber implements EventSubscriberInterface
 
     public function sendTransactionCompletedMail(TransactionCompletedEvent $event): void
     {
-        $tradable = $event->getTradable();
         $user = $event->getUser();
-
-        $symbol = $tradable instanceof Crypto
-            ? $tradable->getSymbol()
-            : MoneyWrapper::TOK_SYMBOL;
-
-        $amount = $this->moneyWrapper->format(
-            $this->moneyWrapper->parse($event->getAmount(), $symbol)
-        );
-
-        // Remove unneeded zeros and check how much decimals we need
-        $subunit = strlen(
-            rtrim(
-                str_replace('.', '', (string)strstr($amount, '.')),
-                '0'
-            )
-        );
-
-        $amount = number_format((float)$amount, $subunit, '.', ',');
 
         try {
             $this->mailer->checkConnection();
-            $this->mailer->sendTransactionCompletedMail($user, $event::TYPE);
-            $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
+
+            if ($event instanceof WithdrawCompletedEvent) {
+                $notificationType = NotificationTypes::WITHDRAWAL;
+                $strategy = new WithdrawalNotificationStrategy(
+                    $this->userNotificationManager,
+                    $notificationType
+                );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
+            } else {
+                $notificationType = NotificationTypes::DEPOSIT;
+                $strategy = new DepositNotificationStrategy(
+                    $this->userNotificationManager,
+                    $notificationType
+                );
+                $notificationContext = new NotificationContext($strategy);
+                $notificationContext->sendNotification($user);
+            }
+
+            $isAvailableEmailNotification = $this->userNotificationManager->isNotificationAvailable(
+                $user,
+                $notificationType,
+                NotificationChannels::EMAIL
+            );
+
+            if ($isAvailableEmailNotification) {
+                $this->mailer->sendTransactionCompletedMail($user, $event::TYPE);
+                $this->logger->info("Sent ".$event::TYPE." completed e-mail to user {$user->getEmail()}");
+            }
         } catch (\Throwable $e) {
             $this->logger->error("Couldn't send ".$event::TYPE." completed e-mail to user {$user->getEmail()}. Reason: {$e->getMessage()}");
         }
@@ -93,7 +110,7 @@ class TransactionSubscriber implements EventSubscriberInterface
     {
         $tradable = $event->getTradable();
         $user = $event->getUser();
-        $amount = $this->moneyWrapper->parse($event->getAmount(), MoneyWrapper::TOK_SYMBOL);
+        $amount = $this->moneyWrapper->parse($event->getAmount(), Symbols::TOK);
 
         if (!$tradable instanceof Token
             || $user->getId() !== $tradable->getProfile()->getUser()->getId()
@@ -104,7 +121,7 @@ class TransactionSubscriber implements EventSubscriberInterface
 
         $withdrawnObj = new Money(
             $tradable->getWithdrawn(),
-            new Currency(MoneyWrapper::TOK_SYMBOL)
+            new Currency(Symbols::TOK)
         );
 
         if ($event instanceof DepositCompletedEvent) {

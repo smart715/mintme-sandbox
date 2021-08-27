@@ -8,13 +8,14 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
-use App\Events\OrderCompletedEvent;
+use App\Events\OrderEvent;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Market;
 use App\Exchange\Order;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\Config\OrderFilterConfig;
 use App\Utils\Converter\MarketNameConverterInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -52,6 +53,8 @@ class Trader implements TraderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    private BalanceHandlerInterface $balanceHandler;
+
     public function __construct(
         TraderFetcherInterface $fetcher,
         LimitOrderConfig $config,
@@ -61,7 +64,8 @@ class Trader implements TraderInterface
         NormalizerInterface $normalizer,
         LoggerInterface $logger,
         float $referralFee,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        BalanceHandlerInterface $balanceHandler
     ) {
         $this->fetcher = $fetcher;
         $this->config = $config;
@@ -72,9 +76,10 @@ class Trader implements TraderInterface
         $this->logger = $logger;
         $this->referralFee = $referralFee;
         $this->eventDispatcher = $eventDispatcher;
+        $this->balanceHandler = $balanceHandler;
     }
 
-    public function placeOrder(Order $order): TradeResult
+    public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
     {
         $result = $this->fetcher->placeOrder(
             $order->getMaker()->getId(),
@@ -88,22 +93,12 @@ class Trader implements TraderInterface
             $this->referralFee ? (string)$this->referralFee : '0'
         );
 
-        $quote = $order->getMarket()->getQuote();
-
         if (TradeResult::SUCCESS === $result->getResult()) {
             /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new OrderCompletedEvent(
-                    $order,
-                    $quote
-                ),
-                OrderCompletedEvent::CREATED
-            );
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
 
-            if ($quote instanceof Token) {
-                $this->updateUserTokenReferencer($order->getMaker(), $quote);
-            } elseif ($quote instanceof Crypto) {
-                $this->updateUserCrypto($order->getMaker(), $quote);
+            if ($updateTokenOrCrypto) {
+                $this->updateUserTradableRelation($order);
             }
         }
 
@@ -120,20 +115,59 @@ class Trader implements TraderInterface
         return $result;
     }
 
+    public function executeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult
+    {
+        $result = $this->fetcher->executeOrder(
+            $order->getMaker()->getId(),
+            $this->marketNameConverter->convert($order->getMarket()),
+            $order->getSide(),
+            $this->moneyWrapper->format($order->getAmount()),
+            $this->moneyWrapper->format($order->getFee()),
+            $order->getReferralId() ?: 0,
+            $this->referralFee ? (string)$this->referralFee : '0'
+        );
+
+        if (TradeResult::SUCCESS === $result->getResult()) {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CREATED);
+
+            if ($updateTokenOrCrypto) {
+                $this->updateUserTradableRelation($order);
+            }
+        } elseif (TradeResult::FAILED === $result->getResult()) {
+            $this->logger->error(
+                "Failed to execute order for user {$order->getMaker()->getEmail()}.
+                Reason: {$result->getMessage()}",
+                (array)$this->normalizer->normalize($result, null, [
+                    'groups' => ['Default'],
+                ])
+            );
+        }
+
+        return $result;
+    }
+
     public function cancelOrder(Order $order): TradeResult
     {
+        $userMaker = $order->getMaker();
+
         $result = $this->fetcher->cancelOrder(
-            $order->getMaker()->getId(),
+            $userMaker->getId(),
             $this->marketNameConverter->convert($order->getMarket()),
             $order->getId() ?? 0
         );
 
         if (TradeResult::FAILED === $result->getResult()) {
             $this->logger->error(
-                "Failed to cancel order '{$order->getId()}' for user {$order->getMaker()->getEmail()}. 
+                "Failed to cancel order '{$order->getId()}' for user {$userMaker->getEmail()}. 
                 Reason: {$result->getMessage()}"
             );
+        } else {
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::CANCELLED);
         }
+
+        $this->updateUserTradableRelation($order);
 
         return $result;
     }
@@ -182,24 +216,19 @@ class Trader implements TraderInterface
         }, $records);
     }
 
-    private function updateUserTokenReferencer(User $user, Token $token): void
+    private function updateUserTradableRelation(Order $order): void
     {
-        $referencer = $user->getReferencer();
+        $user = $order->getMaker();
+        $quote = $order->getMarket()->getQuote();
 
-        if (!in_array($user, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($user);
-            $this->entityManager->persist($userToken);
-            $user->addToken($userToken);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-        }
+        if ($quote instanceof Token) {
+            $this->balanceHandler->updateUserTokenRelation($user, $quote);
 
-        if ($referencer && !in_array($referencer, $token->getUsers(), true)) {
-            $userToken = (new UserToken())->setToken($token)->setUser($referencer);
-            $this->entityManager->persist($userToken);
-            $referencer->addToken($userToken);
-            $this->entityManager->persist($referencer);
-            $this->entityManager->flush();
+            if ($referencer = $user->getReferencer()) {
+                $this->balanceHandler->updateUserTokenRelation($referencer, $quote);
+            }
+        } elseif ($quote instanceof Crypto) {
+            $this->updateUserCrypto($user, $quote);
         }
     }
 
@@ -231,14 +260,14 @@ class Trader implements TraderInterface
             ),
             $status,
             null,
-            $orderData['mtime']
+            $orderData['mtime'] ?? null,
         );
     }
 
     private function getSymbol(TradebleInterface $tradeble): string
     {
         return $tradeble instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradeble->getSymbol();
     }
 }

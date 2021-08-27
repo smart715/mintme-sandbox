@@ -70,7 +70,9 @@ describe('TradeChart', () => {
                                 high: '0',
                                 low: '0',
                                 volume: '321',
+                                volumeDonation: '321',
                                 deal: '0',
+                                dealDonation: '0',
                             },
                         ],
                         'id': null,
@@ -80,14 +82,14 @@ describe('TradeChart', () => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.marketStatus)
                                 .toMatchObject({
-                                    volume: '321',
+                                    volume: '642',
                                     last: '123',
                                     change: '-73',
                                     amount: '0',
                                     monthVolume: '0',
                                     monthChange: '0',
                                     monthAmount: '0',
-                                    marketCap: '0 testBaseSymbol',
+                                    marketCap: '0',
                                 });
                             done();
                         });
@@ -107,7 +109,9 @@ describe('TradeChart', () => {
                                 'high': '0',
                                 'low': '0',
                                 'volume': '3210',
+                                'volumeDonation': '3210',
                                 'deal': '0',
+                                'dealDonation': '0',
                             },
                         ],
                         'id': null,
@@ -117,14 +121,14 @@ describe('TradeChart', () => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.marketStatus)
                                 .toMatchObject({
-                                    volume: '3210',
+                                    volume: '6420',
                                     last: '1230',
                                     change: '-73',
                                     amount: '0',
                                     monthVolume: '0',
                                     monthChange: '0',
                                     monthAmount: '0',
-                                    marketCap: '0 testBaseSymbol',
+                                    marketCap: '0',
                                 });
                             done();
                         });

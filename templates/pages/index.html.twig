@@ -1,220 +1,253 @@
 {% extends 'base.html.twig' %}
 
+
 {% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/home') }}
+{% endblock %}
 
 {% block bgclass %}index-bg{% endblock %}
 
 {% block content %}
-    <section id="top-showcase" class="container-fluid text-responsive pt-2 pb-5 py-sm-5 py-md-0">
-        <div class="row">
-            <div class="col p-0 text-center">
-                <div class="container-fluid w-100 h-100">
-                    <div class="row h-75">
-                        <div class="col d-flex justify-content-center">
-                            <div class="align-self-center pt-4 pt-md-0">
-                                <h1 class="title text-white">
-                                    {% trans %}page.index.promo.main{% endtrans %}
-                                </h1>
-                                <h2 class="tip pt-2 px-3 d-inline-block text-white">
-                                    {% trans %}page.index.promo.description{% endtrans %}
-                                </h2>
-                                <div class="py-sm-4">
-                                {% if not app.user %}
-                                    <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('fos_user_registration_register') }}">
-                                        {% trans %}page.index.promo.btn.register{% endtrans %}
-                                    </a>
-                                {% else %}
-                                    <a class="btn btn-ghost ghost-alt btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
-                                        {% trans %}page.index.promo.btn.trade{% endtrans %}
-                                    </a>
-                                {% endif %}
-                                </div>
-                            </div>
+    <div id="home">
+        <section id="top-showcase">
+            <div class="container px-lg-5">
+                <div class="row">
+                    <div class="col-12 col-md-6 p-lg-0">
+                        <div class="text-center">
+                            {% spaceless %}
+                            <h1 class="title mt-5">
+                                <span>{% trans %}page.index.promo.main_1{% endtrans %} <br class="d-sm-none">{% trans %}page.index.promo.main_2{% endtrans %} <br class="d-none d-sm-inline">{% trans %}page.index.promo.main_3{% endtrans %}</span>
+                                <span>
+                                    <span id="typed-strings">
+                                        <span><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_1{% endtrans %}</span>
+                                        <span class="d-none"><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_2{% endtrans %}</span>
+                                        <span class="d-none"><br class="d-sm-none">&nbsp;<wbr>{% trans %}page.index.promo.main.word_3{% endtrans %}</span>
+                                        <span class="d-none">{% trans %}page.index.promo.main.word_4{% endtrans %}</span>
+                                    </span>
+                                    <span id="typed"></span>
+                                </span>
+                            </h1>
+                            {% endspaceless %}
+                            <h2 class="subtitle mt-4 mt-sm-5">
+                                {% trans %}page.index.promo.description{% endtrans %}
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-5 offset-lg-1 p-lg-0">
+                        <div class="d-none d-md-block">
+                            <img class="w-100" src="{{ asset('build/images/hero-image.webp') }}" alt="hero-image">
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <section id="description">
-        <div class="container px-5">
-            <div class="row justify-content-center pt-md-3 pb-3">
-                <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_1.header{% endtrans %}</h3>
-                </div>
-            </div>
-
-            <div class="row justify-content-center">
-                <div class="col">
-                    <p class="text-white text-center pb-4">
-                        {% trans %}page.index.block_1.body{% endtrans %}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="feature-boxes container px-5">
-            <div class="row justify-content-center text-white text-center">
-                <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="{% trans %}img.creator{% endtrans %}">
-                    <h4 class="mb-4">{% trans %}page.index.block_2.section_1.header{% endtrans %}</h4>
-                    <p>{% trans %}page.index.block_2.section_1.body{% endtrans %}</p>
-                </div>
-                <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="{% trans %}img.tok_trading{% endtrans %}">
-                    <h4 class="mb-4">{% trans %}page.index.block_2.section_2.header{% endtrans %}</h4>
-                    <p>{% trans %}page.index.block_2.section_2.body{% endtrans %}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="container pb-3">
-            <div class="row justify-content-center pt-md-3">
-                <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_3.header{% endtrans %}</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="feature-boxes container px-5">
-            <div class="row justify-content-center text-white">
-                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="{% trans %}img.tok_easy_icon_1{% endtrans %}">
-                    <p>
-                        {% trans %}page.index.block_3.section_1{% endtrans %}
-                    </p>
-                </div>
-                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="{% trans %}img.tok_easy_icon_2{% endtrans %}">
-                    <p>
-                        {% trans %}page.index.block_3.section_2{% endtrans %}
-                    </p>
-                </div>
-                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="{% trans %}img.tok_easy_icon_3{% endtrans %}">
-                    <p>
-                        {% trans %}page.index.block_3.section_3{% endtrans %}
-                    </p>
-                </div>
-                <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
-                    <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="{% trans %}img.tok_easy_icon_4{% endtrans %}">
-                    <p>
-                        {% trans %}page.index.block_3.section_4{% endtrans %}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="container my-5">
-            <div class="text-center text-responsive">
-            {% if not app.user %}
-                <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">
-                    {% trans %}page.index.block_4.btn.register{% endtrans %}
-                </a>
-            {% else %}
-                <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
-                    {% trans %}page.index.block_4.btn.trade{% endtrans %}
-                </a>
-            {% endif %}
-            </div>
-        </div>
-        <div class="container mb-3">
-            <div class="row justify-content-center">
-                <div class="col">
-                    <h3 class="text-uppercase text-white text-center mb-0 mt-4">{% trans %}page.index.block_5.header{% endtrans %}</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="container px-5 text-white mb-4">
-            <div class="border container bg-secondary">
                 <div class="row">
-                    <div class="col-lg-5 py-4 d-flex centered">
-                        <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="{% trans %}img.webchain_graph{% endtrans %}">
+                    <div class="col-12">
+                        <div class="text-center">
+                            {% if not app.user %}
+                                <a class="homepage-action-button btn btn-ghost ghost-alt btn-lg text-uppercase text-bold mt-5" href="{{ path('fos_user_registration_register') }}">
+                                    {% trans %}page.index.promo.btn.register{% endtrans %}
+                                </a>
+                            {% else %}
+                                <a class="homepage-action-button btn btn-ghost ghost-alt btn-lg text-uppercase text-bold mt-5" href="{{ path('trading') }}">
+                                    {% trans %}page.index.promo.btn.trade{% endtrans %}
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-lg-7 pb-3 pt-lg-5 pb-lg-5 px-0 text-center">
-                        <a href="https://mintme.com/coin" target="_blank">
-                            <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="{% trans %}img.webchain{% endtrans %}">
-                        </a>
-                        <p class="px-4 px-lg-5">
-                            {% trans %}page.index.block_5.body{% endtrans %}
+                    <div class="col-12 mt-5 p-lg-0 d-flex justify-content-center">
+                        {{ include("spinners/feed.html.twig") }}
+                        <feed
+                            :items-prop="{{ activities | json_encode }}"
+                            mercure-hub-url="{{ mercure_hub_url }}"
+                            :min="6"
+                            :max="30"
+                        ></feed>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="description">
+            <div class="container px-5">
+                <div class="row justify-content-center pt-md-3 pb-3">
+                    <div class="col">
+                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_1.header{% endtrans %}</h3>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <p class="text-white text-center pb-4">
+                            {% trans %}page.index.block_1.body{% endtrans %}
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="container mb-3">
-            <div class="row justify-content-center pt-md-3">
-                <div class="col">
-                    <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.faq.header{% endtrans %}</h3>
+
+            <div class="feature-boxes container px-5">
+                <div class="row justify-content-center text-white text-center">
+                    <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="img-fluid mb-3" src="{{ asset('build/images/home-creator-icon.svg') }}" alt="{% trans %}img.creator{% endtrans %}">
+                        <h4 class="mb-4">{% trans %}page.index.block_2.section_1.header{% endtrans %}</h4>
+                        <p>{% trans %}page.index.block_2.section_1.body{% endtrans %}</p>
+                    </div>
+                    <div class="col-md col-lg-4 bg-secondary border px-4 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="img-fluid mb-3" src="{{ asset('build/images/home-trader-icon.svg') }}" alt="{% trans %}img.tok_trading{% endtrans %}">
+                        <h4 class="mb-4">{% trans %}page.index.block_2.section_2.header{% endtrans %}</h4>
+                        <p>{% trans %}page.index.block_2.section_2.body{% endtrans %}</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="container faq  px-5 text-white mb-5 pb-5">
-            <div class="border">
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q1.header{% endtrans %}
-                    </span>
+            <div class="container pb-3">
+                <div class="row justify-content-center pt-md-3">
+                    <div class="col">
+                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.block_3.header{% endtrans %}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-boxes container px-5">
+                <div class="row justify-content-center text-white">
+                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_01.svg') }}" alt="{% trans %}img.tok_easy_icon_1{% endtrans %}">
+                        <p>
+                            {% trans %}page.index.block_3.section_1{% endtrans %}
+                        </p>
+                    </div>
+                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_02.svg') }}" alt="{% trans %}img.tok_easy_icon_2{% endtrans %}">
+                        <p>
+                            {% trans %}page.index.block_3.section_2{% endtrans %}
+                        </p>
+                    </div>
+                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_03.svg') }}" alt="{% trans %}img.tok_easy_icon_3{% endtrans %}">
+                        <p>
+                            {% trans %}page.index.block_3.section_3{% endtrans %}
+                        </p>
+                    </div>
+                    <div class="col-md-5 col-lg-4 col-xl bg-module border pt-4 px-3 mx-3 mb-4 text-center bright-on-hover">
+                        <img class="d-block mx-auto mb-3" src="{{ asset('build/images/easy_icon_04.svg') }}" alt="{% trans %}img.tok_easy_icon_4{% endtrans %}">
+                        <p>
+                            {% trans %}page.index.block_3.section_4{% endtrans %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="container my-5">
+                <div class="text-center">
+                {% if not app.user %}
+                    <a href="{{ path('fos_user_registration_register') }}" class="btn btn-ghost btn-lg btn-big text-uppercase">
+                        {% trans %}page.index.block_4.btn.register{% endtrans %}
+                    </a>
+                {% else %}
+                    <a class="btn btn-ghost btn-lg btn-big text-uppercase" href="{{ path('trading') }}">
+                        {% trans %}page.index.block_4.btn.trade{% endtrans %}
+                    </a>
+                {% endif %}
+                </div>
+            </div>
+            <div class="container mb-3">
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <h3 class="text-uppercase text-white text-center mb-0 mt-4">{% trans %}page.index.block_5.header{% endtrans %}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container px-5 text-white mb-4">
+                <div class="border container bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-5 py-4 d-flex centered">
+                            <img src="{{ asset('build/images/mintme-coin-graphic.svg') }}" class="align-self-center mx-auto img-fluid img-reduced" alt="{% trans %}img.webchain_graph{% endtrans %}">
+                        </div>
+                        <div class="col-lg-7 pb-3 pt-lg-5 pb-lg-5 px-0 text-center">
+                            <a href="https://mintme.com/coin" target="_blank">
+                                <img src="{{ asset('build/images/mintme-coin-logo.svg') }}" class="img-fluid img-reduced px-xl-3 mb-4" alt="{% trans %}img.webchain{% endtrans %}">
+                            </a>
+                            <p class="px-4 px-lg-5">
+                                {% trans %}page.index.block_5.body{% endtrans %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container mb-3">
+                <div class="row justify-content-center pt-md-3">
+                    <div class="col">
+                        <h3 class="text-uppercase text-white text-center pt-5 mb-0">{% trans %}page.index.faq.header{% endtrans %}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container faq  px-5 text-white mb-5 pb-5">
+                <div class="border">
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q1.header{% endtrans %}
+                        </span>
                         <span slot="body">
                         {% trans %}page.index.faq.q1.body{% endtrans %}
-                    </span>
-                    </faq-item>
-                </div>
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q2.header{% endtrans %}
-                    </span>
-                    <span slot="body">
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q2.header{% endtrans %}
+                        </span>
+                        <span slot="body">
                         {% trans %}page.index.faq.q2.body{% endtrans %}
-                    </span>
-                    </faq-item>
-                </div>
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q3.header{% endtrans %}
-                    </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q3.body{% endtrans %}
-                    </span>
-                    </faq-item>
-                </div>
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q4.header{% endtrans %}
-                    </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q4.body{% endtrans %}
-                    </span>
-                    </faq-item>
-                </div>
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q5.header{% endtrans %}
-                    </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q5.body{% endtrans %}
-                    </span>
-                    </faq-item>
-                </div>
-                <div class="row faq-block mx-0">
-                    <faq-item>
-                    <span slot="title">
-                        {% trans %}page.index.faq.q6.header{% endtrans %}
-                    </span>
-                        <span slot="body">
-                        {% trans %}page.index.faq.q6.body{% endtrans %}
-                    </span>
-                    </faq-item>
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q3.header{% endtrans %}
+                        </span>
+                            <span slot="body">
+                            {% trans %}page.index.faq.q3.body{% endtrans %}
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q4.header{% endtrans %}
+                        </span>
+                            <span slot="body">
+                            {% trans %}page.index.faq.q4.body{% endtrans %}
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q5.header{% endtrans %}
+                        </span>
+                            <span slot="body">
+                            {% trans %}page.index.faq.q5.body{% endtrans %}
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q6.header{% endtrans %}
+                        </span>
+                            <span slot="body">
+                            {% trans %}page.index.faq.q6.body{% endtrans %}
+                        </span>
+                        </faq-item>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 {% endblock %}
 
 {% block bodyclass %}homepage{% endblock %}
@@ -222,6 +255,5 @@
 {% block messageClass %}d-none{% endblock %}
 
 {% block pagescripts %}
-
+    {{ encore_entry_script_tags('pages/home') }}
 {% endblock %}
-

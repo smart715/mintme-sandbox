@@ -1,59 +1,52 @@
 {% extends 'mail/layout.html.twig' %}
-
 {% block content %}
-    <table width="100%">
-        <tr>
-            <th>
-                <h3 class="text-dark-white" style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >{% trans %}hello{% endtrans %}</h3>
-                <h1 class="text-blue" style="font-size: 34px; margin-top: 0px; margin-bottom: 0px;"><strong>{{username}}</strong></h1>
-            </th>
-        </tr>
-        <tr>
-            <th>
-                <p class="text-dark-white" style="font-size: medium; margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal;">
-                    {{ message }}
-                </p>
-            </th>
-        </tr>
-        <tr>
-            <th class="text-dark-white" style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
-        </tr>
-    </table>
-    <table width="100%" style="border: 1px solid silver; background: #0E3B58;">
-        <tr>
-            <td style="text-align-last: center; !important;" rowspan="4">
-                <img
-                    width="150px"
-                    height="150px"
-                    src="{{ absolute_url(asset('build/images/new_device.png')) }}"
-                    class="align-self-center text-center"
-                    alt="{% trans %}new_device_icon{% endtrans %}"
-                />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="text-dark-white" style="font-weight: bold; line-height: normal; display: inline;">
-                    {% trans %}device_label{% endtrans%}
-                </span>
-                <p class="text-dark-white" style="text-align: end; font-size: smaller; font-weight: normal;">{{ user_device_info.deviceInfo }} ({{ user_device_info.osInfo }})</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="text-dark-white" style="font-weight: bold; line-height: normal; display: inline;">
-                    {% trans %}new_device.date{% endtrans %}
-                </span>
-                <p class="text-dark-white" style="text-align: end; font-size: smaller; font-weight: normal;">{{ user_device_info.date|date('Y-m-d H:i:s') }} (UTC)</p>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="text-dark-white" style="font-weight: bold; line-height: normal; display: inline;">
-                    {% trans %}new_device.ip{% endtrans %}
-                </span>
-                <p class="text-dark-white" style="text-align: end; font-size: smaller; font-weight: normal;">{{ user_device_info.ipAddress }}</p>
-            </td>
-        </tr>
-    </table>
+<div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
+    <tr>
+        <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+            <img alt="Login" src="{{ absolute_url(asset('build/images/Login.png')) }}" width="120" style="width:120px;height:auto;padding-right:20px;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
+            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} hello {% endtrans %}
+            </p>
+            <p style="Margin:0 0 18px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;line-height:30px;color:#2199e8;">{{ username }}
+            </p>
+            <p style="Margin:0 0 12px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} mail.new_device.login.msg {% endtrans %}
+            </p>
+            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans %} mail.new_device.new_ip.msg {% endtrans %}
+            </p>
+        </td>
+    </tr>
+</table>
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+    <tr>
+        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+    </tr>
+</table>
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
+    <tr>
+        <td align="center" width="300" style="width:300px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+            <img alt="Device" src="{{ absolute_url(asset('build/images/Device.png')) }}" width="120" style="width:120px;height:auto;border:none;outline:0;text-align:center;text-decoration:none;-ms-interpolation-mode:bicubic;" />
+        </td>
+        <td align="center" width="300" style="width:300px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+            <p style="Margin:20px 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:20px;color:#0a0a0a;">{% trans %} device_label {% endtrans %}
+            </p>
+            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:400;line-height:18px;color:#0a0a0a;">{{ user_device_info.deviceInfo }} ({{ user_device_info.osInfo }})
+            </p>
+            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:20px;color:#0a0a0a;">{% trans %} new_device.date {% endtrans %}
+            </p>
+            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:400;line-height:18px;color:#0a0a0a;">{{ user_device_info.date|date('Y-m-d H:i:s') }} (UTC)
+            </p>
+            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:600;line-height:20px;color:#0a0a0a;">{% trans %} new_device.ip {% endtrans %}
+            </p>
+            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:18px;font-weight:400;line-height:18px;color:#0a0a0a;">{{ user_device_info.ipAddress }}
+            </p>
+        </td>
+    </tr>
+</table>
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+    <tr>
+        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+    </tr>
+</table>
+</div>
 {% endblock %}
+

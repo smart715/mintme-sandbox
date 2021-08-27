@@ -12,6 +12,7 @@ function mockVue() {
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
             Vue.prototype.$axios = {retry: axios, single: axios};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -72,6 +73,7 @@ describe('Comments', () => {
         const localVue = mockVue();
         let comment = Object.assign({}, testComment);
         comment.editable = true;
+        comment.deletable = true;
         const wrapper = shallowMount(Comment, {
             localVue,
             propsData: {
@@ -123,8 +125,8 @@ describe('Comments', () => {
         moxios.stubRequest('like_comment', {status: 200});
 
         moxios.wait(() => {
-            expect(wrapper.vm.comment.likeCount).toBe(1);
-            expect(wrapper.vm.comment.liked).toBe(true);
+            expect(wrapper.emitted('update-comment')[0][0].likeCount).toBe(1);
+            expect(wrapper.emitted('update-comment')[0][0].liked).toBe(true);
             done();
         });
     });
@@ -147,8 +149,8 @@ describe('Comments', () => {
         moxios.stubRequest('like_comment', {status: 200});
 
         moxios.wait(() => {
-            expect(wrapper.vm.comment.likeCount).toBe(0);
-            expect(wrapper.vm.comment.liked).toBe(false);
+            expect(wrapper.emitted('update-comment')[0][0].likeCount).toBe(0);
+            expect(wrapper.emitted('update-comment')[0][0].liked).toBe(false);
             done();
         });
     });
@@ -162,6 +164,7 @@ describe('Comments', () => {
             install(Vue, options) {
                 Vue.prototype.$routing = {generate: (val) => val};
                 Vue.prototype.$axios = {retry: mockAxios, single: mockAxios};
+                Vue.prototype.$t = (val) => val;
             },
         });
 

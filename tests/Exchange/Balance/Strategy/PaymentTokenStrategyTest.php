@@ -7,12 +7,14 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class PaymentTokenStrategyTest extends TestCase
 {
@@ -21,7 +23,8 @@ class PaymentTokenStrategyTest extends TestCase
         $strategy = new PaymentTokenStrategy(
             $this->mockBalanceHandler($this->exactly(2)),
             $this->mockCryptoManager(),
-            $this->mockMoneyWrapper()
+            $this->mockMoneyWrapper(),
+            $this->mockTokenConfig()
         );
 
         $strategy->deposit(
@@ -57,5 +60,10 @@ class PaymentTokenStrategyTest extends TestCase
         $mw->method("parse")->wilLReturn(new Money("100000000000000", new Currency('TOK')));
 
         return $mw;
+    }
+
+    public function mockTokenConfig(): TokenConfig
+    {
+        return $this->createMock(TokenConfig::class);
     }
 }

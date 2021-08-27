@@ -28,8 +28,6 @@ const $routing = {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-table', {});
     localVue.use(Vuex);
     localVue.use({
         install(Vue) {
@@ -59,8 +57,9 @@ let propsForTestCorrectlyRenders = {
     disabledServicesConfig: '{"depositDisabled":false,"withdrawalsDisabled":false,"deployDisabled":false}',
 };
 
-const assertData = {foo: {name: 'foo'}, bar: {name: 'bar'}};
-const expectData = [{name: 'foo'}, {name: 'bar'}];
+const assertData = {WEB: {name: 'WEB', available: 1}, bar: {name: 'bar', available: 1}, baz: {name: 'baz', available: 0}};
+const expectData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}, {name: 'baz', available: 0}];
+const expectedTokenData = [{name: 'WEB', available: 1}, {name: 'bar', available: 1}];
 
 let assertTokens = {};
 assertTokens['oTokenName'] = {};
@@ -132,7 +131,7 @@ describe('Wallet', () => {
         wrapper.vm.tokens = null;
         expect(wrapper.vm.items).toEqual([]);
         wrapper.vm.tokens = assertData;
-        expect(wrapper.vm.items).toMatchObject(expectData);
+        expect(wrapper.vm.items).toMatchObject(expectedTokenData);
     });
 
     it('should compute showLoadingIconP correctly', () => {
@@ -166,19 +165,16 @@ describe('Wallet', () => {
             propsData: propsForTestCorrectlyRenders,
         });
         wrapper.vm.showModal = false;
-        wrapper.setProps({twofa: ''});
-        wrapper.vm.openWithdraw('currency', 'fee', 'amount', 'subunit');
-        expect(wrapper.vm.showModal).toBe(false);
         wrapper.setProps({twofa: 'foo'});
         wrapper.vm.predefinedTokens = {};
         wrapper.vm.predefinedTokens[webSymbol] = {fee: '0.500000000000000000', available: '.01'};
-        wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8);
+        wrapper.vm.openWithdraw(webSymbol, '0.500000000000000000', '0.800000000000000000', 8, false, false, webSymbol);
         expect(wrapper.vm.showModal).toBe(true);
         expect(wrapper.vm.selectedCurrency).toBe(webSymbol);
         expect(wrapper.vm.isTokenModal).toBe(false);
         expect(wrapper.vm.withdraw.fee).toBe('0.5');
-        expect(wrapper.vm.withdraw.webFee).toBe('0.5');
-        expect(wrapper.vm.withdraw.availableWeb).toBe('.01');
+        expect(wrapper.vm.withdraw.baseFee).toBe('0');
+        expect(wrapper.vm.withdraw.availableBase).toBe('.01');
         expect(wrapper.vm.withdraw.amount).toBe('0.8');
         expect(wrapper.vm.withdraw.subunit).toBe(8);
     });
@@ -278,7 +274,7 @@ describe('Wallet', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.setProps({depositMore: webSymbol});
+            wrapper.setData({depositMore: webSymbol, tokens: []});
             wrapper.vm.predefinedTokens = {};
             wrapper.vm.predefinedTokens[wrapper.vm.depositMore] = {subunit: 8};
             wrapper.vm.depositAddresses = {};

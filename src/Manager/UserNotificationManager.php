@@ -4,81 +4,48 @@ namespace App\Manager;
 
 use App\Entity\User;
 use App\Entity\UserNotification;
-use App\Entity\UserToken;
 use App\Exception\ApiBadRequestException;
-use App\Mailer\MailerInterface;
 use App\Repository\UserNotificationRepository;
+use App\Utils\NotificationTypes;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserNotificationManager implements UserNotificationManagerInterface
 {
     /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
     /** @var UserNotificationRepository */
-    private $userNotificationRepository;
+    private UserNotificationRepository $userNotificationRepository;
 
-    /** @var MailerInterface */
-    private MailerInterface $mailer;
+    /** @var UserNotificationConfigManagerInterface */
+    private UserNotificationConfigManagerInterface $notificationConfigManager;
 
     public function __construct(
         EntityManagerInterface $em,
         UserNotificationRepository $userNotificationRepository,
-        MailerInterface $mailer
+        UserNotificationConfigManagerInterface $notificationConfigManager
     ) {
         $this->em = $em;
         $this->userNotificationRepository =  $userNotificationRepository;
-        $this->mailer = $mailer;
+        $this->notificationConfigManager = $notificationConfigManager;
     }
 
     public function createNotification(
         User $user,
         String $notificationType,
-        array $extraData
+        ?array $extraData
     ): void {
-        if ((UserNotification::TOKEN_NEW_POST_NOTIFICATION === $notificationType ||
-            UserNotification::TOKEN_DEPLOYED_NOTIFICATION === $notificationType)
-        ) {
-            foreach ($this->getUsersHaveTokenIds($user) as $userHaveToken) {
-                $token = $user->getProfile()->getToken();
-                $userWithToken = $this->em->getRepository(User::class)->find($userHaveToken);
+        $userNotification = (new UserNotification())
+            ->setType($notificationType)
+            ->setUser($user);
 
-                $tokenName = $token->getName();
-                $jsonData = (array)json_encode([
-                    'tokenName' => $tokenName,
-                ], JSON_THROW_ON_ERROR);
-
-                $this->newUserNotification($notificationType, $userWithToken, $jsonData);
-                UserNotification::TOKEN_NEW_POST_NOTIFICATION === $notificationType ?
-                    $this->mailer->sendNewPostMail($userWithToken, $tokenName) :
-                    $this->mailer->sendTokenDeployedMail($userWithToken, $tokenName);
-            }
-
-            $this->em->flush();
-        } else {
-            $jsonData = null;
-
-            if (UserNotification::ORDER_CANCELLED_NOTIFICATION === $notificationType ||
-                UserNotification::ORDER_FILLED_NOTIFICATION === $notificationType
-            ) {
-                $tokenName = $user->getProfile()->getToken()->getName();
-                $jsonData = (array)json_encode([
-                        'tokenName' => $tokenName,
-                    ], JSON_THROW_ON_ERROR);
-                $this->mailer->sendNoOrdersMail($user, $tokenName);
-            }
-
-            if (UserNotification::NEW_INVESTOR_NOTIFICATION === $notificationType) {
-                $jsonData = (array)json_encode(
-                    $extraData,
-                    JSON_THROW_ON_ERROR
-                );
-                $this->mailer->sendNewInvestorMail($user, $extraData['profile']);
-            }
-
-            $this->newUserNotification($notificationType, $user, $jsonData);
-            $this->em->flush();
+        if ($extraData) {
+            $userNotification->setJsonData($extraData);
         }
+
+        $userNotification->setViewed(false);
+        $this->em->persist($userNotification);
+        $this->em->flush();
     }
 
     public function getNotifications(User $user, ?int $notificationLimit): ?array
@@ -86,9 +53,9 @@ class UserNotificationManager implements UserNotificationManagerInterface
         return $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
     }
 
-    public function updateNotifications(User $user): void
+    public function updateNotifications(User $user, ?int $notificationLimit): void
     {
-        $notifications =  $this->userNotificationRepository->findUserNotifications($user, null);
+        $notifications =  $this->userNotificationRepository->findUserNotifications($user, $notificationLimit);
 
         if (!$notifications) {
             throw new ApiBadRequestException('Internal error, Please try again later');
@@ -102,40 +69,12 @@ class UserNotificationManager implements UserNotificationManagerInterface
         $this->em->flush();
     }
 
-    private function getUsersHaveTokenIds(User $user): array
+    public function isNotificationAvailable(User $user, String $type, String $channel): Bool
     {
-        $result = [];
-        $usersTokens = $this->em->getRepository(UserToken::class)->findAll();
-
-        if (!$usersTokens) {
-            return $result;
+        if (NotificationTypes::ORDER_FILLED === $type || NotificationTypes::ORDER_CANCELLED === $type) {
+            return true;
         }
 
-        foreach ($usersTokens as $userToken) {
-            $tokenId = $user->getProfile()->getToken()->getId();
-            $userId = $user->getId();
-            $userWithToken = $userToken->getuser()->getId();
-            $userTokenId = $userToken->getToken()->getId();
-
-            if ($userTokenId === $tokenId && $userWithToken !== $userId) {
-                $result[] = $userWithToken;
-            }
-        }
-
-        return $result;
-    }
-
-    private function newUserNotification(String $type, User $user, ?array $jsonData): void
-    {
-        $userNotification = (new UserNotification())
-            ->setType($type)
-            ->setUser($user);
-
-        if ($jsonData) {
-            $userNotification->setJsonData($jsonData);
-        }
-
-        $userNotification->setViewed(false);
-        $this->em->persist($userNotification);
+        return !empty($this->notificationConfigManager->getOneUserNotificationConfig($user, $type, $channel));
     }
 }

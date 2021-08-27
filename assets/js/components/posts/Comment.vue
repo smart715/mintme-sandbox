@@ -15,32 +15,40 @@
             <span class="comment-date">
                 {{ date }}
             </span>
-            <template
-                v-if="comment.editable"
+            <button
+                v-if="comment.deletable"
+                class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
+                :disabled="deleteDisabled"
+                @click="showConfirm"
             >
-                <button
-                    class="btn btn-link p-0 delete-icon float-right text-decoration-none text-reset"
-                    :disabled="deleteDisabled"
-                    @click="deleteComment"
-                >
-                    <font-awesome-icon
-                        class="icon-default c-pointer align-middle"
-                        icon="trash"
-                        transform="shrink-4 up-1.5"
-                    />
-                </button>
-                <button
-                    class="btn btn-link p-0 comment-edit-icon float-right text-decoration-none text-reset"
-                    @click="editing = true"
-                >
-                    <font-awesome-icon
-                        class="icon-default c-pointer align-middle"
-                        icon="edit"
-                        transform="shrink-4 up-1.5"
-                    />
-                </button>
-            </template>
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="trash"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
+            <button
+                v-if="comment.editable"
+                class="btn btn-link p-0 comment-edit-icon float-right text-decoration-none text-reset"
+                @click="editing = true"
+            >
+                <font-awesome-icon
+                    class="icon-default c-pointer align-middle"
+                    icon="edit"
+                    transform="shrink-4 up-1.5"
+                />
+            </button>
         </div>
+        <confirm-modal
+            :visible="isConfirmVisible"
+            @confirm="deleteComment"
+            @close="closeConfirm"
+            model-confirm-prop="confirm_modal.accept_delete"
+        >
+            <p class="text-white modal-title pt-2">
+                {{ $t('comment.confirm_delete') }}
+            </p>
+        </confirm-modal>
         <p
             v-if="!editing"
             v-html="comment.content"
@@ -62,7 +70,7 @@
                 transform="grow-1.5"
                 @click="likeComment"
             />
-            <span class="ml-1">{{ comment.likeCount }} Likes</span>
+            <span class="ml-1">{{ comment.likeCount }} {{ $t('post.likes') }}</span>
         </span>
     </div>
 </template>
@@ -74,10 +82,9 @@ import {faEdit, faTrash, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
 import {NotificationMixin} from '../../mixins';
+import ConfirmModal from '../modal/ConfirmModal';
 
-library.add(faEdit);
-library.add(faTrash);
-library.add(faThumbsUp);
+library.add(faEdit, faTrash, faThumbsUp);
 
 export default {
     name: 'Comment',
@@ -87,6 +94,7 @@ export default {
     components: {
         FontAwesomeIcon,
         CommentForm,
+        ConfirmModal,
     },
     props: {
         comment: Object,
@@ -98,6 +106,7 @@ export default {
             deleteDisabled: false,
             editing: false,
             liking: false,
+            isConfirmVisible: false,
         };
     },
     computed: {
@@ -127,7 +136,7 @@ export default {
                 });
         },
         editComment(comment) {
-            this.comment.content = comment.content;
+            this.$emit('update-comment', {...this.comment, content: comment.content});
             this.cancelEditing();
         },
         cancelEditing() {
@@ -143,14 +152,23 @@ export default {
             }
             this.liking = true;
             this.$axios.single.post(this.$routing.generate('like_comment', {commentId: this.comment.id}))
-                .then((res) => {
-                    this.comment.likeCount += this.comment.liked ? -1 : 1;
-                    this.comment.liked = !this.comment.liked;
+                .then(() => {
+                    this.$emit('update-comment', {
+                        ...this.comment,
+                        likeCount: this.comment.likeCount + (this.comment.liked ? -1 : 1),
+                        liked: !this.comment.liked,
+                    });
                 })
                 .catch(() => {
                     this.notifyError('Error liking comment.');
                 })
                 .finally(() => this.liking = false);
+        },
+        showConfirm() {
+            this.isConfirmVisible = true;
+        },
+        closeConfirm() {
+            this.isConfirmVisible = false;
         },
     },
 };

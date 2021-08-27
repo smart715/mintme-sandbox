@@ -12,6 +12,7 @@ use App\Events\TransactionCompletedEvent;
 use App\Events\WithdrawCompletedEvent;
 use App\EventSubscriber\TransactionSubscriber;
 use App\Mailer\MailerInterface;
+use App\Manager\UserNotificationManagerInterface;
 use App\Tests\MockMoneyWrapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Currency;
@@ -32,7 +33,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Crypto::class);
@@ -51,7 +53,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $this->mockLogger(),
-            $this->mockEntityManager()
+            $this->mockEntityManager(),
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -79,7 +82,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -119,7 +123,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -158,7 +163,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -200,7 +206,8 @@ class TransactionSubscriberTest extends TestCase
             $this->mockMailer(),
             $this->mockMoneyWrapper(),
             $logger,
-            $em
+            $em,
+            $this->mockUserNotificationManagerInterface()
         );
 
         $tradable = $this->createMock(Token::class);
@@ -253,5 +260,10 @@ class TransactionSubscriberTest extends TestCase
     private function mockEntityManager(): EntityManagerInterface
     {
         return $this->createMock(EntityManagerInterface::class);
+    }
+
+    private function mockUserNotificationManagerInterface(): UserNotificationManagerInterface
+    {
+        return $this->createMock(UserNotificationManagerInterface::class);
     }
 }

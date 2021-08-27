@@ -18,6 +18,9 @@ use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Validator\MarketValidator;
+use App\Utils\Validator\MaxAllowedOrdersValidator;
+use App\Utils\Validator\TradebleDigitsValidator;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -25,6 +28,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route(path="/dev/api/v1/user/orders")
@@ -52,6 +56,8 @@ class OrdersController extends DevApiController
     /** @var TokenManagerInterface */
     private $tokenManager;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         MarketFactoryInterface $marketFactory,
         MarketHandlerInterface $marketHandler,
@@ -59,7 +65,8 @@ class OrdersController extends DevApiController
         TraderInterface $trader,
         RebrandingConverterInterface $rebrandingConverter,
         CryptoManagerInterface $cryptoManager,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        TranslatorInterFace $translator
     ) {
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
@@ -68,6 +75,7 @@ class OrdersController extends DevApiController
         $this->rebrandingConverter = $rebrandingConverter;
         $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -244,22 +252,49 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
-        $this->denyAccessUnlessGranted('not-blocked', $quote);
-
-        if (is_null($base) || is_null($quote)) {
+        if (!$base || !$quote
+            || !(new MarketValidator($market = new Market($base, $quote)))->validate()) {
             throw new ApiNotFoundException('Market not found');
         }
 
-        $market = new Market($base, $quote);
+        $this->denyAccessUnlessGranted('not-blocked', $quote);
+
+        if (!$this->isGranted('make-order', $market)
+            ||(Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
+            return $this->view([
+                'message' => $this->translator->trans('api.add_phone_number_message'),
+            ], Response::HTTP_OK);
+        }
 
         /** @var User $user*/
         $user = $this->getUser();
 
+        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+        $maxAllowedValidator = new MaxAllowedOrdersValidator(
+            $maxAllowedOrders,
+            $user,
+            $this->marketHandler,
+            $this->marketFactory,
+        );
+
+        if (!$maxAllowedValidator->validate()) {
+            throw new ApiBadRequestException($maxAllowedValidator->getMessage());
+        }
+
+        $amount = (string)$request->get('amountInput');
+        $price = (string)$request->get('priceInput');
+
+        if (!($validator = new TradebleDigitsValidator($price, $base))->validate()
+            || !($validator = new TradebleDigitsValidator($amount, $quote))->validate()) {
+            throw new ApiBadRequestException($validator->getMessage());
+        }
+
         $tradeResult = $exchanger->placeOrder(
             $user,
             $market,
-            (string)$request->get('amountInput'),
-            (string)$request->get('priceInput'),
+            $amount,
+            $price,
             filter_var($request->get('marketPrice'), FILTER_VALIDATE_BOOLEAN),
             Order::SIDE_MAP[$request->get('action')]
         );
@@ -306,7 +341,8 @@ class OrdersController extends DevApiController
         $base = $this->cryptoManager->findBySymbol($base);
         $quote = $this->cryptoManager->findBySymbol($quote) ?? $this->tokenManager->findByName($quote);
 
-        if (is_null($base) || is_null($quote)) {
+        if (!$base || !$quote
+            || !(new MarketValidator($market = new Market($base, $quote)))->validate()) {
             throw new ApiNotFoundException('Market not found');
         }
 

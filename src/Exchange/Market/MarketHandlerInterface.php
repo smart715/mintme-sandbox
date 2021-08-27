@@ -2,11 +2,17 @@
 
 namespace App\Exchange\Market;
 
+use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Deal;
 use App\Exchange\Market;
+use App\Exchange\Market\Model\BuyOrdersSummaryResult;
+use App\Exchange\Market\Model\SellOrdersSummaryResult;
+use App\Exchange\Market\Model\Summary;
 use App\Exchange\MarketInfo;
 use App\Exchange\Order;
+use App\Exchange\Trade\CheckTradeResult;
+use Money\Money;
 
 interface MarketHandlerInterface
 {
@@ -23,6 +29,12 @@ interface MarketHandlerInterface
         int $limit = 50,
         bool $reverseBaseQuote = false
     ): array;
+
+    /**
+     * @param Market $market
+     * @return Order[]
+     */
+    public function getAllPendingSellOrders(Market $market): array;
 
     /**
      * @param Market $market
@@ -65,7 +77,8 @@ interface MarketHandlerInterface
         array $markets,
         int $offset = 0,
         int $limit = 50,
-        bool $reverseBaseQuote = false
+        bool $reverseBaseQuote = false,
+        int $donationsOffset = 0
     ): array;
 
     /**
@@ -84,7 +97,17 @@ interface MarketHandlerInterface
         bool $reverseBaseQuote = false
     ): array;
 
+    public function getExpectedSellResult(Market $market, string $amount, string $fee): CheckTradeResult;
+
     public function getMarketInfo(Market $market, int $period = 86400): MarketInfo;
+
+    /**
+     * @param Market[] $market
+     * @return Summary[]
+     */
+    public function getSummary(array $market): array;
+
+    public function getOneSummary(Market $market): Summary;
 
     /**
      * @param Market $market
@@ -98,7 +121,9 @@ interface MarketHandlerInterface
 
     public function getBuyDepth(Market $market): string;
 
-    public function getSellOrdersSummary(Market $market): string;
+    public function getSellOrdersSummary(Market $market): SellOrdersSummaryResult;
+
+    public function getBuyOrdersSummary(Market $market): BuyOrdersSummaryResult;
 
     public function getSellOrdersSummaryByUser(User $user, Market $market): array;
 
@@ -108,4 +133,6 @@ interface MarketHandlerInterface
      * @return array
      */
     public function getMarketStatus(Market $market, int $period = 86400): array;
+
+    public function soldOnMarket(Token $token): Money;
 }

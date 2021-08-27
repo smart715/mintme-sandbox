@@ -2,12 +2,17 @@
 
 namespace App\Repository;
 
-use App\Entity\Profile;
 use App\Entity\Token\Token;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-class TokenRepository extends EntityRepository
+class TokenRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Token::class);
+    }
+
     /** @codeCoverageIgnore */
     public function findByName(string $name): ?Token
     {
@@ -55,10 +60,22 @@ class TokenRepository extends EntityRepository
      * @codeCoverageIgnore
      * @return Token[]
      */
-    public function getDeployedTokens(): array
+    public function getDeployedTokens(?int $offset = null, ?int $limit = null): array
     {
-        return $this->createQueryBuilder('token')
-            ->where('token.deployed IS NOT NULL')
+        $query = $this->createQueryBuilder('token')
+            ->leftJoin('token.crypto', 'crypto')
+            ->where('token.deployed = true')
+            ->orderBy('token.crypto', 'ASC');
+
+        if (is_int($offset)) {
+            $query->setFirstResult($offset);
+        }
+
+        if (is_int($limit)) {
+            $query->setMaxResults($limit);
+        }
+
+        return $query
             ->getQuery()
             ->execute();
     }
@@ -78,5 +95,33 @@ class TokenRepository extends EntityRepository
             ->setParameter('nextReminderDate', \Date('Y-m-d'));
 
         return $query->getQuery()->getResult();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getTokensWithoutAirdrops(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t, a')
+            ->leftJoin('t.airdrops', 'a')
+            ->where('a.id IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getTokensWithAirdrops(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t, a')
+            ->leftJoin('t.airdrops', 'a')
+            ->where('a.id IS NOT NULL')
+            ->getQuery()
+            ->getResult();
     }
 }

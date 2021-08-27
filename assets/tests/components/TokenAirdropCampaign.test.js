@@ -17,9 +17,6 @@ window.location = {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.directive('b-toggle', {});
-    localVue.component('font-awesome-icon', {});
-    localVue.component('b-collapse', {});
     localVue.use(Vuex);
     localVue.use(Vuelidate);
     localVue.use({
@@ -65,11 +62,11 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
-                    airdropCampaignId: null,
+                    airdrop: null,
                     actions: {
                         twitterMessage: false,
                         twitterRetweet: false,
@@ -89,7 +86,7 @@ describe('TokenAirdropCampaign', () => {
         });
 
         expect(wrapper.vm.hasAirdropCampaign).toBe(false);
-        wrapper.vm.airdropCampaignId = 2;
+        wrapper.vm.airdrop = {id: 2, actions: {}};
         expect(wrapper.vm.hasAirdropCampaign).toBe(true);
     });
 
@@ -99,12 +96,12 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
@@ -129,13 +126,17 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.btnDisabled).toBe(true);
         wrapper.vm.participantsAmount = 99;
         expect(wrapper.vm.btnDisabled).toBe(true);
-        wrapper.vm.participantsAmount = 101;
+        wrapper.vm.participantsAmount = 100;
         expect(wrapper.vm.btnDisabled).toBe(false);
         wrapper.vm.balanceLoaded = true;
         wrapper.vm.tokenBalance = 0;
         expect(wrapper.vm.btnDisabled).toBe(true);
         expect(wrapper.vm.insufficientBalance).toBe(true);
         wrapper.vm.tokenBalance = 0.01;
+        wrapper.vm.tokensAmount = 0.01;
+        expect(wrapper.vm.btnDisabled).toBe(true);
+        expect(wrapper.vm.insufficientBalance).toBe(true);
+        wrapper.vm.tokenBalance = 0.0101;
         wrapper.vm.tokensAmount = 0.01;
         expect(wrapper.vm.btnDisabled).toBe(false);
         expect(wrapper.vm.insufficientBalance).toBe(false);
@@ -147,7 +148,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -173,9 +174,6 @@ describe('TokenAirdropCampaign', () => {
         wrapper.vm.tokensAmount = '0.0009';
         expect(wrapper.vm.isAmountValid).toBe(false);
         wrapper.vm.tokensAmount = 100;
-        expect(wrapper.vm.isAmountValid).toBe(false);
-        wrapper.vm.tokenBalance = 101;
-        wrapper.vm.tokensAmount = 101;
         expect(wrapper.vm.isAmountValid).toBe(true);
     });
 
@@ -185,7 +183,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -224,7 +222,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -267,7 +265,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -310,7 +308,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -351,7 +349,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -375,7 +373,10 @@ describe('TokenAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                id: 4,
+                airdrop: {
+                    id: 4,
+                    actions: {},
+                },
             },
         });
 
@@ -396,17 +397,17 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test2',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
-                    airdropCampaignId: null,
+                    airdrop: null,
                     tokenBalance: 500,
                     tokensAmount: '100',
                     participantsAmount: 100,
                     showEndDate: false,
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
@@ -447,7 +448,7 @@ describe('TokenAirdropCampaign', () => {
             localVue,
             propsData: {
                 tokenName: 'test5',
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -456,7 +457,7 @@ describe('TokenAirdropCampaign', () => {
                     participantsAmount: 196,
                     showEndDate: false,
                     actions: {
-                        twitterMessage: false,
+                        twitterMessage: true,
                         twitterRetweet: false,
                         facebookMessage: false,
                         facebookPage: false,
@@ -486,9 +487,12 @@ describe('TokenAirdropCampaign', () => {
         const wrapper = shallowMount(TokenAirdropCampaign, {
             store: getStore(),
             localVue,
+            propsData: {
+                airdropParams,
+            },
             data() {
                 return {
-                    airdropCampaignId: 3,
+                    airdrop: {id: 3, actions: {}},
                     actions: {
                         twitterMessage: false,
                         twitterRetweet: false,
@@ -526,7 +530,7 @@ describe('TokenAirdropCampaign', () => {
             store: getStore(),
             localVue,
             propsData: {
-                airdropParams: airdropParams,
+                airdropParams,
             },
             data() {
                 return {
@@ -556,5 +560,35 @@ describe('TokenAirdropCampaign', () => {
         expect(wrapper.vm.tokensAmount).toBe(100);
         expect(wrapper.vm.participantsAmount).toBe(100);
         expect(wrapper.vm.isDateValid).toBe(true);
+    });
+
+    it('should generate iframe code correctly', () => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenAirdropCampaign, {
+            store: getStore(),
+            localVue,
+            propsData: {
+                airdropParams,
+            },
+            data() {
+                return {
+                    airdrop: {
+                        id: 1,
+                        actions: {
+                            foo: true,
+                            bar: true,
+                        },
+                    },
+                };
+            },
+            methods: {
+                loadAirdropCampaign: () => {},
+                loadTokenBalance: () => {},
+            },
+        });
+
+        expect(wrapper.vm.embedCode).toBe(
+            '<iframe src="airdrop_embeded" width="500px" height="500px" style="border: none;" scrolling="no"></iframe>'
+        );
     });
 });

@@ -11,6 +11,13 @@ interface DeployCostFetcherInterface
      * @throws FetchException
      * @return Money
      */
-    public function getDeployWebCost(): Money;
-    public function getDeployCostReferralReward(): Money;
+    public function getDeployCost(string $symbol): Money;
+
+    /**
+     * @throws FetchException
+     * @return array
+     */
+    public function getDeployCosts(): array;
+
+    public function getDeployCostReferralReward(string $symbol): Money;
 }

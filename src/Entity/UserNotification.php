@@ -14,14 +14,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class UserNotification
 {
-    public const DEPOSIT_NOTIFICATION = 'deposit';
-    public const WITHDRAWAL_NOTIFICATION = 'withdrawal';
-    public const NEW_INVESTOR_NOTIFICATION = 'new_investor';
-    public const TOKEN_NEW_POST_NOTIFICATION = 'new_post';
-    public const TOKEN_DEPLOYED_NOTIFICATION =  'deployed';
-    public const ORDER_FILLED_NOTIFICATION =  'filled';
-    public const ORDER_CANCELLED_NOTIFICATION =  'cancelled';
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -126,6 +118,9 @@ class UserNotification
         return $this;
     }
 
+    /**
+     * @Groups({"default", "API"})
+     */
     public function getDate(): DateTimeImmutable
     {
         return $this->date;

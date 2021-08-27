@@ -22,7 +22,7 @@ class UserNotificationRepository extends ServiceEntityRepository
 
         $query = $this->createQueryBuilder('user_notification')
             ->where('user_notification.user = :user')
-            ->andWhere('user_notification.date BETWEEN :customDate AND :actualDate ')
+            ->andWhere('user_notification.date BETWEEN :customDate AND :actualDate')
             ->setParameter('user', $user)
             ->setParameter('customDate', $customDate)
             ->setParameter('actualDate', $actualDate)

@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Exchange\MarketInfo;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -82,10 +82,23 @@ class MarketStatus
     private $buyDepth = '0';
 
     /**
+     * @ORM\Column(type="string", options={"default": "0"})
+     * @var string
+     */
+    private $soldOnMarket;
+
+    /**
      * @ORM\Column(type="datetime_immutable")
      * @var \DateTimeImmutable|null
      */
     private $expires = null;
+
+    /**
+     * @ORM\Column(type="integer", options={"default": 0})
+     */
+    private int $lastDealId = 0; // phpcs:ignore
+
+    private ?int $rank = null; // phpcs:ignore
 
     public function __construct(Crypto $crypto, TradebleInterface $quote, MarketInfo $marketInfo)
     {
@@ -96,6 +109,7 @@ class MarketStatus
         $this->dayVolume = $marketInfo->getDeal()->getAmount();
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
+        $this->soldOnMarket = $marketInfo->getSoldOnMarket()->getAmount();
     }
 
     /**
@@ -177,6 +191,8 @@ class MarketStatus
         $this->monthVolume = $marketInfo->getMonthDeal()->getAmount();
         $this->buyDepth = $marketInfo->getBuyDepth()->getAmount();
         $this->expires = $marketInfo->getExpires();
+        $this->soldOnMarket = $marketInfo->getSoldOnMarket()->getAmount();
+        $this->expires = $marketInfo->getExpires();
 
         return $this;
     }
@@ -189,8 +205,52 @@ class MarketStatus
         return new Money($this->buyDepth, new Currency($this->crypto->getSymbol()));
     }
 
+    public function getSoldOnMarket(): Money
+    {
+        return new Money(
+            $this->soldOnMarket,
+            new Currency($this->quoteCrypto ? $this->quoteCrypto->getSymbol() : Symbols::TOK)
+        );
+    }
+
     public function getExpires(): ?\DateTimeImmutable
     {
         return $this->expires;
+    }
+
+    public function setLastDealId(int $lastDealId): self
+    {
+        $this->lastDealId = $lastDealId;
+
+        return $this;
+    }
+
+    public function getLastDealId(): int
+    {
+        return $this->lastDealId;
+    }
+
+    /** @Groups({"API"}) */
+    public function getRank(): ?int
+    {
+        return $this->rank;
+    }
+
+    public function setRank(int $rank): void
+    {
+        $this->rank = $rank;
+    }
+
+    /** @Groups({"API"}) */
+    public function getHolders(): int
+    {
+        return $this->quoteToken
+            ? $this->quoteToken->getHoldersCount()
+            : 0;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

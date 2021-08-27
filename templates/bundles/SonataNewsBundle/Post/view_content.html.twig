@@ -3,7 +3,7 @@
         <div class="col-md-12 card-fixed-large px-0 box news-box p-4">
             <header>
                 <h1 class="word-break">
-                    {{ post.title }}
+                    {{ post|translateArticle('title') }}
                 </h1>
 
                 <span>{{ post.publicationDateStart | format_date }}</span>
@@ -15,7 +15,7 @@
                     {% media post.image, 'wide' with {'class': 'img-fluid'} %}
                 </div>
                 <div class="col-12 mt-4 word-break">
-                    {{ post.content|safeHtml|raw }}
+                    {{ post|translateArticle('content')|safeHtml|raw }}
                 </div>
             </div>
 
@@ -38,11 +38,7 @@
             <div class="mt-3 mb-3">
                 <a href="{{ path('homepage') }}">MintMe</a>
                 &gt;
-                {% if(app.request.headers.get('referer') == app.request.headers.get('url')) %}
-                    <a href="{{ path('sonata_news_home') }}">{% trans %}page.news.title{% endtrans %}</a>
-                {% else %}
-                    <a href="{{ app.request.headers.get('referer') }}">{% trans %}page.news.title{% endtrans %}</a>
-                {% endif %}
+                <a href="{{ path('sonata_news_home') }}">{% trans %}page.news.title{% endtrans %}</a>
             </div>
         </div>
     </div>

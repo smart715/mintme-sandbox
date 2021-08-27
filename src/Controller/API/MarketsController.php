@@ -2,12 +2,12 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market\MarketCapCalculator;
 use App\Exchange\Market\MarketHandlerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
@@ -21,8 +21,6 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class MarketsController extends APIController
 {
-    private const TOKENS_ON_PAGE = 50;
-
     /**
      * @Rest\View()
      * @Rest\Get(name="markets", options={"expose"=true})
@@ -47,7 +45,7 @@ class MarketsController extends APIController
      * @Rest\Get("/info/{page}", defaults={"page"=1}, name="markets_info", options={"expose"=true})
      * @Rest\QueryParam(name="user")
      * @Rest\QueryParam(name="filter", default=0)
-     * @Rest\QueryParam(name="sort", default="monthVolume")
+     * @Rest\QueryParam(name="sort", default="rank")
      * @Rest\QueryParam(name="order", default="DESC")
      */
     public function getMarketsInfo(
@@ -62,10 +60,11 @@ class MarketsController extends APIController
             : null;
 
         $filter = (int)$request->get('filter');
+        $tokensOnPage = (int)$this->getParameter('tokens_on_page');
 
         $markets = $marketStatusManager->getMarketsInfo(
-            self::TOKENS_ON_PAGE * ($page - 1),
-            self::TOKENS_ON_PAGE,
+            $tokensOnPage * ($page - 1),
+            $tokensOnPage,
             $request->get('sort'),
             $request->get('order'),
             $filter,
@@ -77,7 +76,6 @@ class MarketsController extends APIController
             'rows' => $user
                 ? $marketStatusManager->getUserRelatedMarketsCount($user)
                 : $marketStatusManager->getMarketsCount($filter),
-            'limit' => self::TOKENS_ON_PAGE,
         ]);
     }
 
@@ -105,7 +103,7 @@ class MarketsController extends APIController
      * @Rest\View()
      * @Rest\Get("/marketcap/{base}", name="marketcap", options={"expose"=true})
      */
-    public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Token::BTC_SYMBOL): View
+    public function getMarketCap(MarketCapCalculator $marketCapCalculator, CacheInterface $cache, string $base = Symbols::BTC): View
     {
         $marketCap = $cache->get("marketcap_{$base}", function (ItemInterface $item) use ($marketCapCalculator, $base) {
             $item->expiresAfter(3600);

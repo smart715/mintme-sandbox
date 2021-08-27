@@ -15,6 +15,7 @@ class AddToBlacklist extends Command
     public const CAN_ADD_MANUALLY_TYPES = [
         Blacklist::TOKEN,
         Blacklist::EMAIL,
+        Blacklist::AIRDROP_DOMAIN,
     ];
 
     private BlacklistManagerInterface $blacklistManager;
@@ -53,6 +54,16 @@ class AddToBlacklist extends Command
 
         /** @var string */
         $value = $input->getArgument('value');
+
+        if (Blacklist::AIRDROP_DOMAIN === $type) {
+            if (0 === strpos($value, 'www.')) {
+                $io->error('please add the domain without "www" and the record will stored automatically');
+
+                return 1;
+            }
+
+            $this->blacklistManager->add('www.' . $value, $type);
+        }
 
         $this->blacklistManager->add($value, $type);
         $io->success("Added successfully");

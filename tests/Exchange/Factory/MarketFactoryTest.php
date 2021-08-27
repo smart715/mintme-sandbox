@@ -73,7 +73,10 @@ class MarketFactoryTest extends TestCase
     {
         $tokens = [$this->mockToken(123, 'tok1'),];
 
-        $cryptoManager = $this->mockCryptoManager($this->mockCrypto('WEB', false));
+        $cryptoManager = $this->mockCryptoManager(
+            $this->mockCrypto('WEB', false),
+            $this->exactly(2)
+        );
         $tokenManager = $this->mockTokenManager($tokens, $this->exactly(1));
 
         /** @var MarketFactoryInterface $marketManager */
@@ -92,11 +95,11 @@ class MarketFactoryTest extends TestCase
     }
 
     /** @return MockObject|CryptoManagerInterface */
-    private function mockCryptoManager(Crypto $crypto): CryptoManagerInterface
+    private function mockCryptoManager(Crypto $crypto, ?Invocation $invocatio = null): CryptoManagerInterface
     {
         $cryptoManagerMock = $this->createMock(CryptoManagerInterface::class);
         $cryptoManagerMock
-            ->expects($this->exactly(3))
+            ->expects($invocatio ?:$this->exactly(3))
             ->method('findAll')
             ->willReturn([$crypto])
         ;
@@ -126,6 +129,7 @@ class MarketFactoryTest extends TestCase
 
         $cryptoMock->method('getSymbol')->willReturn($symbol);
         $cryptoMock->method('isExchangeble')->willReturn($exchangable);
+        $cryptoMock->method('getCryptoSymbol')->willReturn('WEB');
 
         return $cryptoMock;
     }
@@ -137,6 +141,7 @@ class MarketFactoryTest extends TestCase
 
         $tokenMock->method('getId')->willReturn($id);
         $tokenMock->method('getSymbol')->willReturn($name);
+        $tokenMock->method('getCryptoSymbol')->willReturn('WEB');
 
         return $tokenMock;
     }

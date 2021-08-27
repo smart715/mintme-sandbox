@@ -8,7 +8,8 @@ use App\Exchange\Order;
 
 interface TraderInterface
 {
-    public function placeOrder(Order $order): TradeResult;
+    public function placeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult;
+    public function executeOrder(Order $order, bool $updateTokenOrCrypto = true): TradeResult;
     public function cancelOrder(Order $order): TradeResult;
 
     /** @return Order[] */

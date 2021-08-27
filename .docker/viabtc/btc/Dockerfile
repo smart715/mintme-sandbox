@@ -55,9 +55,9 @@ ADD build.sh /src/build.sh
 # source directory contains abchosting viabtc version
 COPY source /src/viabtc
 
-RUN sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/matchengine/makefile &&\
+#RUN sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/matchengine/makefile &&\
 #    sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/marketprice/makefile &&\
-    sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/readhistory/makefile
+RUN    sed -i 's/lmariadbclient/lmysqlclient/g' /src/viabtc/readhistory/makefile
 
 RUN cd /src/viabtc/network &&\
     make clean && make &&\
@@ -80,9 +80,9 @@ COPY /btc/ /btc
 
 RUN mkdir -p /var/log/trade &&\
     touch /var/log/trade/matchengine.log &&\
-	mv /src/viabtc/matchengine/matchengine.exe  /btc/matchengine/ &&\
+	mv /src/viabtc/mintme_backend/matchengine/matchengine  /btc/matchengine/ &&\
 	mv /src/viabtc/accesshttp/accesshttp.exe  /btc/accesshttp/ &&\
-	mv /src/viabtc/marketprice/marketprice/marketprice  /btc/marketprice/ &&\
+	mv /src/viabtc/mintme_backend/marketprice/marketprice  /btc/marketprice/ &&\
 	mv /src/viabtc/accessws/accessws.exe  /btc/accessws/ &&\
 	mv /src/viabtc/alertcenter/alertcenter.exe  /btc/alertcenter/ &&\
 	mv /src/viabtc/readhistory/readhistory.exe  /btc/readhistory/ &&\

@@ -1,68 +1,80 @@
 <footer id="footer" class="container-fluid align-items-end">
-    <div class="row h-100 align-content-center text-white pt-3 pb-4 px-5">
-        <div class="col-12 text-center col-lg-auto pt-1">
-            <a href="{{ path('terms_of_service') }}">{% trans %}terms_of_service{% endtrans %}</a> | <a href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a> | <a href="{{ path('app.swagger_ui', {'area': 'v2'}) }}">API</a> | <a {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %} href="{{ path('press_kit') }}">Press Kit</a> | <a href="https://www.mintme.com/coin/">MintMe Coin</a> | <a href="https://www.mintme.com/web-wallet/">Web Wallet</a> <br/>
-            {{ version }} | {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
-            <p class="justify-content-center"><font-awesome-icon icon="cookie-bite"></font-awesome-icon>{% trans %}footer.cookies{% endtrans %}</p>
+    <div class="row h-100 justify-content-center align-items-center text-white pt-3 pb-0 px-5">
+        <div class="col-md-12 text-center drops-switcher">
+            {% if global_translation_flags|length > 1 %}
+                <locale-switcher
+                    current-locale="{{ app.session.get('_locale') ?: app.request.attributes.get('_locale') }}"
+                    flags="{{ global_translation_flags | json_encode(constant('JSON_UNESCAPED_UNICODE')) }}"
+                ></locale-switcher>
+            {% endif %}
+            <currency-mode-switcher></currency-mode-switcher>
         </div>
-        <div class="col-12 col-lg mt-lg-auto">
-            <div class="row justify-content-center justify-content-lg-end mr-4 pr-1">
-                <a
-                    href="{{ twitter_footer_link }}"
-                    rel="noopener"
-                    aria-label="twitter"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-twitter.png') }}" class="align-self-center text-center" alt="twitter logo"/>
-                </a>
-                <a
-                    href="{{ reddit_footer_link }}"
-                    rel="noopener"
-                    aria-label="reddit"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-reddit.png') }}" class="align-self-center text-center" alt="reddit logo"/>
-                </a>
-                <a
-                    href="{{ discord_footer_link }}"
-                    rel="noopener"
-                    aria-label="discord"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-discord.png') }}" class="align-self-center text-center" alt="discord icon"/>
-                </a>
-                <a
-                    href="{{ telegram_chat_footer_link }}"
-                    rel="noopener"
-                    aria-label="telegram_group"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-telegram-group.png') }}" class="align-self-center text-center" width="50" alt="telegram group"/>
-                </a>
-                <a
-                    href="{{ telegram_public_footer_link }}"
-                    rel="noopener"
-                    aria-label="telegram_channel"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-telegram.png') }}" class="align-self-center text-center" alt="telegram chat"/>
-                </a>
-                <a
-                    href="{{ facebook_footer_link }}"
-                    rel="noopener"
-                    aria-label="facebook"
-                    class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-3"
-                    target="_blank"
-                >
-                    <img src="{{ asset('build/images/icon-facebook.png') }}" class="align-self-center text-center" alt="facebook logo"/>
-                </a>
-            </div>
+        <div class="col-md-12 text-center">
+            <a href="{{ path('terms_of_service') }}">{% trans %}terms_of_service{% endtrans %}</a> | <a href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a> | <a href="{{ path('app.swagger_ui', {'area': 'v2'}) }}">API</a> | <a {% if not is_granted('IS_AUTHENTICATED_2FA_IN_PROGRESS') %} target="_blank" {% endif %} href="{{ path('press_kit') }}">Press Kit</a> | <a href="https://www.mintme.com/coin/">MintMe Coin</a> | <a href="https://www.mintme.com/web-wallet/">Web Wallet</a> | <a href="https://www.mintme.com/explorer" target="_blank">{% trans %}footer.explorer{% endtrans %}</a> | <a href="https://www.mintme.com/pool" target="_blank">{% trans %}footer.pool{% endtrans %}</a> <br/>
+            {{ version }} | {% trans with {'%date%': "now"|date("Y")} %}rights_reserved{% endtrans %}
+            <span class="justify-content-center d-inline cookies-term"> <span class="separator">-</span> <font-awesome-icon icon="cookie-bite"></font-awesome-icon>{% trans %}footer.cookies{% endtrans %}</span>
+        </div>
+        <div class="col-md-12 mt-3 text-center social-media-icons">
+            <a
+                href="{{ twitter_footer_link }}"
+                rel="noopener"
+                aria-label="twitter"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-twitter-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="twitter logo"/>
+            </a>
+            <a
+                href="{{ reddit_footer_link }}"
+                rel="noopener"
+                aria-label="reddit"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-reddit-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="reddit logo"/>
+            </a>
+            <a
+                href="{{ discord_footer_link }}"
+                rel="noopener"
+                aria-label="discord"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-discord-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="discord icon"/>
+            </a>
+            <a
+                href="{{ telegram_chat_footer_link }}"
+                rel="noopener"
+                aria-label="telegram_group"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-telegram-group-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="telegram group"/>
+            </a>
+            <a
+                href="{{ telegram_public_footer_link }}"
+                rel="noopener"
+                aria-label="telegram_channel"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-telegram-announcement-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="telegram chat"/>
+            </a>
+            <a
+                href="{{ facebook_footer_link }}"
+                rel="noopener"
+                aria-label="facebook"
+                class="col-auto d-inline text-white rounded-circle justify-content-center p-0 m-3"
+                target="_blank"
+            >
+                <img src="{{ asset('build/images/icon-facebook-45.png') }}" class="align-self-center text-center mb-3"
+                     alt="facebook logo"/>
+            </a>
         </div>
     </div>
 </footer>
-

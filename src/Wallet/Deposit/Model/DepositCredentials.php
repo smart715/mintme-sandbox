@@ -2,8 +2,6 @@
 
 namespace App\Wallet\Deposit\Model;
 
-use App\Entity\Token\Token;
-
 class DepositCredentials implements \IteratorAggregate
 {
     /** @var mixed[]*/

@@ -72,16 +72,31 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faLock, faUnlockAlt} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import Decimal from 'decimal.js';
 import vueSlider from 'vue-slider-component';
-import Guide from '../Guide';
+import {BRow, BCol, BButton} from 'bootstrap-vue';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
 import {HTTP_OK, HTTP_NO_CONTENT} from '../../utils/constants.js';
 import {mapMutations} from 'vuex';
 
+library.add(faCircleNotch, faLock, faUnlockAlt);
+
 export default {
     name: 'TokenReleasePeriod',
-    mixins: [NotificationMixin, LoggerMixin],
+    components: {
+        BRow,
+        BCol,
+        BButton,
+        vueSlider,
+        FontAwesomeIcon,
+    },
+    mixins: [
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         isTokenExchanged: Boolean,
         isTokenNotDeployed: Boolean,
@@ -94,10 +109,6 @@ export default {
             releasePeriod: 0,
             hasLockin: false,
         };
-    },
-    components: {
-        vueSlider,
-        Guide,
     },
     computed: {
         showAreaUnlockedTokens: function() {
@@ -130,7 +141,6 @@ export default {
                 this.loading = false;
             })
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
     },
@@ -145,7 +155,6 @@ export default {
             this.$axios.retry.get(this.$routing.generate('token_exchange_amount', {name: this.tokenName}))
             .then((res) => this.setTokenExchangeAmount(res.data))
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_load_statistics_data'));
                 this.sendLogs('error', 'Can not load statistic data', err);
             });
         },
@@ -184,10 +193,12 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
-    b
-        white-space: nowrap
+<style lang="scss" scoped>
+    b {
+        white-space: nowrap;
+    }
 
-    .statistic-description
-        font-size: 1.2rem
+    .statistic-description {
+        font-size: 1.2rem;
+    }
 </style>

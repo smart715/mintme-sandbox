@@ -9,10 +9,14 @@ import PairNameMixin from './pair_name';
 import PricePositionMixin from './price_position';
 import PlaceOrder from './place_order';
 import TraderHoveredMixin from './trader_hovered';
+import TwitterMixin from './twitter';
 import WebSocketMixin from './websocket';
+import VotingInitMixin from './voting_init';
+import AddPhoneAlertMixin from './add_phone_alert';
 import {
     MoneyFilterMixin,
     RebrandingFilterMixin,
+    BnbToBscFilterMixin,
     TruncateFilterMixin as FiltersMixin,
 } from './filters';
 
@@ -30,6 +34,10 @@ export {
     PlaceOrder,
     PricePositionMixin,
     RebrandingFilterMixin,
+    BnbToBscFilterMixin,
     TraderHoveredMixin,
+    TwitterMixin,
     WebSocketMixin,
+    VotingInitMixin,
+    AddPhoneAlertMixin,
 };

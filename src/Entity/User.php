@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\AirdropCampaign\AirdropAction;
 use App\Entity\Api\Client;
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
@@ -34,6 +37,8 @@ class User extends BaseUser implements
     TrustedDeviceInterface
 {
     public const ROLE_API = 'ROLE_API';
+    public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
 
     /**
      * @ORM\Id
@@ -184,7 +189,7 @@ class User extends BaseUser implements
     protected $comments;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Comment")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likes", fetch="EXTRA_LAZY")
      * @var ArrayCollection
      */
     protected $likes;
@@ -200,6 +205,51 @@ class User extends BaseUser implements
      * @var ArrayCollection
      */
     protected $airdropActions;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessToken;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessTokenSecret;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
+     */
+    protected Collection $rewardClaimedPosts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="airdropReferrals")
+     */
+    protected ?User $airdropReferrerUser;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="airdropReferrerUser", fetch="EXTRA_LAZY")
+     */
+    protected Collection $airdropReferrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop")
+     */
+    protected ?Airdrop $airdropReferrer;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $exchangeCryptoMailSent = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected ?int $discordId;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRoleUser", mappedBy="user", indexBy="token_id")
+     */
+    protected PersistentCollection $discordRoles;
 
     /** @codeCoverageIgnore */
     public function getApiKey(): ?ApiKey
@@ -244,6 +294,14 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
+    public function removeToken(UserToken $userToken): self
+    {
+        $this->tokens->removeElement($userToken);
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
     public function addCrypto(UserCrypto $userCrypto): self
     {
         $this->cryptos->add($userCrypto);
@@ -261,7 +319,7 @@ class User extends BaseUser implements
     }
 
     /** @codeCoverageIgnore */
-    public function setProfile(Profile $profile): self
+    public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
 
@@ -543,5 +601,114 @@ class User extends BaseUser implements
     public function getAirdropActions(): ArrayCollection
     {
         return $this->airdropActions;
+    }
+
+    public function setTwitterAccessToken(?string $token): self
+    {
+        $this->twitterAccessToken = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessToken(): ?string
+    {
+        return $this->twitterAccessToken;
+    }
+
+    public function setTwitterAccessTokenSecret(?string $token): self
+    {
+        $this->twitterAccessTokenSecret = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessTokenSecret(): ?string
+    {
+        return $this->twitterAccessTokenSecret;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isSignedInWithTwitter(): bool
+    {
+        return null !== $this->twitterAccessToken && null !== $this->twitterAccessTokenSecret;
+    }
+
+    public function setAirdropReferrer(Airdrop $airdrop): self
+    {
+        $this->airdropReferrer = $airdrop;
+
+        return $this;
+    }
+
+    public function getAirdropReferrer(): ?Airdrop
+    {
+        return $this->airdropReferrer;
+    }
+
+    public function setAirdropReferrerUser(User $user): self
+    {
+        $this->airdropReferrerUser = $user;
+
+        return $this;
+    }
+
+    public function getAirdropReferrerUser(): ?User
+    {
+        return $this->airdropReferrerUser;
+    }
+
+    public function isExchangeCryptoMailSent(): bool
+    {
+        return $this->exchangeCryptoMailSent;
+    }
+
+    public function setExchangeCryptoMailSent(bool $exchangeCryptoMailSent): self
+    {
+        $this->exchangeCryptoMailSent = $exchangeCryptoMailSent;
+
+        return $this;
+    }
+
+    public function setDiscordId(?int $id): self
+    {
+        $this->discordId = $id;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?int
+    {
+        return $this->discordId;
+    }
+
+    public function isSignedInWithDiscord(): bool
+    {
+        return null !== $this->discordId;
+    }
+
+    public function getDiscordRoles(): Collection
+    {
+        return $this->discordRoles->map(fn (DiscordRoleUser $dru) => $dru->getDiscordRole());
+    }
+
+    public function getDiscordRoleUsers(): Collection
+    {
+        return $this->discordRoles;
+    }
+
+    public function getDiscordRole(Token $token): ?DiscordRole
+    {
+        $dru = $this->discordRoles->get($token->getId());
+
+        return $dru
+            ? $dru->getDiscordRole()
+            : null;
+    }
+
+    public function getDiscordRoleUser(Token $token): ?DiscordRoleUser
+    {
+        return $this->discordRoles->get($token->getId());
     }
 }

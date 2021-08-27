@@ -30,8 +30,8 @@ parameters:
 
     # 0.2%
     taker_fee_rate: 0.002
-    # 0.1%
-    maker_fee_rate: 0.001
+    # 0.2%
+    maker_fee_rate: 0.002
 
     # Max timeout to check user website hash
     verify_timeout_seconds: 10
@@ -39,13 +39,21 @@ parameters:
     # Permanent quantity of each token asset
     token_quantity: 10000000
 
+    # Max sold on market amount for a token to be delete
+    token_delete_sold_limit: 100000
+
     # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
     referral_fee: 0.5
-    donation:
-        fee: 5
+    quick_trade:
+        # 5%
+        donation_fee: 0.05
+        # 0.2%
+        sell_fee: 0.002
         minBtcAmount: 0.000001
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
+        minUsdcAmount: 0.1
+        minBnbAmount: 0.001
         minTokensAmount: 0.0001
 
     google_tracking_id: 'UA-2289508-22'
@@ -68,8 +76,15 @@ parameters:
     mintme_coin_link: 'https://www.mintme.com/coin/'
 
     # the cost of deploying token to blockchain in USD
-    deploy_cost: 99
-    deploy_cost_referral_reward: 0.1
+    deploy_cost_mintme: 99
+    deploy_cost_eth: 99
+    deploy_cost_bnb: 99
+    # the fee in crypto(0.01 ETH)
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
+    deploy_cost_referral_reward_mintme: 0.1
+    deploy_cost_referral_reward_eth: 0.1
+    deploy_cost_referral_reward_bnb: 0.1
     deploy_rpc: 'http://localhost:3001'
     deploy_response_timeout_seconds: 10
 
@@ -118,6 +133,9 @@ parameters:
 
     # 30d min value for token to be added to market cap total on trading page
     minimum_volume_for_marketcap: 100000
+
+    # maximun tokens on a single page in trading page
+    tokens_on_page: 50
 
     # max top holders for each token
     top_holders: 10
@@ -172,6 +190,8 @@ parameters:
     coinify_crypto_currencies:
         - BTC
         - ETH
+        - USDC
+        - BNB
 
     # Disable deposit and withdraw for specified crypto (should be null by default)
     # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
@@ -186,6 +206,12 @@ parameters:
 
     # Disables processing withdrawals and withdraw buttons in wallet
     disable_withdrawals: false
+
+    # Disables processing token's deposits and token deposit buttons in wallet
+    disable_token_deposits: false
+
+    # Disables processing token's withdrawals and token withdraw buttons in wallet
+    disable_token_withdrawals: false
 
     # Disables deploying tokens to blockchain
     disable_deploy_tokens: false
@@ -208,6 +234,8 @@ parameters:
     translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
     translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # add more languages to the array if you want to auto translate the page based on browser language.
+    translation_auto_detect: [es]
     # Flag value should be in ISO 3166-1-alpha-2 code of a country.
     # Check this https://www.iso.org/obp/ui/#search/code/
     # To disable language selector menu you need to remove all languages except en or just set this var to ~
@@ -222,8 +250,90 @@ parameters:
         fr: {label: Française, flag: fr}
 
     #time Interval for scheduled notifications
-    time_intervals: [10, 1440, 43200]
+    orders_filled_intervals: [10 minutes, 1 day, 30 day]
+    orders_cancelled_intervals: [1 day, 30 day]
+    token_marketing_tips_intervals: [2 day, 4 day, 7 day, 10 day, 15 day, 21 day]
+    marketing_airdrop_feature_intervals: [7 day]
+
 
     # min amount of a specific tokens to start DM the owner
-    dm_min_amount: 1
+    dm_min_amount: 100
 
+    # token withdraw fee in ETH (0.003, 0.1 etc)
+    eth_token_withdraw_fee: 0.01
+
+    # token withdraw fee in BNB (0.003, 0.1 etc)
+    bnb_token_withdraw_fee: 0.01
+
+    #max amount of active orders allowed per user
+    max_allowed_active_orders: 100
+
+    # kb links
+    kb_links:
+        - 'Quickstart-Guide-to-MintMe'
+        - 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'
+        - 'Time-for-token-sales-how-can-I-make-a-difference'
+        - 'Ideas-to-promote-and-sell-your-token'
+        - 'Aiming-at-a-strong-token'
+        - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
+
+    # MintMe.host promotion mail
+    freeDays: 7
+    price: 3.99
+    mintmeHostPath: https://www.mintme.host
+
+    # mails available to send via app:sendCustomMail
+    available_mails:
+        - 'MintmeHost'
+
+    # api for sending SMS
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+    # If true - sending sms will be disabled and verification code will be returned to user instead of sending to mobile phone
+    disable_sms: false
+
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        failed: 5
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        # 30 days = 30D
+        interval: '30D'
+
+    # mintme explorer url
+    mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # eth explorer url
+    eth_explorer_url: 'https://goerli.etherscan.io'
+
+    # bnb explorer url
+    bnb_explorer_url: 'https://testnet.bscscan.com'
+
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'
+
+    # filepath of the extra ui translation keys (not parsed by the command)
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+
+    # filepath of the auto generated ui translation keys
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+
+    # list to allow / non-allow services for not fully authenticated users
+    # disable sell except for the token that created by trader
+    auth_make_disable_sell: true
+    auth_make_disable_trading: false
+    auth_make_disable_token_creation: false
+    auth_make_disable_withdrawals_and_deposit: false
+    auth_make_disable_donations: false
+
+    # minimum order value (USD) to make buy/sell orders
+    minimum_order_value_usd: 0.1
+
+    # discord
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_base_commands_url: 'https://discord.com/api/v8/applications/'
+    discord_api_timeout: '10'

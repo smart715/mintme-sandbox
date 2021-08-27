@@ -361,7 +361,7 @@
                             {% trans %}page.terms.content.12.3a{% endtrans %}
                         </p>
                         <p class="pl-4">
-                            {% trans with {'%privacy_policy%': path('privacy_policy')} %}page.terms.content.12.3b{% endtrans %}
+                            {% trans with {'%privacy_policy%': path('privacy_policy'), '%aml_policy%': path('aml_policy')} %}page.terms.content.12.3b{% endtrans %}
                         </p>
                         <p class="pl-4">
                             {% trans %}page.terms.content.12.3c{% endtrans %}
@@ -427,6 +427,9 @@
                         <p>
                             {% trans %}page.terms.content.14.5{% endtrans %}
                         </p>
+                        <p>
+                            {% trans %}page.terms.content.14.6{% endtrans %}
+                        </p>
                     </div>
                     <div class="pt-3 text-justify">
                         <p>
@@ -445,6 +448,14 @@
                         </p>
                         <p>
                             {% trans %}page.terms.content.16.1{% endtrans %}
+                        </p>
+                    </div>
+                    <div class="pt-3 text-justify">
+                        <p>
+                            <strong>{% trans %}page.terms.content.17{% endtrans %}</strong>
+                        </p>
+                        <p>
+                            {% trans %}page.terms.content.17.1{% endtrans %}
                         </p>
                     </div>
                 </div>

@@ -61,6 +61,14 @@ services:
             $url: '%origin_to_disposable_email_domains%'
             $timeoutSeconds: '%disposable_domains_timeout_seconds%'
 
+    d7_networks.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%d7_networks_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
@@ -110,6 +118,10 @@ services:
         arguments:
             $rpc: '@coinify.rest_rpc'
             $partnerId: '%coinify_partner_id%'
+
+    App\Communications\SMS\D7NetworksCommunicator:
+        arguments:
+            $rpc: '@d7_networks.rest_rpc'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -193,9 +205,13 @@ services:
         tags:
             - { name: monolog.logger, channel: cron }
 
-    App\Command\CheckUserSellOrdersCommand:
-        properties:
-            timeIntervals: '%time_intervals%'
+    App\Command\CheckScheduledNotificationsCommand:
+        arguments:
+            $kbLinks: '%kb_links%'
+            $filled_intervals: '%orders_filled_intervals%'
+            $cancelled_intervals: '%orders_cancelled_intervals%'
+            $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
 
     App\Security\Config\DisabledBlockchainConfig:
         arguments:
@@ -205,6 +221,8 @@ services:
         arguments:
             $depositDisabled: '%disable_deposits%'
             $withdrawalsDisabled: '%disable_withdrawals%'
+            $tokenDepositDisabled: '%disable_token_deposits%'
+            $tokenWithdrawDisabled: '%disable_token_withdrawals%'
             $deployDisabled: '%disable_deploy_tokens%'
             $newTradesDisabled: '%disable_new_trades%'
             $tradingDisabled: '%disable_trading%'
@@ -394,6 +412,9 @@ services:
             $formFactory: '@fos_user.registration.form.factory'
             $userManager: '@fos_user.user_manager'
             $tokenStorage: '@security.token_storage'
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
 
     App\Exchange\Config\Config:
         arguments:
@@ -474,8 +495,10 @@ services:
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
             - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
 
-    logout_listner:
+    logout_listener:
         class: App\EventListener\LogoutListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     App\EventListener\ChangePasswordListener:
         tags:
@@ -509,6 +532,8 @@ services:
     App\EventSubscriber\LocaleSubscriber:
         arguments:
             $defaultLocale: '%locale%'
+            $transLocales: '%translation_locales%'
+            $transAuto: '%translation_auto_detect%'
 
     App\Communications\DisposableEmailCommunicator:
         arguments:
@@ -551,6 +576,10 @@ services:
         arguments:
             $mailer: '@app.instant.mailer'
 
+    App\EventSubscriber\DeploySubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
     App\Communications\CachedCryptoRatesFetcher:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
@@ -584,6 +613,7 @@ services:
             $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
             $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
             $contractWorkDir: '%env(CONTRACT_WORKDIR)%'
+            $isTestingServer: '%env(bool:TESTING_SERVER_ENV)%'
 
     App\Exchange\Config\AirdropConfig:
         arguments:
@@ -608,9 +638,9 @@ services:
         arguments:
             $expirationTime: '%withdraw_expiration_time%'
 
-    App\Exchange\Config\DonationConfig:
+    App\Exchange\Config\QuickTradeConfig:
         arguments:
-            $donationParams: '%donation%'
+            $params: '%quick_trade%'
 
     App\Logger\DonationProcessor:
         autowire: true
@@ -642,8 +672,14 @@ services:
 
     App\Exchange\Config\DeployCostConfig:
         arguments:
-            $deployCost: '%deploy_cost%'
-            $deployCostReward: '%deploy_cost_referral_reward%'
+            $deployCostMintme: '%deploy_cost_mintme%'
+            $deployCostEth: '%deploy_cost_eth%'
+            $deployCostBnb: '%deploy_cost_bnb%'
+            $deployFeeEth: '%deploy_fee_eth%'
+            $deployFeeBnb: '%deploy_fee_bnb%'
+            $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
+            $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
+            $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'
 
     gedmo.listener.sortable:
         class: Gedmo\Sortable\SortableListener
@@ -654,4 +690,85 @@ services:
 
     App\Manager\ScheduledNotificationManager:
         properties:
-            timeIntervals: '%time_intervals%'
+            filled_intervals: '%orders_filled_intervals%'
+            cancelled_intervals: '%orders_cancelled_intervals%'
+            token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
+
+    App\Controller\API\WalletController:
+        arguments:
+            $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
+
+    Abraham\TwitterOAuth\TwitterOAuth:
+        arguments:
+            $consumerKey: '%env(TWITTER_API_KEY)%'
+            $consumerSecret: '%env(TWITTER_API_SECRET)%'
+
+    App\Command\SendCustomMailCommand:
+        arguments:
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Utils\ValidatorFactory:
+        properties:
+            minimalPriceOrder: '%minimum_order_value_usd%'
+
+    App\SmartContract\Config\ExplorerUrlsConfig:
+        arguments:
+            $mintmeExplorerUrl: '%mintme_explorer_url%'
+            $ethExplorerUrl: '%eth_explorer_url%'
+            $bnbExplorerUrl: '%bnb_explorer_url%'
+
+    RestCord\DiscordClient:
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%'
+            }
+
+    App\Manager\DiscordManager:
+        arguments:
+            $discordForLeaveGuild: '@discord.client.for.leave_guild'
+            $publicKey: '%env(DISCORD_PUBLIC_KEY)%'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+
+    discord.oauth.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_auth_url%'
+            $timeoutSeconds: '%discord_api_timeout%'
+            $headers:
+                Content-Type: application/x-www-form-urlencoded
+
+    App\Communications\DiscordOAuthClient:
+        arguments:
+            $guzzleRestWrapper: '@discord.oauth.client'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $baseAuthUrl: '%discord_base_auth_url%'
+            $clientSecret: '%env(DISCORD_CLIENT_SECRET)%'
+
+    discord.client.for.leave_guild:
+        class: RestCord\DiscordClient
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%',
+                guzzleOptions: {
+                    headers: {
+                        Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+                    }
+                }
+            }
+
+    discord.command.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_commands_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Content-Type: application/json
+                Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+
+    App\Command\CreateDiscordCommand:
+        arguments:
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $guzzleRestWrapper: '@discord.command.client'

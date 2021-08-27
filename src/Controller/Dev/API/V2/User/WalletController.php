@@ -2,7 +2,16 @@
 
 namespace App\Controller\Dev\API\V2\User;
 
+use App\Entity\Crypto;
+use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
+use App\Entity\User;
+use App\Exchange\Balance\BalanceHandler;
+use App\Exchange\Balance\Model\BalanceResult;
 use App\Mailer\MailerInterface;
+use App\Manager\CryptoManagerInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Converter\TokenNameConverter;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -18,6 +27,20 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class WalletController extends AbstractFOSRestController
 {
+    private RebrandingConverterInterface $rebrandingConverter;
+    private TokenNameConverter $tokenNameConverter;
+    private CryptoManagerInterface $cryptoManager;
+
+    public function __construct(
+        RebrandingConverterInterface $rebrandingConverter,
+        TokenNameConverter $tokenNameConverter,
+        CryptoManagerInterface $cryptoManager
+    ) {
+        $this->rebrandingConverter = $rebrandingConverter;
+        $this->tokenNameConverter = $tokenNameConverter;
+        $this->cryptoManager = $cryptoManager;
+    }
+
     /**
      * List users wallet deposit addresses.
      *
@@ -31,7 +54,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/Address")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -43,6 +66,38 @@ class WalletController extends AbstractFOSRestController
                 'depositCommunicator' => $depositCommunicator,
             ]
         );
+    }
+
+    /**
+     * List users wallet balances.
+     *
+     * @Rest\View(serializerGroups={"dev"})
+     * @Rest\Get("/balances")
+     * @SWG\Response(
+     *     response="200",
+     *     description="Returns wallet balances related to user",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref="#/definitions/BalanceResult")
+     *     )
+     * )
+     * @SWG\Response(response="400", description="Bad request")
+     * @SWG\Tag(name="User Wallet")
+     * @Cache(smaxage=15, mustRevalidate=true)
+     */
+    public function getBalances(BalanceHandler $balanceHandler): array
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $tradebles = array_merge($this->cryptoManager->findAll(), $user->getTokens());
+
+        $balances = $balanceHandler->balances(
+            $user,
+            $tradebles
+        )->getAll();
+
+        return $this->rebrandBalancesKeys($balances, $tradebles);
     }
 
     /**
@@ -74,7 +129,7 @@ class WalletController extends AbstractFOSRestController
      *         @SWG\Items(ref="#/definitions/Transaction")
      *     )
      * )
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      * @Cache(smaxage=15, mustRevalidate=true)
      */
@@ -120,9 +175,9 @@ class WalletController extends AbstractFOSRestController
      *          @SWG\Property(property="address", type="string", example="0x0..0", description="address to withdraw to"),
      *      )
      * ),
-     * @SWG\Response(response="201",description="Returns success message")
-     * @SWG\Response(response="404",description="Currency not found")
-     * @SWG\Response(response="400",description="Bad request")
+     * @SWG\Response(response="201", description="Returns success message")
+     * @SWG\Response(response="404", description="Currency not found")
+     * @SWG\Response(response="400", description="Bad request")
      * @SWG\Tag(name="User Wallet")
      */
     public function withdraw(
@@ -143,5 +198,33 @@ class WalletController extends AbstractFOSRestController
                 'address' => $request->get('address'),
             ]
         );
+    }
+
+    /**
+     * @param BalanceResult[] $balances
+     * @param TradebleInterface[] $tradebles
+     * @return array
+     */
+    private function rebrandBalancesKeys(array $balances, array $tradebles): array
+    {
+        $tokenSymbolMap = [];
+
+        foreach ($tradebles as $tradeble) {
+            if ($tradeble instanceof Token) {
+                $tokenSymbolMap[$this->tokenNameConverter->convert($tradeble)] = $tradeble->getSymbol();
+            }
+        }
+
+        $rebrandedBalancesKeys = [];
+
+        foreach ($balances as $key => $balance) {
+            if (isset($tokenSymbolMap[$key])) {
+                $key = $tokenSymbolMap[$key];
+            }
+
+            $rebrandedBalancesKeys[$this->rebrandingConverter->convert((string)$key)] = $balance;
+        }
+
+        return $rebrandedBalancesKeys;
     }
 }

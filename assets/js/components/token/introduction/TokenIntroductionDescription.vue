@@ -2,7 +2,7 @@
     <div>
         <div class="card h-100">
             <div class="card-header">
-                {{ $t('token.intro.description.header') }}
+               {{ $t('token.intro.description.header') }}
                 <guide class="float-right">
                     <template  slot="header">
                         {{ $t('token.intro.description.guide_header') }}
@@ -24,9 +24,14 @@
                                 @click="editingDescription = true"
                             />
                         </span>
-                        <bbcode-view v-if="!editingDescription" :value="description" />
+                        <div id="description-text">
+                            <div :class="{'show-hide-text': showMore}" ref="hide" >
+                                <bbcode-view v-if="!editingDescription" :value="description" />
+                                <a class="show" v-show="height>=400" href="#0" @click="toggleDescription">{{showMessage}}</a>
+                            </div>
+                        </div>
                         <template v-if="editable">
-                            <div v-show="editingDescription">
+                            <div v-if="editingDescription">
                                 <div class="pb-1">
                                     {{ $t('token.intro.description.plan.header') }}
                                     <guide>
@@ -91,7 +96,6 @@ import Guide from '../../Guide';
 import BbcodeEditor from '../../bbcode/BbcodeEditor';
 import BbcodeHelp from '../../bbcode/BbcodeHelp';
 import BbcodeView from '../../bbcode/BbcodeView';
-import LimitedTextarea from '../../LimitedTextarea';
 import {required, minLength, maxLength} from 'vuelidate/lib/validators';
 import {descriptionLength} from '../../../utils/constants';
 import {LoggerMixin, NotificationMixin} from '../../../mixins';
@@ -113,18 +117,34 @@ export default {
         BbcodeView,
         FontAwesomeIcon,
         Guide,
-        LimitedTextarea,
     },
     data() {
         return {
             editingDescription: false,
             newDescription: this.description || '',
             readyToSave: false,
+            showMore: true,
+            readMore: this.$t('read_more'),
+            height: 0,
+            resizeObserver: null,
         };
+    },
+    mounted: function() {
+        this.$nextTick()
+            .then(() => {
+                this.resizeObserver = new ResizeObserver(this.updateHeight.bind(this));
+                this.resizeObserver.observe(this.$refs.hide);
+            });
+        },
+    beforeDestroy() {
+        this.resizeObserver.disconnect();
     },
     computed: {
         showEditIcon: function() {
             return !this.editingDescription && this.editable;
+        },
+        showMessage() {
+            return this.showMore ? this.$t('read_more') : this.$t('read_less');
         },
         newDescriptionHtmlDecode: function() {
             return he.decode(this.newDescription);
@@ -141,6 +161,16 @@ export default {
         onDescriptionChange: function(val) {
             this.newDescription = he.encode(val);
             this.readyToSave = true;
+        },
+        updateHeight() {
+            let styles = window.getComputedStyle(this.$refs.hide, null);
+            let height = parseFloat(styles.getPropertyValue('height'));
+            let topPadding = parseFloat(styles.getPropertyValue('padding-top'));
+            let bottomPadding = parseFloat(styles.getPropertyValue('padding-bottom'));
+            this.height = height - topPadding - bottomPadding;
+        },
+        toggleDescription: function() {
+            this.showMore = !this.showMore;
         },
         editDescription: function() {
             this.$v.$touch();
@@ -200,8 +230,9 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
-    p
-        white-space: pre-line
-        word-break: break-word
+<style lang="scss" scoped>
+    p {
+        white-space: pre-line;
+        word-break: break-word;
+    }
 </style>

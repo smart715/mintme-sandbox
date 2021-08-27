@@ -20,13 +20,17 @@ class MarketProducer implements MarketAMQPInterface
         $this->config = $config;
     }
 
-    public function send(Market $market): void
+    public function send(Market $market, int $retried = 0): void
     {
         // TODO: split consumers for all branches.
         if ($this->config->getOffset() > 0 && !$this->config->isMarketConsumerEnabled()) {
             return;
         }
 
-        $this->producer->publish(serialize($market));
+        $this->producer->publish((string)json_encode([
+            'retried' => $retried,
+            'base' => $market->getBase()->getSymbol(),
+            'quote' => $market->getQuote()->getSymbol(),
+        ]));
     }
 }

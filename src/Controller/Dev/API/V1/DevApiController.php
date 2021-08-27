@@ -2,15 +2,23 @@
 
 namespace App\Controller\Dev\API\V1;
 
-use App\Entity\Token\Token;
 use App\Exception\ApiNotFoundException;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 
 abstract class DevApiController extends AbstractFOSRestController
 {
     private const DISALLOWED_VALUES = [
-        Token::WEB_SYMBOL,
+        Symbols::WEB,
     ];
+    private RebrandingConverterInterface $rebrandingConverter;
+
+    public function __construct(
+        RebrandingConverterInterface $rebrandingConverter
+    ) {
+        $this->rebrandingConverter = $rebrandingConverter;
+    }
 
     protected function checkForDisallowedValues(string $base, ?string $quote = null): void
     {

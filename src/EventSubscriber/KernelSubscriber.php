@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class KernelSubscriber implements EventSubscriberInterface
 {
-    /** @var ProfileManagerInterface  */
+    /** @var ProfileManagerInterface */
     private $profileManager;
 
     /** @var TokenStorageInterface */
@@ -52,8 +52,8 @@ class KernelSubscriber implements EventSubscriberInterface
     /** @codeCoverageIgnore */
     public function onResponse(ResponseEvent $event): void
     {
+        //todo: handle this protection through config/packages/nelmio_security.yaml
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
-        $event->getResponse()->headers->set('X-Frame-Options', 'deny');
     }
 
     public function onRequest(RequestEvent $request): void
@@ -81,7 +81,10 @@ class KernelSubscriber implements EventSubscriberInterface
              * @psalm-suppress UndefinedDocblockClass
              */
             $user = $this->tokenStorage->getToken()->getUser();
-            $this->profileManager->createHash($user, true, $this->isAuth);
+
+            if (!$user->getHash()) {
+                $this->profileManager->createHash($user, true, $this->isAuth);
+            }
         }
     }
 

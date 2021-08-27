@@ -1,5 +1,5 @@
 {% trans_default_domain 'FOSUserBundle' %}
-<form action="{{ path("login") }}" method="post" id="login">
+<form action="{{ path('login') }}" method="post" id="login">
     {% if app.session.flashbag.peekAll() is not empty %}
         <div class="row">
             {% for label, messages in app.flashes %}
@@ -13,12 +13,14 @@
     {% elseif error %}
         <div class="row">
             <div class="col">
-            {% if error.message == 'Bad credentials.' %}
-                <div class="p-2 mb-2 bg-danger text-center text-white">{% trans %}error.credentials{% endtrans %}</div>
-            {% elseif error.message == 'User account is disabled.' %}
-                <div class="p-2 mb-2 bg-danger text-center text-white">{% trans %}security.login.locked{% endtrans %}</div>
+            {% if error.message == 'User account is disabled.' %}
+                <div class="p-2 mb-2 bg-danger text-center text-white">
+                    {% trans %}security.login.locked{% endtrans %}
+                </div>
             {% else %}
-                <div class="p-2 mb-2 bg-danger text-center text-white">{{error.message}}</div>
+                <div class="p-2 mb-2 bg-danger text-center text-white">
+                    {% trans %}error.credentials{% endtrans %}
+                </div>
             {% endif %}
             </div>
         </div>
@@ -76,7 +78,9 @@
                 value="{% trans %}security.login.submit{% endtrans %}"
             >
             <span class="px-2">or</span>
-            <a href="{{ path('fos_user_registration_register') }}" class="btn-cancel px-0">{% trans %}form.signup.submit{% endtrans %}</a>
+            <a id="signup-button" href="{{ path('register') }}" class="btn-cancel px-0">
+                {% trans %}form.signup.submit{% endtrans %}
+            </a>
         </div>
     </div>
     <div class="text-left text-white">

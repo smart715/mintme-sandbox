@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\RefererTrait;
 use App\Form\CaptchaLoginType;
 use App\Logger\UserActionLogger;
 use App\Security\PathRoles;
+use App\Security\Request\RefererRequestHandlerInterface;
 use FOS\UserBundle\Controller\SecurityController as FOSSecurityController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -19,8 +19,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class SecurityController extends FOSSecurityController
 {
-
-    use RefererTrait;
+    public const MAIN_REDIRECT_ROUTE = 'trading';
 
     /** @var ContainerInterface $container */
     protected $container;
@@ -37,16 +36,20 @@ class SecurityController extends FOSSecurityController
     /** @var bool */
     private $formContentOnly = false;
 
+    private RefererRequestHandlerInterface $refererRequestHandler;
+
     public function __construct(
         ContainerInterface $container,
         UserActionLogger $userActionLogger,
         SessionInterface $session,
+        RefererRequestHandlerInterface $refererRequestHandler,
         ?CsrfTokenManagerInterface $tokenManager = null
     ) {
         $this->container = $container;
         $this->userActionLogger = $userActionLogger;
         $this->session = $session;
         parent::__construct($tokenManager);
+        $this->refererRequestHandler = $refererRequestHandler;
     }
 
     /** @Route("/login", name="login", options={"expose"=true}) */
@@ -63,9 +66,10 @@ class SecurityController extends FOSSecurityController
         $this->form->handleRequest($request);
 
         $refers = $request->headers->get('Referer');
+
         $this->formContentOnly = $request->get('formContentOnly', false);
 
-        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
+        if ($refers && !in_array($refers, $this->refererRequestHandler->refererUrlsToSkip(), true)) {
             $this->session->set('login_referer', $refers);
         }
 
@@ -88,7 +92,7 @@ class SecurityController extends FOSSecurityController
         if ($referer) {
             $roles = $pathRoles->getRoles(Request::create($referer));
 
-            if (null === $roles && $this->noRedirectToMainPage($referer)) {
+            if (null === $roles && $this->refererRequestHandler->noRedirectToMainPage($referer)) {
                 return $this->redirect($referer);
             }
         }
@@ -112,13 +116,13 @@ class SecurityController extends FOSSecurityController
             return $this->redirectToRoute($refererRoute);
         }
 
-        if ($referer && $this->isRefererValid($referer)) {
+        if ($referer && $this->refererRequestHandler->isRefererValid($referer)) {
             $this->session->remove('login_referer');
 
             return $this->redirect($referer);
         }
 
-        return $this->redirectToRoute("trading");
+        return $this->redirectToRoute(self::MAIN_REDIRECT_ROUTE);
     }
 
     /**

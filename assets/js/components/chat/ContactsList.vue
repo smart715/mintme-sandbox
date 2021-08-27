@@ -3,16 +3,20 @@
         <b-table
             v-if="hasContacts"
             class="w-100"
+            thead-class="d-none"
             :items="contacts"
             :fields="fields">
             <template v-slot:cell(trader)="row">
                 <div
                     @click="changeContact(row.item.threadId)"
                     class="d-flex c-pointer flex-row flex-nowrap justify-content-between align-items-center w-100 py-2 text-white">
-                    <img
-                        :src="row.item.avatar"
-                        class="chat-avatar rounded-circle d-block"
-                        alt="avatar">
+                    <div class="position-relative">
+                        <img
+                            :src="row.item.avatar"
+                            class="chat-avatar rounded-circle d-block"
+                        >
+                        <span v-if="row.item.hasUnreadMessages" class="contact-badge position-absolute"></span>
+                    </div>
                     <span class="d-inline-block truncate-name col">
                         <span>
                             {{ row.item.nickname }}
@@ -28,9 +32,13 @@
 </template>
 
 <script>
+import {BTable} from 'bootstrap-vue';
 
 export default {
     name: 'ContactsList',
+    components: {
+        BTable,
+    },
     props: {
         nickname: String,
         threadId: Number,
@@ -41,7 +49,7 @@ export default {
             fields: [
                 {
                     key: 'trader',
-                    label: this.$t('chat.chat_contacts.contacts'),
+                    label: 'contacts:',
                 },
             ],
         };

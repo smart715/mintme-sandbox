@@ -13,16 +13,54 @@
                         {{ $t('post_form.body') }}
                     </template>
                 </guide>
-                <input class="form-control form-control-lg w-100"
+                <input id="post-form-amount-input"
+                    class="form-control form-control-lg w-100"
                     :class="{ 'is-invalid' : invalidAmount }"
                     name="amount"
                     type="text"
                     v-model="amount"
-                    @keypress="checkInput(4, 6)"
-                    @paste="checkInput(4, 6)"
+                    @keypress="checkInput(subunit, 6)"
+                    @paste="checkInput(subunit, 6)"
                 >
                 <div class="invalid-feedback">
                     {{ invalidAmountMessage }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="share_reward">
+                    {{ $t('post_form.share_reward') }}
+                </label>
+                <guide>
+                    <template slot="body">
+                        {{ $t('post_form.share_reward_guide') }}
+                    </template>
+                </guide>
+                <input id="post-form-share_reward-input"
+                    class="form-control form-control-lg w-100"
+                    :class="{ 'is-invalid' : invalidShareReward }"
+                    name="share_reward"
+                    type="text"
+                    v-model="shareReward"
+                    @keypress="checkInput(4, 3)"
+                    @paste="checkInput(4, 3)"
+                >
+                <div class="invalid-feedback">
+                    {{ invalidShareRewardMessage }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="title">
+                    {{ $t('post_form.title') }}
+                </label>
+                <input class="form-control form-control-lg w-100"
+                       :class="{ 'is-invalid' : invalidTitle }"
+                       id="title"
+                       name="title"
+                       type="text"
+                       v-model="title"
+                >
+                <div class="invalid-feedback">
+                    {{ invalidTitleMessage }}
                 </div>
             </div>
             <div class="form-group">
@@ -32,6 +70,7 @@
                     :value="content"
                     @change="onContentChange"
                     @input="onContentChange"
+                    ref="input"
                 />
                 <div class="invalid-feedback"
                     :class="{ 'd-block' : invalidContent }"
@@ -59,7 +98,7 @@ import BbcodeEditor from '../bbcode/BbcodeEditor';
 import BbcodeHelp from '../bbcode/BbcodeHelp';
 import Guide from '../Guide';
 import {toMoney} from '../../utils';
-import {HTTP_OK} from '../../utils/constants';
+import {HTTP_OK, requiredBBCText} from '../../utils/constants';
 import {CheckInputMixin, NotificationMixin} from '../../mixins';
 import {required, minLength, maxLength, decimal, between} from 'vuelidate/lib/validators';
 
@@ -75,15 +114,15 @@ export default {
         Guide,
     },
     props: {
-        apiUrl: {
-            type: String,
-            required: true,
-        },
+        tokenName: String,
+        subunit: Number,
         post: {
             type: Object,
             default: () => ({
                 content: '',
                 amount: '0',
+                title: '',
+                shareReward: '0',
             }),
         },
         resetAfterAction: {
@@ -99,14 +138,22 @@ export default {
         return {
             content: this.post.content,
             amount: toMoney(this.post.amount),
+            title: this.post.title,
+            shareReward: toMoney(this.post.shareReward),
             minContentLength: 2,
             maxContentLength: 1000,
             maxDecimals: 4,
             maxAmount: 999999.9999,
+            maxShareReward: 100,
+            maxTitleLength: 100,
             contentError: false,
             contentErrorMessage: '',
             amountError: false,
             amountErrorMessage: '',
+            titleError: false,
+            titleErrorMessage: '',
+            shareRewardError: false,
+            shareRewardErrorMessage: '',
             submitting: false,
         };
     },
@@ -152,6 +199,46 @@ export default {
 
             return '';
         },
+        invalidTitle() {
+            return this.titleError || (this.$v.title.$invalid && this.title.length > 0);
+        },
+        invalidTitleMessage() {
+            if (this.titleError) {
+                return this.titleErrorMessage;
+            }
+
+            if (!this.$v.title.required) {
+                return this.$t('post_form.msg.title.required');
+            }
+
+            if (!this.$v.title.maxLength) {
+                return this.$t('post_form.msg.title.max_length', {maxTitleLength: this.maxTitleLength});
+            }
+
+            return '';
+        },
+        invalidShareReward() {
+            return this.shareRewardError || this.$v.shareReward.$invalid;
+        },
+        invalidShareRewardMessage() {
+            if (this.shareRewardError) {
+                return this.shareRewardErrorMessage;
+            }
+            if (!this.$v.shareReward.required) {
+                return this.$t('post_form.msg.share_reward.required');
+            }
+            if (!this.$v.shareReward.decimal) {
+                return this.$t('post_form.msg.share_reward.numeric');
+            }
+            if (!this.$v.shareReward.maxDecimals) {
+                return this.$t('post_form.msg.share_reward.max_decimals', {maxDecimals: this.maxDecimals});
+            }
+            if (!this.$v.shareReward.between) {
+                return this.$t('post_form.msg.share_reward.between', {maxReward: this.maxShareReward});
+            }
+
+            return '';
+        },
     },
     methods: {
         onContentChange(content) {
@@ -165,9 +252,15 @@ export default {
                 return;
             }
 
-            this.$axios.single.post(this.apiUrl, {
+            const url = this.post.id
+                ? this.$routing.generate('edit_post', {tokenName: this.tokenName, id: this.post.id})
+                : this.$routing.generate('create_post', {tokenName: this.tokenName});
+
+            this.$axios.single.post(url, {
                 content: this.content,
                 amount: this.amount,
+                title: this.title,
+                shareReward: this.shareReward,
             })
             .then(this.savePostSuccessHandler.bind(this), this.savePostErrorHandler.bind(this))
             .finally(() => this.submitting = false);
@@ -197,11 +290,27 @@ export default {
                     this.contentError = true;
                     this.contentErrorMessage = errors.children.content.errors[0];
                 }
+
+                if (errors.children.title.errors) {
+                    this.titleError = true;
+                    this.titleErrorMessage = errors.children.title.errors[0];
+                }
+
+                if (errors.children.shareReward.errors) {
+                    this.shareRewardError = true;
+                    this.shareRewardErrorMessage = errors.children.shareReward.errors[0];
+                }
             }
         },
         reset() {
+            this.title = '';
             this.content = '';
             this.amount = '0';
+            this.shareReward = '0';
+
+            this.$nextTick(() => {
+                this.$refs.input.$el.dispatchEvent(new Event('input'));
+            });
         },
         cancel() {
             this.$emit('cancel');
@@ -219,13 +328,19 @@ export default {
             this.amountError = false;
             this.amountErrorMessage = '';
         },
+        title() {
+            this.titleError = false;
+            this.titleErrorMessage = '';
+        },
+        shareReward() {
+            this.shareRewardError = false;
+            this.shareRewardErrorMessage = '';
+        },
     },
     validations() {
         return {
             content: {
-                required: (val) => {
-                    return required(val.replace(/\[\s*\/?\s*(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)\s*\]/g, '').trim());
-                },
+                required: requiredBBCText,
                 minLength: minLength(this.minContentLength),
                 maxLength: maxLength(this.maxContentLength),
             },
@@ -236,6 +351,18 @@ export default {
                     return (val.split('.')[1] || '').length <= this.maxDecimals;
                 },
                 between: between(0, this.maxAmount),
+            },
+            title: {
+                required: (val) => required(val.trim()),
+                maxLength: maxLength(this.maxTitleLength),
+            },
+            shareReward: {
+                required,
+                decimal,
+                maxDecimals: (val) => {
+                    return (val.split('.')[1] || '').length <= this.maxDecimals;
+                },
+                between: between(0, this.maxShareReward),
             },
         };
     },

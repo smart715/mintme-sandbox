@@ -80,23 +80,29 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faTelegram} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTooltip} from 'bootstrap-vue';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../mixins/';
 import {isValidTelegramUrl} from '../../utils';
-import {HTTP_ACCEPTED} from '../../utils/constants';
+import {HTTP_OK} from '../../utils/constants';
 
 library.add(faTelegram, faTimes);
 
 export default {
     name: 'TokenTelegramChannel',
+    components: {
+        FontAwesomeIcon,
+        BTooltip,
+    },
+    mixins: [
+        FiltersMixin,
+        NotificationMixin,
+        LoggerMixin,
+    ],
     props: {
         currentTelegram: String,
         editingTelegram: Boolean,
         tokenName: String,
     },
-    components: {
-        FontAwesomeIcon,
-    },
-    mixins: [FiltersMixin, NotificationMixin, LoggerMixin],
     data() {
         return {
             editing: this.editingTelegram,
@@ -148,8 +154,8 @@ export default {
                 telegramUrl: this.newTelegram,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        let state = this.newTelegram ? 'added' : 'removed';
+                    if (response.status === HTTP_OK) {
+                        let state = this.newTelegram ? 'added' : 'deleted';
                         this.$emit('saveTelegram', this.newTelegram);
                         this.newTelegram = this.newTelegram || 'https://t.me/joinchat/';
                         this.notifySuccess(this.$t('toasted.success.telegram.' + state));

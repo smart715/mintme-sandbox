@@ -1,4 +1,5 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
+import '../vueI18nfix.js';
 import TokenOngoingAirdropCampaign from '../../js/components/token/airdrop_campaign/TokenOngoingAirdropCampaign';
 import moxios from 'moxios';
 import axios from 'axios';
@@ -10,7 +11,6 @@ import Vuelidate from 'vuelidate';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$axios = {retry: axios, single: axios};
@@ -36,14 +36,13 @@ describe('TokenOngoingAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        'amount': '125.2365',
-                        'participants': 110,
-                        'actualParticipants': 11,
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 3,
+                    amount: '125.2365',
+                    participants: 110,
+                    actualParticipants: 11,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
@@ -59,22 +58,24 @@ describe('TokenOngoingAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        'amount': '450',
-                        'participants': 150,
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 0,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
             },
         });
 
-        expect(wrapper.vm.airdropReward).toBe(0);
+        expect(wrapper.vm.airdropReward).toBe('0');
+        expect(wrapper.vm.halfReward).toBe('0');
+        wrapper.vm.airdropCampaign = {
+            reward: 3,
+        };
         wrapper.vm.loaded = true;
         expect(wrapper.vm.airdropReward).toBe('3');
+        expect(wrapper.vm.halfReward).toBe('1.5');
     });
 
     it('should format airdrop end date/time properly', () => {
@@ -82,12 +83,11 @@ describe('TokenOngoingAirdropCampaign', () => {
         const localVue = mockVue();
         const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
             localVue,
-            data() {
-                return {
-                    airdropCampaign: {
-                        endDate: dateNow,
-                    },
-                };
+            propsData: {
+                airdropCampaignProp: {
+                    reward: 0,
+                    endDate: dateNow,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
@@ -110,8 +110,6 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loadYoutubeClient: () => {},
             },
         });
-        expect(wrapper.vm.confirmButtonText).toBe('log_in');
-        wrapper.setProps({loggedIn: true});
         expect(wrapper.vm.confirmButtonText).toBe('');
         wrapper.setProps({isOwner: true});
         expect(wrapper.vm.confirmButtonText).toBe('OK');
@@ -131,8 +129,9 @@ describe('TokenOngoingAirdropCampaign', () => {
                     loaded: true,
                     alreadyClaimed: false,
                     airdropCampaign: {
-                        'amount': '300',
-                        'participants': 100,
+                        amount: '300',
+                        participants: 100,
+                        reward: '3',
                     },
                 };
             },
@@ -140,9 +139,6 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loadYoutubeClient: () => {},
             },
         });
-
-        expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.logged_in');
-        wrapper.setProps({loggedIn: true});
         wrapper.setProps({isOwner: true});
         expect(wrapper.vm.confirmModalMessage).toBe('ongoing_airdrop.confirm_message.cant_participate');
         wrapper.setProps({isOwner: false});
@@ -157,7 +153,8 @@ describe('TokenOngoingAirdropCampaign', () => {
             data() {
                 return {
                     airdropCampaign: {
-                        'endDate': new Date(),
+                        reward: 0,
+                        endDate: new Date(),
                     },
                 };
             },
@@ -191,9 +188,13 @@ describe('TokenOngoingAirdropCampaign', () => {
         moxios.stubRequest('get_airdrop_campaign', {
             status: 200,
             response: {
-                'amount': '568',
-                'participants': 120,
-                'actualParticipants': 8,
+                airdrop: {
+                    amount: '568',
+                    participants: 120,
+                    actualParticipants: 8,
+                    reward: '4',
+                },
+                referral_code: null,
             },
         });
 
@@ -203,6 +204,7 @@ describe('TokenOngoingAirdropCampaign', () => {
             expect(wrapper.vm.airdropCampaign.amount).toBe('568');
             expect(wrapper.vm.airdropCampaign.participants).toBe(120);
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(8);
+            expect(wrapper.vm.airdropCampaign.reward).toBe('4');
             expect(wrapper.vm.loaded).toBe(true);
             done();
         });
@@ -216,13 +218,10 @@ describe('TokenOngoingAirdropCampaign', () => {
                 loggedIn: true,
                 tokenName: 'test1',
                 userAlreadyClaimed: false,
-            },
-            data() {
-                return {
-                    airdropCampaign: {
-                        'id': 5,
-                    },
-                };
+                airdropCampaignProp: {
+                    id: 5,
+                    reward: 0,
+                },
             },
             methods: {
                 loadYoutubeClient: () => {},
@@ -231,6 +230,9 @@ describe('TokenOngoingAirdropCampaign', () => {
 
         moxios.stubRequest('claim_airdrop_campaign', {
             status: 200,
+            response: {
+                data: {},
+            },
         });
 
         wrapper.vm.airdropCampaign = {
@@ -243,6 +245,51 @@ describe('TokenOngoingAirdropCampaign', () => {
         moxios.wait(() => {
             expect(wrapper.vm.airdropCampaign.actualParticipants).toBe(14);
             expect(wrapper.vm.alreadyClaimed).toBe(true);
+            done();
+        });
+    });
+
+    it('can store airdrop action for guest user', (done) => {
+        const localVue = mockVue();
+        const wrapper = shallowMount(TokenOngoingAirdropCampaign, {
+            localVue,
+            propsData: {
+                loggedIn: false,
+                tokenName: 'test77',
+                isOwner: false,
+            },
+            data() {
+                return {
+                    alreadyClaimed: false,
+                    airdropCampaign: {
+                        amount: '300',
+                        participants: 100,
+                        id: 5,
+                        reward: '3',
+                        actions: {
+                            facebookPage: {
+                                id: 1,
+                                done: false,
+                            },
+                        },
+                    },
+                };
+            },
+            methods: {
+                loadYoutubeClient: () => {},
+            },
+        });
+        moxios.stubRequest('claim_airdrop_action_for_guest_user', {
+            status: 200,
+            response: {
+                data: null,
+            },
+        });
+
+        wrapper.vm.claimAction(wrapper.vm.airdropCampaign.actions.facebookPage);
+
+        moxios.wait(() => {
+            expect(wrapper.vm.airdropCampaign.actions.facebookPage.done).toBe(true);
             done();
         });
     });

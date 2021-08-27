@@ -6,7 +6,6 @@ import TokenDeployIcon from '../../js/components/token/deploy/TokenDeployIcon';
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('font-awesome-icon', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;
@@ -73,6 +72,9 @@ describe('TokenDeployIcon', () => {
             localVue: mockVue(),
             propsData: {
                 statusProp: 'deployed',
+                tokenCrypto: {
+                    symbol: 'WEB',
+                },
             },
         });
         expect(wrapper.find('.deployed-icon').exists()).toBe(true);

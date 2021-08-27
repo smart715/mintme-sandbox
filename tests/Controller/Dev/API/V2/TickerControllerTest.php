@@ -9,13 +9,14 @@ class TickerControllerTest extends WebTestCase
 {
     public function testGetAssets(): void
     {
-        $this->client->request('GET', '/dev/api/v2/open/ticker');
+        $this->client->request('GET', self::LOCALHOST . '/dev/api/v2/open/ticker');
+
+        $this->client->followRedirect();
 
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $res = json_decode((string)$this->client->getResponse()->getContent(), true);
 
-        $this->assertArrayHasKey(Token::MINTME_SYMBOL . '_' . Token::BTC_SYMBOL, $res[0]);
-        $this->assertArrayHasKey(Token::MINTME_SYMBOL . '_' . Token::ETH_SYMBOL, $res[1]);
+        $this->assertGreaterThanOrEqual(2, count($res));
     }
 }

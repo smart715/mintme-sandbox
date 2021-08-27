@@ -5,13 +5,11 @@ namespace App\Exchange\Balance\Strategy;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
-use App\Entity\UserToken;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Manager\CryptoManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
-use Money\Currency;
-use Money\Money;
 
 class DepositTokenStrategy implements BalanceStrategyInterface
 {
@@ -24,20 +22,24 @@ class DepositTokenStrategy implements BalanceStrategyInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
+    private CryptoManagerInterface $cryptoManager;
+
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         WalletInterface $wallet,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        CryptoManagerInterface $cryptoManager
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->wallet = $wallet;
         $this->moneyWrapper = $moneyWrapper;
+        $this->cryptoManager = $cryptoManager;
     }
 
     /** @param Token $tradeble */
     public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
     {
-        $this->withdrawWebFee($user, $tradeble);
+        $this->withdrawBaseFee($user, $tradeble);
         $this->depositTokens($user, $tradeble, $amount);
     }
 
@@ -46,18 +48,22 @@ class DepositTokenStrategy implements BalanceStrategyInterface
         $this->balanceHandler->deposit(
             $user,
             $token,
-            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
+            $this->moneyWrapper->parse($amount, Symbols::TOK)
         );
     }
 
-    private function withdrawWebFee(User $user, Token $token): void
+    private function withdrawBaseFee(User $user, Token $token): void
     {
+        $tokenDepositFee = $this->wallet->getDepositInfo($token)->getFee();
+
+        if ($tokenDepositFee->isNegative() || $tokenDepositFee->isZero()) {
+            return;
+        }
+
         $this->balanceHandler->withdraw(
             $user,
-            Token::getFromSymbol(Token::WEB_SYMBOL),
-            $this->wallet->getDepositInfo(
-                Token::getFromSymbol(Token::WEB_SYMBOL)
-            )->getFee()
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+            $tokenDepositFee
         );
     }
 }

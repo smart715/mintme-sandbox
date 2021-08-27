@@ -4,8 +4,12 @@
   flex-direction: column
   padding: 10px
 
+.post-title
+  font-size: 1.5rem
+  color: $dark-white
+
 .post
-  background-color: $post-background-color
+  background-color: $odd-item-color
   border-color: $post-border-color
   border-style: solid
   border-width: 1px
@@ -17,11 +21,25 @@
   button:focus
     outline: 1px dotted
 
+  .post-title
+    @media (min-width: 1200px)
+      font-size: 1.8rem
+
+.post-content
+  .bbcode-content
+    margin-bottom: 0 !important
+
+.post-title:hover
+  color: $white
+
 .single-post-page .post
   background-color: transparent
   border-color: transparent
   border-style: none
   border-width: 0
+
+  .post-title
+    font-size: 2.5rem
 
 .post .post-date, .comment .comment-date
   color:  $grey

@@ -2,14 +2,19 @@
 
 namespace App\Controller;
 
-use App\Controller\Traits\RefererTrait;
 use App\Entity\Bonus;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Mailer\MailerInterface;
+use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BonusManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Manager\UserNotificationConfigManagerInterface;
+use App\Security\Request\RefererRequestHandlerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Controller\RegistrationController as FOSRegistrationController;
@@ -24,6 +29,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -31,32 +37,23 @@ use Throwable;
 
 class RegistrationController extends FOSRegistrationController
 {
-
-    use RefererTrait;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var FactoryInterface */
-    private $formFactory;
-
-    /** @var UserManagerInterface */
-    private $userManager;
-
-    /** @var BonusManagerInterface */
-    private $bonusManager;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var EntityManagerInterface */
-    private $em;
+    private EventDispatcherInterface $eventDispatcher;
+    private FactoryInterface $formFactory;
+    private UserManagerInterface $userManager;
+    private BonusManagerInterface $bonusManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private MoneyWrapperInterface $moneyWrapper;
+    private CryptoManagerInterface $cryptoManager;
+    private EntityManagerInterface $em;
+    private UserNotificationConfigManagerInterface $userNotificationConfigManager;
+    private MailerInterface $mailer;
+    private string $mintmeHostFreeDays;
+    private string $mintmeHostPrice;
+    private string $mintmeHostPath;
+    private AirdropReferralCodeManagerInterface $arcManager;
+    private RefererRequestHandlerInterface $refererRequestHandler;
+    private AirdropCampaignManagerInterface $airdropCampaignManager;
+    private SessionInterface $session;
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -67,7 +64,16 @@ class RegistrationController extends FOSRegistrationController
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         CryptoManagerInterface $cryptoManager,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserNotificationConfigManagerInterface $userNotificationConfigManager,
+        MailerInterface $mailer,
+        string $mintmeHostFreeDays,
+        string $mintmeHostPrice,
+        string $mintmeHostPath,
+        AirdropReferralCodeManagerInterface $arcManager,
+        RefererRequestHandlerInterface $refererRequestHandler,
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        SessionInterface $session
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->formFactory = $formFactory;
@@ -77,7 +83,16 @@ class RegistrationController extends FOSRegistrationController
         $this->moneyWrapper = $moneyWrapper;
         $this->cryptoManager = $cryptoManager;
         $this->em = $entityManager;
+        $this->userNotificationConfigManager = $userNotificationConfigManager;
+        $this->mailer = $mailer;
+        $this->mintmeHostFreeDays = $mintmeHostFreeDays;
+        $this->mintmeHostPrice =$mintmeHostPrice;
+        $this->mintmeHostPath = $mintmeHostPath;
+        $this->arcManager = $arcManager;
+        $this->airdropCampaignManager = $airdropCampaignManager;
+        $this->session = $session;
         parent::__construct($eventDispatcher, $formFactory, $userManager, $tokenStorage);
+        $this->refererRequestHandler = $refererRequestHandler;
     }
 
     /**
@@ -126,12 +141,18 @@ class RegistrationController extends FOSRegistrationController
 
         $refers = $request->headers->get('Referer');
 
-        if ($refers && !in_array($refers, $this->refererUrlsToSkip(), true)) {
+        if ($refers && !in_array($refers, $this->refererRequestHandler->refererUrlsToSkip(), true)) {
             $this->get('session')->set('register_referer', $refers);
         }
 
         if ($response) {
             return $response;
+        }
+
+        if ($request->get('formContentOnly', false)) {
+            return $this->render("@FOSUser/Registration/register_content_body.html.twig", [
+                'form' => $form->createView(),
+            ]);
         }
 
         return $this->render('@FOSUser/Registration/register.html.twig', [
@@ -222,11 +243,20 @@ class RegistrationController extends FOSRegistrationController
         }
 
         $bonus = $user->getBonus();
+        $this->userNotificationConfigManager->initializeUserNotificationConfig($user);
+        $this->mailer->sendMintmeHostMail(
+            $user,
+            $this->mintmeHostPrice,
+            $this->mintmeHostFreeDays,
+            $this->mintmeHostPath
+        );
+
+        $this->airdropCampaignManager->claimAirdropsActionsFromSessionData($user);
 
         if ($bonus &&
             Bonus::PENDING_STATUS === $user->getBonus()->getStatus() &&
             Bonus::SIGN_UP_TYPE === $user->getBonus()->getType()) {
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+            $crypto = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
             if (!$crypto) {
                 return parent::confirmedAction($request);
@@ -239,7 +269,7 @@ class RegistrationController extends FOSRegistrationController
             try {
                 $this->balanceHandler->deposit(
                     $user,
-                    Token::getFromCrypto($crypto),
+                    $crypto,
                     $this->moneyWrapper->parse(
                         (string)$this->getParameter('landing_web_bonus'),
                         $crypto->getSymbol()
@@ -254,16 +284,38 @@ class RegistrationController extends FOSRegistrationController
         $session = $this->get('session');
         $referer = $session->get('register_referer');
 
-        if ($referer && $this->isRefererValid($referer)) {
+        if ($referer && $this->refererRequestHandler->isRefererValid($referer)) {
             $session->remove('register_referer');
+
+            $path = $this->refererRequestHandler->getRefererPathData();
+
+            if ('token_show' === $path['_route'] && 'buy' === $path['tab'] && 'signup' === $path['modal']) {
+                return $this->redirectToRoute('wallet');
+            }
 
             return $this->redirect($referer);
         }
 
-        $refCode = $request->cookies->get('referral-code');
+        $referralCode = $request->cookies->get('referral-code');
+        $referralType = $request->cookies->get('referral-type');
 
-        if (!is_null($refCode)) {
-            $token = $this->userManager->findByReferralCode($refCode)->getProfile()->getToken();
+        if (null !== $referralCode) {
+            switch ($referralType) {
+                case 'invite':
+                    $referrerUser = $this->userManager->findByReferralCode($referralCode);
+                    $token = $referrerUser
+                        ? $referrerUser->getProfile()->getFirstToken()
+                        : null;
+
+                    break;
+                case 'airdrop':
+                    $arc = $this->arcManager->decode($referralCode);
+                    $token = $arc
+                        ? $arc->getAirdrop()->getToken()
+                        : null;
+
+                    break;
+            }
         }
 
         if (isset($token)) {

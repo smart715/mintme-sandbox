@@ -61,6 +61,23 @@
         <env name="WITHDRAW_RPC" value="http://nginx:8000"/>
         <env name="VIABTC_RPC" value="http://btc:8080"/>
         <env name="WEBSOCKET_URL" value="ws://localhost:18364"/>
+
+        <env name="TESTING_SERVER_ENV" value="1"/>
+
+        <env name="COINIFY_SHARED_SECRET" value=""/>
+
+        <env name="TWITTER_API_KEY" value=""/>
+        <env name="TWITTER_API_SECRET" value=""/>
+        <env name="TWITTER_API_BEARER_TOKEN" value=""/>
+
+        <env name="D7_NETWORKS_TOKEN" value=""/>
+
+        <!-- ###+ symfony/mercure-bundle ### -->
+        <!-- See https://symfony.com/doc/current/mercure.html#configuration -->
+        <env name="MERCURE_PUBLISH_URL" value="http://mercure/.well-known/mercure"/>
+        <!-- The default token is signed with the secret key: !ChangeMe! -->
+        <env name="MERCURE_JWT_TOKEN" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.Oo0yg7y4yMa1vr_bziltxuTCqb8JVHKxp-f_FwwOim0"/>
+        <!-- ###- symfony/mercure-bundle ### -->
     </php>
 
     <testsuites>

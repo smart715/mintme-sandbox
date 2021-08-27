@@ -1,35 +1,34 @@
 <template>
-    <li class="nav-item d-flex justify-content-center align-items-center">
-        <div
-            class="dropdown lang-dropdown"
-            :class="{ 'show': showLangMenu }"
-            v-on-clickaway="hideLangMenu"
+    <div
+        class="dropup language-switcher d-inline"
+        :class="{ 'show': showLangMenu }"
+        v-on-clickaway="hideLangMenu"
+    >
+        <button
+            class="btn dropdown-toggle"
+            type="button"
+            aria-haspopup="true"
+            :aria-expanded="showLangMenu"
+            @click="showLangMenu = true"
         >
-            <button
-                class="btn btn-lang-menu dropdown-toggle"
-                type="button"
-                aria-haspopup="true"
-                :aria-expanded="showLangMenu"
-                @click="showLangMenu = true"
-            >
-                <span :class="currentLocaleClass"></span>
-            </button>
-            <div
-                class="dropdown-menu lang-menu"
-                :class="{ 'show': showLangMenu }"
-                aria-labelledby="dropdownLangMenuButton"
-            >
-                <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item" @click="changeLocale(locale.locale)">
-                    <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
-                </a>
-            </div>
+            <span :class="currentLocaleClass"></span> {{ currentLocaleLabel }}
+        </button>
+        <div
+            class="dropdown-menu lang-menu"
+            :class="{ 'show': showLangMenu }"
+            aria-labelledby="dropdownLangMenuButton"
+        >
+            <a v-for="locale in flagsWithLocales" v-bind:key="locale.flag" class="dropdown-item"
+               @click="changeLocale(locale.locale)">
+                <span :class="'flag-icon flag-icon-'+locale.flag"></span> {{ locale.label }}
+            </a>
         </div>
-    </li>
+    </div>
 </template>
 
 <script>
 import {directive as onClickaway} from 'vue-clickaway';
-import {HTTP_ACCEPTED} from '../utils/constants';
+import {HTTP_OK} from '../utils/constants';
 
 export default {
     name: 'LocaleSwitcher',
@@ -47,9 +46,6 @@ export default {
         };
     },
     computed: {
-        currentLocaleClass: function() {
-            return 'flag-icon flag-icon-' + this.flagNames[this.currentLocale].flag;
-        },
         flagNames: function() {
           return JSON.parse(this.flags);
         },
@@ -64,6 +60,12 @@ export default {
                 };
             });
         },
+        currentLocaleClass: function() {
+            return 'flag-icon flag-icon-' + this.flagNames[this.currentLocale].flag;
+        },
+        currentLocaleLabel: function() {
+            return this.flagNames[this.currentLocale].label;
+        },
     },
     methods: {
         changeLocale: function(locale) {
@@ -71,7 +73,7 @@ export default {
                 locale,
             }))
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
+                    if (response.status === HTTP_OK) {
                         let hrefWithLocale = '';
                         let href = location.href;
 

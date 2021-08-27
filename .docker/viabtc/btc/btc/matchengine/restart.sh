@@ -1,5 +1,5 @@
 #!/bin/bash
 
-killall -s SIGQUIT matchengine.exe
+killall -s SIGQUIT matchengine
 sleep 1
-cd /btc/matchengine && ./matchengine.exe config.json
+cd /btc/matchengine && ./matchengine -log_dir=/var/log/trade config.json&

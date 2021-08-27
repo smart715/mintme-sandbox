@@ -10,10 +10,12 @@
                     :orders-updated="ordersUpdated"
                     :token-name="market.base.symbol"
                     :fields="fields"
+                    :total-buy-orders="totalBuyOrders"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
-                    @modal="removeOrderModal"/>
+                    @modal="removeOrderModal"
+                    :currency-mode="currencyMode"/>
             </div>
             <div class="col-12 col-xl-6 pl-xl-2 mt-3">
                 <trade-sell-orders
@@ -24,10 +26,12 @@
                     :orders-updated="ordersUpdated"
                     :market="market"
                     :fields="fields"
+                    :total-sell-orders="totalSellOrders"
                     :basePrecision="market.base.subunit"
                     :quotePrecision="market.quote.subunit"
                     :logged-in="loggedIn"
-                    @modal="removeOrderModal"/>
+                    @modal="removeOrderModal"
+                    :currency-mode="currencyMode"/>
             </div>
         </div>
         <confirm-modal
@@ -56,6 +60,7 @@ import Decimal from 'decimal.js';
 import {formatMoney, toMoney} from '../../utils';
 import {WSAPI} from '../../utils/constants';
 import {RebrandingFilterMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenTradeOrders',
@@ -77,13 +82,17 @@ export default {
         },
         buyOrders: [Array, Object],
         sellOrders: [Array, Object],
+        totalSellOrders: [Array, Object],
+        totalBuyOrders: [Array, Object],
         market: Object,
         userId: Number,
         loggedIn: Boolean,
+        currencyMode: String,
     },
     data() {
         return {
             removeOrders: [],
+            removedOrders: [],
             confirmModal: false,
             fields: [
                 {
@@ -110,13 +119,20 @@ export default {
     },
     computed: {
         filteredBuyOrders: function() {
-            return this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
+            let orders = this.buyOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.buyOrders)), false) : [];
+            this.setBuyOrders(orders);
+
+            return orders;
         },
         filteredSellOrders: function() {
-            return this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
+            let orders = this.sellOrders ? this.sortOrders(this.ordersList(this.groupByPrice(this.sellOrders)), true) : [];
+            this.setSellOrders(orders);
+
+            return orders;
         },
     },
     methods: {
+        ...mapMutations('orders', ['setSellOrders', 'setBuyOrders']),
         updateBuyOrders: function({attach, resolve}) {
             return this.updateOrders(attach, 'buy', resolve);
         },
@@ -145,6 +161,7 @@ export default {
         },
         groupByPrice: function(orders) {
             let filtered = [];
+            let accounted = [];
 
             let grouped = this.clone(orders).reduce((a, e) => {
                 let price = parseFloat(e.price);
@@ -152,7 +169,12 @@ export default {
                 if (a[price] === undefined) {
                     a[price] = [];
                 }
-                a[price].push(e);
+
+                if (-1 === accounted.indexOf(e.id) && -1 === this.removedOrders.indexOf(e.id)) {
+                    accounted.push(e.id);
+                    a[price].push(e);
+                }
+
                 return a;
             }, {});
 
@@ -173,9 +195,11 @@ export default {
                 }, {owner: false, orders: [], main: {order: null, amount: 0}, sum: 0});
 
                 let order = obj.main.order;
-                order.amount = obj.sum;
-                order.owner = obj.owner;
-                filtered.push(order);
+                if (order) {
+                  order.amount = obj.sum;
+                  order.owner = obj.owner;
+                  filtered.push(order);
+                }
             });
             return filtered;
         },
@@ -183,22 +207,28 @@ export default {
             let isSellSide = WSAPI.order.type.SELL === row.side;
             let orders = isSellSide ? this.sellOrders : this.buyOrders;
             this.removeOrders = [];
+            let accounted = [];
 
             this.clone(orders).forEach((order) => {
                 if (toMoney(order.price, this.market.base.subunit) === row.price && order.maker.id === this.userId) {
                     order.price = toMoney(order.price, this.market.base.subunit);
                     order.amount = toMoney(order.amount, this.market.quote.subunit);
-                    this.removeOrders.push(order);
+                    if (-1 === accounted.indexOf(order.id) && -1 === this.removedOrders.indexOf(order.id)) {
+                        accounted.push(order.id);
+                        this.removeOrders.push(order);
+                    }
                 }
             });
             this.switchConfirmModal(true);
         },
         removeOrder: function() {
+            let removeNow = this.removeOrders.map((order) => order.id);
+            this.removedOrders = [...this.removedOrders, ...removeNow];
             let deleteOrdersUrl = this.$routing.generate('orders_сancel', {
                 base: this.market.base.symbol,
                 quote: this.market.quote.symbol,
             });
-            this.$axios.single.post(deleteOrdersUrl, {'orderData': this.removeOrders.map((order) => order.id)})
+            this.$axios.single.post(deleteOrdersUrl, {'orderData': removeNow})
                 .catch((err) => {
                     this.notifyError(this.$t('toasted.error.service_unavailable'));
                     this.sendLogs('error', 'Remove order service unavailable', err);

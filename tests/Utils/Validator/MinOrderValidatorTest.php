@@ -2,12 +2,17 @@
 
 namespace App\Tests\Utils\Validator;
 
+use App\Communications\CryptoRatesFetcherInterface;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\TradebleInterface;
+use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\Symbols;
 use App\Utils\Validator\MinOrderValidator;
+use App\Wallet\Money\MoneyWrapperInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MinOrderValidatorTest extends TestCase
 {
@@ -22,9 +27,24 @@ class MinOrderValidatorTest extends TestCase
     ): void {
         $base = $this->mockTradable($basSubunit, false);
         $quote = $this->mockTradable($quoteSubunit, $isToken);
+        $minimalPriceOrder = '0.1';
+        $moneyWrapper = $this->mockMoneyWrapper();
+        $cryptoRatesFetcher = $this->mockCryptoRatesFetcher();
+        $translator = $this->mockTranslator();
+        $rebranding = $this->mockRebranding();
 
-        $minOrderValidator =  new MinOrderValidator($base, $quote, $price, $amount);
-        $this->assertEquals($result, $minOrderValidator->validate());
+        $minOrderValidator =  new MinOrderValidator(
+            $base,
+            $quote,
+            $price,
+            $amount,
+            $minimalPriceOrder,
+            $moneyWrapper,
+            $cryptoRatesFetcher,
+            $translator,
+            $rebranding
+        );
+        self::assertEquals($result, $minOrderValidator->validate());
     }
 
     public function orderProvider(): array
@@ -61,6 +81,11 @@ class MinOrderValidatorTest extends TestCase
             : $cryptoMock;
     }
 
+    private function mockRebranding(): RebrandingConverterInterface
+    {
+        return $this->createMock(RebrandingConverterInterface::class);
+    }
+
     /** @return MockObject|Token */
     private function mockToken(Crypto $crypto): TradebleInterface
     {
@@ -68,5 +93,29 @@ class MinOrderValidatorTest extends TestCase
         $tokenMock->method('getCrypto')->willReturn($crypto);
 
         return $tokenMock;
+    }
+
+    private function mockMoneyWrapper(): MoneyWrapperInterface
+    {
+        return  $this->createMock(MoneyWrapperInterface::class);
+    }
+
+    /** @return CryptoRatesFetcherInterface|MockObject */
+    private function mockCryptoRatesFetcher(): CryptoRatesFetcherInterface
+    {
+        $crf = $this->createMock(CryptoRatesFetcherInterface::class);
+
+        $crf->method('fetch')->willReturn([
+            Symbols::WEB => [
+                Symbols::BTC => 0.00000008,
+            ],
+        ]);
+
+        return $crf;
+    }
+
+    private function mockTranslator(): TranslatorInterface
+    {
+        return $this->createMock(TranslatorInterface::class);
     }
 }

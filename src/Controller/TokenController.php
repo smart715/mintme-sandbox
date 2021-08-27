@@ -2,42 +2,64 @@
 
 namespace App\Controller;
 
+use App\Communications\DiscordOAuthClientInterface;
+use App\Communications\Exception\ApiFetchException;
 use App\Entity\Profile;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\TokenEvent;
+use App\Events\TokenEvents;
 use App\Exception\ApiBadRequestException;
+use App\Exception\ForbiddenException;
+use App\Exception\NotFoundAirdropException;
+use App\Exception\NotFoundPostException;
 use App\Exception\NotFoundTokenException;
+use App\Exception\NotFoundVotingException;
+use App\Exception\RedirectException;
 use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Factory\OrdersFactoryInterface;
+use App\Exchange\Market\MarketHandlerInterface;
 use App\Exchange\Trade\Config\LimitOrderConfig;
 use App\Exchange\Trade\TraderInterface;
 use App\Form\TokenCreateType;
 use App\Logger\UserActionLogger;
 use App\Mailer\MailerInterface;
 use App\Manager\AirdropCampaignManagerInterface;
+use App\Manager\AirdropReferralCodeManagerInterface;
 use App\Manager\BlacklistManager;
 use App\Manager\BlacklistManagerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\MarketStatusManagerInterface;
+use App\Manager\PostManagerInterface;
 use App\Manager\ProfileManagerInterface;
+use App\Manager\ScheduledNotificationManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Manager\VotingManagerInterface;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\String\BbcodeMetaTagsStringStrategy;
 use App\Utils\Converter\String\DashStringStrategy;
 use App\Utils\Converter\String\StringConverter;
 use App\Utils\Converter\TokenNameConverterInterface;
+use App\Utils\NotificationTypes;
+use App\Utils\Symbols;
+use App\Utils\Validator\AirdropReferralCodeHashValidator;
 use App\Utils\Verify\WebsiteVerifierInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 /**
@@ -45,30 +67,28 @@ use Throwable;
  */
 class TokenController extends Controller
 {
-
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
-
-    /** @var BlacklistManagerInterface */
-    protected $blacklistManager;
-
-    /** @var TokenManagerInterface */
-    protected $tokenManager;
-
-    /** @var CryptoManagerInterface */
-    protected $cryptoManager;
-
-    /** @var MarketFactoryInterface */
-    protected $marketManager;
-
-    /** @var TraderInterface */
-    protected $trader;
-
-    /** @var UserActionLogger  */
-    private $userActionLogger;
+    protected EntityManagerInterface $em;
+    protected ProfileManagerInterface $profileManager;
+    protected BlacklistManagerInterface $blacklistManager;
+    protected TokenManagerInterface $tokenManager;
+    protected CryptoManagerInterface $cryptoManager;
+    protected MarketFactoryInterface $marketManager;
+    protected TraderInterface $trader;
+    private UserActionLogger $userActionLogger;
+    private ScheduledNotificationManagerInterface $scheduledNotificationManager;
+    private BalanceHandlerInterface $balanceHandler;
+    private MarketHandlerInterface $marketHandler;
+    private ParameterBagInterface $parameterBag;
+    private TranslatorInterface $translator;
+    private EventDispatcherInterface $eventDispatcher;
+    private PostManagerInterface $postManager;
+    private VotingManagerInterface $votingManager;
+    private TokenNameConverterInterface $tokenNameConverter;
+    private AirdropCampaignManagerInterface $airdropCampaignManager;
+    private LimitOrderConfig $orderConfig;
+    private DisabledServicesConfig $disabledServicesConfig;
+    private MoneyWrapperInterface $moneyWrapper;
+    private DiscordOAuthClientInterface $discordOAuthClient;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -79,7 +99,21 @@ class TokenController extends Controller
         TraderInterface $trader,
         NormalizerInterface $normalizer,
         UserActionLogger $userActionLogger,
-        BlacklistManager $blacklistManager
+        BlacklistManager $blacklistManager,
+        ScheduledNotificationManagerInterface $scheduledNotificationManager,
+        BalanceHandlerInterface $balanceHandler,
+        MarketHandlerInterface $marketHandler,
+        ParameterBagInterface $parameterBag,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher,
+        PostManagerInterface $postManager,
+        VotingManagerInterface $votingManager,
+        TokenNameConverterInterface $tokenNameConverter,
+        AirdropCampaignManagerInterface $airdropCampaignManager,
+        LimitOrderConfig $orderConfig,
+        DisabledServicesConfig $disabledServicesConfig,
+        MoneyWrapperInterface $moneyWrapper,
+        DiscordOAuthClientInterface $discordOAuthClient
     ) {
         $this->em = $em;
         $this->profileManager = $profileManager;
@@ -89,16 +123,122 @@ class TokenController extends Controller
         $this->trader = $trader;
         $this->userActionLogger = $userActionLogger;
         $this->blacklistManager = $blacklistManager;
+        $this->scheduledNotificationManager = $scheduledNotificationManager;
+        $this->balanceHandler = $balanceHandler;
+        $this->marketHandler = $marketHandler;
+        $this->parameterBag = $parameterBag;
+        $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->postManager = $postManager;
+        $this->votingManager = $votingManager;
+        $this->tokenNameConverter = $tokenNameConverter;
+        $this->airdropCampaignManager = $airdropCampaignManager;
+        $this->orderConfig = $orderConfig;
+        $this->disabledServicesConfig = $disabledServicesConfig;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->discordOAuthClient = $discordOAuthClient;
 
         parent::__construct($normalizer);
     }
 
     /**
+     * @Route("/{name}/donate", name="token_show_donate")
+     */
+    public function donate(string $name): RedirectResponse
+    {
+        return $this->redirectToRoute('token_show', ['name' => $name]);
+    }
+
+    /**
+     * @Route("/{name}/posts/{slug}", name="new_show_post", options={"expose"=true})
+     */
+    public function showPost(Request $request, string $name, ?string $slug = null): Response
+    {
+        $token = $this->fetchToken($request, $name);
+
+        $post = $slug
+            ? $this->postManager->getBySlug($slug)
+            : null;
+
+        if ($slug && !$post) {
+            throw new NotFoundPostException();
+        }
+
+        if ($post && $post->getToken()->getName() !== $name) {
+            throw new NotFoundPostException();
+        }
+
+        $tab = $post
+            ? 'post'
+            : 'posts';
+
+        $extraData = [
+            'post' => $this->normalize($post),
+            'comments' => $post ? $this->normalize($post->getComments()) : null,
+        ];
+
+        return $this->renderPairPage($token, $request, $tab, null, $extraData);
+    }
+
+    /**
+     * @Route("/{name}/voting", name="token_list_voting", options={"expose"=true})
+     */
+    public function listVoting(Request $request, string $name): Response
+    {
+        $token = $this->fetchToken($request, $name);
+
+        return $this->renderPairPage($token, $request, 'voting');
+    }
+
+    /**
+     * @Route("/{name}/create-voting", name="token_create_voting", options={"expose"=true})
+     */
+    public function createVoting(Request $request, string $name): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $token = $this->fetchToken($request, $name);
+
+        $balance = $this->balanceHandler->balance($user, $token)->getAvailable();
+        $min = (float)$this->getParameter('dm_min_amount');
+
+        if ((float)$this->moneyWrapper->format($balance) < $min) {
+            throw new ForbiddenException(
+                $this->translator->trans('voting.create.min_amount_required', [
+                    '%amount%' => $min,
+                    '%currency%' => $token->getName(),
+                ])
+            );
+        }
+
+        return $this->renderPairPage($token, $request, 'create-voting');
+    }
+
+    /**
+     * @Route("/{name}/voting/{slug}", name="token_show_voting", options={"expose"=true})
+     */
+    public function showVoting(Request $request, string $name, string $slug): Response
+    {
+        $token = $this->fetchToken($request, $name);
+        $voting = $this->votingManager->getBySlugForTradable($slug, $token);
+
+        if (!$voting) {
+            throw new NotFoundVotingException();
+        }
+
+        $extraData = [
+            'voting' => $this->normalize($voting),
+        ];
+
+        return $this->renderPairPage($token, $request, 'show-voting', null, $extraData);
+    }
+
+    /**
      * @Route("/{name}/{tab}/{modal}",
      *     name="token_show",
-     *     defaults={"tab" = "intro","modal" = "false"},
+     *     defaults={"tab" = "intro"},
      *     methods={"GET", "POST"},
-     *     requirements={"tab" = "trade|intro|donate|buy|posts","modal" = "settings"},
+     *     requirements={"tab" = "trade|intro|buy|posts", "modal" = "settings|signup|created|airdrop"},
      *     options={"expose"=true,"2fa_progress"=false}
      * )
      */
@@ -106,98 +246,18 @@ class TokenController extends Controller
         Request $request,
         string $name,
         ?string $tab,
-        ?string $modal,
-        TokenNameConverterInterface $tokenNameConverter,
-        AirdropCampaignManagerInterface $airdropCampaignManager,
-        LimitOrderConfig $orderConfig,
-        DisabledServicesConfig $disabledServicesConfig
+        ?string $modal = null
     ): Response {
-        if (preg_match('/(intro)/', $request->getPathInfo()) && !preg_match('/(settings)/', $request->getPathInfo())) {
+        if ((preg_match('/(intro)/', $request->getPathInfo()) &&
+            !preg_match('/(settings|created|airdrop)/', $request->getPathInfo())) ||
+            'buy' === $tab
+        ) {
             return $this->redirectToRoute('token_show', ['name' => $name]);
         }
 
-        if ('donate' === $tab) {
-            return $this->redirectToRoute('token_show', [
-                'name' => $name,
-                'tab' => 'buy',
-            ]);
-        }
+        $token = $this->fetchToken($request, $name, $modal);
 
-        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
-
-        if ($dashedName != $name) {
-            return $this->redirectToRoute('token_show', ['name' => $dashedName]);
-        }
-
-        //rebranding
-        if (Token::MINTME_SYMBOL === mb_strtoupper($name)) {
-            $name = Token::WEB_SYMBOL;
-        }
-
-        $token = $this->tokenManager->findByName($name);
-
-        if (!$token || $token->isBlocked()) {
-            throw new NotFoundTokenException();
-        }
-
-        if ($this->tokenManager->isPredefined($token)) {
-            return $this->redirectToRoute(
-                'coin',
-                [
-                    'base'=> (Token::WEB_SYMBOL == $token->getName() ? Token::BTC_SYMBOL : $token->getName()),
-                    'quote'=> Token::WEB_SYMBOL,
-                ]
-            );
-        }
-
-        $webCrypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-        $market = $webCrypto
-            ? $this->marketManager->create($webCrypto, $token)
-            : null;
-        $tokenDescription = $token->getDescription() ?: '';
-        $defaultDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
-        $tokenDescription = $tokenDescription ?: $defaultDescription;
-        $defaultActivated = $tokenDescription === $defaultDescription;
-        $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($tokenDescription);
-        $tokenDescription = preg_replace(
-            '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
-            '\2',
-            $tokenDescription
-        );
-        $metaDescription = str_replace("\n", " ", $tokenDescription ?? '');
-
-        /** @var  User|null $user */
-        $user = $this->getUser();
-
-        return $this->render('pages/pair.html.twig', [
-            'showSuccessAlert' => $request->isMethod('POST') ? true : false,
-            'token' => $token,
-            'tokenDescription' => $metaDescription,
-            'metaTokenDescription' => substr($metaDescription, 0, 200),
-            'showDescription' => ($token === $this->tokenManager->getOwnToken()) || !$defaultActivated,
-            'currency' => Token::WEB_SYMBOL,
-            'hash' => $user ? $user->getHash() : '',
-            'profile' => $token->getProfile(),
-            'isOwner' => $token === $this->tokenManager->getOwnToken(),
-            'isTokenCreated' => $this->isTokenCreated(),
-            'tab' => $tab,
-            'showTrade' => true,
-            'showDonation' => true,
-            'market' => $this->normalize($market),
-            'tokenHiddenName' => $market ?
-                $tokenNameConverter->convert($token) :
-                '',
-            'precision' => $this->getParameter('token_precision'),
-            'isTokenPage' => true,
-            'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
-            'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
-            'userAlreadyClaimed' => $airdropCampaignManager
-                ->checkIfUserClaimed($user, $token),
-            'posts' => $this->normalize($token->getPosts()),
-            'taker_fee' => $orderConfig->getTakerFeeRate(),
-            'showTokenEditModal' => 'settings' === $modal,
-            'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
-        ]);
+        return $this->renderPairPage($token, $request, $tab, $modal);
     }
 
     /**
@@ -209,7 +269,8 @@ class TokenController extends Controller
         BalanceHandlerInterface $balanceHandler,
         MoneyWrapperInterface $moneyWrapper,
         MarketStatusManagerInterface $marketStatusManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        OrdersFactoryInterface $ordersFactory
     ): Response {
         if ($this->isTokenCreated()) {
             return $this->redirectToOwnToken('intro');
@@ -235,6 +296,7 @@ class TokenController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted('new-trades');
             $this->denyAccessUnlessGranted('trading');
+            $this->denyAccessUnlessGranted('create', $token);
 
             if ($this->blacklistManager->isBlacklistedToken($token->getName())) {
                 return $this->json(
@@ -242,6 +304,9 @@ class TokenController extends Controller
                     Response::HTTP_BAD_REQUEST
                 );
             }
+
+            /** @var bool $initOrders */
+            $initOrders = $form->get('initial_orders')->getData();
 
             $this->em->beginTransaction();
 
@@ -255,6 +320,11 @@ class TokenController extends Controller
             $this->em->flush();
 
             $mailer->sendKnowledgeBaseMail($user, $token);
+            $notificationType = NotificationTypes::TOKEN_MARKETING_TIPS;
+            $this->scheduledNotificationManager->createScheduledNotification(
+                $notificationType,
+                $user,
+            );
 
             try {
                 /** @var User $user*/
@@ -265,17 +335,25 @@ class TokenController extends Controller
                     $token,
                     $moneyWrapper->parse(
                         (string)$this->getParameter('token_quantity'),
-                        MoneyWrapper::TOK_SYMBOL
+                        Symbols::TOK
                     )
                 );
                 $market = $this->marketManager->createUserRelated($user);
 
+                if ($initOrders) {
+                    $ordersFactory->createInitOrders($token);
+                }
+
                 $marketStatusManager->createMarketStatus($market);
 
                 $this->em->commit();
+
+                /** @psalm-suppress TooManyArguments */
+                $this->eventDispatcher->dispatch(new TokenEvent($token), TokenEvents::CREATED);
+
                 $this->userActionLogger->info('Create a token', ['name' => $token->getName(), 'id' => $token->getId()]);
 
-                return $this->json("success", Response::HTTP_ACCEPTED);
+                return $this->json("success", Response::HTTP_OK);
             } catch (Throwable $exception) {
                 if (false !== strpos($exception->getMessage(), 'cURL')) {
                     $this->addFlash('danger', 'Exchanger connection lost. Try again');
@@ -292,13 +370,16 @@ class TokenController extends Controller
                         'Got an error, when registering a token',
                         ['message' => $exception->getMessage()]
                     );
+
+                    throw new ApiFetchException($this->translator->trans('toasted.error.service_unavailable'));
                 }
             }
         }
 
         return $this->render('pages/token_creation.html.twig', [
-            'formHeader' => 'Create your own token',
+            'formHeader' => $this->translator->trans('page.token_creation.form_header'),
             'form' => $form->createView(),
+            'tokenCreateError' => !$this->isGranted('create', $token),
         ]);
     }
 
@@ -341,9 +422,83 @@ class TokenController extends Controller
         return $this->redirectToOwnToken('intro', 'settings');
     }
 
+    /**
+     * @Route("/{name}/r/{hash}",
+     *     name="airdrop_referral",
+     *     options={"expose"=true}
+     * )
+     */
+    public function airdropReferral(
+        string $name,
+        string $hash,
+        AirdropReferralCodeManagerInterface $arcManager
+    ): Response {
+        $user = $this->getUser();
+        $validHash = (new AirdropReferralCodeHashValidator($hash))->validate();
+
+        if ($user || !$validHash) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        $arc = $arcManager->decode($hash);
+
+        if (!$arc || $arc->getAirdrop()->getToken()->getName() !== $name || !$arc->getAirdrop()->isActive()) {
+            return $this->redirectToRoute('token_show', ['name' => $name]);
+        }
+
+        $response = $this->redirectToRoute('token_show', ['name' => $name, 'tab' => 'intro', 'modal' => 'airdrop']);
+
+        $response->headers->setCookie(new Cookie('referral-code', $hash));
+        $response->headers->setCookie(new Cookie('referral-type', 'airdrop'));
+
+        return $response;
+    }
+
+    /**
+     * @Route("/{name}/airdrop/{airdropId}/embeded",
+     *     name="airdrop_embeded",
+     *     options={"expose"=true, "2fa_progress"=false},
+     *     requirements={"airdropId"="\d+"}
+     * )
+     */
+    public function airdropEmbeded(
+        string $name,
+        int $airdropId,
+        AirdropReferralCodeManagerInterface $arcManager,
+        Request $request
+    ): Response {
+        /** @var  User|null $user */
+        $user = $this->getUser();
+        $token = $this->fetchToken($request, $name);
+        $airdrop = $token->getAirdrop($airdropId);
+        $referralCode = null;
+
+        if (!$airdrop) {
+            throw new NotFoundAirdropException();
+        }
+
+        if ($user && $airdrop->getToken()->getOwner()->getId() !== $user->getId()) {
+            $referralCode = $arcManager->getByAirdropAndUser($airdrop, $user)
+                ?? $arcManager->create($airdrop, $user);
+            $referralCode = $arcManager->encode($referralCode);
+        }
+
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
+        return $this->render('pages/airdrop_embeded.html.twig', [
+            'airdrop' => $this->normalize($airdrop, ['API']),
+            'referralCode' => $referralCode,
+            'token' => $token,
+            'isOwner' => $user && $token->isOwner($user->getProfile()->getTokens()),
+            'userAlreadyClaimed' => $userAlreadyClaimed,
+        ]);
+    }
+
     private function redirectToOwnToken(?string $showtab = 'trade', ?string $showTokenEditModal = null): RedirectResponse
     {
-        $token = $this->tokenManager->getOwnToken();
+        $ownTokens = $this->tokenManager->getOwnTokens();
+        $token = $this->tokenManager->getOwnMintmeToken()
+            ?? array_pop($ownTokens);
 
         if (null === $token) {
             throw $this->createNotFoundException('User doesn\'t have a token created.');
@@ -360,6 +515,135 @@ class TokenController extends Controller
 
     private function isTokenCreated(): bool
     {
-        return null !== $this->tokenManager->getOwnToken();
+        return count($this->tokenManager->getOwnTokens()) > 0;
+    }
+
+    private function fetchToken(Request $request, string $name, ?string $modal = null): Token
+    {
+        $dashedName = (new StringConverter(new DashStringStrategy()))->convert($name);
+
+        //rebranding
+        if (Symbols::MINTME === mb_strtoupper($dashedName)) {
+            $dashedName = Symbols::WEB;
+        }
+
+        if ($this->cryptoManager->findBySymbol($name)) {
+            throw new RedirectException(
+                $this->redirectToRoute('coin', [
+                    'base'=> (Symbols::WEB === $name ? Symbols::BTC : $name),
+                    'quote'=> Symbols::MINTME,
+                ])
+            );
+        }
+
+        $token = $this->tokenManager->findByName($dashedName);
+
+        if (!$token || $token->isBlocked()) {
+            throw new NotFoundTokenException();
+        }
+
+        return $token;
+    }
+
+    private function renderPairPage(
+        Token $token,
+        Request $request,
+        string $tab,
+        ?string $modal = null,
+        array $extraData = []
+    ): Response {
+        $tokenCrypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
+        $exchangeCrypto = $this->cryptoManager->findBySymbol($token->getExchangeCryptoSymbol());
+        $market = $exchangeCrypto
+            ? $this->marketManager->create($exchangeCrypto, $token)
+            : null;
+
+        if ($token->getDescription()) {
+            $tokenDescription = (new StringConverter(new BbcodeMetaTagsStringStrategy()))->convert($token->getDescription());
+            $tokenDescription = preg_replace(
+                '/\[\/?(?:b|i|u|s|ul|ol|li|p|s|url|img|h1|h2|h3|h4|h5|h6)*?.*?\]/',
+                '\2',
+                $tokenDescription
+            );
+            $tokenDescription = str_replace("\n", " ", $tokenDescription);
+            $defaultActivated = false;
+        } else {
+            $tokenDescription = 'MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.';
+            $defaultActivated = true;
+        }
+
+        /** @var  User|null $user */
+        $user = $this->getUser();
+
+        $tokenDecimals = $token->getDecimals();
+
+        $userAlreadyClaimed = $this->airdropCampaignManager->checkIfUserClaimed($user, $token);
+
+        $topHolders = null;
+        $serviceUnavailable = false;
+
+        if ('intro' === $tab) {
+            try {
+                $topHolders = $this->balanceHandler->topHolders(
+                    $token,
+                    $this->parameterBag->get('top_holders')
+                );
+            } catch (\Throwable $e) {
+                $serviceUnavailable = true;
+            }
+        }
+
+        $discordCallbackUrl = $this->generateUrl('discord_callback_bot', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $discordAuthUrl = $this->discordOAuthClient->generateAuthUrl(
+            'bot applications.commands',
+            $discordCallbackUrl,
+            DiscordOAuthClientInterface::BOT_PERMISSIONS_ADMINISTRATOR,
+            (string)$token->getId()
+        );
+
+        return $this->render(
+            'pages/pair.html.twig',
+            array_merge([
+                'showSuccessAlert' => $request->isMethod('POST'),
+                'token' => $token,
+                'tokenCrypto' => $this->normalize($tokenCrypto),
+                'tokenDescription' => $tokenDescription,
+                'metaTokenDescription' => substr($tokenDescription, 0, 200),
+                'showDescription' => $token->isOwner($this->tokenManager->getOwnTokens()) || !$defaultActivated,
+                'currency' => $token->getExchangeCryptoSymbol(),
+                'hash' => $user ? $user->getHash() : '',
+                'profile' => $token->getProfile(),
+                'isOwner' => $token->isOwner($this->tokenManager->getOwnTokens()),
+                'isTokenCreated' => $this->isTokenCreated(),
+                'tab' => $tab,
+                'showTrade' => true,
+                'market' => $this->normalize($market),
+                'tokenHiddenName' => $market ?
+                    $this->tokenNameConverter->convert($token) :
+                    '',
+                'precision' => $this->getParameter('token_precision'),
+                'isTokenPage' => true,
+                'dMMinAmount' => (float)$this->getParameter('dm_min_amount'),
+                'showAirdropCampaign' => $token->getActiveAirdrop() ? true : false,
+                'userAlreadyClaimed' => $userAlreadyClaimed,
+                'posts' => $this->normalize($token->getPosts()),
+                'votings' => $this->normalize($token->getVotings()),
+                'taker_fee' => $this->orderConfig->getTakerFeeRate(),
+                'showTokenEditModal' => 'settings' === $modal,
+                'disabledServicesConfig' => $this->normalize($this->disabledServicesConfig),
+                'showCreatedModal' => 'created' === $modal,
+                'tokenSubunit' => null === $tokenDecimals || $tokenDecimals > Token::TOKEN_SUBUNIT
+                    ? Token::TOKEN_SUBUNIT
+                    : $tokenDecimals,
+                'topHolders' => $this->normalize($topHolders, ['API']),
+                'showAirdropModal' => !$userAlreadyClaimed && 'airdrop' === $modal,
+                'tokenDeleteSoldLimit' => $this->getParameter('token_delete_sold_limit'),
+                'post' => null,
+                'comments' => [],
+                'serviceUnavailable' => $serviceUnavailable,
+                'discordAuthUrl' => $discordAuthUrl,
+            ], $extraData)
+        );
     }
 }

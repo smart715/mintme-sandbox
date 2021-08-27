@@ -28,7 +28,7 @@ class PaymentCryptoStrategy implements BalanceStrategyInterface
     {
         $this->balanceHandler->deposit(
             $user,
-            Token::getFromCrypto($tradeble),
+            $tradeble,
             $this->moneyWrapper->parse($amount, $tradeble->getSymbol())
                 ->add($tradeble->getFee())
         );

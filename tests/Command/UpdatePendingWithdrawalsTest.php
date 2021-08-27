@@ -9,13 +9,16 @@ use App\Entity\PendingWithdraw;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Repository\CryptoRepository;
 use App\Repository\PendingTokenWithdrawRepository;
 use App\Repository\PendingWithdrawRepository;
 use App\Utils\DateTime;
 use App\Utils\LockFactory;
+use App\Utils\Symbols;
 use App\Wallet\Model\Amount;
+use App\Wallet\Money\MoneyWrapperInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -26,6 +29,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Lock\LockInterface;
 
 class UpdatePendingWithdrawalsTest extends KernelTestCase
@@ -49,7 +53,9 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $cm,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;
@@ -86,7 +92,9 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
             $this->mockDate(new DateTimeImmutable()),
             $handler,
             $cm,
-            $this->mockLockFactory()
+            $this->mockLockFactory(),
+            $this->createMock(MoneyWrapperInterface::class),
+            $this->createMock(TokenConfig::class)
         );
 
         $upw->withdrawExpirationTime = 1;
@@ -187,8 +195,8 @@ class UpdatePendingWithdrawalsTest extends KernelTestCase
     {
         $lock = $this->createMock(Crypto::class);
 
-        $lock->method('getSymbol')->willReturn(Token::WEB_SYMBOL);
-        $lock->method('getName')->willReturn(Token::WEB_SYMBOL);
+        $lock->method('getSymbol')->willReturn(Symbols::WEB);
+        $lock->method('getName')->willReturn(Symbols::WEB);
 
         return $lock;
     }

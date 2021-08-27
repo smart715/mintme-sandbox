@@ -3,9 +3,8 @@
 namespace App\Communications;
 
 use App\Communications\Exception\FetchException;
-use App\Entity\Token\Token;
 use App\Exchange\Config\DeployCostConfig;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Money\Currency;
 use Money\Exchange\FixedExchange;
@@ -14,14 +13,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DeployCostFetcher implements DeployCostFetcherInterface
 {
-    /** @var RestRpcInterface */
-    private $rpc;
+    private const CRYPTO_IDS = [
+        Symbols::WEB => 'webchain',
+        Symbols::ETH => 'ethereum',
+        Symbols::BNB => 'binancecoin',
+    ];
 
-    /** @var DeployCostConfig */
-    private $deployCostConfig;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private RestRpcInterface $rpc;
+    private DeployCostConfig $deployCostConfig;
+    private MoneyWrapperInterface $moneyWrapper;
 
     public function __construct(
         RestRpcInterface $rpc,
@@ -33,37 +33,76 @@ class DeployCostFetcher implements DeployCostFetcherInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDeployWebCost(): Money
+    public function getDeployCost(string $symbol): Money
     {
+        $ids = implode(',', self::CRYPTO_IDS);
         $response = $this->rpc->send(
-            'simple/price?ids=webchain&vs_currencies=usd',
+            "simple/price?ids=${ids}&vs_currencies=usd",
             Request::METHOD_GET
         );
 
         $response = json_decode($response, true);
 
-        if (!isset($response['webchain']['usd'])) {
-            throw new FetchException();
+        foreach (self::CRYPTO_IDS as $cryptoId) {
+            if (!isset($response[$cryptoId]['usd'])) {
+                throw new FetchException();
+            }
         }
 
-        return $this->moneyWrapper->convert(
-            Money::USD($this->deployCostConfig->getDeployCost()),
-            new Currency(Token::WEB_SYMBOL),
-            new FixedExchange([
-                MoneyWrapper::USD_SYMBOL => [ Token::WEB_SYMBOL => 1 / $response['webchain']['usd'] ],
-            ])
-        );
+        return $this->rate($symbol, $response);
     }
 
-    public function getDeployCostReferralReward(): Money
+    public function getDeployCosts(): array
     {
-        $deployCostReward = $this->deployCostConfig->getDeployCostReward();
-        $deployWebCost = $this->getDeployWebCost();
+        $ids = implode(',', self::CRYPTO_IDS);
+        $response = $this->rpc->send(
+            "simple/price?ids=${ids}&vs_currencies=usd",
+            Request::METHOD_GET
+        );
+
+        $response = json_decode($response, true);
+
+        foreach (self::CRYPTO_IDS as $cryptoId) {
+            if (!isset($response[$cryptoId]['usd'])) {
+                throw new FetchException();
+            }
+        }
+
+        $costs = [];
+
+        foreach (array_keys(self::CRYPTO_IDS) as $symbol) {
+            $costs[$symbol] = $this->rate($symbol, $response);
+        }
+
+        return $costs;
+    }
+
+    /**
+     * @return Money
+     * @throws FetchException
+     */
+    public function getDeployCostReferralReward(string $symbol): Money
+    {
+        $deployCostReward = $this->deployCostConfig->getDeployCostReward($symbol);
+        $deployWebCost = $this->getDeployCost($symbol);
 
         if ($deployCostReward > 0 && $deployWebCost->isPositive()) {
             return $deployWebCost->multiply($deployCostReward);
         }
 
-        return new Money(0, new Currency(Token::WEB_SYMBOL));
+        return new Money(0, new Currency($symbol));
+    }
+
+    private function rate(string $symbol, array $response): Money
+    {
+        return $this->moneyWrapper->convert(
+            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployCost($symbol), Symbols::USD),
+            new Currency($symbol),
+            new FixedExchange([
+                Symbols::USD => [ $symbol => 1 / $response[self::CRYPTO_IDS[$symbol]]['usd'] ],
+            ])
+        )->add(
+            $this->moneyWrapper->parse((string)$this->deployCostConfig->getDeployFee($symbol), $symbol)
+        );
     }
 }

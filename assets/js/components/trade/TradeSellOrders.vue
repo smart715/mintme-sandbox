@@ -47,8 +47,9 @@
                             <template v-slot:cell(sum)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="sum(row.value, rate)">
                                         </span>
                                     </div>
                                 </div>
@@ -102,11 +103,15 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import Decimal from 'decimal.js';
+import {mapGetters} from 'vuex';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
 import {toMoney, removeSpaces, currencyConversion} from '../../utils';
-import {mapGetters} from 'vuex';
-import {USD, usdSign} from '../../utils/constants.js';
-import Decimal from 'decimal.js';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
 import {
     LazyScrollTableMixin,
     FiltersMixin,
@@ -117,8 +122,18 @@ import {
     OrderHighlights,
 } from '../../mixins/';
 
+library.add(faCircleNotch, faTimes);
+
 export default {
     name: 'TradeSellOrders',
+    components: {
+        Guide,
+        BTable,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         FiltersMixin,
         LazyScrollTableMixin,
@@ -133,6 +148,7 @@ export default {
         ordersList: [Array],
         market: Object,
         fields: Array,
+        totalSellOrders: [Array, Object],
         basePrecision: Number,
         loggedIn: Boolean,
         ordersLoaded: Boolean,
@@ -140,14 +156,13 @@ export default {
             type: Boolean,
             default: false,
         },
+        currencyMode: String,
     },
     data() {
         return {
             tableData: this.ordersList,
+            currencyModes,
         };
-    },
-    components: {
-        Guide,
     },
     mounted: function() {
         this.startScrollListeningOnce(this.ordersList);
@@ -160,9 +175,13 @@ export default {
             return this.market.quote.symbol.length > 12;
         },
         total: function() {
-            return toMoney(this.tableData.reduce((sum, order) =>
-                new Decimal(order.amount).add(sum), 0), this.quotePrecision
-            );
+            if (this.totalSellOrders) {
+                return toMoney(this.totalSellOrders, this.quotePrecision);
+            } else {
+                return toMoney(this.tableData.reduce((sum, order) =>
+                    new Decimal(order.amount).add(sum), 0), this.quotePrecision
+                );
+            }
         },
         hasOrders: function() {
             return this.tableData.length > 0;
@@ -177,6 +196,11 @@ export default {
         },
     },
     methods: {
+        sum: function(value, rate) {
+            return this.currencyMode === this.currencyModes.usd.value ?
+                this.currencyConvert(value, rate, 2) :
+                value;
+        },
         removeOrderModal: function(row) {
             this.$emit('modal', row);
         },

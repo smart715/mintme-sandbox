@@ -9,6 +9,7 @@ function mockVue() {
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$routing = {generate: (val) => val};
+            Vue.prototype.$t = (val) => val;
         },
     });
     return localVue;
@@ -43,6 +44,33 @@ const testComment = {
     },
 };
 
+const testPost = {
+    id: 1,
+    amount: '0',
+    content: 'foo',
+    createdAt: '2016-01-01T23:35:01',
+    updatedAt: '2016-01-01T23:35:01',
+    editable: false,
+    author: {
+        id: 1,
+        profile: {
+            anonymous: false,
+            city: null,
+            country: 'testCountry',
+            description: '',
+            firstName: 'John',
+            lastName: 'Doe',
+            image: {
+                avatar_small: 'testAvatarSmall',
+                avatar_middle: 'testAvatarMiddle',
+                avatar_large: 'testAvatarLarge',
+            },
+            page_url: 'testPageUrl',
+            nickname: 'John',
+        },
+    },
+};
+
 describe('Comments', () => {
     it('shows no one commented yet if there are no comments', () => {
         const localVue = mockVue();
@@ -50,12 +78,12 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comments: [],
-                postId: 1,
+                post: testPost,
             },
         });
 
         expect(wrapper.findAll('comment-stub').length).toBe(0);
-        expect(wrapper.find('.comments').html()).toContain('No one commented yet.');
+        expect(wrapper.find('.comments').html()).toContain('post.no_one_commented');
     });
 
     it('shows comments if comments is not empty', () => {
@@ -64,7 +92,7 @@ describe('Comments', () => {
             localVue,
             propsData: {
                 comments: [testComment],
-                postId: 1,
+                post: testPost,
             },
         });
 

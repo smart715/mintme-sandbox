@@ -1,7 +1,7 @@
 # This file is auto-generated during the composer install
 parameters:
     locale: en
-    version: V1.0.0
+    version: V1.5.0
     is_beta_version: false
     viabtc_rpc: 'http://btc:8080'
     viabtc_response_timeout_seconds: 60
@@ -23,15 +23,18 @@ parameters:
         - basic
     websocket_url: 'wss://localhost/ws'
     taker_fee_rate: 0.002
-    maker_fee_rate: 0.001
+    maker_fee_rate: 0.002
     verify_timeout_seconds: 10
     token_quantity: 10000000
+    token_delete_sold_limit: 100000
     referral_fee: 0.5
-    donation:
-        fee: 5
+    quick_trade:
+        donation_fee: 0.05
+        sell_fee: 0.002
         minBtcAmount: 1.0E-6
         minMintmeAmount: 0.01
         minEthAmount: 0.0001
+        minUsdcAmount: 0.1
         minTokensAmount: 0.0001
     google_tracking_id: UA-2289508-20
     tawk_api_key: 328536796c72787602bf8a9c6c59045f456d434c
@@ -42,8 +45,14 @@ parameters:
     mintme_supply: 'https://mintme.com/coin/supply.txt'
     mintme_coin: 'MintMe Coin'
     mintme_coin_link: 'https://www.mintme.com/coin/'
-    deploy_cost: 0
-    deploy_cost_referral_reward: 0.1
+    deploy_cost_mintme: 0
+    deploy_cost_eth: 0
+    deploy_cost_bnb: 0
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
+    deploy_cost_referral_reward_mintme: 0.3
+    deploy_cost_referral_reward_eth: 0.2
+    deploy_cost_referral_reward_bnb: 0.1
     deploy_rpc: 'http://deploytok:3001'
     deploy_response_timeout_seconds: 60
     token_deletion_confirm_code_expiration_time: 60
@@ -63,6 +72,7 @@ parameters:
     quick_registration_password: blockchaincrowdfunding
     front_end_logs_cut_headers: true
     minimum_volume_for_marketcap: 100000
+    tokens_on_page: 50
     top_holders: 10
     images_path: /uploads/images
     airdrop_params:
@@ -90,9 +100,13 @@ parameters:
     coinify_crypto_currencies:
         - BTC
         - ETH
+        - USDC
+        - BNB
     blockchain_disabled: null
     disable_deposits: false
     disable_withdrawals: false
+    disable_token_deposits: false
+    disable_token_withdrawals: false
     disable_deploy_tokens: false
     disable_new_trades: false
     disable_trading: false
@@ -108,6 +122,8 @@ parameters:
         - fr
         - pl
     translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    translation_auto_detect:
+        - es
     translation_flags:
         en:
             label: English
@@ -133,8 +149,62 @@ parameters:
         fr:
             label: Française
             flag: fr
-    time_intervals:
-        - 10
-        - 1440
-        - 43200
+    orders_filled_intervals:
+        - '10 minutes'
+        - '1 day'
+        - '30 day'
+    orders_cancelled_intervals:
+        - '1 day'
+        - '30 day'
+    token_marketing_tips_intervals:
+        - '2 day'
+        - '4 day'
+        - '7 day'
+        - '10 day'
+        - '15 day'
+        - '21 day'
+    marketing_airdrop_feature_intervals:
+        - '7 day'
     dm_min_amount: 1
+    eth_token_withdraw_fee: 0.01
+    bnb_token_withdraw_fee: 0.01
+    max_allowed_active_orders: 100
+    kb_links:
+        - Quickstart-Guide-to-MintMe
+        - Talking-to-your-followers-about-MintMe-we-got-some-ideas
+        - Time-for-token-sales-how-can-I-make-a-difference
+        - Ideas-to-promote-and-sell-your-token
+        - Aiming-at-a-strong-token
+        - The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported
+    freeDays: 7
+    price: 100
+    mintmeHostPath: 'https://mintme.host'
+    available_mails:
+        - MintmeHost
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: YWNkbjk1OTU6cHhmUGkzN2c=
+    disable_sms: true
+    adding_phone_attempts_limit:
+        failed: 5
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        interval: 30D
+    mintme_explorer_url: 'https://mintme.com/explorer'
+    eth_explorer_url: 'https://goerli.etherscan.io'
+    bnb_explorer_url: 'https://testnet.bscscan.com'
+    liip_data_root: '%kernel.project_dir%/public'
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+    auth_make_disable_sell: false
+    auth_make_disable_trading: false
+    auth_make_disable_token_creation: false
+    auth_make_disable_withdrawals_and_deposit: false
+    auth_make_disable_donations: false
+    minimum_order_value_usd: 0.1
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_base_commands_url: 'https://discord.com/api/v8/applications/'
+    discord_api_timeout: '10'

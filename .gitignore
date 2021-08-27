@@ -41,3 +41,6 @@ public/build
 
 ###< avatar uploader ###
 public/media/cache
+
+###< translations ###
+translations/ui/auto_gen_keys.json

@@ -13,6 +13,11 @@
         </div>
         <div v-else-if="hasAirdropCampaign">
             <div>
+                <p>{{ $t('airdrop.embed_title') }}</p>
+                <copy-link
+                    class="form-control"
+                    :content-to-copy="embedCode"
+                >{{ embedCode }}</copy-link>
                 <span
                     class="btn-cancel px-0 c-pointer m-1"
                     @click="showModal = true"
@@ -313,7 +318,7 @@
                 </div>
                 <button
                     class="btn btn-primary float-left"
-                    :disabled="btnDisabled || insufficientBalance"
+                    :disabled="btnDisabled || insufficientBalance || allOptionsUnChecked"
                     @click="createAirdropCampaign"
                 >
                     {{ $t('save') }}
@@ -326,26 +331,46 @@
 <script>
 import moment from 'moment';
 import Decimal from 'decimal.js';
-import datePicker from 'vue-bootstrap-datetimepicker';
+import datePicker from '../../DatePicker';
+import {BCollapse, VBToggle} from 'bootstrap-vue';
+import {mapGetters} from 'vuex';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faCircle, faGlobe} from '@fortawesome/free-solid-svg-icons';
+import {faTwitter, faFacebookF, faLinkedinIn, faYoutube} from '@fortawesome/free-brands-svg-icons';
+import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import ConfirmModal from '../../modal/ConfirmModal';
 import {LoggerMixin, NotificationMixin, MoneyFilterMixin} from '../../../mixins';
 import {TOK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, AIRDROP_CREATED, AIRDROP_DELETED, tweetLink, facebookPostLink} from '../../../utils/constants';
-import {mapGetters} from 'vuex';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
 import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
 import {requiredIf} from 'vuelidate/lib/validators';
+import CopyLink from '../../CopyLink';
+
+library.add(
+    faCircleNotch,
+    faCircle,
+    faGlobe,
+    faTwitter,
+    faFacebookF,
+    faLinkedinIn,
+    faYoutube
+);
 
 export default {
     name: 'TokenAirdropCampaign',
     mixins: [NotificationMixin, LoggerMixin, MoneyFilterMixin],
     components: {
+        CopyLink,
+        BCollapse,
         datePicker,
         ConfirmModal,
         FontAwesomeIcon,
         FontAwesomeLayers,
         TokenFacebookAddress,
         TokenYoutubeAddress,
+    },
+    directives: {
+        'b-toggle': VBToggle,
     },
     props: {
         tokenName: String,
@@ -357,7 +382,7 @@ export default {
     data() {
         return {
             showModal: false,
-            airdropCampaignId: null,
+            airdrop: null,
             airdropCampaignRemoved: false,
             tokenBalance: 0,
             balanceLoaded: false,
@@ -396,6 +421,21 @@ export default {
         this.loadAirdropCampaign();
     },
     computed: {
+        airdropCampaignId: function() {
+            return this.airdrop ? this.airdrop.id : null;
+        },
+        embedCode: function() {
+            const src = this.$routing.generate('airdrop_embeded', {
+                name: this.tokenName,
+                airdropId: this.airdropCampaignId,
+            }, true);
+
+            return `<iframe src="${src}" width="500px" height="500px" style="border: none;" scrolling="no"></iframe>`;
+        },
+        allOptionsUnChecked: function() {
+            return Object.values(this.actions)
+                .every((item) => item === false);
+        },
         minTokensAmount: function() {
             return this.airdropParams.min_tokens_amount || 0;
         },
@@ -412,13 +452,19 @@ export default {
             return parseInt(this.airdropCampaignId) > 0;
         },
         btnDisabled: function() {
-            return !(this.isAmountValid && this.isParticipantsAmountValid && this.isDateEndValid) || this.$v.$invalid;
+            return !this.isAmountValid
+                || !this.isParticipantsAmountValid
+                || !this.isDateEndValid
+                || this.insufficientBalance
+                || this.$v.$invalid;
         },
         insufficientBalance: function() {
             if (this.balanceLoaded) {
                 let balance = new Decimal(this.tokenBalance);
 
-                return balance.lessThan(this.minTokensAmount);
+                let tokensAmount = new Decimal(this.tokensAmount || 0);
+
+                return balance.lessThan(this.minTokensAmount) || balance.lessThan(tokensAmount.add(this.reward.dividedBy(2)));
             }
 
             return false;
@@ -427,8 +473,7 @@ export default {
             if (this.tokensAmount > 0) {
                 let tokensAmount = new Decimal(this.tokensAmount);
 
-                return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount)
-                    && tokensAmount.lessThanOrEqualTo(this.tokenBalance);
+                return tokensAmount.greaterThanOrEqualTo(this.minTokensAmount);
             }
 
             return false;
@@ -445,21 +490,25 @@ export default {
             return this.showEndDate && selectedDate.valueOf() > moment().valueOf();
         },
         isRewardValid: function() {
-            if (this.isAmountValid && this.isParticipantsAmountValid) {
-                let amount = new Decimal(this.tokensAmount);
-                let participants = new Decimal(this.participantsAmount);
-                let res = amount.dividedBy(participants);
-
-                return res.greaterThanOrEqualTo(this.minTokenReward);
-            }
-
-            return false;
+            return this.reward.greaterThanOrEqualTo(this.minTokenReward);
         },
         ...mapGetters('tokenStatistics', [
             'getTokenExchangeAmount',
         ]),
         tokenExchangeAmount: function() {
             return this.getTokenExchangeAmount;
+        },
+        /**
+         * @return {Decimal}
+         */
+        reward() {
+            if (this.tokensAmount > 0 && this.participantsAmount > 0) {
+                let amount = new Decimal(this.tokensAmount);
+                let participants = new Decimal(this.participantsAmount);
+                return amount.dividedBy(participants);
+            }
+
+            return new Decimal(0);
         },
     },
     methods: {
@@ -470,7 +519,6 @@ export default {
                     this.balanceLoaded = true;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_load_token_balance'));
                     this.sendLogs('error', 'Can not load token balance data', err);
                 });
         },
@@ -480,8 +528,8 @@ export default {
                 tokenName: this.tokenName,
             }))
                 .then((result) => {
-                    if ('object' === typeof result.data) {
-                        this.airdropCampaignId = result.data.id;
+                    if (result.data.airdrop !== null) {
+                        this.airdrop = result.data.airdrop;
                     }
 
                     if (!this.hasAirdropCampaign) {
@@ -491,7 +539,6 @@ export default {
                     this.loading = false;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.try_reload'));
                     this.sendLogs('error', 'Can not load airdrop campaign.', err);
                 });
         },
@@ -526,7 +573,7 @@ export default {
                 tokenName: this.tokenName,
             }), data)
                 .then((result) => {
-                    this.airdropCampaignId = result.data.id;
+                    this.airdrop = result.data;
                     this.loading = false;
                     this.notifySuccess(this.$t('airdrop.msg_created'));
 
@@ -568,7 +615,7 @@ export default {
                 id: this.airdropCampaignId,
             }))
                 .then(() => {
-                    this.airdropCampaignId = null;
+                    this.airdrop = null;
                     this.notifySuccess(this.$t('airdrop.msg_removed'));
                     window.localStorage.removeItem(AIRDROP_DELETED);
                     window.localStorage.setItem(AIRDROP_DELETED, this.tokenName);
@@ -635,6 +682,9 @@ export default {
         },
         tokenExchangeAmount: function() {
             this.tokenBalance = this.tokenExchangeAmount;
+        },
+        allOptionsUnChecked: function(value) {
+            this.errorMessage = value ? this.$t('airdrop.actions.error_message') : '';
         },
     },
     validations() {

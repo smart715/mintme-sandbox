@@ -15,11 +15,13 @@ use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderInterface;
 use App\Logger\UserActionLogger;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Symbols;
 use App\Utils\ValidatorFactoryInterface;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
+use Money\Currency;
+use Money\Money;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
@@ -108,6 +110,9 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function placeOrder(
         User $user,
         Market $market,
@@ -126,8 +131,18 @@ class Exchanger implements ExchangerInterface
             return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
         }
 
-        if (!$this->vf->createOrderValidator($market, $priceInput, $amountInput)->validate()) {
-            return new TradeResult(TradeResult::SMALL_AMOUNT, $this->translator);
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $priceInput,
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
         }
 
         $price = $this->mw->parse(
@@ -136,11 +151,10 @@ class Exchanger implements ExchangerInterface
         );
 
         if ($marketPrice) {
-            /** @var Order[] $orders */
-            $orders = $this->getPendingOrders($market, $isSellSide ? Order::BUY_SIDE : Order::SELL_SIDE);
-
-            if ($orders) {
-                $price = $orders[0]->getPrice();
+            try {
+                $price = $this->getMarketPrice($market, $user, $isSellSide);
+            } catch (\Throwable $e) {
+                return new TradeResult(TradeResult::FAILED, $this->translator);
             }
         }
 
@@ -192,6 +206,89 @@ class Exchanger implements ExchangerInterface
         return $tradeResult;
     }
 
+    public function executeOrder(
+        User $user,
+        Market $market,
+        string $amountInput,
+        string $expectedToReceive,
+        int $side,
+        ?string $fee = null
+    ): TradeResult {
+        $isSellSide = Order::SELL_SIDE === $side;
+
+        if ($isSellSide && $this->exceedAvailableReleased($user, $market->getQuote()->getSymbol(), $amountInput)) {
+            return new TradeResult(TradeResult::INSUFFICIENT_BALANCE, $this->translator);
+        }
+
+        $avgPrice = $this->mw->parse(
+            $expectedToReceive,
+            $market->getBase()->getSymbol()
+        )->divide($amountInput);
+
+        $minOrderValidator = $this->vf->createOrderValidator(
+            $market,
+            $this->mw->format($avgPrice),
+            $amountInput
+        );
+
+        if (!$minOrderValidator->validate()) {
+            return new TradeResult(
+                TradeResult::SMALL_AMOUNT,
+                $this->translator,
+                $minOrderValidator->getMessage()
+            );
+        }
+
+        $amount = $this->mw->parse(
+            $this->parseAmount($amountInput, $market),
+            $this->getSymbol($market->getQuote())
+        );
+
+        $fee = $fee ?? (string)$this->bag->get($isSellSide ? 'maker_fee_rate' : 'taker_fee_rate');
+
+        $fee = $this->mw->parse(
+            $fee,
+            $this->getSymbol($market->getQuote())
+        );
+
+        $order = new Order(
+            null,
+            $user,
+            null,
+            $market,
+            $amount,
+            $side,
+            $avgPrice,
+            Order::PENDING_STATUS,
+            $fee,
+            null,
+            null,
+            $user->getReferencer() ? (int)$user->getReferencer()->getId() : 0
+        );
+
+        $tradeResult = $this->trader->executeOrder($order);
+
+        try {
+            $this->mp->send($market);
+        } catch (Throwable $exception) {
+            $this->logger->error(
+                "Failed to update '${market}' market status. Reason: {$exception->getMessage()}"
+            );
+        }
+
+        $this->logger->info(
+            sprintf('Excecute %s order', Order::BUY_SIDE === $side ? 'buy' : 'sell'),
+            [
+                'base' => $market->getBase()->getSymbol(),
+                'quote' => $market->getQuote()->getSymbol(),
+                'amount' => $amount->getAmount(),
+                'received' => $expectedToReceive,
+            ]
+        );
+
+        return $tradeResult;
+    }
+
     private function parseAmount(string $amount, Market $market, bool $useBase = false): string
     {
         /** @var Crypto $crypto */
@@ -214,37 +311,118 @@ class Exchanger implements ExchangerInterface
     private function getSymbol(TradebleInterface $tradeble): string
     {
         return $tradeble instanceof Token
-            ? MoneyWrapper::TOK_SYMBOL
+            ? Symbols::TOK
             : $tradeble->getSymbol();
     }
 
     /** @return array<Order> */
-    private function getPendingOrders(Market $market, int $side): array
+    private function getPendingOrders(Market $market, int $side, int $offset): array
     {
         return Order::BUY_SIDE === $side ?
-            $this->mh->getPendingBuyOrders($market, 0, 1) :
-            $this->mh->getPendingSellOrders($market, 0, 1);
+            $this->mh->getPendingBuyOrders($market, $offset) :
+            $this->mh->getPendingSellOrders($market, $offset);
     }
 
     private function exceedAvailableReleased(
         User $user,
-        string $token,
+        string $tokenName,
         string $amount
     ): bool {
-        $token = $this->tm->findByName($token);
+        /** @var Token|null $token */
+        $token = $this->tm->findByName($tokenName);
+
+        if (!$token) {
+            return false;
+        }
+
         $profile = $token->getProfile();
 
-        if ($profile && $user === $profile->getUser()) {
+        if ($profile && $user->getId() === $profile->getUser()->getId()) {
             /** @var BalanceView $balanceViewer */
             $balanceViewer = $this->bvf->create(
-                $this->bh->balances($user, [$token])
+                $this->bh->balances($user, [$token]),
+                $user
             )[$token->getSymbol()];
 
             return $this->mw
-                ->parse($amount, MoneyWrapper::TOK_SYMBOL)
+                ->parse($amount, Symbols::TOK)
                 ->greaterThan($balanceViewer->getAvailable());
         }
 
         return false;
+    }
+
+    private function getMarketPrice(Market $market, User $user, bool $isSellSide): Money
+    {
+        $base = $market->getBase();
+        $quote = $market->getQuote();
+
+        $balance = $this->getBalance(
+            $user,
+            $isSellSide ? $quote : $base
+        );
+
+        $ordersQuoteAmountSum = new Money(0, new Currency($this->getSymbol($quote)));
+
+        $offset = 0;
+        $orders = [];
+
+        $marketPrice = null;
+
+        do {
+            $offset += count($orders);
+            $moreOrders = $this->getPendingOrders(
+                $market,
+                $isSellSide ? Order::BUY_SIDE : Order::SELL_SIDE,
+                $offset
+            );
+
+            // This is so that $orders will keep the last orders if $moreOrders comes empty
+            // so that price can be set to last order's price if the market price is still null after loop
+            $orders = count($moreOrders)
+                ? $moreOrders
+                : $orders;
+
+            foreach ($moreOrders as $order) {
+                $ordersQuoteAmountSum = $ordersQuoteAmountSum->add($order->getAmount());
+
+                $totalPrice = $order->getPrice()->multiply($this->mw->format($ordersQuoteAmountSum));
+
+                $condition = $balance->lessThanOrEqual(
+                    $isSellSide ? $ordersQuoteAmountSum : $totalPrice
+                );
+
+                if ($condition) {
+                    $marketPrice = $order->getPrice();
+
+                    break;
+                }
+            }
+
+            if ($marketPrice) {
+                break;
+            }
+        } while ($moreOrders);
+
+        $count = count($orders);
+
+        if (null === $marketPrice && $count > 0) {
+            $marketPrice = $orders[$count - 1]->getPrice();
+        } elseif (null === $marketPrice) {
+            throw new \Exception('Market price selected when market price is 0');
+        }
+
+        return $marketPrice;
+    }
+
+    private function getBalance(User $user, TradebleInterface $tradeble): Money
+    {
+        $balanceResult = $this->bh->balance($user, $tradeble);
+
+        if ($tradeble instanceof Token) {
+            return $this->tm->getRealBalance($tradeble, $balanceResult, $user)->getAvailable();
+        }
+
+        return $balanceResult->getAvailable();
     }
 }

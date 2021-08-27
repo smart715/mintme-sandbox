@@ -11,7 +11,6 @@ class OrdersControllerTest extends WebTestCase
     public function testGetSellActiveOrders(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $fooClient = self::createClient();
@@ -68,7 +67,6 @@ class OrdersControllerTest extends WebTestCase
     public function testGetBuyActiveOrders(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
         $this->sendWeb($email);
 
@@ -113,7 +111,7 @@ class OrdersControllerTest extends WebTestCase
                 'MINTME',
                 $tokName,
                 '1.000000000000',
-                '0.999000000000',
+                '0.998000000000',
             ],
             [
                 $res[0]['market']['base']['symbol'],
@@ -127,7 +125,6 @@ class OrdersControllerTest extends WebTestCase
     public function testGetSellActiveOrdersWithOffset(): void
     {
         $email = $this->register($this->client);
-        $this->createProfile($this->client);
         $tokName = $this->createToken($this->client);
 
         $this->client->request('POST', '/api/orders/WEB/'. $tokName . '/place-order', [

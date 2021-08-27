@@ -43,7 +43,7 @@
                     </template>
                     <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
-                            <span class="icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
+                            <span class="icon icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
                         </a>
                     </template>
                 </b-table>
@@ -72,9 +72,13 @@
     </div>
 </template>
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
-import ConfirmModal from '../modal/ConfirmModal';
 import Decimal from 'decimal.js';
+import {BTable, VBTooltip} from 'bootstrap-vue';
+import ConfirmModal from '../modal/ConfirmModal';
 import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
 import {
@@ -88,8 +92,18 @@ import {
     OrderMixin,
 } from '../../mixins/';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'ActiveOrders',
+    components: {
+        BTable,
+        FontAwesomeIcon,
+        ConfirmModal,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -100,7 +114,6 @@ export default {
         PairNameMixin,
         OrderMixin,
     ],
-    components: {ConfirmModal},
     props: {
         userId: Number,
         isUserBlocked: Boolean,
@@ -194,7 +207,7 @@ export default {
         history: function() {
             return this.tableData.map((order) => {
                 return {
-                    date: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                    date: moment.unix(order.timestamp).format(GENERAL.dateTimeFormat),
                     type: this.getSideByType(order.side),
                     name: this.pairNameFunc(
                         this.rebrandingFunc(order.market.base),
@@ -247,10 +260,9 @@ export default {
                             this.$refs.btable.refresh();
                         }
                     }
-                }, 'active-tableData-update');
+                }, 'active-tableData-update', 'ActiveOrders');
             })
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_update_order_list'));
                 this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
             });
     },
@@ -276,7 +288,6 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_orders_history'));
                         this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });

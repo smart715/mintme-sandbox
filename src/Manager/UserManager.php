@@ -7,10 +7,38 @@ use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Entity\UserCrypto;
 use App\Entity\UserToken;
+use App\Mailer\MailerInterface;
 use App\Repository\UserRepository;
+use App\Utils\Symbols;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\UserBundle\Util\CanonicalFieldsUpdater;
+use FOS\UserBundle\Util\PasswordUpdaterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserManagerInterface
 {
+    private CryptoManagerInterface $cryptoManager;
+    private MailerInterface $mailer;
+    private EntityManagerInterface $entityManager;
+    private TranslatorInterface $translator;
+
+    public function __construct(
+        PasswordUpdaterInterface $passwordUpdater,
+        CanonicalFieldsUpdater $canonicalFieldsUpdater,
+        ObjectManager $om,
+        string $class,
+        CryptoManagerInterface $cryptoManager,
+        MailerInterface $mailer,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ) {
+        parent::__construct($passwordUpdater, $canonicalFieldsUpdater, $om, $class);
+        $this->cryptoManager = $cryptoManager;
+        $this->mailer = $mailer;
+        $this->entityManager = $entityManager;
+        $this->translator = $translator;
+    }
 
     public function find(int $id): ?User
     {
@@ -46,9 +74,42 @@ class UserManager extends \FOS\UserBundle\Doctrine\UserManager implements UserMa
         return $this->findUserBy(['email' => $email]);
     }
 
+    public function findByDiscordId(int $discordId): ?User
+    {
+        /** @var User|null $user */
+        $user = $this->findUserBy(['discordId' => $discordId]);
+
+        return $user;
+    }
+
     public function checkExistCanonicalEmail(string $email): bool
     {
         return $this->getRepository()->checkExistCanonicalEmail($email);
+    }
+
+    public function sendMintmeExchangeMail(User $user): void
+    {
+        $exchangeCryptos = array_filter(
+            $this->cryptoManager->findAll(),
+            fn (Crypto $crypto) => Symbols::WEB !== $crypto->getSymbol() && $crypto->isTradable()
+        );
+
+        $cryptosList = array_reduce(
+            $exchangeCryptos,
+            fn ($carry, Crypto $crypto) =>
+             $exchangeCryptos[count($exchangeCryptos)] === $crypto
+                ? $carry . ' ' . $this->translator->trans('and') . ' ' . $crypto->getSymbol()
+                : ('' === $carry
+                    ? $crypto->getSymbol()
+                    : $carry . ', ' . $crypto->getSymbol()),
+            ''
+        );
+
+        $this->mailer->sentMintmeExchangeMail($user, $exchangeCryptos, $cryptosList);
+
+        $user->setExchangeCryptoMailSent(true);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 
     /** @inheritDoc */

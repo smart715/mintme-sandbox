@@ -17,7 +17,7 @@
             <template slot="close"></template>
             <template slot="body">
                 <div class="token-edit p-0">
-                    <div class="row faq-block mx-0 border-bottom border-top">
+                    <div class="row faq-block light-border no-decoration mx-0">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                                 {{ $t('token_edit_modal.add_social_media') }}
@@ -42,7 +42,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item @switch="refreshSliders">
                             <template slot="title">
                               {{ $t('token_edit_modal.period') }}
@@ -58,7 +58,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.deploy') }}
@@ -74,13 +74,21 @@
                                     @pending="$emit('token-deploy-pending')"
                                     :key="tokenDeployKey"
                                     :disabled-services-config="disabledServicesConfig"
+                                    :current-locale="currentLocale"
+                                    :token-deployed-date="tokenDeployedDate"
+                                    :token-tx-hash-address="tokenTxHashAddress"
+                                    :mintme-explorer-url="mintmeExplorerUrl"
+                                    :eth-explorer-url="ethExplorerUrl"
+                                    :bnb-explorer-url="bnbExplorerUrl"
+                                    :token-crypto="tokenCrypto"
+                                    :is-controlled-token="isControlledToken"
                                 />
                             </template>
                         </faq-item>
                     </div>
                     <div
                         v-if="isTokenCreated && isOwner"
-                        class="row faq-block mx-0 border-bottom">
+                        class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.airdrop') }}
@@ -99,7 +107,20 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div class="row faq-block light-border no-decoration mx-0">
+                        <faq-item>
+                            <template slot="title">
+                                {{ $t('discord.rewards.title') }}
+                            </template>
+                            <template slot="body">
+                                <discord-rewards-edit
+                                    :token-name="currentName"
+                                    :auth-url="discordAuthUrl"
+                                />
+                            </template>
+                        </faq-item>
+                    </div>
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.change_name') }}
@@ -114,7 +135,7 @@
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0 border-bottom">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.release_addr') }}
@@ -125,19 +146,17 @@
                                     :release-address="releaseAddress"
                                     :token-name="currentName"
                                     :twofa="twofa"
-                                    @update-release-address="$emit('update-release-address')"
                                 />
                             </template>
                         </faq-item>
                     </div>
-                    <div class="row faq-block mx-0">
+                    <div v-if="isControlledToken" class="row faq-block light-border no-decoration mx-0">
                         <faq-item>
                             <template slot="title">
                                 {{ $t('token_edit_modal.delete') }}
                             </template>
                             <template slot="body">
                                 <token-delete
-                                    :is-token-exchanged="isTokenExchanged"
                                     :is-token-not-deployed="isTokenNotDeployed"
                                     :token-name="currentName"
                                     :twofa="twofa"
@@ -152,8 +171,8 @@
 </template>
 
 <script>
+import {VBTooltip} from 'bootstrap-vue';
 import FaqItem from '../FaqItem';
-import Guide from '../Guide';
 import Modal from './Modal';
 import TokenChangeName from '../token/TokenChangeName';
 import TokenAirdropCampaign from '../token/airdrop_campaign/TokenAirdropCampaign';
@@ -162,14 +181,13 @@ import TokenDeploy from '../token/deploy/TokenDeploy';
 import TokenSocialMediaEdit from '../token/TokenSocialMediaEdit';
 import TokenReleaseAddress from '../token/TokenReleaseAddress';
 import TokenReleasePeriod from '../token/TokenReleasePeriod';
-import TwoFactorModal from './TwoFactorModal';
 import {tokenDeploymentStatus} from '../../utils/constants';
+import DiscordRewardsEdit from '../token/discord/DiscordRewardsEdit';
 
 export default {
     name: 'TokenEditModal',
     components: {
         FaqItem,
-        Guide,
         Modal,
         TokenChangeName,
         TokenAirdropCampaign,
@@ -178,13 +196,17 @@ export default {
         TokenReleaseAddress,
         TokenReleasePeriod,
         TokenSocialMediaEdit,
-        TwoFactorModal,
+        DiscordRewardsEdit,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         currentName: String,
         hasReleasePeriodProp: Boolean,
         isOwner: Boolean,
         isTokenCreated: Boolean,
+        isControlledToken: Boolean,
         isTokenExchanged: Boolean,
         noClose: Boolean,
         precision: Number,
@@ -203,6 +225,20 @@ export default {
         youtubeClientId: String,
         youtubeChannelId: String,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
+        discordAuthUrl: String,
     },
     data() {
         return {

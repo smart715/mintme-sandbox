@@ -2,20 +2,26 @@
 
 namespace App\Controller;
 
+use App\Communications\DiscordOAuthClientInterface;
 use App\Entity\ApiKey;
+use App\Entity\DiscordRoleUser;
 use App\Entity\Unsubscriber;
 use App\Entity\User;
+use App\Events\UserEvents;
+use App\Exception\Discord\DiscordException;
 use App\Exchange\Config\DeployCostConfig;
 use App\Form\ChangePasswordType;
+use App\Form\DisconnectDiscordType;
 use App\Form\TwoFactorType;
 use App\Form\UnsubscribeType;
 use App\Logger\UserActionLogger;
+use App\Manager\DiscordManagerInterface;
 use App\Manager\ProfileManagerInterface;
 use App\Manager\TokenManager;
 use App\Manager\TwoFactorManagerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,33 +30,29 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserController extends AbstractController implements TwoFactorAuthenticatedInterface
 {
-    /** @var UserManagerInterface */
-    protected $userManager;
-
-    /** @var ProfileManagerInterface */
-    protected $profileManager;
-
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var NormalizerInterface */
-    private $normalizer;
-
-    /** @var TokenManager */
-    private $tokenManager;
+    protected UserManagerInterface $userManager;
+    protected ProfileManagerInterface $profileManager;
+    private UserActionLogger $userActionLogger;
+    private EventDispatcherInterface $eventDispatcher;
+    private NormalizerInterface $normalizer;
+    private TokenManager $tokenManager;
+    private TranslatorInterface $translator;
+    private DiscordManagerInterface $discordManager;
+    private DiscordOAuthClientInterface $discordOAuthClient;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         UserManagerInterface $userManager,
@@ -58,7 +60,11 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         UserActionLogger $userActionLogger,
         EventDispatcherInterface $eventDispatcher,
         NormalizerInterface $normalizer,
-        TokenManager $tokenManager
+        TokenManager $tokenManager,
+        TranslatorInterface $translator,
+        DiscordManagerInterface $discordManager,
+        DiscordOAuthClientInterface $discordOAuthClient,
+        EntityManagerInterface $entityManager
     ) {
         $this->userManager = $userManager;
         $this->profileManager = $profileManager;
@@ -66,6 +72,10 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $this->eventDispatcher = $eventDispatcher;
         $this->normalizer = $normalizer;
         $this->tokenManager = $tokenManager;
+        $this->translator = $translator;
+        $this->discordManager = $discordManager;
+        $this->discordOAuthClient = $discordOAuthClient;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -83,9 +93,35 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ? $user->getApiClients()
             : null;
 
-        $passwordForm = $this->getPasswordForm($request, $keys);
+        $passwordForm = $this->getPasswordForm();
+        $passwordForm->handleRequest($request);
 
-        return $this->addDownloadCodesToResponse($this->renderSettings($passwordForm, $keys, $clients));
+        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
+            $this->userManager->updatePassword($user);
+            $this->userManager->updateUser($user);
+            $this->addFlash('success', $this->translator->trans('toasted.success.password_updated'));
+            $this->userActionLogger->info('Password was updated successfully');
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(
+                new FilterUserResponseEvent(
+                    $user,
+                    $request,
+                    new Response(Response::HTTP_OK)
+                ),
+                UserEvents::PASSWORD_UPDATED
+            );
+
+            return $this->redirectToRoute('settings');
+        }
+
+        $disconnectDiscordForm = $this->getDisconnectDiscordForm($request);
+
+        $this->entityManager->flush();
+
+        return $this->addDownloadCodesToResponse(
+            $this->renderSettings($passwordForm, $keys, $clients, $disconnectDiscordForm)
+        );
     }
 
     /**
@@ -95,14 +131,14 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
     {
         /** @var User $user */
         $user = $this->getUser();
+        $token =  $user->getProfile()->getFirstToken();
 
         return $this->render('pages/referral.html.twig', [
             'referralCode' => $user->getReferralCode(),
             'referralPercentage' => $this->getParameter('referral_fee') * 100,
-            'deployCostReward' => $deployCostConfig->getDeployCostRewardPercent(),
+            'deployCostReward' => $token ? $deployCostConfig->getDeployCostRewardPercent($token->getCryptoSymbol()) : 0,
             'referralsCount' => count($user->getReferrals()),
-            'userToken' => null == $user->getProfile()->getToken()
-                ? null : $user->getProfile()->getToken()->getName(),
+            'userToken' => $token ? $token->getName() : null,
         ]);
     }
 
@@ -114,14 +150,18 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         AuthorizationCheckerInterface $authorizationChecker
     ): Response {
         $token = $this->tokenManager->findByName($userToken);
+
+        if (null === $token) {
+            throw new NotFoundHttpException();
+        }
+
         $referralCode = $token->getProfile()->getUser()->getReferralCode();
         $response = $authorizationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
-            ? $this->redirectToRoute('homepage', [], 301)
+            ? $this->redirectToRoute('token_show', ['name' => $userToken], 301)
             : $this->redirectToRoute('fos_user_registration_register', [], 301);
 
-        $response->headers->setCookie(
-            new Cookie('referral-code', $referralCode)
-        );
+        $response->headers->setCookie(new Cookie('referral-code', $referralCode));
+        $response->headers->setCookie(new Cookie('referral-type', 'invite'));
 
         return $response;
     }
@@ -140,6 +180,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         $response->headers->setCookie(
             new Cookie('referral-code', $code)
         );
+        $response->headers->setCookie(new Cookie('referral-type', 'invite'));
 
         return $response;
     }
@@ -188,8 +229,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return $this->redirectToRoute('settings');
         }
 
-        return $this->redirectToRoute(
-            'two_factor_auth',
+        return $this->forward(
+            'App\Controller\UserController::twoFactorAuth',
             ['backupCodes' => $this->turnOnAuthenticator($twoFactorManager) ]
         );
     }
@@ -248,9 +289,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         /** @var User $user*/
         $user = $this->getUser();
         $user->setGoogleAuthenticatorBackupCodes($backupCodes);
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         /** @var mixed $bag */
         $bag = $this->container->get('session')->getBag('attributes');
@@ -277,39 +317,54 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         return $this->redirectToRoute('settings');
     }
 
-    private function getPasswordForm(Request $request, ?ApiKey $apiKey): FormInterface
+    private function getPasswordForm(): FormInterface
     {
         /** @var User $user */
         $user = $this->getUser();
-        $passwordForm = $this->createForm(ChangePasswordType::class, $user);
-        $passwordForm->handleRequest($request);
 
-        if ($passwordForm->isSubmitted() && $passwordForm->isValid()) {
-            $this->userManager->updatePassword($user);
-            $this->userManager->updateUser($user);
-            $this->addFlash('success', 'Password was updated successfully');
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new FilterUserResponseEvent(
-                    $user,
-                    $request,
-                    $this->renderSettings(
-                        $passwordForm,
-                        $apiKey,
-                        $user->GetApiClients()
-                    )
-                ),
-                FOSUserEvents::CHANGE_PASSWORD_COMPLETED
-            );
-        }
-
-        return $passwordForm;
+        return $this->createForm(ChangePasswordType::class, $user, [
+            'action' => $this->generateUrl('settings'),
+            'method' => 'POST',
+            ]);
     }
 
-    private function renderSettings(FormInterface $passwordForm, ?ApiKey $apiKey, ?array $clients): Response
+    private function getDisconnectDiscordForm(Request $request): FormInterface
     {
         /** @var User $user */
         $user = $this->getUser();
+        $disconnectDiscordForm = $this->createForm(DisconnectDiscordType::class);
+        $disconnectDiscordForm->handleRequest($request);
+
+        if ($disconnectDiscordForm->isSubmitted() && $disconnectDiscordForm->isValid()) {
+            /** @var DiscordRoleUser $roleUser */
+            foreach ($user->getDiscordRoleUsers() as $roleUser) {
+                try {
+                    $this->discordManager->removeGuildMemberRole($user, $roleUser->getDiscordRole());
+                    $this->entityManager->remove($roleUser);
+                } catch (DiscordException $e) {
+                    continue;
+                }
+            }
+
+            $user->setDiscordId(null);
+            $this->userManager->updateUser($user);
+            $this->addFlash('success', $this->translator->trans('discord.account.disconnected'));
+        }
+
+        return $disconnectDiscordForm;
+    }
+
+    private function renderSettings(
+        FormInterface $passwordForm,
+        ?ApiKey $apiKey,
+        ?array $clients,
+        FormInterface $disconnectDiscordForm
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $discordCallbackUrl = $this->generateUrl('discord_callback_user', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $discordAuthUrl = $this->discordOAuthClient->generateAuthUrl('identify', $discordCallbackUrl);
 
         return $this->render('pages/settings.html.twig', [
             'keys' => $this->normalizer->normalize($apiKey ?? [], null, [
@@ -320,14 +375,17 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             ]),
             'passwordForm' => $passwordForm->createView(),
             'twoFactorAuth' => $user->isGoogleAuthenticatorEnabled(),
+            'discordAuthUrl' => $discordAuthUrl,
+            'isSignedInWithDiscord' => $user->isSignedInWithDiscord(),
+            'disconnectDiscordForm' => $disconnectDiscordForm->createView(),
         ]);
     }
 
     private function turnOnAuthenticator(TwoFactorManagerInterface $twoFactorManager): array
     {
         $backupCodes = $this->getBackupCodes($twoFactorManager);
-        $this->addFlash('success', 'Congratulations! You have enabled two-factor authentication!');
-        $this->addFlash('success', 'Downloading backup codes...');
+        $this->addFlash('success', $this->translator->trans('2fa.notification.enabled'));
+        $this->addFlash('success', $this->translator->trans('2fa.notification.download_backup_code'));
         $this->userActionLogger->info('Enable Two-Factor Authentication');
 
         return $backupCodes;
@@ -338,11 +396,10 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
         /** @var User $user*/
         $user = $this->getUser();
         $googleAuth = $twoFactorManager->getGoogleAuthEntry($user->getId());
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($googleAuth);
-        $entityManager->flush();
+        $this->entityManager->remove($googleAuth);
+        $this->entityManager->flush();
         $this->container->get('session')->remove('googleSecreteCode');
-        $this->addFlash('success', 'You have disabled two-factor authentication!');
+        $this->addFlash('success', $this->translator->trans('2fa.notification.disabled'));
         $this->userActionLogger->info('Disable Two-Factor Authentication');
     }
 
@@ -370,8 +427,7 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             return $this->render('pages/404.html.twig');
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $repo = $entityManager->getRepository(Unsubscriber::class);
+        $repo = $this->entityManager->getRepository(Unsubscriber::class);
 
         if ($repo->findOneBy(['email' => $mail])) {
             return $this->render('pages/unsubscribe.html.twig', [
@@ -387,8 +443,8 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
             try {
                 $date = new \DateTimeImmutable();
                 $unsubscriber = new Unsubscriber($mail, $date);
-                $entityManager->persist($unsubscriber);
-                $entityManager->flush();
+                $this->entityManager->persist($unsubscriber);
+                $this->entityManager->flush();
             } catch (\Throwable $e) {
                 $form->addError(new FormError("Error when unsubscribing {$mail}"));
 
@@ -403,7 +459,9 @@ class UserController extends AbstractController implements TwoFactorAuthenticate
                 sprintf("%s %s\n", $mail, $date->format('Y-m-d H:i:s'))
             );
 
-            $this->addFlash('success', "{$mail} was successfully unsubscribed");
+            $this->addFlash('success', $this->translator->trans('page.unsubscribe.success', [
+                '%mail%' => $mail,
+            ]));
 
             return $this->redirectToRoute('homepage');
         }

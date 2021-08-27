@@ -3,7 +3,6 @@
 namespace App\Controller\API;
 
 use App\Entity\User;
-use App\Events\OrderCompletedEvent;
 use App\Exchange\ExchangerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
@@ -12,7 +11,8 @@ use App\Exchange\Order;
 use App\Exchange\Trade\TradeResult;
 use App\Logger\UserActionLogger;
 use App\Manager\MarketStatusManager;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
+use App\Utils\Validator\MaxAllowedOrdersValidator;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -20,9 +20,9 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use FOS\RestBundle\View\View;
 use Money\Currency;
 use Money\Money;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Rest\Route("/api/orders")
@@ -42,19 +42,19 @@ class OrdersController extends AbstractFOSRestController
     /** @var UserActionLogger */
     private $userActionLogger;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    /** @var TranslatorInterface */
+    private $translations;
 
     public function __construct(
         MarketHandlerInterface $marketHandler,
         MarketFactoryInterface $marketManager,
         UserActionLogger $userActionLogger,
-        EventDispatcherInterface $eventDispatcher
+        TranslatorInterface $translations
     ) {
         $this->marketHandler = $marketHandler;
         $this->marketManager = $marketManager;
         $this->userActionLogger = $userActionLogger;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->translations = $translations;
     }
 
     /**
@@ -93,17 +93,6 @@ class OrdersController extends AbstractFOSRestController
 
             $exchanger->cancelOrder($market, $order);
             $this->userActionLogger->info('Cancel order', ['id' => $order->getId()]);
-
-            $quote = $market->getQuote();
-
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new OrderCompletedEvent(
-                    $order,
-                    $quote
-                ),
-                OrderCompletedEvent::CANCELLED
-            );
         }
 
         return $this->view(Response::HTTP_OK);
@@ -126,18 +115,41 @@ class OrdersController extends AbstractFOSRestController
         $this->denyAccessUnlessGranted('new-trades');
         $this->denyAccessUnlessGranted('trading');
 
+        if (!$this->isGranted('make-order', $market)
+            || (Order::SELL_SIDE === Order::SIDE_MAP[$request->get('action')]
+                && !$this->isGranted('sell-order', $market))) {
+             return $this->view(['error' => true, 'type' => 'action'], Response::HTTP_OK);
+        }
+
         /** @var User $currentUser */
         $currentUser = $this->getUser();
-        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), MoneyWrapper::TOK_SYMBOL);
-        $maximum = $moneyWrapper->parse((string)99999999.9999, MoneyWrapper::TOK_SYMBOL);
-
+        $priceInput = $moneyWrapper->parse((string)$request->get('priceInput'), Symbols::TOK);
+        $maximum = $moneyWrapper->parse((string)99999999.9999, Symbols::TOK);
         $this->denyAccessUnlessGranted('not-blocked', $market->getQuote());
+
+        $maxAllowedOrders = $this->getParameter('max_allowed_active_orders');
+        $maxAllowedValidator = new MaxAllowedOrdersValidator(
+            $maxAllowedOrders,
+            $currentUser,
+            $this->marketHandler,
+            $this->marketManager
+        );
+
+        if (!$maxAllowedValidator->validate()) {
+            return $this->view([
+                'result' => TradeResult::FAILED,
+                'message' => $this->translations->trans(
+                    'api.orders.max_allowed_active_orders',
+                    ['%maxAllowed%' => $maxAllowedOrders],
+                ),
+            ], Response::HTTP_OK);
+        }
 
         if ($priceInput->greaterThanOrEqual($maximum)) {
             return $this->view([
                 'result' => TradeResult::FAILED,
                 'message' => 'Invalid price quantity',
-            ], Response::HTTP_ACCEPTED);
+            ], Response::HTTP_OK);
         }
 
         $tradeResult = $exchanger->placeOrder(
@@ -152,7 +164,7 @@ class OrdersController extends AbstractFOSRestController
         return $this->view([
             'result' => $tradeResult->getResult(),
             'message' => $tradeResult->getMessage(),
-        ], Response::HTTP_ACCEPTED);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -169,36 +181,48 @@ class OrdersController extends AbstractFOSRestController
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
         $pendingSellOrders = $this->marketHandler->getPendingSellOrders(
             $market,
             ($page - 1) * self::PENDING_OFFSET,
             self::PENDING_OFFSET
         );
+
+        $totalSellOrders = $this->marketHandler->getSellOrdersSummary($market)->getQuoteAmount();
+        $totalBuyOrders = $this->marketHandler->getBuyOrdersSummary($market)->getBasePrice();
+
         $buyDepth = $marketStatusManager->getMarketStatus($market)->getBuyDepth();
 
         return [
             'sell' => $pendingSellOrders,
             'buy' => $pendingBuyOrders,
             'buyDepth' => $buyDepth,
+            'totalSellOrders' => $totalSellOrders,
+            'totalBuyOrders' => $totalBuyOrders,
         ];
     }
 
     /**
      * @Rest\Get(
-     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=0}, options={"expose"=true}
+     *     "/{base}/{quote}/executed/last/{id}", name="executed_orders", defaults={"id"=1}, options={"expose"=true}
      * )
      * @Rest\View()
      */
     public function getExecutedOrders(Market $market, int $id): array
     {
-        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET);
+        return $this->marketHandler->getExecutedOrders($market, $id, self::OFFSET * $id);
     }
 
     /**
-     * @Rest\Get("/executed/page/{page}", name="executed_user_orders", defaults={"page"=1}, options={"expose"=true})
+     * @Rest\Get(
+     *     "/executed/page/{page}/{donations}",
+     *     name="executed_user_orders",
+     *     defaults={"page"=1,"donations"=0},
+     *     options={"expose"=true}
+     * )
      * @Rest\View()
      */
-    public function getExecutedUserOrders(int $page): array
+    public function getExecutedUserOrders(int $page, int $donations): array
     {
         if (!$this->getUser()) {
             throw new AccessDeniedHttpException();
@@ -217,7 +241,9 @@ class OrdersController extends AbstractFOSRestController
             $user,
             $markets,
             ($page - 1) * self::WALLET_OFFSET,
-            self::WALLET_OFFSET
+            self::WALLET_OFFSET,
+            false,
+            $donations
         );
     }
 

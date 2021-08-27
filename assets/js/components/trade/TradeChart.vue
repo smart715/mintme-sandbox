@@ -67,7 +67,7 @@
                     <br>
                     {{ buyDepth | formatMoney }} {{ market.base.symbol|rebranding }}
                 </div>
-                <div class="my-1 text-center text-lg-right">
+                <div v-if="!isToken || isToken && isControlledToken" class="my-1 text-center text-lg-right">
                     <span>{{ $t('trade.chart.market_cap') }} </span>
                     <guide>
                         <template slot="header">
@@ -78,7 +78,10 @@
                         </template>
                     </guide>
                     <br>
-                    {{ marketStatus.marketCap | formatMoney | rebranding }}
+                    {{ marketStatus.marketCap | formatMoney }}
+                    <template v-if="marketStatus.marketCap !== '-'">
+                        {{ market.base.symbol | rebranding }}
+                    </template>
                 </div>
             </div>
             <div class="row">
@@ -111,7 +114,7 @@ import {
 import {toMoney, EchartTheme as VeLineTheme, getBreakPoint} from '../../utils';
 import moment from 'moment';
 import Decimal from 'decimal.js/decimal.js';
-import {WEB, webBtcSymbol} from '../../utils/constants.js';
+import {WEB} from '../../utils/constants.js';
 
 export default {
     name: 'TradeChart',
@@ -129,6 +132,7 @@ export default {
         minimumVolumeForMarketcap: Number,
         buyDepth: String,
         isToken: Boolean,
+        isControlledToken: Boolean,
     },
     data() {
         let min = 1 / Math.pow(10, this.market.base.subunit);
@@ -186,7 +190,7 @@ export default {
                 monthVolume: '0',
                 monthChange: '0',
                 monthAmount: '0',
-                marketCap: '0 ' + this.market.base.symbol,
+                marketCap: '0',
             },
             stats: [],
             maxAvailableDays: 30,
@@ -254,10 +258,8 @@ export default {
         window.addEventListener('resize', this.handleRightLabel);
         this.handleRightLabel();
 
-        if (webBtcSymbol === this.market.identifier) {
-            this.fetchWEBsupply().then(() => {
-                this.marketStatus.marketCap = toMoney(Decimal.mul(this.marketStatus.last, this.supply), this.market.base.subunit);
-            });
+        if (!this.isToken) {
+            this.fetchWEBsupply();
         }
 
         this.$axios.retry.get(this.$routing.generate('market_kline', {
@@ -267,7 +269,7 @@ export default {
             this.stats = res.data;
             this.chartSettings.start = this.getStartTradingPeriod();
 
-            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state');
+            this.addMessageHandler(this.messageHandler.bind(this), 'trade-chart-state', 'TradeChart');
 
             this.sendMessage(JSON.stringify({
                 method: 'state.subscribe',
@@ -280,7 +282,6 @@ export default {
                 id: parseInt(Math.random().toString().replace('0.', '')),
             }));
         }).catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_chart_data'));
             this.sendLogs('error', 'Can not load the chart data', err);
         });
     },
@@ -293,8 +294,8 @@ export default {
             const marketInfo = marketData.params[1];
             const marketOpenPrice = parseFloat(marketInfo.open);
             const marketLastPrice = parseFloat(marketInfo.last);
-            const marketVolume = parseFloat(marketInfo.volume);
-            const marketAmount = parseFloat(marketInfo.deal);
+            const marketVolume = parseFloat(marketInfo.volume) + parseFloat(marketInfo.volumeDonation);
+            const marketAmount = parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
 
@@ -320,27 +321,49 @@ export default {
         updateMonthMarketData: function(marketData) {
             const marketOpenPrice = parseFloat(marketData.open);
             const marketLastPrice = parseFloat(marketData.last);
-            const marketVolume = parseFloat(marketData.volume);
-            const marketAmount = parseFloat(marketData.deal);
+            const marketVolume = parseFloat(marketData.volume) + parseFloat(marketData.volumeDonation);
+            const marketAmount = parseFloat(marketData.deal) + parseFloat(marketData.dealDonation);
             const priceDiff = marketLastPrice - marketOpenPrice;
             const changePercentage = marketOpenPrice ? priceDiff * 100 / marketOpenPrice : 0;
-            let marketCap;
-
-            if (webBtcSymbol === this.market.identifier && 1e7 === this.supply) {
-                this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
-                marketCap = 0;
-            } else {
-                marketCap = WEB.symbol === this.market.base.symbol && marketAmount < this.minimumVolumeForMarketcap
-                    ? '-'
-                    : toMoney(parseFloat(this.marketStatus.last) * this.supply, this.market.base.subunit) + ' ' + this.market.base.symbol;
-            }
-
             const monthInfo = {
                 monthChange: toMoney(changePercentage, 2),
                 monthVolume: toMoney(marketVolume, this.market.quote.subunit),
                 monthAmount: toMoney(marketAmount, this.market.base.subunit),
-                marketCap: marketCap,
             };
+
+            if (!this.isToken) {
+                if (1e7 === this.supply) {
+                    // if fetchWEBsupply() fails
+                    this.notifyError(this.$t('toasted.error.can_not_update_market_cap_btc_mintme'));
+                    monthInfo.marketCap = '-';
+                } else {
+                    monthInfo.marketCap = toMoney(
+                        Decimal.mul(this.marketStatus.last, this.supply),
+                        this.market.base.subunit
+                    );
+                }
+            } else if (this.isToken) {
+                if (!this.isControlledToken || marketAmount < this.minimumVolumeForMarketcap) {
+                  monthInfo.marketCap = '-';
+                } else {
+                    this.$axios.retry.get(this.$routing.generate('token_sold_on_market', {
+                        name: this.market.quote.symbol,
+                    }))
+                    .then((res) => {
+                        monthInfo.marketCap = toMoney(
+                            parseFloat(this.marketStatus.last) * res.data,
+                            this.market.base.subunit
+                        );
+                    })
+                    .catch((err) => {
+                        monthInfo.marketCap = '-';
+                        this.sendLogs('error', 'Can not load soldOnMarket value', err);
+                    })
+                    .finally(() => {
+                        this.marketStatus = {...this.marketStatus, ...monthInfo};
+                    });
+                }
+            }
 
             this.marketStatus = {...this.marketStatus, ...monthInfo};
         },
@@ -372,7 +395,6 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.$toasted.error(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update WEB circulation supply', err);
                         reject(err);
                     });

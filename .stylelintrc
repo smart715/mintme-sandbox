@@ -3,5 +3,6 @@
   "rules": {
     "declaration-block-no-duplicate-properties": true,
     "block-no-empty": true
-  }
+  },
+  "ignoreFiles": ["node_modules", "assets/scss/lang-menu.sass"]
 }

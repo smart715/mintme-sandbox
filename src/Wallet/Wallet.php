@@ -11,10 +11,12 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\PendingManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Deposit\DepositGatewayCommunicator;
 use App\Wallet\Exception\IncorrectAddressException;
 use App\Wallet\Exception\NotEnoughAmountException;
@@ -23,7 +25,7 @@ use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
-use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\Withdraw\WithdrawGatewayInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -34,32 +36,27 @@ use Throwable;
 
 class Wallet implements WalletInterface
 {
-    /** @var WithdrawGatewayInterface */
-    private $withdrawGateway;
+    private WithdrawGatewayInterface $withdrawGateway;
 
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private BalanceHandlerInterface $balanceHandler;
 
-    /** @var DepositGatewayCommunicator */
-    private $depositCommunicator;
+    private DepositGatewayCommunicator $depositCommunicator;
 
-    /** @var PendingManagerInterface */
-    private $pendingManager;
+    private PendingManagerInterface $pendingManager;
 
-    /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var ContractHandlerInterface */
-    private $contractHandler;
+    private ContractHandlerInterface $contractHandler;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private TokenManagerInterface $tokenManager;
+
+    private MoneyWrapperInterface $moneyWrapper;
+
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         WithdrawGatewayInterface $withdrawGateway,
@@ -70,7 +67,9 @@ class Wallet implements WalletInterface
         CryptoManagerInterface $cryptoManager,
         ContractHandlerInterface $contractHandler,
         LoggerInterface $logger,
-        TokenManagerInterface $tokenManager
+        TokenManagerInterface $tokenManager,
+        MoneyWrapperInterface $moneyWrapper,
+        TokenConfig $tokenConfig
     ) {
         $this->withdrawGateway = $withdrawGateway;
         $this->balanceHandler = $balanceHandler;
@@ -81,6 +80,8 @@ class Wallet implements WalletInterface
         $this->contractHandler = $contractHandler;
         $this->logger = $logger;
         $this->tokenManager = $tokenManager;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** {@inheritdoc} */
@@ -112,31 +113,39 @@ class Wallet implements WalletInterface
         Amount $amount,
         TradebleInterface $tradable
     ): PendingWithdrawInterface {
-        if ($tradable instanceof Crypto) {
-            $fee = $tradable->getFee();
-            $crypto = $tradable;
-            $token = Token::getFromCrypto($tradable);
-        } else {
-            $fee = new Money('0', new Currency(MoneyWrapper::TOK_SYMBOL));
-            $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
-            $token = $tradable;
-        }
+        $crypto = $tradable instanceof Crypto
+            ? $tradable
+            : $this->cryptoManager->findBySymbol($tradable->getCryptoSymbol());
 
         if (!$crypto) {
             throw new NotFoundTokenException();
         }
 
-        if (Token::WEB_SYMBOL === $crypto->getSymbol()) {
-            if (!$this->validateEtheriumAddress($address->getAddress())) {
+        $fee = $tradable->getFee() ?? new Money('0', new Currency(Symbols::TOK));
+
+        $withdrawFee = $this->getFee($tradable, $crypto);
+
+        $cryptoSymbol = $crypto->getSymbol();
+
+        if (in_array($crypto->getSymbol(), [Symbols::ETH, Symbols::WEB, Symbols::BNB], true)) {
+            if (!$this->validateEtheriumAddress($address->getAddress()) ||
+                !$this->withdrawGateway->isContractAddress($address->getAddress(), $cryptoSymbol)
+            ) {
                 throw new IncorrectAddressException();
             }
         }
 
-        $available = $this->tokenManager->getRealBalance(
-            $token,
-            $this->balanceHandler->balance($user, $token)
-        )->getAvailable();
+        $balanceResult = $this->balanceHandler->balance($user, $tradable);
 
+        if ($tradable instanceof Token) {
+            $balanceResult = $this->tokenManager->getRealBalance(
+                $tradable,
+                $this->balanceHandler->balance($user, $tradable),
+                $user
+            );
+        }
+
+        $available = $balanceResult->getAvailable();
         $this->logger->info(
             "Created a new withdraw request for '{$user->getEmail()}' to
             send {$amount->getAmount()->getAmount()} {$tradable->getSymbol()} on {$address->getAddress()}"
@@ -152,21 +161,22 @@ class Wallet implements WalletInterface
             throw new NotEnoughUserAmountException();
         }
 
-        if ($tradable instanceof Crypto && !$this->validateAmount($crypto, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($crypto, $amount, $user)) {
+            throw new NotEnoughAmountException();
+        } elseif (!$tradable->getFee() && !$this->validateTokenFee($user, $crypto, $withdrawFee)) {
             throw new NotEnoughAmountException();
         }
 
-        if ($tradable instanceof Token && !$this->validateTokenFee($user, $crypto)) {
-            throw new NotEnoughAmountException();
+        if ($tradable instanceof Token && !$tradable->getFee()) {
+            $this->balanceHandler->withdraw($user, $tradable, $amount->getAmount()->add($fee));
+            $this->balanceHandler->withdraw(
+                $user,
+                $crypto,
+                $withdrawFee
+            );
         }
 
-        $this->balanceHandler->withdraw($user, $token, $amount->getAmount()->add($fee));
-
-        if ($tradable instanceof Token) {
-            $this->balanceHandler->withdraw($user, Token::getFromCrypto($crypto), $crypto->getFee());
-        }
-
-        return $this->pendingManager->create($user, $address, $amount, $tradable);
+        return $this->pendingManager->create($user, $address, $amount, $tradable, $withdrawFee);
     }
 
     /**
@@ -183,17 +193,17 @@ class Wallet implements WalletInterface
         $amount = $pendingWithdraw->getAmount();
         $address = $pendingWithdraw->getAddress();
 
-        if ($tradable instanceof Crypto && !$this->validateAmount($tradable, $amount, $user)) {
+        if ($tradable instanceof Crypto && !$tradable->isToken() && !$this->validateAmount($tradable, $amount, $user)) {
             throw new NotEnoughAmountException();
         }
 
         $this->em->beginTransaction();
 
         try {
-            if ($tradable instanceof Crypto) {
-                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+            if ($tradable instanceof Crypto && !$tradable->isToken()) {
+                $this->withdrawGateway->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $pendingWithdraw->getFee());
             } else {
-                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable);
+                $this->contractHandler->withdraw($user, $amount->getAmount(), $address->getAddress(), $tradable, $pendingWithdraw->getFee());
             }
 
             $this->em->remove($pendingWithdraw);
@@ -203,7 +213,7 @@ class Wallet implements WalletInterface
 
             $this->logger->error(
                 "Failed to pay '{$user->getEmail()}' amount {$amount->getAmount()->getAmount()} {$tradable->getSymbol()}.
-                Withdraw-gateway failed with the next errror: {$exception->getMessage()}. Payment has been rollbacked"
+                Withdraw-gateway failed with the next error: {$exception->getMessage()}. Payment has been rollbacked"
             );
 
             throw new Exception();
@@ -217,17 +227,19 @@ class Wallet implements WalletInterface
     {
         return array_map(function (string $address) {
             return new Address($address);
-        }, $this->depositCommunicator->getDepositCredentials($user->getId(), array_map(function ($crypto) {
-            return Token::getFromCrypto($crypto);
-        }, $cryptos))->toArray());
+        }, $this->depositCommunicator->getDepositCredentials($user->getId(), $cryptos)->toArray());
     }
 
     /** {@inheritDoc} */
     public function getTokenDepositCredentials(User $user): array
     {
-        return [
-            MoneyWrapper::TOK_SYMBOL => new Address($this->contractHandler->getDepositCredentials($user)),
-        ];
+        $addresses = $this->contractHandler->getDepositCredentials($user);
+
+        foreach ($addresses as $symbol => $address) {
+            $addresses[$symbol] = new Address($address);
+        }
+
+        return $addresses;
     }
 
     /** {@inheritDoc} */
@@ -238,20 +250,18 @@ class Wallet implements WalletInterface
 
     public function getDepositInfo(TradebleInterface $tradable): DepositInfo
     {
-        return $this->depositCommunicator->getDepositInfo($tradable->getSymbol());
+        $symbol = $tradable->getSymbol();
+
+        return $tradable instanceof Crypto && !$tradable->isToken()
+            ? $this->depositCommunicator->getDepositInfo($symbol)
+            : $this->contractHandler->getDepositInfo($symbol);
     }
 
-    private function validateTokenFee(User $user, ?Crypto $crypto = null): bool
+    private function validateTokenFee(User $user, Crypto $crypto, Money $tokenFee): bool
     {
-        $crypto = $crypto ?? $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $balance = $this->balanceHandler->balance($user, $crypto);
 
-        if (!$crypto) {
-            throw new NotFoundTokenException();
-        }
-
-        $balance = $this->balanceHandler->balance($user, Token::getFromCrypto($crypto));
-
-        if ($balance->getAvailable()->lessThan($crypto->getFee())) {
+        if ($balance->getAvailable()->lessThan($tokenFee)) {
             $this->logger->warning(
                 "Requested withdraw-gateway balance to pay '{$user->getEmail()}'. Not enough amount to pay fee"
             );
@@ -287,5 +297,24 @@ class Wallet implements WalletInterface
     private function startsWith(string $haystack, string $needle): bool
     {
         return substr($haystack, 0, strlen($needle)) === $needle;
+    }
+
+    private function getFee(TradebleInterface $tradable, Crypto $crypto): Money
+    {
+        $cryptoFee = $tradable->getFee();
+
+        if ($cryptoFee) {
+            return $cryptoFee;
+        }
+
+        if ($crypto->getFee()->isSameCurrency(new Money(0, new Currency(Symbols::WEB)))) {
+            return $crypto->getFee();
+        }
+
+        if ($tradable instanceof Token && Symbols::BNB === $tradable->getCryptoSymbol()) {
+            return $this->tokenConfig->getBnbWithdrawFee();
+        }
+
+        return $this->tokenConfig->getEthWithdrawFee();
     }
 }

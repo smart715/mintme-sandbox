@@ -1,0 +1,5 @@
+webpack_encore:
+    # Set attributes that will be rendered on all script and link tags
+    script_attributes:
+        # Throw an exception if the entrypoints.json file is missing or an entry is missing from the data
+         strict_mode: false

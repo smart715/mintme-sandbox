@@ -70,9 +70,9 @@ describe('UserNotification', () => {
         });
     });
 
-    it('show "Any notification yet" message', () => {
+    it('show "No notification yet" message', () => {
         wrapper.vm.userNotifications = [];
-        expect(wrapper.html().includes('userNotification.any_notifications_yet')).toBe(true);
+        expect(wrapper.html().includes('userNotification.no_notifications_yet')).toBe(true);
     });
 
     it('show user notifications', () => {

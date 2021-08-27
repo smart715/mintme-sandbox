@@ -16,6 +16,16 @@ interface TraderFetcherInterface
         string $referralFee
     ): TradeResult;
 
+    public function executeOrder(
+        int $userId,
+        string $market,
+        int $side,
+        string $amount,
+        string $fee,
+        int $referralId,
+        string $referralFee
+    ): TradeResult;
+
     public function cancelOrder(int $userId, string $marketName, int $orderId): TradeResult;
 
     /** @return mixed[] */

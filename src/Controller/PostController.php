@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Token\Token;
 use App\Exception\NotFoundPostException;
 use App\Manager\PostManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +40,15 @@ class PostController extends Controller
             throw new NotFoundPostException();
         }
 
+        $slug = $post->getSlug();
+
+        if ($slug) {
+            return $this->redirectToRoute('new_show_post', [
+                'name' => $post->getToken()->getName(),
+                'slug' => $slug,
+            ]);
+        }
+
         return $this->render('pages/show_post.html.twig', [
             'post' => $this->normalize($post),
             'showEdit' => $this->isGranted('edit', $post) ? 'true' : 'false',
@@ -59,15 +69,28 @@ class PostController extends Controller
 
         $this->denyAccessUnlessGranted('edit', $post);
 
-        /** @var array $post */
-        $post = $this->normalize($post);
+        /** @var array $serializedPost */
+        $serializedPost = $this->normalize($post);
 
         // This is safe to do here, because we know it's going to be shown on an textarea
         // shouldn't be done anywhere else
-        $post['content'] = html_entity_decode($post['content']);
+        $serializedPost['content'] = html_entity_decode($serializedPost['content']);
+
+        $decimals = $post->getToken()->getDecimals();
 
         return $this->render('pages/edit_post.html.twig', [
-            'post' => $post,
+            'post' => $serializedPost,
+            'decimals' => null === $decimals || $decimals > Token::TOKEN_SUBUNIT
+                ? Token::TOKEN_SUBUNIT
+                : $decimals,
         ]);
+    }
+
+    /**
+     * @Route("/home", name="show_user_home")
+     */
+    public function home(): Response
+    {
+        return $this->render('pages/show_user_home.html.twig');
     }
 }

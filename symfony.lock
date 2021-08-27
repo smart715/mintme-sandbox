@@ -1,4 +1,7 @@
 {
+    "abraham/twitteroauth": {
+        "version": "1.2.0"
+    },
     "amphp/amp": {
         "version": "v2.4.4"
     },
@@ -37,6 +40,9 @@
     },
     "dasprid/enum": {
         "version": "1.0.0"
+    },
+    "discord/interactions": {
+        "version": "1.0.7"
     },
     "doctrine/annotations": {
         "version": "1.0",
@@ -211,6 +217,12 @@
     "gedmo/doctrine-extensions": {
         "version": "v2.4.41"
     },
+    "giggsey/libphonenumber-for-php": {
+        "version": "8.12.16"
+    },
+    "giggsey/locale": {
+        "version": "1.9"
+    },
     "google/recaptcha": {
         "version": "1.1",
         "recipe": {
@@ -226,8 +238,14 @@
     "graze/guzzle-jsonrpc": {
         "version": "3.2.1"
     },
+    "guzzlehttp/command": {
+        "version": "1.0.0"
+    },
     "guzzlehttp/guzzle": {
         "version": "6.5.5"
+    },
+    "guzzlehttp/guzzle-services": {
+        "version": "1.1.3"
     },
     "guzzlehttp/promises": {
         "version": "v1.3.1"
@@ -279,6 +297,9 @@
     },
     "incenteev/composer-parameter-handler": {
         "version": "v2.1.4"
+    },
+    "jbbcode/jbbcode": {
+        "version": "v1.4.2"
     },
     "jms/i18n-routing-bundle": {
         "version": "3.0.4"
@@ -407,6 +428,18 @@
     "ocramius/proxy-manager": {
         "version": "2.8.0"
     },
+    "odolbeau/phone-number-bundle": {
+        "version": "3.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "3.0",
+            "ref": "4388686329b81291918a948cd42891829fb1de71"
+        },
+        "files": [
+            "config/packages/misd_phone_number.yaml"
+        ]
+    },
     "openlss/lib-array2xml": {
         "version": "1.0.0"
     },
@@ -522,6 +555,9 @@
     "ramsey/uuid": {
         "version": "3.9.3"
     },
+    "restcord/restcord": {
+        "version": "0.5.0"
+    },
     "scheb/two-factor-bundle": {
         "version": "3.16",
         "recipe": {
@@ -550,17 +586,14 @@
             "config/packages/sensio_framework_extra.yaml"
         ]
     },
-    "sensiolabs/security-checker": {
-        "version": "4.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "4.0",
-            "ref": "160c9b600564faa1224e8f387d49ef13ceb8b793"
-        },
-        "files": [
-            "config/packages/security_checker.yaml"
-        ]
+    "simplito/bigint-wrapper-php": {
+        "version": "1.0.0"
+    },
+    "simplito/bn-php": {
+        "version": "1.1.2"
+    },
+    "simplito/elliptic-php": {
+        "version": "1.0.7"
     },
     "sirprize/postal-code-validator": {
         "version": "1.3.6"
@@ -804,6 +837,12 @@
             "src/Kernel.php"
         ]
     },
+    "symfony/http-client": {
+        "version": "v4.4.19"
+    },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.4.10"
     },
@@ -827,6 +866,21 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure": {
+        "version": "v0.4.1"
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "0.2",
+            "ref": "a37d3438e4bd4f9f924c516996bc29e25f66b07e"
+        },
+        "files": [
+            "config/packages/mercure.yaml"
+        ]
     },
     "symfony/mime": {
         "version": "v4.4.10"
@@ -1053,6 +1107,28 @@
             "version": "3.3",
             "ref": "dae9b39fd6717970be7601101ce5aa960bf53d9a"
         }
+    },
+    "symfony/webpack-encore-bundle": {
+        "version": "1.9",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.9",
+            "ref": "9399a0bfc6ee7a0c019f952bca46d6a6045dd451"
+        },
+        "files": [
+            "assets/app.js",
+            "assets/bootstrap.js",
+            "assets/controllers.json",
+            "assets/controllers/hello_controller.js",
+            "assets/styles/app.css",
+            "config/packages/assets.yaml",
+            "config/packages/prod/webpack_encore.yaml",
+            "config/packages/test/webpack_encore.yaml",
+            "config/packages/webpack_encore.yaml",
+            "package.json",
+            "webpack.config.js"
+        ]
     },
     "symfony/yaml": {
         "version": "v4.4.10"

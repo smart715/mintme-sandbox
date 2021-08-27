@@ -4,21 +4,25 @@ namespace App\Entity\Token;
 
 use App\Entity\AirdropCampaign\Airdrop;
 use App\Entity\Crypto;
+use App\Entity\DiscordRole;
 use App\Entity\Image;
 use App\Entity\ImagineInterface;
 use App\Entity\Message\Thread;
-use App\Entity\Message\ThreadMetadata;
 use App\Entity\Post;
 use App\Entity\Profile;
 use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Entity\UserToken;
+use App\Utils\Symbols;
 use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Money\Currency;
 use Money\Money;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -32,11 +36,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Token implements TradebleInterface, ImagineInterface
 {
-    public const MINTME_SYMBOL = "MINTME";
-    public const WEB_SYMBOL = "WEB";
-    public const BTC_SYMBOL = "BTC";
-    public const ETH_SYMBOL = "ETH";
-    public const TOK_SYMBOL = "TOK";
     public const NAME_MIN_LENGTH = 4;
     public const NAME_MAX_LENGTH = 60;
     public const DESC_MIN_LENGTH = 200;
@@ -45,6 +44,7 @@ class Token implements TradebleInterface, ImagineInterface
     public const DEPLOYED = 'deployed';
     public const PENDING = 'pending';
     public const TOKEN_SUBUNIT = 4;
+    public const PENDING_ADDR = '0x';
 
     /**
      * @ORM\Id()
@@ -55,7 +55,7 @@ class Token implements TradebleInterface, ImagineInterface
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      * @Assert\Regex(pattern="/^[a-zA-Z0-9\s-]*$/", message="Invalid token name.")
      * @Assert\Length(min = Token::NAME_MIN_LENGTH, max = Token::NAME_MAX_LENGTH)
@@ -73,6 +73,18 @@ class Token implements TradebleInterface, ImagineInterface
      * @var string|null
      */
     protected $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"API", "API_TOK"})
+     * @var string|null
+     */
+    protected $txHash;
+
+    /**
+     * @ORM\Column(type="bigint",nullable=true)
+     */
+    protected ?string $fee = null; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -134,9 +146,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $discordUrl;
 
     /**
-     * @Assert\NotBlank()
      * @ORM\Column(type="text", length=Token::DESC_MAX_LENGTH, nullable=true)
-     * @Assert\Length(min=Token::DESC_MIN_LENGTH, max=Token::DESC_MAX_LENGTH)
+     * @AppAssert\TokenDescription(
+     *     min = Token::DESC_MIN_LENGTH,
+     *     max = Token::DESC_MAX_LENGTH
+     * )
      * @Groups({"API_TOK"})
      * @var string|null
      */
@@ -149,7 +163,7 @@ class Token implements TradebleInterface, ImagineInterface
     protected $websiteConfirmationToken;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Profile", inversedBy="token")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Profile", inversedBy="tokens")
      * @Groups({"API_TOK"})
      * @var Profile|null
      */
@@ -166,8 +180,19 @@ class Token implements TradebleInterface, ImagineInterface
      */
     protected $lockIn;
 
-    /** @var Crypto|null */
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
+     * @ORM\JoinColumn(nullable=true)
+     * @var Crypto|null
+     */
     protected $crypto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Crypto", cascade={"all"})
+     * @ORM\JoinColumn(nullable=true)
+     * @var Crypto|null
+     */
+    protected $exchangeCrypto;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -177,8 +202,10 @@ class Token implements TradebleInterface, ImagineInterface
     protected $created;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserToken", mappedBy="token")
-     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="App\Entity\UserToken",
+     *     mappedBy="token",
+     *     fetch="EXTRA_LAZY")
+     * @var ArrayCollection|null
      */
     protected $users;
 
@@ -186,7 +213,12 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\Column(type="datetime_immutable", nullable=true)
      * @var \DateTimeImmutable|null
      */
-    private $deployed;
+    private $deployedDate;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default"=false})
+     */
+    private bool $deployed = false; // phpcs:ignore
 
     /**
      * @ORM\Column(type="string")
@@ -198,7 +230,7 @@ class Token implements TradebleInterface, ImagineInterface
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
      * @Groups({"Default", "API"})
-     * @var Image
+     * @var Image|null
      */
     protected $image;
 
@@ -239,6 +271,11 @@ class Token implements TradebleInterface, ImagineInterface
     protected $isBlocked = false;
 
     /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    protected bool $isHidden = false; // phpcs:ignore
+
+    /**
      * @ORM\Column(name="number_of_reminder", type="smallint")
      * @var int
      */
@@ -256,6 +293,38 @@ class Token implements TradebleInterface, ImagineInterface
      */
     private $threads;
 
+    /**
+     * @ORM\Column(type="integer", options={"default"=12})
+     * @Groups({"Default", "API"})
+     * @var int|null
+     */
+    private $decimals = 12;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\TokenVoting",
+     *     mappedBy="token"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $showDeployedModal = false; // phpcs:ignore
+
+    /**
+     * @ORM\OneToOne(targetEntity="DiscordConfig", mappedBy="token", cascade={"persist", "remove"})
+     */
+    private ?DiscordConfig $discordConfig;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRole", mappedBy="token", cascade={"remove"})
+     */
+    protected PersistentCollection $discordRoles;
+
     public function __construct()
     {
         $this->airdrops = new ArrayCollection();
@@ -267,6 +336,23 @@ class Token implements TradebleInterface, ImagineInterface
         return array_map(function (UserToken $userToken) {
             return $userToken->getUser();
         }, $this->users->toArray());
+    }
+
+    /**
+     * @Groups({"Default", "API"})
+     * @return int
+     */
+    public function getHoldersCount(): int
+    {
+        if ($this->users) {
+            $holders = $this->users->filter(function ($userToken) {
+                return $userToken->isHolder();
+            });
+
+            return $holders->count();
+        }
+
+        return 0;
     }
 
     /** {@inheritdoc} */
@@ -285,9 +371,33 @@ class Token implements TradebleInterface, ImagineInterface
         return $this->crypto;
     }
 
+    /**
+     * @Groups({"API"})
+     */
+    public function getCryptoSymbol(): string
+    {
+        return $this->crypto
+            ? $this->crypto->getSymbol()
+            : Symbols::WEB;
+    }
+
     public function setCrypto(?Crypto $crypto): self
     {
         $this->crypto = $crypto;
+
+        return $this;
+    }
+
+    public function getExchangeCryptoSymbol(): string
+    {
+        return $this->exchangeCrypto
+            ? $this->exchangeCrypto->getSymbol()
+            : Symbols::WEB;
+    }
+
+    public function setExchangeCrypto(?Crypto $crypto): self
+    {
+        $this->exchangeCrypto = $crypto;
 
         return $this;
     }
@@ -321,6 +431,22 @@ class Token implements TradebleInterface, ImagineInterface
     public function getAddress(): ?string
     {
         return $this->address;
+    }
+
+    public function getFee(): ?Money
+    {
+        return $this->fee ?
+            new Money($this->fee, new Currency(Symbols::TOK))
+            : null;
+    }
+
+    public function setFee(?Money $fee): self
+    {
+        $this->fee = $fee
+            ? $fee->getAmount()
+            : null;
+
+        return $this;
     }
 
     public function setPendingDeployment(): self
@@ -447,7 +573,7 @@ class Token implements TradebleInterface, ImagineInterface
     {
         return !$this->address
             ? self::NOT_DEPLOYED
-            : ('0x' === $this->address
+            : (self::PENDING_ADDR === $this->address
                 ? self::PENDING
                 : self::DEPLOYED);
     }
@@ -455,16 +581,6 @@ class Token implements TradebleInterface, ImagineInterface
     public function isDeployed(): bool
     {
         return self::DEPLOYED === $this->getDeploymentStatus();
-    }
-
-    public static function getFromCrypto(Crypto $crypto): self
-    {
-        return (new self())->setName($crypto->getSymbol());
-    }
-
-    public static function getFromSymbol(string $symbol): self
-    {
-        return (new self())->setName($symbol);
     }
 
     public function getCreated(): \DateTimeImmutable
@@ -480,6 +596,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getTelegramUrl(): ?string
     {
         return $this->telegramUrl;
@@ -492,6 +609,7 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    /** @Groups({"Default", "API"}) */
     public function getDiscordUrl(): ?string
     {
         return $this->discordUrl;
@@ -505,13 +623,27 @@ class Token implements TradebleInterface, ImagineInterface
     }
 
     /** @codeCoverageIgnore */
-    public function getDeployed(): ?\DateTimeImmutable
+    public function getDeployedDate(): ?\DateTimeImmutable
+    {
+        return $this->deployedDate;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setDeployedDate(?\DateTimeImmutable $deployedDate): self
+    {
+        $this->deployedDate = $deployedDate;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getDeployed(): bool
     {
         return $this->deployed;
     }
 
     /** @codeCoverageIgnore */
-    public function setDeployed(?\DateTimeImmutable $deployed): self
+    public function setDeployed(bool $deployed): self
     {
         $this->deployed = $deployed;
 
@@ -537,14 +669,20 @@ class Token implements TradebleInterface, ImagineInterface
         $this->image = $image;
     }
 
-    public function getImage(): Image
+    public function getImage(): ?Image
     {
-        return $this->image ?? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL);
+        if ($this->image) {
+            return $this->image;
+        }
+
+        return Symbols::WEB === $this->getCryptoSymbol()
+            ? Image::defaultImage(Image::DEFAULT_TOKEN_IMAGE_URL)
+            : null;
     }
 
     public function getMintedAmount(): Money
     {
-        return new Money($this->mintedAmount ?? 0, new Currency(self::TOK_SYMBOL));
+        return new Money($this->mintedAmount ?? 0, new Currency(Symbols::TOK));
     }
 
     public function setMintedAmount(Money $mintedAmount): void
@@ -568,6 +706,15 @@ class Token implements TradebleInterface, ImagineInterface
         return $activeAirdrop->isEmpty()
             ? null
             : $activeAirdrop->first();
+    }
+
+    public function getAirdrop(int $id): ?Airdrop
+    {
+        $airdrops = $this->getAirdrops()->filter(fn(Airdrop $a) => $id === $a->getId());
+
+        return $airdrops->isEmpty()
+            ? null
+            : $airdrops->first();
     }
 
     /** @codeCoverageIgnore */
@@ -594,7 +741,7 @@ class Token implements TradebleInterface, ImagineInterface
     /** @codeCoverageIgnore */
     public function getAirdropsAmount(): Money
     {
-        return new Money($this->airdropsAmount, new Currency(self::TOK_SYMBOL));
+        return new Money($this->airdropsAmount, new Currency(Symbols::TOK));
     }
 
     /** @codeCoverageIgnore */
@@ -618,6 +765,18 @@ class Token implements TradebleInterface, ImagineInterface
         return $this;
     }
 
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    public function setIsHidden(bool $isHidden): self
+    {
+        $this->isHidden = $isHidden;
+
+        return $this;
+    }
+
     /**
      * @return Post[]
      */
@@ -632,6 +791,16 @@ class Token implements TradebleInterface, ImagineInterface
 
         return $profile
             ? $profile->getUser()
+            : null;
+    }
+
+    /** @Groups({"Default", "API"}) */
+    public function getOwnerId(): ?int
+    {
+        $owner = $this->getOwner();
+
+        return $owner
+            ? $owner->getId()
             : null;
     }
 
@@ -669,5 +838,108 @@ class Token implements TradebleInterface, ImagineInterface
     public function getThreads(): array
     {
         return $this->threads->toArray();
+    }
+
+    public function setDecimals(int $decimals): self
+    {
+        $this->decimals = $decimals;
+
+        return $this;
+    }
+
+    public function getDecimals(): ?int
+    {
+        return $this->decimals;
+    }
+
+    /*
+     * @Groups({"Default"})
+     */
+    public function isMintmeToken(): bool
+    {
+        return Symbols::WEB === $this->getCryptoSymbol();
+    }
+
+    /*
+     * @Groups({"Default"})
+     */
+    public function isControlledToken(): bool
+    {
+        return !$this->isDeployed() || ($this->getAddress() && $this->getTxHash());
+    }
+
+    public function isOwner(array $ownTokens): bool
+    {
+        /** @var Token $ownToken */
+        foreach ($ownTokens as $ownToken) {
+            if ($ownToken->getId() === $this->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isShowDeployedModal(): bool
+    {
+        return $this->showDeployedModal;
+    }
+
+    public function setShowDeployedModal(bool $showDeployedModal): self
+    {
+        $this->showDeployedModal = $showDeployedModal;
+
+        return $this;
+    }
+
+    public function setTxHash(?string $txHash): self
+    {
+        $this->txHash = $txHash;
+
+        return $this;
+    }
+
+    public function getTxHash(): ?string
+    {
+        return $this->txHash;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
+    }
+
+    public function getShowSubunit(): int
+    {
+        return self::TOKEN_SUBUNIT;
+    }
+
+    public function getDiscordConfig(): DiscordConfig
+    {
+        return $this->discordConfig ?? $this->discordConfig = (new DiscordConfig())->setToken($this);
+    }
+
+    public function getDiscordRoles(): PersistentCollection
+    {
+        return $this->discordRoles;
+    }
+
+    public function getDiscordRolesMatching(Criteria $criteria): Collection
+    {
+        return $this->discordRoles->matching($criteria);
+    }
+
+    public function addDiscordRole(DiscordRole $role): self
+    {
+        $this->discordRoles->add($role);
+
+        return $this;
+    }
+
+    public function removeDiscordRole(DiscordRole $role): self
+    {
+        $this->discordRoles->removeElement($role);
+
+        return $this;
     }
 }

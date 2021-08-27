@@ -6,38 +6,33 @@ use App\Communications\RabbitMQCommunicatorInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\ContractHandlerInterface;
 use App\Utils\ServiceInfo\Model\ServiceInfo;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 class ServiceInfoBuilder implements ServiceInfoBuilderInterface
 {
-    /** @var TokenManagerInterface */
-    private $tokenManager;
-
-    /** @var ServiceInfo */
-    private $serviceInfo;
-
-    /** @var RabbitMQCommunicatorInterface */
-    private $rabbitCommunicator;
-
-    /** @var ContractHandlerInterface */
-    private $contractHandler;
-
-    /** @var string  */
-    private $depositWorkDir;
-
-    /** @var string */
-    private $withdrawWorkDir;
-
-    /** @var string */
-    private $contractWorkDir;
+    private const SERVER_COMMAND = 'sudo^ssh^-t^-p^2279^mintme@10.81.143.1^'
+        .'lxc exec branch-%branch% -- bash -c \'git -C %path% rev-parse --abbrev-ref HEAD\'';
+    private TokenManagerInterface $tokenManager;
+    private ServiceInfo $serviceInfo;
+    private RabbitMQCommunicatorInterface $rabbitCommunicator;
+    private ContractHandlerInterface $contractHandler;
+    private string $depositWorkDir;
+    private string $withdrawWorkDir;
+    private string $contractWorkDir;
+    private bool $isTestingServer;
+    private ?string $panelBranch;
+    private LoggerInterface $logger;
 
     public function __construct(
         string $depositWorkDir,
         string $withdrawWorkDir,
         string $contractWorkDir,
+        bool $isTestingServer,
         TokenManagerInterface $tokenManager,
         RabbitMQCommunicatorInterface $rabbitCommunicator,
-        ContractHandlerInterface $contractHandler
+        ContractHandlerInterface $contractHandler,
+        LoggerInterface $logger
     ) {
         $this->depositWorkDir = $depositWorkDir;
         $this->withdrawWorkDir = $withdrawWorkDir;
@@ -46,11 +41,13 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
         $this->rabbitCommunicator = $rabbitCommunicator;
         $this->contractHandler = $contractHandler;
         $this->serviceInfo = new ServiceInfo();
+        $this->isTestingServer = $isTestingServer;
+        $this->logger = $logger;
     }
 
-    public function addTokenInfo(): void
+    public function addMintmeTokenInfo(): void
     {
-        $token = $this->tokenManager->getOwnToken();
+        $token = $this->tokenManager->getOwnMintmeToken();
 
         $this->serviceInfo->setTokenName(
             $token ? $token->getName() : null
@@ -59,11 +56,29 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
 
     public function addGitInfo(): void
     {
+        $this->panelBranch = str_replace(
+            PHP_EOL,
+            '',
+            str_replace('.', '', $this->getGitBranch('../'))
+        );
+
         $this->serviceInfo
-            ->setPanelBranch($this->getGitBranch('../'))
-            ->setDepositBranch($this->getGitBranch($this->depositWorkDir))
-            ->setWithdrawBranch($this->getGitBranch($this->withdrawWorkDir))
-            ->setContractBranch($this->getGitBranch($this->contractWorkDir));
+            ->setPanelBranch($this->panelBranch)
+            ->setDepositBranch($this->getGitBranch(
+                $this->depositWorkDir,
+                self::SERVER_COMMAND,
+                $this->isTestingServer
+            ))
+            ->setWithdrawBranch($this->getGitBranch(
+                $this->withdrawWorkDir,
+                null,
+                true
+            ))
+            ->setContractBranch($this->getGitBranch(
+                $this->contractWorkDir,
+                self::SERVER_COMMAND,
+                $this->isTestingServer
+            ));
     }
 
     public function addConsumersInfo(): void
@@ -76,15 +91,36 @@ class ServiceInfoBuilder implements ServiceInfoBuilderInterface
         return $this->serviceInfo;
     }
 
-    private function getGitBranch(string $path): ?string
-    {
-        $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $path);
+    private function getGitBranch(
+        string $path,
+        ?string $externalCommand = null,
+        bool $externalContainer = false
+    ): ?string {
+        if ($externalCommand && $externalContainer) {
+            $externalCommand = str_replace('%path%', $path, $externalCommand);
+            $externalCommand = $this->panelBranch
+                ? str_replace('%branch%', $this->panelBranch, $externalCommand)
+                : $externalCommand;
+
+            $command = explode('^', $externalCommand);
+            $process = new Process($command);
+        } elseif ($externalContainer) {
+            $process = new Process(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                str_replace('%branch%', $this->panelBranch, $path)
+            );
+        } else {
+            $process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $path);
+        }
 
         try {
             $process->mustRun();
 
             return $process->getOutput();
         } catch (\Throwable $exception) {
+            $this->logger->error('Failed to fetch git branch for '.$this->panelBranch. ' branch'.
+                'with path: '.$path.'. Reason: '.$exception->getMessage());
+
             return null;
         }
     }

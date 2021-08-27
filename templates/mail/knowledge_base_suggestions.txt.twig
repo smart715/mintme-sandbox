@@ -1,27 +1,39 @@
 {% extends('mail/layout.txt.twig') %}
 {% block content %}
-{% trans %}hello{% endtrans %}
-{{username}},
 
-{% trans with {'%tokenName%': tokenName}%}knowledge_base.header.1{% endtrans %}
-- {% trans %}knowledge_base.link.1{% endtrans %}
-- {% trans %}knowledge_base.link.2{% endtrans %}
-- {% trans %}knowledge_base.link.3{% endtrans %}
-- {% trans %}knowledge_base.link.4{% endtrans %}
-- {% trans %}knowledge_base.link.5{% endtrans %}
+{% trans with {'%tokenName%': tokenName} %} mail.knowledge_base.header.2 {% endtrans %}, {{ tokenName }}!
 
-{% trans %}knowledge_base.header.2{% endtrans %}
+{% trans %} mail.knowledge_base.header.3 {% endtrans %}:
 
-{% trans %}knowledge_base.header2.msg.1{% endtrans %}
-{% trans %}knowledge_base.header2.msg.2{% endtrans %}
+- {% trans %} knowledge_base.link.1 {% endtrans %} {{ tokenSalesUrl }}
+- {% trans %} knowledge_base.link.2 {% endtrans %} {{ aimingUrl }}
+- {% trans %} knowledge_base.link.3 {% endtrans %} {{ ideasUrl }}
+- {% trans %} knowledge_base.link.4 {% endtrans %} {{ stuckUrl }}
+- {% trans %} knowledge_base.link.5 {% endtrans %} {{ talkingUrl }}
+
+{% trans %} knowledge_base.header.3 {% endtrans %}
+
+
+1. {% trans %}knowledge_base.header2.msg.1{% endtrans %}
+
+2. {% trans %}knowledge_base.header2.msg.2{% endtrans %}
+
 
 {% trans %}knowledge_base.read.txt{% endtrans %} {% trans %}knowledge_base.link.blockchain{% endtrans %} {% trans %}knowledge_base.article.txt{% endtrans %}
 
+{{ deployUrl }}
+
 {% trans %}knowledge_base.whatnext.txt{% endtrans %}
 
-{% trans %}knowlegde_base.whatnext.link1{% endtrans %}
-{% trans %}knowlegde_base.whatnext.link2{% endtrans %}
-{% trans %}knowlegde_base.whatnext.link3{% endtrans %}
-{% trans %}knowlegde_base.whatnext.link4{% endtrans %}
-{% trans %}knowlegde_base.whatnext.link5{% endtrans %}
+
+1. {% trans %}knowlegde_base.whatnext.link2{% endtrans %}
+
+2. {% trans %}knowlegde_base.whatnext.link3{% endtrans %}
+
+3. {% trans %}knowlegde_base.whatnext.link4{% endtrans %}
+
+4. {% trans %}knowlegde_base.whatnext.link5{% endtrans %}
+
+
 {% endblock %}
+

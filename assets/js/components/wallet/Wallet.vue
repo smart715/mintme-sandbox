@@ -6,6 +6,9 @@
             :coinify-partner-id="coinifyPartnerId"
             :coinify-crypto-currencies="coinifyCryptoCurrencies"
             :addresses="depositAddresses"
+            :addresses-signature="addressesSignature"
+            :predefined-tokens="predefinedItems"
+            :mintme-exchange-mail-sent="mintmeExchangeMailSent"
         />
         <div class="table-responsive">
             <div v-if="showLoadingIconP" class="p-5 text-center">
@@ -18,7 +21,7 @@
             <b-table v-else hover :items="predefinedItems" :fields="predefinedTokenFields">
                 <template v-slot:cell(name)="data">
                     <div class="first-field">
-                        <a :href="rebrandingFunc(generateCoinUrl(data.item))" class="text-white truncate-name">
+                        <a :href="data.item.url" class="text-white truncate-name">
                             {{ data.item.fullname|rebranding }} ({{ data.item.name|rebranding }})
                         </a>
                     </div>
@@ -31,12 +34,15 @@
                 <template v-slot:cell(action)="data">
                     <div class="row pl-2">
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="cryptoActionsClass('depositDisabled', data)"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="actionButtonClass(isCryptoActionDisabled('depositDisabled', data))"
                             @click="openDeposit(data.item.name, data.item.subunit)">
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isCryptoActionDisabled('depositDisabled', data)
+                                        }"
                                     :icon="['fac', 'deposit']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -45,17 +51,21 @@
                             </div>
                         </button>
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="cryptoActionsClass('withdrawalsDisabled', data)"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="actionButtonClass(isCryptoActionDisabled('withdrawalsDisabled', data))"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
-                                        data.item.subunit)"
+                                        data.item.subunit
+                                        )"
                         >
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isCryptoActionDisabled('withdrawalsDisabled', data)
+                                        }"
                                     :icon="['fac', 'withdraw']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -123,15 +133,26 @@
                         class="row pl-2"
                     >
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="(data.item.blocked
-                                || disabledServices.depositDisabled
-                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
-                            @click="openDeposit(data.item.name, data.item.subunit, true, data.item.blocked)"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('depositDisabled', data) ||
+                                isTokenActionDisabled('tokenDepositsDisabled', data)
+                            )"
+                            @click="openDeposit(
+                                data.item.name,
+                                data.item.subunit,
+                                true,
+                                data.item.blocked,
+                                data.item.cryptoSymbol
+                               )"
                         >
                             <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isTokenActionDisabled('depositDisabled', data) ||
+                                            isTokenActionDisabled('tokenDepositsDisabled', data)
+                                        }"
                                     :icon="['fac', 'deposit']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -140,22 +161,29 @@
                             </div>
                         </button>
                         <button
-                            class="btn btn-transparent d-flex flex-row c-pointer pl-2"
-                            :class="(data.item.blocked
-                                || disabledServices.withdrawalsDisabled
-                                || disabledServices.allServicesDisabled) ? 'text-muted' : 'text-white'"
+                            class="btn btn-transparent d-flex flex-row pl-2"
+                            :class="actionButtonClass(
+                                isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                isTokenActionDisabled('tokenWithdrawalsDisabled', data)
+                            )"
                             @click="openWithdraw(
                                         data.item.name,
                                         data.item.fee,
                                         data.item.available,
                                         data.item.subunit,
                                         true,
-                                        data.item.blocked)"
+                                        data.item.blocked,
+                                        data.item.cryptoSymbol
+                                        )"
                         >
                             <div>
                                 <div class="hover-icon">
                                 <font-awesome-icon
                                     class="icon-default"
+                                    :class="{
+                                        'text-muted': isTokenActionDisabled('withdrawalsDisabled', data) ||
+                                            isTokenActionDisabled('tokenWithdrawalsDisabled', data)
+                                        }"
                                     :icon="['fac', 'withdraw']"
                                 />
                                 <span class="pl-2 text-xs align-middle wallet-action-txt">
@@ -169,15 +197,8 @@
             </b-table>
         </div>
         <div class="table-responsive">
-            <table v-if="!hasTokens && !showLoadingIcon" class="table table-hover no-owned-token">
-                <thead>
-                    <tr>
-                        <th class="first-field">{{ $t('wallet.name') }}</th>
-                        <th class="field-table">{{ $t('wallet.amount') }}</th>
-                        <th >&nbsp;</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <table v-if="!showLoadingIcon && items.length <= 0" class="table table-hover no-owned-token">
+              <tbody>
                     <tr>
                         <td class="first-field">
                             <div class="truncate-name">
@@ -204,8 +225,9 @@
             :currency="selectedCurrency"
             :is-token="isTokenModal"
             :fee="withdraw.fee"
-            :web-fee="withdraw.webFee"
-            :available-web="withdraw.availableWeb"
+            :base-fee="withdraw.baseFee"
+            :base-symbol="withdraw.baseSymbol"
+            :available-base="withdraw.availableBase"
             :withdraw-url="withdrawUrl"
             :max-amount="withdraw.amount"
             :twofa="twofa"
@@ -213,6 +235,7 @@
             :no-close="true"
             :expiration-time="expirationTime"
             @close="closeWithdraw"
+            :currency-mode="currencyMode"
         />
         <deposit-modal
             :address="depositAddress"
@@ -225,12 +248,20 @@
             :no-close="false"
             @close="closeDeposit()"
         />
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            :no-close="false"
+            @close="addPhoneModalVisible = false"
+        >
+        </add-phone-alert-modal>
     </div>
 </template>
 
 <script>
 import WithdrawModal from '../modal/WithdrawModal';
 import DepositModal from '../modal/DepositModal';
+import AddPhoneAlertModal from '../modal/AddPhoneAlertModal';
 import {
     WebSocketMixin,
     FiltersMixin,
@@ -238,16 +269,26 @@ import {
     RebrandingFilterMixin,
     NotificationMixin,
     LoggerMixin,
+    AddPhoneAlertMixin,
 } from '../../mixins';
 import Decimal from 'decimal.js';
 import {toMoney} from '../../utils';
-import {tokSymbol, btcSymbol, webSymbol, ethSymbol} from '../../utils/constants';
+import {
+    tokSymbol,
+    webSymbol,
+    ethSymbol,
+    tokEthSymbol,
+    ethCryptoTokens,
+    bnbSymbol,
+} from '../../utils/constants';
 import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
 import {deposit as depositIcon, withdraw as withdrawIcon} from '../../utils/icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import BuyCrypto from './BuyCrypto';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 
-library.add(depositIcon);
-library.add(withdrawIcon);
+library.add(depositIcon, withdrawIcon, faCircleNotch);
 
 export default {
     name: 'Wallet',
@@ -258,31 +299,45 @@ export default {
         RebrandingFilterMixin,
         NotificationMixin,
         LoggerMixin,
+        AddPhoneAlertMixin,
     ],
     components: {
+        BTable,
         BuyCrypto,
         WithdrawModal,
         DepositModal,
+        AddPhoneAlertModal,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
     },
     props: {
         withdrawUrl: {type: String, required: true},
         createTokenUrl: String,
         tradingUrl: String,
-        depositMore: String,
+        depositMoreProp: String,
         twofa: String,
         expirationTime: Number,
         disabledCrypto: String,
         disabledServicesConfig: String,
+        ethTokenWithdrawFee: Number,
+        bnbTokenWithdrawFee: Number,
         isUserBlocked: Boolean,
         coinifyUiUrl: String,
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
+        cantMakeDepositWithdrawal: Boolean,
+        profileNickname: String,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {
+            depositMore: null,
             tokens: null,
             predefinedTokens: null,
             depositAddresses: {},
+            addressesSignature: {},
             showModal: false,
             selectedCurrency: null,
             isTokenModal: false,
@@ -290,6 +345,8 @@ export default {
             depositDescription: null,
             showDepositModal: null,
             noClose: false,
+            addPhoneModalMessageType: 'deposit_withdrawal',
+            addPhoneModalProfileNickName: this.profileNickname,
             tooltipOptions: {
                 placement: 'bottom',
                 arrow: true,
@@ -308,18 +365,25 @@ export default {
             ],
             withdraw: {
                 fee: '0',
-                webFee: '0',
+                baseFee: '0',
                 amount: '0',
                 subunit: 4,
-                availableWeb: '0',
+                availableBase: '0',
             },
             deposit: {
                 fee: undefined,
                 min: undefined,
             },
+            tokenWithdrawFees: {
+                [ethSymbol]: this.ethTokenWithdrawFee,
+                [bnbSymbol]: this.bnbTokenWithdrawFee,
+            },
         };
     },
     computed: {
+        currencyMode: function() {
+             return localStorage.getItem('_currency_mode');
+        },
         hasTokens: function() {
             return Object.values(this.tokens || {}).length > 0;
         },
@@ -332,10 +396,13 @@ export default {
             });
         },
         predefinedItems: function() {
-            return this.tokensToArray(this.predefinedTokens || {});
+            return this.tokensToArray(this.predefinedTokens || {}).map((item) => {
+                item.url = this.rebrandingFunc(this.generateCoinUrl(item));
+                return item;
+            });
         },
         items: function() {
-            return this.tokensToArray(this.tokens || {});
+            return this.tokensToArray(this.tokens || {}).filter((token) => !(!token.deployed && token.available <= 0));
         },
         showLoadingIconP: function() {
             return (this.predefinedTokens === null);
@@ -348,6 +415,13 @@ export default {
         },
     },
     mounted: function() {
+        if (window.localStorage.getItem('mintme_signedup_from_quick_trade') !== null) {
+            this.depositMore = window.localStorage.getItem('mintme_quick_trade_currency');
+
+            window.localStorage.removeItem('mintme_signedup_from_quick_trade');
+            window.localStorage.removeItem('mintme_quick_trade_currency');
+        }
+
         Promise.all([
             this.$axios.retry.get(this.$routing.generate('tokens'))
                 .then((res) => {
@@ -362,7 +436,7 @@ export default {
                                 if ('asset.update' === response.method) {
                                     this.updateBalances(response.params[0]);
                                 }
-                            }, 'wallet-asset-update');
+                            }, 'wallet-asset-update', 'Wallet');
 
                             this.sendMessage(JSON.stringify({
                                 method: 'asset.subscribe',
@@ -378,81 +452,99 @@ export default {
                         });
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_tokens'));
                     this.sendLogs('error', 'Service unavailable. Can not update tokens now', err);
                 }),
 
-            this.$axios.retry.get(this.$routing.generate('deposit_addresses'))
-                .then((res) => this.depositAddresses = res.data)
+            this.$axios.retry.get(this.$routing.generate('deposit_addresses_signature'))
+                .then((res) => {
+                    this.depositAddresses = res.data.addresses;
+                    this.addressesSignature = res.data.signatures;
+                })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_data'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit data now.', err);
                 }),
         ])
         .then(() => {
+            if (this.depositMore === null) {
+                this.depositMore = this.depositMoreProp;
+            }
             this.openDepositMore();
         })
         .catch((err) => {
-            this.notifyError(this.$t('toasted.error.can_not_load_wallet_data'));
             this.sendLogs('error', 'Service unavailable. Can not load wallet data now.', err);
         });
     },
     methods: {
-        /**
-         * @param {string} action
-         * @param {object} data
-         * @return {string}
-         */
-        cryptoActionsClass: function(action, data) {
-            let {name} = data;
-
+        checkIsUserAbleToDepositWithdraw: function() {
+            if (this.cantMakeDepositWithdrawal) {
+                this.addPhoneModalVisible = true;
+                return false;
+            }
+            return true;
+        },
+        isCryptoActionDisabled: function(action, data) {
             return this.isUserBlocked
-            || this.isDisabledCrypto(name)
+            || this.isDisabledCrypto(data.name)
             || this.disabledServices[action]
-            || this.disabledServices.allServicesDisabled
-              ? 'text-muted'
-              : 'text-white';
+            || this.disabledServices.allServicesDisabled;
+        },
+        isTokenActionDisabled: function(action, data) {
+            return data.item.blocked
+            || this.disabledServices[action]
+            || this.disabledServices.allServicesDisabled;
+        },
+        actionButtonClass: function(disabled) {
+            return disabled ?
+                'text-muted pointer-events-none' :
+                'text-white';
         },
         isDisabledCrypto: function(name) {
             return JSON.parse(this.disabledCrypto).includes(name);
         },
-        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false) {
+        openWithdraw: function(currency, fee, amount, subunit, isToken = false, isBlockedToken = false, crypto = '') {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.withdrawalsDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenWithdrawalsDisabled)
             ) {
-              this.notifyError('Withdrawals are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.withdrawals.disabled'));
 
               return;
             }
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            if (!this.twofa) {
-                this.notifyInfo(this.$t('toasted.info.enable_2fa_before'));
+
+            if (!this.checkIsUserAbleToDepositWithdraw()) {
                 return;
             }
+
             this.showModal = true;
             this.selectedCurrency = currency;
             this.isTokenModal = isToken;
-            this.withdraw.fee = toMoney(isToken ? 0 : fee, subunit);
-            this.withdraw.webFee = toMoney(
-                isToken || webSymbol === currency ? this.predefinedTokens[webSymbol].fee : 0,
-                subunit
+            this.withdraw.fee = fee ? toMoney(fee) : null;
+            this.withdraw.baseSymbol = crypto;
+            this.withdraw.baseFee = toMoney(
+                isToken
+                    ? [ethSymbol, bnbSymbol].includes(crypto)
+                        ? this.tokenWithdrawFees[crypto]
+                        : this.predefinedTokens[crypto || webSymbol].fee
+                    : 0
             );
-            this.withdraw.availableWeb = this.predefinedTokens[webSymbol].available;
+            this.withdraw.availableBase = this.predefinedTokens[crypto || webSymbol].available;
             this.withdraw.amount = toMoney(amount, subunit);
             this.withdraw.subunit = subunit;
         },
         closeWithdraw: function() {
             this.showModal = false;
         },
-        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false) {
+        openDeposit: function(currency, subunit, isToken = false, isBlockedToken = false, crypto = null) {
             if (this.isDisabledCrypto(currency)
                 || this.disabledServices.depositDisabled
                 || this.disabledServices.allServicesDisabled
+                || (isToken && this.disabledServices.tokenDepositsDisabled)
             ) {
-              this.notifyError('Deposits are disabled. Please try again later');
+              this.notifyError(this.$t('toasted.error.deposits.disabled'));
 
               return;
             }
@@ -460,15 +552,28 @@ export default {
             if ((isToken && isBlockedToken) || (!isToken && this.isUserBlocked )) {
                 return;
             }
-            this.depositAddress = (isToken ? this.depositAddresses[tokSymbol] : this.depositAddresses[currency])
-                || this.$t('wallet.loading');
+
+            if (!this.checkIsUserAbleToDepositWithdraw()) {
+                return;
+            }
+
+            if (isToken && !this.tokens[currency].deployed) {
+                return;
+            }
+
+            this.depositAddress = (isToken
+                ? this.depositAddresses[tokSymbol + crypto]
+                : ethCryptoTokens.includes(currency)
+                        ? this.depositAddresses[tokEthSymbol]
+                        : this.depositAddresses[currency]
+                ) || this.$t('wallet.loading');
             this.depositDescription = this.$t('wallet.send_to_address', {currency: currency});
             this.selectedCurrency = currency;
             this.deposit.fee = undefined;
             this.isTokenModal = isToken;
 
             this.$axios.retry.get(this.$routing.generate('deposit_info', {
-                    crypto: isToken ? webSymbol : currency,
+                    crypto: currency,
                 }))
                 .then((res) => {
                     this.deposit.fee = res.data.fee && 0.0 !== parseFloat(res.data.fee)
@@ -477,7 +582,6 @@ export default {
                     this.deposit.min = res.data.minDeposit ? toMoney(res.data.minDeposit, subunit) : undefined;
                 })
                 .catch((err) => {
-                    this.notifyError(this.$t('toasted.error.can_not_update_deposit_fee_status'));
                     this.sendLogs('error', 'Service unavailable. Can not update deposit fee status', err);
                 });
 
@@ -488,22 +592,25 @@ export default {
             this.showDepositModal = false;
         },
         openDepositMore: function() {
-            if (
-                [webSymbol, btcSymbol, ethSymbol].includes(this.depositMore) &&
-                null !== this.predefinedTokens &&
-                this.predefinedTokens.hasOwnProperty(this.depositMore) &&
-                this.depositAddresses.hasOwnProperty(this.depositMore) &&
-                !this.isUserBlocked
-            ) {
+            const isToken = !!this.tokens[this.depositMore];
+
+            const asset = isToken ?
+                this.tokens[this.depositMore] :
+                this.predefinedTokens[this.depositMore]
+            ;
+
+            if (asset && !this.isUserBlocked) {
                 if (window.history.replaceState) {
                     window.history.replaceState(
                         {}, '', location.href.split('?')[0]
                     );
                 }
 
-                this.openDeposit(
-                    this.depositMore,
-                    this.predefinedTokens[this.depositMore].subunit
+                this.openDeposit(this.depositMore,
+                    asset.subunit,
+                    isToken,
+                    asset.blocked,
+                    asset.cryptoSymbol
                 );
             }
         },

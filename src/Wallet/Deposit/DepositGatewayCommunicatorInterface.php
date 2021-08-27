@@ -2,16 +2,21 @@
 
 namespace App\Wallet\Deposit;
 
+use App\Entity\Crypto;
 use App\Entity\User;
 use App\Wallet\Deposit\Model\DepositCredentials;
 use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Transaction;
 use App\Wallet\RowsFetcherInterface;
-use Money\Money;
 
 interface DepositGatewayCommunicatorInterface extends RowsFetcherInterface
 {
-    public function getDepositCredentials(int $userId, array $predefinedToken): DepositCredentials;
+    /**
+     * @param int $userId
+     * @param Crypto[] $cryptos
+     * @return DepositCredentials
+     */
+    public function getDepositCredentials(int $userId, array $cryptos): DepositCredentials;
 
     /** @return Transaction[] */
     public function getTransactions(User $user, int $offset, int $limit): array;

@@ -39,7 +39,7 @@ class Thread
     private $type;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Message\Message",  mappedBy="thread")
+     * @ORM\OneToMany(targetEntity="App\Entity\Message\Message",  mappedBy="thread", cascade={"remove"})
      * @var Message[]|Collection
      */
     private $messages;
@@ -79,6 +79,9 @@ class Thread
         return $this;
     }
 
+    /**
+     * @Groups({"Default"})
+     */
     public function getToken(): Token
     {
         return $this->token;

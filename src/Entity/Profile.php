@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use App\Entity\Token\Token;
 use App\Validator\Constraints as AppAssert;
+use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use ZipCodeValidator\Constraints\ZipCode;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
@@ -40,7 +41,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
-     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $firstName;
@@ -51,7 +51,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
      * @AppAssert\ProfilePeriodLock()
-     * @Groups({"API", "Default"})
      * @var string|null
      */
     protected $lastName;
@@ -61,7 +60,6 @@ class Profile implements ImagineInterface
      * @Assert\Regex(pattern="/^[\p{L}\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $city;
@@ -71,7 +69,6 @@ class Profile implements ImagineInterface
      * @Assert\Country()
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $country;
@@ -91,9 +88,11 @@ class Profile implements ImagineInterface
      */
     protected $anonymous = false;
 
+    public bool $disabledAnonymous = false;  // phpcs:ignore
+
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
-     * @var \DateTimeImmutable|null
+     * @var DateTimeImmutable|null
      */
     protected $nameChangedDate;
 
@@ -104,11 +103,22 @@ class Profile implements ImagineInterface
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
-     * @var Token|null
+     * @ORM\OneToOne(
+     *     targetEntity="App\Entity\PhoneNumber",
+     *     mappedBy="profile",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
+     * @ORM\JoinColumn(name="phone_number_id", referencedColumnName="id")
+     */
+    protected ?PhoneNumber $phoneNumber;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @var ArrayCollection|null
      * @Groups({"API"})
      */
-    protected $token;
+    protected $tokens;
 
     /** @var bool */
     private $isChangesLocked = false;
@@ -123,8 +133,7 @@ class Profile implements ImagineInterface
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
-     * @Groups({"Default", "API"})
-     * @var Image
+     * @var Image|null
      */
     protected $image;
 
@@ -139,6 +148,12 @@ class Profile implements ImagineInterface
      * @var \DateTime
      */
     private $nextReminderDate;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var DateTimeImmutable
+     */
+    private ?DateTimeImmutable $created;
 
     public function __construct(User $user)
     {
@@ -177,6 +192,20 @@ class Profile implements ImagineInterface
         return $this->nameChangedDate;
     }
 
+    private function returnDefault(): bool
+    {
+        return !$this->isAnonymous() || $this->disabledAnonymous;
+    }
+
+    private function filterAnonymous(?string $property): string
+    {
+        return  is_null($property)
+            ? ''
+            : ($property && $this->returnDefault()
+            ? $property
+            : 'Anonymous');
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -187,19 +216,32 @@ class Profile implements ImagineInterface
         return $this->nickname ?? '';
     }
 
-    public function getFirstName(): ?string
+    /**
+     * @Groups({"API", "Default"})
+     * @return string
+     */
+    public function getFirstName(): string
     {
-        return $this->firstName;
+        return $this->filterAnonymous($this->firstName);
     }
 
-    public function getLastName(): ?string
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getLastName(): string
     {
-        return $this->lastName;
+        return $this->filterAnonymous($this->lastName);
     }
 
+    /**
+     * @Groups({"API", "Default"})
+     */
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description && $this->returnDefault()
+            ? $this->description
+            : '';
     }
 
     public function setDescription(?string $description): self
@@ -221,9 +263,20 @@ class Profile implements ImagineInterface
         return $this;
     }
 
-    public function getCity(): ?string
+    public function setDisabledAnonymous(bool $disabledAnonymous): self
     {
-        return $this->city;
+        $this->disabledAnonymous = $disabledAnonymous;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getCity(): string
+    {
+        return $this->filterAnonymous($this->city);
     }
 
     public function setCity(?string $city): self
@@ -242,9 +295,13 @@ class Profile implements ImagineInterface
         return null;
     }
 
-    public function getCountry(): ?string
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getCountry(): string
     {
-        return $this->country;
+        return $this->filterAnonymous($this->country);
     }
 
     public function setCountry(?string $country): self
@@ -280,9 +337,49 @@ class Profile implements ImagineInterface
         return $this->user->getEmail();
     }
 
-    public function getToken(): ?Token
+    public function getMintmeToken(): ?Token
     {
-        return $this->token;
+        /** @var Token $token */
+        foreach ($this->getTokens() as $token) {
+            if ($token->isMintmeToken()) {
+                return $token;
+            }
+        }
+
+        return null;
+    }
+
+    public function getFirstToken(): ?Token
+    {
+        if ($this->hasTokens()) {
+            return $this->tokens[0];
+        }
+
+        return null;
+    }
+
+    public function getTokens(): array
+    {
+        return null !== $this->tokens
+            ? $this->tokens->toArray()
+            : [];
+    }
+
+    public function hasTokens(): bool
+    {
+        return count($this->getTokens()) > 0;
+    }
+
+    public function hasBlockedTokens(): bool
+    {
+        /** @var Token $token */
+        foreach ($this->getTokens() as $token) {
+            if ($token->isBlocked()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getZipCode(): ?string
@@ -309,10 +406,16 @@ class Profile implements ImagineInterface
         $this->image = $image;
     }
 
+
+    /**
+     * @return Image
+     * @Groups({"API", "Default"})
+     */
     public function getImage(): Image
     {
         return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
     }
+
 
     /**
     * @Assert\Callback
@@ -356,6 +459,34 @@ class Profile implements ImagineInterface
     public function setNextReminderDate(\DateTime $nextReminderDate): self
     {
         $this->nextReminderDate = $nextReminderDate;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreated(): self
+    {
+        $this->created = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getCreated(): ?DateTimeImmutable
+    {
+        return $this->created;
+    }
+
+    public function getPhoneNumber(): ?PhoneNumber
+    {
+        return $this->phoneNumber;
+    }
+
+
+    public function setPhoneNumber(?PhoneNumber $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
 
         return $this;
     }

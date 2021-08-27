@@ -265,6 +265,8 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
@@ -273,6 +275,8 @@ describe('Trade', () => {
             moxios.wait(() => {
                 expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}]);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
@@ -292,6 +296,8 @@ describe('Trade', () => {
                     buy: [],
                     sell: [],
                     buyDepth: 0,
+                    totalSellOrders: 0,
+                    totalBuyOrders: 0,
                 },
             });
 
@@ -318,12 +324,16 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
             moxios.wait(() => {
                 expect(wrapper.vm.sellOrders).toMatchObject([{price: '3'}, {price: '4'}, {price: '3'}, {price: '4'}]);
                 expect(wrapper.vm.sellPage).toBe(3);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
@@ -344,12 +354,16 @@ describe('Trade', () => {
                     buy: ordersBuy,
                     sell: ordersSell,
                     buyDepth: 0,
+                    totalSellOrders: '1.0001',
+                    totalBuyOrders: '1.0001',
                 },
             });
 
             moxios.wait(() => {
                 expect(wrapper.vm.buyOrders).toMatchObject([{price: '1'}, {price: '2'}, {price: '1'}, {price: '2'}]);
                 expect(wrapper.vm.buyPage).toBe(3);
+                expect(wrapper.vm.totalSellOrders).toMatchObject({d: [1, 1000]});
+                expect(wrapper.vm.totalBuyOrders).toMatchObject({d: [1, 1000]});
                 done();
             });
         });
@@ -401,6 +415,16 @@ describe('Trade', () => {
             });
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
+            wrapper.vm.totalSellOrders = {sub: () => {
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
+            wrapper.vm.totalBuyOrders = {sub: () => {
+                 return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                 return wrapper.vm.totalBuyOrders;
+            }};
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.UPDATE);
             expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
             expect(wrapper.vm.buyOrders).toBe(null);
@@ -412,10 +436,39 @@ describe('Trade', () => {
                 localVue,
                 propsData: propsForTestCorrectlyRenders,
             });
-            wrapper.vm.sellOrders = [{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}];
+            wrapper.vm.sellOrders = [{id: 'bar', price: 2, ctime: 'nestCtime', amount: 5, mtime: 'testMtime'}];
             wrapper.vm.buyOrders = null;
-            wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime'}, Constants.WSAPI.order.status.UPDATE);
-            expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2, ctime: 'nestCtime', left: 'testLeft', mtime: 'testMtime', createdTimestamp: 'nestCtime', amount: 'testLeft', timestamp: 'testMtime'}]);
+            wrapper.vm.totalSellOrders = {sub: () => {
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
+            wrapper.vm.totalBuyOrders = {sub: () => {
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                 return wrapper.vm.totalBuyOrders;
+            }};
+            wrapper.vm.processOrders({
+                id: 'bar',
+                side: Constants.WSAPI.order.type.SELL,
+                price: 2,
+                ctime: 'nestCtime',
+                left: 3,
+                mtime: 'testMtime',
+                },
+                Constants.WSAPI.order.status.UPDATE
+            );
+
+            expect(wrapper.vm.sellOrders).toMatchObject([{
+                id: 'bar',
+                price: 2,
+                ctime: 'nestCtime',
+                mtime: 'testMtime',
+                createdTimestamp: 'nestCtime',
+                amount: 3,
+                timestamp: 'testMtime',
+            }]);
+
             expect(wrapper.vm.buyOrders).toBe(null);
         });
 
@@ -427,7 +480,16 @@ describe('Trade', () => {
             });
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
-            wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'foobar'}, Constants.WSAPI.order.status.FINISH);
+            wrapper.vm.totalSellOrders = {sub: () => {
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
+            wrapper.vm.totalBuyOrders = {sub: () => {
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+             return wrapper.vm.totalBuyOrders;
+            }};
             expect(wrapper.vm.sellOrders).toMatchObject([{id: 'bar', price: 2}]);
             expect(wrapper.vm.buyOrders).toBe(null);
         });
@@ -440,6 +502,16 @@ describe('Trade', () => {
             });
             wrapper.vm.sellOrders = [{id: 'bar', price: 2}];
             wrapper.vm.buyOrders = null;
+            wrapper.vm.totalSellOrders = {sub: () => {
+                return wrapper.vm.totalSellOrders;
+            }, add: () => {
+                return wrapper.vm.totalSellOrders;
+            }};
+            wrapper.vm.totalBuyOrders = {sub: () => {
+                return wrapper.vm.totalBuyOrders;
+            }, add: () => {
+                return wrapper.vm.totalBuyOrders;
+            }};
             wrapper.vm.processOrders({side: Constants.WSAPI.order.type.SELL, id: 'bar'}, Constants.WSAPI.order.status.FINISH);
             expect(wrapper.vm.sellOrders).toEqual([]);
             expect(wrapper.vm.buyOrders).toBe(null);

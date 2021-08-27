@@ -3,6 +3,7 @@
 namespace App\Tests\SmartContract;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -10,9 +11,11 @@ use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\SmartContract\ContractHandlerInterface;
 use App\SmartContract\DeploymentFacade;
+use App\Utils\Symbols;
 use Doctrine\ORM\EntityManager;
 use Money\Currency;
 use Money\Money;
+use phpDocumentor\Reflection\Types\This;
 use PHPUnit\Framework\MockObject\Matcher\Invocation;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +32,8 @@ class DeploymentFacadeTest extends TestCase
 
         $process->execute(
             $this->createMock(User::class),
-            $this->mockToken($this->once(), $this->once())
+            $this->mockToken($this->once(), $this->once()),
+            $this->mockCrypto('WEB')
         );
     }
 
@@ -42,12 +46,13 @@ class DeploymentFacadeTest extends TestCase
             $this->mockContractHandler($this->never())
         );
 
-        $this->expectException(BalanceException::class);
+          $this->expectException(BalanceException::class);
 
-        $process->execute(
-            $this->createMock(User::class),
-            $this->mockToken($this->never(), $this->never())
-        );
+          $process->execute(
+              $this->createMock(User::class),
+              $this->mockToken($this->never(), $this->never()),
+              $this->mockCrypto('WEB')
+          );
     }
 
     private function mockContractHandler(Invocation $invocation): ContractHandlerInterface
@@ -62,7 +67,7 @@ class DeploymentFacadeTest extends TestCase
     {
         $balanceResult = $this->createMock(BalanceResult::class);
         $balanceResult->method('getAvailable')->willReturn(
-            new Money($balance, new Currency(Token::WEB_SYMBOL))
+            new Money($balance, new Currency(Symbols::WEB))
         );
 
         $balanceHandler = $this->createMock(BalanceHandlerInterface::class);
@@ -76,7 +81,7 @@ class DeploymentFacadeTest extends TestCase
     {
         $costFetcher = $this->createMock(DeployCostFetcherInterface::class);
         $costFetcher->method('getDeployWebCost')
-            ->willReturn(new Money($balance, new Currency(Token::WEB_SYMBOL)));
+            ->willReturn(new Money($balance, new Currency(Symbols::WEB)));
 
         return $costFetcher;
     }
@@ -84,9 +89,18 @@ class DeploymentFacadeTest extends TestCase
     private function mockToken(Invocation $pendingInvocation, Invocation $costInvocation): Token
     {
         $token = $this->createMock(Token::class);
+        $token->method('getOwner')->willReturn($this->createMock(User::class));
         $token->expects($pendingInvocation)->method('setPendingDeployment');
         $token->expects($costInvocation)->method('setDeployCost');
 
         return $token;
+    }
+
+    private function mockCrypto(string $symbol): Crypto
+    {
+        $crypto = $this->createMock(Crypto::class);
+        $crypto->method('getSymbol')->willReturn($symbol);
+
+        return $crypto;
     }
 }

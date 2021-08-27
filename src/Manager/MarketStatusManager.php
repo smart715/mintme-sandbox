@@ -6,36 +6,53 @@ use App\Entity\Crypto;
 use App\Entity\MarketStatus;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Events\OrderEvent;
+use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Factory\MarketFactoryInterface;
 use App\Exchange\Market;
+use App\Exchange\Market\MarketHandler;
 use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Repository\MarketStatusRepository;
 use App\Utils\BaseQuote;
 use App\Utils\Converter\MarketNameConverterInterface;
+use App\Utils\Symbols;
+use App\Wallet\Money\MoneyWrapper;
+use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\QueryBuilder;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class MarketStatusManager implements MarketStatusManagerInterface
 {
-    private const SORTS = [
-        'lastPrice' => 'to_number(ms.lastPrice)',
-        'monthVolume' => 'to_number(ms.monthVolume)',
-        'dayVolume' => 'to_number(ms.dayVolume)',
-        'change' => 'change',
-        'pair' => 'qt.name',
-        'buyDepth' => 'to_number(ms.buyDepth)',
-        'marketCap' => 'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)',
-    ];
+    public const FILTER_DEPLOYED_FIRST = 1;
+    public const FILTER_DEPLOYED_ONLY_MINTME = 2;
+    public const FILTER_AIRDROP_ONLY = 3;
+    public const FILTER_DEPLOYED_ONLY_ETH = 4;
+    public const FILTER_DEPLOYED_ONLY_BNB = 5;
+    public const FILTER_AIRDROP_ACTIVE = true;
+    public const FILTER_FOR_TOKENS = [
+            'deployed_first' => self::FILTER_DEPLOYED_FIRST,
+            'deployed_only_mintme' => self::FILTER_DEPLOYED_ONLY_MINTME,
+            'airdrop_only' => self::FILTER_AIRDROP_ONLY,
+            'deployed_only_eth' => self::FILTER_DEPLOYED_ONLY_ETH,
+            'deployed_only_bnb' => self::FILTER_DEPLOYED_ONLY_BNB,
+        ];
 
-    private const SORT_BY_CHANGE = 'change';
-
-    private const SORT_BY_MARKETCAP = ['marketCap', 'marketCapUSD'];
-
-    private const DEPLOYED_FIRST = 1;
-    private const DEPLOYED_ONLY = 2;
-    private const AIRDROP_ONLY = 3;
-    private const AIRDROP_ACTIVE = 1;
+    public const SORT_LAST_PRICE = 'lastPrice';
+    public const SORT_MONTH_VOLUME = 'monthVolume';
+    public const SORT_DAY_VOLUME = 'dayVolume';
+    public const SORT_CHANGE = 'change';
+    public const SORT_PAIR = 'pair';
+    public const SORT_BUY_DEPTH = 'buyDepth';
+    public const SORT_MARKET_CAP = 'marketCap';
+    public const SORT_MARKET_CAP_USD = 'marketCapUsd';
+    public const SORT_RANK = 'rank';
+    public const SORT_HOLDERS = 'holders';
 
     /** @var MarketStatusRepository */
     protected $repository;
@@ -58,12 +75,24 @@ class MarketStatusManager implements MarketStatusManagerInterface
     /** @var int */
     public $minVolumeForMarketcap;
 
+    private BalanceHandlerInterface $balanceHandler;
+
+    private ParameterBagInterface $bag;
+
+    private MoneyWrapperInterface $moneyWrapper;
+
+    private EventDispatcherInterface $eventDispatcher;
+
     public function __construct(
         EntityManagerInterface $em,
         MarketNameConverterInterface $marketNameConverter,
         CryptoManagerInterface $cryptoManager,
         MarketFactoryInterface $marketFactory,
-        MarketHandlerInterface $marketHandler
+        MarketHandlerInterface $marketHandler,
+        BalanceHandlerInterface $balanceHandler,
+        ParameterBagInterface $bag,
+        MoneyWrapperInterface $moneyWrapper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         /** @var  MarketStatusRepository $repository */
         $repository = $em->getRepository(MarketStatus::class);
@@ -73,35 +102,179 @@ class MarketStatusManager implements MarketStatusManagerInterface
         $this->marketFactory = $marketFactory;
         $this->marketHandler = $marketHandler;
         $this->em = $em;
+        $this->balanceHandler = $balanceHandler;
+        $this->bag = $bag;
+        $this->moneyWrapper = $moneyWrapper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /** {@inheritDoc} */
     public function getMarketsCount(int $filter = 0): int
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms')
-            ->join('ms.quoteToken', 'qt');
+        $queryBuilder = $this->repository->createQueryBuilder('ms')
+            ->select('COUNT(ms)')
+            ->join('ms.quoteToken', 'qt')
+            ->leftJoin('qt.crypto', 'c')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false');
 
-        if (self::DEPLOYED_ONLY === $filter) {
-            $qb->where("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
-        } elseif (self::AIRDROP_ONLY === $filter) {
-            $qb->innerJoin('qt.airdrops', 'a')
-                ->where('a.status = :active')
-                ->setParameter('active', self::AIRDROP_ACTIVE);
+        switch ($filter) {
+            case self::FILTER_DEPLOYED_ONLY_MINTME:
+                $queryBuilder
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
+                    ->setParameter('web', Symbols::WEB)
+                ;
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_ETH:
+                $queryBuilder
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :eth")
+                    ->setParameter('eth', Symbols::ETH)
+                ;
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_BNB:
+                $queryBuilder->andWhere("qt.deployed = 1 AND c.symbol = :bnb")
+                    ->setParameter('bnb', Symbols::BNB);
+
+                break;
+            case self::FILTER_AIRDROP_ONLY:
+                $queryBuilder
+                    ->innerJoin('qt.airdrops', 'a')
+                    ->andWhere('a.status = :active')
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
+                    ->setParameter('web', Symbols::WEB)
+                ;
+
+                break;
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
     }
+
+    private function getMarketsInfoFilter(int $filter, QueryBuilder $queryBuilder): void
+    {
+        switch ($filter) {
+            case self::FILTER_DEPLOYED_FIRST:
+                $queryBuilder
+                    ->addSelect('CASE WHEN qt.deployed = 1 AND c.symbol = :web THEN 1 ELSE 0 END AS HIDDEN deployed_on_mintme')
+                    ->setParameter('web', Symbols::WEB)
+                    ->addOrderBy('deployed_on_mintme', 'DESC')
+                ;
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_MINTME:
+                $queryBuilder
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
+                    ->setParameter('web', Symbols::WEB)
+                ;
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_ETH:
+                $queryBuilder
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :eth")
+                    ->setParameter('eth', Symbols::ETH)
+                ;
+
+                break;
+            case self::FILTER_DEPLOYED_ONLY_BNB:
+                $queryBuilder
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :bnb")
+                    ->setParameter('bnb', Symbols::BNB)
+                ;
+
+                break;
+            case self::FILTER_AIRDROP_ONLY:
+                $queryBuilder
+                    ->innerJoin('qt.airdrops', 'a')
+                    ->andWhere('a.status = :active')
+                    ->setParameter('active', self::FILTER_AIRDROP_ACTIVE)
+                    ->andWhere("qt.deployed = 1 AND c.symbol = :web")
+                    ->setParameter('web', Symbols::WEB)
+                ;
+
+                break;
+        }
+    }
+
+    private function getMarketsInfoSort(string $sort, QueryBuilder $queryBuilder): array
+    {
+        $result = [];
+
+        switch ($sort) {
+            case self::SORT_CHANGE:
+                $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
+                $result[] = 'change';
+
+                break;
+            case self::SORT_MARKET_CAP:
+            case self::SORT_MARKET_CAP_USD:
+                $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
+                $result[] = 'marketcap(ms.lastPrice, ms.monthVolume, :minvolume)';
+
+                break;
+            case self::SORT_LAST_PRICE:
+                $result[] = 'to_number(ms.lastPrice)';
+
+                break;
+            case self::SORT_DAY_VOLUME:
+                $result[] = 'to_number(ms.dayVolume)';
+
+                break;
+            case self::SORT_PAIR:
+                $result[] = 'qt.name';
+
+                break;
+            case self::SORT_BUY_DEPTH:
+                $result[] = 'to_number(ms.buyDepth)';
+
+                break;
+            case self::SORT_RANK:
+                $queryBuilder
+                    ->addSelect('CASE WHEN qt.deployed = 1 AND c.symbol = :web THEN 1 ELSE 0 END AS HIDDEN rank_deployed_on_mintme')
+                    ->setParameter('web', Symbols::WEB)
+                ;
+                $result[] = 'rank_deployed_on_mintme';
+                $result[] = 'to_number(ms.monthVolume)';
+
+                break;
+            case self::SORT_HOLDERS:
+                $queryBuilder->addSelect('COUNT(u) AS HIDDEN holders');
+                $result[] = 'holders';
+
+                break;
+            default:
+                $result[] = 'to_number(ms.monthVolume)';
+        }
+
+        return $result;
+    }
+
+    private function getMarketsInfoOrder(array $sorts, string $order, QueryBuilder $queryBuilder): void
+    {
+        $order = 'ASC' === $order
+            ? 'ASC'
+            : 'DESC';
+
+        foreach ($sorts as $sort) {
+            $queryBuilder->addOrderBy($sort, $order);
+        }
+
+        $queryBuilder->addOrderBy('ms.id', $order);
+    }
+
 
     /** {@inheritDoc} */
     public function getUserRelatedMarketsCount(int $userId): int
     {
-        return (int)$this->em->createQueryBuilder()
+        return (int)$this->repository->createQueryBuilder('ms')
             ->select('COUNT(ms)')
-            ->from(MarketStatus::class, 'ms')
             ->join('ms.quoteToken', 'qt')
             ->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            ->where('qt IS NOT NULL')
+            ->andWhere('qt.isBlocked=false')
             ->setParameter('id', $userId)
             ->getQuery()
             ->getSingleScalarResult();
@@ -111,7 +284,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getMarketsInfo(
         int $offset,
         int $limit,
-        string $sort = "monthVolume",
+        string $sort = "rank",
         string $order = "DESC",
         int $filter = 1,
         ?int $userId = null
@@ -120,58 +293,40 @@ class MarketStatusManager implements MarketStatusManagerInterface
 
         $queryBuilder = $this->repository->createQueryBuilder('ms')
             ->join('ms.quoteToken', 'qt')
+            ->leftJoin('qt.crypto', 'c')
+            ->leftJoin('qt.users', 'u')
             ->where('qt IS NOT NULL')
             ->andWhere('qt.isBlocked=false')
+            ->andWhere('qt.isHidden=false')
+            ->groupBy('ms')
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
         if (null !== $userId) {
-            $queryBuilder->innerJoin('qt.users', 'u', 'WITH', 'u.user = :id')
+            $queryBuilder->andWhere('u.user = :id')
                 ->setParameter('id', $userId);
         }
 
-        if (self::DEPLOYED_FIRST === $filter) {
-            $queryBuilder->addSelect(
-                "CASE WHEN qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x' THEN 1 ELSE 0 END AS HIDDEN deployed"
-            )->orderBy('deployed', 'DESC');
-        } elseif (self::DEPLOYED_ONLY === $filter) {
-            $queryBuilder->andWhere("qt.address IS NOT NULL AND qt.address != '' AND qt.address != '0x'");
-        } elseif (self::AIRDROP_ONLY === $filter) {
-            $queryBuilder->innerJoin('qt.airdrops', 'a')
-                ->andWhere('a.status = :active')
-                ->setParameter('active', self::AIRDROP_ACTIVE);
-        }
+        $this->getMarketsInfoFilter($filter, $queryBuilder);
+        $sort = $this->getMarketsInfoSort($sort, $queryBuilder);
+        $this->getMarketsInfoOrder($sort, $order, $queryBuilder);
 
-        if (self::SORT_BY_CHANGE === $sort) {
-            $queryBuilder->addSelect('change_percentage(ms.lastPrice, ms.openPrice) AS HIDDEN change');
-        }
+        $result = $queryBuilder->getQuery()->getResult();
 
-        if (in_array($sort, self::SORT_BY_MARKETCAP)) {
-            $queryBuilder->setParameter('minvolume', $this->minVolumeForMarketcap * 10000);
-        }
-
-        $sort = self::SORTS[$sort] ?? self::SORTS['monthVolume'];
-        $order = 'ASC' === $order
-            ? 'ASC'
-            : 'DESC';
-
-        $queryBuilder->addOrderBy($sort, $order)
-            ->addOrderBy('ms.id', $order);
+        $this->setRanks($result);
 
         return $this->parseMarketStatuses(
             array_merge(
                 $predefinedMarketStatus,
-                $queryBuilder->getQuery()->getResult()
+                $result
             )
         );
     }
 
     /** {@inheritDoc} */
-    public function getAllMarketsInfo(): array
+    public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array
     {
-        return $this->parseMarketStatuses(
-            $this->repository->findBy([], ['lastPrice' => Criteria::DESC])
-        );
+        return $this->repository->getCryptoAndDeployedTokenMarketStatuses($offset, $limit);
     }
 
     /** {@inheritDoc} */
@@ -214,9 +369,29 @@ class MarketStatusManager implements MarketStatusManagerInterface
             );
         }
 
-        $marketInfo = $this->marketHandler->getMarketInfo($market);
+        $this->em->refresh($marketStatus);
+
+        $marketInfo = $this->marketHandler->getMarketInfo(
+            $market,
+            MarketHandler::DAY_PERIOD
+        );
 
         $marketStatus->updateStats($marketInfo);
+
+        $orders = $this->marketHandler->getExecutedOrders($market, $marketStatus->getLastDealId());
+
+        foreach ($orders as $order) {
+            if (Order::DONATION_SIDE === $order->getSide()) {
+                continue;
+            }
+
+            /** @psalm-suppress TooManyArguments */
+            $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::COMPLETED);
+        }
+
+        if (isset($orders[0])) {
+            $marketStatus->setLastDealId($orders[0]->getId());
+        }
 
         $this->em->merge($marketStatus);
         $this->em->flush();
@@ -316,7 +491,7 @@ class MarketStatusManager implements MarketStatusManagerInterface
                 ($base instanceof Token && $base->isBlocked()) ||
                 $quote instanceof Token ||
                 $base === $quote ||
-                ($base instanceof Token && !(Token::MINTME_SYMBOL === $quote->getSymbol() || Token::WEB_SYMBOL === $quote->getSymbol()))
+                ($base instanceof Token && !(Symbols::MINTME === $quote->getSymbol() || Symbols::WEB === $quote->getSymbol()))
             );
     }
 
@@ -324,5 +499,46 @@ class MarketStatusManager implements MarketStatusManagerInterface
     public function getExpired(): array
     {
         return $this->repository->getExpired();
+    }
+
+    public function setRanks(array $marketStatuses): void
+    {
+        $ids = array_map(fn (MarketStatus $ms) => $ms->getId(), $marketStatuses);
+
+        $sql = "SELECT * FROM (
+                    SELECT ms.id,
+                    qt.deployed = 1 AND c.symbol = :web AS deployed_on_mintme,
+                    RANK() OVER (ORDER BY deployed_on_mintme DESC, to_number(ms.month_volume, :subunit, :showSubunit) DESC, ms.id DESC) AS rank
+                    FROM market_status AS ms
+                    INNER JOIN token AS qt ON ms.quote_token_id = qt.id
+                    LEFT JOIN crypto AS c ON qt.crypto_id = c.id
+                    WHERE qt.is_blocked = false
+                    AND qt.is_hidden = false
+                ) AS r
+                WHERE r.id IN (:ids)";
+
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('id', 'id', 'integer');
+        $rsm->addScalarResult('rank', 'rank', 'integer');
+
+        $query = $this->em->createNativeQuery($sql, $rsm);
+        $query
+            ->setParameter('ids', $ids)
+            ->setParameter('subunit', MoneyWrapper::MINTME_SUBUNIT)
+            ->setParameter('showSubunit', MoneyWrapper::MINTME_SHOW_SUBUNIT)
+            ->setParameter('web', Symbols::WEB)
+        ;
+
+        $result = $query->getResult();
+
+        $result = array_reduce($result, function (array $acc, array $resultRow) {
+            $acc[$resultRow['id']] = $resultRow['rank'];
+
+            return $acc;
+        }, []);
+
+        foreach ($marketStatuses as $marketStatus) {
+            $marketStatus->setRank($result[$marketStatus->getId()]);
+        }
     }
 }

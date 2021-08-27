@@ -3,9 +3,9 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
+use App\Utils\Symbols;
 use App\Wallet\Model\Address;
 use App\Wallet\Model\Amount;
-use App\Wallet\Money\MoneyWrapper;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
@@ -71,12 +71,24 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
      */
     protected string $hash;
 
-    public function __construct(User $user, Token $token, Amount $amount, Address $address)
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $fee;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private string $feeCurrency;
+
+    public function __construct(User $user, Token $token, Amount $amount, Address $address, Money $fee)
     {
         $this->user = $user;
         $this->token = $token;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+        $this->fee = $fee->getAmount();
+        $this->feeCurrency = $fee->getCurrency()->getCode();
     }
 
     public function getId(): int
@@ -99,7 +111,7 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         return new Amount(
             new Money(
                 $this->amount,
-                new Currency(MoneyWrapper::TOK_SYMBOL)
+                new Currency(Symbols::TOK)
             )
         );
     }
@@ -131,5 +143,13 @@ class PendingTokenWithdraw implements PendingWithdrawInterface
         $this->date = new DateTimeImmutable();
 
         return $this;
+    }
+
+    public function getFee(): Money
+    {
+        return new Money(
+            $this->fee,
+            new Currency($this->feeCurrency ?: Symbols::TOK)
+        );
     }
 }

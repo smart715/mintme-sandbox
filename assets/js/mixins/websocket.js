@@ -1,7 +1,9 @@
 import {mapActions, mapGetters} from 'vuex';
 import {status} from '../storage/modules/websocket';
+import LoggerMixin from './logger';
 
 export default {
+    mixins: [LoggerMixin],
     props: {
         websocketUrl: {type: String, required: true},
         hash: {type: String},
@@ -79,13 +81,17 @@ export default {
          * Add additional handler for a websocket stream.
          * @param {function} handler
          * @param {*} id - uniq identifier for a handler to overwrite duplicated handler
+         * @param {*} message - message from vue component
          * @return {*}
          */
-        addMessageHandler: function(handler, id = null) {
+        addMessageHandler: function(handler, id = null, message = 'WebSocket') {
             return this._addMessageHandler({
                 url: this.websocketUrl,
                 id,
-                handler,
+                handler: (result) => {
+                    this.sendLogsIfWsError(result, message);
+                    handler(result);
+                },
             });
         },
         addOnOpenHandler: function(handler) {
@@ -101,6 +107,11 @@ export default {
                     request: message,
                 });
             });
+        },
+        sendLogsIfWsError: function(result, message = '') {
+            if (null !== result.error && 'object' === typeof result.error) {
+                this.sendLogs('error', message, result.error);
+            }
         },
     },
 };

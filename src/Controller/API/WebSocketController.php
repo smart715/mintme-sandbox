@@ -54,7 +54,7 @@ class WebSocketController extends AbstractFOSRestController
             if (null === $user) {
                 throw new RuntimeException('User with hash '.$token.' could not be found in mintme db', 3);
             }
-
+            
             $profileManager->createHash($user, false);
 
             return $this->confirmed($user->getId() + $this->config->getOffset());

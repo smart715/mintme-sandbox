@@ -14,6 +14,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
     private const MARKET_STATUS = 'market.status';
     private const KLINE = 'market.kline';
+    private const SUMMARY = 'market.summary';
     private const PENDING_ORDER_DETAIL_METHOD = 'order.pending_detail';
 
     /** @var JsonRpcInterface */
@@ -149,6 +150,17 @@ class MarketFetcher implements MarketFetcherInterface
             $end,
             $interval,
         ]);
+
+        if ($response->hasError()) {
+            throw new FetchException($response->getError()['message'] ?? '');
+        }
+
+        return $response->getResult();
+    }
+
+    public function getSummary(array $markets): array
+    {
+        $response = $this->jsonRpc->send(self::SUMMARY, $markets);
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');

@@ -10,6 +10,7 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\PaymentCryptoStrategy;
 use App\Exchange\Balance\Strategy\PaymentTokenStrategy;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
@@ -28,32 +29,25 @@ class PaymentConsumer implements ConsumerInterface
 
     private const STATUS_FAIL = 'fail';
 
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
+    private BalanceHandlerInterface $balanceHandler;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var UserManagerInterface */
-    private $userManager;
+    private UserManagerInterface $userManager;
 
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
+    private CryptoManagerInterface $cryptoManager;
 
-    /** @var TokenManagerInterface */
-    private $tokenManager;
+    private TokenManagerInterface $tokenManager;
 
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
 
-    /** @var ClockInterface */
-    private $clock;
+    private ClockInterface $clock;
 
-    /** @var EntityManagerInterface */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
+
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
@@ -64,7 +58,8 @@ class PaymentConsumer implements ConsumerInterface
         MoneyWrapperInterface $moneyWrapper,
         ClockInterface $clock,
         EntityManagerInterface $em,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TokenConfig $tokenConfig
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->userManager = $userManager;
@@ -75,6 +70,7 @@ class PaymentConsumer implements ConsumerInterface
         $this->clock = $clock;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** {@inheritdoc} */
@@ -87,7 +83,7 @@ class PaymentConsumer implements ConsumerInterface
         )) {
             return false;
         }
-        
+
         $this->em->clear();
 
         $this->logger->info('[payment-consumer] Received new message: '.json_encode($msg->body));
@@ -129,7 +125,8 @@ class PaymentConsumer implements ConsumerInterface
                     ? new PaymentTokenStrategy(
                         $this->balanceHandler,
                         $this->cryptoManager,
-                        $this->moneyWrapper
+                        $this->moneyWrapper,
+                        $this->tokenConfig
                     )
                     : new PaymentCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 

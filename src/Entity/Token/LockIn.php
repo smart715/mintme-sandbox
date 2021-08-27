@@ -2,8 +2,8 @@
 
 namespace App\Entity\Token;
 
+use App\Utils\Symbols;
 use App\Validator\Constraints\GreaterThanPrevious;
-use App\Wallet\Money\MoneyWrapper;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
@@ -78,7 +78,7 @@ class LockIn
      */
     public function getHourlyRate(): Money
     {
-        $money = new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        $money = new Money($this->amountToRelease, new Currency(Symbols::TOK));
 
         return 0 === $this->releasePeriod
             ? $money
@@ -111,13 +111,13 @@ class LockIn
         if ($this->token->isDeployed()) {
             $notReleasedAtStart = $this->getAmountToRelease();
             $frozenAmount = $notReleasedAtStart->subtract($this->getEarnedMoneyFromDeploy());
-            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
             return $frozenAmount->greaterThan($zeroValue)
                 ? $frozenAmount
                 : $zeroValue;
         } else {
-            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money($this->frozenAmount, new Currency(Symbols::TOK));
         }
     }
 
@@ -138,20 +138,20 @@ class LockIn
                 : $this->getAmountToRelease()
                     ->subtract($received)
                     ->add($releasedAtStart);
-            $zeroValue = new Money(0, new Currency(MoneyWrapper::TOK_SYMBOL));
+            $zeroValue = new Money(0, new Currency(Symbols::TOK));
 
             return $frozenAmount->greaterThan($zeroValue)
                 ? $frozenAmount
                 : $zeroValue;
         } else {
-            return new Money($this->frozenAmount, new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money($this->frozenAmount, new Currency(Symbols::TOK));
         }
     }
 
     /** @codeCoverageIgnore */
     public function getReleasedAtStart(): Money
     {
-        return new Money($this->releasedAtStart, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->releasedAtStart, new Currency(Symbols::TOK));
     }
 
     /** @codeCoverageIgnore */
@@ -195,10 +195,10 @@ class LockIn
      */
     public function getCountHoursFromDeploy(): float
     {
-        if ($this->token->getDeployed() instanceof \DateTimeImmutable) {
+        if ($this->token->getDeployedDate() instanceof \DateTimeImmutable) {
             $timezone = date_default_timezone_get();
             date_default_timezone_set('UTC');
-            $deployedTimestamp = strtotime($this->token->getDeployed()->format('Y-m-d H:i:s'));
+            $deployedTimestamp = strtotime($this->token->getDeployedDate()->format('Y-m-d H:i:s'));
             $currentTimestamp = time();
             $timestampDiff = abs($currentTimestamp - $deployedTimestamp);
             date_default_timezone_set($timezone);
@@ -228,6 +228,6 @@ class LockIn
 
     public function getAmountToRelease(): Money
     {
-        return new Money($this->amountToRelease, new Currency(MoneyWrapper::TOK_SYMBOL));
+        return new Money($this->amountToRelease, new Currency(Symbols::TOK));
     }
 }

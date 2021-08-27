@@ -25,6 +25,6 @@ class LocaleAPIController extends APIController
     {
         $session->set('_locale', $locale);
 
-        return $this->view(['locale' => $locale], Response::HTTP_ACCEPTED);
+        return $this->view(['locale' => $locale], Response::HTTP_OK);
     }
 }

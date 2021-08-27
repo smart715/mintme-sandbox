@@ -6,6 +6,7 @@ use App\Entity\Blacklist;
 
 interface BlacklistManagerInterface
 {
+    public function isBlacklistedAirdropDomain(string $url, bool $sensitive = false): bool;
     public function isBlacklistedEmail(string $email, bool $sensitive = false): bool;
     public function isBlacklistedToken(string $token, bool $sensitive = false): bool;
     public function add(string $value, string $type, bool $flush = true): void;

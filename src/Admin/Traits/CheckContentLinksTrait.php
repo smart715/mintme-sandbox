@@ -13,9 +13,18 @@ trait CheckContentLinksTrait
         foreach ($dom->getElementsByTagName('a') as $item) {
             $initialLinkText = $dom->saveHTML($item);
             $item->setAttribute('rel', 'noopener');
-            $item->setAttribute('target', '_blank');
-            $changedLinkText = $dom->saveHTML($item);
+            $link = $item->getAttribute('href');
+            $devPattern = '/^(http(s)?:\/\/(www.)?\S+.mintme.abchosting.abc)/i';
+            $prodPattern = '/^(http(s)?:\/\/(www.)?mintme.com)/i';
 
+            $prodResult = preg_match($prodPattern, $link);
+            $devResult = preg_match($devPattern, $link);
+
+            if (0 === $prodResult && 0 === $devResult) {
+                $item->setAttribute('target', '_blank');
+            }
+
+            $changedLinkText = $dom->saveHTML($item);
             $content = str_replace((string)$initialLinkText, (string)$changedLinkText, $content);
             $contentChanged = true;
         }

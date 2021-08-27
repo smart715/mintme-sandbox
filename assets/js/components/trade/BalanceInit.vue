@@ -24,7 +24,6 @@ export default {
         loggedIn: Boolean,
         isOwner: Boolean,
         precision: Number,
-        isToken: Boolean,
     },
     computed: {
         ...mapGetters('tradeBalance', [
@@ -62,6 +61,7 @@ export default {
             'setBalances',
             'setQuoteBalance',
             'setBaseBalance',
+            'setHasQuoteRelation',
         ]),
         updateAssets: function() {
             if (!this.loggedIn) {
@@ -75,6 +75,8 @@ export default {
 
                     if (!this.balances.hasOwnProperty(this.market.quote.symbol)) {
                         this.balances[this.market.quote.symbol] = {available: toMoney(0, this.precision)};
+                    } else {
+                        this.setHasQuoteRelation(true);
                     }
 
                     this.authorize()
@@ -123,7 +125,7 @@ export default {
                 if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.market.base.identifier)) {
                     this.baseBalance = response.params[0][this.market.base.identifier].available;
                 }
-            }, 'trade-sell-order-asset');
+            }, 'trade-sell-order-asset', 'BalanceInit');
         },
     },
     watch: {

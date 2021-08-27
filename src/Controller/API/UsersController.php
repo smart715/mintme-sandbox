@@ -6,6 +6,7 @@ use App\Controller\TwoFactorAuthenticatedInterface;
 use App\Entity\Api\Client;
 use App\Entity\ApiKey;
 use App\Entity\User;
+use App\Events\UserEvents;
 use App\Exception\ApiBadRequestException;
 use App\Exception\ApiNotFoundException;
 use App\Form\ChangePasswordType;
@@ -15,7 +16,6 @@ use FOS\OAuthServerBundle\Entity\ClientManager;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
-use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
@@ -206,14 +206,14 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
 
         $this->userManager->updatePassword($user);
         $this->userManager->updateUser($user);
-        $response = new Response(Response::HTTP_ACCEPTED);
+        $response = new Response(Response::HTTP_OK);
 
         $event = new FilterUserResponseEvent($user, $request, $response);
 
         /** @psalm-suppress TooManyArguments */
         $this->eventDispatcher->dispatch(
             $event,
-            FOSUserEvents::CHANGE_PASSWORD_COMPLETED
+            UserEvents::PASSWORD_UPDATED
         );
 
         return $response;
@@ -245,7 +245,7 @@ class UsersController extends AbstractFOSRestController implements TwoFactorAuth
             throw new ApiBadRequestException($errorOnPasswordForm);
         }
 
-        return new Response(Response::HTTP_ACCEPTED);
+        return new Response(Response::HTTP_OK);
     }
 
     private function checkStoredUserPassword(Request $request, User $user): ?string

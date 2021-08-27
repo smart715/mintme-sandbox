@@ -6,7 +6,7 @@ class TradingControllerTest extends WebTestCase
 {
     public function testTrading(): void
     {
-        $this->client->request('GET', '/trading/1');
+        $this->client->request('GET', self::LOCALHOST . '/trading/1');
         $res = $this->client->getResponse()->getContent();
 
         $this->assertContains(':page="1"', (string)$res);

@@ -40,18 +40,24 @@
 </template>
 
 <script>
+import {VBTooltip} from 'bootstrap-vue';
 import {FiltersMixin} from '../../../mixins';
 import Guide from '../../Guide';
 
 export default {
     name: 'TokenFacebookAddressView',
-    props: {
-        address: String,
-    },
     components: {
         Guide,
     },
-    mixins: [FiltersMixin],
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        FiltersMixin,
+    ],
+    props: {
+        address: String,
+    },
     data() {
         return {
             currentAddress: this.address,

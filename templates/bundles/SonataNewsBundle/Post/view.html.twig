@@ -3,18 +3,25 @@
 {% if post.image is not null %}
     {% set metaImage %}{% path post.image, 'reference' %}{% endset %}
 {% endif %}
-{% set metaTitle = post.title ~ ' | mintMe' %}
-{% set metaImageAlt = post.title %}
+{% set title = post|translateArticle('title') %}
+{% set abstract = post|translateArticle('abstract') %}
+{% set metaTitle = title ~ ' | mintMe' %}
+{% set metaImageAlt = title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/news') }}
+{% endblock %}
 
 {% block title %}
-{% spaceless %}
-    {{ post.title }} | mintMe
-{% endspaceless %}
+    {% spaceless %}
+        {{ title }} | mintMe
+    {% endspaceless %}
 {% endblock %}
 
 {% block metaDescription %}
-    <meta property="og:description" content="{{ post.abstract }}">
-    <meta name="description" content="{{ post.abstract }}">
+    <meta property="og:description" content="{{ abstract }}">
+    <meta name="description" content="{{ abstract }}">
 {% endblock %}
 
 {% block contentClass %}blog{% endblock %}
@@ -26,5 +33,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/news.js') }}"></script>
+    {{ encore_entry_script_tags('pages/news') }}
 {% endblock %}

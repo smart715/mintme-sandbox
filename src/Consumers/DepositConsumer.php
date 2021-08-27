@@ -6,18 +6,14 @@ use App\Consumers\Helpers\DBConnection;
 use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
-use App\Entity\UserNotification;
 use App\Events\DepositCompletedEvent;
-use App\Events\UserNotificationEvent;
 use App\Exchange\Balance\BalanceHandlerInterface;
-use App\Exchange\Balance\Exception\BalanceException;
 use App\Exchange\Balance\Strategy\BalanceContext;
 use App\Exchange\Balance\Strategy\DepositCryptoStrategy;
 use App\Exchange\Balance\Strategy\DepositTokenStrategy;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
-use App\Utils\ClockInterface;
 use App\Wallet\Deposit\Model\DepositCallbackMessage;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
@@ -50,9 +46,6 @@ class DepositConsumer implements ConsumerInterface
     /** @var MoneyWrapperInterface */
     private $moneyWrapper;
 
-    /** @var ClockInterface */
-    private $clock;
-
     /** @var WalletInterface */
     private $depositCommunicator;
 
@@ -68,7 +61,6 @@ class DepositConsumer implements ConsumerInterface
     /** @var ContainerInterface */
     private $container;
 
-
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         UserManagerInterface $userManager,
@@ -76,7 +68,6 @@ class DepositConsumer implements ConsumerInterface
         TokenManagerInterface $tokenManager,
         LoggerInterface $logger,
         MoneyWrapperInterface $moneyWrapper,
-        ClockInterface $clock,
         WalletInterface $depositCommunicator,
         EntityManagerInterface $em,
         EventDispatcherInterface $eventDispatcher,
@@ -89,7 +80,6 @@ class DepositConsumer implements ConsumerInterface
         $this->tokenManager = $tokenManager;
         $this->logger = $logger;
         $this->moneyWrapper = $moneyWrapper;
-        $this->clock = $clock;
         $this->depositCommunicator = $depositCommunicator;
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
@@ -159,6 +149,12 @@ class DepositConsumer implements ConsumerInterface
                 return true;
             }
 
+            if ($tradable instanceof Token && !$this->security->isGranted('token-deposit')) {
+                $this->logger->info('[deposit-consumer] Token deposits are disabled. Canceled.');
+
+                return true;
+            }
+
             if ($tradable instanceof Crypto) {
                 if (!$this->security->isGranted('not-disabled', $tradable)) {
                     $this->logger->info('[deposit-consumer] Deposit for this crypto was disabled. Cancelled.');
@@ -171,7 +167,8 @@ class DepositConsumer implements ConsumerInterface
                 ? new DepositTokenStrategy(
                     $this->balanceHandler,
                     $this->depositCommunicator,
-                    $this->moneyWrapper
+                    $this->moneyWrapper,
+                    $this->cryptoManager
                 )
                 : new DepositCryptoStrategy($this->balanceHandler, $this->moneyWrapper);
 
@@ -184,26 +181,8 @@ class DepositConsumer implements ConsumerInterface
                 DepositCompletedEvent::NAME
             );
 
-            /** @psalm-suppress TooManyArguments */
-            $this->eventDispatcher->dispatch(
-                new UserNotificationEvent(
-                    $user,
-                    UserNotification::DEPOSIT_NOTIFICATION
-                ),
-                UserNotificationEvent::NAME
-            );
-
             $this->logger->info('[deposit-consumer] Deposit ('.json_encode($clbResult->toArray()).') paid');
         } catch (\Throwable $exception) {
-            if ($exception instanceof BalanceException) {
-                $this->logger->error(
-                    '[deposit-consumer] Failed to update balance. Retry operation. Reason:'. $exception->getMessage()
-                );
-                $this->clock->sleep(10);
-
-                return false;
-            }
-
             $this->logger->error(
                 '[deposit-consumer] Something went wrong during deposit. Reason:'. $exception->getMessage()
             );

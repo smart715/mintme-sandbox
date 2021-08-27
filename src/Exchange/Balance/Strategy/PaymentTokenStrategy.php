@@ -7,59 +7,76 @@ use App\Entity\TradebleInterface;
 use App\Entity\User;
 use App\Exception\NotFoundTokenException;
 use App\Exchange\Balance\BalanceHandlerInterface;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
-use App\Wallet\Money\MoneyWrapper;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 
 class PaymentTokenStrategy implements BalanceStrategyInterface
 {
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var CryptoManagerInterface */
-    private $cryptoManager;
-
-    /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private BalanceHandlerInterface $balanceHandler;
+    private CryptoManagerInterface $cryptoManager;
+    private MoneyWrapperInterface $moneyWrapper;
+    private TokenConfig $tokenConfig;
 
     public function __construct(
         BalanceHandlerInterface $balanceHandler,
         CryptoManagerInterface $cryptoManager,
-        MoneyWrapperInterface $moneyWrapper
+        MoneyWrapperInterface $moneyWrapper,
+        TokenConfig $tokenConfig
     ) {
         $this->balanceHandler = $balanceHandler;
         $this->cryptoManager = $cryptoManager;
         $this->moneyWrapper = $moneyWrapper;
+        $this->tokenConfig = $tokenConfig;
     }
 
     /** @param Token $tradeble */
     public function deposit(User $user, TradebleInterface $tradeble, string $amount): void
     {
-        $this->withdrawWebFee($user);
+        if (!$tradeble->getFee()) {
+            $this->withdrawBaseFee($user, $tradeble);
+        }
+
         $this->depositTokens($user, $tradeble, $amount);
     }
 
     private function depositTokens(User $user, Token $token, string $amount): void
     {
+        $fullAmount = $this->moneyWrapper->parse($amount, Symbols::TOK);
+        $tokenFee = $token->getFee();
+
+        if ($tokenFee) {
+            $fullAmount = $fullAmount->add($tokenFee);
+        }
+
         $this->balanceHandler->deposit(
             $user,
             $token,
-            $this->moneyWrapper->parse($amount, MoneyWrapper::TOK_SYMBOL)
+            $fullAmount
         );
     }
 
-    private function withdrawWebFee(User $user): void
+    private function withdrawBaseFee(User $user, Token $token): void
     {
-        $crypto = $this->cryptoManager->findBySymbol(Token::WEB_SYMBOL);
+        $crypto = $this->cryptoManager->findBySymbol($token->getCryptoSymbol());
 
         if (!$crypto) {
             throw new NotFoundTokenException();
         }
 
-        $this->balanceHandler->deposit(
-            $user,
-            Token::getFromCrypto($crypto),
-            $crypto->getFee()
-        );
+        $cryptoSymbol = $crypto->getSymbol();
+
+        $fee = in_array($cryptoSymbol, [Symbols::ETH, Symbols::BNB])
+            ? $this->tokenConfig->getWithdrawFeeByCryptoSymbol($cryptoSymbol)
+            : $crypto->getFee();
+
+        if (!$token->getFee()) {
+            $this->balanceHandler->deposit(
+                $user,
+                $crypto,
+                $fee
+            );
+        }
     }
 }

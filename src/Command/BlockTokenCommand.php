@@ -4,7 +4,13 @@ namespace App\Command;
 
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\ExchangerInterface;
+use App\Exchange\Factory\MarketFactoryInterface;
+use App\Exchange\Market;
+use App\Exchange\Market\MarketHandlerInterface;
+use App\Exchange\Order;
 use App\Logger\UserActionLogger;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +23,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class BlockTokenCommand extends Command
 {
+    private const ORDERS_LIMIT = 100;
+    private const OPTION_BOTH = 'both';
+    private const OPTION_TOKEN = 'token';
+    private const OPTION_USER = 'user';
+
     /** @var string */
     protected static $defaultName = 'app:block';
 
@@ -32,16 +43,36 @@ class BlockTokenCommand extends Command
     /** @var UserActionLogger */
     private $logger;
 
+    /** @var MarketHandlerInterface */
+    private $marketHandler;
+
+    /** @var MarketFactoryInterface */
+    private $marketFactory;
+
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
+
+    /** @var ExchangerInterface */
+    private $exchanger;
+
     public function __construct(
         TokenManagerInterface $tokenManager,
         UserManagerInterface $userManager,
         EntityManagerInterface $em,
-        UserActionLogger $logger
+        UserActionLogger $logger,
+        MarketHandlerInterface $marketHandler,
+        MarketFactoryInterface $marketFactory,
+        CryptoManagerInterface $cryptoManager,
+        ExchangerInterface $exchanger
     ) {
         $this->tokenManager = $tokenManager;
         $this->userManager = $userManager;
         $this->em = $em;
         $this->logger = $logger;
+        $this->marketHandler = $marketHandler;
+        $this->cryptoManager = $cryptoManager;
+        $this->marketFactory = $marketFactory;
+        $this->exchanger = $exchanger;
         parent::__construct();
     }
 
@@ -101,7 +132,7 @@ class BlockTokenCommand extends Command
             /** @var User $user */
             $user = $entityToBlock;
             /** @var Token|null $token */
-            $token = $user->getProfile()->getToken();
+            $token = $user->getProfile()->getMintmeToken();
         } else {
             /** @var Token $token */
             $token = $entityToBlock;
@@ -109,26 +140,32 @@ class BlockTokenCommand extends Command
         }
 
         if ($tokenOption) {
-            if ($token) {
-                if ($this->isExecuted($token, $user, $unblock, $io, 'token')) {
-                    return 1;
-                } else {
-                    $token->setIsBlocked(!$unblock);
-                    $this->em->persist($token);
-                }
-            } else {
+            if (!$token) {
                 $io->warning('Token doesn\'t exist');
 
                 return 1;
             }
+
+            if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_TOKEN)) {
+                return 1;
+            } else {
+                $token->setIsBlocked(!$unblock);
+                $this->em->persist($token);
+            }
         } elseif ($userOption) {
-            if ($this->isExecuted($token, $user, $unblock, $io, 'user')) {
+            if ($this->isExecuted($token, $user, $unblock, $io, self::OPTION_USER)) {
                 return 1;
             } else {
                 $user->setIsBlocked(!$unblock);
             }
         } else {
-            if ($this->isExecuted($token, $user, $unblock, $io)) {
+            if ($this->isExecuted(
+                $token,
+                $user,
+                $unblock,
+                $io,
+                $token ? self::OPTION_BOTH : self::OPTION_USER
+            )) {
                 return 1;
             } else {
                 $user->setIsBlocked(!$unblock);
@@ -140,12 +177,11 @@ class BlockTokenCommand extends Command
             }
         }
 
-        $entityExecutedMsg = $tokenOption
-            ? 'Token '.$token->getName()
-            : ($userOption
-                ? 'User '.$user->getUsername()
-                : 'Token '.$token->getName().' and User '.$user->getUsername()
-            );
+        $entityExecutedMsg = $this->generateEntityExecutedMsg($token, $userOption ? $user : null);
+
+        if (!$unblock && $token) {
+            $this->cancelOrders($token, $tokenOption, $userOption, $io);
+        }
 
         $this->em->persist($user);
         $this->em->flush();
@@ -161,7 +197,7 @@ class BlockTokenCommand extends Command
         User $user,
         bool $unblock,
         SymfonyStyle $io,
-        string $option = 'both'
+        string $option
     ): bool {
         $blockName = 'both' === $option
             ? 'User and Token'
@@ -188,5 +224,72 @@ class BlockTokenCommand extends Command
         }
 
         return false;
+    }
+
+    private function cancelOrders(Token $token, Bool $tokenOption, Bool $userOption, SymfonyStyle $io): void
+    {
+        /** @var User $user */
+        $user = $token->getOwner();
+        $coinMarkets = $this->marketFactory->getCoinMarkets();
+        $tokenMarket = $this->marketFactory->create(
+            $this->cryptoManager->findBySymbol($token->getCryptoSymbol()),
+            $token
+        );
+
+        if ((!$userOption && $tokenOption) || (!$userOption && !$tokenOption)) {
+            $this->cancelTokenOrders($tokenMarket, Order::SELL_SIDE);
+            $this->cancelTokenOrders($tokenMarket, Order::BUY_SIDE);
+        }
+
+        if (($userOption && !$tokenOption) || (!$userOption && !$tokenOption)) {
+            $this->cancelCoinOrders($user, $coinMarkets);
+        }
+    }
+
+    public function cancelTokenOrders(Market $market, int $side): void
+    {
+        do {
+            $orders = Order::SELL_SIDE === $side
+                ? $this->marketHandler->getPendingSellOrders($market, 0, self::ORDERS_LIMIT)
+                : $this->marketHandler->getPendingBuyOrders($market, 0, self::ORDERS_LIMIT);
+
+            $this->cancelOrdersList($orders);
+        } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    public function cancelCoinOrders(User $user, array $markets): void
+    {
+        do {
+            $orders = $this->marketHandler->getPendingOrdersByUser(
+                $user,
+                $markets,
+                0,
+                self::ORDERS_LIMIT
+            );
+
+            $this->cancelOrdersList($orders);
+        } while (count($orders) >= self::ORDERS_LIMIT);
+    }
+
+    public function cancelOrdersList(array $orders): void
+    {
+        foreach ($orders as $order) {
+            $this->exchanger->cancelOrder($order->getMarket(), $order);
+        }
+    }
+
+    private function generateEntityExecutedMsg(?Token $token, ?User $user): string
+    {
+        $optionsTxt = [];
+
+        if ($token) {
+            $optionsTxt[] = 'Token '.$token->getName();
+        }
+
+        if ($user) {
+            $optionsTxt[] = 'User '.$user->getUsername();
+        }
+
+        return implode(' and ', $optionsTxt);
     }
 }

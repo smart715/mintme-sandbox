@@ -6,19 +6,18 @@ use App\Entity\PendingTokenWithdraw;
 use App\Entity\PendingWithdraw;
 use App\Entity\PendingWithdrawInterface;
 use App\Entity\User;
-use App\Entity\UserNotification;
-use App\Events\UserNotificationEvent;
 use App\Logger\UserActionLogger;
 use App\Repository\PendingWithdrawRepository;
 use App\Security\Config\DisabledBlockchainConfig;
 use App\Security\Config\DisabledServicesConfig;
 use App\Utils\Converter\RebrandingConverterInterface;
+use App\Utils\LockFactory;
 use App\Wallet\WalletInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Throwable;
 
@@ -27,24 +26,19 @@ use Throwable;
  */
 class WalletController extends Controller
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var UserActionLogger */
-    private $userActionLogger;
-
-    /** @var RebrandingConverterInterface */
-    private $rebrandingConverter;
+    private UserActionLogger $userActionLogger;
+    private RebrandingConverterInterface $rebrandingConverter;
+    private LockFactory $lockFactory;
 
     public function __construct(
         UserActionLogger $userActionLogger,
         NormalizerInterface $normalizer,
         RebrandingConverterInterface $rebrandingConverter,
-        EventDispatcherInterface $eventDispatcher
+        LockFactory $lockFactory
     ) {
         $this->userActionLogger = $userActionLogger;
         $this->rebrandingConverter = $rebrandingConverter;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct($normalizer);
     }
@@ -53,7 +47,7 @@ class WalletController extends Controller
      * @Route("/{tab}",
      *     name="wallet",
      *     defaults={"tab"="wallet"},
-     *     requirements={"tab"="(dw-history|trade-history|active-orders)"},
+     *     requirements={"tab"="dw-history|trade-history|active-orders"},
      *     options={"expose"=true}
      * )
      * @param Request $request
@@ -78,6 +72,8 @@ class WalletController extends Controller
             'depositMore' => $this->rebrandingConverter->reverseConvert($depositMore),
             'disabledBlockchain' => $disabledBlockchainConfig->getDisabledCryptoSymbols(),
             'disabledServicesConfig' => $this->normalize($disabledServicesConfig),
+            'tab' => $tab,
+            'error' => !$this->isGranted('make-deposit') || !$this->isGranted('make-withdrawal'),
         ]);
     }
 
@@ -90,7 +86,16 @@ class WalletController extends Controller
      */
     public function withdrawConfirm(string $hash, WalletInterface $wallet): Response
     {
-        if (!$this->isGranted('withdraw')) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedException();
+        }
+
+        $lock = $this->lockFactory->createLock(LockFactory::LOCK_BALANCE.$user->getId());
+
+        if (!$lock->acquire() || !$this->isGranted('withdraw')) {
             return $this->createWalletRedirection(
                 'danger',
                 'Withdrawing is not possible. Please try again later'
@@ -112,6 +117,13 @@ class WalletController extends Controller
             return $this->createWalletRedirection(
                 'danger',
                 'There are no transactions attached to this hashcode'
+            );
+        }
+
+        if ($pendingWithdraw instanceof PendingTokenWithdraw && !$this->isGranted('token-withdraw')) {
+            return $this->createWalletRedirection(
+                'danger',
+                'Withdrawing is not possible. Please try again later'
             );
         }
 
@@ -154,14 +166,7 @@ class WalletController extends Controller
             'amount' => $pendingWithdraw->getAmount()->getAmount()->getAmount(),
         ]);
 
-        /** @var  User $user*/
-        $user = $this->getUser();
-
-        /** @psalm-suppress TooManyArguments */
-        $this->eventDispatcher->dispatch(
-            new UserNotificationEvent($user, UserNotification::WITHDRAWAL_NOTIFICATION),
-            UserNotificationEvent::NAME
-        );
+        $lock->release();
 
         return $this->createWalletRedirection(
             'success',

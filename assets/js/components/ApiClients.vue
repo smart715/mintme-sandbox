@@ -62,14 +62,25 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCopy} from '@fortawesome/free-regular-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import ConfirmModal from './modal/ConfirmModal';
 import CopyLink from './CopyLink';
 import {NotificationMixin} from '../mixins';
+import {BTable} from 'bootstrap-vue';
+
+library.add(faCopy);
 
 export default {
     name: 'ApiClients',
     mixins: [NotificationMixin],
-    components: {ConfirmModal, CopyLink},
+    components: {
+        BTable,
+        ConfirmModal,
+        CopyLink,
+        FontAwesomeIcon,
+    },
     props: {
         apiClients: {type: [Array], required: true},
     },

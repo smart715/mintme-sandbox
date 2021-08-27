@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/register') }}
+{% endblock %}
+
 {% block title %}Sign Up Landing | mintMe{% endblock %}
 
 {% set formHeader = 'sign_up' %}
@@ -25,7 +30,7 @@
                         <div>
                             <passwordmeter :password="password" @toggle-error="toggleError">
                                     <span @click="togglePassword()" class="show-password">
-                                        <i class="far fa-eye"></i>
+                                        <font-awesome-icon icon="eye"></font-awesome-icon>
                                     </span>
                                 {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
                             </passwordmeter>
@@ -146,5 +151,5 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/register.js') }}"></script>
+    {{ encore_entry_script_tags('pages/register') }}
 {% endblock %}

@@ -7,6 +7,8 @@
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-owner="editable"
                 :is-token-created="isTokenCreated"
+                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
                 :is-token-exchanged="isTokenExchanged"
                 :no-close="true"
                 :precision="precision"
@@ -27,12 +29,19 @@
                 :disabled-services-config="disabledServicesConfig"
                 @close="closeTokenEditModal"
                 @token-deploy-pending="$emit('token-deploy-pending')"
-                @update-release-address="updateReleaseAddress"
                 @updated-website="$emit('updated-website', $event)"
                 @updated-facebook="$emit('updated-facebook', $event)"
                 @updated-youtube="$emit('updated-youtube', $event)"
                 @updated-discord="$emit('updated-discord', $event)"
                 @updated-telegram="$emit('updated-telegram', $event)"
+                :current-locale="currentLocale"
+                :token-deployed-date="tokenDeployedDate"
+                :token-tx-hash-address="tokenTxHashAddress"
+                :mintme-explorer-url="mintmeExplorerUrl"
+                :eth-explorer-url="ethExplorerUrl"
+                :bnb-explorer-url="bnbExplorerUrl"
+                :token-crypto="tokenCrypto"
+                :discord-auth-url="discordAuthUrl"
             />
             <font-awesome-icon
                 class="icon-default c-pointer align-middle token-edit-icon"
@@ -57,18 +66,33 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mixin as clickaway} from 'vue-clickaway';
-import {WebSocketMixin, FiltersMixin, NotificationMixin, LoggerMixin} from '../../mixins/';
-import TokenEditModal from '../modal/TokenEditModal';
+import {VBTooltip} from 'bootstrap-vue';
+import {WebSocketMixin, FiltersMixin, LoggerMixin} from '../../mixins/';
 import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
 library.add(faEdit);
 
 export default {
     name: 'TokenName',
+    components: {
+        FontAwesomeIcon,
+        TokenEditModal: () => import('../modal/TokenEditModal').then((data) => data.default),
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        clickaway,
+        LoggerMixin,
+    ],
     props: {
         editable: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
+        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
         identifier: String,
         name: String,
         precision: Number,
@@ -86,12 +110,21 @@ export default {
         youtubeChannelId: String,
         showTokenEditModalProp: Boolean,
         disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
+        discordAuthUrl: String,
     },
-    components: {
-        FontAwesomeIcon,
-        TokenEditModal,
-    },
-    mixins: [WebSocketMixin, FiltersMixin, NotificationMixin, clickaway, LoggerMixin],
     data() {
         return {
             currentName: this.name,
@@ -141,7 +174,7 @@ export default {
             ) {
                 this.checkIfTokenExchanged();
             }
-        }, 'token-name-asset-update');
+        }, 'token-name-asset-update', 'TokenName');
 
         if (this.showTokenEditModalProp) {
             window.history.replaceState(
@@ -161,7 +194,6 @@ export default {
             }))
             .then((res) => this.isTokenExchanged = res.data)
             .catch((err) => {
-                this.notifyError(this.$t('toasted.error.can_not_fetch_token_data'));
                 this.sendLogs('error', 'Can not fetch token data now', err);
             });
         },
@@ -171,9 +203,6 @@ export default {
             }
 
             this.showTokenEditModal = true;
-        },
-        updateReleaseAddress: function() {
-            this.releaseAddress = '0x';
         },
     },
 };

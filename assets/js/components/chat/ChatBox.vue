@@ -13,6 +13,11 @@
                         :items="messagesList"
                         :fields="fields">
                         <template v-slot:cell(trader)="row">
+                            <diV v-if="row.item.date">
+                                <span class="d-block small word-break toast-text text-bold align-text-top">
+                                    {{ row.item.date }}
+                                </span>
+                            </diV>
                             <div class="d-flex c-pointer flex-row flex-nowrap justify-content-between align-items-start w-100 pb-2 text-white">
                                 <img
                                     :src="row.item.avatar"
@@ -21,6 +26,9 @@
                                 <span class="d-inline-block col">
                                     <span class="d-block text-bold">
                                         {{ row.item.nickname }}
+                                        <span class="small text-bold">
+                                            {{ row.item.time }}
+                                        </span>
                                     </span>
                                     <span class="d-block small word-break">
                                         {{ row.item.body }}
@@ -30,10 +38,14 @@
                         </template>
                     </b-table>
                     <div v-else-if="messagesLoaded">
-                        <p class="text-center p-5">{{ $t('chat.chat_box.no_messages_yet') }}</p>
+                        <p class="text-center p-5">
+                            {{ $t('chat.chat_box.no_messages_yet') }}
+                        </p>
                     </div>
                     <div v-else>
-                        <unread-messages-count/>
+                        <p class="text-center p-5">
+                            {{ $t('chat.chat_box.please_chose_contact') }}
+                        </p>
                     </div>
                 </template>
                 <template v-else>
@@ -43,8 +55,8 @@
                 </template>
             </div>
         </div>
-        <div v-if="messagesLoaded" class="card-footer border-0 py-2 px-0">
-            <form @submit.prevent="sendMessage" class="d-flex">
+        <div v-if="showInput" class="card-footer border-0 py-2 px-0">
+            <form @submit.prevent="addMessageToQueue" class="d-flex">
                 <input
                     v-model="messageBody"
                     type="text"
@@ -55,7 +67,6 @@
                 >
                 <button
                     type="submit"
-                    @click="sendMessage"
                     class="btn btn-primary ml-2"
                 >
                     {{ $t('chat.form.send') }}
@@ -66,19 +77,34 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import {mapGetters} from 'vuex';
+import moment from 'moment';
+import {BTable} from 'bootstrap-vue';
 import {LoggerMixin, NotificationMixin} from '../../mixins';
-import UnreadMessagesCount from './UnreadMessagesCount';
-const updateMessagesMS = 1000;
+import {GENERAL} from '../../utils/constants';
+
+library.add(faCircleNotch);
+
+const updateMessagesMS = 3500;
 
 export default {
     name: 'ChatBox',
-    mixin: {
+    components: {
+        BTable,
+        FontAwesomeIcon,
+    },
+    mixins: [
         LoggerMixin,
         NotificationMixin,
-    },
-    components: {
-        UnreadMessagesCount,
+    ],
+    props: {
+        chatReady: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -86,24 +112,36 @@ export default {
             loading: false,
             messageBody: '',
             messages: null,
+            messagesQueue: [],
+            isQueueRunning: false,
             fields: [
                 {
                     key: 'trader',
                     label: 'messages:',
                 },
             ],
+            updaterId: null,
         };
     },
     computed: {
         ...mapGetters('chat', {
             getContactName: 'getContactName',
+            tokenName: 'getTokenName',
+            userTokenName: 'getUserTokenName',
             threadId: 'getCurrentThreadId',
+            dMMinAmount: 'getDMMinAmount',
+        }),
+        ...mapGetters('tradeBalance', {
+            quoteBalance: 'getQuoteBalance',
         }),
         hasMessages: function() {
             return this.messagesList.length > 0;
         },
         messagesLoaded: function() {
             return this.messages !== null;
+        },
+        showInput: function() {
+            return this.messagesLoaded && this.chatReady;
         },
         contactName: function() {
             return this.messagesLoaded
@@ -122,12 +160,24 @@ export default {
             });
         },
         messagesList: function() {
+            let repeatedDate = [];
+
             return (this.messages || []).map((message) => {
+                message.date = moment(message.createdAt).format(GENERAL.dateFormat);
+
+                if (repeatedDate.indexOf(message.date) === -1) {
+                  repeatedDate.push(message.date);
+                } else {
+                  message.date = null;
+                }
+
                 return {
                     id: message.id,
                     nickname: message.sender.profile.nickname,
                     body: message.body,
                     avatar: message.sender.profile.image.avatar_middle,
+                    date: message.date,
+                    time: moment(message.createdAt).format(GENERAL.timeFormat),
                 };
             });
         },
@@ -137,23 +187,56 @@ export default {
                 ? lastMessage.id
                 : 0;
         },
+        translationContext: function() {
+            return {
+                amount: this.dMMinAmount,
+                currency: this.tokenName,
+            };
+        },
     },
     methods: {
-        sendMessage: function() {
+        addMessageToQueue: function() {
             if (!this.messageBody) {
                 return;
             }
 
+            if (this.tokenName !== this.userTokenName && this.quoteBalance < this.dMMinAmount) {
+                this.notifyInfo(this.$t(
+                    'chat.chat_box.min_amount_required_info',
+                    this.translationContext
+                ));
+                this.messageBody = '';
+                return;
+            }
+
+            this.messagesQueue.push(this.messageBody);
+            this.messageBody = '';
+            this.runQueue();
+        },
+        runQueue: function() {
+            if (this.isQueueRunning) {
+                return;
+            }
+
+            this.isQueueRunning = true;
+            this.sendNextMessage();
+        },
+        sendNextMessage: function() {
+            if (0 === this.messagesQueue.length) {
+                this.isQueueRunning = false;
+                return;
+            }
+            this.sendMessage(this.messagesQueue.splice(0, 1)[0]);
+        },
+        sendMessage: function(body) {
             this.$axios.single.post(this.$routing.generate('send_dm_message', {
                 threadId: this.threadId,
-            }), {
-                body: this.messageBody,
-            }).catch((error) => {
-                this.notifyError(this.$('toasted.error.didnt_send_message'));
+            }), {body})
+            .then(() => this.sendNextMessage())
+            .catch((error) => {
+                this.sendMessage(body);
                 this.sendLogs('error', 'send message error', error);
             });
-
-            this.messageBody = '';
         },
         getMessages: function() {
             this.messages = null;
@@ -187,7 +270,10 @@ export default {
                 .catch((error) => this.sendLogs('error', 'update messages response error', error));
         },
         updateMessagesInterval: function() {
-            setInterval(() => {
+            if (this.updaterId) {
+                clearInterval(this.updaterId);
+            }
+            this.updaterId = setInterval(() => {
                 this.updateMessages();
             }, updateMessagesMS);
         },
@@ -208,4 +294,3 @@ export default {
     },
 };
 </script>
-

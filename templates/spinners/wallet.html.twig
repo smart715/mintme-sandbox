@@ -1,43 +1,79 @@
 <div class="tabs tabs-theme" v-if="false">
     <div>
         <ul role="tablist" class="nav nav-tabs">
-            <li role="presentation" class="nav-item"><a role="tab" aria-selected="true" aria-setsize="4"
-                                                        aria-posinset="1" target="_self" href="#"
-                                                        class="nav-link active">
-                    {% trans %}page.wallet.title{% endtrans%}
+            <li role="presentation" class="nav-item">
+                <a
+                    role="tab"
+                    aria-selected="true"
+                    aria-setsize="4"
+                    aria-posinset="1"
+                    target="_self"
+                    href="{{ path('wallet', {tab: 'wallet'}) }}"
+                    class="nav-link {% if tab|default and tab == 'wallet' %} active {% endif %}"
+                >
+                    {% trans %} page.wallet.title {% endtrans%}
                 </a>
             </li>
-            <li role="presentation" class="nav-item"><a role="tab" tabindex="-1" aria-selected="false" aria-setsize="4"
-                                                        aria-posinset="2" target="_self" href="#" class="nav-link">
-                    {% trans %}page.wallet.trading_history.spinner{% endtrans %} </a></li>
-            <li role="presentation" class="nav-item"><a role="tab" tabindex="-1" aria-selected="false" aria-setsize="4"
-                                                        aria-posinset="3" target="_self" href="#" class="nav-link">
-                    {% trans %}page.wallet.dep_with.spinner{% endtrans%}
+            <li role="presentation" class="nav-item">
+                <a
+                    role="tab"
+                    tabindex="-1"
+                    aria-selected="false"
+                    aria-setsize="4"
+                    aria-posinset="2"
+                    target="_self"
+                    href="{{ path('wallet', {tab: 'trade-history'}) }}"
+                    class="nav-link {% if tab|default and tab == 'trade-history' %} active {% endif %}"
+                >
+                    {% trans %} page.wallet.trading_history {% endtrans %}
                 </a>
             </li>
-            <li role="presentation" class="nav-item"><a role="tab" aria-selected="false" aria-setsize="4"
-                                                        aria-posinset="4" target="_self" href="#" class="nav-link"
-                                                        tabindex="-1"> {% trans %}page.wallet.active_orders.spinner{% endtrans %}
+            <li role="presentation" class="nav-item">
+                <a
+                    role="tab"
+                    tabindex="-1"
+                    aria-selected="false"
+                    aria-setsize="4"
+                    aria-posinset="3"
+                    target="_self"
+                    href="{{ path('wallet', {tab: 'dw-history'}) }}"
+                    class="nav-link {% if tab|default and tab == 'dw-history' %} active {% endif %}"
+                >
+                    {% trans %} page.wallet.dep_with {% endtrans%}
+                </a>
+            </li>
+            <li role="presentation" class="nav-item">
+                <a
+                    role="tab"
+                    aria-selected="false"
+                    aria-setsize="4"
+                    aria-posinset="4"
+                    target="_self"
+                    href="{{ path('wallet', {tab: 'active-orders'}) }}"
+                    class="nav-link {% if tab|default and tab == 'active-orders' %} active {% endif %}"
+                    tabindex="-1"
+                >
+                    {% trans %} page.wallet.active_orders {% endtrans %}
                 </a>
             </li>
         </ul>
     </div>
     <div class="tab-content">
-        <div role="tabpanel" aria-hidden="false" class="tab-pane active" tabindex="-1" style="">
+        <div role="tabpanel" aria-hidden="false" class="tab-pane active" tabindex="-1">
             <div class="px-0 py-2">
                 <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-                    {% trans %}page.wallet.balance.spinner{% endtrans %}
+                    {% trans %} page.wallet.balance.spinner {% endtrans %}
                 </div>
                 <div class="table-responsive">
                     <div class="p-5 text-center">
-                        <i class="vld-icon"></i>
+                        <div class="icon-loading"></div>
                     </div>
                 </div>
                 <div class="card-title font-weight-bold pl-4 pt-2 pb-1">
-                    {% trans %}page.wallet.tokens_own.spinner{% endtrans %}
+                    {% trans %} page.wallet.tokens_own.spinner {% endtrans %}
                 </div>
                 <div class="p-5 text-center">
-                    <i class="vld-icon"></i>
+                    <div class="icon-loading"></div>
                 </div>
             </div>
         </div>

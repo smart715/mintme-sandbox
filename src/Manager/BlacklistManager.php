@@ -8,6 +8,12 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BlacklistManager implements BlacklistManagerInterface
 {
+    private const TOKEN_NAME_APPEND = [
+        'token',
+        'coin',
+        '-',
+    ];
+
     /** @var BlacklistRepository */
     private $repository;
 
@@ -22,6 +28,15 @@ class BlacklistManager implements BlacklistManagerInterface
         $repository = $this->em->getRepository(Blacklist::class);
 
         $this->repository = $repository;
+    }
+
+    public function isBlacklistedAirdropDomain(string $url, bool $sensitive = false): bool
+    {
+        $domain = parse_url($url, PHP_URL_HOST);
+
+        return $domain
+            ? $this->repository->matchValue($domain, Blacklist::AIRDROP_DOMAIN, $sensitive)
+            : true;
     }
 
     public function isBlackListedEmail(string $email, bool $sensitive = false): bool
@@ -130,7 +145,6 @@ class BlacklistManager implements BlacklistManagerInterface
 
     private function nameMatches(string $name, string $val): bool
     {
-        return false !== stripos($name, $val)
-            && (strlen($name) - strlen($val)) <= 1;
+        return (bool)preg_match('/^' . preg_quote($val, '/') . '('. implode('|', self::TOKEN_NAME_APPEND) . ')*$/', mb_strtolower($name));
     }
 }

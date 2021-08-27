@@ -1,11 +1,12 @@
 <template>
-    <div class="token-avatar">
+    <div class="token-avatar show-avatar ml-2">
         <div class="d-flex align-items-center token-name">
             <div class="align-items-center token-avatar-link">
                 <avatar
                     type="token"
                     size="large"
                     :image="image"
+                    :token="tokenName"
                     :editable="isOwner"
                 />
             </div>
@@ -14,8 +15,10 @@
                 :editable="isOwner"
                 :has-release-period-prop="hasReleasePeriodProp"
                 :is-token-created="isTokenCreated"
-                :identifier="identifier"
-                :name="name"
+                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
+                :identifier="market.quote.identifier"
+                :name="market.quote.name"
                 :precision="precision"
                 :status-prop="statusProp"
                 :twofa="twofa"
@@ -37,8 +40,18 @@
                 @updated-telegram="$emit('updated-telegram')"
                 :show-token-edit-modal-prop="showTokenEditModal"
                 :disabled-services-config="disabledServicesConfig"
+                :current-locale="currentLocale"
+                :token-deployed-date="tokenDeployedDate"
+                :token-tx-hash-address="tokenTxHashAddress"
+                :mintme-explorer-url="mintmeExplorerUrl"
+                :eth-explorer-url="ethExplorerUrl"
+                :bnb-explorer-url="bnbExplorerUrl"
+                :token-crypto="tokenCrypto"
+                :discord-auth-url="discordAuthUrl"
             />
             <token-deploy-icon
+                :is-mintme="isMintmeToken"
+                :token-crypto="tokenCrypto"
                 class="ml-2 token-deploy-icon"
                 :is-owner="isOwner"
                 :status-prop="statusProp"
@@ -54,6 +67,8 @@
                 :token-youtube="tokenYoutube"
                 :token-website="tokenWebsite"
                 :token-status="statusProp"
+                :is-controlled-token="isControlledToken"
+                :has-release-period="hasReleasePeriodProp"
             />
         </div>
     </div>
@@ -64,15 +79,22 @@ import Avatar from '../Avatar';
 import TokenName from './TokenName';
 import TokenDeployIcon from './deploy/TokenDeployIcon';
 import TokenPointsProgress from './TokenPointsProgress';
+import {NotificationMixin} from '../../mixins';
+import {mapMutations} from 'vuex';
 
 export default {
     name: 'TokenAvatar',
+    mixins: [
+        NotificationMixin,
+    ],
     props: {
         isOwner: Boolean,
         hasReleasePeriodProp: Boolean,
         isTokenCreated: Boolean,
-        identifier: String,
-        name: String,
+        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
+        market: Object,
+        tokenCrypto: Object,
         precision: Number,
         statusProp: String,
         twofa: Boolean,
@@ -95,12 +117,39 @@ export default {
         discordUrl: String,
         showTokenEditModal: Boolean,
         disabledServicesConfig: String,
+        tokenName: String,
+        tokenDeleteSoldLimit: Number,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        serviceUnavailable: Boolean,
+        discordAuthUrl: String,
     },
     components: {
         Avatar,
         TokenName,
         TokenDeployIcon,
         TokenPointsProgress,
+    },
+    mounted() {
+        this.setTokenDeleteSoldLimit(this.tokenDeleteSoldLimit);
+        if (this.serviceUnavailable) {
+            this.notifyError(this.$t('toasted.error.service_unavailable'));
+        }
+    },
+    methods: {
+        ...mapMutations('tokenStatistics', [
+            'setTokenDeleteSoldLimit',
+        ]),
     },
 };
 </script>

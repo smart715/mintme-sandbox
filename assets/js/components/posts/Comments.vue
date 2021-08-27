@@ -1,18 +1,20 @@
 <template>
-    <div class="comments">
+    <div v-if="post.content" class="comments">
         <comment-form
             class="p-2"
             :logged-in="loggedIn"
             :api-url="apiUrl"
             @submitted="$emit('new-comment', $event)"
             @error="notifyError('Error creating comment.')"
+            @cancel="$emit('cancel')"
             reset-after-submit
         />
         <div class="my-3">
             <template v-if="commentsCount > 0">
                 <comment
-                    v-for="(n, i) in commentsCount"
-                    :comment="comments[i]"
+                    v-for="(c, i) in comments"
+                    :comment="c"
+                    @update-comment="updateComment($event, i)"
                     :key="i"
                     :index="i"
                     :logged-in="loggedIn"
@@ -20,7 +22,7 @@
                 />
             </template>
             <div v-else class="text-center w-100">
-                No one commented yet.
+              {{ $t('post.no_one_commented') }}
             </div>
         </div>
     </div>
@@ -42,15 +44,20 @@ export default {
     },
     props: {
         comments: Array,
-        postId: Number,
         loggedIn: Boolean,
+        post: Object,
     },
     computed: {
         commentsCount() {
             return this.comments.length;
         },
         apiUrl() {
-            return this.$routing.generate('add_comment', {id: this.postId});
+            return this.$routing.generate('add_comment', {id: this.post.id});
+        },
+    },
+    methods: {
+        updateComment(comment, i) {
+            this.$emit('update-comment', {comment, i});
         },
     },
 };

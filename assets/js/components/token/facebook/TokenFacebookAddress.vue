@@ -15,6 +15,13 @@
                 <a href="#" class="text-reset">
                     {{ computedAddress }}
                 </a>
+                <font-awesome-icon
+                    v-if="submitting"
+                    icon="circle-notch"
+                    spin
+                    class="loading-spinner"
+                    fixed-width
+                />
             </span>
             <b-tooltip
                 v-if="address"
@@ -88,22 +95,18 @@ import {library} from '@fortawesome/fontawesome-svg-core';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {faFacebookSquare} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import {BTooltip} from 'bootstrap-vue';
 import {FiltersMixin, LoggerMixin, NotificationMixin} from '../../../mixins';
-import Guide from '../../Guide';
 import Modal from '../../modal/Modal';
-import {HTTP_ACCEPTED} from '../../../utils/constants';
+import {HTTP_OK} from '../../../utils/constants';
 
 library.add(faFacebookSquare, faTimes);
 
 export default {
     name: 'TokenFacebookAddress',
-    props: {
-        address: String,
-        tokenName: String,
-    },
     components: {
+        BTooltip,
         FontAwesomeIcon,
-        Guide,
         Modal,
     },
     mixins: [
@@ -111,6 +114,10 @@ export default {
         NotificationMixin,
         LoggerMixin,
     ],
+    props: {
+        address: String,
+        tokenName: String,
+    },
     data() {
         return {
             pages: [],
@@ -131,20 +138,37 @@ export default {
         this.selectedUrl = this.pages.length ? this.pages[0].link : '';
     },
     methods: {
-        addPage: function() {
-            FB.login((response) => {
-                if (response.status === 'connected') {
-                    FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
-                        if (accountsData.error) {
-                            this.notifyError(this.$t('toasted.error.try_later'));
-                            this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error);
-                            return;
-                        }
-                        this.pages = accountsData.data;
-                        this.showConfirmModal = true;
-                    });
+        addPage: async function() {
+            if (this.submitting) {
+                return;
+            }
+
+            this.submitting = true;
+            let {status} = await this.getLoginStatus();
+            if (status !== 'connected') {
+                ({status} = await this.login());
+            }
+
+            if (status !== 'connected') {
+                return;
+            }
+
+            FB.api('/me/accounts?type=page&fields=name,link', (accountsData) => {
+                if (accountsData.error) {
+                    this.notifyError(this.$t('toasted.error.try_later'));
+                    this.sendLogs('error', 'An error has occurred, please try again later', accountsData.error);
+                    return;
                 }
-            }, {scope: 'pages_show_list'});
+                this.pages = accountsData.data;
+                this.showConfirmModal = true;
+                this.submitting = false;
+            });
+        },
+        getLoginStatus: function() {
+            return new Promise((resolve) => FB.getLoginStatus((res) => resolve(res)));
+        },
+        login: function() {
+            return new Promise((resolve) => FB.login((res) => resolve(res), {scope: 'pages_show_list'}));
         },
         savePage: function() {
             this.saveFacebookAddress();
@@ -163,8 +187,8 @@ export default {
                 facebookUrl: this.selectedUrl,
             })
                 .then((response) => {
-                    if (response.status === HTTP_ACCEPTED) {
-                        let state = this.selectedUrl ? `saved as ${this.selectedUrl}` : 'deleted';
+                    if (response.status === HTTP_OK) {
+                        let state = this.selectedUrl ? `added` : 'deleted';
                         this.notifySuccess(this.$t(
                             'toasted.success.facebook.' + state,
                             {address: this.selectedUrl}

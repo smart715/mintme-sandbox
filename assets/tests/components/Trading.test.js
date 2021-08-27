@@ -5,6 +5,13 @@ import axios from 'axios';
 
 // TODO: Improve tests and add more tests
 
+const filterForTokens = {
+    deployed_first: 1,
+    deployed_only_mintme: 2,
+    airdrop_only: 3,
+    deployed_only_eth: 4,
+};
+
 /**
  * @return {VueConstructor}
  */
@@ -34,6 +41,7 @@ function mockTrading(props = {}) {
         propsData: {
             websocketUrl: 'testWebsocketUrl',
             enableUsd: true,
+            filterForTokens: filterForTokens,
             ...props,
         },
         methods: {
@@ -67,11 +75,6 @@ describe('Trading', () => {
         base: 'WEB',
         quote: 'MobCoin',
     };
-
-    it('Show USD in dropdown option if enableUSD is true', () => {
-        const wrapper = mockTrading();
-        expect(wrapper.find('.usdOption').exists()).toBe(true);
-    });
     it('show message if there are not deployed tokens yet', () => {
         const wrapper = mockTrading();
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
@@ -96,14 +99,28 @@ describe('Trading', () => {
         expect(wrapper.html().includes('trading.no_any_token')).toBe(false);
     });
     it('show rest of token link', () => {
-        const wrapper = mockTrading();
+        const wrapper = mockTrading({page: 1});
+
         wrapper.vm.marketFilters.selectedFilter = 'deployed';
         wrapper.vm.sanitizedMarkets = {};
         wrapper.vm.markets = {};
+        wrapper.vm.totalRows = 0;
+        wrapper.vm.perPage = 50;
         wrapper.vm.loading = false;
         expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
+
         wrapper.vm.sanitizedMarkets = market;
+        wrapper.vm.totalRows = 1;
         expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
+
+        wrapper.vm.totalRows = 60;
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
+
+        wrapper.vm.currentPage = 2;
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(true);
+
+        wrapper.vm.marketFilters.selectedFilter = 'all';
+        expect(wrapper.html().includes('trading.show_all_tokens')).toBe(false);
     });
     it('make sure that expected "user=1" will be sent', (done) => {
         const wrapper = mockTrading();
@@ -219,8 +236,9 @@ describe('Trading', () => {
                                 close: '789',
                                 high: '0',
                                 low: '0',
-                                volume: '0',
+                                volumeDonation: '0',
                                 deal: '321',
+                                dealDonation: '321',
                             },
                         ],
                         id: null,
@@ -229,7 +247,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '321 MINTME'},
+                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
                             ]);
                             done();
                         });
@@ -249,7 +267,9 @@ describe('Trading', () => {
                                 high: '0',
                                 low: '0',
                                 volume: '0',
+                                volumeDonation: '0',
                                 deal: '32',
+                                dealDonation: '32',
                         },
                         ],
                         id: null,
@@ -258,7 +278,7 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.sanitizedMarketsOnTop).toMatchObject([
-                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '32 BTC'},
+                                {pair: 'WEB/BTC', change: '-73%', lastPrice: '12 BTC', dayVolume: '64 BTC'},
                             ]);
                             done();
                         });
@@ -278,7 +298,9 @@ describe('Trading', () => {
                                 high: '0',
                                 low: '0',
                                 volume: '0',
+                                volumeDonation: '0',
                                 deal: '3210',
+                                dealDonation: '3210',
                         },
                         ],
                         id: null,
@@ -287,8 +309,8 @@ describe('Trading', () => {
                     wrapper.vm.$nextTick(() => {
                         wrapper.vm.$nextTick(() => {
                             expect(wrapper.vm.tokens).toMatchObject([
-                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '321 MINTME'},
-                                {pair: 'tok2', change: '-73%', lastPrice: '1230 MINTME', dayVolume: '3210 MINTME'},
+                                {pair: 'tok1', change: '-73%', lastPrice: '123 MINTME', dayVolume: '642 MINTME'},
+                                {pair: 'tok2', change: '-73%', lastPrice: '1230 MINTME', dayVolume: '6420 MINTME'},
                             ]);
                             done();
                         });

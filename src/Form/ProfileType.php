@@ -84,6 +84,10 @@ class ProfileType extends AbstractType
                   'class' => 'custom-control-input',
                 ],
                 'label_attr' => ['class' => 'custom-control-label'],
+            ])
+            ->add('phoneNumber', PhoneNumberType::class, [
+                'required' => $options['had_phone_number'],
+                'mapped' => false,
             ]);
 
         if ($this->showFullDataInProfile) {
@@ -128,5 +132,8 @@ class ProfileType extends AbstractType
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_intention',
         ]);
+
+        $resolver->setDefault('had_phone_number', false);
+        $resolver->setAllowedTypes('had_phone_number', 'bool');
     }
 }

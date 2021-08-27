@@ -14,13 +14,13 @@
             @click="submit"
             :disabled="$v.content.$invalid"
         >
-            Save
+          {{ $t('save') }}
         </button>
         <button
             class="btn btn-cancel"
             @click="cancel"
         >
-            Cancel
+          {{ $t('cancel') }}
         </button>
     </div>
 </template>
@@ -93,6 +93,7 @@ export default {
         cancel() {
             if (!this.loggedIn) {
                 location.href = this.loginUrl;
+                return;
             }
 
             this.content = this.propContent;

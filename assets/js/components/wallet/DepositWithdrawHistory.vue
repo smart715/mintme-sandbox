@@ -57,28 +57,39 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import {toMoney, formatMoney} from '../../utils';
 import {
     LazyScrollTableMixin,
     FiltersMixin,
     RebrandingFilterMixin,
-    NotificationMixin,
     LoggerMixin,
 } from '../../mixins/';
 import CopyLink from '../CopyLink';
 import {GENERAL} from '../../utils/constants';
 
+library.add(faCircleNotch);
+
 export default {
     name: 'DepositWithdrawHistory',
+    components: {
+        BTable,
+        CopyLink,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         LazyScrollTableMixin,
         FiltersMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
     ],
-    components: {CopyLink},
     data() {
         return {
             fields: {
@@ -170,7 +181,6 @@ export default {
                         resolve(this.tableData);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_payment_history'));
                         this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });
@@ -180,7 +190,7 @@ export default {
             historyData.forEach((item) => {
                 item['url'] = this.generatePairUrl(item.tradable);
                 item['date'] = item.date
-                    ? moment(item.date).format(GENERAL.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateTimeFormat)
                     : null;
                 item['fee'] = item.fee
                     ? toMoney(item.fee, item.tradable.subunit)

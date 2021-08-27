@@ -23,6 +23,8 @@ class Deal extends AbstractOrder
     /** @var int|null */
     private $dealOrderId;
 
+    private int $orderId;
+
     public function __construct(
         ?int $id,
         ?int $timestamp,
@@ -34,6 +36,7 @@ class Deal extends AbstractOrder
         ?Money $deal,
         Money $fee,
         ?int $dealOrderId,
+        int $orderId,
         Market $market
     ) {
         $this->id = $id;
@@ -46,6 +49,7 @@ class Deal extends AbstractOrder
         $this->deal = $deal;
         $this->fee = $fee;
         $this->dealOrderId = $dealOrderId;
+        $this->orderId = $orderId;
         $this->market = $market;
     }
 
@@ -58,6 +62,12 @@ class Deal extends AbstractOrder
     public function getDealOrderId(): ?int
     {
         return $this->dealOrderId;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getOrderId(): ?int
+    {
+        return $this->orderId;
     }
 
     public function getUserId(): ?int

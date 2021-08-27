@@ -3,6 +3,7 @@
 namespace App\Wallet\Money;
 
 use App\Manager\CryptoManagerInterface;
+use App\Utils\Symbols;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Money\Converter;
@@ -16,10 +17,10 @@ use Money\Parser\DecimalMoneyParser;
 
 final class MoneyWrapper implements MoneyWrapperInterface
 {
-    public const TOK_SYMBOL = 'TOK';
-    private const TOK_SUBUNIT = 12;
-    public const USD_SYMBOL = 'USD';
-    private const USD_SUBUNIT = 0;
+    public const TOK_SUBUNIT = 12;
+    public const USD_SUBUNIT = 2;
+    public const MINTME_SUBUNIT = 18;
+    public const MINTME_SHOW_SUBUNIT = 4;
 
     /** @var CryptoManagerInterface */
     private $cryptoManager;
@@ -48,8 +49,8 @@ final class MoneyWrapper implements MoneyWrapperInterface
             array_merge(
                 $this->fetchCurrencies(),
                 [
-                    self::TOK_SYMBOL => self::TOK_SUBUNIT,
-                    self::USD_SYMBOL => self::USD_SUBUNIT,
+                    Symbols::TOK => self::TOK_SUBUNIT,
+                    Symbols::USD => self::USD_SUBUNIT,
                 ]
             )
         );
@@ -58,6 +59,19 @@ final class MoneyWrapper implements MoneyWrapperInterface
     public function format(Money $money): string
     {
         return $this->getFormatter()->format($money);
+    }
+
+    public function convertByRatio(Money $amount, string $toCurrency, string $ratio): Money
+    {
+        $from = $amount->getCurrency()->getCode();
+
+        $exchange = new FixedExchange([
+            $from => [
+                $toCurrency => $ratio,
+            ],
+        ]);
+
+        return $this->convert($amount, new Currency($toCurrency), $exchange);
     }
 
     public function convertToDecimalIfNotation(string $notation, string $symbol): string

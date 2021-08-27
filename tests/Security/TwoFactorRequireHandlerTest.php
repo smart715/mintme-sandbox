@@ -2,10 +2,13 @@
 
 namespace App\Tests\Security;
 
+use App\Security\Request\RefererRequestHandlerInterface;
 use App\Security\TwoFactorRequireHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scheb\TwoFactorBundle\DependencyInjection\Factory\Security\TwoFactorFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -36,7 +39,9 @@ class TwoFactorRequireHandlerTest extends TestCase
             $this->mockHttpUtils($request),
             $this->createMock(TokenStorageInterface::class),
             $this->mockRouter(),
-            $this->mockUrlGenerator()
+            $this->mockUrlGenerator(),
+            $this->createMock(SessionInterface::class),
+            $this->createMock(RefererRequestHandlerInterface::class)
         );
         $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
         $this->assertEquals('/2fa', $response->getContent());
@@ -49,7 +54,9 @@ class TwoFactorRequireHandlerTest extends TestCase
             $this->mockHttpUtils($request),
             $this->createMock(TokenStorageInterface::class),
             $this->mockRouter(),
-            $this->mockUrlGenerator()
+            $this->mockUrlGenerator(),
+            $this->createMock(SessionInterface::class),
+            $this->createMock(RefererRequestHandlerInterface::class)
         );
         $response = $handler->onAuthenticationRequired($request, $this->createMock(TokenInterface::class));
         $this->assertEquals('/free', $response->getContent());
@@ -105,8 +112,12 @@ class TwoFactorRequireHandlerTest extends TestCase
     /** @return MockObject|RouterInterface */
     private function mockRouter(): RouterInterface
     {
+        $headerBag = $this->createMock(HeaderBag::class);
+        $headerBag->method('get')->willReturn('referer');
+
         $router = $this->createMock(RouterInterface::class);
         $router->method('getRouteCollection')->willReturn($this->routeCollection);
+        $router->method('session')->willReturn($headerBag);
 
         return $router;
     }

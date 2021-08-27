@@ -8,14 +8,18 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import VueSidebarMenu from 'vue-sidebar-menu';
+import {SidebarMenu} from 'vue-sidebar-menu';
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTasks, faAnchor, faCubes, faSignInAlt} from '@fortawesome/free-solid-svg-icons';
 
-Vue.use(VueSidebarMenu);
+library.add(faTasks, faAnchor, faCubes, faSignInAlt);
 
 export default {
     name: 'AdminMenu',
+    components: {
+        SidebarMenu,
+    },
     props: {
         isUserLogged: Boolean,
     },
@@ -68,6 +72,14 @@ export default {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
                             title: this.$t('hacker_menu.crypto.btc'),
                         },
+                        {
+                          href: this.$routing.generate('hacker-add-crypto', {crypto: 'usdc'}),
+                          title: this.$t('hacker_menu.crypto.usdc'),
+                        },
+                        {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'bnb'}),
+                            title: this.$t('hacker_menu.crypto.bnb'),
+                        },
                     ],
                 },
             ],
@@ -114,35 +126,47 @@ export default {
 };
 </script>
 
-<style lang="sass">
-    @import '../../scss/variables'
+<style lang="scss">
+    @import '../../scss/variables';
 
-    .v-sidebar-menu
-        background: $secondary !important
+    .v-sidebar-menu {
+        background: $secondary !important;
+        z-index: 1040;
+    }
 
-    .v-sidebar-menu .vsm-dropdown>.vsm-list
-        background: $primary !important
+    .v-sidebar-menu .vsm-dropdown>.vsm-list {
+        background: $primary !important;
+    }
 
-    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon
-        background: transparent !important
+    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon {
+        background: transparent !important;
+    }
 
-    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link
-        background: $primary-light !important
+    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link {
+        background: $primary-light !important;
+    }
 
-    .v-sidebar-menu.vsm-collapsed
-        background: none !important
+    .v-sidebar-menu.vsm-collapsed {
+        background: none !important;
 
-        & > *:not(button)
-            display: none !important
+        & > *:not(button) {
+            display: none !important;
+        }
+    }
 
-    .v-sidebar-menu .vsm-arrow:after
-        content: "↓" !important
+    .v-sidebar-menu .vsm-arrow:after {
+        content: "↓" !important;
+    }
 
-    .v-sidebar-menu .collapse-btn:after
-        content: ">" !important
+    .v-sidebar-menu .collapse-btn:after {
+        content: ">" !important;
+    }
 
-    .vsm-collapsed
-        width: 10px !important
-        .collapse-btn
-            width: 30px !important
+    .vsm-collapsed {
+        width: 10px !important;
+
+        .collapse-btn {
+            width: 30px !important;
+        }
+    }
 </style>

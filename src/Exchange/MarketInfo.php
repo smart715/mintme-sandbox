@@ -75,6 +75,9 @@ class MarketInfo
      */
     private $buyDepth;
 
+    /** @var Money */
+    private $soldOnMarket;
+
     /** @var \DateTimeImmutable|null */
     private $expires;
 
@@ -90,6 +93,7 @@ class MarketInfo
         Money $deal,
         Money $monthDeal,
         Money $buyDepth,
+        Money $soldOnMarket,
         ?\DateTimeImmutable $expires
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
@@ -103,6 +107,7 @@ class MarketInfo
         $this->deal = $deal;
         $this->monthDeal = $monthDeal;
         $this->buyDepth = $buyDepth;
+        $this->soldOnMarket = $soldOnMarket;
         $this->expires = $expires;
     }
 
@@ -188,6 +193,12 @@ class MarketInfo
     public function getBuyDepth(): Money
     {
         return $this->buyDepth;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getSoldOnMarket(): Money
+    {
+        return $this->soldOnMarket;
     }
 
     public function getExpires(): ?\DateTimeImmutable

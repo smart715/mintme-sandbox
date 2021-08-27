@@ -1,4 +1,4 @@
-import {webSymbol, btcSymbol, ethSymbol, WSAPI} from '../utils/constants';
+import {webSymbol, btcSymbol, ethSymbol, usdcSymbol, bnbSymbol, WSAPI} from '../utils/constants';
 
 export default {
     props: {
@@ -36,18 +36,18 @@ export default {
             return '';
         },
         isCryptoMarket: function() {
-            return [webSymbol, btcSymbol, ethSymbol].includes(this.marketIdentifier);
+            return [webSymbol, btcSymbol, ethSymbol, usdcSymbol, bnbSymbol].includes(this.marketIdentifier);
         },
     },
     methods: {
         getSideByType: function(orderType, isDonationOrder) {
             switch (orderType) {
                 case WSAPI.order.type.BUY:
-                    return isDonationOrder ? 'Buy (donation)' : 'Buy';
+                    return isDonationOrder ? this.$t('donation.order.buy') : this.$t('buy');
                 case WSAPI.order.type.SELL:
-                    return isDonationOrder ? 'Sell (donation)' : 'Sell';
+                    return isDonationOrder ? this.$t('donation.order.sell') : this.$t('sell');
                 case WSAPI.order.type.DONATION:
-                    return 'Donation';
+                    return this.$t('donation.order.donation');
             }
         },
     },

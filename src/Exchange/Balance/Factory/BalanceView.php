@@ -41,6 +41,9 @@ class BalanceView
     /** @var bool */
     public $isBlocked;
 
+    /** @var string */
+    public $cryptoSymbol;
+
     public function __construct(
         string $identifier,
         Money $available,
@@ -52,7 +55,8 @@ class BalanceView
         bool $tradable,
         bool $deployed,
         bool $owner,
-        bool $isBlocked
+        bool $isBlocked,
+        string $cryptoSymbol
     ) {
         $this->identifier = $identifier;
         $this->available = $available;
@@ -65,6 +69,7 @@ class BalanceView
         $this->deployed = $deployed;
         $this->owner = $owner;
         $this->isBlocked = $isBlocked;
+        $this->cryptoSymbol = $cryptoSymbol;
     }
 
     /** @Groups({"API"}) */
@@ -131,5 +136,11 @@ class BalanceView
     public function isBlocked(): bool
     {
         return $this->isBlocked;
+    }
+
+    /** @Groups({"API"}) */
+    public function getCryptoSymbol(): string
+    {
+        return $this->cryptoSymbol;
     }
 }

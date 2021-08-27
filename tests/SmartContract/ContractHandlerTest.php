@@ -10,12 +10,13 @@ use App\Entity\Profile;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
 use App\Entity\User;
+use App\Exchange\Config\TokenConfig;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\SmartContract\Config\Config;
 use App\SmartContract\ContractHandler;
+use App\Utils\Symbols;
 use App\Wallet\Model\DepositInfo;
-use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Money\Currencies;
@@ -39,6 +40,7 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             )
             ->willReturn($this->mockResponse(false, []));
@@ -48,7 +50,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $handler->deploy($this->mockToken(true));
@@ -65,7 +68,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -85,6 +89,7 @@ class ContractHandlerTest extends TestCase
                     'releasedAtCreation' => '100000',
                     'releasePeriod' => 10,
                     'userId' => 1,
+                    'crypto' => '',
                 ]
             )
             ->willReturn($this->mockResponse(true, []));
@@ -94,7 +99,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -121,7 +127,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $handler->updateMintDestination(
@@ -141,7 +148,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -172,7 +180,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
@@ -194,6 +203,9 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
+                    'crypto' => '',
+                    'tokenFee' => '1',
+                    'tokenFeeCurrency' => 'TOK',
                 ]
             );
 
@@ -202,14 +214,16 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed')
+            $this->mockToken(true, '0x123', 'deployed'),
+            new Money('1', new Currency(Symbols::TOK))
         );
     }
 
@@ -224,16 +238,18 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'not-deployed')
+            $this->mockToken(true, '0x123', 'not-deployed'),
+            new Money('1', new Currency(Symbols::WEB))
         );
     }
 
@@ -248,6 +264,9 @@ class ContractHandlerTest extends TestCase
                     'to' => '0x123',
                     'value' => '1',
                     'userId' => 1,
+                    'crypto' => '',
+                    'tokenFee' => '1',
+                    'tokenFeeCurrency' => 'TOK',
                 ]
             )->willReturn($this->mockResponse(true));
 
@@ -256,16 +275,18 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(\Throwable::class);
 
         $handler->withdraw(
             $this->mockUser(1),
-            new Money('1', new Currency(Token::WEB_SYMBOL)),
+            new Money('1', new Currency(Symbols::WEB)),
             '0x123',
-            $this->mockToken(true, '0x123', 'deployed')
+            $this->mockToken(true, '0x123', 'deployed'),
+            new Money('1', new Currency(Symbols::TOK))
         );
     }
 
@@ -290,6 +311,9 @@ class ContractHandlerTest extends TestCase
                     'token' => 'foo',
                     'status' => 'paid',
                     'type' => 'withdraw',
+                    'crypto' => 'WEB',
+                    'tokenFee' => '1000000000000',
+                    'tokenFeeCurrency' => 'TOK',
                 ],
                 [
                     'hash' => 'hash',
@@ -300,15 +324,25 @@ class ContractHandlerTest extends TestCase
                     'token' => 'bar',
                     'status' => 'paid',
                     'type' => 'deposit',
+                    'crypto' => 'WEB',
+                    'tokenFee' => '1000000000000',
+                    'tokenFeeCurrency' => 'TOK',
                 ],
             ]));
+
+        $cryptoManager = $this->createMock(CryptoManagerInterface::class);
+        $cryptoManager->method('findBySymbol')->willReturn($this->mockTokenCrypto());
+        $cryptoManager->method('findAllIndexed')->willReturn([
+            'WEB' => $this->mockCrypto(),
+        ]);
 
         $handler = new ContractHandler(
             $rpc,
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
-            $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $cryptoManager,
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $result = $handler->getTransactions(
@@ -357,7 +391,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $this->expectException(FetchException::class);
@@ -368,6 +403,32 @@ class ContractHandlerTest extends TestCase
             0,
             50
         );
+    }
+
+    public function testGetDepositInfo(): void
+    {
+        $rpc = $this->mockRpc();
+        $rpc
+            ->expects($this->once())->method('send')->with(
+                'get_deposit_info',
+                [
+                    'tokenName' => 'AWESOME',
+                ]
+            )->willReturn($this->mockResponse(false, ['fee' => '0', 'minDeposit' => '1000000000000']));
+
+        $handler = new ContractHandler(
+            $rpc,
+            $this->mockLoggerInterface(),
+            $this->mockMoneyWrapper(),
+            $this->mockCryptoManager(),
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
+        );
+
+        $expectedMinDeposit = new Money('1000000000000', new Currency(Symbols::TOK));
+        $result = $handler->getDepositInfo('AWESOME');
+
+        $this->assertEquals($expectedMinDeposit, $result->getMinDeposit());
     }
 
     public function getDepositCredentials(): void
@@ -386,7 +447,8 @@ class ContractHandlerTest extends TestCase
             $this->mockLoggerInterface(),
             $this->mockMoneyWrapper(),
             $this->mockCryptoManager(),
-            $this->mockTokenManager()
+            $this->mockTokenManager(),
+            $this->mockTokenConfig()
         );
 
         $result = $handler->getDepositCredentials(
@@ -401,7 +463,7 @@ class ContractHandlerTest extends TestCase
         $wallet = $this->createMock(WalletInterface::class);
         $depositInfo = $this->createMock(DepositInfo::class);
 
-        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $depositInfo->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
         $wallet->method('getDepositInfo')->willReturn($depositInfo);
 
         return $wallet;
@@ -423,7 +485,7 @@ class ContractHandlerTest extends TestCase
         $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
         $moneyWrapper->method('getRepository')->willReturn($currencies);
         $moneyWrapper->method('parse')->willReturnCallback(function () {
-            return new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL));
+            return new Money('1000000000000', new Currency(Symbols::TOK));
         });
         $moneyWrapper->method('format')->willReturnCallback(function ($money) {
             return $money->getAmount();
@@ -451,7 +513,7 @@ class ContractHandlerTest extends TestCase
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getReleasePeriod')->willReturn(10);
-        $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $lockIn->method('getReleasedAmount')->willReturn(new Money('100000', new Currency(Symbols::TOK)));
         $token->method('getLockIn')->willReturn($lockIn);
 
         $user = $this->createMock(User::class);
@@ -466,7 +528,17 @@ class ContractHandlerTest extends TestCase
     private function mockCrypto(): Crypto
     {
         $crypto = $this->createMock(Crypto::class);
-        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::TOK)));
+
+        return $crypto;
+    }
+
+    private function mockTokenCrypto(): Crypto
+    {
+        $crypto = $this->createMock(Crypto::class);
+        $crypto->method('getFee')->willReturn(new Money('1000000000000', new Currency(Symbols::USDC)));
+        $crypto->method('getSymbol')->willReturn('USDC');
+        $crypto->method('getSubunit')->willReturn(6);
 
         return $crypto;
     }
@@ -497,12 +569,26 @@ class ContractHandlerTest extends TestCase
     {
         $manager = $this->createMock(CryptoManagerInterface::class);
         $manager->method('findBySymbol')->willReturn($this->mockCrypto());
+        $manager->method('findAllIndexed')->willReturn([
+            'WEB' => $this->mockCrypto(),
+        ]);
 
         return $manager;
     }
 
     private function mockTokenManager(): TokenManagerInterface
     {
-        return $this->createMock(TokenManagerInterface::class);
+        $tm = $this->createMock(TokenManagerInterface::class);
+        $token = $this->createMock(Token::class);
+        $token->method('getSymbol')->willReturn('USDC');
+        $token->method('getUsers')->willReturn([$this->createMock(User::class)]);
+        $tm->method('findByName')->willReturn($token);
+
+        return $tm;
+    }
+
+    public function mockTokenConfig(): TokenConfig
+    {
+        return $this->createMock(TokenConfig::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\SmartContract;
 
 use App\Communications\DeployCostFetcherInterface;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
 use App\Entity\User;
 use App\Exchange\Balance\BalanceHandlerInterface;
@@ -11,17 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DeploymentFacade implements DeploymentFacadeInterface
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var DeployCostFetcherInterface */
-    private $costFetcher;
-
-    /** @var BalanceHandlerInterface */
-    private $balanceHandler;
-
-    /** @var ContractHandlerInterface */
-    private $contractHandler;
+    private EntityManagerInterface $em;
+    private DeployCostFetcherInterface $costFetcher;
+    private BalanceHandlerInterface $balanceHandler;
+    private ContractHandlerInterface $contractHandler;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -35,21 +29,22 @@ class DeploymentFacade implements DeploymentFacadeInterface
         $this->contractHandler = $contractHandler;
     }
 
-    public function execute(User $user, Token $token): void
+    public function execute(User $user, Token $token, Crypto $crypto): void
     {
-        $cost = $this->costFetcher->getDeployWebCost();
+        $cost = $this->costFetcher->getDeployCost($crypto->getSymbol());
         $balance = $this->balanceHandler
-            ->balance($user, Token::getFromSymbol(Token::WEB_SYMBOL))->getAvailable();
+            ->balance($token->getOwner(), $crypto)->getAvailable();
 
         if ($cost->greaterThan($balance)) {
             throw new BalanceException('Low balance');
         }
 
+        $token->setCrypto($crypto);
         $this->contractHandler->deploy($token);
 
         $this->balanceHandler->withdraw(
-            $user,
-            Token::getFromSymbol(Token::WEB_SYMBOL),
+            $token->getOwner(),
+            $crypto,
             $cost
         );
 

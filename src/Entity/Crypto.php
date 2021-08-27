@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Token\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
@@ -22,51 +21,43 @@ class Crypto implements TradebleInterface, ImagineInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="string", length=20)
-     * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * @ORM\Column(type="string", length=5)
-     * @var string
      */
-    protected $symbol;
+    protected string $symbol;
 
     /**
      * @ORM\Column(type="integer")
-     * @var int
      */
-    protected $subunit;
+    protected int $subunit;
 
     /**
      * @ORM\Column(type="integer")
-     * @var int
      */
-    protected $showSubunit;
+    protected int $showSubunit;
 
     /**
      * @ORM\Column(type="bigint")
-     * @var string
      */
-    protected $fee;
+    protected string $fee;
 
     /**
      * @ORM\Column(type="boolean")
-     * @var bool
      */
-    protected $tradable;
+    protected bool $tradable;
 
     /**
      * @ORM\Column(type="boolean")
-     * @var bool
      */
-    protected $exchangeble;
+    protected bool $exchangeble;
 
     /**
      * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="crypto", cascade={"persist", "remove"})
@@ -81,10 +72,26 @@ class Crypto implements TradebleInterface, ImagineInterface
     protected $imagePath = '';
 
     /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable=false)
      * @Groups({"Default", "API"})
-     * @var Image
+     * @var bool
      */
-    protected $image;
+    protected $isToken = false;
+
+    /**
+     * @Groups({"Default", "API"})
+     */
+    protected Image $image;
+
+    /**
+     * @ORM\OneToMany(
+     *     targetEntity="App\Entity\Voting\CryptoVoting",
+     *     mappedBy="crypto"
+     * )
+     * @ORM\OrderBy({"endDate" = "DESC", "createdAt" = "DESC"})
+     *  @var ArrayCollection
+     */
+    private $votings;
 
     public function getId(): int
     {
@@ -157,5 +164,20 @@ class Crypto implements TradebleInterface, ImagineInterface
     public function getImage(): Image
     {
         return Image::defaultImage($this->imagePath);
+    }
+
+    public function isToken(): bool
+    {
+        return $this->isToken;
+    }
+
+    public function setIsToken(bool $isToken): void
+    {
+        $this->isToken = $isToken;
+    }
+
+    public function getVotings(): array
+    {
+        return $this->votings->toArray();
     }
 }

@@ -176,6 +176,57 @@ function currencyConversion(amount, rate, symbol, subunit = 2) {
     return currencySymbol + toMoney(amount, subunit);
 }
 
+/**
+ * @param {string} link
+ * @return {Promise}
+ */
+function openPopup(link) {
+    return new Promise((resolve) => {
+        let popup = window.open(link, 'popup', 'width=600,height=600');
+
+        let interval = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000);
+    });
+}
+
+/**
+ * @param {string} link
+ * @return {undefined}
+ */
+function openNewTab(link) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank';
+    a.click();
+}
+
+/**
+ * @param {array} arr
+ * @param {string} prop
+ * @param {boolean} excludeEmpty
+ * @return {boolean}
+ */
+function assertUniquePropertyValuesInObjectArray(arr, prop, excludeEmpty = true) {
+    let values = {};
+
+    return arr.every((item) => {
+        if (excludeEmpty && item[prop] === '') {
+            return true;
+        }
+
+        if (values[item[prop]]) {
+            return false;
+        }
+
+        values[item[prop]] = true;
+        return true;
+    });
+}
+
 export {
     isValidUrl,
     isValidTelegramUrl,
@@ -191,4 +242,7 @@ export {
     getBreakPoint,
     removeSpaces,
     currencyConversion,
+    openPopup,
+    openNewTab,
+    assertUniquePropertyValuesInObjectArray,
 };

@@ -22,15 +22,27 @@
 </template>
 
 <script>
+    import {library} from '@fortawesome/fontawesome-svg-core';
+    import {faCamera} from '@fortawesome/free-solid-svg-icons';
+    import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
     import {NotificationMixin} from '../mixins';
+
+    library.add(faCamera);
 
     export default {
         name: 'ImageUploader',
+        components: {
+            FontAwesomeIcon,
+        },
         mixins: [NotificationMixin],
         props: {
             type: {
                 type: String,
                 default: '',
+            },
+            token: {
+                type: String,
+                default: null,
             },
         },
         data() {
@@ -58,6 +70,7 @@
 
                 formData.append('file', file);
                 formData.append('type', this.type);
+                formData.append('token', this.token);
 
                 this.uploading = true;
 

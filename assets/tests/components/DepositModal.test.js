@@ -26,12 +26,6 @@ let rebrandingTest = (val) => {
  */
 function mockVue() {
     const localVue = createLocalVue();
-    localVue.component('b-modal', {render: () => ''});
-    localVue.component('b-col', {});
-    localVue.component('b-row', {});
-    localVue.component('font-awesome-icon', {});
-    localVue.directive('clipboard', {});
-    localVue.directive('tippy', {});
     localVue.use({
         install(Vue, options) {
             Vue.prototype.$t = (val) => val;

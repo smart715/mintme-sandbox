@@ -9,36 +9,37 @@
                     <div class="row coin-markets">
                         <div v-for="(market, index) in this.sanitizedMarketsOnTop"
                              :key="market.pair"
-                             class="col-12 col-lg-6 my-2 pl-3"
-                             v-bind:class="{'market-border': sanitizedMarketsOnTop.length-1 > index}"
+                             class="col-12 col-lg-6 my-2 px-0"
+                             v-bind:class="{'market-border': Number.isInteger(index/2) || 0 === index}"
                         >
-                            <a  :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
-                                <div class="d-inline-block px-md-3 py-2">
+                            <a :href="rebrandingFunc(market.tokenUrl)" class="d-inline text-white text-decoration-none">
+                                <div class="d-inline-block text-center col-2 pr-0 pl-0 pl-sm-4">
                                     <img :src="require('../../../img/' + market.base + '.png')"/>
                                 </div>
-                                <div class="crypto-pair d-inline-block align-middle">
-                                    <span>{{ market.pair|rebranding }}</span>
-                                    <br>
-                                    <span>{{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}</span>
-                                </div>
-                                <div class="d-inline-block text-center mx-md-1 market-change">
-                                    <span v-if="parseFloat(market.change) > 0" class="market-up">
-                                        &#9650;+{{ market.change }}
-                                    </span>
-                                    <span v-else-if="parseFloat(market.change) < 0" class="market-down">
-                                        &#9660;{{ market.change }}
-                                    </span>
-                                    <span v-else>
-                                        {{ market.change }}
-                                    </span>
+                                <div class="crypto-pair d-inline-block align-middle col-3 px-0">
+                                    <div class="text-center">{{ market.pair|rebranding }}</div>
+                                    <div class="text-center">
+                                        {{ ( showUsd ? market.lastPriceUSD : market.lastPrice ) | formatMoney }}
+                                    </div>
                                 </div>
                             </a>
-                            <div class="d-inline-block align-middle market-data">
+                            <div class="d-inline-block align-middle col-2 px-0">
+                                <div v-if="parseFloat(market.change) > 0" class="market-up text-center">
+                                    &#9650;+{{ market.change }}
+                                </div>
+                                <div v-else-if="parseFloat(market.change) < 0" class="market-down text-center">
+                                    &#9660;{{ market.change }}
+                                </div>
+                                <div class="text-center" v-else>
+                                    {{ market.change }}
+                                </div>
+                            </div>
+                            <div class="d-inline-block col-4 align-middle market-data float-right float-lg-none px-0">
                                 <span>{{ $t('trading.table.volume_30d') }}</span>
-                                <span class="float-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right">{{ ( showUsd ? market.monthVolumeUSD : market.monthVolume ) | formatMoney}}</span>
                                 <br/>
                                 <span>{{ $t('trading.table.volume_24h') }}</span>
-                                <span class="float-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
+                                <span class="float-lg-right">{{ ( showUsd ? market.dayVolumeUSD : market.dayVolume ) | formatMoney}}</span>
                             </div>
                         </div>
                     </div>
@@ -56,29 +57,6 @@
                     <span class="px-3 pb-2 mr-auto">{{ $t('trading.tokens') }}</span>
                     <div>
                         <b-dropdown
-                                id="currency"
-                                variant="primary"
-                                class="ml-auto pl-3 pb-2"
-                                :lazy="true"
-                        >
-                            <template slot="button-content">
-                                <span v-if="showUsd">
-                                    {{ $t('trading.currency.usd') }}
-                                </span>
-                                <span v-else>
-                                    {{ $t('trading.currency.crypto') }}
-                                </span>
-                            </template>
-                            <template>
-                                <b-dropdown-item @click="toggleUsd(false)">
-                                    {{ $t('trading.currency.crypto') }}
-                                </b-dropdown-item>
-                                <b-dropdown-item class="usdOption" :disabled="!enableUsd" @click="toggleUsd(true)">
-                                    {{ $t('trading.currency.usd') }}
-                                </b-dropdown-item>
-                            </template>
-                        </b-dropdown>
-                        <b-dropdown
                                 id="customFilter"
                                 variant="primary"
                                 class="px-3 pb-2"
@@ -90,8 +68,7 @@
                             </template>
                             <template>
                                 <b-dropdown-item
-                                        v-for="filter in marketFilters.options"
-                                        v-if="'user' !== filter.key || 'user' === filter.key && userId"
+                                        v-for="filter in marketFiltersOptions"
                                         :key="filter.key"
                                         :value="filter.label"
                                         @click="toggleFilter(filter.key)"
@@ -109,6 +86,7 @@
                     <div class="trading-table table-responsive text-nowrap">
                         <b-table
                                 thead-class="trading-head"
+                                tbody-class="trading-body"
                                 :items="tokens"
                                 :fields="fieldsArray"
                                 :sort-compare="sortCompare"
@@ -119,6 +97,18 @@
                                 :busy="tableLoading"
                                 @sort-changed="sortChanged"
                         >
+                            <template v-slot:[`head(${fields.rank.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                    tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
+                            </template>
                             <template v-slot:[`head(${fields.volume.key})`]="data">
                                 <b-dropdown
                                         id="volume"
@@ -193,11 +183,11 @@
                                             {{ row.item.base }}/
                                         </span>
                                         <avatar
-                                                :image="row.item.quoteImage"
-                                                type="token"
-                                                size="small"
-                                                class="d-inline"
-                                                :key="row.item.quoteImage"
+                                            :image="row.item.quoteImage"
+                                            type="token"
+                                            size="small"
+                                            class="d-inline"
+                                            :key="row.item.quoteImage"
                                         />
                                         {{ row.item.quote }}
                                     </a>
@@ -205,30 +195,33 @@
                                        v-b-tooltip="{title: row.value, boundary:'window', customClass: 'tooltip-custom'}">
                                         <span v-if="showFullPair(row.value)">
                                             <avatar
-                                                    :image="row.item.baseImage"
-                                                    type="token"
-                                                    size="small"
-                                                    :symbol="row.item.base"
-                                                    class="d-inline"
-                                                    :key="row.item.baseImage"
+                                                :image="row.item.baseImage"
+                                                type="token"
+                                                size="small"
+                                                :symbol="row.item.base"
+                                                class="d-inline"
+                                                :key="row.item.baseImage"
                                             />
                                             {{ row.item.base }}/
                                         </span>
                                         <avatar
-                                                :image="row.item.quoteImage"
-                                                type="token"
-                                                size="small"
-                                                class="d-inline"
-                                                :key="row.item.quoteImage"
+                                            v-if="row.item.quoteImage"
+                                            :image="row.item.quoteImage"
+                                            type="token"
+                                            size="small"
+                                            class="d-inline"
+                                            :key="row.item.quoteImage"
                                         />
                                         <span class="token-link">
                                             {{ row.item.quote | truncate(20 - (showFullPair(row.value) ? (row.item.base+1) : 0)) }}
                                         </span>
                                     </a>
                                     <guide
-                                            placement="top"
-                                            max-width="150px"
-                                            v-if="row.item.tokenized">
+                                        v-if="row.item.tokenized &&
+                                        row.item.quoteImage &&
+                                        row.item.cryptoSymbol === MINTME.symbol"
+                                        placement="top"
+                                        max-width="150px">
                                         <template slot="icon">
                                             <img :src="row.item.baseImage" alt="deployed">
                                         </template>
@@ -237,6 +230,18 @@
                                         </template>
                                     </guide>
                                 </div>
+                            </template>
+                            <template v-slot:[`head(${fields.holders.key})`]="data">
+                                <span>
+                                    {{ data.label }}
+                                </span>
+                                <guide class="ml-1 mr-2"
+                                       tippy-class="d-inline-flex align-items-center"
+                                >
+                                    <template slot="body">
+                                        {{ data.field.help }}
+                                    </template>
+                                </guide>
                             </template>
                         </b-table>
                     </div>
@@ -256,8 +261,7 @@
                                 <p class="text-center p-5">{{ $t('trading.no_any_token') }}</p>
                             </div>
                         </template>
-                        <template v-if="marketFilters.selectedFilter === marketFilters.options.deployed.key
-                        && tokens.length">
+                        <template v-if="shouldShowAll">
                             <div class="row justify-content-center">
                                 <b-link @click="toggleFilter('all')">{{ $t('trading.show_all_tokens') }}</b-link>
                             </div>
@@ -283,7 +287,18 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import _ from 'lodash';
+import {
+    BDropdown,
+    BDropdownItem,
+    BTable,
+    BLink,
+    BPagination,
+    VBTooltip,
+} from 'bootstrap-vue';
 import Guide from '../Guide';
 import Avatar from '../Avatar';
 import {
@@ -291,26 +306,35 @@ import {
   WebSocketMixin,
   MoneyFilterMixin,
   RebrandingFilterMixin,
-  NotificationMixin,
   LoggerMixin,
 } from '../../mixins/';
 import {toMoney, formatMoney} from '../../utils';
-import {USD, WEB, BTC, MINTME, ETH} from '../../utils/constants.js';
+import {USD, WEB, BTC, MINTME, USDC, ETH, BNB} from '../../utils/constants.js';
 import Decimal from 'decimal.js/decimal.js';
-import {cryptoSymbols, tokenDeploymentStatus} from '../../utils/constants';
+import {cryptoSymbols, tokenDeploymentStatus, webSymbol, currencyModes} from '../../utils/constants';
 
-const DEPLOYED_FIRST = 1;
-const DEPLOYED_ONLY = 2;
-const AIRDROP_ONLY = 3;
+library.add(faCircleNotch);
 
 export default {
     name: 'Trading',
+    components: {
+        BDropdown,
+        BDropdownItem,
+        BTable,
+        BLink,
+        BPagination,
+        Guide,
+        Avatar,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
         MoneyFilterMixin,
         RebrandingFilterMixin,
-        NotificationMixin,
         LoggerMixin,
     ],
     props: {
@@ -320,30 +344,30 @@ export default {
         coinbaseUrl: String,
         mintmeSupplyUrl: String,
         minimumVolumeForMarketcap: Number,
+        marketsProp: Object,
         sort: String,
         order: Boolean,
-    },
-    components: {
-        Guide,
-        Avatar,
+        filterForTokens: Object,
+        perPage: Number,
+        rowsProp: Number,
     },
     data() {
         return {
+            MINTME: MINTME,
             deployedFirst: ('' === this.sort),
             tableLoading: false,
-            markets: null,
+            markets: this.marketsProp,
             currentPage: this.page,
-            perPage: 25,
-            totalRows: 25,
-            loading: false,
+            totalRows: this.rowsProp,
             sanitizedMarkets: {},
             sanitizedMarketsOnTop: [],
+            currencyModes,
             marketsOnTop: [
                 {currency: BTC.symbol, token: WEB.symbol},
                 {currency: ETH.symbol, token: WEB.symbol},
+                {currency: USDC.symbol, token: WEB.symbol},
+                {currency: BNB.symbol, token: WEB.symbol},
             ],
-            showUsd: true,
-            enableUsd: true,
             stateQueriesIdsTokensMap: new Map(),
             conversionRates: {},
             sortBy: this.sort,
@@ -361,6 +385,14 @@ export default {
                     deployed: {
                         key: 'deployed',
                         label: this.$t('trading.deployed.label'),
+                    },
+                    deployedEth: {
+                        key: 'deployedEth',
+                        label: this.$t('trading.deployed_eth.label'),
+                    },
+                    deployedBnb: {
+                        key: 'deployedBnb',
+                        label: this.$t('trading.deployed_bnb.label'),
                     },
                     airdrop: {
                         key: 'airdrop',
@@ -403,15 +435,25 @@ export default {
         };
     },
     computed: {
+        currencyMode: function() {
+            return localStorage.getItem('_currency_mode');
+        },
+        showUsd: function() {
+            return this.currencyMode === currencyModes.usd.value;
+        },
         marketsHiddenNames: function() {
             return undefined === typeof this.markets ? {} : Object.keys(this.markets);
         },
         tokens: function() {
             let tokens = Object.values(this.sanitizedMarkets);
+
             if ('' === this.sortBy) {
                 tokens.sort((first, second) => {
-                    if (first.tokenized !== second.tokenized) {
-                        return first.tokenized ? -1 : 1;
+                    let firstMintmeDeployed = first.tokenized && webSymbol === first.cryptoSymbol;
+                    let secondMintmeDeployed = second.tokenized && webSymbol === second.cryptoSymbol;
+
+                    if (firstMintmeDeployed !== secondMintmeDeployed) {
+                        return firstMintmeDeployed ? -1 : 1;
                     }
                     return parseFloat(second.monthVolume) - parseFloat(first.monthVolume);
                 });
@@ -428,13 +470,19 @@ export default {
             return tokens;
         },
         loaded: function() {
-            return this.markets !== null && !this.loading;
+            return this.markets !== null;
         },
         marketsOnTopIsLoaded: function() {
             return this.sanitizedMarketsOnTop.length;
         },
         fields: function() {
             return {
+                rank: {
+                    key: 'rank',
+                    label: this.$t('trading.fields.rank'),
+                    sortable: true,
+                    help: this.$t('trading.fields.rank.help'),
+                },
                 pair: {
                     key: 'pair',
                     label: this.$t('trading.fields.pair'),
@@ -464,6 +512,12 @@ export default {
                     sortable: true,
                     formatter: 'marketCap' === this.activeMarketCap ? this.marketCapFormatter : formatMoney,
                 },
+                holders: {
+                    key: 'holders',
+                    label: this.$t('trading.fields.holders'),
+                    sortable: true,
+                    help: this.$t('trading.fields.holders.help'),
+                },
             };
         },
         fieldsArray: function() {
@@ -473,6 +527,42 @@ export default {
             return this.showUsd
                 ? this.globalMarketCaps[USD.symbol].toLocaleString() + ' ' + USD.symbol
                 : this.globalMarketCaps[BTC.symbol].toLocaleString() + ' ' + BTC.symbol;
+        },
+        filterDeployedFirst: function() {
+            return this.filterForTokens.deployed_first || 0;
+        },
+        filterDeployedOnlyMintme: function() {
+            return this.filterForTokens.deployed_only_mintme || 0;
+        },
+        filterAirdropOnly: function() {
+            return this.filterForTokens.airdrop_only || 0;
+        },
+        filterDeployedOnlyEth: function() {
+            return this.filterForTokens.deployed_only_eth || 0;
+        },
+        filterDeployedOnlyBnb: function() {
+            return this.filterForTokens.deployed_only_bnb || 0;
+        },
+        shouldShowAll: function() {
+            const totalPages = Math.ceil(this.totalRows / this.perPage);
+
+            return [
+                    this.marketFilters.options.deployed.key,
+                    this.marketFilters.options.deployedEth.key,
+                    this.marketFilters.options.deployedBnb.key,
+                ].includes(this.marketFilters.selectedFilter)
+                && this.tokens.length
+                && this.currentPage === totalPages;
+        },
+        marketFiltersOptions: function() {
+            const options = Object.values(this.marketFilters.options);
+            const allKey = this.marketFilters.options.all.key;
+            const userKey = this.marketFilters.options.user.key;
+
+            return options.filter((filter) =>
+                (userKey !== filter.key || this.userId) &&
+                allKey !== filter.key
+            );
         },
     },
     mounted() {
@@ -486,68 +576,49 @@ export default {
             let page = this.marketFilters.selectedFilter !== this.marketFilters.options.user.key
                 && (
                     value === this.marketFilters.options.deployed.key
+                    || value === this.marketFilters.options.deployedEth.key
+                    || value === this.marketFilters.options.deployedBnb.key
                     || value === this.marketFilters.options.all.key
                     || value === this.marketFilters.options.airdrop.key
                 )
                 && this.tokens.some((token) => token.tokenized) ? this.currentPage : 1;
             this.marketFilters.userSelected = true;
             this.marketFilters.selectedFilter = value;
-            this.sortBy = '';
+            this.sortBy = 'rank';
             this.sortDesc = true;
             this.updateMarkets(page, true);
         },
-        toggleUsd: function(show) {
-            this.showUsd = show;
-        },
-        disableUsd: function() {
-            this.showUsd = false;
-            this.enableUsd = false;
-        },
         initialLoad: function() {
-            this.loading = true;
             this.fetchGlobalMarketCap();
-            let updateDataPromise = this.updateRawMarkets(this.currentPage, this.deployedFirst);
-            let conversionRatesPromise = this.fetchConversionRates();
+            this.updateSanitizedMarkets();
+            this.fetchConversionRates().catch((e) => e);
 
-            Promise.all([updateDataPromise, conversionRatesPromise.catch((e) => e)])
-                .then((res) => {
-                    this.updateSanitizedMarkets();
-                    this.loading = false;
-
-                    this.addMessageHandler((result) => {
-                        if ('state.update' === result.method) {
-                            this.sanitizeMarket(result);
-                            this.requestMonthInfo(result.params[0]);
-                        } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
-                            this.updateMonthVolume(result.id, result.result);
-                        }
-                    });
-                });
+            this.addMessageHandler((result) => {
+                if ('state.update' === result.method) {
+                    this.sanitizeMarket(result);
+                    this.requestMonthInfo(result.params[0]);
+                } else if (Array.from(this.stateQueriesIdsTokensMap.keys()).indexOf(result.id) != -1) {
+                    this.updateMonthVolume(result.id, result.result);
+                }
+            }, null, 'Trading');
         },
         sortCompare: function(a, b, key) {
-            let pair = false;
-            this.marketsOnTop.forEach((market)=> {
-                let currency = this.rebrandingFunc(market.currency);
-                let token = this.rebrandingFunc(market.token);
-
-                if (b.pair === currency + '/' + token || a.pair === currency + '/' + token) {
-                    pair = true;
-                }
-            });
             let numeric = key !== this.fields.pair.key;
 
             if (numeric || (typeof a[key] === 'number' && typeof b[key] === 'number')) {
                 let first = parseFloat(a[key]);
                 let second = parseFloat(b[key]);
 
+                let rank = key === this.fields.rank.key;
+
                 let compareResult = first < second ? -1 : ( first > second ? 1 : 0);
 
-                return pair ? 0 : compareResult;
+                return (-1) ** rank * compareResult;
             }
 
             // If the value is not numeric, currently only pair column
             // b and a are reversed so that 'pair' column is ordered A-Z on first click (DESC, would be Z-A)
-            return pair ? 0 : b[key].localeCompare(a[key]);
+            return b[key].localeCompare(a[key]);
         },
         updateRawMarkets: function(page = null, deployedFirst = null) {
             return new Promise((resolve, reject) => {
@@ -557,7 +628,7 @@ export default {
                 let sort = this.sortBy.replace(USD.symbol, '');
 
                 // So that 'pair' column will be sorted A-Z on first click (which is DESC and would be Z-A)
-                let order = sort === this.fields.pair.key ? !this.sortDesc : this.sortDesc;
+                let order = this.fields.pair.key === sort ? !this.sortDesc : this.sortDesc;
                 let params = {
                     page,
                     sort,
@@ -569,19 +640,28 @@ export default {
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                 ) {
-                    params.filter = DEPLOYED_ONLY;
+                    params.filter = this.filterDeployedOnlyMintme;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedEth.key
+                ) {
+                    params.filter = this.filterDeployedOnlyEth;
+                } else if (
+                    this.marketFilters.selectedFilter === this.marketFilters.options.deployedBnb.key
+                ) {
+                    params.filter = this.filterDeployedOnlyBnb;
                 } else if (
                     this.marketFilters.selectedFilter === this.marketFilters.options.airdrop.key
                 ) {
-                    params.filter = AIRDROP_ONLY;
+                    params.filter = this.filterAirdropOnly;
                 } else if (deployedFirst) {
-                    params.filter = DEPLOYED_FIRST;
+                    params.filter = this.filterDeployedFirst;
                 }
 
                 this.$axios.retry.get(this.$routing.generate('markets_info', params))
                     .then((res) => {
                         if (
-                            Object.keys(res.data.markets).length === 2 // there are only WEBBTC and WEBETH markets
+                            // there are only WEBBTC,WEBETH and WEBUSDC markets
+                            Object.keys(res.data.markets).length === 3
                             && !this.marketFilters.userSelected
                             && this.marketFilters.selectedFilter === this.marketFilters.options.deployed.key
                         ) {
@@ -603,7 +683,6 @@ export default {
                         this.deployedFirst = deployedFirst;
                         this.currentPage = page;
                         this.markets = res.data.markets;
-                        this.perPage = res.data.limit;
                         this.totalRows = res.data.rows;
 
                         if (window.history.replaceState) {
@@ -620,7 +699,6 @@ export default {
                         resolve();
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_markets_data'));
                         this.sendLogs('error', 'Can not update the markets data', err);
                         reject(err);
                     });
@@ -649,27 +727,36 @@ export default {
             const supply = market.supply;
             const monthVolume = market.monthVolume;
             const buyDepth = market.buyDepth;
+            const marketCap = !market.marketCap ||
+                WEB.symbol === marketCurrency &&
+                parseFloat(monthVolume) < this.minimumVolumeForMarketcap
+                    ? 0
+                    : market.marketCap;
 
             const marketOnTopIndex = this.getMarketOnTopIndex(marketCurrency, marketToken);
 
             const tokenized = market.quote.deploymentStatus === tokenDeploymentStatus.deployed;
 
             const baseImage = market.base.image.avatar_small;
-            const quoteImage = market.quote.image.avatar_small;
+            const quoteImage = market.quote.image ? market.quote.image.avatar_small : '';
 
             const sanitizedMarket = this.getSanitizedMarket(
                 marketCurrency,
                 marketToken,
                 changePercentage,
                 marketLastPrice,
-                parseFloat(marketInfo.deal),
+                parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 monthVolume,
                 supply,
                 marketPrecision,
                 tokenized,
                 buyDepth,
                 baseImage,
-                quoteImage
+                quoteImage,
+                market.quote.cryptoSymbol,
+                marketCap,
+                market.rank || 0,
+                market.holders || 0
             );
 
             if (marketOnTopIndex > -1) {
@@ -682,7 +769,7 @@ export default {
                 ...market,
                 openPrice: marketInfo.open,
                 lastPrice: marketInfo.last,
-                dayVolume: marketInfo.deal,
+                dayVolume: parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
             };
         },
         getSanitizedMarket: function(
@@ -697,15 +784,18 @@ export default {
             tokenized,
             buyDepth,
             baseImage,
-            quoteImage
+            quoteImage,
+            cryptoSymbol,
+            marketCap = 0,
+            rank = 0,
+            holders = 0,
         ) {
             let hiddenName = this.findHiddenName(token);
-            let marketCap = WEB.symbol === currency && parseFloat(monthVolume) < this.minimumVolumeForMarketcap
-                ? 0
-                : Decimal.mul(lastPrice, supply);
 
             return {
-                pair: BTC.symbol === currency || ETH.symbol === currency ? `${token}/${currency}` : `${token}`,
+                pair: [BTC.symbol, ETH.symbol, WEB.symbol, USDC.symbol, BNB.symbol].includes(token)
+                    ? `${token}/${currency}`
+                    : `${token}`,
                 change: toMoney(changePercentage, 2) + '%',
                 lastPrice: toMoney(lastPrice, subunit) + ' ' + currency,
                 dayVolume: this.toMoney(dayVolume, BTC.symbol === currency ? 4 : 2) + ' ' + currency,
@@ -725,6 +815,9 @@ export default {
                 quote: token,
                 baseImage,
                 quoteImage,
+                cryptoSymbol,
+                rank,
+                holders,
             };
         },
         getMarketOnTopIndex: function(currency, token) {
@@ -741,6 +834,7 @@ export default {
         },
         updateSanitizedMarkets: function() {
             this.sanitizedMarkets = {};
+
             for (let market in this.markets) {
                 if (this.markets.hasOwnProperty(market)) {
                     const cryptoSymbol = this.markets[market].base.symbol;
@@ -748,6 +842,7 @@ export default {
                     const marketOnTopIndex = this.getMarketOnTopIndex(cryptoSymbol, tokenName);
                     const tokenized = this.markets[market].quote.deploymentStatus === tokenDeploymentStatus.deployed;
                     const webBtcOnTop = this.marketsOnTop[0];
+
                     if (marketOnTopIndex > -1 &&
                         cryptoSymbol === webBtcOnTop.currency &&
                         tokenName === webBtcOnTop.token) {
@@ -762,22 +857,28 @@ export default {
                         this.markets[market].supply = 1e7;
                     }
 
+                    const selectedMarket = this.markets[market];
+
                     const sanitizedMarket = this.getSanitizedMarket(
                         cryptoSymbol,
                         tokenName,
                         this.getPercentage(
-                            parseFloat(this.markets[market].lastPrice),
-                            parseFloat(this.markets[market].openPrice)
+                            parseFloat(selectedMarket.lastPrice),
+                            parseFloat(selectedMarket.openPrice)
                         ),
-                        parseFloat(this.markets[market].lastPrice),
-                        parseFloat(this.markets[market].dayVolume),
-                        parseFloat(this.markets[market].monthVolume),
-                        this.markets[market].supply,
-                        this.markets[market].base.subunit,
+                        parseFloat(selectedMarket.lastPrice),
+                        parseFloat(selectedMarket.dayVolume),
+                        parseFloat(selectedMarket.monthVolume),
+                        selectedMarket.supply,
+                        selectedMarket.base.subunit,
                         tokenized,
                         parseFloat(this.markets[market].buyDepth),
-                        this.markets[market].base.image.avatar_small,
-                        this.markets[market].quote.image.avatar_small
+                        selectedMarket.base.image.avatar_small,
+                        selectedMarket.quote.image? selectedMarket.quote.image.avatar_small: '',
+                        selectedMarket.quote.cryptoSymbol,
+                        selectedMarket.marketCap || 0,
+                        selectedMarket.rank || 0,
+                        selectedMarket.holders || 0
                     );
                     if (marketOnTopIndex > -1) {
                         this.$set(this.sanitizedMarketsOnTop, marketOnTopIndex, sanitizedMarket);
@@ -830,13 +931,17 @@ export default {
                 ),
                 market.lastPrice,
                 market.dayVolume,
-                market.monthVolume = marketInfo.deal,
+                market.monthVolume = parseFloat(marketInfo.deal) + parseFloat(marketInfo.dealDonation),
                 market.supply,
                 market.base.subunit,
                 tokenized,
                 market.buyDepth,
                 market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.quote.image ? market.quote.image.avatar_small: '',
+                market.quote.cryptoSymbol,
+                market.marketCap || 0,
+                market.rank || 0,
+                market.holders || 0
                 );
 
             if (marketOnTopIndex > -1) {
@@ -872,7 +977,6 @@ export default {
                     })
                     .catch((err) => {
                         this.$emit('disable-usd');
-                        this.notifyError(this.$t('toasted.error.fetching_exchange_rates'));
                         this.sendLogs('error', 'Error fetching exchange rates for cryptos', err);
                         reject();
                     });
@@ -900,7 +1004,6 @@ export default {
                         resolve(res.data);
                     })
                     .catch((err) => {
-                        this.notifyError(this.$t('toasted.error.can_not_update_supply'));
                         this.sendLogs('error', 'Can not update MINTME circulation supply', err);
                         reject(err);
                     });
@@ -923,7 +1026,11 @@ export default {
                 false,
                 market.buyDepth,
                 market.base.image.avatar_small,
-                market.quote.image.avatar_small
+                market.quote.image.avatar_small,
+                market.quote.cryptoSymbol,
+                market.marketCap,
+                market.rank,
+                market.holders
             );
             this.$set(this.sanitizedMarketsOnTop, 0, market);
         },
@@ -951,7 +1058,8 @@ export default {
             return toMoney(val, precision);
         },
         marketCapFormatter: function(value, key, item) {
-            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap
+            return MINTME.symbol === item.base && parseFloat(item.monthVolume) < this.minimumVolumeForMarketcap ||
+                ETH.symbol === item.cryptoSymbol
                 ? '-'
                 : value;
         },

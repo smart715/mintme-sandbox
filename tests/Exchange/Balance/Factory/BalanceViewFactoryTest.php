@@ -5,10 +5,12 @@ namespace App\Tests\Exchange\Balance\Factory;
 use App\Entity\Crypto;
 use App\Entity\Token\LockIn;
 use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Factory\BalanceView;
 use App\Exchange\Balance\Factory\BalanceViewFactory;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use Money\Currency;
@@ -20,37 +22,69 @@ class BalanceViewFactoryTest extends TestCase
     public function testCreate(): void
     {
         $tokens = [
-            ['name' => 'foo', 'hidden' => true, 'crypto' => true, 'lockIn' => true, 'status' => 'not-deployed'],
-            ['name' => 'bar', 'hidden' => false, 'crypto' => true, 'lockIn' => false, 'status' => 'not-deployed'],
-            ['name' => 'baz', 'hidden' => false, 'crypto' => false, 'lockIn' => true, 'status' => 'pending'],
-            ['name' => 'qux', 'hidden' => true, 'crypto' => false, 'lockIn' => false, 'status' => 'pending'],
-            ['name' => 'empty', 'hidden' => null, 'crypto' => false, 'lockIn' => false, 'status' => 'deployed'],
-            ['name' => 'lok', 'hidden' => false, 'crypto' => true, 'lockIn' => true, 'status' => 'deployed'],
+            [
+                'id' => null,
+                'name' => 'foo',
+                'hidden' => true,
+                'crypto' => true,
+                'lockIn' => true,
+                'status' => 'not-deployed',
+            ],
+            [
+                'id' => null,
+                'name' => 'bar',
+                'hidden' => false,
+                'crypto' => true,
+                'lockIn' => false,
+                'status' => 'not-deployed',
+            ],
+            ['id' => 1, 'name' => 'baz', 'hidden' => false, 'crypto' => false, 'lockIn' => true, 'status' => 'pending'],
+            ['id' => 2, 'name' => 'qux', 'hidden' => true, 'crypto' => false, 'lockIn' => false, 'status' => 'pending'],
+            [
+                'id' => null,
+                'name' => 'empty',
+                'hidden' => null,
+                'crypto' => false,
+                'lockIn' => false,
+                'status' => 'deployed',
+            ],
+            [
+                'id' => null,
+                'name' => 'lok',
+                'hidden' => false,
+                'crypto' => true,
+                'lockIn' => true,
+                'status' => 'deployed',
+            ],
         ];
 
         $factory = new BalanceViewFactory(
+            $this->mockCryptoManager(),
             $this->mockTokenManager($tokens),
             $this->mockTokenNameConverter(),
             4
         );
 
+        $user = $this->createMock(User::class);
+
         $view = $factory->create(
             $this->mockBalanceResultContainer(array_map(function (array $tok): string {
                 return $tok['name'];
-            }, $tokens))
+            }, $tokens)),
+            $user
         );
 
         $this->assertEquals([
-            'foo' => ['1', '1', '1', 'FOO', 'fooBAR', 4, false, true, false],
-            'bar' => ['1', '1', null, 'FOO', 'barBAR', 4, true, true, false],
-            'baz' => ['1', null, '1', 'baz', 'bazBAR', 4, false, false, false],
-            'qux' => ['1', null, null, 'qux', 'quxBAR', 4, false, false, false],
-            'lok' => ['1', '1', '1', 'FOO', 'lokBAR', 4, true, true, true],
+            'foo' => ['1', '1', '1', 'foo', 'fooBAR', 4, false, true, false],
+            'bar' => ['1', '1', null, 'bar', 'barBAR', 4, true, true, false],
+            'baz' => ['1', '1', '1', 'baz', 'bazBAR', 4, false, false, false],
+            'qux' => ['1', '1', null, 'qux', 'quxBAR', 4, false, false, false],
+            'lok' => ['1', '1', '1', 'lok', 'lokBAR', 4, true, true, true],
         ], array_map(function (BalanceView $view): array {
             return [
                 $view->getAvailable()->getAmount(),
-                $view->getFee() ? $view->getFee()->getAmount(): null,
-                $view->getFrozen() ? $view->getFrozen()->getAmount(): null,
+                $view->getFee()->getAmount(),
+                $view->getFrozen() ? $view->getFrozen()->getAmount() : null,
                 $view->getFullname(),
                 $view->getIdentifier(),
                 $view->getSubunit(),
@@ -78,7 +112,14 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (false === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden'], $token['status']);
+                    return $this->mockToken(
+                        $token['id'],
+                        $name,
+                        $token['crypto'],
+                        $token['lockIn'],
+                        $token['hidden'],
+                        $token['status']
+                    );
                 }
             }
 
@@ -88,7 +129,14 @@ class BalanceViewFactoryTest extends TestCase
         $tm->method('findByHiddenName')->willReturnCallback(function ($name) use ($tokens): ?Token {
             foreach ($tokens as $token) {
                 if (true === $token['hidden'] && $token['name'] === $name) {
-                    return $this->mockToken($name, $token['crypto'], $token['lockIn'], $token['hidden'], $token['status']);
+                    return $this->mockToken(
+                        $token['id'],
+                        $name,
+                        $token['crypto'],
+                        $token['lockIn'],
+                        $token['hidden'],
+                        $token['status']
+                    );
                 }
             }
 
@@ -113,13 +161,21 @@ class BalanceViewFactoryTest extends TestCase
         return $converter;
     }
 
-    private function mockToken(string $name, bool $hasCrypto, bool $hasLockIn, bool $isHidden, string $status): Token
-    {
+    private function mockToken(
+        ?int $id,
+        string $name,
+        bool $hasCrypto,
+        bool $hasLockIn,
+        bool $isHidden,
+        string $status
+    ): Token {
         $tok = $this->createMock(Token::class);
         $tok->method('getName')->willReturn($name);
         $tok->method('getCrypto')->willReturn(
             $hasCrypto ? $this->mockCrypto($isHidden) : null
         );
+        $tok->method('getId')->willReturn($id);
+        $tok->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
 
         $lockIn = $this->createMock(LockIn::class);
         $lockIn->method('getFrozenAmount')->willReturn(new Money(1, new Currency('FOO')));
@@ -135,11 +191,20 @@ class BalanceViewFactoryTest extends TestCase
     {
         $crypto = $this->createMock(Crypto::class);
         $crypto->method('getName')->willReturn('FOO');
-        $crypto->method('getFee')->willReturn(new Money(1, new Currency('FOO')));
+        $crypto->method('getFee')->willReturn(new Money(2, new Currency('FOO')));
         $crypto->method('getShowSubunit')->willReturn(4);
         $crypto->method('isTradable')->willReturn(true);
         $crypto->method('isExchangeble')->willReturn($isHidden ? false : true);
 
         return $crypto;
+    }
+
+    private function mockCryptoManager(): CryptoManagerInterface
+    {
+        $cm = $this->createMock(CryptoManagerInterface::class);
+
+        $cm->method('findBySymbol')->willReturn(null);
+
+        return $cm;
     }
 }

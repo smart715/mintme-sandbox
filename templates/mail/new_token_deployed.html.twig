@@ -1,22 +1,32 @@
 {% extends 'mail/layout.html.twig' %}
-
 {% block content %}
-    <table width="100%">
-        <tr>
-            <th>
-                <h3 class="text-dark-white" style="font-size: 28px; margin-bottom:0px; font-family: Helvetica, Arial, sans-serif;font-weight: normal;" >{% trans %}hello{% endtrans %}</h3>
-                <h1 class="text-blue" style="font-size: 34px; margin-top: 0px; margin-bottom: 0px;"><strong>{{username}}</strong></h1>
-            </th>
-        </tr>
-        <tr>
-            <th>
-                <p class="text-dark-white" style="margin-right:20px;margin-bottom:0px;margin-left:20px;font-weight: normal;">
-                    {% trans with {'%urlToken%':absolute_url(path('token_show', {'name': tokenName })), '%tokenName%': tokenName} %}deployed.msg{% endtrans %}
-                </p>
-            </th>
-        </tr>
-        <tr>
-            <th class="text-dark-white" style="height:20px;font-size:0px;line-height:20px;">&#xA0;</th>
-        </tr>
-    </table>
+<div style="width:100%;max-width:600px;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;display:inline-block;vertical-align:middle;">
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#ffffff;" bgcolor="#ffffff">
+    <tr>
+        <td align="center" width="600" style="width:100%;Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;line-height:16px;height:16px;background-color:#ffffff;" bgcolor="#ffffff">
+            <img alt="Blockchain" src="{{ absolute_url(asset('build/images/Blockchain.png')) }}" width="120" style="width:120px;height:auto;border:none;outline:0;text-align:center;text-decoration:none;color:#ffffff;-ms-interpolation-mode:bicubic;" />
+            <p style="Margin:0 0 12px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans from 'messages' %} hello {% endtrans %}
+            </p>
+            <p style="Margin:0 0 18px 0;padding:0;word-break:break-all;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:30px;font-weight:400;line-height:30px;color:#2199e8;">{{ username }}
+            </p>
+            <p style="Margin:0 0 20px 0;padding:0;text-align:center;vertical-align:middle;font-family:Helvetica,Arial,sans-serif;font-size:20px;font-weight:400;line-height:26px;color:#0a0a0a;">{% trans with {'%tokenName%': tokenName} %} mail.deployed.msg {% endtrans %}.
+            </p>
+        </td>
+    </tr>
+</table>
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+    <tr>
+        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:18px;height:18px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+    </tr>
+</table>
+{% set url = absolute_url(path('token_show', {'name': tokenName })) %}
+{% set vars = {'href': url, 'text': 'mail.deployed.text_link' } %}
+{% include 'mail/mail_block_button.html.twig' with vars %}
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f3f3f3;" bgcolor="#f3f3f3">
+    <tr>
+        <td align="center" style="Margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;font-size:0;line-height:10px;height:10px;background-color:#f3f3f3;" bgcolor="#f3f3f3">&nbsp;</td>
+    </tr>
+</table>
+</div>
 {% endblock %}
+

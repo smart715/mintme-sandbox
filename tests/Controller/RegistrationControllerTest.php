@@ -10,7 +10,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $email = $this->generateEmail();
 
-        $this->client->request('GET', '/register/');
+        $this->client->request('GET', self::LOCALHOST . '/register/');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -27,9 +27,9 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertTrue($this->client->getResponse()->isRedirect('/register/confirmed'));
         $this->client->followRedirect();
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'The user has been created successfully.',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -37,7 +37,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $str = $this->generateString();
 
-        $this->client->request('GET', '/register/');
+        $this->client->request('GET', self::LOCALHOST . '/register/');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -51,9 +51,9 @@ class RegistrationControllerTest extends WebTestCase
             ]
         );
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Invalid email address.',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
     }
 
@@ -61,7 +61,7 @@ class RegistrationControllerTest extends WebTestCase
     {
         $email = $this->generateEmail();
 
-        $this->client->request('GET', '/sign-up');
+        $this->client->request('GET', self::LOCALHOST . '/sign-up');
         $this->client->submitForm(
             'Sign Up',
             [
@@ -83,9 +83,9 @@ class RegistrationControllerTest extends WebTestCase
             'email' => $email,
         ]);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'The user has been created successfully.',
-            $this->client->getResponse()->getContent()
+            (string)$this->client->getResponse()->getContent()
         );
 
         $this->assertEquals('sign-up', $user->getBonus()->getType());
@@ -97,17 +97,16 @@ class RegistrationControllerTest extends WebTestCase
         $this->register($this->client);
         $tokName = $this->createToken($this->client);
 
-        $this->client->request('GET', '/logout');
-        $this->client->followRedirect();
+        $fooClient = self::createClient();
 
-        $this->client->request('GET', '/token/' . $tokName . '/trade');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->request('GET', self::LOCALHOST . '/token/' . $tokName . '/trade');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
-        $this->client->clickLink('Sign Up');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $fooClient->clickLink('Sign Up');
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
 
         $email = $this->generateEmail();
-        $this->client->submitForm(
+        $fooClient->submitForm(
             'Sign Up',
             [
                 'fos_user_registration_form[email]' => $email,
@@ -120,12 +119,12 @@ class RegistrationControllerTest extends WebTestCase
             ]
         );
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('/register/confirmed'));
-        $this->client->followRedirect();
-        $this->assertTrue($this->client->getResponse()->isRedirect('http://localhost/token/' . $tokName . '/trade'));
-        $this->assertTrue($this->client->getResponse()->isRedirection());
-        $this->client->followRedirect();
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
-        $this->assertContains($tokName, $this->client->getResponse()->getContent());
+        $this->assertTrue($fooClient->getResponse()->isRedirect('/register/confirmed'));
+        $fooClient->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isRedirect(self::LOCALHOST . '/token/' . $tokName . '/trade'));
+        $this->assertTrue($fooClient->getResponse()->isRedirection());
+        $fooClient->followRedirect();
+        $this->assertTrue($fooClient->getResponse()->isSuccessful());
+        $this->assertStringContainsString($tokName, (string)$fooClient->getResponse()->getContent());
     }
 }

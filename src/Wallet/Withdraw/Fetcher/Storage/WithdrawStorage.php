@@ -3,12 +3,12 @@
 namespace App\Wallet\Withdraw\Fetcher\Storage;
 
 use App\Communications\JsonRpcInterface;
-use Dompdf\Exception;
 
 class WithdrawStorage implements StorageAdapterInterface
 {
     private const RPC_HISTORY = 'history';
     private const RPC_BALANCE = 'balance';
+    private const RPC_ADDRESS_CODE = 'code';
 
     /** @var JsonRpcInterface */
     private $jsonRpc;
@@ -39,6 +39,17 @@ class WithdrawStorage implements StorageAdapterInterface
         return $this->sendRequest(self::RPC_BALANCE, [
             'crypto' => $symbol,
         ])['balance'] ?? '0';
+    }
+
+    public function requestAddressCode(string $address, String $crypto): bool
+    {
+        return '0x' === $this->sendRequest(
+            self::RPC_ADDRESS_CODE,
+            [
+                    'address' => $address,
+                    'crypto' => $crypto,
+            ]
+        )['code'];
     }
 
     private function sendRequest(string $method, array $params): array

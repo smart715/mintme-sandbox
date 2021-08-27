@@ -10,11 +10,16 @@
         name: 'Notification',
         mixins: [NotificationMixin],
         props: {
-            type: String,
+            typeProp: String,
             duration: {
                 type: Number,
                 default: 5000,
             },
+        },
+        data() {
+            return {
+                type: this.typeProp,
+            };
         },
         mounted: function() {
             this.type = this.type === 'danger' ? 'error' : this.type;

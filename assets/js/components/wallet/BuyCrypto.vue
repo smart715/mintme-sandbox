@@ -29,7 +29,9 @@
             :partner-id="coinifyPartnerId"
             :crypto-currencies="coinifyCryptoCurrencies"
             :addresses="addresses"
+            :addresses-signature="addressesSignature"
             :refresh-token="refreshToken"
+            :predefined-tokens="predefinedTokens"
             @close="modalVisible = false"
         />
     </div>
@@ -37,7 +39,11 @@
 
 <script>
 import BuyCryptoModal from '../modal/BuyCryptoModal';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCcVisa, faCcMastercard} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+
+library.add(faCcVisa, faCcMastercard);
 
 export default {
     name: 'BuyCrypto',
@@ -50,24 +56,40 @@ export default {
         coinifyPartnerId: Number,
         coinifyCryptoCurrencies: Array,
         addresses: Object,
+        addressesSignature: Object,
+        predefinedTokens: Array,
+        mintmeExchangeMailSent: Boolean,
     },
     data() {
         return {
             modalVisible: false,
             refreshToken: null,
+            isExchangeMailSent: false,
         };
     },
     methods: {
         buyCrypto: function() {
             this.modalVisible = true;
+            this.getRefreshToken();
+
+            if (!this.mintmeExchangeMailSent && !this.isExchangeMailSent) {
+                this.$axios.single.post(this.$routing.generate('send_exchange_mintme_mail'))
+                    .then(() => {
+                        this.isExchangeMailSent = true;
+                    })
+                    .catch((err) => {
+                        this.sendLogs('error', 'Can not send exchange cryptos mail', err);
+                    });
+            }
         },
         getRefreshToken: function() {
+            if (this.refreshToken) {
+                return;
+            }
+
             this.$axios.retry.get(this.$routing.generate('refresh_token'))
                 .then((res) => this.refreshToken = res.data);
         },
-    },
-    mounted() {
-        this.getRefreshToken();
     },
 };
 </script>

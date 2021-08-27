@@ -15,16 +15,15 @@
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table mb-0" ref="tableData">
-                    <template v-if="loaded">
+                <template v-if="loaded">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
-                            ref="table"
                             :items="ordersList"
                             :fields="fields">
 
-                            <template v-slot:head(pricePerQuote)="row">
+                            <template v-slot:head(pricePerQuote)>
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
                                     {{ $t('trade.history.price_per') }} {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
                                 </span>
@@ -33,7 +32,7 @@
                                 </span>
                             </template>
 
-                            <template v-slot:head(quoteAmount)="row">
+                            <template v-slot:head(quoteAmount)>
                                 <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
                                     {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} {{ $t('trade.history.amount') }}
                                 </span>
@@ -94,8 +93,11 @@
                             <template v-slot:cell(baseAmount)="row">
                                 <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
                                     <div class="col-11 pl-0 ml-0">
-                                        <span class="d-inline-block truncate-name flex-grow-1">
-                                            {{ row.value | currencyConvert(rate, 4) }}
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="currencyMode === currencyModes.usd.value ?
+                                                currencyConvert(row.value, rate, 2) :
+                                                row.value">
                                         </span>
                                     </div>
                                 </div>
@@ -106,31 +108,35 @@
                                 </span>
                             </template>
                         </b-table>
-                        <div v-if="!hasOrders">
-                            <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
-                        </div>
-                        <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="p-5 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                </div>
+                    </div>
+                    <div v-if="!hasOrders">
+                        <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
+                    </div>
+                    <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import Decimal from 'decimal.js';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import Guide from '../Guide';
 import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
 import {mapGetters} from 'vuex';
-import {USD, usdSign} from '../../utils/constants.js';
-import Decimal from 'decimal.js';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
 import {GENERAL} from '../../utils/constants';
 import {
     WebSocketMixin,
@@ -140,8 +146,18 @@ import {
     OrderMixin,
 } from '../../mixins/';
 
+library.add(faCircleNotch, faTimes);
+
 export default {
     name: 'TradeTradeHistory',
+    components: {
+        BTable,
+        Guide,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
     mixins: [
         WebSocketMixin,
         FiltersMixin,
@@ -151,13 +167,12 @@ export default {
     ],
     props: {
         market: Object,
-    },
-    components: {
-        Guide,
+        currencyMode: String,
     },
     data() {
         return {
             maxLengthToTruncate: 4,
+            currencyModes,
             fields: [
                 {
                     key: 'type',
@@ -189,6 +204,8 @@ export default {
                     label: this.$t('trade.history.time'),
                 },
             ],
+            currentPage: 1,
+            limit: 100,
         };
     },
     computed: {
@@ -226,8 +243,8 @@ export default {
             return this.tableData !== null;
         },
         lastId: function() {
-            return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
-                this.tableData[0].id :
+            return this.tableData && this.tableData.length && this.tableData[this.tableData.length - 1].hasOwnProperty('id') ?
+                this.tableData[this.tableData.length - 1].id :
                 0;
         },
         rate: function() {
@@ -262,21 +279,18 @@ export default {
                         this.sendLogs('error', 'Can not get executed order details', err);
                     });
                 }
-            }, 'trade-tableData-update-deals');
+            }, 'trade-tableData-update-deals', 'TradeTradeHistory');
         }).catch((err) => {
             this.sendLogs('error', 'Can not update table data', err);
         });
     },
     methods: {
-        startScrollListeningOnce: function(val) {
-            // Disable listener from mixin
-        },
         updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
-                    id: this.lastId,
+                    id: this.currentPage,
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
@@ -286,10 +300,15 @@ export default {
                         return resolve([]);
                     }
 
-                    this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-
-                    if (this.$refs.table) {
-                        this.$refs.table.hasOwnProperty('refresh') ? this.$refs.table.refresh() : null;
+                    if (!attach) {
+                        this.tableData = result.data;
+                        this.currentPage = 2;
+                    } else {
+                        let resultData = result.data.filter((order) => order.id < this.lastId);
+                        this.tableData = this.tableData.concat(resultData);
+                        if (resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
+                            this.currentPage++;
+                        }
                     }
 
                     resolve(result.data);

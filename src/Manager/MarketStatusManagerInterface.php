@@ -33,7 +33,7 @@ interface MarketStatusManagerInterface
     /**
      * @return array<MarketStatus>
      */
-    public function getAllMarketsInfo(): array;
+    public function getCryptoAndDeployedMarketsInfo(?int $offset = null, ?int $limit = null): array;
 
     /**
      * @param array $market

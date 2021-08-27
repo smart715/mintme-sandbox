@@ -10,6 +10,7 @@ use App\Form\QuickRegistrationType;
 use App\Form\RegistrationType;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapperInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
@@ -31,8 +32,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  */
 class HackerController extends AbstractController
 {
-    public const BTC_SYMBOL = 'BTC';
-
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
@@ -66,17 +65,36 @@ class HackerController extends AbstractController
             return $this->redirect($referer);
         }
 
-        $amount = self::BTC_SYMBOL === $crypto->getSymbol()
-            ? '0.001'
-            : (Token::ETH_SYMBOL === $crypto->getSymbol() ? '0.05' : '100');
+        $symbol = $crypto->getSymbol();
+
+        switch ($symbol) {
+            case Symbols::BTC:
+                $amount = '0.001';
+
+                break;
+            case Symbols::ETH:
+                $amount = '0.05';
+
+                break;
+            case Symbols::USDC:
+                $amount = '10';
+
+                break;
+            case Symbols::BNB:
+                $amount = '0.1';
+
+                break;
+            default:
+                $amount = '100';
+        }
 
         /** @var User $user*/
         $user = $this->getUser();
 
         $balanceHandler->deposit(
             $user,
-            Token::getFromCrypto($crypto),
-            $moneyWrapper->parse($amount, $crypto->getSymbol())
+            $crypto,
+            $moneyWrapper->parse($amount, $symbol)
         );
 
         return $this->redirect($referer);

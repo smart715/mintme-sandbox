@@ -1,9 +1,11 @@
+@import "~bootstrap/scss/functions";
+
 // Change bootstrap variables to match Mintme style
 
 // Fonts
 $lato-font: 'Lato', 'Arial', sans-serif;
-$concord-font: 'ConcordBold';
-$cloud-font: 'AlphaCloud', sans-serif;
+$concord-font: 'Concord';
+$concord-bold-font: 'ConcordBold';
 
 $font-scales: (
   xs: 13px,
@@ -17,7 +19,6 @@ $border-radius: 0;
 
 // Colors
 $ghost-dark: rgba(0, 0, 0, 0.15);
-
 $ghost-light: rgba(255, 255, 255, 0.25);
 $grey-light: #8A96A4;
 $grey: #a09999;
@@ -38,6 +39,7 @@ $primary-light: #017bbc;
 $blue: #1da1f3;
 $meterbg-list: (#b71c1c, #d32f2f, #f9a825, #8bc34a, #558b2f);
 $gold: #C1AE83;
+$odd-item-color: #00334E;
 // This variable affects the `.h-*` and `.w-*` classes.
 $sizes: () !default;
 
@@ -72,7 +74,7 @@ $theme-colors: (
   "blue": $blue
 );
 
-$body-background: $black url("../img/sky_image.jpg") no-repeat fixed;
+$body-background: $black url("../img/sky_image.webp") no-repeat fixed;
 $body-background-sm: linear-gradient(#184b80, #193a5d);
 $module-background: linear-gradient(#0b3c57, #19263d);
 $body-text-color: #1a1a1a;
@@ -112,10 +114,6 @@ $card-header-bg: $primary;
 $card-body-bg: $secondary;
 $card-text-color: $dark-white;
 
-//Donation
-$donation-header-bg: $primary;
-$donation-body-bg: $secondary;
-
 // Pagination
 $pagination-color: $primary;
 $pagination-border-width: 0;
@@ -146,5 +144,9 @@ $toast-warning-text: #de3300;
 $token-avatar-margin-left: 115px;
 
 // Posts
-$post-background-color: #00334e;
 $post-border-color: #0e3b59;
+
+// This variable should mirror config/paramaters.dist.yml translation_flags.flag variable.
+$translation-flags: gb, es, ru, ua, pl, ae, pt, fr;
+
+@import "~bootstrap/scss/variables";

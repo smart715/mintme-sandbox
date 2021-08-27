@@ -10,12 +10,15 @@ use App\Exchange\Balance\BalanceHandlerInterface;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Manager\UserManagerInterface;
+use App\Manager\UserNotificationManagerInterface;
 use App\Utils\ClockInterface;
+use App\Utils\Symbols;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
 use App\Wallet\WalletInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Money\Currency;
 use Money\Money;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -38,7 +41,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
@@ -65,7 +67,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
@@ -92,7 +93,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
@@ -119,7 +119,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
@@ -145,7 +144,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager($this->mockToken($tokenName)),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
@@ -173,7 +171,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager($this->mockToken($tokenName, [$user])),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager($this->never()),
             $this->mockEventDispatcher(),
@@ -197,7 +194,7 @@ class DepositConsumerTest extends TestCase
         $bh = $this->createMock(BalanceHandlerInterface::class);
         $bh->expects($this->once())
             ->method('deposit')
-            ->willThrowException(new \Exception());
+            ->willThrowException(new Exception());
 
         $dc = new DepositConsumer(
             $bh,
@@ -206,7 +203,6 @@ class DepositConsumerTest extends TestCase
             $this->mockTokenManager(null),
             $this->mockLogger(),
             $this->mockMoneyWrapper(),
-            $this->createMock(ClockInterface::class),
             $this->mockWallet(),
             $this->mockEntityManager(),
             $this->mockEventDispatcher(),
@@ -238,7 +234,7 @@ class DepositConsumerTest extends TestCase
     {
         $wallet = $this->createMock(WalletInterface::class);
         $wallet->method('getFee')->willReturn(
-            new Money('10000000000', new Currency(MoneyWrapper::TOK_SYMBOL))
+            new Money('10000000000', new Currency(Symbols::TOK))
         );
 
         return $wallet;
