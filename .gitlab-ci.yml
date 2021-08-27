@@ -10,8 +10,6 @@ stages:
   - update-repository
   - tests
   - build-sites
-  - clean-unused-sites
-  - auto-merge
 
 update_repository_redmine_training.abchosting.org:
   script:
@@ -61,65 +59,14 @@ tests_assets:
   except:
     - translations
 
-phpfunctional_tests:
-  stage: tests
-  script:
-    - sudo start-tests.sh $CI_COMMIT_REF_NAME
-  tags:
-    # This job only will be executed by this runner:
-    - mintme-docker.abchosting.org
-  only:
-    # this job only will be executed for branches
-    - functional-test
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-
 build_mintme_sites:
   stage: build-sites
   script:
     - SRC=$(pwd)
-    - sudo build-sites-mintme.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+    - sudo build-sites-mintme-sandbox.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC  
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
     # this job only will be executed for branches
     - branches
-
-staging_release:
-  stage: build-sites
-  script:
-    - sudo /root/update-staging.sh $CI_COMMIT_REF_NAME
-  tags:
-    # This job only will be executed by this runner:
-    - staging
-  only:
-    # this job only will be executed for branches
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-clean_mintme_unused_sites:
-  stage: clean-unused-sites
-  script:
-    - sudo /usr/local/bin/clean-unused-sites-mintme.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
-
-auto_merge_release_branch:
-  stage: auto-merge
-  script:
-    - sudo auto-merge-release-branch.py
-  tags:
-    # This job only will be executed by this runner:
-    - mintme.abchosting.org
-  only:
-    # this job only will be executed for these branches:
-    - /^v\d{1,2}[.]\d{1,2}[.]\d{1,2}$/
-    - master
-  allow_failure: true
