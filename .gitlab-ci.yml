@@ -8,65 +8,33 @@
 
 stages:
   - update-repository
-  - tests
   - build-sites
 
 update_repository_redmine_training.abchosting.org:
-  script:
-    - cd /home/git/gitlab/mintme-panel.git && sudo git fetch --all -p
   stage: update-repository
+  script:
+    - cd /home/git/gitlab/coinimp-sandbox.git && sudo git fetch --all -p
   tags:
     # this job will be executed only on training.abchosting.org server
     - training.abchosting.org
 
-before_script:
-  - export PATH=/usr/local/php74:$PATH
-  - shopt -s expand_aliases
-  - alias php='/usr/bin/php7.4'
-  - alias npm='/usr/local/bin/npm'
-
-tests_php:
-  stage: tests
-  script:
-    - export $(grep -v '^#' .env.dist | xargs)
-    - composer install
-    - THREADS_COUNT=4 make phpunit
-    - THREADS_COUNT=4 make syntax_check
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - node_modules/
-      - vendor/
-  tags:
-    - mintme-tests
-  except:
-    - translations
-
-tests_assets:
-  stage: tests
-  script:
-    - npm ci --cache .npm --prefer-offline
-    - make syntax_check_assets
-    - make jest
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    paths:
-      - .npm/
-      - node_modules/
-      - vendor/
-  tags:
-    - mintme-tests
-  except:
-    - translations
-
 build_mintme_sites:
   stage: build-sites
+  before_script:
+    - shopt -s expand_aliases
+    - alias php='/usr/bin/php7.4'
+    - alias npm='/usr/local/bin/npm'
   script:
     - SRC=$(pwd)
-    - sudo build-sites-mintme-sandbox.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC  
+    - sudo build-sites-mintme-sandbox.sh -a build -b $CI_COMMIT_REF_NAME -s $SRC
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - vendor/
   tags:
     # This job only will be executed by this runner:
     - mintme.abchosting.org
   only:
     # this job only will be executed for branches
-    - branches
+    - /^sb-.*$/
