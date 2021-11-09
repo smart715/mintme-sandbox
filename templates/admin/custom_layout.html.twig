@@ -76,8 +76,8 @@
             background: #448aff;
         }
         .modal .modal-header .modal-title {
-              color: #fff;
-              line-height: 1;
+            color: #fff;
+            line-height: 1;
         }
 
         @media screen and (max-width: 767px) {
@@ -124,5 +124,5 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('build/admin.js') }}"></script>
+    {{ encore_entry_script_tags('admin') }}
 {% endblock %}

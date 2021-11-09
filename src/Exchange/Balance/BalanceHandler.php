@@ -2,60 +2,109 @@
 
 namespace App\Exchange\Balance;
 
-use App\Communications\Exception\FetchException;
+use App\Entity\Crypto;
 use App\Entity\Token\Token;
+use App\Entity\TradebleInterface;
 use App\Entity\User;
+use App\Entity\UserToken;
 use App\Exchange\Balance\Exception\BalanceException;
+use App\Exchange\Balance\Factory\BalancesArrayFactoryInterface;
+use App\Exchange\Balance\Factory\TraderBalanceView;
+use App\Exchange\Balance\Factory\TraderBalanceViewFactoryInterface;
 use App\Exchange\Balance\Model\BalanceResult;
 use App\Exchange\Balance\Model\BalanceResultContainer;
 use App\Exchange\Balance\Model\SummaryResult;
+use App\Manager\UserManagerInterface;
+use App\Manager\UserTokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
 use App\Wallet\Money\MoneyWrapperInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Money\Money;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class BalanceHandler
+ *
+ * @package App\Exchange\Balance
+ */
 class BalanceHandler implements BalanceHandlerInterface
 {
     /** @var TokenNameConverterInterface */
-    private $converter;
+    private TokenNameConverterInterface $converter;
 
     /** @var BalanceFetcherInterface */
-    private $balanceFetcher;
+    private BalanceFetcherInterface $balanceFetcher;
 
     /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+
+    /** @var UserManagerInterface */
+    private UserManagerInterface $userManager;
+
+    /** @var BalancesArrayFactoryInterface */
+    private BalancesArrayFactoryInterface $balanceArrayFactory;
 
     /** @var MoneyWrapperInterface */
-    private $moneyWrapper;
+    private MoneyWrapperInterface $moneyWrapper;
+
+    /** @var TraderBalanceViewFactoryInterface */
+    private TraderBalanceViewFactoryInterface $traderBalanceViewFactory;
 
     /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
+    private UserTokenManagerInterface $userTokenManager;
+
+    /**
+     * BalanceHandler constructor.
+     *
+     * @param TokenNameConverterInterface $converter
+     * @param BalanceFetcherInterface $balanceFetcher
+     * @param EntityManagerInterface $entityManager
+     * @param UserManagerInterface $userManager
+     * @param BalancesArrayFactoryInterface $balanceArrayFactory
+     * @param MoneyWrapperInterface $moneyWrapper
+     * @param TraderBalanceViewFactoryInterface $traderBalanceViewFactory
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         TokenNameConverterInterface $converter,
         BalanceFetcherInterface $balanceFetcher,
         EntityManagerInterface $entityManager,
+        UserManagerInterface $userManager,
+        BalancesArrayFactoryInterface $balanceArrayFactory,
         MoneyWrapperInterface $moneyWrapper,
-        LoggerInterface $logger
+        TraderBalanceViewFactoryInterface $traderBalanceViewFactory,
+        LoggerInterface $logger,
+        UserTokenManagerInterface $userTokenManager
     ) {
         $this->converter = $converter;
         $this->balanceFetcher = $balanceFetcher;
         $this->entityManager = $entityManager;
+        $this->userManager = $userManager;
+        $this->balanceArrayFactory = $balanceArrayFactory;
         $this->moneyWrapper = $moneyWrapper;
+        $this->traderBalanceViewFactory = $traderBalanceViewFactory;
         $this->logger = $logger;
+        $this->userTokenManager = $userTokenManager;
     }
 
-    /** {@inheritdoc} */
-    public function deposit(User $user, Token $token, Money $amount): void
+    public function deposit(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount, 'deposit');
+        try {
+            $this->update($user, $tradable, $amount, 'deposit', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
-    /** {@inheritdoc} */
-    public function withdraw(User $user, Token $token, Money $amount): void
+    public function withdraw(User $user, TradebleInterface $tradable, Money $amount, ?int $businessId = null): void
     {
-        $this->update($user, $token, $amount->negative(), 'withdraw');
+        try {
+            $this->update($user, $tradable, $amount->negative(), 'withdraw', $businessId);
+        } catch (\Throwable $e) {
+            throw $e;
+        }
     }
 
     public function summary(Token $token): SummaryResult
@@ -63,21 +112,70 @@ class BalanceHandler implements BalanceHandlerInterface
         return $this->balanceFetcher->summary($this->converter->convert($token));
     }
 
-    /**
-     * @param Token[] $tokens
-     */
-    public function balances(User $user, array $tokens): BalanceResultContainer
+    public function balances(User $user, array $tradables): BalanceResultContainer
     {
         return $this->balanceFetcher
-            ->balance($user->getId(), array_map(function (Token $token) {
-                return $this->converter->convert($token);
-            }, $tokens));
+            ->balance($user->getId(), array_map(function (TradebleInterface $tradable) {
+                return $this->converter->convert($tradable);
+            }, $tradables));
     }
 
-    public function balance(User $user, Token $token): BalanceResult
+    public function indexedBalances(User $user, array $tokens): array
     {
-        return $this->balances($user, [$token])
-            ->get($this->converter->convert($token));
+        $indexedBalances = [];
+        $balances = $this->balances(
+            $user,
+            $tokens,
+        );
+
+        foreach ($tokens as $token) {
+            $indexedBalances[$token->getSymbol()] = $balances->get($this->converter->convert($token));
+        }
+
+        return $indexedBalances;
+    }
+
+    public function balance(User $user, TradebleInterface $tradable): BalanceResult
+    {
+        return $this->balances($user, [$tradable])
+            ->get($this->converter->convert($tradable));
+    }
+
+    public function exchangeBalance(User $user, Token $token): Money
+    {
+        $balance = $this->balance($user, $token)->getAvailable();
+
+        if ($token->getLockIn()) {
+            return $token->isDeployed()
+                ? $balance = $balance->subtract($token->getLockIn()->getFrozenAmountWithReceived())
+                : $balance = $balance->subtract($token->getLockIn()->getFrozenAmount());
+        }
+
+        return $balance;
+    }
+
+    public function topHolders(
+        TradebleInterface $tradable,
+        int $limit,
+        int $extend = 15,
+        int $incrementer = 5,
+        int $max = 30
+    ): array {
+        $tradableName = $tradable instanceof Token
+            ? $this->converter->convert($tradable)
+            : $tradable->getSymbol();
+
+        $balances = $this->balanceFetcher->topBalances($tradableName, $extend);
+        $normalizeBalances = $this->normalizeBalances($balances);
+
+        return $this->createBalanceViewWithExtension(
+            $normalizeBalances,
+            $tradable,
+            $limit,
+            $extend,
+            $incrementer,
+            $max
+        );
     }
 
     public function isNotExchanged(Token $token, int $amount): bool
@@ -88,32 +186,100 @@ class BalanceHandler implements BalanceHandlerInterface
         return $available->equals($balance);
     }
 
-    /**
-     * @throws FetchException
-     * @throws BalanceException
-     */
-    private function update(User $user, Token $token, Money $amount, string $type): void
+    public function update(User $user, TradebleInterface $tradable, Money $amount, string $type, ?int $businessId = null): void
     {
         try {
             $this->balanceFetcher->update(
                 $user->getId(),
-                $this->converter->convert($token),
+                $this->converter->convert($tradable),
                 $this->moneyWrapper->format($amount),
-                $type
+                $type,
+                $businessId
             );
-        } catch (BalanceException $exception) {
+        } catch (BalanceException $e) {
             $this->logger->error(
-                "Failed to update '{$user->getEmail()}' balance for {$token->getSymbol()}.
-                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$exception->getMessage()}"
+                "Failed to update '{$user->getEmail()}' balance for {$tradable->getSymbol()}.
+                Requested: {$amount->getAmount()}. Type: {$type}. Reason: {$e->getMessage()}"
             );
 
-            throw $exception;
+            throw $e;
+        } catch (\Throwable $e) {
+            throw $e;
         }
 
-        if (!in_array($token, $user->getRelatedTokens()) && $token->getId()) {
-            $user->addRelatedToken($token);
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+        if ($tradable instanceof Token) {
+            $this->updateUserTokenRelation($user, $tradable);
         }
+    }
+
+    public function updateUserTokenRelation(User $user, TradebleInterface $tradable): void
+    {
+        $balance = $this->balance($user, $tradable)->getAvailable();
+
+        if ($tradable instanceof Token) {
+            $this->userTokenManager->updateRelation($user, $tradable, $balance);
+        }
+    }
+
+    /**
+     * @param array[] $balances
+     * @param TradebleInterface $tradable
+     * @param int $limit
+     * @param int $extend
+     * @param int $incrementer
+     * @param int $max
+     * @return TraderBalanceView[]
+     */
+    private function createBalanceViewWithExtension(
+        array $balances,
+        TradebleInterface $tradable,
+        int $limit,
+        int $extend,
+        int $incrementer,
+        int $max
+    ): array {
+        if (0 === count($balances) || ($tradable instanceof Token && null === $tradable->getId())) {
+            return [];
+        }
+
+        $isMax = $max <= $extend || count($balances) < $extend;
+        $balances = $this->balanceArrayFactory->create($balances);
+
+        $usersTradables = count($balances) > 0 ? $this->getUserTradables($tradable, array_keys($balances)) : [];
+
+        if ($isMax || count($usersTradables) >= $limit) {
+            return $this->traderBalanceViewFactory->create($usersTradables, $balances, $limit);
+        }
+
+        return $this->topHolders($tradable, $limit, $extend + $incrementer, $incrementer, $max);
+    }
+
+    /**
+     * @param TradebleInterface $tradable
+     * @param array $userIds
+     * @return array
+     */
+    private function getUserTradables(TradebleInterface $tradable, array $userIds): array
+    {
+        if ($tradable instanceof Token) {
+            return $this->userManager->getUserToken($tradable, $userIds);
+        }
+
+        if ($tradable instanceof Crypto) {
+            return $this->userManager->getUserCrypto($tradable, $userIds);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $balances
+     * @return array
+     */
+    private function normalizeBalances(array $balances): array
+    {
+        return array_filter($balances, static function ($key) {
+            return round($key[1]) > 0;
+        });
     }
 }

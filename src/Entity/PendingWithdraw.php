@@ -18,31 +18,29 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class PendingWithdraw
+class PendingWithdraw implements PendingWithdrawInterface
 {
-    public const EXPIRES_HOURS = 4;
-
     /**
      * @ORM\Id()
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @var int
      */
-    protected $id;
+    protected int $id;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Groups({"API"})
      * @var DateTimeImmutable
      */
-    private $date;
+    private DateTimeImmutable $date;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Crypto")
      * @Groups({"API"})
      * @var Crypto
      */
-    private $crypto;
+    private Crypto $crypto;
 
     /**
      * @ORM\Column(type="string")
@@ -55,7 +53,7 @@ class PendingWithdraw
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="pendingWithdrawals")
      * @var User
      */
-    private $user;
+    private User $user;
 
     /**
      * @Assert\NotBlank()
@@ -68,14 +66,26 @@ class PendingWithdraw
      * @ORM\Column(type="string")
      * @var string
      */
-    protected $hash;
+    protected string $hash;
 
-    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address)
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $fee;
+
+
+    public function __construct(User $user, Crypto $crypto, Amount $amount, Address $address, Money $fee)
     {
         $this->user = $user;
         $this->crypto = $crypto;
         $this->amount = $amount->getAmount()->getAmount();
         $this->address = $address->getAddress();
+        $this->fee = $fee->getAmount();
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getHash(): string
@@ -113,6 +123,11 @@ class PendingWithdraw
         return $this->user;
     }
 
+    public function getSymbol(): string
+    {
+        return $this->getCrypto()->getSymbol();
+    }
+
     /** @ORM\PrePersist() */
     public function init(): self
     {
@@ -120,5 +135,13 @@ class PendingWithdraw
         $this->date = new DateTimeImmutable();
 
         return $this;
+    }
+
+    public function getFee(): Money
+    {
+        return new Money(
+            $this->fee,
+            new Currency($this->crypto->getSymbol())
+        );
     }
 }

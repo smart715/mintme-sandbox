@@ -2,6 +2,13 @@ parameters:
     service: 'mintme'
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     locale: 'en'
+    sonata.media.admin.media.class: App\Admin\MediaAdmin
+    router.request_context.host: '%mintme_url%'
+    router.request_context.base_url: ''
+    asset.request_context.base_path: '%router.request_context.base_url%'
+    old_sound_rabbit_mq.consumer.class: 'App\RabbitMq\Consumer'
+    container.dumper.inline_factories: true
+    container.dumper.inline_class_loader: true
 
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
@@ -40,11 +47,34 @@ services:
             $headers:
                 Accept: application/json
 
+    rabbitmq.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%env(RABBITMQ_MANAGMENT_URL)%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic Z3Vlc3Q6Z3Vlc3Q='
+
+    disposable_email.json_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%origin_to_disposable_email_domains%'
+            $timeoutSeconds: '%disposable_domains_timeout_seconds%'
+
+    d7_networks.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%d7_networks_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Authorization: 'Basic %env(D7_NETWORKS_TOKEN)%'
+
     viabtc.json_rpc:
         class: App\Communications\GuzzleWrapper
         arguments:
             $url: '%env(VIABTC_RPC)%'
             $timeoutSeconds: '%viabtc_response_timeout_seconds%'
+            $auth: '%viabtc_auth%'
 
     deposit.json_rpc:
         class: App\Communications\GuzzleWrapper
@@ -60,9 +90,38 @@ services:
             $timeoutSeconds: '%withdraw_response_timeout_seconds%'
             $auth: '%withdraw_auth%'
 
+    deploy.json_rpc:
+        class: App\Communications\GuzzleWrapper
+        arguments:
+            $url: '%deploy_rpc%'
+            $timeoutSeconds: '%deploy_response_timeout_seconds%'
+
+    coinify.rest_rpc:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%coinify_api_url%'
+            $timeoutSeconds: '%coinify_api_timeout%'
+
     App\Communications\CoinmarketcapCommunicator:
         arguments:
             $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\RabbitMQCommunicator:
+        arguments:
+            $rpc: '@rabbitmq.rest_rpc'
+
+    App\Communications\DeployCostFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CoinifyCommunicator:
+        arguments:
+            $rpc: '@coinify.rest_rpc'
+            $partnerId: '%coinify_partner_id%'
+
+    App\Communications\SMS\D7NetworksCommunicator:
+        arguments:
+            $rpc: '@d7_networks.rest_rpc'
 
     App\Wallet\Deposit\DepositGatewayCommunicator:
         arguments:
@@ -90,9 +149,18 @@ services:
         arguments:
             $jsonRpc: '@viabtc.json_rpc'
 
+    App\Exchange\Donation\DonationFetcher:
+        arguments:
+            $jsonRpc: '@viabtc.json_rpc'
+
+    App\SmartContract\ContractHandler:
+        $rpc: '@deploy.json_rpc'
+
     App\Communications\Factory\RpcClientFactoryInterface: '@App\Communications\Factory\GuzzleRpcClientFactory'
 
-    App\Manager\TwoFactorManagerInterface: '@App\Manager\TwoFactorManager'
+    App\Manager\TwoFactorManagerInterface:
+        class: App\Manager\TwoFactorManager
+        public: true
 
     App\Wallet\Withdraw\Communicator\AMQPCommunicator:
         arguments:
@@ -114,12 +182,51 @@ services:
     App\Utils\Verify\WebsiteVerifier:
         arguments:
             $timeoutSeconds: '%verify_timeout_seconds%'
+            $proxy: '%website_verify_proxy%'
 
     App\Command\UpdateTokenRelease:
         arguments:
             $logger: '@logger'
         tags:
             - { name: monolog.logger, channel: cron }
+
+    App\Command\UpdatePendingWithdrawals:
+        properties:
+            withdrawExpirationTime: '%withdraw_expiration_time%'
+            viabtcResponseTimeout: '%viabtc_response_timeout_seconds%'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
+    App\Command\UpdateDisposableEmailDomains:
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: cron }
+
+    App\Command\CheckScheduledNotificationsCommand:
+        arguments:
+            $kbLinks: '%kb_links%'
+            $filled_intervals: '%orders_filled_intervals%'
+            $cancelled_intervals: '%orders_cancelled_intervals%'
+            $token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            $marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
+
+    App\Security\Config\DisabledBlockchainConfig:
+        arguments:
+            $disabledCrypto: '%blockchain_disabled%'
+
+    App\Security\Config\DisabledServicesConfig:
+        arguments:
+            $depositDisabled: '%disable_deposits%'
+            $withdrawalsDisabled: '%disable_withdrawals%'
+            $tokenDepositDisabled: '%disable_token_deposits%'
+            $tokenWithdrawDisabled: '%disable_token_withdrawals%'
+            $deployDisabled: '%disable_deploy_tokens%'
+            $newTradesDisabled: '%disable_new_trades%'
+            $tradingDisabled: '%disable_trading%'
+            $allServicesDisabled: '%disable_all%'
 
     # SonataAdminBundle Registered Admin Classes
     # =======================================
@@ -145,6 +252,56 @@ services:
             - { name: sonata.admin, manager_type: orm, label: Blacklist }
         public: true
 
+    admin.reciprocal.links:
+        class: App\Admin\ReciprocalLinksAdmin
+        arguments:
+            - null
+            - App\Entity\ReciprocalLinks
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Reciprocal Links }
+        public: true
+
+    admin.knowledgebase:
+        class: App\Admin\KnowledgeBase\KnowledgeBaseAdmin
+        arguments:
+            - null
+            - App\Entity\KnowledgeBase\KnowledgeBase
+            - PixSortableBehaviorBundle:SortableAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Knowledge Base }
+        public: true
+
+    admin.knowledgebase.category:
+        class: App\Admin\KnowledgeBase\KnowledgeBaseCategoryAdmin
+        arguments:
+            - null
+            - App\Entity\KnowledgeBase\Category
+            - PixSortableBehaviorBundle:SortableAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: KB Categories }
+        public: true
+
+    admin.knowledgebase.subcategory:
+        class: App\Admin\KnowledgeBase\KnowledgeBaseSubcategoryAdmin
+        arguments:
+            - null
+            - App\Entity\KnowledgeBase\Subcategory
+            - PixSortableBehaviorBundle:SortableAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: KB Subcategories }
+        public: true
+
+    admin.main.documents:
+        class: App\Admin\MainDocumentsAdmin
+        arguments:
+            - null
+            - App\Entity\MainDocument
+            - Sonata\AdminBundle\Controller\CRUDController
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Main Documents }
+        public: true
+
     # Required by rabbitmq bundle
     market_consumer:
         class: 'App\Consumers\MarketConsumer'
@@ -167,6 +324,21 @@ services:
         tags:
             - { name: monolog.logger, channel: rabbitmq }
 
+    deploy_consumer:
+        class: 'App\Consumers\DeployConsumer'
+        arguments:
+            $logger: '@logger'
+            $coinbaseApiTimeout: '%coinbase_api_timeout%'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
+    contract_update_consumer:
+        class: 'App\Consumers\ContractUpdateConsumer'
+        arguments:
+            $logger: '@logger'
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+
     wallet:
         class: 'App\Wallet\Wallet'
         arguments:
@@ -174,15 +346,16 @@ services:
         tags:
             - { name: monolog.logger, channel: payments }
 
-    trader:
-        class: 'App\Exchange\Trade\Trader'
+    App\Exchange\Trade\Trader:
         arguments:
             $logger: '@logger'
+            $referralFee: '%referral_fee%'
         tags:
             - { name: monolog.logger, channel: exchange }
 
     balancer:
         class: 'App\Exchange\Balance\BalanceHandler'
+        public: true
         arguments:
             $logger: '@logger'
         tags:
@@ -195,17 +368,6 @@ services:
             - "@doctrine.orm.entity_manager"
             - "%fos_user.model.user.class%"
 
-    App\Exchange\Trade\Config\PrelaunchConfig:
-        arguments:
-            - "%prelaunch_finish_datetime%"
-            - "%prelaunch_referral_trading_period%"
-            - "%prelaunch_referral_fee%"
-            - "%prelaunch_autostart%"
-
-    App\Security\PrelaunchVoter:
-        arguments:
-            $env: "%kernel.environment%"
-
     App\Security\HackerVoter:
         arguments:
             $isHackerAllowed: "%is_hacker_allowed%"
@@ -216,6 +378,12 @@ services:
             $mail: "%env(MAILER_USER)%"
 
     App\Mailer\MailerInterface: "@app.mailer"
+
+    app.instant.mailer:
+        class: App\Mailer\Mailer
+        arguments:
+            $mail: "%env(MAILER_USER)%"
+            $mailer: '@swiftmailer.mailer.instant_mailer'
 
     App\Exchange\Balance\Factory\BalanceViewFactory:
         arguments:
@@ -236,17 +404,34 @@ services:
             - '@fos_user.mailer'
             - '%fos_user.resetting.retry_ttl%'
 
+    App\Controller\RegistrationController:
+        decorates: fos_user.registration.controller
+        public: true
+        arguments:
+            $eventDispatcher: '@event_dispatcher'
+            $formFactory: '@fos_user.registration.form.factory'
+            $userManager: '@fos_user.user_manager'
+            $tokenStorage: '@security.token_storage'
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
+
     App\Exchange\Config\Config:
         arguments:
             $offset: "%env(VIABTC_OFFSET)%"
+            $marketConsumerEnabled: "%market_consumer_enabled%"
 
-    App\Controller\API\WebSocketAPIController:
+    App\Controller\API\WebSocketController:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
 
     App\EventSubscriber\KernelSubscriber:
         arguments:
             $isAuth: "%env(VIABTC_FORCE_WS_AUTH)%"
+
+    App\EventSubscriber\LoginInfoSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
 
     App\EventListener\BruteForceListener:
         arguments:
@@ -288,9 +473,302 @@ services:
         tags:
             - { name: monolog.logger, channel: user_action }
 
-    logout_listner:
+    App\Logger\FrontEndProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: front_end }
+
+    monolog.formatter.front_end:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%extra.url%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\FrontEndLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: front_end }
+
+    App\EntityListener\ImageListener:
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postLoad, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: postPersist, lazy: true }
+            - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preRemove, lazy: true }
+
+    logout_listener:
         class: App\EventListener\LogoutListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     App\EventListener\ChangePasswordListener:
         tags:
             - { name: kernel.event_listener, event: fos_user.change_password.edit.completed }
+
+    app.form.change_password:
+        class: App\Form\ChangePasswordType
+        tags:
+            - { name: form.type, alias: app_user_change_password }
+
+    app.form.resetting:
+        class: App\Form\ResettingType
+        tags:
+            - { name: form.type, alias: app_user_resetting }
+
+    App\EventSubscriber\SitemapSubscriber:
+        arguments:
+            - "@router"
+        tags:
+            - { name: "kernel.event_subscriber", priority: 100 }
+
+    App\Controller\API\TokensController:
+        arguments:
+            $topHolders: "%top_holders%"
+            $expirationTime: "%token_deletion_confirm_code_expiration_time%"
+
+    two_factor.auth_require_handler:
+        class: App\Security\TwoFactorRequireHandler
+        public: true
+
+    App\EventSubscriber\LocaleSubscriber:
+        arguments:
+            $defaultLocale: '%locale%'
+            $transLocales: '%translation_locales%'
+            $transAuto: '%translation_auto_detect%'
+
+    App\Communications\DisposableEmailCommunicator:
+        arguments:
+            $rpc: '@disposable_email.json_rpc'
+            $fileNameIndex: "%name_of_files_for_disposable_domains_index%"
+            $fileNameWildcard: "%name_of_files_for_disposable_domains_wildcard%"
+
+    App\Utils\Converter\FriendlyUrlConverterInterface: '@App\Utils\Converter\FriendlyUrlConverter'
+
+    # Media providers
+    app.media.provider.document:
+        class: App\Media\Provider\DocumentProvider
+        tags:
+            - { name: sonata.media.provider }
+        arguments:
+            - app.media.provider.document
+            - '@sonata.media.generator.default'
+            - '@sonata.media.thumbnail.format'
+            - '%docs_path%'
+            - '@App\Utils\Converter\FriendlyUrlConverterInterface'
+            - ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']
+            - ['application/pdf', 'application/x-pdf', 'application/rtf', 'text/html', 'text/rtf', 'text/plain', 'application/excel', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.text', 'application/vnd.oasis.opendocument.graphics', 'application/vnd.oasis.opendocument.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'application/vnd.oasis.opendocument.chart', 'application/vnd.oasis.opendocument.formula', 'application/vnd.oasis.opendocument.database', 'application/vnd.oasis.opendocument.image', 'text/comma-separated-values', 'text/xml', 'application/xml', 'application/zip']
+            - '@sonata.media.metadata.proxy'
+        calls:
+            - [ setTemplates, [ { helper_thumbnail: SonataMediaBundle:Provider:thumbnail.html.twig, helper_view: SonataMediaBundle:Provider:view_file.html.twig } ] ]
+
+    App\Exchange\Market\MarketCapCalculator:
+        arguments:
+            $supplyLinks: { Webchain: '%mintme_supply%' }
+            $tokenSupply: "%token_quantity%"
+            $rpc: '@coinmarketcap.rest_rpc'
+            $minimumVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    app.profile.form:
+        class: App\Form\ProfileType
+        arguments:
+            $showFullDataInProfile: '%show_full_data_in_profile%'
+
+    App\EventSubscriber\TransactionSubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
+    App\EventSubscriber\DeploySubscriber:
+        arguments:
+            $mailer: '@app.instant.mailer'
+
+    App\Communications\CachedCryptoRatesFetcher:
+        arguments:
+            $rpc: '@coinmarketcap.rest_rpc'
+
+    App\Communications\CryptoRatesFetcherInterface: '@App\Communications\CachedCryptoRatesFetcher'
+
+    App\Manager\ImageManagerInterface: '@App\Manager\ImageManager'
+
+    app.emailCanonicalizer:
+        class: App\Canonicalizer\EmailCanonicalizer
+        public: false
+
+    App\Controller\HackerController:
+        arguments:
+            $quickRegistrationPassword: '%quick_registration_password%'
+
+    App\Controller\API\UsersController:
+         arguments:
+            $clientManager: '@fos_oauth_server.client_manager.default'
+
+    App\Security\ApiKeyAuthenticator:
+         arguments:
+            $oAuthStorage: '@fos_oauth_server.storage.default'
+
+    App\EventSubscriber\AuthenticationListener:
+        arguments:
+            $firewallName: '%fos_user.firewall_name%'
+
+    App\Utils\ServiceInfo\ServiceInfoBuilder:
+        arguments:
+            $depositWorkDir: '%env(DEPOSIT_WORKDIR)%'
+            $withdrawWorkDir: '%env(WITHDRAW_WORKDIR)%'
+            $contractWorkDir: '%env(CONTRACT_WORKDIR)%'
+            $isTestingServer: '%env(bool:TESTING_SERVER_ENV)%'
+
+    App\Exchange\Config\AirdropConfig:
+        arguments:
+            $airdropParams: '%airdrop_params%'
+
+    App\EventListener\NoCacheListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.response' }
+
+    App\Security\PathRoles:
+        arguments:
+            $accessMap: '@security.access_map'
+
+    App\Form\DataTransformer\MoneyTransformer:
+        shared: false
+
+    App\Repository\PendingWithdrawRepository:
+        arguments:
+            $expirationTime: '%withdraw_expiration_time%'
+
+    App\Repository\PendingTokenWithdrawRepository:
+        arguments:
+            $expirationTime: '%withdraw_expiration_time%'
+
+    App\Exchange\Config\QuickTradeConfig:
+        arguments:
+            $params: '%quick_trade%'
+
+    App\Logger\DonationProcessor:
+        autowire: true
+        tags:
+            - { name: monolog.processor, channel: donation }
+
+    monolog.formatter.donation:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%datetime%%|%%level_name%%|%%extra.ip_address%%|%%extra.username%%|%%message%%|%%context%%\n"
+            - "Y-m-d H:i:s"
+
+    App\Logger\DonationLogger:
+        autowire: true
+        tags:
+            - { name: monolog.logger, channel: donation }
+
+    old_sound_rabbit_mq.consumer_command:
+        class: App\Command\ConsumerCommand
+
+    App\Manager\MarketStatusManager:
+        properties:
+            minVolumeForMarketcap: '%minimum_volume_for_marketcap%'
+
+    monolog.formatter.unsubscribe:
+        class: Monolog\Formatter\LineFormatter
+        arguments:
+            - "%%message%%\n"
+
+    App\Exchange\Config\DeployCostConfig:
+        arguments:
+            $deployCostMintme: '%deploy_cost_mintme%'
+            $deployCostEth: '%deploy_cost_eth%'
+            $deployCostBnb: '%deploy_cost_bnb%'
+            $deployFeeEth: '%deploy_fee_eth%'
+            $deployFeeBnb: '%deploy_fee_bnb%'
+            $deployCostRewardMintme: '%deploy_cost_referral_reward_mintme%'
+            $deployCostRewardEth: '%deploy_cost_referral_reward_eth%'
+            $deployCostRewardBnb: '%deploy_cost_referral_reward_bnb%'
+
+    gedmo.listener.sortable:
+        class: Gedmo\Sortable\SortableListener
+        calls:
+            - [setAnnotationReader, ['@annotation_reader']]
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
+    App\Manager\ScheduledNotificationManager:
+        properties:
+            filled_intervals: '%orders_filled_intervals%'
+            cancelled_intervals: '%orders_cancelled_intervals%'
+            token_marketing_tips_intervals: '%token_marketing_tips_intervals%'
+            marketing_airdrop_feature_intervals: '%marketing_airdrop_feature_intervals%'
+
+    App\Controller\API\WalletController:
+        arguments:
+            $coinifySharedSecret: '%env(COINIFY_SHARED_SECRET)%'
+
+    Abraham\TwitterOAuth\TwitterOAuth:
+        arguments:
+            $consumerKey: '%env(TWITTER_API_KEY)%'
+            $consumerSecret: '%env(TWITTER_API_SECRET)%'
+
+    App\Command\SendCustomMailCommand:
+        arguments:
+            $mintmeHostFreeDays: '%freeDays%'
+            $mintmeHostPrice: '%price%'
+            $mintmeHostPath: '%mintmeHostPath%'
+
+    App\Utils\ValidatorFactory:
+        properties:
+            minimalPriceOrder: '%minimum_order_value_usd%'
+
+    App\SmartContract\Config\ExplorerUrlsConfig:
+        arguments:
+            $mintmeExplorerUrl: '%mintme_explorer_url%'
+            $ethExplorerUrl: '%eth_explorer_url%'
+            $bnbExplorerUrl: '%bnb_explorer_url%'
+
+    RestCord\DiscordClient:
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%'
+            }
+
+    App\Manager\DiscordManager:
+        arguments:
+            $discordForLeaveGuild: '@discord.client.for.leave_guild'
+            $publicKey: '%env(DISCORD_PUBLIC_KEY)%'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+
+    discord.oauth.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_auth_url%'
+            $timeoutSeconds: '%discord_api_timeout%'
+            $headers:
+                Content-Type: application/x-www-form-urlencoded
+
+    App\Communications\DiscordOAuthClient:
+        arguments:
+            $guzzleRestWrapper: '@discord.oauth.client'
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $baseAuthUrl: '%discord_base_auth_url%'
+            $clientSecret: '%env(DISCORD_CLIENT_SECRET)%'
+
+    discord.client.for.leave_guild:
+        class: RestCord\DiscordClient
+        arguments:
+            $options: {
+                token: '%env(DISCORD_BOT_TOKEN)%',
+                guzzleOptions: {
+                    headers: {
+                        Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+                    }
+                }
+            }
+
+    discord.command.client:
+        class: App\Communications\GuzzleRestWrapper
+        arguments:
+            $url: '%discord_base_commands_url%'
+            $timeoutSeconds: '10'
+            $headers:
+                Content-Type: application/json
+                Authorization: 'Bot %env(DISCORD_BOT_TOKEN)%'
+
+    App\Command\CreateDiscordCommand:
+        arguments:
+            $clientId: '%env(DISCORD_CLIENT_ID)%'
+            $guzzleRestWrapper: '@discord.command.client'

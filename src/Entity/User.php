@@ -2,9 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\AirdropCampaign\Airdrop;
+use App\Entity\AirdropCampaign\AirdropAction;
+use App\Entity\Api\Client;
 use App\Entity\Token\Token;
+use App\Validator\Constraints as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
@@ -12,6 +18,7 @@ use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\PreferredProviderInterface;
+use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -26,8 +33,13 @@ class User extends BaseUser implements
     TwoFactorInterface,
     EmailTwoFactorInterface,
     BackupCodeInterface,
-    PreferredProviderInterface
+    PreferredProviderInterface,
+    TrustedDeviceInterface
 {
+    public const ROLE_API = 'ROLE_API';
+    public const ROLE_AUTHENTICATED = 'ROLE_AUTHENTICATED';
+    public const ROLE_SEMI_AUTHENTICATED = 'ROLE_SEMI_AUTHENTICATED';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -39,7 +51,7 @@ class User extends BaseUser implements
      * @Serializer\XmlAttributeMap
      * @Serializer\Expose
      * @var int
-     * @Groups({"API"})
+     * @Groups({"API", "Default"})
      */
     protected $id;
 
@@ -62,15 +74,17 @@ class User extends BaseUser implements
      * @Assert\NotBlank()
      * @Assert\Email(
      *     message = "Invalid email address.",
-     *     checkMX = true
+     *     checkMX = true,
+     *     mode = "strict"
      * )
+     * @AppAssert\IsNotBlacklisted(type="email", message="This domain is not allowed")
+     * @AppAssert\UserEmailSymbols()
      * @var string
      */
     protected $email;
 
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(min="8", max="255")
+     * @Assert\Length(min="8", max="72")
      * @Assert\Regex(
      *     pattern="/(?=.*[\p{Lu}])(?=.*[\p{Ll}])(?=.*[\p{N}]).{8,}/",
      *     match=true,
@@ -82,32 +96,40 @@ class User extends BaseUser implements
     protected $plainPassword;
 
     /**
-     * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist"})
-     * @var Profile
+     * @ORM\OneToOne(targetEntity="Profile", mappedBy="user", cascade={"persist", "remove"})
+     * @var Profile|null
      */
     protected $profile;
 
     /**
-     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist"})
-     * @var GoogleAuthenticatorEntry
+     * @ORM\OneToOne(targetEntity="GoogleAuthenticatorEntry", mappedBy="user", cascade={"persist", "remove"})
+     * @var GoogleAuthenticatorEntry|null
      */
     protected $googleAuthenticatorEntry;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      * @var string|null
      */
     private $authCode;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Token\Token", inversedBy="relatedUsers")
-     * @ORM\JoinTable(name="user_tokens",
-     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="token_id", referencedColumnName="id")}
-     * )
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var \DateTimeImmutable
+     */
+    protected $authCodeExpirationTime;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserToken", mappedBy="user")
      * @var ArrayCollection
      */
-    protected $relatedTokens;
+    protected $tokens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="UserCrypto", mappedBy="user", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     */
+    protected $cryptos;
 
     /**
      * @ORM\OneToMany(targetEntity="User", mappedBy="referencer")
@@ -128,47 +150,189 @@ class User extends BaseUser implements
      */
     protected $pendingWithdrawals;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true, options={"default": 0})
+     * @var int
+     */
+    protected $trustedTokenVersion = 0;
+
+    /**
+     * @ORM\OneToOne(targetEntity="ApiKey", mappedBy="user", cascade={"remove", "persist"})
+     * @var ApiKey
+     */
+    protected $apiKey;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Api\Client", mappedBy="user", cascade={"remove", "persist"})
+     * @var ArrayCollection
+     */
+    protected $clients;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Bonus")
+     * @ORM\JoinColumn(name="bonus_id", referencedColumnName="id")
+     * @var Bonus|null
+     */
+    protected $bonus;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @var bool
+     */
+    protected $isBlocked = false;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="author", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
+     */
+    protected $comments;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Comment", mappedBy="likes", fetch="EXTRA_LAZY")
+     * @var ArrayCollection
+     */
+    protected $likes;
+
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     * @var string
+     */
+    protected $coinifyOfflineToken;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\AirdropCampaign\AirdropAction")
+     * @var ArrayCollection
+     */
+    protected $airdropActions;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessToken;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected ?string $twitterAccessTokenSecret;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="rewardedUsers")
+     */
+    protected Collection $rewardClaimedPosts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="airdropReferrals")
+     */
+    protected ?User $airdropReferrerUser;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="airdropReferrerUser", fetch="EXTRA_LAZY")
+     */
+    protected Collection $airdropReferrals;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\AirdropCampaign\Airdrop")
+     */
+    protected ?Airdrop $airdropReferrer;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false}, nullable= false)
+     */
+    private bool $exchangeCryptoMailSent = false; // phpcs:ignore
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected ?int $discordId;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\DiscordRoleUser", mappedBy="user", indexBy="token_id")
+     */
+    protected PersistentCollection $discordRoles;
+
+    /** @codeCoverageIgnore */
+    public function getApiKey(): ?ApiKey
+    {
+        return $this->apiKey;
+    }
+
+    /** @codeCoverageIgnore
+     * @return array
+     */
+    public function getApiClients(): array
+    {
+        return array_map(function (Client $client) {
+            return ['id' => $client->getPublicId()];
+        }, $this->clients->toArray());
+    }
+
+
+    /** @codeCoverageIgnore */
     public function getPreferredTwoFactorProvider(): ?string
     {
         return 'email';
     }
 
-    /** @return Token[] */
-    public function getRelatedTokens(): array
+    /**
+     * @codeCoverageIgnore
+     * @return Token[]
+     */
+    public function getTokens(): array
     {
-        return $this->relatedTokens->toArray();
+        return array_map(function (UserToken $userToken) {
+            return $userToken->getToken();
+        }, $this->tokens->toArray());
     }
 
-    public function addRelatedToken(Token $token): self
+    /** @codeCoverageIgnore */
+    public function addToken(UserToken $userToken): self
     {
-        $this->relatedTokens->add($token);
+        $this->tokens->add($userToken);
 
         return $this;
     }
 
-    public function removeRelatedToken(Token $token): self
+    /** @codeCoverageIgnore */
+    public function removeToken(UserToken $userToken): self
     {
-        $this->relatedTokens->removeElement($token);
+        $this->tokens->removeElement($userToken);
 
         return $this;
     }
 
-    /** @Groups({"API"}) */
-    public function getProfile(): ?Profile
+    /** @codeCoverageIgnore */
+    public function addCrypto(UserCrypto $userCrypto): self
     {
-        return $this->profile;
+        $this->cryptos->add($userCrypto);
+
+        return $this;
     }
 
-    public function setProfile(Profile $profile): self
+    /**
+     * @codeCoverageIgnore
+     * @Groups({"API", "Default"})
+     */
+    public function getProfile(): Profile
+    {
+        return $this->profile ?? new Profile($this);
+    }
+
+    /** @codeCoverageIgnore */
+    public function setProfile(?Profile $profile): self
     {
         $this->profile = $profile;
 
         return $this;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * @codeCoverageIgnore
+     * {@inheritdoc}
+     */
     public function setEmail($email)
     {
+        $email = strtolower($email);
         $this->username = $email;
 
         return parent::setEmail($email);
@@ -179,16 +343,17 @@ class User extends BaseUser implements
         return null !== $this->googleAuthenticatorEntry;
     }
 
+    /** @codeCoverageIgnore */
     public function getGoogleAuthenticatorUsername(): string
     {
         return $this->username;
     }
 
-    public function getGoogleAuthenticatorSecret(): string
+    public function getGoogleAuthenticatorSecret(): ?string
     {
         $googleAuth = $this->googleAuthenticatorEntry;
 
-        return null !== $googleAuth && null !==  $googleAuth->getSecret()
+        return null !== $googleAuth && null !== $googleAuth->getSecret()
             ? $googleAuth->getSecret()
             : '';
     }
@@ -202,6 +367,7 @@ class User extends BaseUser implements
             : false;
     }
 
+    /** @codeCoverageIgnore */
     public function invalidateBackupCode(string $code): void
     {
         if (null !== $this->googleAuthenticatorEntry) {
@@ -216,14 +382,140 @@ class User extends BaseUser implements
         return null !== $googleAuth ? $googleAuth->getBackupCodes() : [];
     }
 
+    /** @codeCoverageIgnore */
     public function setGoogleAuthenticatorSecret(string $secret): void
     {
         $this->getGoogleAuthenticatorEntry()->setSecret($secret);
     }
 
+    /** @codeCoverageIgnore */
     public function setGoogleAuthenticatorBackupCodes(array $codes): void
     {
         $this->getGoogleAuthenticatorEntry()->setBackupCodes($codes);
+    }
+
+    /** @codeCoverageIgnore */
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setHash(?string $hash): self
+    {
+        $this->hash = $hash;
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReferencer(): ?self
+    {
+        return $this->referencer;
+    }
+
+    /** @codeCoverageIgnore */
+    public function setReferencer(User $user): self
+    {
+        $this->referencer = $user;
+
+        return $this;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @return User[]
+     */
+    public function getReferrals(): array
+    {
+        return $this->referrals->toArray();
+    }
+
+    /** @codeCoverageIgnore */
+    public function getReferralCode(): string
+    {
+        return $this->referralCode ?? '';
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @var string
+     * @return string
+     */
+    public function getNickname(): string
+    {
+        return $this->getProfile()->getNickname();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @param string $nickname
+     * @return self
+     */
+    public function setNickname(?string $nickname): self
+    {
+        if (!$this->profile) {
+            $this->profile = new Profile($this);
+        }
+
+        $this->profile->setNickname($nickname ?? '');
+
+        return $this;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getTawkHash(string $api_key): string
+    {
+        return hash_hmac('sha256', $this->getUsername(), $api_key);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     * @ORM\PrePersist()
+     */
+    public function prePersist(): void
+    {
+        $this->referralCode = Uuid::uuid1()->toString();
+    }
+
+    /** @codeCoverageIgnore */
+    public function isEmailAuthEnabled(): bool
+    {
+        return !$this->isGoogleAuthenticatorEnabled();
+    }
+
+    /** @codeCoverageIgnore */
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    /** @codeCoverageIgnore */
+    public function getEmailAuthCode(): string
+    {
+        return $this->authCode ?? '';
+    }
+
+    /** @codeCoverageIgnore */
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
+    }
+
+    public function getEmailAuthCodeExpirationTime(): \DateTimeImmutable
+    {
+        return $this->authCodeExpirationTime;
+    }
+
+    public function setEmailAuthCodeExpirationTime(\DateTimeImmutable $authCodeExpirationTime): void
+    {
+        $this->authCodeExpirationTime = $authCodeExpirationTime;
     }
 
     private function getGoogleAuthenticatorEntry(): GoogleAuthenticatorEntry
@@ -239,74 +531,184 @@ class User extends BaseUser implements
         return $this->googleAuthenticatorEntry;
     }
 
-    public function getHash(): ?string
+    /** @codeCoverageIgnore */
+    public function getTrustedTokenVersion(): int
     {
-        return $this->hash;
+        return $this->trustedTokenVersion;
     }
 
-    public function setHash(?string $hash): self
+    /** @codeCoverageIgnore */
+    public function setTrustedTokenVersion(int $trustedTokenVersion): self
     {
-        $this->hash = $hash;
+        $this->trustedTokenVersion = $trustedTokenVersion;
 
         return $this;
     }
 
-    public function getReferrencer(): ?self
+    public function getBonus(): ?Bonus
     {
-        return $this->referencer;
+        return $this->bonus;
     }
 
-    public function setReferrencer(User $user): self
+    public function setBonus(?Bonus $bonus): void
     {
-        $this->referencer = $user;
+        $this->bonus= $bonus;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBlocked;
+    }
+
+    public function setIsBlocked(bool $isBlocked): self
+    {
+        $this->isBlocked = $isBlocked;
 
         return $this;
     }
 
-    /** @return User[] */
-    public function getReferrals(): array
+    public function getComments(): array
     {
-        return $this->referrals->toArray();
+        return $this->comments->toArray();
     }
 
-    public function getReferralCode(): string
+    public function addComment(Comment $comment): self
     {
-        return $this->referralCode ?? '';
+        $this->comments->add($comment);
+
+        return $this;
     }
 
-    public function getUsername(): string
+    public function getCoinifyOfflineToken(): ?string
     {
-        return $this->username;
+        return $this->coinifyOfflineToken;
     }
 
-    public function getTawkHash(string $api_key): string
+    public function setCoinifyOfflineToken(string $coinifyOfflineToken): self
     {
-        return hash_hmac('sha256', $this->getUsername(), $api_key);
+        $this->coinifyOfflineToken = $coinifyOfflineToken;
+
+        return $this;
     }
 
-    /** @ORM\PrePersist() */
-    public function prePersist(): void
+    public function addAirdropAction(AirdropAction $action): self
     {
-        $this->referralCode = Uuid::uuid1()->toString();
+        $this->airdropActions->add($action);
+
+        return $this;
     }
 
-    public function isEmailAuthEnabled(): bool
+    public function getAirdropActions(): ArrayCollection
     {
-        return true;
+        return $this->airdropActions;
     }
 
-    public function getEmailAuthRecipient(): string
+    public function setTwitterAccessToken(?string $token): self
     {
-        return $this->email;
+        $this->twitterAccessToken = $token;
+
+        return $this;
     }
 
-    public function getEmailAuthCode(): string
+    public function getTwitterAccessToken(): ?string
     {
-        return (string)$this->authCode;
+        return $this->twitterAccessToken;
     }
 
-    public function setEmailAuthCode(string $authCode): void
+    public function setTwitterAccessTokenSecret(?string $token): self
     {
-        $this->authCode = $authCode;
+        $this->twitterAccessTokenSecret = $token;
+
+        return $this;
+    }
+
+    public function getTwitterAccessTokenSecret(): ?string
+    {
+        return $this->twitterAccessTokenSecret;
+    }
+
+    /**
+     * @Groups({"Default"})
+     */
+    public function isSignedInWithTwitter(): bool
+    {
+        return null !== $this->twitterAccessToken && null !== $this->twitterAccessTokenSecret;
+    }
+
+    public function setAirdropReferrer(Airdrop $airdrop): self
+    {
+        $this->airdropReferrer = $airdrop;
+
+        return $this;
+    }
+
+    public function getAirdropReferrer(): ?Airdrop
+    {
+        return $this->airdropReferrer;
+    }
+
+    public function setAirdropReferrerUser(User $user): self
+    {
+        $this->airdropReferrerUser = $user;
+
+        return $this;
+    }
+
+    public function getAirdropReferrerUser(): ?User
+    {
+        return $this->airdropReferrerUser;
+    }
+
+    public function isExchangeCryptoMailSent(): bool
+    {
+        return $this->exchangeCryptoMailSent;
+    }
+
+    public function setExchangeCryptoMailSent(bool $exchangeCryptoMailSent): self
+    {
+        $this->exchangeCryptoMailSent = $exchangeCryptoMailSent;
+
+        return $this;
+    }
+
+    public function setDiscordId(?int $id): self
+    {
+        $this->discordId = $id;
+
+        return $this;
+    }
+
+    public function getDiscordId(): ?int
+    {
+        return $this->discordId;
+    }
+
+    public function isSignedInWithDiscord(): bool
+    {
+        return null !== $this->discordId;
+    }
+
+    public function getDiscordRoles(): Collection
+    {
+        return $this->discordRoles->map(fn (DiscordRoleUser $dru) => $dru->getDiscordRole());
+    }
+
+    public function getDiscordRoleUsers(): Collection
+    {
+        return $this->discordRoles;
+    }
+
+    public function getDiscordRole(Token $token): ?DiscordRole
+    {
+        $dru = $this->discordRoles->get($token->getId());
+
+        return $dru
+            ? $dru->getDiscordRole()
+            : null;
+    }
+
+    public function getDiscordRoleUser(Token $token): ?DiscordRoleUser
+    {
+        return $this->discordRoles->get($token->getId());
     }
 }

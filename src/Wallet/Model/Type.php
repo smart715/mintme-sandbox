@@ -34,7 +34,7 @@ class Type
         );
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getTypeCode(): string
     {
         return $this->type;

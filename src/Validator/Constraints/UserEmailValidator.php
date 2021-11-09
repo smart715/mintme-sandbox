@@ -2,7 +2,7 @@
 
 namespace App\Validator\Constraints;
 
-use FOS\UserBundle\Model\UserManagerInterface;
+use App\Manager\UserManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -15,8 +15,11 @@ class UserEmailValidator extends ConstraintValidator
     /** @var UserManagerInterface */
     private $userManager;
 
-    public function __construct(UserManagerInterface $userManager, TokenStorageInterface $token)
-    {
+    public function __construct(
+        UserManagerInterface $userManager,
+        TokenStorageInterface $token
+    ) {
+        /** @psalm-suppress UndefinedDocblockClass */
         $this->user = $token->getToken()->getUser();
         $this->userManager = $userManager;
     }

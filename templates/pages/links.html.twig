@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Links | mintMe{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/links') }}
+{% endblock %}
+
+{% block bodyclass %}document{% endblock %}
+
+{% block content %}
+    <div id="links" class="container">
+        <div class="row pt-4 justify-content-center text-white">
+            <div class="col-md-8 text-white bg-primary p-4">
+                <div class="text-center">
+                    <h2 class="page-title">{% trans %}page.links.header{% endtrans %}</h2>
+                </div>
+                {% for link in links %}
+                <a href="{{ link.url }}" rel=”nofollow”>{{ link.title }}</a>
+               {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

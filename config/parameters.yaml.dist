@@ -2,32 +2,36 @@
 parameters:
     locale: 'en'
 
-    version: 'V1.0.0'
-    is_beta_version: true
+    version: 'V1.1.0'
+    is_beta_version: false
 
     viabtc_rpc: 'http://btc:8080'
     viabtc_response_timeout_seconds: 10
-    withdraw_auth:
+    viabtc_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
     withdraw_rpc: 'http://nginx:8000'
     withdraw_response_timeout_seconds: 10
-    deposit_auth:
+    withdraw_auth:
         - 'user'
         - 'pass'
         - 'basic'
 
     deposit_rpc: 'http://deposit:3000'
     deposit_response_timeout_seconds: 10
+    deposit_auth:
+        - 'user'
+        - 'pass'
+        - 'basic'
 
     websocket_url: 'ws://localhost:18364'
 
     # 0.2%
     taker_fee_rate: 0.002
-    # 0.1%
-    maker_fee_rate: 0.001
+    # 0.2%
+    maker_fee_rate: 0.002
 
     # Max timeout to check user website hash
     verify_timeout_seconds: 10
@@ -35,22 +39,30 @@ parameters:
     # Permanent quantity of each token asset
     token_quantity: 10000000
 
-    # Show all hidden from prelaunch content automatically when prelaunch finishes
-    prelaunch_autostart: false
-    # Datetime to finish prelaunch period. Format `Y-m-d H:i:s`
-    prelaunch_finish_datetime: '2019-04-01 10:00:00'
-    # Set date interval in ISO_8601 format
-    prelaunch_referral_trading_period: 'P1Y'
-    # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
-    prelaunch_referral_fee: 0.5
+    # Max sold on market amount for a token to be delete
+    token_delete_sold_limit: 100000
 
-    google_tracking_id: 'UA-2289508-20'
+    # Fee coefficient. e.g 0.4 means 40% of regular fee will go to referral
+    referral_fee: 0.5
+    quick_trade:
+        # 5%
+        donation_fee: 0.05
+        # 0.2%
+        sell_fee: 0.002
+        minBtcAmount: 0.000001
+        minMintmeAmount: 0.01
+        minEthAmount: 0.0001
+        minUsdcAmount: 0.1
+        minBnbAmount: 0.001
+        minTokensAmount: 0.0001
+
+    google_tracking_id: 'UA-2289508-22'
 
     tawk_api_key: '328536796c72787602bf8a9c6c59045f456d434c'
 
     # Precision to show for corresponding markets in trading view
     # This values can be set to any you want. Back-end will
-    # handle currencies with their actual precision (8 for BTC, 16 for WEB, 12 for Tokens)
+    # handle currencies with their actual precision (8 for BTC, 16 for MINTME, 12 for Tokens)
     token_precision: 4
 
     # Show hacker menu for testers. Works only on 'localhost' and 'mintme.abchosting.(abc|org)' domains.
@@ -59,3 +71,269 @@ parameters:
 
     coinbase_api_url: 'https://api.coingecko.com/api/v3'
     coinbase_api_timeout: 10
+    mintme_supply: 'https://www.mintme.com/coin/supply.txt'
+    mintme_coin: 'MintMe Coin'
+    mintme_coin_link: 'https://www.mintme.com/coin/'
+
+    # the cost of deploying token to blockchain in USD
+    deploy_cost_mintme: 99
+    deploy_cost_eth: 99
+    deploy_cost_bnb: 99
+    # the fee in crypto(0.01 ETH)
+    deploy_fee_eth: 0.01
+    deploy_fee_bnb: 0.01
+    deploy_cost_referral_reward_mintme: 0.1
+    deploy_cost_referral_reward_eth: 0.1
+    deploy_cost_referral_reward_bnb: 0.1
+    deploy_rpc: 'http://localhost:3001'
+    deploy_response_timeout_seconds: 10
+
+    # Expiration time for token deletion confirm code (minutes)
+    # Accepts an integer value:
+    token_deletion_confirm_code_expiration_time: 60
+
+    # If the trusted device feature should be enabled
+    trusted_device_enabled: true
+
+    # Lifetime of the trusted device token (default 30 days)
+    trusted_device_cookie_lifetime: 2592000
+
+    # Automatically extend lifetime of the trusted cookie on re-login
+    trusted_device_extend_lifetime: true
+
+    origin_to_disposable_email_domains: 'https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/'
+    name_of_files_for_disposable_domains_index: 'index.json'
+    name_of_files_for_disposable_domains_wildcard: 'wildcard.json'
+
+    disposable_domains_timeout_seconds: 30
+
+    # Path for all main documents
+    docs_path: '/docs'
+
+    # Password reset link expiration time in seconds
+    password_reset_expiration_time: 7200
+
+    # Time that has to pass to be able to request password reset link again, in seconds
+    password_reset_retry_time: 1800
+
+    # Switch hide or show personal data in profile page (like city and zip code)
+    show_full_data_in_profile: false
+
+    # WEB limit for landing page bonus
+    landing_web_bonus_limit: 50000
+
+    # How much user receive for registration
+    landing_web_bonus: 5
+
+    # Quick Registration Default Password for Hacker Menu -> Quick Registration.
+    quick_registration_password: 'blockchaincrowdfunding'
+
+    # If true, then it will cut headers for front end logging
+    front_end_logs_cut_headers: true
+
+    # 30d min value for token to be added to market cap total on trading page
+    minimum_volume_for_marketcap: 100000
+
+    # maximun tokens on a single page in trading page
+    tokens_on_page: 50
+
+    # max top holders for each token
+    top_holders: 10
+
+    # where to store images
+    images_path: "/uploads/images"
+
+    airdrop_params:
+        min_tokens_amount: 0.01
+        min_participants_amount: 100
+        max_participants_amount: 999999
+        min_token_reward: 0.0001
+
+    # forward proxy for hiding real mintme server IP when verifying token owner's website
+    # see guzzlephp docs for syntax: http://docs.guzzlephp.org/en/stable/request-options.html?highlight=proxy#proxy
+    # to disable the proxy, set empty string ''
+    website_verify_proxy: 'http://mintme:Iw87wqelIwsced823FXuswL9@212.32.255.5:38425'
+
+    #host for urls generated on commands
+    mintme_url: 'mintme.com'
+
+    contact_email: support@mintme.com
+
+    # enable it to be able to use market consumer for test
+    # this param have to be removed after splitting consumers for all branches.
+    market_consumer_enabled: false
+
+    # expiration time for withdraws (in seconds)
+    # should be kept to values that represent hours (3600, 7200, etc) unless for testing purposes
+    withdraw_expiration_time: 14400
+
+    # enable sending web site visit stats to google, should only be enabled for prod,
+    # default value is disabled (false)
+    enable_google_analytics: false
+
+    #HMAC SHA1 key
+    hmac_sha_one_key: 'qwerty'
+
+    #Social media links
+    twitter_social_media_link: 'https://twitter.com/mintmeproject'
+    reddit_social_media_link: 'https://www.reddit.com/r/MintMeCom'
+    discord_social_media_link: 'https://discord.com/invite/uuZXhCn'
+    telegram_chat_social_media_link: 'https://t.me/joinchat/Hzio4lCr-95bHcbB1-RX9Q'
+    telegram_webchain_network_social_media_link: 'https://t.me/webchainnetwork'
+    facebook_social_media_link: 'https://www.facebook.com/mintmeproject'
+
+    # coinify parameters
+    coinify_api_url: 'https://app-api.sandbox.coinify.com'
+    coinify_ui_url: 'https://trade-ui.sandbox.coinify.com'
+    coinify_api_timeout: 0.1
+    coinify_partner_id: 135
+    coinify_crypto_currencies:
+        - BTC
+        - ETH
+        - USDC
+        - BNB
+
+    # Disable deposit and withdraw for specified crypto (should be null by default)
+    # Remember to restart deposit consumer after changing. For MINTME you should use old name - WEB
+    # Example for ETH and BTC:
+    # blockchain_disabled:
+    #     - ETH
+    #     - BTC
+    blockchain_disabled: null
+
+    # Disables processing deposits and deposit buttons in wallet. Remember to restart deposit consumer after changing this
+    disable_deposits: false
+
+    # Disables processing withdrawals and withdraw buttons in wallet
+    disable_withdrawals: false
+
+    # Disables processing token's deposits and token deposit buttons in wallet
+    disable_token_deposits: false
+
+    # Disables processing token's withdrawals and token withdraw buttons in wallet
+    disable_token_withdrawals: false
+
+    # Disables deploying tokens to blockchain
+    disable_deploy_tokens: false
+
+    # Disables creating trades and creating new tokens
+    disable_new_trades: false
+
+    # Disables trade page completely and disables creating new tokens
+    disable_trading: false
+
+    # Disables all main functionality:
+    #     processing deposits and deposit buttons in wallet, withdrawals and btns, deploying tokens to blockchain,
+    #     creating trades and creating new tokens, trade page completely and disables creating new tokens
+    disable_all: false
+
+    # Prefixes for security access_control.
+    # For add additional language just add slash + lang
+    # (for ex.: if you want to add USA(us) you need to add /us| . Should be like '/us|/ru|/uk|/es|/ar|/pt|/fr|/pl|\s*'
+    # if you want to remove lang, just remove /{language_prefix}|
+    translation_prefixes: '/ru|/ua|/es|/ar|/pt|/fr|/pl|\s*'
+    translation_locales: [en, ru, ua, es, ar, pt, fr, pl]
+    translation_requirements: en|ru|ua|es|ar|pt|fr|pl
+    # add more languages to the array if you want to auto translate the page based on browser language.
+    translation_auto_detect: [es]
+    # Flag value should be in ISO 3166-1-alpha-2 code of a country.
+    # Check this https://www.iso.org/obp/ui/#search/code/
+    # To disable language selector menu you need to remove all languages except en or just set this var to ~
+    translation_flags:
+        en: {label: English, flag: gb}
+        es: {label: Español, flag: es}
+        ru: {label: Русский, flag: ru}
+        ua: {label: Українська, flag: ua}
+        pl: {label: Polski, flag: pl}
+        ar: {label: العربية, flag: ae}
+        pt: {label: Portugues, flag: pt}
+        fr: {label: Française, flag: fr}
+
+    #time Interval for scheduled notifications
+    orders_filled_intervals: [10 minutes, 1 day, 30 day]
+    orders_cancelled_intervals: [1 day, 30 day]
+    token_marketing_tips_intervals: [2 day, 4 day, 7 day, 10 day, 15 day, 21 day]
+    marketing_airdrop_feature_intervals: [7 day]
+
+
+    # min amount of a specific tokens to start DM the owner
+    dm_min_amount: 100
+
+    # token withdraw fee in ETH (0.003, 0.1 etc)
+    eth_token_withdraw_fee: 0.01
+
+    # token withdraw fee in BNB (0.003, 0.1 etc)
+    bnb_token_withdraw_fee: 0.01
+
+    #max amount of active orders allowed per user
+    max_allowed_active_orders: 100
+
+    # kb links
+    kb_links:
+        - 'Quickstart-Guide-to-MintMe'
+        - 'Talking-to-your-followers-about-MintMe-we-got-some-ideas'
+        - 'Time-for-token-sales-how-can-I-make-a-difference'
+        - 'Ideas-to-promote-and-sell-your-token'
+        - 'Aiming-at-a-strong-token'
+        - 'The-Golden-Rule-Treat-your-followers-as-you-want-to-be-supported'
+
+    # MintMe.host promotion mail
+    freeDays: 7
+    price: 3.99
+    mintmeHostPath: https://www.mintme.host
+
+    # mails available to send via app:sendCustomMail
+    available_mails:
+        - 'MintmeHost'
+
+    # api for sending SMS
+    d7_networks_url: 'https://rest-api.d7networks.com/secure/'
+    d7_networks_token: 'YWNkbjk1OTU6cHhmUGkzN2c='
+    # If true - sending sms will be disabled and verification code will be returned to user instead of sending to mobile phone
+    disable_sms: false
+
+    # Limits for adding and editing phone number (max attempts)
+    adding_phone_attempts_limit:
+        failed: 5
+        daily: 3
+        weekly: 10
+        monthly: 20
+        overall: 50
+    edit_phone:
+        attempts: 3
+        # 30 days = 30D
+        interval: '30D'
+
+    # mintme explorer url
+    mintme_explorer_url: 'https://mintme.com/explorer'
+
+    # eth explorer url
+    eth_explorer_url: 'https://goerli.etherscan.io'
+
+    # bnb explorer url
+    bnb_explorer_url: 'https://testnet.bscscan.com'
+
+    # folder for cached images
+    liip_data_root: '%kernel.project_dir%/public'
+
+    # filepath of the extra ui translation keys (not parsed by the command)
+    ui_extra_keys_filepath: '%kernel.project_dir%/translations/ui/extra_keys.json'
+
+    # filepath of the auto generated ui translation keys
+    ui_trans_keys_filepath: '%kernel.project_dir%/translations/ui/auto_gen_keys.json'
+
+    # list to allow / non-allow services for not fully authenticated users
+    # disable sell except for the token that created by trader
+    auth_make_disable_sell: true
+    auth_make_disable_trading: false
+    auth_make_disable_token_creation: false
+    auth_make_disable_withdrawals_and_deposit: false
+    auth_make_disable_donations: false
+
+    # minimum order value (USD) to make buy/sell orders
+    minimum_order_value_usd: 0.1
+
+    # discord
+    discord_base_auth_url: 'https://discord.com/api/oauth2/'
+    discord_base_commands_url: 'https://discord.com/api/v8/applications/'
+    discord_api_timeout: '10'

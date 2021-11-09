@@ -14,6 +14,7 @@ class MarketFetcher implements MarketFetcherInterface
     private const USER_EXECUTED_HISTORY = 'market.user_deals';
     private const MARKET_STATUS = 'market.status';
     private const KLINE = 'market.kline';
+    private const SUMMARY = 'market.summary';
     private const PENDING_ORDER_DETAIL_METHOD = 'order.pending_detail';
 
     /** @var JsonRpcInterface */
@@ -28,19 +29,19 @@ class MarketFetcher implements MarketFetcherInterface
         $this->config = $config;
     }
 
+    /**
+     * @param int $period Either 86400 for daily or 2592000 for monthly. No other values work.
+     */
+
     public function getMarketInfo(string $market, int $period = 86400): array
     {
-        try {
-            $response = $this->jsonRpc->send(self::MARKET_STATUS, [
-                $market,
-                $period,
-            ]);
-        } catch (FetchException $e) {
-            return [];
-        }
+        $response = $this->jsonRpc->send(self::MARKET_STATUS, [
+            $market,
+            $period,
+        ]);
 
         if ($response->hasError()) {
-            return [];
+            throw new FetchException($response->getError()['message'] ?? '');
         }
 
         return $response->getResult();
@@ -80,11 +81,7 @@ class MarketFetcher implements MarketFetcherInterface
             throw new FetchException($response->getError()['message'] ?? '');
         }
 
-        return array_map(function (array $order) {
-            $order['id'] -= $this->config->getOffset();
-
-            return $order;
-        }, $response->getResult()['records']);
+        return $response->getResult()['records'];
     }
 
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array
@@ -153,6 +150,17 @@ class MarketFetcher implements MarketFetcherInterface
             $end,
             $interval,
         ]);
+
+        if ($response->hasError()) {
+            throw new FetchException($response->getError()['message'] ?? '');
+        }
+
+        return $response->getResult();
+    }
+
+    public function getSummary(array $markets): array
+    {
+        $response = $this->jsonRpc->send(self::SUMMARY, $markets);
 
         if ($response->hasError()) {
             throw new FetchException($response->getError()['message'] ?? '');

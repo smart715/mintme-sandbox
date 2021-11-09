@@ -7,6 +7,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
+/** @codeCoverageIgnore */
 class PaymentProducer extends Producer
 {
     private const QUEUE_NAME = 'payment';
@@ -44,7 +45,12 @@ class PaymentProducer extends Producer
         ]);
     }
 
-    private function declareQueue(AMQPChannel $channel, string $QUEUE_NAME): array
+    /**
+     * @param AMQPChannel $channel
+     * @param string      $QUEUE_NAME
+     * @return array|mixed|null
+     */
+    private function declareQueue(AMQPChannel $channel, string $QUEUE_NAME)
     {
         return $channel->queue_declare(
             $QUEUE_NAME,

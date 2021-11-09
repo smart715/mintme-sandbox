@@ -2,6 +2,7 @@ import Decimal from 'decimal.js/decimal.js';
 import * as Constants from './constants';
 import Interval from './interval';
 import EchartTheme from './echart-theme';
+import {useMarkitup} from './markitup.js';
 
 /**
  * Checks that given url is valid
@@ -50,6 +51,26 @@ function isValidUrl(url) {
 }
 
 /**
+ * Checks that given telegram url is valid
+ * @param {string} url
+ * @return {boolean} whether is valid or not
+ */
+function isValidTelegramUrl(url) {
+    let regex = new RegExp('^https:\/\/t\.me\/joinchat\/([-\\w]{1,})$');
+    return regex.test(url);
+}
+
+/**
+ * Checks that given discord url is valid
+ * @param {string} url
+ * @return {boolean} whether is valid or not
+ */
+function isValidDiscordUrl(url) {
+    let regex = new RegExp('^https:\/\/(discord\.gg|discordapp\.com\/invite)\/([-\\w]{1,})$');
+    return regex.test(url);
+}
+
+/**
  * @param {object|Array} object
  * @return {Array}
  */
@@ -74,12 +95,19 @@ function deepFlatten(object) {
 /**
  * @param {string|int|float} val
  * @param {int} precision
+ * @param {boolean} fixedPoint
  * @return {string}
  */
-function toMoney(val, precision = Constants.GENERAL.precision) {
-    Decimal.set({rounding: Decimal.ROUND_DOWN});
+function toMoney(val, precision = Constants.GENERAL.precision, fixedPoint = true) {
+    Decimal.set({rounding: Decimal.ROUND_DOWN, toExpNeg: -20});
 
-    return new Decimal(val).toFixed(precision);
+    val = new Decimal(val);
+    precision = val.lessThan(1 / Math.pow(10, precision)) ? 0 : precision;
+    val = val.toDP(precision);
+
+    return fixedPoint
+        ? val.toString()
+        : val;
 }
 
 /**
@@ -88,6 +116,9 @@ function toMoney(val, precision = Constants.GENERAL.precision) {
  */
 function formatMoney(str) {
     str = str ? str.toString() : '';
+    str = str.split(/ (.+)/);
+    let additional = str[1] || '';
+    str = str[0];
     let regx = /(\d{1,3})(\d{3}(?:,|$))/;
     let currStr;
 
@@ -99,7 +130,7 @@ function formatMoney(str) {
         currStr.concat(`.`, str.split(`.`)[1]) :
         currStr;
 
-    return res.replace(/,/g, ' ');
+    return `${res.replace(/,/g, ' ')} ${additional}`.trim();
 }
 
 /**
@@ -116,8 +147,90 @@ function getUserOffset() {
     return parseInt(offset.getAttribute('content'));
 }
 
+/**
+ * @return {string}
+ */
+function getBreakPoint() {
+    return window.getComputedStyle(document.body)
+        .getPropertyValue('content').replace(/"/g, '');
+}
+
+/**
+ * @param {string} amount
+ * @return {string}
+ */
+function removeSpaces(amount) {
+    return amount.replace(/\s+/g, '');
+}
+
+/**
+ * @param {string} amount
+ * @param {int} rate
+ * @param {string} symbol
+ * @param {int} subunit
+ * @return {string}
+ */
+function currencyConversion(amount, rate, symbol, subunit = 2) {
+    amount = Decimal.mul(amount, rate);
+    let currencySymbol = rate !== 1 ? symbol : '';
+    return currencySymbol + toMoney(amount, subunit);
+}
+
+/**
+ * @param {string} link
+ * @return {Promise}
+ */
+function openPopup(link) {
+    return new Promise((resolve) => {
+        let popup = window.open(link, 'popup', 'width=600,height=600');
+
+        let interval = setInterval(() => {
+            if (popup.closed) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 1000);
+    });
+}
+
+/**
+ * @param {string} link
+ * @return {undefined}
+ */
+function openNewTab(link) {
+    const a = document.createElement('a');
+    a.href = link;
+    a.target = '_blank';
+    a.click();
+}
+
+/**
+ * @param {array} arr
+ * @param {string} prop
+ * @param {boolean} excludeEmpty
+ * @return {boolean}
+ */
+function assertUniquePropertyValuesInObjectArray(arr, prop, excludeEmpty = true) {
+    let values = {};
+
+    return arr.every((item) => {
+        if (excludeEmpty && item[prop] === '') {
+            return true;
+        }
+
+        if (values[item[prop]]) {
+            return false;
+        }
+
+        values[item[prop]] = true;
+        return true;
+    });
+}
+
 export {
     isValidUrl,
+    isValidTelegramUrl,
+    isValidDiscordUrl,
     deepFlatten,
     toMoney,
     formatMoney,
@@ -125,4 +238,11 @@ export {
     EchartTheme,
     Interval,
     getUserOffset,
+    useMarkitup,
+    getBreakPoint,
+    removeSpaces,
+    currencyConversion,
+    openPopup,
+    openNewTab,
+    assertUniquePropertyValuesInObjectArray,
 };

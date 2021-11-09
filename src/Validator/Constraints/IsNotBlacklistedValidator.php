@@ -2,19 +2,25 @@
 
 namespace App\Validator\Constraints;
 
+use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
+use App\Manager\TokenManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class IsNotBlacklistedValidator extends ConstraintValidator
 {
-    /** @var BlacklistManagerInterface */
-    private $blacklistManager;
 
-    public function __construct(BlacklistManagerInterface $blacklistManager)
-    {
+    private BlacklistManagerInterface $blacklistManager;
+    private TokenManagerInterface $tokenManager;
+
+    public function __construct(
+        BlacklistManagerInterface $blacklistManager,
+        TokenManagerInterface $tokenManager
+    ) {
         $this->blacklistManager = $blacklistManager;
+        $this->tokenManager = $tokenManager;
     }
 
     /**
@@ -24,11 +30,20 @@ class IsNotBlacklistedValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint): void
     {
+        if (null === $value) {
+            return;
+        }
+
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if ($this->blacklistManager->isBlacklisted($value, $constraint->type, $constraint->caseSensetive)) {
+        if ((Blacklist::EMAIL === $constraint->type &&
+            $this->blacklistManager->isBlacklistedEmail($value, $constraint->caseSensetive)) ||
+            (in_array($constraint->type, Blacklist::TOKEN_TYPES, true) &&
+            $this->blacklistManager->isBlackListedToken($value, $constraint->caseSensetive)) &&
+            !$this->tokenManager->findByName($value)
+        ) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }

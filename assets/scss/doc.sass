@@ -1,0 +1,166 @@
+@import 'variables'
+@import 'mixins'
+
+header::before
+  content: none
+
+.text-monospaced
+  font-family: 'Consolas', sans-serif !important
+
+.swagger-ui
+  .download-contents
+    width: auto
+
+  color: $dark-white
+
+  .response-col_description span .response-col_description div div
+    @extend .text-monospaced
+    color: #3b4151
+
+  .curl, .request-url pre, .response-col_description .markdown, .opblock-body pre span
+    @extend .text-monospaced
+    color: $dark-white !important
+
+  .curl
+    -webkit-text-fill-color: $dark-white
+
+  input::placeholder
+    color: $dark-white
+
+  .auth-wrapper
+    padding-right: 5px
+
+  .response-undocumented i, .parameters-col_name div, .body-param__text, .false td, .false td span span span
+    @extend .text-monospaced
+
+  .scheme-container
+    box-shadow: none
+    background: none
+
+  .arrow
+    filter: invert(1)
+
+  .wrapper
+    .models
+      background: white
+
+    @include media-breakpoint-down('sm')
+      margin: 0 !important
+      padding: 0 !important
+
+      section
+        margin: 0
+        padding: 0
+
+  .opblock-tag
+    background: $primary
+    color: $dark-white
+
+  .opblock-tag-section
+    background: $primary
+    padding: 10px 10px 0 10px
+
+  .opblock-summary-path
+    .nostyle
+      @extend .text-monospaced
+
+  .swagger-ui .info .description p
+    color: $dark-white
+
+  .swagger-ui .model-container
+    overflow: auto
+
+  .title
+    display: none
+
+  .response-col_status
+    width: auto
+
+  .btn.authorize svg
+    fill: $dark-white
+
+  .authorization__btn.locked
+    opacity: .4
+
+  .parameters-col_name
+    width: auto
+
+  .parameters-col_description
+    color: $black
+    width: auto
+
+  .opblock-summary-description
+    text-align: right
+
+  .modal-ux
+    border: none !important
+    border-radius: 0 !important
+    box-shadow: none !important
+
+    .modal-ux-header
+      background: $primary
+
+      h3
+        color: $dark-white
+
+      .close-modal
+        filter: invert(1)
+
+#swagger-ui.api-platform
+  .wrapper
+    padding: 0 10px
+
+  .opblock-tag:hover
+    background-color: rgba(0, 0, 0, .1)
+    color: $dark-white
+
+  .information-container
+    margin-bottom: auto !important
+
+    &.wrapper
+      display: none
+      background-color: transparent
+      border-bottom: none
+
+  .btn
+    color: $dark-white
+    background-color: $secondary !important
+    border: none !important
+    border-radius: inherit
+
+    &:focus
+      box-shadow: 0 0 0 0.2rem rgba(50, 88, 113, .5)
+      -webkit-box-shadow: 0 0 0 0.2rem rgba(50, 88, 113, .5)
+
+    @media (hover: hover)
+      &:hover
+        color: $secondary !important
+        background-color: $dark-white !important
+        border-color: $dark-white !important
+    @media (hover: none)
+      background-color: $primary
+      border-color: $dark-white !important
+
+    &:hover
+      background-color: $secondary-dark !important
+      color: $dark-white !important
+      border: none !important
+
+  .auth-wrapper
+    .btn
+      border: 1px solid $dark-white !important
+      &:hover
+        color: $secondary !important
+        background-color: $dark-white !important
+
+        svg
+          fill: $secondary
+
+    .auth-btn-wrapper
+      .btn
+        border: none !important
+
+  select
+    @include media-breakpoint-down('sm')
+      width: 100%
+      min-width: auto

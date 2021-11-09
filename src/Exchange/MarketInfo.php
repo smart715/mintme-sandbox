@@ -3,36 +3,83 @@
 namespace App\Exchange;
 
 use Money\Money;
+use Swagger\Annotations as SWG;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MarketInfo
 {
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $last;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $volume;
 
-    /** @var Money*/
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $open;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $close;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $high;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $low;
 
-    /** @var Money */
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
     private $deal;
 
-    /** @var string */
+    /**
+     * @SWG\Property(property="quote")
+     * @var string
+     */
     private $tokenName;
 
-    /** @var string */
+    /** @var Money */
+    private $monthDeal;
+
+    /**
+     * @SWG\Property(property="base")
+     * @var string
+     */
     private $cryptoSymbol;
+
+    /**
+     * @var Money
+     * @SWG\Property(type="number")
+     */
+    private $buyDepth;
+
+    /** @var Money */
+    private $soldOnMarket;
+
+    /** @var \DateTimeImmutable|null */
+    private $expires;
 
     public function __construct(
         string $cryptoSymbol,
@@ -43,7 +90,11 @@ class MarketInfo
         Money $close,
         Money $high,
         Money $low,
-        Money $deal
+        Money $deal,
+        Money $monthDeal,
+        Money $buyDepth,
+        Money $soldOnMarket,
+        ?\DateTimeImmutable $expires
     ) {
         $this->cryptoSymbol = $cryptoSymbol;
         $this->tokenName = $tokenName;
@@ -54,55 +105,104 @@ class MarketInfo
         $this->high = $high;
         $this->low = $low;
         $this->deal = $deal;
+        $this->monthDeal = $monthDeal;
+        $this->buyDepth = $buyDepth;
+        $this->soldOnMarket = $soldOnMarket;
+        $this->expires = $expires;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /**
+     * @Groups({"Default", "API", "dev"})
+     * @SWG\Property(type="string")
+     */
     public function getLast(): Money
     {
         return $this->last;
     }
 
+    /** @Groups({"dev"}) */
     public function getDeal(): Money
     {
         return $this->deal;
     }
 
+    /** @Groups({"dev"}) */
     public function getLow(): Money
     {
         return $this->low;
     }
 
+    public function getMonthDeal(): Money
+    {
+        return $this->monthDeal;
+    }
+
+    /** @Groups({"dev"}) */
     public function getHigh(): Money
     {
         return $this->high;
     }
 
+    /** @Groups({"dev"}) */
     public function getClose(): Money
     {
         return $this->close;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "dev"}) */
     public function getOpen(): Money
     {
         return $this->open;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /** @Groups({"Default", "API", "dev"}) */
     public function getVolume(): Money
     {
         return $this->volume;
     }
 
-    /** @Groups({"Default", "API"}) */
+    /**
+     * @SerializedName("base")
+     * @Groups({"Default", "API", "dev"})
+     */
     public function getCryptoSymbol(): string
     {
         return $this->cryptoSymbol;
     }
 
-    /** @Groups({"Default", "API"}) */
+    public function setCryptoSymbol(string $cryptoSymbol): void
+    {
+        $this->cryptoSymbol = $cryptoSymbol;
+    }
+
+    /**
+     * @SerializedName("quote")
+     * @Groups({"Default", "API", "dev"})
+     */
     public function getTokenName(): string
     {
         return $this->tokenName;
+    }
+
+    public function setTokenName(string $tokenName): void
+    {
+        $this->tokenName = $tokenName;
+    }
+
+    /** @Groups({"dev"}) */
+    public function getBuyDepth(): Money
+    {
+        return $this->buyDepth;
+    }
+
+    /** @Groups({"Default"}) */
+    public function getSoldOnMarket(): Money
+    {
+        return $this->soldOnMarket;
+    }
+
+    public function getExpires(): ?\DateTimeImmutable
+    {
+        return $this->expires;
     }
 }

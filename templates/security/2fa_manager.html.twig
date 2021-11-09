@@ -5,26 +5,24 @@
 {% block content %}
     {% if backupCodes %}
         <div class="container text-center">
-            <div class="row pt-5 justify-content-center">
-                <div class="col-lg-4 col-md-6">
+            <div class="row pt-4 justify-content-center">
+                <div class="col-10 col-sm-10 col-md-8 col-lg-6 col-xl-5">
                     <div class="card">
                         <div class="card-header">
-                            Two-Factor authentication backup codes
+                            {% trans %}page.manager_2fa.header{% endtrans %}
                         </div>
                         <div class="card-body text-center">
                             <p>
                                 <small>
-                                    Should you ever lose your phone, each of these recovery codes can be used
-                                    one time each to regain access to your account.
-                                    Please save them in a safe place, or you <b>will</b> lose access to your account.
+                                    {% trans %}page.manager_2fa.body{% endtrans %}
                                 </small>
                             </p>
-                            <code class="html hljs">
+                            <code class="html hljs text-white">
                                 {% for backupCode in backupCodes %}
                                     <p>{{ backupCode }}</p>
                                 {% endfor %}
                             </code>
-                            <p><a href="{{ path('settings') }}" class="btn btn-primary" role="button">Proceed</a></p>
+                            <p><a href="{{ path('settings') }}" class="btn btn-primary" role="button">{% trans %}page.manager_2fa.back_settings{% endtrans %}</a></p>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,60 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, target-densityDpi=device-dpi" />
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="keywords" content="mintMe,MINTME,crypto,exchanger,token,dapps">
+<meta name="author" content="mintme">
+<meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
+{% if viabtc_offset != 0 %}
+    <meta name="X-USER-OFFSET" content="{{ viabtc_offset }}">
+{% endif %}
+<link rel="apple-touch-icon" sizes="57x57" href="{{ asset('build/images/apple-icon-57x57.png') }}">
+<link rel="apple-touch-icon" sizes="60x60" href="{{ asset('build/images/apple-icon-60x60.png') }}">
+<link rel="apple-touch-icon" sizes="72x72" href="{{ asset('build/images/apple-icon-72x72.png') }}">
+<link rel="apple-touch-icon" sizes="76x76" href="{{ asset('build/images/apple-icon-76x76.png') }}">
+<link rel="apple-touch-icon" sizes="114x114" href="{{ asset('build/images/apple-icon-114x114.png') }}">
+<link rel="apple-touch-icon" sizes="120x120" href="{{ asset('build/images/apple-icon-120x120.png') }}">
+<link rel="apple-touch-icon" sizes="144x144" href="{{ asset('build/images/apple-icon-144x144.png') }}">
+<link rel="apple-touch-icon" sizes="152x152" href="{{ asset('build/images/apple-icon-152x152.png') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ asset('build/images/apple-icon-180x180.png') }}">
+<link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('build/images/android-icon-192x192.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('build/images/favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="96x96" href="{{ asset('build/images/favicon-96x96.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ asset('build/images/favicon-16x16.png') }}">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="{{ asset('manifest.json') }}">
+
+<meta name="theme-color" content="#141C29">
+
+<meta property="og:title" content="{{ metaTitle | default('mintMe | create your own token, monetize yourself!') }}">
+<meta property="og:site_name" content="Mintme">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ app.request.uri }}">
+<meta property="og:image" content="{{ metaImage | default(asset('build/images/view-logo.png')) | absolute_url }}">
+<meta
+    property="og:image:alt"
+    content="{{ metaImageAlt | default('Mintme logo. Create your own token, monetize yourself!') }}"
+>
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="{{ app.request.uri }}">
+<meta name="twitter:creator" content="Mintme">
+
+<style>
+    @font-face {
+        font-family: 'ConcordBold';
+        src: url({{ asset('build/fonts/Concord-Bold.ttf') }}) format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Concord';
+        src: url({{ asset('build/fonts/Concord.otf') }}) format('opentype');
+    }
+
+    body {
+        background-color: #0c1a29;
+    }
+</style>
+

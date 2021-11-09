@@ -29,6 +29,7 @@ class ProfileFetcher implements ProfileFetcherInterface
             throw new RuntimeException('Not authenticated.');
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         return $this->profileManager->getProfile(
             $this->tokenStorage->getToken()->getUser()
         );

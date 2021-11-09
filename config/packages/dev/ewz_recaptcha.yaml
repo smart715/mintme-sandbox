@@ -1,2 +1,3 @@
 ewz_recaptcha:
+    # Don't change it. Thi option isn't supported with a custom ewz recaptcha
     enabled: true

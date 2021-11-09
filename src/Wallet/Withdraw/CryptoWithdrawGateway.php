@@ -23,9 +23,14 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
         $this->mapper = $mapper;
     }
 
-    public function withdraw(User $user, Money $balance, string $address, Crypto $crypto): void
-    {
-        $this->communicator->sendWithdrawRequest($user, $balance, $address, $crypto);
+    public function withdraw(
+        User $user,
+        Money $balance,
+        string $address,
+        Crypto $crypto,
+        ?Money $fee = null
+    ): void {
+        $this->communicator->sendWithdrawRequest($user, $balance, $address, $crypto, $fee);
     }
 
     public function retryWithdraw(WithdrawCallbackMessage $callbackMessage): void
@@ -43,5 +48,10 @@ class CryptoWithdrawGateway implements WithdrawGatewayInterface
     public function getBalance(Crypto $crypto): Money
     {
         return $this->mapper->getBalance($crypto);
+    }
+
+    public function isContractAddress(string $address, string $crypto): bool
+    {
+        return $this->mapper->isContractAddress($address, $crypto);
     }
 }

@@ -8,4 +8,5 @@ interface WebsiteVerifierInterface
     public const PREFIX = 'mintme-site-verification';
 
     public function verify(string $url, string $verificationToken): bool;
+    public function verifyAirdropPostLinkAction(string $url, string $message): bool;
 }

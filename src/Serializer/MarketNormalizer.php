@@ -28,8 +28,13 @@ class MarketNormalizer implements NormalizerInterface
      */
     public function normalize($market, $format = null, array $context = array())
     {
+        /** @var array $normalized */
         $normalized = $this->normalizer->normalize($market, $format, $context);
-        $normalized['identifier'] = $this->marketNameConverter->convert($market);
+
+        if ($context['groups'] &&
+            (in_array('Default', $context['groups']) || in_array('API', $context['groups']))) {
+            $normalized['identifier'] = $this->marketNameConverter->convert($market);
+        }
 
         return $normalized;
     }

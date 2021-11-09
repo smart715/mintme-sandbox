@@ -8,6 +8,21 @@ sonata_admin:
             - { position: left, type: sonata.admin.block.admin_list }
 
         groups:
+            main.documents:
+                label: Main Documents
+                items:
+                    - admin.main.documents
+
+            reciprocal.links:
+                label: reciprocal links
+                items:
+                    - admin.reciprocal.links
+            knowledge.base:
+                label: Knowledge Base
+                items:
+                    - admin.knowledgebase
+                    - admin.knowledgebase.category
+                    - admin.knowledgebase.subcategory
 
             blacklist:
                 label: Blacklist
@@ -38,7 +53,29 @@ sonata_admin:
                     - sonata.classification.admin.collection
                     - sonata.classification.admin.context
 
+            translations:
+                label: Translations
+                items:
+                    - route: translation_index
+                      label: All translations
+                icon: '<i class="fa fa-language"></i>'
+
     templates:
         layout: admin/custom_layout.html.twig
         edit: admin/custom_edit.html.twig
         base_list_field: admin/custom_base_list_field.html.twig
+        preview: admin/preview.html.twig
+
+    assets:
+        extra_javascripts:
+            - bundles/fosckeditor/ckeditor.js
+            - bundles/sonataformatter/vendor/markitup-markitup/markitup/jquery.markitup.js
+            - bundles/sonataformatter/markitup/sets/markdown/set.js
+            - bundles/sonataformatter/markitup/sets/html/set.js
+            - bundles/sonataformatter/markitup/sets/textile/set.js
+
+        extra_stylesheets:
+            - bundles/sonataformatter/markitup/skins/sonata/style.css
+            - bundles/sonataformatter/markitup/sets/markdown/style.css
+            - bundles/sonataformatter/markitup/sets/html/style.css
+            - bundles/sonataformatter/markitup/sets/textile/style.css

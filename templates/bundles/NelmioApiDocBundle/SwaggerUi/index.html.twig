@@ -1,0 +1,191 @@
+{# templates/bundles/NelmioApiDocBundle/SwaggerUi/index.html.twig #}
+
+{#
+    To avoid a "reached nested level" error an exclamation mark `!` has to be added
+    See https://symfony.com/blog/new-in-symfony-3-4-improved-the-overriding-of-templates
+#}
+{% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
+
+{% if '/v1' in app.request.uri %}
+    {% set version = 'v1' %}
+{% else %}
+    {% set version = 'v2' %}
+{% endif %}
+
+{% block title %}
+    {% trans %}api.page.title{% endtrans %} | mintMe
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .top-navbar .mintme-logo {
+          max-height: 42px !important;
+        }
+
+        @media (min-width: 768px) {
+          .top-navbar .mintme-logo {
+            max-height: 48px !important;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .top-navbar .mintme-logo {
+            max-height: 56px !important;
+          }
+        }
+
+        #footer .socialmedia img {
+          width: 45px !important;
+          height: 45px !important;
+          -webkit-transition: all .3s ease;
+          transition: all .3s ease;
+        }
+    </style>
+    {{ encore_entry_link_tags('base_main') }}
+    {{ encore_entry_link_tags('pages/api') }}
+{% endblock stylesheets %}
+
+{% block javascripts %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
+    {% include 'base_scripts.html.twig' %}
+    <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-bundle.js') }}"></script>
+    <script src="{{ asset('bundles/nelmioapidoc/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
+    {{ encore_entry_script_tags('pages/api') }}
+    {% endapply %}
+{% endblock javascripts %}
+
+{% block swagger_initialization %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
+    <script src="{{ asset('bundles/nelmioapidoc/init-swagger-ui.js') }}"></script>
+    {% endapply %}
+{% endblock swagger_initialization %}
+
+{% block header %}
+{% endblock header %}
+
+{% block svg_icons %}
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0">
+        <defs>
+            <symbol viewBox="0 0 20 20" id="unlocked">
+                <path d="M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V6h2v-.801C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8z"></path>
+            </symbol>
+            <symbol viewBox="0 0 20 20" id="locked">
+                <path d="M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V6h2v-.801C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8z"></path>
+            </symbol>
+            <symbol viewBox="0 0 20 20" id="close">
+                <path d="M14.348 14.849c-.469.469-1.229.469-1.697 0L10 11.819l-2.651 3.029c-.469.469-1.229.469-1.697 0-.469-.469-.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-.469-.469-.469-1.228 0-1.697.469-.469 1.228-.469 1.697 0L10 8.183l2.651-3.031c.469-.469 1.228-.469 1.697 0 .469.469.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c.469.469.469 1.229 0 1.698z"></path>
+            </symbol>
+            <symbol viewBox="0 0 20 20" id="large-arrow">
+                <path d="M13.25 10L6.109 2.58c-.268-.27-.268-.707 0-.979.268-.27.701-.27.969 0l7.83 7.908c.268.271.268.709 0 .979l-7.83 7.908c-.268.271-.701.27-.969 0-.268-.269-.268-.707 0-.979L13.25 10z"></path>
+            </symbol>
+            <symbol viewBox="0 0 20 20" id="large-arrow-down">
+                <path d="M17.418 6.109c.272-.268.709-.268.979 0s.271.701 0 .969l-7.908 7.83c-.27.268-.707.268-.979 0l-7.908-7.83c-.27-.268-.27-.701 0-.969.271-.268.709-.268.979 0L10 13.25l7.418-7.141z"></path>
+            </symbol>
+            <symbol viewBox="0 0 24 24" id="jump-to">
+                <path d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z"></path>
+            </symbol>
+            <symbol viewBox="0 0 24 24" id="expand">
+                <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"></path>
+            </symbol>
+        </defs>
+    </svg>
+{% endblock svg_icons %}
+
+{% block swagger_ui %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
+    <div class="content-wrapper d-flex flex-column">
+        {% include 'topnav.html.twig' %}
+        <main class="flex-fill content">
+            <div class="container-fluid">
+                <div class="row pt-4 justify-content-center">
+                    <div class="col-12 px-3">
+                        <div class="card card-fixed-large mx-auto">
+                            <div class="card-header py-3 px-4">
+                                <div class="row justify-content-md-center align-items-center">
+                                    <div class="col"><h2 class="m-0">{% trans %}api.page.title{% endtrans %}</h2></div>
+                                    <div id="api-version" class="col-auto mr-auto">
+                                        <api-version
+                                            url-version={{ version }}
+                                        >
+                                        </api-version>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body py-2 px-0">
+                                <div class="mx-0 px-1 px-sm-4 px-4 mt-4 mb-0 pb-0">
+                                    {% if version != 'v1' %}
+                                    <p>
+                                        {% trans %}api.page.v2.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.v2.body.2{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.v2.body.3{% endtrans %}
+                                    </p>
+                                    {% else %}
+                                    <p>
+                                        {% trans %}api.page.body.1{% endtrans %} <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a> {% trans %}api.page.body.2{% endtrans %}
+                                    </p>
+                                    {% endif %}
+                                    <p>
+                                        {% trans %}api.page.body.3{% endtrans %}
+                                        <span class="text-danger">X-API-ID</span>
+                                        {% trans %}api.page.body.4{% endtrans %}
+                                        <span class="text-danger">X-API-KEY</span>
+                                        {% trans %}api.page.body.5{% endtrans %}
+                                        <span class="text-danger">Authorization: Bearer {token}</span>
+                                        {% trans %}api.page.body.6{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.body.7{% endtrans %}
+                                        <span class="text-danger">{{ path('fos_oauth_server_token') }}?client_id={YOUR_CLIENT_ID}&grant_type=client_credentials&client_secret={YOUR_SECRET}</span>.
+                                        {% trans %}api.page.body.8{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.body.9{% endtrans %}
+                                    </p>
+                                    <p>
+                                        {% if app.user is not null %}
+                                            {% trans %}api.page.body.10{% endtrans %}
+                                            <a href="{{ path('settings') }}">{% trans %}settings{% endtrans %}</a>
+                                            {% trans with {'%path%': path('settings')} %}api.page.body.11{% endtrans %}
+                                        {% else %}
+                                            {% trans with {'%path%': path('login')} %}api.page.body.12{% endtrans %}
+                                        {% endif %}
+                                    </p>
+                                    <p>
+                                        {% trans %}api.page.body.13{% endtrans %}
+                                    </p>
+                                </div>
+                                {{ parent() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% include 'footer.html.twig' %}
+    </div>
+    {% endapply %}
+{% endblock %}
+
+{% block meta %}
+    {% apply
+        replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+        raw
+    %}
+    {% include 'head.html.twig' %}
+    {% endapply %}
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/doc') }}
+{% endblock %}

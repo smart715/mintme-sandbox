@@ -1,5 +1,5 @@
 #!/bin/bash
 
-killall -s SIGQUIT marketprice.exe
+killall -s SIGQUIT marketprice
 sleep 1
-cd /btc/marketprice && ./marketprice.exe config.json
+cd /btc/marketprice && ./marketprice -log_dir=/var/log/trade config.json&

@@ -3,19 +3,22 @@
 namespace App\Entity;
 
 use App\Entity\Token\Token;
-use App\Validator\Constraints\ProfilePeriodLock;
+use App\Validator\Constraints as AppAssert;
+use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProfileRepository")
  * @ORM\HasLifecycleCallbacks()
  * @codeCoverageIgnore
  */
-class Profile
+class Profile implements ImagineInterface
 {
     /**
      * @ORM\Id()
@@ -26,35 +29,37 @@ class Profile
     protected $id;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
-     * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
+     * @ORM\Column(type="string", unique=true, nullable=true)
      * @Groups({"API", "Default"})
+     * @var string
+     */
+    protected $nickname;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     * @AppAssert\ProfileNameRequired()
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
+     * @Assert\Length(max="30")
+     * @AppAssert\ProfilePeriodLock()
      * @var string|null
      */
     protected $firstName;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[A-Za-zÁ-Źá-ź]+[A-Za-zÁ-Źá-ź\s'‘’`´-]*$/u")
-     * @Assert\Length(min="2")
+     * @AppAssert\ProfileNameRequired()
+     * @Assert\Regex(pattern="/^[\p{L}]+[\p{L}\s'‘’`´-]*$/u")
      * @Assert\Length(max="30")
-     * @ProfilePeriodLock()
-     * @Groups({"API", "Default"})
+     * @AppAssert\ProfilePeriodLock()
      * @var string|null
      */
     protected $lastName;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\Regex(pattern="/^[A-Za-z\s-]+$/u")
+     * @Assert\Regex(pattern="/^[\p{L}\s-]+$/u")
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $city;
@@ -64,7 +69,6 @@ class Profile
      * @Assert\Country()
      * @Assert\Length(min="2")
      * @Assert\Length(max="30")
-     * @Groups({"Default", "API"})
      * @var string|null
      */
     protected $country;
@@ -84,9 +88,11 @@ class Profile
      */
     protected $anonymous = false;
 
+    public bool $disabledAnonymous = false;  // phpcs:ignore
+
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
-     * @var \DateTimeImmutable|null
+     * @var DateTimeImmutable|null
      */
     protected $nameChangedDate;
 
@@ -97,21 +103,57 @@ class Profile
     protected $user;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
-     * @var Token|null
+     * @ORM\OneToOne(
+     *     targetEntity="App\Entity\PhoneNumber",
+     *     mappedBy="profile",
+     *     orphanRemoval=true,
+     *     cascade={"persist", "remove"}
+     *     )
+     * @ORM\JoinColumn(name="phone_number_id", referencedColumnName="id")
+     */
+    protected ?PhoneNumber $phoneNumber;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Token\Token", mappedBy="profile", cascade={"persist", "remove"})
+     * @var ArrayCollection|null
      * @Groups({"API"})
      */
-    protected $token;
+    protected $tokens;
 
     /** @var bool */
     private $isChangesLocked = false;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @AppAssert\ZipCode(getter="getCountry")
      * @var string|null
-     * @Groups({"API"})
      */
-    private $page_url;
+    protected $zipCode;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Image", cascade={"remove"}, orphanRemoval=true)
+     * @ORM\JoinColumn(name="image_id", referencedColumnName="id")
+     * @var Image|null
+     */
+    protected $image;
+
+    /**
+     * @ORM\Column(name="number_of_reminder", type="smallint")
+     * @var int
+     */
+    private $numberOfReminder = 0;
+
+    /**
+     * @ORM\Column(name="next_reminder_date", type="date", nullable=true)
+     * @var \DateTime
+     */
+    private $nextReminderDate;
+
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @var DateTimeImmutable
+     */
+    private ?DateTimeImmutable $created;
 
     public function __construct(User $user)
     {
@@ -138,7 +180,7 @@ class Profile
     /** @ORM\PreUpdate() */
     public function updateNameChangedDate(PreUpdateEventArgs $args): self
     {
-        if ($args->hasChangedField('firstName') || $args->hasChangedField('lastName')) {
+        if ($this->keyChanged($args, 'firstName') || $this->keyChanged($args, 'lastName')) {
             $this->nameChangedDate = new \DateTimeImmutable('+1 month');
         }
 
@@ -150,24 +192,56 @@ class Profile
         return $this->nameChangedDate;
     }
 
+    private function returnDefault(): bool
+    {
+        return !$this->isAnonymous() || $this->disabledAnonymous;
+    }
+
+    private function filterAnonymous(?string $property): string
+    {
+        return  is_null($property)
+            ? ''
+            : ($property && $this->returnDefault()
+            ? $property
+            : 'Anonymous');
+    }
+
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getFirstName(): ?string
+    public function getNickname(): string
     {
-        return $this->firstName;
+        return $this->nickname ?? '';
     }
 
-    public function getLastName(): ?string
+    /**
+     * @Groups({"API", "Default"})
+     * @return string
+     */
+    public function getFirstName(): string
     {
-        return $this->lastName;
+        return $this->filterAnonymous($this->firstName);
     }
 
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getLastName(): string
+    {
+        return $this->filterAnonymous($this->lastName);
+    }
+
+    /**
+     * @Groups({"API", "Default"})
+     */
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description && $this->returnDefault()
+            ? $this->description
+            : '';
     }
 
     public function setDescription(?string $description): self
@@ -189,9 +263,20 @@ class Profile
         return $this;
     }
 
-    public function getCity(): ?string
+    public function setDisabledAnonymous(bool $disabledAnonymous): self
     {
-        return $this->city;
+        $this->disabledAnonymous = $disabledAnonymous;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getCity(): string
+    {
+        return $this->filterAnonymous($this->city);
     }
 
     public function setCity(?string $city): self
@@ -210,14 +295,25 @@ class Profile
         return null;
     }
 
-    public function getCountry(): ?string
+    /**
+     * @return string
+     * @Groups({"API", "Default"})
+     */
+    public function getCountry(): string
     {
-        return $this->country;
+        return $this->filterAnonymous($this->country);
     }
 
     public function setCountry(?string $country): self
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    public function setNickname(string $nickname): self
+    {
+        $this->nickname = $nickname;
 
         return $this;
     }
@@ -236,25 +332,162 @@ class Profile
         return $this;
     }
 
-    public function getPageUrl(): ?string
-    {
-        return $this->page_url;
-    }
-
-    public function setPageUrl(?string $page_url): self
-    {
-        $this->page_url = $page_url;
-
-        return $this;
-    }
-
     public function getUserEmail(): string
     {
         return $this->user->getEmail();
     }
 
-    public function getToken(): ?Token
+    public function getMintmeToken(): ?Token
     {
-        return $this->token;
+        /** @var Token $token */
+        foreach ($this->getTokens() as $token) {
+            if ($token->isMintmeToken()) {
+                return $token;
+            }
+        }
+
+        return null;
+    }
+
+    public function getFirstToken(): ?Token
+    {
+        if ($this->hasTokens()) {
+            return $this->tokens[0];
+        }
+
+        return null;
+    }
+
+    public function getTokens(): array
+    {
+        return null !== $this->tokens
+            ? $this->tokens->toArray()
+            : [];
+    }
+
+    public function hasTokens(): bool
+    {
+        return count($this->getTokens()) > 0;
+    }
+
+    public function hasBlockedTokens(): bool
+    {
+        /** @var Token $token */
+        foreach ($this->getTokens() as $token) {
+            if ($token->isBlocked()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(?string $zipCode = null): self
+    {
+        $this->zipCode = $zipCode;
+
+        return $this;
+    }
+
+    private function keyChanged(PreUpdateEventArgs $args, string $name): bool
+    {
+        return $args->hasChangedField($name)
+            && null !== $args->getOldValue($name)
+            && ($args->getOldValue($name) || $args->getNewValue($name));
+    }
+
+    public function setImage(Image $image): void
+    {
+        $this->image = $image;
+    }
+
+
+    /**
+     * @return Image
+     * @Groups({"API", "Default"})
+     */
+    public function getImage(): Image
+    {
+        return $this->image ?? Image::defaultImage(Image::DEFAULT_PROFILE_IMAGE_URL);
+    }
+
+
+    /**
+    * @Assert\Callback
+    */
+    public function validateNames(ExecutionContextInterface $context, ?string $payload): void
+    {
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getFirstName()))) {
+            if (2 > strlen(strval($this->getFirstName()))) {
+                $context->buildViolation('This value is too short. It should have 2 characters or more.')
+                ->atPath('firstName')
+                ->addViolation();
+            }
+        }
+
+        if (preg_match("/[A-Za-zÄÖÜäöüß -]/", strval($this->getLastName()))) {
+            if (2 > strlen(strval($this->getLastName()))) {
+                $context->buildViolation('This value is too short. It should have 2 characters or more.')
+                ->atPath('lastName')
+                ->addViolation();
+            }
+        }
+    }
+
+    public function getNumberOfReminder(): ?int
+    {
+        return $this->numberOfReminder;
+    }
+
+    public function setNumberOfReminder(int $numberOfReminder): self
+    {
+        $this->numberOfReminder = $numberOfReminder;
+
+        return $this;
+    }
+
+    public function getNextReminderDate(): ?\DateTime
+    {
+        return $this->nextReminderDate;
+    }
+
+    public function setNextReminderDate(\DateTime $nextReminderDate): self
+    {
+        $this->nextReminderDate = $nextReminderDate;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function setCreated(): self
+    {
+        $this->created = new DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getCreated(): ?DateTimeImmutable
+    {
+        return $this->created;
+    }
+
+    public function getPhoneNumber(): ?PhoneNumber
+    {
+        return $this->phoneNumber;
+    }
+
+
+    public function setPhoneNumber(?PhoneNumber $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
     }
 }

@@ -2,164 +2,253 @@
     <div>
         <div class="card">
             <div class="card-header">
-                Trade History
+                {{ $t('trade.history.header') }}
                 <span class="card-header-icon">
                     <guide>
                         <template slot="header">
-                            Trade History
+                            {{ $t('trade.history.guide_header') }}
                         </template>
                         <template slot="body">
-                            List of last closed orders for {{ market.base.symbol }}.
+                            {{ $t('trade.history.guide_body', {baseSymbol: market.base.symbol}) | rebranding }}
                         </template>
                     </guide>
                 </span>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive fixed-head-table" ref="tableData">
-                    <template v-if="loaded">
+                <template v-if="loaded">
+                    <div class="table-responsive fixed-head-table mb-0" ref="table">
                         <b-table
                             v-if="hasOrders"
                             class="w-100"
-                            ref="table"
                             :items="ordersList"
                             :fields="fields">
-                            <template slot="orderMaker" slot-scope="row">
-                                <a :href="row.item.makerUrl">
-                                    <span v-b-tooltip="{title: row.item.makerFullName, boundary:'viewport'}">
-                                        {{ row.value }}
-                                    </span>
-                                    <img
-                                        src="../../../img/avatar.png"
-                                        class="pl-3 pl-lg-0 float-lg-right"
-                                        alt="avatar">
-                                </a>
+
+                            <template v-slot:head(pricePerQuote)>
+                                <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding | truncate(maxLengthToTruncate) }}
+                                </span>
+                                <span v-else>
+                                    {{ $t('trade.history.price_per') }} {{ market.quote | rebranding }}
+                                </span>
                             </template>
-                            <template slot="orderTrader" slot-scope="row">
-                                <a :href="row.item.takerUrl">
-                                    <span v-b-tooltip="{title: row.item.takerFullName, boundary:'viewport'}">
-                                        {{ row.value }}
-                                    </span>
-                                    <img
-                                        src="../../../img/avatar.png"
-                                        class="pl-3 pl-lg-0 float-lg-right"
-                                        alt="avatar">
-                                </a>
+
+                            <template v-slot:head(quoteAmount)>
+                                <span v-if="shouldTruncate" v-b-tooltip="{title: rebrandingFunc(market.quote), boundary:'viewport'}">
+                                    {{ market.quote | rebranding | truncate(maxLengthToTruncate) }} {{ $t('trade.history.amount') }}
+                                </span>
+                                 <span v-else>
+                                    {{ market.quote | rebranding }} {{ $t('trade.history.amount') }}
+                                </span>
+                            </template>
+
+                            <template v-slot:cell(orderMaker)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.makerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
+                                        <img
+                                            :src="row.item.makerAvatar"
+                                            class="rounded-circle d-block flex-grow-0 mr-1"
+                                            :alt="$t('avatar')">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </a>
+                                    <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                    </a>
+                                </div>
+                            </template>
+                            <template v-slot:cell(orderTrader)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <a :href="row.item.takerUrl" class="d-flex flex-row flex-nowrap justify-content-between w-100 text-white">
+                                        <img
+                                            :src="row.item.takerAvatar"
+                                            class="rounded-circle d-block flex-grow-0 mr-1"
+                                            alt="avatar">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span v-b-tooltip="{title: row.value, boundary:'viewport'}"
+                                            >
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </a>
+                                    <a v-if="row.item.owner" class="d-inline-block flex-grow-0" @click="removeOrderModal(row.item)">
+                                        <font-awesome-icon icon="times" class="text-danger c-pointer ml-2" />
+                                    </a>
+                                </div>
+                            </template>
+                            <template v-slot:cell(pricePerQuote)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span class="d-inline-block truncate-name flex-grow-1">
+                                            <span
+                                                v-b-tooltip="{title: currencyConvert(row.value, rate, 2), boundary:'viewport'}">
+                                                {{ row.value }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-slot:cell(baseAmount)="row">
+                                <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                    <div class="col-11 pl-0 ml-0">
+                                        <span
+                                            class="d-inline-block truncate-name flex-grow-1"
+                                            v-text="currencyMode === currencyModes.usd.value ?
+                                                currencyConvert(row.value, rate, 2) :
+                                                row.value">
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-slot:cell(dateTime)="row">
+                                <span class="truncate-name" v-b-tooltip="{title: row.value, boundary:'viewport'}">
+                                    {{ row.value | truncate(11) }}
+                                </span>
                             </template>
                         </b-table>
-                        <div v-if="!hasOrders">
-                            <p class="text-center p-5">No deal was made yet</p>
-                        </div>
-                        <div v-if="loading" class="p-1 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class="p-5 text-center">
-                            <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
-                        </div>
-                    </template>
-                </div>
-                <div class="text-center pb-2" v-if="showDownArrow">
-                    <img
-                        src="../../../img/down-arrows.png"
-                        class="icon-arrows-down c-pointer"
-                        alt="arrow down"
-                        @click="scrollDown">
-                </div>
+                    </div>
+                    <div v-if="!hasOrders">
+                        <p class="text-center p-5">{{ $t('trade.history.no_deals') }}</p>
+                    </div>
+                    <div v-if="loading" class="p-1 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="p-5 text-center">
+                        <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import Guide from '../Guide';
-import {formatMoney, toMoney} from '../../utils';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import moment from 'moment';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
-import {WebSocketMixin, LazyScrollTableMixin} from '../../mixins';
+import {BTable, VBTooltip} from 'bootstrap-vue';
+import Guide from '../Guide';
+import {formatMoney, toMoney, removeSpaces, currencyConversion} from '../../utils';
+import {mapGetters} from 'vuex';
+import {USD, usdSign, currencyModes} from '../../utils/constants.js';
+import {GENERAL} from '../../utils/constants';
+import {
+    WebSocketMixin,
+    FiltersMixin,
+    LazyScrollTableMixin,
+    RebrandingFilterMixin,
+    OrderMixin,
+} from '../../mixins/';
+
+library.add(faCircleNotch, faTimes);
 
 export default {
     name: 'TradeTradeHistory',
-    mixins: [WebSocketMixin, LazyScrollTableMixin],
+    components: {
+        BTable,
+        Guide,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        OrderMixin,
+    ],
     props: {
         market: Object,
-    },
-    components: {
-        Guide,
+        currencyMode: String,
     },
     data() {
         return {
-            fields: {
-                type: {
-                    label: 'Type',
+            maxLengthToTruncate: 4,
+            currencyModes,
+            fields: [
+                {
+                    key: 'type',
+                    label: this.$t('trade.history.type'),
                 },
-                orderMaker: {
-                    label: 'Order maker',
+                {
+                    key: 'orderMaker',
+                    label: this.$t('trade.history.order_maker'),
                 },
-                orderTrader: {
-                    label: 'Order taker',
+                {
+                    key: 'orderTrader',
+                    label: this.$t('trade.history.order_taker'),
                 },
-                pricePerQuote: {
-                    label: 'Price per ' + this.market.quote.symbol,
+                {
+                    key: 'pricePerQuote',
                     formatter: formatMoney,
                 },
-                quoteAmount: {
-                    label: this.market.quote.symbol + ' amount',
+                {
+                    key: 'quoteAmount',
                     formatter: formatMoney,
                 },
-                baseAmount: {
-                    label: this.market.base.symbol + ' amount',
+                {
+                    key: 'baseAmount',
+                    label: this.$t('trade.orders.sum'),
                     formatter: formatMoney,
                 },
-                dateTime: {
-                    label: 'Date & Time',
+                {
+                    key: 'dateTime',
+                    label: this.$t('trade.history.time'),
                 },
-            },
+            ],
+            currentPage: 1,
+            limit: 100,
         };
     },
     computed: {
+        ...mapGetters('rates', [
+            'getRates',
+        ]),
+        shouldTruncate: function() {
+            return this.market.quote.symbol.length > this.maxLengthToTruncate;
+        },
         hasOrders: function() {
             return this.ordersList.length > 0;
         },
         ordersList: function() {
-            return this.tableData !== false ? this.tableData.map((order) => {
-                return {
-                    dateTime: new Date(order.timestamp * 1000).toDateString(),
-                    orderMaker: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? this.truncateFullName(order.maker.profile)
-                        : 'Anonymous',
-                    orderTrader: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? this.truncateFullName(order.taker.profile)
-                        : 'Anonymous',
-                    makerFullName: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? order.maker.profile.firstName + ' ' + order.maker.profile.lastName
-                        : 'Anonymous',
-                    takerFullName: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? order.taker.profile.firstName + ' ' + order.taker.profile.lastName
-                        : 'Anonymous',
-                    makerUrl: order.maker && order.maker.profile && !order.maker.profile.anonymous
-                        ? this.$routing.generate('profile-view', {pageUrl: order.maker.profile.page_url})
-                        : '',
-                    takerUrl: order.taker && order.taker.profile && !order.taker.profile.anonymous
-                        ? this.$routing.generate('profile-view', {pageUrl: order.taker.profile.page_url})
-                        : '',
-                    type: (order.side === WSAPI.order.type.BUY) ? 'Buy' : 'Sell',
-                    pricePerQuote: toMoney(order.price, this.market.base.subunit),
-                    quoteAmount: toMoney(order.amount, this.market.quote.subunit),
-                    baseAmount: toMoney(
-                        new Decimal(order.price).mul(order.amount).toString(),
-                        this.market.base.subunit
-                    ),
-                };
-            }) : [];
+            return this.tableData !== false ? this.tableData.filter((order) => order.maker && order.taker)
+                .map((order) => {
+                    return {
+                        dateTime: moment.unix(order.timestamp).format(GENERAL.dateFormat),
+                        orderMaker: order.maker.profile.nickname,
+                        orderTrader: order.taker.profile.nickname,
+                        makerUrl: this.$routing.generate('profile-view', {nickname: order.maker.profile.nickname}),
+                        takerUrl: this.$routing.generate('profile-view', {nickname: order.taker.profile.nickname}),
+                        type: this.getSideByType(order.side),
+                        pricePerQuote: toMoney(order.price, this.market.base.subunit),
+                        quoteAmount: toMoney(order.amount, this.market.quote.subunit),
+                        baseAmount: toMoney(
+                            new Decimal(order.price).mul(order.amount).toString(),
+                            this.market.base.subunit
+                        ),
+                        makerAvatar: order.maker.profile.image.avatar_small,
+                        takerAvatar: order.taker.profile.image.avatar_small,
+                    };
+                }) : [];
         },
         loaded: function() {
             return this.tableData !== null;
         },
         lastId: function() {
-            return this.tableData && this.tableData[0] && this.tableData[0].hasOwnProperty('id') ?
-                this.tableData[0].id :
+            return this.tableData && this.tableData.length && this.tableData[this.tableData.length - 1].hasOwnProperty('id') ?
+                this.tableData[this.tableData.length - 1].id :
                 0;
+        },
+        rate: function() {
+            return (this.getRates[this.market.base.symbol] || [])[USD.symbol] || 1;
         },
     },
     mounted: function() {
@@ -183,22 +272,25 @@ export default {
                         quote: this.market.quote.symbol,
                         id: parseInt(orders[0].id),
                     })).then((res) => {
-                        this.tableData.unshift(res.data);
+                        if (this.tableData.findIndex((item) => item.id === res.data.id) === -1) {
+                            this.tableData.unshift(res.data);
+                        }
+                    }).catch((err) => {
+                        this.sendLogs('error', 'Can not get executed order details', err);
                     });
                 }
-            }, 'trade-tableData-update-deals');
+            }, 'trade-tableData-update-deals', 'TradeTradeHistory');
+        }).catch((err) => {
+            this.sendLogs('error', 'Can not update table data', err);
         });
     },
     methods: {
-        startScrollListeningOnce: function(val) {
-            // Disable listener from mixin
-        },
         updateTableData: function(attach = false) {
             return new Promise((resolve, reject) => {
                 this.$axios.retry.get(this.$routing.generate('executed_orders', {
                     base: this.market.base.symbol,
                     quote: this.market.quote.symbol,
-                    id: this.lastId,
+                    id: this.currentPage,
                 })).then((result) => {
                     if (!result.data.length) {
                         if (!attach) {
@@ -208,28 +300,29 @@ export default {
                         return resolve([]);
                     }
 
-                    this.tableData = !attach ? result.data : this.tableData.concat(result.data);
-
-                    if (this.$refs.table) {
-                        this.$refs.table.refresh();
+                    if (!attach) {
+                        this.tableData = result.data;
+                        this.currentPage = 2;
+                    } else {
+                        let resultData = result.data.filter((order) => order.id < this.lastId);
+                        this.tableData = this.tableData.concat(resultData);
+                        if (resultData.length && this.limit < this.tableData[this.tableData.length - 1].id ) {
+                            this.currentPage++;
+                        }
                     }
 
                     resolve(result.data);
                 }).catch(reject);
             });
         },
-        truncateFullName: function(profile) {
-            let first = profile.firstName;
-            let second = profile.lastName;
-            if ((first + second).length > 7) {
-                return first.length > 7
-                    ? first.slice(0, 7) + '..'
-                    : first + ' ' + second.slice(0, 7 - first.length) + '..';
-            } else {
-                return first + ' ' + second;
-            }
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
+        },
+    },
+    filters: {
+        currencyConvert: function(val, rate, subunit) {
+            return currencyConversion(removeSpaces(val), rate, usdSign, subunit);
         },
     },
 };
 </script>
-

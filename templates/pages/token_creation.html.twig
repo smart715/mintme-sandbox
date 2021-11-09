@@ -1,38 +1,150 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token Creation{% endblock %}
+{% block title %}{% trans %}page.token_creation.title{% endtrans %} | mintMe{% endblock %}
 
 {% block content %}
-    <div class="container" id="token">
-        <div class="row pt-5 justify-content-center">
-            <div class="col-lg-4 col-md-6">
-                <div class="card">
+    <div id="token" class="container">
+        <input type="hidden" ref="profileNickname" value="{{ app.user ? app.user.profile.nickname : '' }}">
+        <input type="hidden" ref="tokenCreateError" value="{{tokenCreateError}}">
+        <add-phone-alert-modal
+            :visible="addPhoneModalVisible"
+            :message="addPhoneModalMessage"
+            :no-close="true"
+            {# set-nickname used to set addPhoneModalProfileNickName data #}
+            :set-nickname="addPhoneModalProfileNickName = '{{ app.user.profile.nickname }}'"
+            @close="closeAddPhoneModal"
+        >
+        </add-phone-alert-modal>
+        <div class="row pt-4 justify-content-center">
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
                         {{ formHeader }}
                     </div>
                     <div class="card-body py-2">
                         {{ form_start(form) }}
-                        {{ form_errors(form) }}
-                        {{ form_row(form.name, {'attr': {
-                            'v-model': '$v.tokenName.$model',
-                            'class' : 'form-control',
-                            'oninvalid': 'setCustomValidity("Invalid token name.")',
-                            'onchange': 'setCustomValidity("")',
-                            'oninput': 'setCustomValidity("")',
-                        }}) }}
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.tokenContain" class="text-danger text-center">
-                            Token name can contain alphabets, numbers, spaces and dashes
+                        {% if not form.vars.valid %}
+                            {% for error in form.vars.errors %}
+                                {% if not (error.cause.id is defined and 'token_create' is same as(error.cause.id)) %}
+                                    <div class="py-2 mb-2 bg-danger text-white text-center">{{ error.message }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ form_errors(form) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-left">
+                                    <div class="clearfix">
+                                        <div class="float-left">
+                                            {{ form_label(form.name, null, {'label_attr': {'class': 'mb-1'}}) }}
+                                        </div>
+                                        <div class="float-right">
+                                            <div
+                                                v-cloak="$v.tokenName"
+                                                v-if="tokenNameExists"
+                                                class="alert alert-danger alert-float"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                {% trans %}page.token_creation.error.taken{% endtrans %}
+                                            </div>
+                                        </div>
+                                        <div class="float-right">
+                                            <div
+                                                v-cloak="$v.tokenName"
+                                                v-if="tokenNameInBlacklist"
+                                                class="alert alert-danger alert-float"
+                                            >
+                                                <font-awesome-icon icon="exclamation-circle"></font-awesome-icon>
+                                                {% trans %}page.token_creation.error.forbidden{% endtrans %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 pb-2">
+                                    {{ form_widget(form.name, {'attr': {
+                                        'v-model': '$v.tokenName.$model',
+                                        'class': 'form-control',
+                                        '@invalid': 'tokenInvalid',
+                                        '@change': 'tokenChange',
+                                        '@input': 'tokenInput'
+                                    }}) }}
+                                </div>
+                                <div class="col-12">
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.validChars" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.contain{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="tokenName.length > 0 && (!$v.tokenName.validFirstChars || !$v.tokenName.validLastChars || !$v.tokenName.noSpaceBetweenDashes)" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.space{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.min{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.max{% endtrans %}
+                                    </div>
+                                    <div v-cloak="$v.tokenName" v-if="!$v.tokenName.hasNotBlockedWords" class="text-danger text-center">
+                                        {% trans %}page.token_creation.error.blocked{% endtrans %}
+                                    </div>
+                                </div>
+                                <div class="col-12 text-left">
+                                    <div class="clearfix">
+                                        <div class="float-left">
+                                            {{ form_label(form.description, null, {'label_attr': {'class': 'mb-1'}}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="description">
+                                        {{ form_widget(form.description, {'attr': {
+                                            'v-model': '$v.description.$model'
+                                        }}) }}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div
+                                        v-cloak="$v.description"
+                                        v-if="!$v.description.maxLength"
+                                        class="text-danger text-center"
+                                    >
+                                        ${ $t('token.intro.description.max_length', translationsContext) }
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    {{ form_widget(form.initial_orders, {
+                                        'attr': {
+                                            'class': 'align-middle'
+                                        }
+                                    })}}
+                                    {{ form_label(form.initial_orders, null, {'label_attr': {'class': 'pl-1 pb-0'}}) }}
+                                    <guide>
+                                        <template slot="body">
+                                            {% trans %}form.token.initial_order.guide{% endtrans %}
+                                        </template>
+                                    </guide>
+                                </div>
+                            </div>
                         </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.minLength" class="text-danger text-center">
-                            Token name should have at least 4 symbols
-                        </div>
-                        <div v-cloak="$v.tokenName" v-if="!$v.tokenName.maxLength" class="text-danger text-center">
-                            Token name can't be longer than 255 characters
-                        </div>
-                        <div class="form-group row">
+                        <div class="form-group row mt-3">
                             <div class="col-md-12 text-left">
-                                <input type="submit" :disabled="$v.$anyError || !tokenName" class="btn btn-primary" value="Create token" />
-                                <a class="btn-cancel pl-3" href="javascript:history.back()">Cancel</a>
+                                <input
+                                    type="submit"
+                                    class="btn btn-primary submit-creation"
+                                    :class="{'input-disabled': !tokenCreation}"
+                                    :disabled="saveBtnDisabled"
+                                    @click="createToken"
+                                    value="{% trans %}page.token_creation.create{% endtrans %}"
+                                />
+                                <input
+                                    type="reset"
+                                    class="btn btn-cancel ml-3"
+                                    style="text-transform: capitalize;"
+                                    @click="$goBack"
+                                    value="{% trans %}cancel{% endtrans %}"
+                                />
                             </div>
                         </div>
                         {{ form_end(form) }}
@@ -40,20 +152,9 @@
                 </div>
             </div>
         </div>
-        <modal
-            no-close-on-backdrop
-            :visible="domLoaded && {{ profileCreated ? 'false' : 'true' }}">
-            <template slot="close"> &nbsp; </template>
-            <template slot="body">
-                <div class="text-center">
-                    <p class="text-white">You need to create profile, only then you will be able to create token</p>
-                    <a href="{{ path('profile') }}" class="btn btn-primary">OK</a>
-                </div>
-            </template>
-        </modal>
     </div>
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/token_creation.js') }}"></script>
+    {{ encore_entry_script_tags('pages/token_creation') }}
 {% endblock %}

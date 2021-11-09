@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 abstract class Controller extends AbstractController
@@ -17,12 +18,23 @@ abstract class Controller extends AbstractController
 
     /**
      * @param mixed $object
-     * @return array|bool|float|int|string
+     * @param array $groups
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    protected function normalize($object)
+    protected function normalize($object, array $groups = ['Default'])
     {
         return $this->normalizer->normalize($object, null, [
-            'groups' => ['Default'],
+            'groups' => $groups,
         ]);
+    }
+
+    protected function redirectToRoute(string $route, array $parameters = [], int $status = 301): RedirectResponse
+    {
+        return parent::redirectToRoute($route, $parameters, $status);
+    }
+
+    protected function redirect(string $url, int $status = 301): RedirectResponse
+    {
+        return parent::redirect($url, $status);
     }
 }

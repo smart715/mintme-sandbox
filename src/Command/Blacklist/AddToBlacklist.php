@@ -2,6 +2,7 @@
 
 namespace App\Command\Blacklist;
 
+use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,8 +12,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class AddToBlacklist extends Command
 {
-    /** @var BlacklistManagerInterface */
-    private $blacklistManager;
+    public const CAN_ADD_MANUALLY_TYPES = [
+        Blacklist::TOKEN,
+        Blacklist::EMAIL,
+        Blacklist::AIRDROP_DOMAIN,
+    ];
+
+    private BlacklistManagerInterface $blacklistManager;
 
     public function __construct(BlacklistManagerInterface $blacklistManager)
     {
@@ -25,19 +31,43 @@ class AddToBlacklist extends Command
     {
         $this->setName('blacklist:add')
             ->setDescription('Add row to blacklisted')
-            ->addArgument('type', InputArgument::REQUIRED, 'Blacklist type, e.g. "token"')
+            ->addArgument('type', InputArgument::REQUIRED, 'Blacklist type')
             ->addArgument('value', InputArgument::REQUIRED, 'Value to be blocked');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         /** @var string */
         $type = $input->getArgument('type');
+
+        if (!in_array($type, self::CAN_ADD_MANUALLY_TYPES, true)) {
+            $io->error(
+                'Not supported type: '. $type.
+                ', supported types are: '. implode(' ', self::CAN_ADD_MANUALLY_TYPES)
+            );
+
+            return 1;
+        }
 
         /** @var string */
         $value = $input->getArgument('value');
 
-        $this->blacklistManager->addToBlacklist($value, $type);
-        (new SymfonyStyle($input, $output))->success("Added successfuly");
+        if (Blacklist::AIRDROP_DOMAIN === $type) {
+            if (0 === strpos($value, 'www.')) {
+                $io->error('please add the domain without "www" and the record will stored automatically');
+
+                return 1;
+            }
+
+            $this->blacklistManager->add('www.' . $value, $type);
+        }
+
+        $this->blacklistManager->add($value, $type);
+        $io->success("Added successfully");
+
+        return 0;
     }
 }

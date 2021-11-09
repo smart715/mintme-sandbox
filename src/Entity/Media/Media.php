@@ -11,6 +11,7 @@ use Sonata\MediaBundle\Entity\BaseMedia;
  * @ORM\Table(name="media__media")
  * @Serializer\ExclusionPolicy("all")
  * @Serializer\XmlRoot(name="_media")
+ * @codeCoverageIgnore
  */
 class Media extends BaseMedia
 {

@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Token\LockIn;
 use App\Repository\LockInRepository;
+use App\Utils\LockFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -19,12 +20,17 @@ class UpdateTokenRelease extends Command
     /** @var EntityManagerInterface */
     private $em;
 
+    /** @var LockFactory */
+    private $lockFactory;
+
     public function __construct(
         LoggerInterface $logger,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LockFactory $lockFactory
     ) {
         $this->logger = $logger;
         $this->em = $entityManager;
+        $this->lockFactory = $lockFactory;
 
         parent::__construct();
     }
@@ -39,9 +45,15 @@ class UpdateTokenRelease extends Command
     }
 
     /** {@inheritdoc} */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger->info('Update job started..');
+        $lock = $this->lockFactory->createLock('update-token-release');
+
+        if (!$lock->acquire()) {
+            return 0;
+        }
+
+        $this->logger->info('[release] Update job started..');
 
         /** @var LockIn[] $locked */
         $locked = $this->getLockInTokenRepository()->findAllUnreleased();
@@ -53,12 +65,16 @@ class UpdateTokenRelease extends Command
 
         $updateMessage = count($locked) . ' tokens were updated. Saving to DB..';
 
-        $this->logger->info($updateMessage);
+        $this->logger->info('[release] '.$updateMessage);
         $output->writeln($updateMessage);
 
         $this->em->flush();
 
-        $this->logger->info('Finished.');
+        $this->logger->info('[release] Finished.');
+
+        $lock->release();
+
+        return 0;
     }
 
     private function getLockInTokenRepository(): LockInRepository

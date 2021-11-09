@@ -12,9 +12,17 @@ old_sound_rabbit_mq:
             connection: default
             queue_options:    {name: 'deposit', durable: true}
             callback: deposit_consumer
+        deploy:
+            connection: default
+            queue_options:    {name: 'deploy', durable: true}
+            callback: deploy_consumer
+        contract_update:
+            connection: default
+            queue_options:    {name: 'contract-update', durable: true}
+            callback: contract_update_consumer
         market:
             connection: default
-            exchange_options: {name: 'market', type: fanout}
+            exchange_options: {name: 'market', type: 'x-delayed-message', durable: true, arguments: {x-delayed-type: ['S', fanout]}}
             queue_options:    {name: 'market', durable: true}
             callback: market_consumer
 
@@ -25,10 +33,7 @@ old_sound_rabbit_mq:
         payment_retry:
             connection: default
             class: App\Producer\RetryPaymentProducer
-        market:
-            connection: default
-            exchange_options: {name: 'market', type: fanout}
         market_delayed:
             connection: default
-            exchange_options: {name: 'market_delayed', type: fanout, durable: true}
+            exchange_options: {name: 'market', type: 'x-delayed-message', durable: true, arguments: {x-delayed-type: ['S', fanout]}}
             class: App\Producer\MarketDelayedProducer

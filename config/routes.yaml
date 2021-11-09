@@ -1,9 +1,22 @@
+nelmio_api_doc:
+    resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
+    prefix: /dev/documentation/v1
+    options:
+        2fa_progress: false
+
+nelmio_security:
+    path:     /csp-report
+    defaults: { _controller: nelmio_security.csp_reporter_controller:indexAction }
+    methods:  [POST]
+
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"
 
 fos_user_security_login:
     controller: App\Controller\SecurityController:loginAction
     path: /login
+    options:
+        sitemap: true
 
 fos_user_change_password:
     resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
@@ -13,17 +26,25 @@ fos_user_registration:
     resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
     prefix: /register
 
-fos_user_resetting:
+fos_user_registration_confirm:
+    controller: "fos_user.registration.controller:confirmAction"
+    path: /register/confirm/{token}
+    schemes: [https]
+
+app_user_resetting:
     resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
     prefix: /resetting
+    schemes: [https]
 
 fos_user_resetting_send_email:
     controller: App\Controller\ResettingController:sendEmailAction
     path: /resetting/request
+    schemes: [https]
 
 fos_user_resetting_request:
     controller: App\Controller\ResettingController:sendEmailAction
     path: /resetting/request
+    schemes: [https]
 
 2fa_login:
     path: /2fa
@@ -36,9 +57,87 @@ api_controllers:
     resource: ../src/Controller/API/
     type: rest
 
-news:
-    resource: '@SonataNewsBundle/Resources/config/routing/news.xml'
-    prefix: /news
+sonata_news_home:
+  path: '/news'
+  controller: Sonata\NewsBundle\Action\PostArchiveAction
+  options:
+    2fa_progress: false
+
+sonata_news_archive:
+  path: '/news/archive'
+  controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+  defaults:
+    route: 'sonata_news_home'
+    permanent: true
+  requirements:
+    _format: html|rss
+  options:
+    2fa_progress: false
+
+sonata_news_archive_daily:
+  path: '/news/archive/{year}/{month}/{day}.{_format}'
+  controller: Sonata\NewsBundle\Action\DailyPostArchiveAction
+  requirements:
+    _format: html|rss
+    year: '\d+'
+    month: '\d+'
+    day: '\d+'
+  options:
+    2fa_progress: false
+
+sonata_news_archive_monthly:
+  path: '/news/archive/{year}/{month}.{_format}'
+  controller: Sonata\NewsBundle\Action\MonthlyPostArchiveAction
+  requirements:
+    _format: html|rss
+    year: '\d+'
+    month: '\d+'
+  options:
+    2fa_progress: false
+
+sonata_news_archive_yearly:
+  path: '/news/archive/{year}.{_format}'
+  controller: Sonata\NewsBundle\Action\YearlyPostArchiveAction
+  format: html
+  requirements:
+    _format: html|rss
+    year: '\d+'
+  options:
+    2fa_progress: false
+
+sonata_news_tag:
+  path: '/news/tag/{tag}.{_format}'
+  controller: Sonata\NewsBundle\Action\TagPostArchiveAction
+  format: html
+  requirements:
+    _format: html|rss
+  options:
+    2fa_progress: false
+
+sonata_news_collection:
+  path: '/news/collection/{collection}.{_format}'
+  controller: Sonata\NewsBundle\Action\CollectionPostArchiveAction
+  format: html
+  requirements:
+    _format: html|rss
+  options:
+    2fa_progress: false
+
+sonata_news_view:
+  path: '/news/{permalink}.{_format}'
+  controller: Sonata\NewsBundle\Action\ViewPostAction
+  format: html
+  requirements:
+    _format: html|rss
+    permalink: '.+?'
+  options:
+    2fa_progress: false
+
+sonata_news_add_comment:
+  path: '/add-comment/{id}'
+  controller: Sonata\NewsBundle\Action\CreateCommentAction
+  options:
+    2fa_progress: false
 
 admin:
     resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
@@ -52,7 +151,7 @@ _sonata_admin:
 controllers:
     resource: ../src/Controller/
     type: annotation
-    
+
 gallery:
     resource: '@SonataMediaBundle/Resources/config/routing/gallery.xml'
     prefix: /media/gallery
@@ -60,3 +159,13 @@ gallery:
 media:
     resource: '@SonataMediaBundle/Resources/config/routing/media.xml'
     prefix: /media
+
+PrestaSitemapBundle:
+    resource: "@PrestaSitemapBundle/Resources/config/routing.yml"
+    prefix: /
+
+pageNotFound:
+    path:  /{path}
+    controller: App\Controller\SecurityController:pageNotFoundAction
+    requirements:
+        path: .*

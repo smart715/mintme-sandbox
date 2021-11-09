@@ -31,7 +31,7 @@
     {% set break = false %}
     {%- if errors|length > 0 -%}
     <div class="py-2 mb-2 bg-danger text-white text-center">
-        <ul class="pl-3 m-0 list-unstyled">
+        <ul class="pl-3 pr-3 m-0 list-unstyled">
             {%- for error in errors if not break  -%}
                 <li>{{ error.message }}</li>
                 {% set break = true %}
@@ -54,7 +54,7 @@
 {%- endblock form_widget_compound -%}
 
 {%- block button_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%} class="btn btn-primary"
+    id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%} class="btn btn-primary {{ attr.class }}"
     {{ block('attributes') }}
 {%- endblock button_attributes -%}
 
@@ -75,7 +75,7 @@
         <button type="button"
         class="btn btn-primary ml-3"
         close>
-            Cancel
+            {% trans %}cancel{% endtrans %}
         </button>
     {%- endif -%}
     </div>
@@ -103,8 +103,39 @@
 
 {%- block textarea_widget -%}
 {%- if  (attr.max is defined) -%}
-    <limited-textarea {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} rows="5" cols="30" class="form-control form-control-md"></limited-textarea>
+    <limited-textarea
+            {{ block('widget_attributes') }}
+            value="{{ value }}"
+            rows="5"
+            cols="30"
+    ></limited-textarea>
 {%- else -%}
     <textarea {{ block('widget_attributes') }} rows="5" cols="30" class="form-control form-control-md">{{ value }}</textarea>
 {%- endif -%}
 {%- endblock textarea_widget -%}
+
+{%- block bbcode_editor_row -%}
+    {% spaceless %}
+        <div class="form-group">
+            {{ form_label(form) }}
+            <bbcode-help class="float-right"></bbcode-help>
+            {{ form_errors(form) }}
+            <bbcode-editor
+                    value="{{ value }}"
+                    rows="5"
+                    cols="30"
+                    {{ block('widget_attributes') }}
+            ></bbcode-editor>
+        </div>
+    {% endspaceless %}
+{%- endblock bbcode_editor_row -%}
+
+{% block trusted_device %}
+    {% if trusted_device_enabled %}
+        <div class="custom-control custom-checkbox my-1">
+            <input type="checkbox" id="trusted_device" name="_trusted" class="custom-control-input" value="1" checked>
+            {% set lifetime_days = trusted_device_cookie_lifetime/(24*60*60) %}
+            <label for="trusted_device" class="custom-control-label">{% trans with {'%days%': lifetime_days} %}2fa.trusted_device{% endtrans %}</label>
+        </div>
+    {% endif %}
+{% endblock %}

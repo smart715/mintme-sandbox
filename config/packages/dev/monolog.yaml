@@ -1,11 +1,11 @@
 monolog:
-    channels: ['user_action']
+    channels: ['user_action', 'front_end', 'donation', 'unsubscribe']
     handlers:
         main:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
-            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action']
+            channels: ['!cron', '!rabbitmq', '!payments', '!exchange', '!user_action', '!front_end', '!donation', '!unsubscribe']
         console:
             type: console
             process_psr_3_messages: false
@@ -15,6 +15,12 @@ monolog:
             path: "%kernel.logs_dir%/cron.log"
             level: info
             channels: ['cron']
+        donation:
+            type: stream
+            path: "%kernel.logs_dir%/donation.log"
+            level: error
+            channels: ['donation']
+            formatter: monolog.formatter.donation
         rabbitmq:
             type: stream
             path: "%kernel.logs_dir%/rabbitmq.log"
@@ -40,9 +46,26 @@ monolog:
             path: "%kernel.logs_dir%/exchange.log"
             level: debug
             channels: ['exchange']
+        security:
+            type: stream
+            path: "%kernel.logs_dir%/security.log"
+            level: debug
+            channels: ['security']
         user_action:
             type: stream
             path: "%kernel.logs_dir%/user_action.log"
             level: debug
             channels: ['user_action']
             formatter: monolog.formatter.user_action
+        front_end:
+            type: stream
+            path: "%kernel.logs_dir%/front_end.log"
+            level: debug
+            channels: ['front_end']
+            formatter: monolog.formatter.front_end
+        unsubscribe:
+            type: stream
+            path: "%kernel.logs_dir%/unsubscribers.txt"
+            level: info
+            channels: ['unsubscribe']
+            formatter: monolog.formatter.unsubscribe

@@ -31,7 +31,8 @@ class ShowProfileInfoCommand extends Command
             ->addArgument('email', InputArgument::REQUIRED, 'Email address of the profile');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $style = new SymfonyStyle($input, $output);
 
@@ -47,6 +48,8 @@ class ShowProfileInfoCommand extends Command
                 $this->buildProfileFields($profile)
             );
         }
+
+        return 0;
     }
 
     private function buildProfileFields(Profile $profile): array

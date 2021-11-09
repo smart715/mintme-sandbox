@@ -1,20 +1,9 @@
-import '../scss/main.sass';
-import Vue from 'vue';
-import VueBootstrap from 'bootstrap-vue';
-import fontawesome from '@fortawesome/fontawesome';
-import fas from '@fortawesome/fontawesome-free-solid';
-import fab from '@fortawesome/fontawesome-free-brands';
-import far from '@fortawesome/fontawesome-free-regular';
-import {faSearch, faCog} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon, FontAwesomeLayers} from '@fortawesome/vue-fontawesome';
 import VueClipboard from 'vue-clipboard2';
 import VueTippy from 'vue-tippy';
 import Vuelidate from 'vuelidate';
-import Toasted from 'vue-toasted';
-import Axios from './axios';
-import Routing from './routing';
-import TokenSearcher from './components/token/TokenSearcher';
-import AdminMenu from './components/AdminMenu';
+import sanitizeHtml from './sanitize_html';
+import store from './storage';
+import UserInit from './components/UserInit';
 
 /*
     To enable passive listeners,
@@ -25,22 +14,20 @@ import AdminMenu from './components/AdminMenu';
 
 VueClipboard.config.autoSetContainer = true;
 
-fontawesome.library.add(fas, far, fab, faSearch, faCog);
-
-window.Vue = Vue;
-
-Vue.component('font-awesome-icon', FontAwesomeIcon);
-Vue.component('font-awesome-layers', FontAwesomeLayers);
-
-Vue.use(Axios);
-Vue.use(Routing);
-Vue.use(VueBootstrap);
 Vue.use(VueClipboard);
-Vue.use(VueTippy);
 Vue.use(Vuelidate);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
+Vue.use(sanitizeHtml);
+
+Vue.use(VueTippy, {
+    directive: 'tippy',
+    flipDuration: 0,
+    popperOptions: {
+        modifiers: {
+            preventOverflow: {
+                boundariesElement: 'window',
+            },
+        },
+    },
 });
 
 Vue.options.delimiters = ['{[', ']}'];
@@ -53,18 +40,9 @@ const imagesContext = require.context(
 imagesContext.keys().forEach(imagesContext);
 
 new Vue({
-    el: '#navbar',
-    data() {
-        return {
-            items: [],
-        };
-    },
+    el: '#user-init',
     components: {
-        TokenSearcher,
-        AdminMenu,
+        UserInit,
     },
-});
-
-new Vue({
-    el: '#footer',
+    store,
 });

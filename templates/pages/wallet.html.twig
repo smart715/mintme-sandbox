@@ -1,44 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Wallet{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/wallet') }}
+{% endblock %}
+
+{% block title %}{% trans %}page.wallet.title{% endtrans %} | mintMe{% endblock %}
 
 {% block bodyclass %}wallet{% endblock %}
 
 {% block content %}
     <div id="wallet" class="container">
-        <div class="row pt-5 justify-content-center">
-            <div class="col-md-8 text-white">
-                <b-tabs :lazy="true" class="tabs-theme" v-model="tabIndex" :class="{'no-padding': expandedTab}" v-cloak>
-                    {{ include("loader.html.twig", {vCloak:'v-cloak--block'}) }}
-                    <b-tab title="Wallet" active>
+        {% if app.user.profile.hasBlockedTokens or app.user.isBlocked %}
+            <div class="col-12 error-text py-5 text-center text-white text-uppercase error-big-text">
+                <h1>
+                    {% if app.user.isBlocked %}
+                        {% trans %}page.wallet.blocked.account{% endtrans %}
+                    {% else %}
+                        {% trans %}page.wallet.blocked.token{% endtrans %}
+                    {% endif %}
+                </h1>
+            </div>
+        {% endif %}
+        <div class="row pt-4 justify-content-center">
+            <div class="col-md-12 card-fixed-large px-0 text-white">
+                {{ include('spinners/wallet.html.twig') }}
+                <b-tabs
+                    @input="tabUpdated"
+                    :lazy="true"
+                    class="tabs-theme"
+                    v-model="tabIndex"
+                    :class="{'no-padding': expandedTab}"
+                >
+                    <b-tab
+                        title="{% trans %}page.wallet.title{% endtrans %}"
+                        {% if tab|default and tab == 'wallet' %} {{ 'active' }} {% endif %}
+                    >
                         <wallet
                             hash="{{ hash }}"
                             websocket-url="{{ global_websocket_url }}"
                             create-token-url="{{ path('token_create') }}"
                             trading-url="{{ path('trading') }}"
                             withdraw-url="{{ path('withdraw') }}"
-                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}">
+                            :deposit-more-prop="depositMoreCurrency"
+                            twofa="{{ app.user.isGoogleAuthenticatorEnabled }}"
+                            :expiration-time="{{ withdraw_expiration_time }}"
+                            disabled-crypto="{{ disabledBlockchain | json_encode }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            :eth-token-withdraw-fee="{{ global_eth_token_withdraw_fee }}"
+                            :bnb-token-withdraw-fee="{{ global_bnb_token_withdraw_fee }}"
+                            {% if app.user.isBlocked %}
+                            is-user-blocked
+                            {% endif %}
+                            coinify-ui-url="{{ global_coinify_ui_url }}"
+                            :coinify-partner-id="{{ global_partner_id }}"
+                            :coinify-crypto-currencies="{{ global_coinify_crypto_currencies | json_encode }}"
+                            :cant-make-deposit-withdrawal="{{ error ? 'true' : 'false' }}"
+                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                            :mintme-exchange-mail-sent="{{ app.user.exchangeCryptoMailSent ? 'true' : 'false' }}"
+                        >
                         </wallet>
                     </b-tab>
-                    <b-tab title="Trading history">
+                    <b-tab
+                        title="{% trans %}page.wallet.trading_history{% endtrans %}"
+                        {% if tab|default and tab == 'trade-history' %} {{ 'active' }} {% endif %}
+                    >
                         <trading-history></trading-history>
                     </b-tab>
-                    <b-tab title="Deposit/Withdraw history">
+                    <b-tab
+                        title="{% trans %}page.wallet.dep_with{% endtrans %}"
+                        {% if tab|default and tab == 'dw-history' %} {{ 'active' }} {% endif %}
+                        >
                         <deposit-withdraw-history></deposit-withdraw-history>
                     </b-tab>
-                    <b-tab title="Active orders">
+                    <b-tab
+                        title="{% trans %}page.wallet.active_orders{% endtrans %}"
+                        {% if tab|default and tab == 'active-orders' %} {{ 'active' }} {% endif %}
+                    >
                         <active-orders
                                 hash="{{ hash }}"
                                 websocket-url="{{ global_websocket_url }}"
-                                :user-id="{{ app.user.id }}">
+                                :user-id="{{ app.user.id }}"
+                                {% if app.user.isBlocked %}
+                                is-user-blocked
+                                {% endif %}
+                        >
                         </active-orders>
                     </b-tab>
                 </b-tabs>
+                <input type="hidden" ref="depositMore" value="{{ depositMore }}"/>
             </div>
         </div>
-    </div>
+    </div><span style="display: none;">This is training of 2 branch text</span>
 {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/wallet.js') }}"></script>
+    {{ encore_entry_script_tags('pages/wallet') }}
 {% endblock %}

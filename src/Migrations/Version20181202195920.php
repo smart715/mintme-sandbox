@@ -17,7 +17,7 @@ final class Version20181202195920 extends AbstractMigration
 
         $this->addSql('ALTER TABLE crypto ADD fee BIGINT NOT NULL');
         $this->addSql('UPDATE crypto SET fee = 50000 WHERE symbol = "BTC"');
-        $this->addSql('UPDATE crypto SET fee = 3000000000000000 WHERE symbol = "WEB"');
+        $this->addSql('UPDATE crypto SET fee = 100000000000000000 WHERE symbol = "WEB"');
     }
 
     public function down(Schema $schema) : void

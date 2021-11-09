@@ -2,15 +2,17 @@
 
 namespace App\Exchange\Balance\Factory;
 
+use App\Entity\Token\Token;
+use App\Entity\User;
 use App\Exchange\Balance\Model\BalanceResultContainer;
+use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
 use App\Utils\Converter\TokenNameConverterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BalanceViewFactory implements BalanceViewFactoryInterface
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    /** @var CryptoManagerInterface */
+    private $cryptoManager;
 
     /** @var TokenManagerInterface */
     private $tokenManager;
@@ -22,51 +24,65 @@ class BalanceViewFactory implements BalanceViewFactoryInterface
     private $tokenSubunit;
 
     public function __construct(
-        TokenStorageInterface $tokenStorage,
+        CryptoManagerInterface $cryptoManager,
         TokenManagerInterface $tokenManager,
         TokenNameConverterInterface $tokenNameConverter,
         int $tokenSubunit
     ) {
-        $this->tokenStorage = $tokenStorage;
+        $this->cryptoManager = $cryptoManager;
         $this->tokenManager = $tokenManager;
         $this->tokenNameConverter = $tokenNameConverter;
         $this->tokenSubunit = $tokenSubunit;
     }
 
     /** {@inheritdoc} */
-    public function create(BalanceResultContainer $container): array
+    public function create(BalanceResultContainer $container, User $user): array
     {
         $result = [];
 
         foreach ($container as $key => $balanceResult) {
             $token = $this->tokenManager->findByName($key) ?? $this->tokenManager->findByHiddenName($key);
+            $crypto = $this->cryptoManager->findBySymbol($key);
 
-            if (!$token) {
+            if (!$token && !$crypto) {
                 continue;
             }
 
-            $name = $token->getName();
-            $fee = null;
-            $subunit = $this->tokenSubunit;
+            if ($token) {
+                $name = $token->getName();
+                $fee = $token->getFee();
+                $subunit = $this->tokenSubunit;
 
-            if ($token->getCrypto()) {
-                $fee = $token->getCrypto()->getFee();
-                $name = $token->getCrypto()->getName();
-                $subunit = $token->getCrypto()->getShowSubunit();
+                $owner = null !== $token->getProfile() && $user->getId() === $token->getProfile()->getUser()->getId();
+            } else {
+                $name = $crypto->getSymbol();
+                $fee = $crypto->getFee();
+                $subunit = $crypto->getShowSubunit();
+
+                $owner = false;
             }
 
-            $securityToken = $this->tokenStorage->getToken();
-            $result[$token->getName()] = new BalanceView(
-                $this->tokenNameConverter->convert($token),
-                $this->tokenManager->getRealBalance(
-                    $token,
-                    $balanceResult
-                )->getAvailable(),
-                $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
+            $result[$name] = new BalanceView(
+                $this->tokenNameConverter->convert($token ?? $crypto),
+                $token
+                    ? $this->tokenManager->getRealBalance(
+                        $token,
+                        $balanceResult,
+                        $user
+                    )->getAvailable()
+                    : $balanceResult->getAvailable(),
+                $token && $token->getLockIn() ? $token->getLockIn()->getFrozenAmount() : null,
                 $name,
                 $fee,
-                $subunit,
-                $securityToken && $token->getProfile() && $securityToken->getUser() === $token->getProfile()->getUser()
+                $token
+                    ? null === $token->getDecimals() || $token->getDecimals() > $subunit ? $subunit : $token->getDecimals()
+                    : $subunit,
+                $token && $token->getCrypto() ? $token->getCrypto()->isExchangeble() : false,
+                $token && $token->getCrypto() ? $token->getCrypto()->isTradable() : false,
+                $token ? Token::DEPLOYED === $token->getDeploymentStatus() : false,
+                $owner,
+                $token ? $token->isBlocked() : false,
+                $token ? $token->getCryptoSymbol() : $name,
             );
         }
 

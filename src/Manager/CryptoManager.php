@@ -13,7 +13,10 @@ class CryptoManager implements CryptoManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->repository = $entityManager->getRepository(Crypto::class);
+        /** @var CryptoRepository $repository */
+        $repository = $entityManager->getRepository(Crypto::class);
+
+        $this->repository = $repository;
     }
 
     public function findBySymbol(string $symbol): ?Crypto
@@ -25,5 +28,14 @@ class CryptoManager implements CryptoManagerInterface
     public function findAll(): array
     {
         return $this->repository->findAll();
+    }
+
+    public function findAllIndexed(string $index, bool $array = false): array
+    {
+        $query = $this->repository->createQueryBuilder('c', "c.{$index}")->getQuery();
+
+        return $array
+            ? $query->getArrayResult()
+            : $query->getResult();
     }
 }

@@ -1,23 +1,20 @@
+import NotificationMixin from './notification';
+
 export default {
-    data: function() {
-      return {
-          showModal: false,
-          modalTitle: '',
-          modalSuccess: false,
-      };
-    },
+    mixins: [NotificationMixin],
     methods: {
         handleOrderError: function(error) {
             if (!error.status) {
-                this.$toasted.error('Network Error!');
+                this.notifyError(this.$t('toasted.error.network'));
             } else {
-                this.showModalAction();
+                this.showNotification();
             }
         },
-        showModalAction: function({result, message} = {}) {
-            this.modalSuccess = 1 === result;
-            this.modalTitle = message ? message : (1 === result ? 'Order Created' : 'Order Failed');
-            this.showModal = true;
+        showNotification: function({result, message} = {}) {
+            let success = 1 === result;
+            message = message ||
+                (success ? this.$t('place_order.created') : this.$t('place_order.failed'));
+            this.sendNotification(message, success ? 'success' : 'error');
         },
     },
 };

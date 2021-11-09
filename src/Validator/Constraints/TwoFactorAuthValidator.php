@@ -7,26 +7,35 @@ use App\Manager\TwoFactorManager;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TwoFactorAuthValidator extends ConstraintValidator
 {
     /** @var User */
-    protected $user;
+    public $user;
+    protected TwoFactorManager $twoFactorManager;
+    private TranslatorInterface $translator;
 
-    /** @var TwoFactorManager  */
-    protected $twoFactorManager;
-
-    public function __construct(TokenStorageInterface $token, TwoFactorManager $twoFactorManager)
-    {
-        $this->user = $token->getToken()->getUser();
+    public function __construct(
+        TokenStorageInterface $token,
+        TwoFactorManager $twoFactorManager,
+        TranslatorInterface $translator
+    ) {
+        /**
+         * @var User $user
+         * @psalm-suppress UndefinedDocblockClass
+         */
+        $user = $token->getToken()->getUser();
+        $this->user = $user;
         $this->twoFactorManager = $twoFactorManager;
+        $this->translator = $translator;
     }
 
     /** {@inheritdoc} */
     public function validate($value, Constraint $constraint): void
     {
         if ($value && !$this->twoFactorManager->checkCode($this->user, $value)) {
-            $this->context->buildViolation($constraint->message)->addViolation();
+            $this->context->buildViolation($this->translator->trans($constraint->message))->addViolation();
         }
     }
 }

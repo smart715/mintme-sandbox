@@ -1,19 +1,38 @@
 <template>
+    <div>
     <textarea
+        :name="name"
+        class="form-control"
         @keydown="onKeyDown"
         :title="tooltipMessage"
         v-tippy="tooltipOptions"
+        @mousemove="hideTooltip"
         v-model="internalValue">
     </textarea>
+        <div
+            class="left small characters-used"
+        >
+            {{ $t('form.token.characters_used') }} {{ internalValue.length }} ({{ $t('form.token.min') }} {{ limit }})
+        </div>
+    </div>
 </template>
 
 <script>
+
 export default {
     name: 'LimitedTextarea',
     props: {
+        name: {
+            type: String,
+            default: '',
+        },
         value: {
             type: String,
             default: '',
+        },
+        limit: {
+            type: String,
+            default: '0',
         },
         max: {
             type: String,
@@ -36,10 +55,15 @@ export default {
     },
     computed: {
         tooltipMessage: function() {
-            return 'The value can not be more than ' + this.max + ' characters';
+            return this.$t('limited_textarea.tooltip', {max: this.max});
         },
         charactersLeft: function() {
             return (parseInt(this.max) - this.internalValue.length);
+        },
+    },
+    watch: {
+        internalValue: function(val) {
+            this.$emit('input', val);
         },
     },
     methods: {
@@ -57,6 +81,11 @@ export default {
         showTooltip(e) {
             if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
                 e.target._tippy.show();
+            }
+        },
+        hideTooltip(e) {
+            if (typeof e.target != 'undefined' && typeof e.target._tippy != 'undefined') {
+                e.target._tippy.hide();
             }
         },
     },

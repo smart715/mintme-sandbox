@@ -5,31 +5,27 @@
 
 {% block fos_user_content %}
     <div class="container">
-        <div class="row pt-5 justify-content-center notification">
-            <div class="col-12 col-lg-5 col-md-6">
-                <div class="card">
+        <div class="row pt-4 justify-content-center notification">
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
                         <div class="row">
-                            <div class="col-lg-4">Congrats!</div>
+                            <div class="col-lg-4">{% trans %}register.confirmed.header{% endtrans %}</div>
                             <div class="col-lg-8 card-header-description text-lg-right align-self-center">
                                 <span class="align-middle">
-                                    The user has been created successfully!
+                                    {% trans %}register.confirmed.body{% endtrans %}
                                 </span>
                             </div>
                         </div>
                     </div>
                     <div class="card-body py-2 text-center">
                         <h1 class="title">{{ user.username }}</h1>
-                        <p class="text">your account is now activated</p>
+                        <p class="text">{% trans %}register.confirmed.activated{% endtrans %}</p>
                         <p class="mt-1 pb-0 mb-0">
                             {% if targetUrl is empty %}
-                                {% if prelaunch.isFinished() %}
-                                    <a href="{{ path('trading') }}" class="link">Go to Trading</a>
-                                {% else %}
-                                    <a href="{{ path('referral-program') }}" class="link">Go to Referral</a>
-                                {% endif %}
+                                <a href="{{ path('trading') }}" class="link">{% trans from 'messages' %}go_trading{% endtrans %}</a>
                             {% else %}
-                                <a href="{{ targetUrl }}" class="link">{{ 'registration.back'|trans }}</a>
+                                <a href="{{ targetUrl }}" class="link">{% trans %}registration.back{% endtrans %}</a>
                             {% endif %}
                         </p>
                     </div>

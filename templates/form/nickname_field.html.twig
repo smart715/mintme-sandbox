@@ -1,0 +1,17 @@
+{{ form_label(form.nickname) }}
+<guide>
+    <template slot="header">
+        {% trans %}nickname_field.header{% endtrans %}
+    </template>
+    <template slot="body">
+        {% trans %}nickname_field.body{% endtrans %}
+    </template>
+</guide>
+{{ form_errors(form.nickname) }}
+{{ form_widget(form.nickname, {'attr':
+    {
+        'v-model.trim': '$v.nickname.$model',
+        'ref': 'nickname'
+    }
+}) }}
+{{ form_help(form.nickname) }}

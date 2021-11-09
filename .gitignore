@@ -5,6 +5,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+###> sonata-project/media-bundle ###
+/public/uploads/
+###< sonata-project/media-bundle ###
+
 ###> symfony/web-server-bundle ###
 /.web-server-pid
 ###< symfony/web-server-bundle ###
@@ -25,3 +29,18 @@ public/build
 .vscode
 /coverage-php
 /coverage-js
+.phpunit.result.cache
+
+###< docker databases ###
+.docker/db
+
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
+
+###< avatar uploader ###
+public/media/cache
+
+###< translations ###
+translations/ui/auto_gen_keys.json

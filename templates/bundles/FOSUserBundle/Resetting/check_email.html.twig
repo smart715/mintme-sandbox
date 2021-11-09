@@ -4,21 +4,20 @@
 
 {% block fos_user_content %}
     <div class="container">
-        <div class="row pt-5 justify-content-center notification">
-            <div class="col-12 col-lg-5 col-md-6">
-                <div class="card">
+        <div class="row pt-4 justify-content-center notification">
+            <div class="col-12">
+                <div class="card card-fixed-small mx-auto">
                     <div class="card-header">
                         <div class="row">
-                            Email Sent!
+                            {% trans %}email.sent{% endtrans %}
                         </div>
                     </div>
                     <div class="card-body py-2 text-center">
                         <p>
-                            If the email you typed matches yours, you will receive a message which contains a link you must click to reset your password.<br/>
-                            Note: You can only request a new password once within {{ tokenLifetime }} hours.
+                            {% trans with {'%hours%': tokenLifetime} %}email.sent.body{% endtrans %}
                         </p>
                         <p class="pb-0 mb-0">
-                            If you don't get an email check your spam folder or try again.
+                            {% trans %}email.sent.help{% endtrans %}
                         </p>
                     </div>
                 </div>

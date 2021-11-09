@@ -22,8 +22,13 @@ class ProfileManager implements ProfileManagerInterface
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->profileRepository = $entityManager->getRepository(Profile::class);
-        $this->userRepository = $entityManager->getRepository(User::class);
+        /** @var ProfileRepository $profileRepository */
+        $profileRepository = $entityManager->getRepository(Profile::class);
+        $this->profileRepository = $profileRepository;
+
+        /** @var  UserRepository $userRepository */
+        $userRepository = $entityManager->getRepository(User::class);
+        $this->userRepository = $userRepository;
         $this->em = $entityManager;
     }
 
@@ -38,9 +43,11 @@ class ProfileManager implements ProfileManagerInterface
 
         return $this->profileRepository->getProfileByUser($user);
     }
-    public function getProfileByPageUrl(string $pageUrl): ?Profile
+
+    /** @codeCoverageIgnore */
+    public function getProfileByNickname(string $nickname): ?Profile
     {
-        return $this->profileRepository->getProfileByPageUrl($pageUrl);
+        return $this->profileRepository->getProfileByNickname($nickname);
     }
 
     public function findByEmail(string $email): ?Profile
@@ -52,22 +59,14 @@ class ProfileManager implements ProfileManagerInterface
             : $this->getProfile($user);
     }
 
-    public function generatePageUrl(Profile $profile): string
+    public function findByNickname(string $nickname): ?Profile
     {
-        $route = $profile->getFirstName() . '.' . $profile->getLastName();
-        $route = str_replace(' ', '-', $route);
-
-        if ('.' === substr($route, 0, 1)) {
-            throw new \Exception('Can\'t generate profile link for empty profile');
-        }
-
-        $existedProfile = $this->profileRepository->getProfileByPageUrl($route);
-
-        return null === $existedProfile || $profile === $existedProfile
-                ? strtolower($route)
-                : $this->generateUniqueUrl($route);
+        return $this->profileRepository->findOneBy([
+            'nickname' => $nickname,
+        ]);
     }
 
+    /** @codeCoverageIgnore */
     public function createHash(User $user, bool $hash = true, bool $enforceSecurity = true): User
     {
         $user->setHash($hash ?
@@ -81,21 +80,15 @@ class ProfileManager implements ProfileManagerInterface
 
     public function findProfileByHash(?string $hash): ?User
     {
-        if (null == $hash || '' === $hash) {
+        if (null === $hash || '' === $hash) {
             return null;
         }
 
         return $this->userRepository->findByHash($hash);
     }
 
-    private function generateUniqueUrl(string $prefix): string
+    public function findAllProfileWithEmptyDescriptionAndNotAnonymous(int $param = 14): ?array
     {
-        $str = strtolower($prefix . "." . bin2hex(openssl_random_pseudo_bytes(3) ?: uniqid()));
-
-        if ($this->profileRepository->getProfileByPageUrl($str)) {
-            return $this->generateUniqueUrl($prefix);
-        }
-
-        return $str;
+        return $this->profileRepository->findAllProfileWithEmptyDescriptionAndNotAnonymous($param);
     }
 }

@@ -1,168 +1,209 @@
 <template>
-    <div v-on-clickaway="cancelEditingMode">
+    <div class="overflow-hidden token-name">
         <template v-if="editable">
-            <input
-                type="text"
-                v-model.trim="$v.newName.$model"
-                v-if="editingName"
-                ref="tokenNameInput"
-                class="token-name-input"
-                :class="{ 'is-invalid': $v.$invalid }">
+            <token-edit-modal
+                v-if="editable"
+                :current-name="currentName"
+                :has-release-period-prop="hasReleasePeriodProp"
+                :is-owner="editable"
+                :is-token-created="isTokenCreated"
+                :is-mintme-token="isMintmeToken"
+                :is-controlled-token="isControlledToken"
+                :is-token-exchanged="isTokenExchanged"
+                :no-close="true"
+                :precision="precision"
+                :status-prop="statusProp"
+                :twofa="twofa"
+                :visible="showTokenEditModal"
+                :websocket-url="websocketUrl"
+                :release-address="releaseAddress"
+                :discord-url="discordUrl"
+                :editable="editable"
+                :facebook-url="facebookUrl"
+                :facebook-app-id="facebookAppId"
+                :telegram-url="telegramUrl"
+                :website-url="websiteUrl"
+                :youtube-client-id="youtubeClientId"
+                :youtube-channel-id="youtubeChannelId"
+                :airdrop-params="airdropParams"
+                :disabled-services-config="disabledServicesConfig"
+                @close="closeTokenEditModal"
+                @token-deploy-pending="$emit('token-deploy-pending')"
+                @updated-website="$emit('updated-website', $event)"
+                @updated-facebook="$emit('updated-facebook', $event)"
+                @updated-youtube="$emit('updated-youtube', $event)"
+                @updated-discord="$emit('updated-discord', $event)"
+                @updated-telegram="$emit('updated-telegram', $event)"
+                :current-locale="currentLocale"
+                :token-deployed-date="tokenDeployedDate"
+                :token-tx-hash-address="tokenTxHashAddress"
+                :mintme-explorer-url="mintmeExplorerUrl"
+                :eth-explorer-url="ethExplorerUrl"
+                :bnb-explorer-url="bnbExplorerUrl"
+                :token-crypto="tokenCrypto"
+                :discord-auth-url="discordAuthUrl"
+            />
             <font-awesome-icon
-                class="icon-edit c-pointer align-middle"
-                :icon="icon"
+                class="icon-default c-pointer align-middle token-edit-icon"
+                icon="edit"
                 transform="shrink-4 up-1.5"
-                @click="editName"
+                @click="editToken"
             />
         </template>
-        <span v-if="!editingName">{{ currentName }}</span>
+        <h1 v-if="shouldTruncate"
+              class="h2 current-token-name"
+              v-b-tooltip="{title: currentName, boundary:'viewport'}">
+            {{ currentName | truncate(maxLengthToTruncate) }}
+        </h1>
+        <h1 v-else class="h2 current-token-name">
+            {{ currentName }}
+        </h1>
     </div>
 </template>
 
 <script>
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit, faCheck} from '@fortawesome/free-solid-svg-icons';
+import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import Toasted from 'vue-toasted';
 import {mixin as clickaway} from 'vue-clickaway';
-import WebSocketMixin from '../../mixins/websocket';
-import {required, minLength, maxLength, helpers} from 'vuelidate/lib/validators';
+import {VBTooltip} from 'bootstrap-vue';
+import {WebSocketMixin, FiltersMixin, LoggerMixin} from '../../mixins/';
+import {AIRDROP_CREATED, AIRDROP_DELETED, TOKEN_NAME_CHANGED} from '../../utils/constants';
 
-const tokenContain = helpers.regex('names', /^[a-zA-Z0-9\s-]*$/u);
-
-library.add(faEdit, faCheck);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
-
-const HTTP_ACCEPTED = 202;
-const HTTP_ALREADY_REPORTED = 208;
+library.add(faEdit);
 
 export default {
     name: 'TokenName',
-    props: {
-        name: String,
-        identifier: String,
-        updateUrl: String,
-        editable: Boolean,
-    },
     components: {
         FontAwesomeIcon,
+        TokenEditModal: () => import('../modal/TokenEditModal').then((data) => data.default),
     },
-    mixins: [WebSocketMixin, clickaway],
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        clickaway,
+        LoggerMixin,
+    ],
+    props: {
+        editable: Boolean,
+        hasReleasePeriodProp: Boolean,
+        isTokenCreated: Boolean,
+        isMintmeToken: Boolean,
+        isControlledToken: Boolean,
+        identifier: String,
+        name: String,
+        precision: Number,
+        statusProp: String,
+        twofa: Boolean,
+        websocketUrl: String,
+        releaseAddress: String,
+        airdropParams: Object,
+        discordUrl: String,
+        facebookUrl: String,
+        facebookAppId: String,
+        telegramUrl: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
+        showTokenEditModalProp: Boolean,
+        disabledServicesConfig: String,
+        currentLocale: String,
+        tokenDeployedDate: {
+            type: Object,
+            default: null,
+        },
+        tokenTxHashAddress: {
+            type: String,
+            default: null,
+        },
+        mintmeExplorerUrl: String,
+        ethExplorerUrl: String,
+        bnbExplorerUrl: String,
+        tokenCrypto: Object,
+        discordAuthUrl: String,
+    },
     data() {
         return {
-            editingName: false,
-            icon: 'edit',
             currentName: this.name,
-            newName: this.name,
             isTokenExchanged: true,
-            minLength: 4,
+            isTokenNotDeployed: false,
+            maxLengthToTruncate: 30,
+            showTokenEditModal: this.showTokenEditModalProp,
         };
+    },
+    computed: {
+        shouldTruncate: function() {
+            return this.currentName.length > this.maxLengthToTruncate;
+        },
     },
     mounted: function() {
         if (!this.editable) {
             return;
         }
 
+        window.addEventListener('storage', (event) => {
+            // Reload token page in case if token name was changed in another tab
+            if (TOKEN_NAME_CHANGED === event.key && this.currentName === event.oldValue
+                && this.currentName !== event.newValue
+            ) {
+                this.currentName = event.newValue;
+                window.localStorage.removeItem(event.key);
+                location.href = this.$routing.generate('token_show', {
+                    name: this.currentName,
+                });
+            }
+
+            // Reload token page in case if new token created/deleted in another tab
+            if ((AIRDROP_CREATED === event.key || AIRDROP_DELETED === event.key)
+                && this.currentName === event.newValue
+            ) {
+                window.localStorage.removeItem(event.key);
+                location.reload();
+            }
+        });
+
         this.checkIfTokenExchanged();
 
         this.addMessageHandler((response) => {
-            if ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier)) {
+            if (
+                ('asset.update' === response.method && response.params[0].hasOwnProperty(this.identifier))
+                || 'order.update' === response.method
+            ) {
                 this.checkIfTokenExchanged();
             }
-        }, 'token-name-asset-update');
+        }, 'token-name-asset-update', 'TokenName');
+
+        if (this.showTokenEditModalProp) {
+            window.history.replaceState(
+                {}, '', this.$routing.generate('token_show', {
+                    name: this.name,
+                })
+            );
+        }
     },
     methods: {
+        closeTokenEditModal: function() {
+            this.showTokenEditModal = false;
+        },
         checkIfTokenExchanged: function() {
             this.$axios.retry.get(this.$routing.generate('is_token_exchanged', {
                 name: this.currentName,
             }))
-                .then((res) => this.isTokenExchanged = res.data)
-                .catch(() => this.$toasted.error('Can not fetch token data now. Try later'));
+            .then((res) => this.isTokenExchanged = res.data)
+            .catch((err) => {
+                this.sendLogs('error', 'Can not fetch token data now', err);
+            });
         },
-        editName: function() {
+        editToken: function() {
             if (!this.editable) {
                 return;
             }
 
-            if (null === this.isTokenExchanged || this.isTokenExchanged) {
-                this.$toasted.error('You need all your tokens to change token\'s name');
-                return;
-            }
-
-            if (this.icon === 'check') {
-                return this.doEditName();
-            }
-
-            this.editingName = !this.editingName;
-            this.icon = 'check';
-            this.$nextTick(() => {
-                let tokenNameInput = this.$refs.tokenNameInput;
-                tokenNameInput.focus();
-            });
+            this.showTokenEditModal = true;
         },
-        doEditName: function() {
-            this.$v.$touch();
-            if (this.currentName === this.newName) {
-                this.cancelEditingMode();
-                return;
-            } else if (!this.newName || this.newName.replace(/-/g, '').length === 0) {
-                this.$toasted.error('Token name shouldn\'t be blank');
-                return;
-            } else if (!this.$v.newName.tokenContain) {
-                this.$toasted.error('Token name can contain alphabets, numbers, spaces and dashes');
-                return;
-            } else if (!this.$v.newName.minLength || this.newName.replace(/-/g, '').length < this.minLength) {
-                this.$toasted.error('Token name should have at least 4 symbols');
-                return;
-            } else if (!this.$v.newName.maxLength) {
-                this.$toasted.error('Token name can not be longer than 60 characters');
-                return;
-            }
-
-            this.$axios.single.patch(this.updateUrl, {
-                name: this.newName,
-            })
-            .then((response) => {
-                if (response.status === HTTP_ACCEPTED) {
-                    this.currentName = response.data['tokenName'];
-
-                    // TODO: update name in a related components and link path instead of redirecting
-                    location.href = this.$routing.generate('token_show', {
-                        name: this.currentName,
-                    });
-                    this.cancelEditingMode();
-                } else if (response.status === HTTP_ALREADY_REPORTED) {
-                    this.$toasted.error(response.data);
-                }
-            }, (error) => {
-                if (!error.response) {
-                    this.$toasted.error('Network error');
-                } else if (error.response.data.message) {
-                    this.$toasted.error(error.response.data.message);
-                } else {
-                    this.$toasted.error('An error has occurred, please try again later');
-                }
-            });
-        },
-        cancelEditingMode: function() {
-            this.$v.$reset();
-            this.newName = this.currentName;
-            this.editingName = false;
-            this.icon = 'edit';
-        },
-    },
-    validations() {
-        return {
-            newName: {
-                required,
-                tokenContain: tokenContain,
-                minLength: minLength(this.minLength),
-                maxLength: maxLength(60),
-            },
-        };
     },
 };
 </script>

@@ -2,7 +2,7 @@
 
 namespace App\Wallet\Model;
 
-use App\Entity\Crypto;
+use App\Entity\TradebleInterface;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -27,8 +27,8 @@ class Transaction
     /** @var Money */
     private $fee;
 
-    /** @var Crypto|null */
-    private $crypto;
+    /** @var TradebleInterface|null */
+    private $tradable;
 
     /** @var Status */
     private $status;
@@ -43,7 +43,7 @@ class Transaction
         string $to,
         Money $amount,
         Money $fee,
-        ?Crypto $crypto,
+        ?TradebleInterface $tradable,
         Status $status,
         Type $type
     ) {
@@ -53,7 +53,7 @@ class Transaction
         $this->to = $to;
         $this->amount = $amount;
         $this->fee = $fee;
-        $this->crypto = $crypto;
+        $this->tradable = $tradable;
         $this->status = $status;
         $this->type = $type;
     }
@@ -76,39 +76,45 @@ class Transaction
         return $this->to;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getAmount(): Money
     {
         return $this->amount;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getFee(): Money
     {
         return $this->fee;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getDate(): \DateTime
     {
         return $this->date;
     }
 
-    /** @Groups({"API"}) */
-    public function getCrypto(): ?Crypto
+    /** @Groups({"API", "dev"}) */
+    public function getTradable(): ?TradebleInterface
     {
-        return $this->crypto;
+        return $this->tradable;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getStatus(): Status
     {
         return $this->status;
     }
 
-    /** @Groups({"API"}) */
+    /** @Groups({"API", "dev"}) */
     public function getType(): Type
     {
         return $this->type;
+    }
+
+    /** @Groups({"dev"}) */
+    public function getAddress(): string
+    {
+        return $this->to;
     }
 }

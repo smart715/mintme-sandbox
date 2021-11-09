@@ -1,0 +1,58 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: ~
+            description: ~
+            version: 1.0.0
+        securityDefinitions:
+            PublicKey:
+                type: apiKey
+                description: 'X-API-ID: {apiId}'
+                name: X-API-ID
+                in: header
+            PrivateKey:
+                type: apiKey
+                description: 'X-API-KEY: {apiKey}'
+                name: X-API-KEY
+                in: header
+            OAuthToken:
+                 type: apiKey
+                 description: 'Authorization: Bearer {token}'
+                 name: Authorization
+                 in: header
+        sandbox:
+            accept_type: 'application/json'
+            body_format:
+                formats: ['json']
+                default_format: 'json'
+            request_format:
+                formats:
+                    json: 'application/json'
+        security:
+            - PublicKey: []
+              PrivateKey: []
+              OAuthToken: []
+            - {}
+
+    models:
+        use_jms: false
+        names:
+            - { alias: Сurrency,                type: App\Entity\TradebleInterface,             groups: [dev] }
+            - { alias: Market,                  type: App\Exchange\Market,                      groups: [dev] }
+            - { alias: MarketStatus,            type: App\Entity\MarketStatus,                  groups: [dev] }
+            - { alias: MarketStatusDetails,     type: App\Exchange\MarketInfo,                  groups: [dev] }
+            - { alias: Order,                   type: App\Exchange\AbstractOrder,               groups: [dev] }
+            - { alias: Address,                 type: App\Wallet\Model\Address,                 groups: [dev] }
+            - { alias: Transaction,             type: App\Wallet\Model\Transaction,             groups: [dev] }
+            - { alias: BalanceResult,           type: App\Exchange\Balance\Model\BalanceResult, groups: [dev] }
+
+    areas:
+        default:
+            path_patterns:
+                - ^/dev/api/v2
+        v1:
+            path_patterns:
+                - ^/dev/api/v1
+        v2:
+            path_patterns:
+                - ^/dev/api/v2

@@ -1,0 +1,12 @@
+{% extends('mail/layout.txt.twig') %}
+{% block content %}
+
+{{ tokenName }} {% trans %} mail.new_post.msg {% endtrans %}
+
+
+{% trans %} mail.new_post.text_link {% endtrans %}
+
+{{ absolute_url(path('new_show_post', {'name': tokenName, 'slug': slug })) }}
+
+{% endblock %}
+

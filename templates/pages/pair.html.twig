@@ -1,94 +1,464 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}mintMe | Token{% endblock %}
+{% if isTokenPage and token.image is not null %}
+    {% set metaImage = token.image.url | imagine_filter('avatar_large') %}
+{% endif %}
+
+{% if token|default %}
+    {% set metaTitle = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+    {% set metaImageAlt = 'Information about ' ~ token.name ~ ' token | mintMe' %}
+{% else %}
+    {% set metaTitle = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+    {% set metaImageAlt = market.base.symbol|rebranding ~ '/' ~ market.quote.symbol|rebranding ~ ' | mintMe' %}
+{% endif %}
+
+{% block metaDescription %}
+    {% if isTokenPage and tokenDescription is defined %}
+        <meta property="og:description" content="{{ metaTokenDescription }}">
+        <meta name="description" content="{{ metaTokenDescription }}">
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block title %}
+    {% if token|default %} {% trans with {'%name%': token.name}%}page.pair.title_info{% endtrans %}{% else %} {{ market.base.symbol|rebranding }}/{{ market.quote.symbol|rebranding }} {% endif %} | mintMe
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/pair') }}
+{% endblock %}
 
 {% block content %}
-    <div id="token" class="container">
-        <div class="row pt-5 justify-content-center">
-            <div class="col-md-10" v-cloak>
-                {{ include("loader.html.twig", {vCloak: 'v-cloak--block'}) }}
-                <b-tabs no-key-nav @input="tabUpdated" :lazy="true" class="tabs-theme transparent" v-model="tabIndex">
-                    <b-tab title="Trade" {% if tab|default and tab == 'trade' %} {{ 'active' }} {% endif %}>
+{% set isOwner = isOwner ? 'true' : 'false' %}
+{% set loggedIn = app.user ? 'true' : 'false' %}
+{% set isMintmeToken = isTokenPage and token.isMintmeToken ? 'true' : 'false' %}
+{% set isControlledToken = isTokenPage and token.isControlledToken ? 'true' : 'false' %}
+{% set showAirdropCampaign = showAirdropCampaign is defined and showAirdropCampaign ? 'true' : 'false' %}
+{% set userAlreadyClaimed = userAlreadyClaimed is defined and userAlreadyClaimed ? 'true' : 'false' %}
+{% set currentLocale = app.session.get('_locale') %}
+{% set showAirdropModal = showAirdropModal is defined and showAirdropModal ? 'true' : 'false' %}
+
+<div id="token" class="container">
+    {{ include('spinners/pair.html.twig') }}
+
+    <balance-init
+            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+            websocket-url="{{ global_websocket_url }}"
+            hash="{{ hash }}"
+            :market="{{ market | json_encode }}"
+            :logged-in="{{ loggedIn }}"
+            :is-owner="{{ isOwner }}"
+            :precision="{{ precision }}"
+    >
+    </balance-init>
+
+    {% if isTokenPage %}
+    <div class="row justify-content-center pair-container">
+        <div class="col-md-10 d-flex justify-content-between">
+            <token-avatar
+                ref="tokenAvatar"
+                class="ml-2"
+                :is-owner="{{ isOwner }}"
+                :has-release-period-prop="{{ token.getLockIn ? 'true' : 'false' }}"
+                :is-token-created="{{ isTokenCreated ? 'true' : 'false' }}"
+                :is-mintme-token="getIsMintmeToken({{ isMintmeToken }})"
+                :is-controlled-token="{{ isControlledToken }}"
+                :market="{{ market | json_encode }}"
+                :token-crypto="getTokenCrypto({{ tokenCrypto | json_encode }})"
+                :precision="{{ precision }}"
+                :status-prop="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                :twofa="{{ app.user ? (app.user.isGoogleAuthenticatorEnabled ? 'true' : 'false') : 'false' }}"
+                websocket-url="{{ global_websocket_url }}"
+                release-address="{{ token.mintDestination }}"
+                facebook-app-id="{{ global_facebook_app_id }}"
+                youtube-client-id="{{ global_youtube_client_id }}"
+                :showSuccess="{{ showSuccessAlert ? 'true' : 'false' }}"
+                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+                :airdrop-params="{{ airdrop_params | json_encode }}"
+                @token-deploy-pending="setTokenPending"
+                @updated-website="websiteUpdated"
+                @updated-facebook="facebookUpdated"
+                @updated-youtube="youtubeUpdated"
+                @updated-discord="discordUpdated"
+                @updated-telegram="telegramUpdated"
+                image="{{token.image is null or token.image.url == '/media/default_token.png' ? asset('build/images/default_token_avatar.svg') : token.image.url | imagine_filter('avatar_large')}}"
+                profile-url="{{ url('profile-view', {'nickname': profile.nickname}) }}"
+                profile-name="{{ profile.firstName }}"
+                profile-lastname="{{ profile.lastname }}"
+                profile-description="{{ profile.description }}"
+                profile-anonymously="{{ profile.anonymous }}"
+                :token-description="tokenDescription"
+                token-name="{{ market.quote.name }}"
+                :token-facebook="tokenFacebook ? tokenFacebook : {{token.facebookUrl | json_encode}}"
+                :token-youtube="tokenYoutube ? tokenWebsite : {{token.youtubeChannelId | json_encode}}"
+                :token-website="tokenWebsite ? tokenWebsite : {{token.websiteUrl | json_encode}}"
+                :show-token-edit-modal="{{ showTokenEditModal ? 'true' : 'false' }}"
+                disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                :token-delete-sold-limit="{{ tokenDeleteSoldLimit }}"
+                current-locale="{{ currentLocale }}"
+                :token-deployed-date="tokenDeployedDate || (tokenDeployedDate = {{ token.deployedDate | json_encode}})"
+                :token-tx-hash-address="tokenTxHashAddress || (tokenTxHashAddress = {{ token.txHash | json_encode }})"
+                mintme-explorer-url="{{ global_mintme_explorer_url }}"
+                eth-explorer-url="{{ global_eth_explorer_url }}"
+                bnb-explorer-url="{{ global_bnb_explorer_url }}"
+                :service-unavailable="{{ serviceUnavailable ? 'true' : 'false' }}"
+                discord-auth-url="{{ discordAuthUrl }}"
+            ></token-avatar>
+            <token-social-media-icons
+                youtube-client-id="{{ global_youtube_client_id }}"
+                facebook-app-id="{{ global_facebook_app_id }}"
+                token-name="{{ market.quote.name }}"
+                token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
+                :website-url="coalesce(tokenWebsite, '{{ token.websiteUrl }}')"
+                :facebook-url="coalesce(tokenFacebook,'{{ token.facebookUrl }}')"
+                :youtube-channel-id="coalesce(tokenYoutube, '{{ token.youtubeChannelId }}')"
+                :telegram-url="coalesce(tokenTelegram, '{{ token.telegramUrl }}')"
+                :discord-url="coalesce(tokenDiscord, '{{ token.discordUrl }}')"
+            />
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-1 justify-content-center">
+        <div class="col-md-10" v-cloak>
+            <b-tabs
+                no-key-nav
+                @input="tabUpdated"
+                :lazy="true"
+                nav-wrapper-class="tabs-wrapper"
+                class="tabs-theme transparent {% if not isTokenPage %} parent-trade-tab {% endif %}"
+                v-model="tabIndex"
+            >
+                <div class="row">
+                    <quick-trade
+                        class="col-12 mb-3"
+                        :market="{{ market | json_encode }}"
+                        :logged-in="{{ loggedIn }}"
+                        :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                        :params="{{ quick_trade_params | json_encode }}"
+                        websocket-url="{{ global_websocket_url }}"
+                        disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                        profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                        :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                        {% if isTokenPage %}
+                            :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                        {% endif %}
+                    >
+                    </quick-trade>
+                </div>
+                <token-ongoing-airdrop-campaign
+                    v-if="{{ showAirdropCampaign }}"
+                    :logged-in="{{ loggedIn }}"
+                    :is-owner="{{ isOwner }}"
+                    :token-name="'{{ token.name | default }}'"
+                    :user-already-claimed="{{ userAlreadyClaimed }}"
+                    login-url="{{ absolute_url(path('fos_user_security_login')) }}"
+                    signup-url="{{ absolute_url(path('fos_user_registration_register')) }}"
+                    youtube-client-id="{{ global_youtube_client_id }}"
+                    current-locale="{{ currentLocale }}"
+                    :show-airdrop-modal="{{ showAirdropModal }}"
+                    profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                    :google-recaptcha-site-key="'{{ google_recaptcha_site_key }}'"
+                ></token-ongoing-airdrop-campaign>
+                {% if isTokenPage %}
+                    <b-tab
+                        title="{% trans %}page.pair.tab.introduction{% endtrans %}"
+                        title-link-class="token-intro-tab-link"
+                        {% if isTokenPage %} title-item-class="token-avatar-left" {% endif %}
+                        {% if tab|default and tab == 'intro' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="row">
+                            {% if showDescription %}
+                                <token-introduction-description
+                                    class="col-12 mb-3"
+                                    name="{{ token.name }}"
+                                    :description="tokenDescription"
+                                    :editable="{{ isOwner }}"
+                                    @updated="descriptionUpdated"
+                                ></token-introduction-description>
+                            {% endif %}
+                        </div>
+                        <div class="row token-info-container position-relative">
+                            <posts class="col-12 col-lg-7 pr-lg-1"
+                                :posts="posts || (posts = {{ posts | json_encode }})"
+                                @update-post="updatePost($event)"
+                                :max="3"
+                                token-name="{{ token.name }}"
+                                token-page
+                                :show-edit="{{ isOwner }}"
+                                @go-to-posts="goToPosts"
+                                @delete-post="deletePost"
+                                @go-to-trade="goToTrade"
+                                :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                @go-to-post="goToPost"
+                            >
+                                <template v-slot:title>{% trans %}page.pair.recent_posts{% endtrans %}</template>
+                            </posts>
+                            <top-holders
+                                class="col-12 offset-lg-7 col-lg-5 pt-3 pt-lg-0 pl-lg-1"
+                                {% if topHolders %}
+                                :traders-prop="{{ topHolders | json_encode }}"
+                                {% endif %}
+                                :token-name="{{ market.quote.symbol | json_encode }}"
+                                websocket-url="{{ global_websocket_url }}"
+                            >
+                            </top-holders>
+                        </div>
+                        <div class="row">
+                            <token-introduction-statistics
+                                :is-controlled-token="{{ isControlledToken }}"
+                                class="col-12 mt-3"
+                                :market="{{ market | json_encode }}"
+                                :editable="{{ isOwner }}"
+                                release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
+                                twofa="{{ app.user ? app.user.isGoogleAuthenticatorEnabled : '' }}"
+                                token-created="{{ token.getCreated().format('d M Y') }}"
+                                :precision="{{ precision }}"
+                                :deployment-status="getTokenStatus({{ token.getDeploymentStatus | json_encode }})"
+                                :token-contract-address="tokenAddress || (tokenAddress = {{ token.address | json_encode }})"
+                                websocket-url="{{ global_websocket_url }}"
+                                :holders-prop="{{ token.getHoldersCount }}"
+                            >
+                            </token-introduction-statistics>
+                        </div>
+                    </b-tab>
+                {% endif %}
+                {% if isTokenPage %}
+                    <b-tab
+                        title="{% trans %}page.pair.posts_title{% endtrans %}"
+                        title-link-class="token-posts-tab-link"
+                        {% if isTokenPage %} title-item-class="trade-post" {% endif %}
+                        {% if tab == 'posts' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="container-fluid">
+                            {% if is_granted('edit', token) %}
+                                <div class="row mb-3 justify-content-center">
+                                    <create-post class="col-12 col-md-10 col-lg-8"
+                                         token-name="{{ token.name }}"
+                                         :subunit="{{ tokenSubunit }}"
+                                        @update-posts="updatePosts"
+                                    />
+                                </div>
+                            {% endif %}
+                            <div class="row justify-content-center">
+                                <posts class="col-12 col-md-10 col-lg-8"
+                                    :posts="posts || (posts = {{posts | json_encode}})"
+                                    @update-post="updatePost($event)"
+                                    :show-edit="{{ isOwner }}"
+                                    @delete-post="deletePost"
+                                    @go-to-trade="goToTrade"
+                                    :logged-in="{{ app.user ? 'true' : 'false' }}"
+                                    @go-to-post="goToPost"
+                                />
+                            </div>
+                        </div>
+                    </b-tab>
+                {% endif %}
+                {% if showTrade %}
+                    <b-tab
+                        title="{% trans %}page.pair.tab.trade{% endtrans %}"
+                        title-link-class="token-trade-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'trade' %} {{ 'active' }} {% endif %}
+                    >
                         <trade
+                            :is-token="{{ isTokenPage ? 'true' : 'false' }}"
+                            :is-controlled-token="{{ isControlledToken }}"
                             websocket-url="{{ global_websocket_url }}"
                             hash="{{ hash }}"
                             login-url="{{ path('fos_user_security_login') }}"
                             signup-url="{{ path('fos_user_registration_register') }}"
                             :market="{{ market | json_encode }}"
-                            :logged-in="{{ app.user ? 'true' : 'false' }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
+                            :logged-in="{{ loggedIn }}"
+                            :is-owner="{{ isOwner }}"
                             :precision="{{ precision }}"
-                            :is-owner="{{ isOwner ? 'true' : 'false' }}"
-                            :user-id="{{ app.user ? app.user.id : 0 }}">
+                            :user-id="{{ app.user ? app.user.id : 0 }}"
+                            mintme-supply-url="{{ mintme_supply }}"
+                            :minimum-volume-for-marketcap="{{ minimum_volume_for_marketcap }}"
+                            disabled-services-config="{{ disabledServicesConfig | json_encode }}"
+                            {% if isTokenPage %}
+                                :taker-fee="{{ taker_fee }}"
+                            {% endif %}
+                            profile-nickname="{{ app.user ? app.user.profile.nickname : '' }}"
+                        >
                         </trade>
                     </b-tab>
-                    {% if showIntro %}
-                        <b-tab title="Introduction" {% if tab == 'intro' %} {{ 'active' }} {% endif %}>
-                            <div class="row">
-                                <token-introduction-profile
-                                    class="col-12 col-lg-6 pr-lg-2"
-                                    youtube-client-id="{{ global_youtube_client_id }}"
-                                    facebook-app-id="{{ global_facebook_app_id }}"
-                                    confirm-website-file-url="{{ path('token_website_confirmation', {'name': market.quote.name}) }}"
-                                    confirm-website-url="{{ path('token_website_confirm', {'name': market.quote.name}) }}"
-                                    profile-name="{{ profile.firstName }} {{ profile.lastName }}"
-                                    website-url="{{ token.websiteUrl }}"
-                                    facebook-url="{{ token.facebookUrl }}"
-                                    youtube-channel-id="{{ token.youtubeChannelId }}"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    profile-url="{{ absolute_url(path('profile-view', { 'pageUrl': token.getProfile().getPageUrl() })) }}"
-                                    token-url="{{ absolute_url(path('token_show', {'name': market.quote.name, 'tab': 'intro'})) }}"
-                                >
-                                </token-introduction-profile>
-
-                                <token-introduction-statistics
-                                    class="col-12 col-lg-6 pt-3 pt-lg-0 pl-lg-2"
-                                    :market="{{ market | json_encode }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}"
-                                    release-period-route="{{ path('lock_in', {'name': market.quote.name}) }}"
-                                    token-created="{{ token.getCreated().format('d M Y') }}"
-                                    :precision="{{ precision }}">
-                                </token-introduction-statistics>
-                                <token-introduction-description
-                                    class="col-12 pt-3"
-                                    @updated="descriptionUpdated"
-                                    name="{{ token.name }}"
-                                    :description="tokenDescription"
-                                    update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                    :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-introduction-description>
+                {% endif %}
+                {% if isTokenPage %}
+                    <b-tab
+                        title="Post"
+                        title-item-class="d-none"
+                        {% if tab == 'post' %} {{ 'active' }} {% endif %}
+                    >
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-md-10 col-lg-8">
+                                <div class="card h-100 single-post-page">
+                                    <div class="card-body posts">
+                                        <post
+                                            :post="singlePost || (singlePost = {{ post | json_encode }})"
+                                            @update-post="singlePost = $event"
+                                            :show-edit="{{ isOwner }}"
+                                            :logged-in="{{ loggedIn }}"
+                                            @delete-post="deleteSinglePost"
+                                            @go-to-trade="goToTrade"
+                                            single-page
+                                        ></post>
+                                        {% if post %}
+                                            {% if post.content %}
+                                            <comments
+                                                :comments="comments || (comments = {{ comments | json_encode }})"
+                                                @update-comment="updateComment($event)"
+                                                :logged-in="{{ loggedIn }}"
+                                                @delete-comment="deleteComment"
+                                                @new-comment="newComment"
+                                                @cancel="goToPosts"
+                                                :post="singlePost ? singlePost : {{ post | json_encode }}"
+                                            ></comments>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
-                        </b-tab>
-                    {% endif %}
-                    <template slot="tabs">
-                        <li class="nav-item float-sm-right">
-                            <div class="nav-link">
-                                <token-name
-                                        websocket-url="{{ global_websocket_url }}"
-                                        identifier="{{ market.quote.identifier }}"
-                                        name="{{ market.quote.name }}"
-                                        update-url="{{ path('token_update', {'name': market.quote.name}) }}"
-                                        :editable="{{ isOwner ? 'true' : 'false' }}">
-                                </token-name>
+                        </div>
+                    </b-tab>
+                    <b-tab
+                        title="{% trans %}voting.voting{% endtrans %}"
+                        title-link-class="token-voting-tab-link"
+                        {% if not isTokenPage %} title-item-class="trade-tab" {% endif %}
+                        {% if tab == 'voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-list
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            :min-amount="{{ dMMinAmount }}"
+                            @go-to-create="goToCreateVoting"
+                            @go-to-show="goToShowVoting"
+                        >
+                        </voting-list>
+                    </b-tab>
+                    <b-tab
+                        title="create-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'create-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-create
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                        >
+                        </voting-create>
+                    </b-tab>
+                    <b-tab
+                        title="show-voting"
+                        title-item-class="d-none"
+                        {% if tab == 'show-voting' %} {{ 'active' }} {% endif %}
+                    >
+                        <voting-show
+                            token-name-prop="{{ token.name }}"
+                            :votings-prop="{{ votings | json_encode }}"
+                            {% if voting is defined %}
+                            :voting-prop="{{ voting | json_encode }}"
+                            {% endif %}
+                        >
+                        </voting-show>
+                    </b-tab>
+                {% endif %}
+                <template slot="tabs-end">
+                    {% if isTokenPage %}
+                        <li class="nav-item ml-auto my-2 my-lg-0">
+                            <div class="d-flex align-items-center h-100">
+                                <envelope
+                                    :logged-in="{{ loggedIn }}"
+                                    :is-owner="{{ isOwner }}"
+                                    :dm-min-amount="{{ dMMinAmount }}"
+                                    token-name="{{ token.name }}"
+                                ></envelope>
+                                <div class="div-container-avatar">
+                                    <a
+                                        href="{{ path('profile') }}/{{ profile.nickname }}"
+                                    >
+                                        <avatar
+                                            class="{% if profile.image.url == "/media/default_profile.png" %}default-user-avatar-navbar{% endif %}"
+                                            size="small"
+                                            type="profile"
+                                            image="{{ profile.image.url | imagine_filter('avatar_small') }}"
+                                        ></avatar>
+                                    </a>
+                                </div>
                             </div>
                         </li>
-                        <div class="clearfix"></div>
-                    </template>
-                </b-tabs>
-            </div>
+                    {% endif %}
+                    {% if not isTokenPage %}
+                        <li class="nav-item-token">
+                            <div class="nav-link-token">
+                                <div class="truncate-token">
+                                    {% if(market.quote.name | rebranding is same as(mintme_coin)) %}
+                                        <a href="{{ mintme_coin_link }}" target="_blank">
+                                            <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
+                                                {{ market.quote.name | rebranding }}
+                                            </span>
+                                        </a>
+                                    {%else%}
+                                        <span v-b-tooltip="{title: '{{ market.quote.name | rebranding }}', boundary:'viewport'}">
+                                            {{ market.quote.name | rebranding }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <div class="clearfix"></div>
+                </template>
+            </b-tabs>
         </div>
         {% if token|default %}
             <input type="hidden" v-model="tokenDescription" :set-value="tokenDescription = tokenDescription || {{ token.description | json_encode }}" />
             <input type="hidden" v-model="tokenName" :set-value="tokenName = tokenName || {{ market.quote.name | json_encode }}" />
+            <input
+                    type="hidden"
+                    v-model="showDeployedOnBoard"
+                    :set-value="showDeployedOnBoard = null !== showDeployedOnBoard
+                        ? showDeployedOnBoard
+                        : {{ isOwner is same as ('true') and token.showDeployedModal ? 'true' : 'false' }}" />
         {% endif %}
-    </div>
 
-    <input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
+    </div>
+    <token-deployed-modal
+        v-if="showDeployedOnBoard"
+        :visible="showDeployedOnBoard"
+        token-name="{{ market.quote.name }}"
+        @close="closeDeployedModal()"
+    ></token-deployed-modal>
+    {% if showCreatedModal and isOwner is same as('true') %}
+        <token-created-modal
+            :visible="showCreatedModal"
+            token-name="{{ market.quote.name }}"
+            @close="showCreatedModal = false"
+        ></token-created-modal>
+    {% endif %}
+</div>
+
+<input type="hidden" id="confirm-website-url" value="{{ path('token_website_confirm', {'name': market.quote.name}) }}">
 {% endblock %}
 
 {% block pagescripts %}
     <script src="https://apis.google.com/js/platform.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="{{ asset('build/pair.js') }}"></script>
+    {% if not app.user %}
+        <script defer src="https://www.google.com/recaptcha/api.js"></script>
+    {% endif %}
+    {{ encore_entry_script_tags('pages/pair') }}
+    <script defer>
+        window.fbAsyncInit = () => {
+            FB.init({
+                appId: '{{ global_facebook_app_id }}',
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v3.1',
+            });
+        };
+    </script>
+    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
 {% endblock %}

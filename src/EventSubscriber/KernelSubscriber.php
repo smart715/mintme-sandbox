@@ -6,9 +6,9 @@ use App\Entity\User;
 use App\Manager\ProfileManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class KernelSubscriber implements EventSubscriberInterface
 {
-    /** @var ProfileManagerInterface  */
+    /** @var ProfileManagerInterface */
     private $profileManager;
 
     /** @var TokenStorageInterface */
@@ -40,6 +40,7 @@ class KernelSubscriber implements EventSubscriberInterface
         $this->csrfTokenManager = $csrfTokenManager;
     }
 
+    /** @codeCoverageIgnore */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -48,13 +49,14 @@ class KernelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onResponse(FilterResponseEvent $event): void
+    /** @codeCoverageIgnore */
+    public function onResponse(ResponseEvent $event): void
     {
+        //todo: handle this protection through config/packages/nelmio_security.yaml
         $event->getResponse()->headers->set('X-XSS-Protection', '1; mode=block');
-        $event->getResponse()->headers->set('X-Frame-Options', 'deny');
     }
 
-    public function onRequest(GetResponseEvent $request): void
+    public function onRequest(RequestEvent $request): void
     {
         $csrf = $request->getRequest()->headers->get('X-CSRF-TOKEN', '');
 
@@ -63,16 +65,26 @@ class KernelSubscriber implements EventSubscriberInterface
             $this->isApiRequest($request->getRequest()) &&
             !$this->isCsrfTokenValid($csrf))
         ) {
-            throw new AccessDeniedHttpException("Invalid token given");
+            $request->setResponse(new Response('Invalid token given.', Response::HTTP_UNAUTHORIZED));
+
+            return;
         }
 
+        /** @psalm-suppress UndefinedDocblockClass */
         if (is_object($this->tokenStorage->getToken()) &&
             is_object($this->tokenStorage->getToken()->getUser()) &&
-            !$request->getRequest()->isXmlHttpRequest()
+            !$request->getRequest()->isXmlHttpRequest() &&
+            !$this->isImgFilterRequest($request->getRequest())
         ) {
-            /** @var User $user */
+            /**
+             * @var User $user
+             * @psalm-suppress UndefinedDocblockClass
+             */
             $user = $this->tokenStorage->getToken()->getUser();
-            $this->profileManager->createHash($user, true, $this->isAuth);
+
+            if (!$user->getHash()) {
+                $this->profileManager->createHash($user, true, $this->isAuth);
+            }
         }
     }
 
@@ -81,10 +93,15 @@ class KernelSubscriber implements EventSubscriberInterface
         return (bool)preg_match('/^\/api\//', $request->getPathInfo());
     }
 
-    private function isCsrfTokenValid(string $token): bool
+    private function isCsrfTokenValid(?string $token): bool
     {
         return $this->csrfTokenManager->isTokenValid(
             new CsrfToken('authenticate', $token ?? '')
         );
+    }
+
+    private function isImgFilterRequest(Request $request): bool
+    {
+        return 'liip_imagine_filter' === $request->attributes->get('_route');
     }
 }

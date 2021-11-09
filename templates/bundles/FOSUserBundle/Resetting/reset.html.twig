@@ -1,9 +1,12 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block title %} {% trans %}resetting.email.subject{% endtrans %} | mintMe{% endblock %}
 
 {% block fos_user_content %}
     {{ include("@FOSUser/Resetting/reset_content.html.twig") }}
 {% endblock fos_user_content %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/reset.js') }}"></script>
+    {{ encore_entry_script_tags('reset') }}
 {% endblock %}

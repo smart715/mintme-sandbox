@@ -1,20 +1,9 @@
 import Vuex from 'vuex';
-import Mutations from './mutations';
-import Actions from './actions';
-import websocket from './modules/websocket';
-import makeOrder from './modules/make_order';
-import interval from '../utils/interval';
+import storage from './storage';
 
-Vue.use(Vuex);
+if (!window.store) {
+    Vue.use(Vuex);
+    window.store = new Vuex.Store(storage);
+}
 
-export default new Vuex.Store({
-    state: {
-        interval,
-    },
-    mutations: Mutations,
-    actions: Actions,
-    modules: {
-        websocket,
-        makeOrder,
-    },
-});
+export default window.store;

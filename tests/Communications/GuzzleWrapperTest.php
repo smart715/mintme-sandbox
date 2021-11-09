@@ -2,6 +2,7 @@
 
 namespace App\Tests\Communications;
 
+use App\Communications\Exception\FetchException;
 use App\Communications\Factory\RpcClientFactoryInterface;
 use App\Communications\GuzzleWrapper;
 use App\Communications\JsonRpcResponse;
@@ -96,6 +97,38 @@ class GuzzleWrapperTest extends TestCase
 
         $this->expectException(\Throwable::class);
         $wrapper->send($method, $params);
+    }
+
+    /** @dataProvider failedResponseProvider */
+    public function testSendFailsWithEptyResponse(?ResponseInterface $res): void
+    {
+        $clientMock = $this->createMock(ClientInterface::class);
+        $clientMock->method('request')
+            ->willReturn($this->createMock(RequestInterface::class));
+        $clientMock->method('send')
+            ->willReturn($res);
+
+        $clientFactory = $this->createMock(RpcClientFactoryInterface::class);
+        $clientFactory->expects($this->once())
+            ->method('createClient')
+            ->willReturn($clientMock);
+
+        $wrapper = new GuzzleWrapper(
+            $this->getRandomNumber(),
+            $clientFactory,
+            $this->getLoggerMock(),
+            'http://localhost:8080',
+            10,
+            ['auth' => ['type' => 'basic']]
+        );
+
+        $this->expectException(FetchException::class);
+        $wrapper->send('stubMethod', [['param1', 'param2']]);
+    }
+
+    public function failedResponseProvider(): array
+    {
+        return [[null], [$this->getResponseMock($this->getStreamMock("['foo']"))]];
     }
 
     private function getStreamMock(string $content): StreamInterface

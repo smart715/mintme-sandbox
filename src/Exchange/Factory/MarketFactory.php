@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exchange\Market;
 use App\Manager\CryptoManagerInterface;
 use App\Manager\TokenManagerInterface;
+use App\Utils\Symbols;
 
 class MarketFactory implements MarketFactoryInterface
 {
@@ -36,7 +37,7 @@ class MarketFactory implements MarketFactoryInterface
     {
         return array_merge(
             $this->getCoinMarkets(),
-            $this->getMarkets(
+            $this->getTokenMarkets(
                 $this->getExchangableCryptos(),
                 $this->tokenManager->findAll()
             )
@@ -44,24 +45,13 @@ class MarketFactory implements MarketFactoryInterface
     }
 
     /** {@inheritdoc} */
-    public function createUserRelated(User $user): array
+    public function createUserRelated(User $user, bool $deployed = false): array
     {
         return array_merge(
             $this->getCoinMarkets(),
-            $this->getMarkets(
+            $this->getTokenMarkets(
                 $this->getExchangableCryptos(),
-                $user->getRelatedTokens()
-            )
-        );
-    }
-
-    public function createPredefined(): array
-    {
-        return array_merge(
-            $this->getCoinMarkets(),
-            $this->getMarkets(
-                $this->getExchangableCryptos(),
-                $this->getExchangableCryptos()
+                !$deployed ? $user->getTokens() : $this->tokenManager->getDeployedTokens()
             )
         );
     }
@@ -81,31 +71,50 @@ class MarketFactory implements MarketFactoryInterface
         });
     }
 
-    /** @return Market[] */
-    private function getCoinMarkets(): array
-    {
-        return $this->getMarkets(
-            $this->getTradableCryptos(),
-            $this->getExchangableCryptos()
-        );
-    }
-
-    /**
-     * @param TradebleInterface[] $bases
-     * @param TradebleInterface[] $quotes
-     * @return Market[]
-     */
-    private function getMarkets(array $bases, array $quotes): array
+    /** {@inheritdoc} */
+    public function getCoinMarkets(): array
     {
         $markets = [];
 
-        foreach ($bases as $base) {
-            foreach ($quotes as $quote) {
-                if ($base === $quote) {
-                    continue;
-                }
+        $bases = $this->getTradableCryptos();
+        $quote = $this->cryptoManager->findBySymbol(Symbols::WEB);
 
+        if (!$quote) {
+            return $markets;
+        }
+
+        /** @var Crypto $base */
+        foreach ($bases as $base) {
+            if ($base->getSymbol() !== $quote->getSymbol()) {
                 $markets[] = $this->create($base, $quote);
+            }
+        }
+
+        return $markets;
+    }
+
+    /**
+     * @param TradebleInterface[] $cryptos
+     * @param TradebleInterface[] $tokens
+     * @return Market[]
+     */
+    private function getTokenMarkets(array $cryptos, array $tokens): array
+    {
+        $markets = [];
+        $cryptosBySymbol = [];
+
+        /** @var Crypto $crypto */
+        foreach ($cryptos as $crypto) {
+            $cryptosBySymbol[$crypto->getSymbol()] = $crypto;
+        }
+
+        /** @var Token $token */
+        foreach ($tokens as $token) {
+            if (isset($cryptosBySymbol[$token->getExchangeCryptoSymbol()])) {
+                $markets[] = $this->create(
+                    $cryptosBySymbol[$token->getExchangeCryptoSymbol()],
+                    $token
+                );
             }
         }
 

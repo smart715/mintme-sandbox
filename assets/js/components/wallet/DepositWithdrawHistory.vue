@@ -1,14 +1,36 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table">
+        <div class="deposit-withdraw-table table-responsive text-nowrap table-restricted" ref="table" v-if="!noHistory">
             <b-table
-                v-if="!noHistory"
+                thead-class="trading-head"
                 :items="sanitizedHistory"
-                :fields="fields"
+                :fields="fieldsArray"
+                :sort-compare="$sortCompare(fields)"
+                :sort-by="fields.date.key"
+                :sort-desc="true"
+                sort-direction="desc"
                 :class="{'empty-table': noHistory}"
+                sort-icon-left
             >
-                <template slot="toAddress" slot-scope="row">
+                <template v-slot:cell(symbol)="data">
+                    <span v-if="!data.item.tradable.blocked">
+                        <a :href="data.item.url" class="text-white">
+                            <span
+                                v-if="data.item.symbol.length > 17"
+                                v-b-tooltip="{title: data.item.symbol, boundary:'viewport'}">
+                                {{ data.item.symbol | truncate(17) }}
+                            </span>
+                            <span v-else>
+                                {{ data.item.symbol }}
+                            </span>
+                        </a>
+                    </span>
+                    <span v-else class="text-muted">
+                        {{ data.item.symbol }}
+                    </span>
+                </template>
+                <template v-slot:cell(toAddress)="row">
                     <div v-b-tooltip="{title: row.value, boundary: 'viewport'}">
                         <copy-link :content-to-copy="row.value" class="c-pointer">
                             <div class="text-truncate text-blue">
@@ -18,12 +40,12 @@
                     </div>
                 </template>
             </b-table>
-            <div v-if="noHistory">
-                <p class="text-center p-5">No transactions were added yet</p>
-            </div>
         </div>
         <div v-if="loading" class="p-1 text-center">
             <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+        </div>
+        <div v-else-if="noHistory">
+            <p class="text-center p-5">{{ $t('wallet.history.no_transactions') }}</p>
         </div>
         </template>
         <template v-else>
@@ -35,51 +57,86 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
 import moment from 'moment';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import {toMoney, formatMoney} from '../../utils';
-import {LazyScrollTableMixin} from '../../mixins';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    RebrandingFilterMixin,
+    LoggerMixin,
+} from '../../mixins/';
 import CopyLink from '../CopyLink';
+import {GENERAL} from '../../utils/constants';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'DepositWithdrawHistory',
-    mixins: [LazyScrollTableMixin],
-    components: {CopyLink},
+    components: {
+        BTable,
+        CopyLink,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        LazyScrollTableMixin,
+        FiltersMixin,
+        RebrandingFilterMixin,
+        LoggerMixin,
+    ],
     data() {
         return {
             fields: {
                 date: {
-                    label: 'Date',
+                    key: 'date',
+                    label: this.$t('wallet.history.date'),
                     sortable: true,
+                    type: 'date',
                 },
                 type: {
-                    label: 'Type',
+                    key: 'type',
+                    label: this.$t('wallet.history.type'),
                     sortable: true,
+                    type: 'string',
                 },
-                crypto: {
-                    label: 'Name',
+                symbol: {
+                    key: 'symbol',
+                    label: this.$t('wallet.history.symbol'),
                     sortable: true,
+                    type: 'string',
                 },
                 toAddress: {
-                    label: 'Address',
+                    key: 'toAddress',
+                    label: this.$t('wallet.history.to_address'),
                     sortable: true,
+                    type: 'string',
                 },
                 amount: {
-                    label: 'Amount',
+                    key: 'amount',
+                    label: this.$t('wallet.history.amount'),
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
                 status: {
-                    label: 'Status',
+                    key: 'status',
+                    label: this.$t('wallet.history.status'),
                     sortable: true,
+                    type: 'string',
                 },
                 fee: {
-                    label: 'Fee',
+                    key: 'fee',
+                    label: this.$t('wallet.history.fee'),
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-            },
-            history: {
-                dateFormat: 'MM-DD-YYYY',
             },
             tableData: null,
             currentPage: 1,
@@ -94,6 +151,9 @@ export default {
         },
         loaded: function() {
             return this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
         },
     },
     mounted: function() {
@@ -120,25 +180,26 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
-                        this.$toasted.error('Can not update payment history. Try again later.');
+                    .catch((err) => {
+                        this.sendLogs('error', 'Can not update payment history', err);
                         reject([]);
                     });
             });
         },
         sanitizeHistory: function(historyData) {
             historyData.forEach((item) => {
+                item['url'] = this.generatePairUrl(item.tradable);
                 item['date'] = item.date
-                    ? moment(item.date).format(this.history.dateFormat)
+                    ? moment(item.date).format(GENERAL.dateTimeFormat)
                     : null;
                 item['fee'] = item.fee
-                    ? toMoney(item.fee, item.crypto.subunit)
+                    ? toMoney(item.fee, item.tradable.subunit)
                     : null;
                 item['amount'] = item.amount
-                    ? toMoney(item.amount, item.crypto.subunit)
+                    ? toMoney(item.amount, item.tradable.subunit)
                     : null;
-                item['crypto'] = item.crypto.symbol
-                    ? item.crypto.symbol
+                item['symbol'] = item.tradable.symbol
+                    ? this.rebrandingFunc(item.tradable)
                     : null;
                 item['status'] = item.status.statusCode
                     ? item.status.statusCode
@@ -149,6 +210,19 @@ export default {
             });
 
             return historyData;
+        },
+        generatePairUrl: function(quote) {
+            if (quote.hasOwnProperty('exchangeble')) {
+                /** @TODO In future we need to use another solution and remove hardcoded BTC & MINTME symbols **/
+                let params = {
+                    base: !quote.exchangeble ? this.rebrandingFunc(quote) : 'BTC',
+                    quote: quote.exchangeble && quote.tradable ? this.rebrandingFunc(quote) : 'MINTME',
+                    tab: 'trade',
+                };
+                return this.$routing.generate('coin', params);
+            }
+
+            return this.$routing.generate('token_show', {name: quote.name, tab: 'trade'});
         },
     },
 };

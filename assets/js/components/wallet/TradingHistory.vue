@@ -1,23 +1,53 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="table-responsive table-restricted trading-history" ref="table" v-if="hasHistory">
                 <b-table
-                    v-if="hasHistory"
-                    :items="tableData"
-                    :fields="fields">
-                    <template slot="market" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    thead-class="trading-head"
+                    :items="history"
+                    :fields="fieldsArray"
+                    :sort-compare="$sortCompare(fields)"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                    sort-icon-left
+                >
+                    <template v-slot:cell(name)="row">
+                        <div v-if="row.value.full.length > 17"
+                            v-b-tooltip="{title: row.value.full, boundary: 'viewport'}"
+                        >
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
+
+                        </div>
+                        <div v-else>
+                            <span v-if="row.item.blocked">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
+                        </div>
                     </template>
-                     <template slot="side" slot-scope="row">{{ getType(row.value)}}</template>
-                     <template slot="timestamp" slot-scope="row">{{ getDate(row.value) }}</template>
                 </b-table>
-                <div v-if="!hasHistory">
-                    <p class="text-center p-5">No deal was made yet</p>
-                </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
                 <font-awesome-icon icon="circle-notch" spin class="loading-spinner" fixed-width />
+            </div>
+            <div v-else-if="!hasHistory">
+                <p class="text-center p-5">{{ $t('wallet.trading_history.no_deals') }}</p>
             </div>
         </template>
         <template v-else>
@@ -29,55 +59,106 @@
 </template>
 
 <script>
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import moment from 'moment';
+import {BTable, VBTooltip} from 'bootstrap-vue';
 import {Decimal} from 'decimal.js';
 import {toMoney, formatMoney} from '../../utils';
-import {WSAPI} from '../../utils/constants';
-import {FiltersMixin, LazyScrollTableMixin} from '../../mixins';
+import {
+    GENERAL,
+    WSAPI,
+    BTC,
+    MINTME,
+    webBtcSymbol,
+    predefinedMarkets,
+} from '../../utils/constants';
+import {
+    FiltersMixin,
+    LazyScrollTableMixin,
+    RebrandingFilterMixin,
+    LoggerMixin,
+    PairNameMixin,
+    OrderMixin,
+} from '../../mixins/';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'TradingHistory',
-    mixins: [FiltersMixin, LazyScrollTableMixin],
+    components: {
+        BTable,
+        FontAwesomeIcon,
+    },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        LoggerMixin,
+        PairNameMixin,
+        OrderMixin,
+    ],
     data() {
         return {
             tableData: null,
             currentPage: 1,
+            donations: 0,
             fields: {
-                timestamp: {label: 'Date', sortable: true},
-                side: {label: 'Type', sortable: true},
-                market: {
-                    label: 'Name',
+                date: {
+                    key: 'date',
+                    label: this.$t('wallet.trading_history.table.date'),
                     sortable: true,
-                    formatter: (market) => {
-                        let name = market.base.symbol + '/' + market.quote.symbol;
+                    type: 'date',
+                },
+                side: {
+                    key: 'side',
+                    label: this.$t('wallet.trading_history.table.type'),
+                    sortable: true,
+                    type: 'string',
+                },
+                name: {
+                    key: 'name',
+                    label: this.$t('wallet.trading_history.table.name'),
+                    sortable: true,
+                    class: 'pair-cell',
+                    formatter: (name) => {
                         return {
                             full: name,
-                            truncate: this.truncateFunc(name, 15),
+                            truncate: this.truncateFunc(name, 17),
                         };
                     },
                 },
                 amount: {
-                    label: 'Amount',
+                    key: 'amount',
+                    label: this.$t('wallet.trading_history.table.amount'),
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.quote.subunit)),
+                    formatter: formatMoney,
+                    type: 'numeric',
                 },
                 price: {
-                    label: 'Price',
+                    key: 'price',
+                    label: this.$t('wallet.trading_history.table.price'),
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: (val) => '0' === val ? '-' : toMoney(val),
+                    type: 'numeric',
                 },
                 total: {
-                    label: 'Total cost',
+                    key: 'total',
+                    label: this.$t('wallet.trading_history.table.total_cost'),
                     sortable: true,
-                    formatter: (value, key, item) => {
-                        let tWF = new Decimal(item.amount).times(item.price);
-                        let f = new Decimal(item.fee);
-                        return formatMoney(toMoney(tWF.add(f).toString(), item.market.base.subunit));
-                    },
+                    formatter: formatMoney,
+                    type: 'numeric',
                 },
                 fee: {
-                    label: 'Fee',
+                    key: 'fee',
+                    label: this.$t('wallet.trading_history.table.fee'),
                     sortable: true,
-                    formatter: (value, key, item) => formatMoney(toMoney(value, item.market.base.subunit)),
+                    formatter: formatMoney,
+                    type: 'numeric',
                 },
             },
         };
@@ -89,6 +170,30 @@ export default {
         hasHistory: function() {
             return !!(Array.isArray(this.tableData) && this.tableData.length);
         },
+        history: function() {
+            return this.tableData.map((history) => {
+                let isDonationOrder = 0 === history.orderId || 0 === history.dealOrderId;
+
+                return {
+                    date: moment.unix(history.timestamp).format(GENERAL.dateTimeFormat),
+                    side: this.getSideByType(history.side, isDonationOrder),
+                    name: isDonationOrder ? this.rebrandingFunc(history.market.quote) : this.pairNameFunc(
+                        this.rebrandingFunc(history.market.base),
+                        this.rebrandingFunc(history.market.quote)
+                    ),
+                    amount: toMoney(history.amount, history.market.base.subunit),
+                    price: toMoney(history.price, history.market.base.subunit),
+                    total: toMoney(this.calculateTotalCost(history, isDonationOrder), GENERAL.precision) + ' '
+                        + this.rebrandingFunc(history.market.base),
+                    fee: this.createTicker(toMoney(history.fee, history.market.base.subunit), history, isDonationOrder),
+                    pairUrl: this.generatePairUrl(history.market),
+                    blocked: history.market.quote.hasOwnProperty('blocked') ? history.market.quote.blocked : false,
+                };
+            });
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
+        },
     },
     mounted: function() {
         this.updateTableData();
@@ -96,32 +201,78 @@ export default {
     methods: {
         updateTableData: function() {
             return new Promise((resolve, reject) => {
-                this.$axios.retry.get(this.$routing.generate('executed_user_orders', {page: this.currentPage}))
+                this.$axios.retry.get(this.$routing.generate('executed_user_orders', {
+                    page: this.currentPage,
+                    donations: this.donations,
+                }))
                     .then((res) => {
-                        res.data = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+                        let orders = typeof res.data === 'object' ? Object.values(res.data) : res.data;
+                        orders.forEach((order) => {
+                            if (0 === order.id) {
+                               this.donations++;
+                            }
+                        });
 
                         if (this.tableData === null) {
-                            this.tableData = res.data;
+                            this.tableData = orders;
                             this.currentPage++;
-                        } else if (res.data.length > 0) {
-                            this.tableData = this.tableData.concat(res.data);
+                        } else if (orders.length > 0) {
+                            this.tableData = this.tableData.concat(orders);
                             this.currentPage++;
                         }
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
-                        this.$toasted.error('Can not update trading history. Try again later.');
+                    .catch((err) => {
+                        this.sendLogs('error', 'Service unavailable. Can not update trading history', err);
                         reject([]);
                     });
             });
         },
-        getDate: function(timestamp) {
-           return new Date(timestamp * 1000).toDateString();
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base.symbol),
+                    quote: this.rebrandingFunc(market.quote.symbol),
+                    tab: 'trade',
+                });
+            }
+
+            return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        getType: function(type) {
-           return (type === WSAPI.order.type.SELL) ? 'Sell' : 'Buy';
+        createTicker: function(amount, history, isDonationOrder) {
+            if (predefinedMarkets.includes(history.market.identifier)) {
+                return amount + ' ' + (WSAPI.order.type.BUY === history.side
+                    ? this.rebrandingFunc(history.market.quote.symbol)
+                    : this.rebrandingFunc(history.market.base.symbol));
+            }
+            return amount + ' '
+                + (isDonationOrder ? this.rebrandingFunc(history.market.base.symbol) : MINTME.symbol);
         },
+        /**
+         * @param {object} history
+         * @param {boolean} isDonationOrder
+         * @return {string}
+         */
+        calculateTotalCost: function(history, isDonationOrder) {
+            let cost = (new Decimal(isDonationOrder ? 1 : history.price).times(history.amount));
+
+            if (WSAPI.order.type.BUY === history.side && !predefinedMarkets.includes(history.market.identifier)) {
+                cost.add(history.fee);
+            }
+
+            return toMoney(cost.toString(), history.market.base.subunit);
+        },
+        producePrecision(history) {
+            if (history.market.identifier !== webBtcSymbol) {
+                return MINTME.subunit;
+            }
+
+            return isDonationOrder
+                ? history.market.base.subunit
+                : (WSAPI.order.type.BUY === history.side ? MINTME.subunit : BTC.subunit);
+        },
+
     },
 };
 </script>

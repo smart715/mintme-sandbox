@@ -6,10 +6,12 @@ use OldSound\RabbitMqBundle\RabbitMq\Producer;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
+/** @codeCoverageIgnore */
 class MarketDelayedProducer extends Producer
 {
-    private const MARKET_DELAYED_QUQUE_NAME     = 'market-delayed';
-    private const MARKET_EXCHANGE_NAME          = 'market';
+    private const MARKET_DELAYED_QUQUE_NAME = 'market';
+    private const MARKET_DELAYED_EXCHANGE_NAME = 'market';
+    private const DELAY = 15000;
 
     private const QUEUE_IS_PASSIVE      = false;
     private const QUEUE_IS_DURABLE      = true;
@@ -17,19 +19,16 @@ class MarketDelayedProducer extends Producer
     private const QUEUE_IS_AUTO_DELETE  = false;
     private const QUEUE_IS_NOWAIT       = false;
 
-    /** {@inheritDoc} */
-    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null)
+    /** @inheritDoc */
+    public function publish($msgBody, $routingKey = '', $additionalProperties = [], ?array $headers = null): void
     {
         if ($this->autoSetupFabric) {
             $this->setupFabric();
         }
 
         $msg = new AMQPMessage($msgBody, array_merge($this->getBasicProperties(), $additionalProperties));
-
-        if (!empty($headers)) {
-            $headersTable = new AMQPTable($headers);
-            $msg->set('application_headers', $headersTable);
-        }
+        $headersTable = new AMQPTable(['x-delay' => self::DELAY]);
+        $msg->set('application_headers', $headersTable);
 
         $this->getChannel()->queue_declare(
             self::MARKET_DELAYED_QUQUE_NAME,
@@ -38,16 +37,21 @@ class MarketDelayedProducer extends Producer
             self::QUEUE_IS_EXCLUSIVE,
             self::QUEUE_IS_AUTO_DELETE,
             self::QUEUE_IS_NOWAIT,
-            [
-                'x-dead-letter-exchange' => [
-                    'S', self::MARKET_EXCHANGE_NAME,
-                ],
-                'x-message-ttl' => ['I', 15000],
-            ]
         );
 
-        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, $this->exchangeOptions['name']);
-        $this->getChannel()->basic_publish($msg, $this->exchangeOptions['name'], $routingKey);
+        $this->getChannel()->exchange_declare(
+            self::MARKET_DELAYED_EXCHANGE_NAME,
+            'x-delayed-message',
+            false,
+            true,
+            false,
+            false,
+            false,
+            ['x-delayed-type' => ['s', 'fanout']],
+        );
+
+        $this->getChannel()->queue_bind(self::MARKET_DELAYED_QUQUE_NAME, self::MARKET_DELAYED_EXCHANGE_NAME);
+        $this->getChannel()->basic_publish($msg, self::MARKET_DELAYED_EXCHANGE_NAME, $routingKey);
 
         $this->logger->debug('[Market] Delayed message published', [
             'amqp' => [

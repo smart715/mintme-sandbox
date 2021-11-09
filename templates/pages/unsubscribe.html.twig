@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% trans %}page.unsubscribe.title{% endtrans %}{% endblock %}
+
+{% block content %}
+<div class="container">
+   <div class="row pt-5 justify-content-center">
+      <div class="col-12">
+         <div class="card card-fixed-small mx-auto">
+            <div class="card-header">
+               {% trans %}page.unsubscribe.header{% endtrans %}
+            </div>
+            <div class="card-body py-3">
+               {% if alreadyUnsubscribed %}
+                  {% trans with {'%mail%': mail} %}page.unsubscribe.already{% endtrans %}
+
+               {% else %}
+                  {{ form_start(form) }}
+                  {{ form_errors(form) }}
+                  <div class="row">
+                     <div class="col-12 mb-3">
+                        <span>{% trans with {'%mail%': mail} %}page.unsubscribe.question{% endtrans %}</span>
+                     </div>
+                  </div>
+                  <div class="row">
+                     <div class="col-12">
+                        <div class="float-left mr-2">{{ form_widget(form.confirm, { label: 'yes'|trans }) }}</div>
+                        <div class="float-left">
+                           <a href="{{ path('homepage') }}" class="btn-cancel">{% trans %}no{% endtrans %}</a>
+                        </div>
+                     </div>
+                  </div>
+                  {{ form_end(form) }}
+               {% endif %}
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

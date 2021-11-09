@@ -11,4 +11,5 @@ interface MarketFetcherInterface
     public function getUserExecutedHistory(int $userId, string $market, int $offset = 0, int $limit = 100): array;
     public function getPendingOrdersByUser(int $userId, string $market, int $offset = 0, int $limit = 100): array;
     public function getKLineStat(string $market, int $start, int $end, int $interval): array;
+    public function getSummary(array $markets): array;
 }

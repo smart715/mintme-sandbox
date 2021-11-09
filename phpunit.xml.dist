@@ -16,6 +16,7 @@
         <env name="APP_DEBUG" value="1"/>
         <env name="APP_SECRET" value="632318237b6d7a41e40c6ee83f8e6385"/>
         <env name="KERNEL_CLASS" value="App\Kernel" />
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
         <!-- env name="TRUSTED_PROXIES" value="127.0.0.1,127.0.0.2" -->
         <!-- env name="TRUSTED_HOSTS" value="localhost,example.com" -->
         <!-- ###- symfony/framework-bundle ### -->
@@ -24,7 +25,7 @@
         <!-- Format described at http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url -->
         <!-- For an SQLite database, use: "sqlite:///%kernel.project_dir%/var/data.db" -->
         <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
-        <env name="DATABASE_URL" value="mysql://db_user:db_password@127.0.0.1:3306/db_name"/>
+        <env name="DATABASE_URL" value="mysql://root:root@db:3306/panel"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
 
         <!-- ###+ symfony/swiftmailer-bundle ### -->
@@ -32,8 +33,8 @@
         <!-- For a generic SMTP server, use: "smtp://localhost:25?encryption=&auth_mode=" -->
         <!-- Delivery is disabled by default via "null://localhost" -->
         <env name="MAILER_URL" value="null://localhost"/>
-        <!-- ###- symfony/swiftmailer-bundle ### -->
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors"/>
+
+        <env name="MAILER_USER" value="mintme@mintme.abchosting.org"/>
 
         <!-- ###+ google/recaptcha ### -->
         <!-- To use Google Recaptcha, you must register a site on Recaptcha's admin panel: -->
@@ -43,26 +44,60 @@
         <!-- ###- google/recaptcha ### -->
 
         <!-- ###+ php-amqplib/rabbitmq-bundle ### -->
-        <env name="RABBITMQ_URL" value="amqp://guest:guest@localhost:5672"/>
+        <env name="RABBITMQ_URL" value="amqp://guest:guest@rabbitmq:5672"/>
         <!-- ###- php-amqplib/rabbitmq-bundle ### -->
+
+        <env name="YOUTUBE_CLIENT" value=""/>
+        <env name="FACEBOOK_CLIENT" value=""/>
+
+        <!-- VIABTC offset to use. From which token/user IDs starts -->
+        <env name="VIABTC_OFFSET" value="0"/>
+
+        <!-- If set to '0', panel will not check actual hash. Do it only in testing env -->
+        <env name="VIABTC_FORCE_WS_AUTH" value="0"/>
+
+
+        <env name="DEPOSIT_RPC" value="http://deposit:3000"/>
+        <env name="WITHDRAW_RPC" value="http://nginx:8000"/>
+        <env name="VIABTC_RPC" value="http://btc:8080"/>
+        <env name="WEBSOCKET_URL" value="ws://localhost:18364"/>
+
+        <env name="TESTING_SERVER_ENV" value="1"/>
+
+        <env name="COINIFY_SHARED_SECRET" value=""/>
+
+        <env name="TWITTER_API_KEY" value=""/>
+        <env name="TWITTER_API_SECRET" value=""/>
+        <env name="TWITTER_API_BEARER_TOKEN" value=""/>
+
+        <env name="D7_NETWORKS_TOKEN" value=""/>
+
+        <!-- ###+ symfony/mercure-bundle ### -->
+        <!-- See https://symfony.com/doc/current/mercure.html#configuration -->
+        <env name="MERCURE_PUBLISH_URL" value="http://mercure/.well-known/mercure"/>
+        <!-- The default token is signed with the secret key: !ChangeMe! -->
+        <env name="MERCURE_JWT_TOKEN" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InB1Ymxpc2giOltdfX0.Oo0yg7y4yMa1vr_bziltxuTCqb8JVHKxp-f_FwwOim0"/>
+        <!-- ###- symfony/mercure-bundle ### -->
     </php>
 
     <testsuites>
         <testsuite name="unit">
             <directory>tests</directory>
-            <exclude>tests/Controller</exclude>
             <exclude>tests/Repository</exclude>
+            <exclude>tests/Controller</exclude>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Controller</directory>
             <directory>tests/Repository</directory>
         </testsuite>
+        <testsuite name="nothing"></testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
             <directory>src</directory>
             <exclude>
+                <directory>src/Admin</directory>
                 <directory>src/*Bundle/Resources</directory>
                 <directory>src/*/*Bundle/Resources</directory>
                 <directory>src/*/Bundle/*Bundle/Resources</directory>

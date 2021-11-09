@@ -1,23 +1,54 @@
 <template>
     <div class="px-0 pt-2">
         <template v-if="loaded">
-            <div class="table-responsive table-restricted" ref="table">
+            <div class="active-orders table-responsive table-restricted" ref="table">
                 <b-table
+                    thead-class="trading-head"
                     ref="btable"
                     v-if="hasOrders"
-                    :items="getHistory"
-                    :fields="fields">
-                    <template slot="name" slot-scope="row">
-                        <div v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">{{ row.value.truncate }}</div>
+                    :items="history"
+                    :fields="fieldsArray"
+                    :sort-compare="$sortCompare(fields)"
+                    :sort-by="fields.date.key"
+                    :sort-desc="true"
+                    sort-direction="desc"
+                    sort-icon-left
+                    no-sort-reset
+                >
+                    <template v-slot:cell(name)="row">
+                        <div v-if="row.value.full.length <= 7">
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.full }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.full }}
+                                </a>
+                            </span>
+                        </div>
+                        <div v-else v-b-tooltip="{title: row.value.full, boundary: 'viewport'}">
+                            <span v-if="row.item.blocked && !row.item.isCryptoMarket">
+                                <span class="text-muted">
+                                    {{ row.value.truncate }}
+                                </span>
+                            </span>
+                            <span v-else>
+                                <a :href="row.item.pairUrl" class="text-white">
+                                    {{ row.value.truncate }}
+                                </a>
+                            </span>
+                        </div>
                     </template>
-                    <template slot="action" slot-scope="row">
+                    <template v-slot:cell(action)="row">
                         <a @click="removeOrderModal(row.item)">
-                            <span class="icon-cancel c-pointer"></span>
+                            <span class="icon icon-cancel c-pointer" :class="{'cancel-forbidden': row.item.blocked}"></span>
                         </a>
                     </template>
                 </b-table>
                 <div v-if="!hasOrders">
-                    <p class="text-center p-5">No order was added yet</p>
+                    <p class="text-center p-5">{{ $t('wallet.active_orders.no_order') }}</p>
                 </div>
             </div>
             <div v-if="loading" class="p-1 text-center">
@@ -29,8 +60,7 @@
                     @confirm="removeOrder"
             >
                 <div class="pt-2">
-                    Are you sure that you want to remove {{ this.currentRow.name }}
-                    with amount {{ this.currentRow.amount }} and price {{ this.currentRow.price }}
+                    {{ $t('wallet.active_orders.confirm_body', translationsContext) }}
                 </div>
             </confirm-modal>
         </template>
@@ -42,20 +72,51 @@
     </div>
 </template>
 <script>
-import ConfirmModal from '../modal/ConfirmModal';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
+import moment from 'moment';
 import Decimal from 'decimal.js';
-import {WSAPI} from '../../utils/constants';
+import {BTable, VBTooltip} from 'bootstrap-vue';
+import ConfirmModal from '../modal/ConfirmModal';
+import {GENERAL, WSAPI} from '../../utils/constants';
 import {toMoney, formatMoney, getUserOffset} from '../../utils';
-import {LazyScrollTableMixin, FiltersMixin, WebSocketMixin} from '../../mixins';
+import {
+    LazyScrollTableMixin,
+    FiltersMixin,
+    WebSocketMixin,
+    RebrandingFilterMixin,
+    NotificationMixin,
+    LoggerMixin,
+    PairNameMixin,
+    OrderMixin,
+} from '../../mixins/';
+
+library.add(faCircleNotch);
 
 export default {
     name: 'ActiveOrders',
-    mixins: [WebSocketMixin, FiltersMixin, LazyScrollTableMixin],
     components: {
+        BTable,
+        FontAwesomeIcon,
         ConfirmModal,
     },
+    directives: {
+        'b-tooltip': VBTooltip,
+    },
+    mixins: [
+        WebSocketMixin,
+        FiltersMixin,
+        LazyScrollTableMixin,
+        RebrandingFilterMixin,
+        NotificationMixin,
+        LoggerMixin,
+        PairNameMixin,
+        OrderMixin,
+    ],
     props: {
         userId: Number,
+        isUserBlocked: Boolean,
     },
     data() {
         return {
@@ -69,10 +130,21 @@ export default {
             amount: null,
             price: null,
             fields: {
-                date: {label: 'Date', sortable: true},
-                type: {label: 'Type', sortable: true},
+                date: {
+                    key: 'date',
+                    label: this.$t('wallet.active_orders.table.date'),
+                    sortable: true,
+                    type: 'date',
+                },
+                type: {
+                    key: 'type',
+                    label: this.$t('wallet.active_orders.table.type'),
+                    sortable: true,
+                    type: 'string',
+                },
                 name: {
-                    label: 'Name',
+                    key: 'name',
+                    label: this.$t('wallet.active_orders.table.name'),
                     sortable: true,
                     formatter: (name) => {
                         return {
@@ -80,20 +152,39 @@ export default {
                             truncate: this.truncateFunc(name, 7),
                         };
                     },
+                    type: 'string',
                 },
-                amount: {label: 'Amount', sortable: true},
+                amount: {
+                    key: 'amount',
+                    label: this.$t('wallet.active_orders.table.amount'),
+                    sortable: true,
+                    type: 'numeric',
+                },
                 price: {
-                    label: 'Price',
+                    key: 'price',
+                    label: this.$t('wallet.active_orders.table.price'),
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
                 total: {
-                    label: 'Total cost',
+                    key: 'total',
+                    label: this.$t('wallet.active_orders.table.total_cost'),
                     sortable: true,
                     formatter: formatMoney,
+                    type: 'numeric',
                 },
-                fee: {label: 'Fee', sortable: true},
-                action: {label: 'Action', sortable: false},
+                fee: {
+                    key: 'fee',
+                    label: this.$t('wallet.active_orders.table.fee'),
+                    sortable: true,
+                    type: 'numeric',
+                },
+                action: {
+                    key: 'action',
+                    label: this.$t('wallet.active_orders.table.action'),
+                    sortable: false,
+                },
             },
         };
     },
@@ -109,6 +200,40 @@ export default {
         },
         loaded: function() {
             return this.markets !== null && this.tableData !== null;
+        },
+        fieldsArray: function() {
+            return Object.values(this.fields);
+        },
+        history: function() {
+            return this.tableData.map((order) => {
+                return {
+                    date: moment.unix(order.timestamp).format(GENERAL.dateTimeFormat),
+                    type: this.getSideByType(order.side),
+                    name: this.pairNameFunc(
+                        this.rebrandingFunc(order.market.base),
+                        this.rebrandingFunc(order.market.quote)
+                    ),
+                    amount: toMoney(order.amount, order.market.base.subunit),
+                    price: toMoney(order.price, order.market.base.subunit),
+                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
+                    fee: order.fee * 100 + '%',
+                    action: this.$routing.generate('orders_сancel', {
+                        base: order.market.base.symbol,
+                        quote: order.market.quote.symbol,
+                    }),
+                    id: order.id,
+                    pairUrl: this.generatePairUrl(order.market),
+                    blocked: order.market.quote.hasOwnProperty('blocked') ? order.market.quote.blocked : this.isUserBlocked,
+                    isCryptoMarket: !order.market.base.exchangeble,
+                };
+            });
+        },
+        translationsContext: function() {
+            return {
+                name: this.currentRow.name || '-',
+                amount: this.currentRow.amount || 0,
+                price: this.currentRow.price || 0,
+            };
         },
     },
     mounted: function() {
@@ -135,9 +260,11 @@ export default {
                             this.$refs.btable.refresh();
                         }
                     }
-                }, 'active-tableData-update');
+                }, 'active-tableData-update', 'ActiveOrders');
             })
-            .catch(() => this.$toasted.error('Can not update order list now. Try again later'));
+            .catch((err) => {
+                this.sendLogs('error', 'Service unavailable. Can not update order list now', err);
+            });
     },
     methods: {
         updateTableData: function() {
@@ -160,33 +287,28 @@ export default {
 
                         resolve(this.tableData);
                     })
-                    .catch(() => {
-                        this.$toasted.error('Can not update orders history. Try again later.');
+                    .catch((err) => {
+                        this.sendLogs('error', 'Service unavailable. Can not update orders history', err);
                         reject([]);
                     });
             });
         },
-        getHistory: function() {
-            return this.tableData.map((order) => {
-                return {
-                    date: new Date(order.timestamp * 1000).toDateString(),
-                    type: WSAPI.order.type.SELL === parseInt(order.side) ? 'Sell' : 'Buy',
-                    name: order.market.base.symbol + '/' + order.market.quote.symbol,
-                    amount: toMoney(order.amount, order.market.base.subunit),
-                    price: toMoney(order.price, order.market.base.subunit),
-                    total: toMoney(new Decimal(order.price).mul(order.amount).toString(), order.market.base.subunit),
-                    fee: order.fee * 100 + '%',
-                    action: this.$routing.generate('orders_сancel', {
-                        base: order.market.base.symbol,
-                        quote: order.market.quote.symbol,
-                    }),
-                    id: order.id,
-                };
-            });
+        generatePairUrl: function(market) {
+            if (market.quote.hasOwnProperty('exchangeble') && market.quote.exchangeble && market.quote.tradable) {
+                return this.$routing.generate('coin', {
+                    base: this.rebrandingFunc(market.base),
+                    quote: this.rebrandingFunc(market.quote),
+                    tab: 'trade',
+                });
+            }
+            return this.$routing.generate('token_show', {name: market.quote.name, tab: 'trade'});
         },
-        removeOrderModal: function(row) {
-            this.currentRow = row;
-            this.actionUrl = row.action;
+        removeOrderModal: function(item) {
+            if (item.blocked) {
+                return;
+            }
+            this.currentRow = item;
+            this.actionUrl = item.action;
             this.switchConfirmModal(true);
         },
         switchConfirmModal: function(val) {
@@ -194,8 +316,9 @@ export default {
         },
         removeOrder: function() {
             this.$axios.single.post(this.actionUrl, {'orderData': [this.currentRow.id]})
-                .catch(() => {
-                    this.$toasted.show('Service unavailable, try again later');
+                .catch((err) => {
+                    this.notifyError(this.$t('toasted.error.service_unavailable'));
+                    this.sendLogs('error', 'Service unavailable. Can not remove orders', err);
                 });
         },
         getMarketFromName: function(name) {

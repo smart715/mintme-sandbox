@@ -1,333 +1,332 @@
 <template>
     <div>
         <div class="card h-100">
-            <div class="card-header">
+            <div class="card-header truncate-token">
+                <div class="d-inline float-left">
+                    <avatar
+                        size="small"
+                        type="profile"
+                        :image="profileImage"
+                    />
+                </div>
                 {{ profileName }}
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
+                <div class="d-flex flex-column h-100">
+                    <div>
                         <font-awesome-icon
-                            v-if="showEditIcon"
-                            class="icon-edit float-right c-pointer"
-                            icon="edit"
+                            v-if="editable"
+                            class="icon-default float-right c-pointer"
+                            :icon="editingUrlsIcon"
                             transform="shrink-4 up-1.5"
-                            @click="editingUrls = true"/>
-                        <a :href="profileUrl">
-                            Visit token's creator profile
-                        </a>
-                        <div class="pt-4">
-                            <div class="pb-1">
-                                <div v-if="!editingUrls">
-                                    <div v-if="currentWebsite">
-                                        Web:
-                                        <a :href="currentWebsite" target="_blank" rel="nofollow">
-                                            {{ currentWebsite }}
-                                        </a>
-                                        <guide>
-                                            <template  slot="header">
-                                                Web
-                                            </template>
-                                            <template slot="body">
-                                                Link to token creator’s website.
-                                                Before adding it, we confirmed ownership.
-                                            </template>
-                                        </guide>
-                                    </div>
-                                </div>
-                                <div class="form-group" v-else>
-                                    <label for="website-err">Website address:</label>
-                                    <input
-                                        id="website-err"
-                                        type="text"
-                                        v-model="newWebsite"
-                                        class="form-control"
-                                        :class="{ 'is-invalid': showWebsiteError }"
-                                        @keyup.enter="checkWebsiteUrl">
-                                        <div class="invalid-feedback" v-if="showWebsiteError">
-                                        Please provide a valid URL.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pb-1">
-                                <token-facebook-address
-                                    :app-id="facebookAppId"
-                                    :editing="editingUrls"
-                                    :address="facebookUrl"
-                                    :update-url="updateUrl"/>
-                            </div>
-                            <div class="pb-2">
-                                <token-youtube-address
-                                    :client-id="youtubeClientId"
-                                    :editable="editable"
-                                    :editing="editingUrls"
-                                    :channel-id="youtubeChannelId"
-                                    :update-url="updateUrl"/>
-                            </div>
-                        </div>
+                            @click="editingUrls = !editingUrls"
+                        />
+                        <a :href="profileUrl">{{ $t('token.intro.profile.visit') }}</a>
                     </div>
-
-                    <div class="col-12 my-3 text-left d-flex align-items-center" v-if="!editingUrls">
-                        <b-dropdown id="share" text="Share" variant="primary" class="mt-3">
-                            <social-sharing
+                    <div v-show="editingUrls" class="pb-1 pt-4 flex-grow-1 mb-2">
+                        <token-website-address
+                            :currentWebsite="currentWebsite"
+                            :editingWebsite="editingWebsite"
+                            :tokenName="tokenName"
+                            :key="reRenderTokenWebsite"
+                            @saveWebsite="saveWebsite"
+                            @toggleEdit="toggleEdit"
+                        />
+                        <token-youtube-address
+                            :editable="editable"
+                            :channel-id="currentYoutube"
+                            :client-id="youtubeClientId"
+                            :tokenName="tokenName"
+                            @saveYoutube="saveYoutube"
+                        />
+                        <token-facebook-address
+                            :address="currentFacebook"
+                            :editing="editingUrls"
+                            :tokenName="tokenName"
+                            @saveFacebook="saveFacebook"
+                        />
+                        <token-telegram-channel
+                            :currentTelegram="currentTelegram"
+                            :editingTelegram="editingTelegram"
+                            :tokenName="tokenName"
+                            @saveTelegram="saveTelegram"
+                            @toggleEdit="toggleEdit"
+                        />
+                        <token-discord-channel
+                            :currentDiscord="currentDiscord"
+                            :editingDiscord="editingDiscord"
+                            :tokenName="tokenName"
+                            @saveDiscord="saveDiscord"
+                            @toggleEdit="toggleEdit"
+                        />
+                    </div>
+                    <div v-show="!editingUrls" class="pb-1 pt-4 flex-grow-1 mb-2">
+                        <token-website-address-view
+                            v-if="currentWebsite"
+                            :currentWebsite="currentWebsite"
+                        />
+                        <token-youtube-address-view
+                            v-if="currentYoutube"
+                            :channel-id="currentYoutube"
+                            :client-id="youtubeClientId"
+                        />
+                        <token-facebook-address-view
+                            v-if="currentFacebook"
+                            :address="currentFacebook"
+                        />
+                        <div class="col-12 my-3 text-left d-flex align-items-center">
+                            <b-dropdown
+                                id="share"
+                                text="Share"
+                                variant="primary"
+                                class="mt-3"
+                            >
+                                <social-sharing
                                     url=""
                                     title="MintMe"
                                     :description="description"
-                                    inline-template>
-                                <div class="px-2">
-                                    <network class="d-block c-pointer" network="email">
-                                        <font-awesome-icon icon="envelope"></font-awesome-icon> Email
-                                    </network>
-                                </div>
-                            </social-sharing>
-                            <social-sharing
-                                    :title="twitterDescription"
+                                    inline-template
+                                >
+                                    <div class="px-2">
+                                        <network
+                                            class="d-block c-pointer"
+                                            network="email"
+                                        >
+                                            <font-awesome-icon icon="envelope" /> Email
+                                        </network>
+                                    </div>
+                                </social-sharing>
+                                <social-sharing
+                                    :title="this.$t('token.intro.profile.twitter_description')"
                                     :description="description"
                                     :quote="description"
-                                    hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,
-                                        Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
-                                    inline-template>
-                                <div class="px-2">
-                                    <network class="d-block c-pointer" network="facebook">
-                                        <font-awesome-icon :icon="['fab', 'facebook']"></font-awesome-icon> Facebook
-                                    </network>
-                                    <network class="d-block c-pointer" network="linkedin">
-                                        <font-awesome-icon :icon="['fab', 'linkedin']"></font-awesome-icon> LinkedIn
-                                    </network>
-                                    <network class="d-block c-pointer" network="reddit">
-                                        <font-awesome-icon :icon="['fab', 'reddit']"></font-awesome-icon> Reddit
-                                    </network>
-                                    <network class="d-block c-pointer" network="telegram">
-                                        <font-awesome-icon :icon="['fab', 'telegram']"></font-awesome-icon> Telegram
-                                    </network>
-                                    <network class="d-block c-pointer" network="twitter">
-                                        <font-awesome-icon :icon="['fab', 'twitter']"></font-awesome-icon> Twitter
-                                    </network>
+                                    hashtags="Mintme,MutualSupport,Monetization,Crowdfunding,Business,Exchange,Creators,Technology,Blockchain,Trading,Token,CryptoTrading,Crypto,Voluntary"
+                                    inline-template
+                                >
+                                    <div class="px-2">
+                                        <network class="d-block c-pointer" network="facebook">
+                                            <font-awesome-icon :icon="['fab', 'facebook']" /> Facebook
+                                        </network>
+                                        <network class="d-block c-pointer" network="linkedin">
+                                            <font-awesome-icon :icon="['fab', 'linkedin']" /> LinkedIn
+                                        </network>
+                                        <network class="d-block c-pointer" network="reddit">
+                                            <font-awesome-icon :icon="['fab', 'reddit']" /> Reddit
+                                        </network>
+                                        <network class="d-block c-pointer" network="telegram">
+                                            <font-awesome-icon :icon="['fab', 'telegram']" /> Telegram
+                                        </network>
+                                        <network class="d-block c-pointer" network="twitter">
+                                            <font-awesome-icon :icon="['fab', 'twitter']" /> Twitter
+                                        </network>
+                                    </div>
+                                </social-sharing>
+                            </b-dropdown>
+                            <div class="tooltip-static tooltip-static-left">
+                                {{ $t('token.intro.profile.join_us') }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <span
+                                    v-if="currentTelegram || currentDiscord"
+                                    class="d-inline-block mx-2 mb-1"
+                                >
+                                    {{ $t('token.intro.profile.join_us') }}
+                                </span>
+                                <div class="row justify-content-start pl-4">
+                                    <a
+                                        v-if="currentDiscord"
+                                        :href="currentDiscord"
+                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia p-0 mx-1"
+                                        target="_blank"
+                                    >
+                                        <img
+                                            src="../../../../img/icon-discord.png"
+                                            class="align-self-center text-center"
+                                            width="45"
+                                            alt="discord icon"
+                                        />
+                                    </a>
+                                    <a
+                                        v-if="currentTelegram"
+                                        :href="currentTelegram"
+                                        class="col-auto d-flex text-white rounded-circle justify-content-center socialmedia icon-with-badge p-0 mx-1"
+                                        target="_blank"
+                                    >
+                                        <img
+                                            src="../../../../img/icon-telegram-group.png"
+                                            class="align-self-center text-center"
+                                            width="45"
+                                            height="48.5"
+                                            alt="telegram group"
+                                        />
+                                    </a>
                                 </div>
-                            </social-sharing>
-                        </b-dropdown>
-                        <div class="tooltip-static tooltip-static-left">
-                            Do you want to help your token grow? Spread the word!
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-12 text-left" v-if="editingUrls">
-                        <input type="submit" class="btn btn-primary" value="Save"  @click="editUrls"/>
-                        <a class="btn-cancel pl-3 c-pointer" @click="editingUrls = false">Cancel</a>
+                    <div
+                        v-if="isTokenDeployed"
+                        class="truncate-address d-flex flex-row justify-content-between flex-nowrap mt-auto"
+                    >
+                        <strong class="mr-2">{{ $t('token.intro.profile.contract_address') }}</strong>
+                        <span>{{ tokenContractAddress }}</span>
+                        <copy-link
+                            class="c-pointer"
+                            :content-to-copy="tokenContractAddress"
+                        >
+                           <font-awesome-icon :icon="['far', 'copy']" />
+                        </copy-link>
+                        <guide>
+                            <template slot="header">
+                                {{ $t('token.intro.profile.contract_address.header') }}
+                            </template>
+                            <template slot="body">
+                                {{ $t('token.intro.profile.contract_address.body') }}
+                            </template>
+                        </guide>
                     </div>
                 </div>
             </div>
         </div>
-        <modal
-            @close="closeFileErrorModal"
-            :visible="fileErrorVisible">
-            <template slot="body">
-                <h3 class="modal-title text-center text-danger">{{ fileError.title }}</h3>
-                <div class="text-white">
-                    <p>
-                        {{ fileError.details }}
-                        <a
-                            v-if="fileErrorHttpUrl"
-                            href="https://www.restapitutorial.com/httpstatuscodes.html"
-                            target="_blank"
-                            rel="nofollow">
-                            More information about HTTP status codes.
-                        </a>
-                    </p>
-                    <div class="pt-2 text-center">
-                        <button
-                            class="btn btn-primary"
-                            @click="closeFileErrorModal">
-                            OK
-                        </button>
-                    </div>
-                </div>
-            </template>
-        </modal>
-        <modal
-            class="text-white"
-            :visible="showConfirmWebsiteModal"
-            @close="showConfirmWebsiteModal = false">
-            <template slot="body">
-                <h5 class="modal-title text-center mb-2">Website Confirmation</h5>
-                <div class="row">
-                    <div class="col-12">
-                        <ol class="pl-3">
-                            <li>
-                                Download
-                                <a :href="confirmWebsiteFileUrl" target="_blank">this html verification file</a>
-                            </li>
-                            <li>Upload the file to {{ parsedWebsite }}</li>
-                            <li>
-                                Check if file was uploaded successfully by visiting
-                                <a
-                                    :href="siteRequestUrl"
-                                    target="_blank"
-                                    rel="nofollow">
-                                    {{ siteRequestUrl }}
-                                </a>
-                            </li>
-                            <li>Click confirm below</li>
-                        </ol>
-                    </div>
-                    <div class="col-12 text-left">
-                        <button class="btn btn-primary" @click="confirmWebsite">
-                            <font-awesome-icon
-                                    v-if="submitting"
-                                    icon="circle-notch" spin
-                                    class="loading-spinner" fixed-width />
-                            Confirm
-                        </button>
-                        <a class="btn-cancel pl-3 c-pointer" @click="showConfirmWebsiteModal = false">Cancel</a>
-                    </div>
-                </div>
-            </template>
-        </modal>
     </div>
 </template>
 
 <script>
-import TokenFacebookAddress from '../TokenFacebookAddress';
-import TokenYoutubeAddress from '../TokenYoutubeAddress';
-import bDropdown from 'bootstrap-vue/es/components/dropdown/dropdown';
-import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item';
 import {library} from '@fortawesome/fontawesome-svg-core';
-import {faEdit} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTimes, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {
+    faFacebook,
+    faLinkedin,
+    faReddit,
+    faTelegram,
+    faTwitter,
+} from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome';
-import {isValidUrl} from '../../../utils';
-import Toasted from 'vue-toasted';
+import {BDropdown} from 'bootstrap-vue';
+import TokenDiscordChannel from '../TokenDiscordChannel';
+import TokenFacebookAddress from '../facebook/TokenFacebookAddress';
+import TokenFacebookAddressView from '../facebook/TokenFacebookAddressView';
+import TokenTelegramChannel from '../TokenTelegramChannel';
+import TokenWebsiteAddress from '../website/TokenWebsiteAddress';
+import TokenWebsiteAddressView from '../website/TokenWebsiteAddressView';
+import TokenYoutubeAddress from '../youtube/TokenYoutubeAddress';
+import TokenYoutubeAddressView from '../youtube/TokenYoutubeAddressView';
+import Avatar from '../../Avatar';
 import Guide from '../../Guide';
-import Modal from '../../modal/Modal';
+import CopyLink from '../../CopyLink';
+import {tokenDeploymentStatus} from '../../../utils/constants';
+
 let SocialSharing = require('vue-social-sharing');
 
 Vue.use(SocialSharing);
 
-library.add(faEdit);
-Vue.use(Toasted, {
-    position: 'top-center',
-    duration: 5000,
-});
+library.add(
+    faEdit,
+    faTimes,
+    faEnvelope,
+    faFacebook,
+    faLinkedin,
+    faReddit,
+    faTelegram,
+    faTwitter
+);
 
 export default {
     name: 'TokenIntroductionProfile',
+    components: {
+        Avatar,
+        BDropdown,
+        CopyLink,
+        FontAwesomeIcon,
+        Guide,
+        TokenDiscordChannel,
+        TokenFacebookAddress,
+        TokenFacebookAddressView,
+        TokenTelegramChannel,
+        TokenYoutubeAddress,
+        TokenYoutubeAddressView,
+        TokenWebsiteAddress,
+        TokenWebsiteAddressView,
+    },
     props: {
-        facebookAppId: String,
-        youtubeClientId: String,
-        confirmWebsiteFileUrl: String,
-        confirmWebsiteUrl: String,
-        profileName: String,
-        websiteUrl: String,
-        facebookUrl: String,
-        youtubeChannelId: String,
-        updateUrl: String,
+        deploymentStatus: String,
+        discordUrl: String,
         editable: Boolean,
+        facebookUrl: String,
+        profileName: String,
+        profileImage: String,
         profileUrl: String,
         tokenUrl: String,
-    },
-    components: {
-        bDropdown,
-        bDropdownItem,
-        FontAwesomeIcon,
-        TokenFacebookAddress,
-        TokenYoutubeAddress,
-        Guide,
-        Modal,
+        telegramUrl: String,
+        tokenContractAddress: String,
+        tokenName: String,
+        websiteUrl: String,
+        youtubeClientId: String,
+        youtubeChannelId: String,
     },
     data() {
         return {
-            submitting: false,
-            editingUrls: false,
+            currentDiscord: this.discordUrl,
+            currentFacebook: this.facebookUrl,
+            currentTelegram: this.telegramUrl,
             currentWebsite: this.websiteUrl,
-            newWebsite: this.websiteUrl || 'http://',
-            showConfirmWebsiteModal: false,
+            currentYoutube: this.youtubeChannelId,
+            reRenderTokenWebsite: 0,
+            editingDiscord: false,
+            editingTelegram: false,
+            editingUrls: false,
+            editingWebsite: false,
             showWebsiteError: false,
-            parsedWebsite: '',
-            websitePath: '/mintme.html',
-            fileError: {},
+            submitting: false,
             twitterDescription: 'A great way for mutual support. Check this token and see how the idea evolves: ',
         };
     },
     computed: {
         description: function() {
-           return this.twitterDescription + this.tokenUrl;
+           return this.$t('token.intro.profile.twitter_description') + this.tokenUrl;
         },
-        siteRequestUrl: function() {
-            return this.parsedWebsite + '/mintme.html';
+        editingUrlsIcon: function() {
+            return this.editingUrls ? 'times' : 'edit';
         },
         showEditIcon: function() {
             return !this.editingUrls && this.editable;
         },
-        fileErrorVisible: function() {
-            return this.fileError.title && this.fileError.details;
-        },
-        fileErrorHttpUrl: function() {
-            return !!this.fileError.visibleHttpUrl;
+        isTokenDeployed: function() {
+            return tokenDeploymentStatus.deployed === this.deploymentStatus;
         },
     },
     watch: {
-        newWebsite: function() {
-            this.fileError = {};
+        editingUrls: function() {
+            this.toggleEdit(null);
         },
     },
     methods: {
-        editUrls: function() {
-            if (this.newWebsite.length && this.newWebsite !== this.websiteUrl) {
-                this.checkWebsiteUrl();
-            }
-
-            if (this.showWebsiteError && !this.newWebsite.length) {
-                this.showWebsiteError = false;
-            }
-
-            if (this.showWebsiteError) {
-                return;
-            }
-
-            if (!this.showConfirmWebsiteModal) {
-                this.editingUrls = false;
-            }
+        saveWebsite: function(newWebsite) {
+            this.currentWebsite = newWebsite;
+            this.$emit('updated-website', newWebsite);
+            this.reRenderTokenWebsite++;
+            this.editingWebsite = false;
         },
-        checkWebsiteUrl: function() {
-            this.showWebsiteError = false;
-            if (!isValidUrl(this.newWebsite)) {
-                this.showWebsiteError = true;
-                return;
-            }
-
-            this.parsedWebsite = this.newWebsite.replace(/\/+$/, '');
-            this.showConfirmWebsiteModal = true;
+        saveDiscord: function(newDiscord) {
+            this.currentDiscord = newDiscord;
         },
-        confirmWebsite: function() {
-            if (this.submitting) {
-                return;
-            }
-            this.submitting = true;
-            this.$axios.single.post(this.confirmWebsiteUrl, {url: this.parsedWebsite})
-                .then((response) => {
-                    if (response.data.verified) {
-                        this.currentWebsite = this.newWebsite = this.websiteUrl = this.parsedWebsite;
-                        this.$toasted.success('Website confirmed successfully');
-                        this.showConfirmWebsiteModal = false;
-                        this.editingUrls = false;
-                        this.clearFileError();
-                    } else if (response.data.errors.fileError) {
-                        this.fileError = response.data.errors.fileError;
-                    } else if (response.data.errors.length) {
-                        response.data.errors.forEach((error) => this.$toasted.error(error));
-                        this.clearFileError();
-                    } else {
-                        this.clearFileError();
-                        return Promise.reject({response: 'error'});
-                    }
-                })
-                .catch(({response}) => this.$toasted.error(!response ? 'Network error' : response.statusText))
-                .then(() => this.submitting = false);
+        saveFacebook: function(newFacebook) {
+            this.currentFacebook = newFacebook;
+            this.$emit('updated-facebook', newFacebook);
         },
-        closeFileErrorModal: function() {
-            this.fileError = {};
-            this.showConfirmWebsiteModal = true;
+        saveTelegram: function(newTelegram) {
+            this.currentTelegram = newTelegram;
         },
-        clearFileError: function() {
-            this.fileError = {};
+        saveYoutube: function(newChannelId) {
+            this.currentYoutube = newChannelId;
+            this.$emit('updated-youtube', newChannelId);
+        },
+        toggleEdit: function(url = null) {
+            this.editingDiscord = 'discord' === url;
+            this.editingTelegram = 'telegram' === url;
+            this.editingWebsite = 'website' === url;
         },
     },
 };

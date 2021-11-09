@@ -1,7 +1,11 @@
 fos_user:
+    use_authentication_listener: false
     db_driver: orm
     firewall_name: main
     user_class: App\Entity\User
+    change_password:
+        form:
+            type: App\Form\ChangePasswordType
     registration:
         form:
             type: App\Form\RegistrationType
@@ -9,13 +13,18 @@ fos_user:
             enabled: true
             template: bundles/FOSUserBundle/Registration/email.html.twig
     resetting:
+        form:
+            type: App\Form\ResettingType
         email:
             template: bundles/FOSUserBundle/Resetting/email.html.twig
+        token_ttl: '%password_reset_expiration_time%'
+        retry_ttl: '%password_reset_retry_time%'
     from_email:
         address: "%env(MAILER_USER)%"
         sender_name: "%env(MAILER_USER)%"
     service:
         mailer: fos_user.mailer.twig_swift
         user_manager: App\Manager\UserManagerInterface
+        email_canonicalizer: app.emailCanonicalizer
     group:
         group_class: Sonata\UserBundle\Entity\BaseGroup

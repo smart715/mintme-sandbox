@@ -5,6 +5,7 @@ namespace App\Tests\Withdraw\Fetcher;
 use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
+use App\Utils\Symbols;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Money\MoneyWrapper;
 use App\Wallet\Money\MoneyWrapperInterface;
@@ -44,7 +45,7 @@ class WithdrawMapperTest extends TestCase
         $this->assertInstanceOf(Transaction::class, $transaction);
         $this->assertEquals($data[0]['createdDate'], $transaction->getDate()->getTimestamp());
         $this->assertEquals($data[0]['status'], $transaction->getStatus()->getStatusCode());
-        $this->assertEquals($data[0]['crypto'], $transaction->getCrypto()->getSymbol());
+        $this->assertEquals($data[0]['crypto'], $transaction->getTradable()->getSymbol());
         $this->assertEquals($data[0]['amount'], $transaction->getAmount()->getAmount());
     }
 
@@ -68,7 +69,7 @@ class WithdrawMapperTest extends TestCase
     {
         $moneyWrapper = $this->createMock(MoneyWrapperInterface::class);
 
-        $moneyWrapper->method('parse')->willReturn(new Money($data, new Currency(MoneyWrapper::TOK_SYMBOL)));
+        $moneyWrapper->method('parse')->willReturn(new Money($data, new Currency(Symbols::TOK)));
 
         return $moneyWrapper;
     }

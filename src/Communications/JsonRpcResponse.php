@@ -25,22 +25,28 @@ class JsonRpcResponse
         return new self($decodedResponse);
     }
 
-    /** @return mixed */
+    /**
+     * @return mixed
+     * @codeCoverageIgnore
+     */
     public function getResult()
     {
         return $this->response['result'] ?? [];
     }
 
+    /** @codeCoverageIgnore */
     public function getError(): array
     {
         return $this->response['error'] ?? [];
     }
 
+    /** @codeCoverageIgnore */
     public function hasResult(): bool
     {
         return !empty($this->getResult());
     }
 
+    /** @codeCoverageIgnore */
     public function hasError(): bool
     {
         return !empty($this->getError());

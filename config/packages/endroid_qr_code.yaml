@@ -1,0 +1,11 @@
+endroid_qr_code:
+    writer: 'svg'
+    size: 300
+    margin: 10
+    foreground_color: { r: 0, g: 0, b: 0 }
+    background_color: { r: 255, g: 255, b: 255 }
+    error_correction_level: low
+    encoding: UTF-8
+    validate_result: false
+    writer_options:
+        exclude_xml_declaration: true

@@ -1,114 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta name="description" content="Mintme revolutionizes how people help each other by allowing sides to earn">
-        <meta name="keywords" content="mintMe,MINTME,crypto,exchanger,token,dapps">
-        <meta name="author" content="mintme">
-        <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
-        {% if viabtc_offset != 0 %}
-            <meta name="X-USER-OFFSET" content="{{ viabtc_offset }}">
-        {% endif %}
-        <link rel="icon" type="img/png" href="{{ asset('build/images/favicon.png') }}">
-        <link rel="manifest" href="{{ asset('manifest.json') }}">
-        <meta name="theme-color" content="#141C29">
-        <title>
-            {% block title %}mintMe{% endblock %}
-        </title>
-
-        <style>
-            body {
-                background-color: #0c1a29;
-            }
-            .hidden {
-                display: none;
-            }
-        </style>
-
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_tracking_id }}"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', '{{ google_tracking_id }}');
-        </script>
-
-        <!--Start of Tawk.to Script-->
-        <script type="text/javascript">
-            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-            (function(){
-                var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-                s1.async=true;
-                s1.src='https://embed.tawk.to/5c61c14e7cf662208c950e23/default';
-                s1.charset='UTF-8';
-                s1.setAttribute('crossorigin','*');
-                s0.parentNode.insertBefore(s1,s0);
-            })();
-            Tawk_API.onLoad = function(){
-                Tawk_API.setAttributes({
-                    'name'  : '{{ app.user.profile.firstName|default('') }}',
-                    'email' : '{{ app.user.username|default('') }}',
-                    'hash'  : '{{ app.user.getTawkHash(tawk_api_key)|default('') }}',
-                    'user' : '{{ app.user.username|default('') }}',
-                    'token' : '{{ app.user.getProfile().getToken().getName()|default('') }}',
-                    'first-name' : '{{ app.user.getProfile().getFirstName()|default('') }}',
-                    'last-name' : '{{ app.user.getProfile().getLastName()|default('') }}'
-                }, function(error){});
-            }
-        </script>
-        <!--End of Tawk.to Script-->
-
-        {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('build/main.css') }}">
-            {% block pagestyles %}{% endblock %}
-        {% endblock %}
-        {% include 'schema.html.twig' %}
-    </head>
-    <body class="{% block bodyclass %}{% endblock %}">
-        {% block body %}
-            <wrapper onload="document.body.classList.remove('hidden')" class="content-wrapper hidden d-flex flex-column {% block contentclass %}{% endblock %}">
-                {% block header %}
-                    {% include 'topnav.html.twig' %}
+{% apply
+    replace({'<script':'<script nonce="' ~ csp_nonce('script') ~ '"'})|
+    raw
+%}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            {% block stylesheets %}
+                {% block pagestyles %}
+                    {{ encore_entry_link_tags('base_main') }}
                 {% endblock %}
-                <main class="flex-fill content">
-                    {% block main %}
-                        {% block messageContainer %}
-                            {% if app.session.flashbag.peekAll() is not empty %}
-                                <div class="text-center {% block messageClass %}{% endblock %}">
-                                    {% for label, messages in app.flashes %}
-                                        {% for message in messages %}
-                                            <div class="d-block mb-3">
-                                                <div class="d-inline-block mx-auto text-white text-center bg-{{ label }} alert alert-{{ label }}">
-                                                    {{ message }}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endblock %}
-                        {% block content %}{% endblock %}
+            {% endblock %}
+            {% block javascripts %}
+                {% include 'base_scripts.html.twig' %}
+                {% if (app.request.attributes.get('_route') != 'homepage') %}
+                    {% include 'scripts.html.twig' %}
+                {% endif %}
+
+                {% block pagescripts %}{% endblock %}
+            {% endblock %}
+            {% block head %}{% endblock %}
+            {% block metaDescription %}
+                <meta name="description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents the success of your project.">
+                <meta property="og:description" content="MintMe is a blockchain crowdfunding platform where patrons also earn on their favorite influencer success. Anyone can create a token that represents themselves or their project. When you create a coin, its value represents success of your project.">
+            {% endblock %}
+            {% include 'head.html.twig' %}
+            {% block headscripts %}
+                {% include 'head_scripts.html.twig' %}
+            {% endblock %}
+            <title>
+                {% block title %}mintMe{% endblock %}
+            </title>
+        </head>
+        <body class="{% block bodyclass %}{% endblock %}">
+            <div id="user-init">
+                {% if app.user %}
+                    <user-init
+                        :is-signed-in-with-twitter="{{ app.user.isSignedInWithTwitter | json_encode }}"
+                        :user-id="{{ app.user.id }}"
+                    ></user-init>
+                {% endif %}
+            </div>
+            {% block body %}
+                <div class="content-wrapper d-flex flex-column {% block contentclass %}{% endblock %}">
+                    {% block header %}
+                        {% include 'topnav.html.twig' %}
                     {% endblock %}
-                </main>
-                {% block footer %}
-                    {% include 'footer.html.twig' %}
-                {% endblock %}
-            </wrapper>
-        {% endblock %}
-        {% block javascripts %}
-            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
-            <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
-            <script src="{{ asset('build/main.js') }}"></script>
-            {% if viabtc_offset != 0 %}
-            <script>
-                console.debug("Offset: " + "{{ viabtc_offset }}")
-            </script>
-            {% endif %}
-            {% block pagescripts %}{% endblock %}
-        {% endblock %}
-    </body>
-</html>
+                    <main class="flex-fill content {% block bgclass %}{% endblock %}">
+                        {% block main %}
+                            {% block messageContainer %}
+                                {% if app.session.flashbag.peekAll() is not empty %}
+                                    <div id="notifications" class="text-center {% block messageClass %}{% endblock %}">
+                                        {% for label, messages in app.flashes %}
+                                            {% for message in messages %}
+                                                <notification type-prop="{{ label }}" class="d-none">
+                                                    {{ message }}
+                                                </notification>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endblock %}
+                            {% block content %}{% endblock %}
+                        {% endblock %}
+                    </main>
+                    {% block footer %}
+                        {% include 'footer.html.twig' %}
+                    {% endblock %}
+                </div>
+            {% endblock %}
+        </body>
+    </html>
+{% endapply %}

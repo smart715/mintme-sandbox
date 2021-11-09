@@ -1,0 +1,61 @@
+.posts
+  align-items: center
+  display: flex
+  flex-direction: column
+  padding: 10px
+
+.post-title
+  font-size: 1.5rem
+  color: $dark-white
+
+.post
+  background-color: $odd-item-color
+  border-color: $post-border-color
+  border-style: solid
+  border-width: 1px
+  margin: 5px auto
+  padding: 7px
+  padding-bottom: 0
+  width: 100%
+
+  button:focus
+    outline: 1px dotted
+
+  .post-title
+    @media (min-width: 1200px)
+      font-size: 1.8rem
+
+.post-content
+  .bbcode-content
+    margin-bottom: 0 !important
+
+.post-title:hover
+  color: $white
+
+.single-post-page .post
+  background-color: transparent
+  border-color: transparent
+  border-style: none
+  border-width: 0
+
+  .post-title
+    font-size: 2.5rem
+
+.post .post-date, .comment .comment-date
+  color:  $grey
+
+.comments
+  width: 100%
+
+  textarea
+    min-height: 50px
+
+.comment
+  background-color: #183251
+  border-color: #0e3956
+  border-style: solid
+  border-width: 1px
+  margin: 5px auto
+  padding: 7px
+  padding-bottom: 0
+  width: 100%

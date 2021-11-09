@@ -1,5 +1,6 @@
 var allTestFiles = []
 var TEST_REGEXP = /(spec|test)\.js$/i
+var gapi = {};
 
 // Get a list of all the test files to include
 Object.keys(window.__karma__.files).forEach(function (file) {
@@ -20,5 +21,9 @@ require.config({
   deps: allTestFiles,
 
   // we have to kickoff jasmine, as it is asynchronous
-  callback: window.__karma__.start
+  callback: window.__karma__.start,
+
+  // The number of seconds to wait before giving up on loading a script.
+  // Setting it to 0 disables the timeout. The default is 7 seconds.
+  waitSeconds: 0,
 });

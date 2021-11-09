@@ -1,29 +1,36 @@
 <template>
     <modal
         :visible="visible"
-        @close="closeModal">
+        :embeded="embeded"
+        @close="closeModal"
+    >
         <template slot="body">
             <div class="text-center">
-                <div>
+                <div v-if="showImage">
                     <img src="../../../img/are-you-sure.png"/>
                 </div>
                 <slot>
                     <p class="text-white modal-title pt-2 text-uppercase">
-                        ARE YOU SURE?
+                        {{ $t('confirm_modal.body') }}
                     </p>
                 </slot>
                 <div class="pt-2">
                     <button
+                        v-if="showConfirmButton"
                         class="btn btn-primary"
-                        @click="onConfirm">
-                        <slot name="confirm">Confirm</slot>
+                        :tabindex="9"
+                        @click="onConfirm"
+                        :disabled="buttonDisabled"
+                    >
+                        <slot name="confirm">{{ $t(modalConfirm) }}</slot>
                     </button>
-                    <a
-                        href="#"
-                        class="btn-cancel pl-3"
+                    <button
+                        v-if="showCancelButton"
+                        class="btn-cancel pl-3 bg-transparent"
+                        :tabindex="10"
                         @click="onCancel">
-                        <slot name="cancel">Cancel</slot>
-                    </a>
+                        <slot name="cancel">{{ $t('confirm_modal.cancel') }}</slot>
+                    </button>
                 </div>
             </div>
         </template>
@@ -32,6 +39,7 @@
 
 <script>
 import Modal from './Modal.vue';
+
 export default {
     name: 'ConfirmModal',
     components: {
@@ -39,6 +47,32 @@ export default {
     },
     props: {
         visible: Boolean,
+        showConfirmButton: {
+            type: Boolean,
+            default: true,
+        },
+        showCancelButton: {
+            type: Boolean,
+            default: true,
+        },
+        showImage: {
+            type: Boolean,
+            default: true,
+        },
+        buttonDisabled: {
+            type: Boolean,
+            default: false,
+        },
+        modelConfirmProp: String,
+        embeded: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    computed: {
+        modalConfirm: function() {
+            return this.modelConfirmProp ? this.modelConfirmProp : 'confirm_modal.confirm';
+        },
     },
     methods: {
         closeModal: function() {

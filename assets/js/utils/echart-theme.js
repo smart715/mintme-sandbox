@@ -1,4 +1,7 @@
 /* eslint-disable valid-jsdoc */
+
+const DARK_WHITE = '#ebebeb';
+
 /**
  * @param {Number} precision
  * @return Object
@@ -17,7 +20,7 @@ export default function(precision) {
         legend: {
             show: false,
             textStyle: {
-                color: '#fff',
+                color: DARK_WHITE,
             },
             top: 0,
         },
@@ -45,7 +48,7 @@ export default function(precision) {
                 },
             },
             textStyle: {
-                color: '#fff',
+                color: DARK_WHITE,
             },
         },
 
@@ -71,7 +74,6 @@ export default function(precision) {
         },
 
         axisPointer: {
-            link: {xAxisIndex: 'all'},
             label: {
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 showMinLabel: false,
@@ -104,7 +106,7 @@ export default function(precision) {
                 margin: 8,
 
                 textStyle: {
-                    color: '#fff',
+                    color: DARK_WHITE,
                 },
             },
             splitLine: {
@@ -142,10 +144,9 @@ export default function(precision) {
                 show: true,
                 rotate: 0,
                 margin: 8,
-                formatter: '{value} kg',
-
+                padding: [5, 0, 0, 0],
                 textStyle: {
-                    color: '#fff',
+                    color: DARK_WHITE,
                 },
             },
             splitLine: {

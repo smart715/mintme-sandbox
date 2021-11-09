@@ -5,33 +5,29 @@ namespace App\Command\Blacklist;
 use App\Communications\CryptoSynchronizerInterface;
 use App\Entity\Blacklist;
 use App\Manager\BlacklistManagerInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * @codeCoverageIgnore
+ * Ignored due the conflicting ConsoleSectionOutput class.
+ */
 class SynchronizeTokenBlacklist extends Command
 {
-    /** @var BlacklistManagerInterface */
-    private $blacklistManager;
-
-    /** @var CryptoSynchronizerInterface */
-    private $cryptoSynchronizer;
-
-    /** @var EntityManagerInterface */
-    private $em;
+    private BlacklistManagerInterface $blacklistManager;
+    private CryptoSynchronizerInterface $cryptoSynchronizer;
 
     public function __construct(
         BlacklistManagerInterface $blacklistManager,
-        CryptoSynchronizerInterface $cryptoSynchronizer,
-        EntityManagerInterface $em
+        CryptoSynchronizerInterface $cryptoSynchronizer
     ) {
         $this->blacklistManager = $blacklistManager;
         $this->cryptoSynchronizer = $cryptoSynchronizer;
-        $this->em = $em;
 
         parent::__construct();
     }
@@ -39,45 +35,38 @@ class SynchronizeTokenBlacklist extends Command
     protected function configure(): void
     {
         $this->setName('blacklist:synchronize')
-            ->setDescription('Synchronize coin list with coinmarketcap');
+            ->setDescription('Synchronize existing coins list with a crypto data aggregator');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    /** @inheritDoc */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var ConsoleSectionOutput $section */
+        /** @var ConsoleOutput $output */
         $section = $output->section();
-        $style = new SymfonyStyle($input, $section);
-        $list = $this->cryptoSynchronizer->fetchCryptos();
-        $existed = $this->blacklistManager->getList('token');
-        $progressBar = new ProgressBar($section, count($list));
 
+        $style = new SymfonyStyle($input, $section);
+
+        $existing = $this->cryptoSynchronizer->fetchCryptos();
+
+        $progressBar = new ProgressBar($section, 4);
         $progressBar->start();
 
-        foreach ($list as $name) {
-            if (!$this->isValueExists($name, $existed)) {
-                $this->blacklistManager->addToBlacklist($name, 'token', false);
-            }
+        $this->blacklistManager->bulkDelete(Blacklist::CRYPTO_NAME);
+        $progressBar->advance(1);
 
-            $progressBar->advance();
-        }
+        $this->blacklistManager->bulkDelete(Blacklist::CRYPTO_SYMBOL);
+        $progressBar->advance(1);
 
+        $this->blacklistManager->bulkAdd($existing['names'], Blacklist::CRYPTO_NAME);
+        $progressBar->advance(1);
+
+        $this->blacklistManager->bulkAdd($existing['symbols'], Blacklist::CRYPTO_SYMBOL);
+        $style->success(
+            'Synchronized '.count($existing['names']).' coins'
+        );
         $progressBar->finish();
 
-        $this->em->flush();
-
-        $section->clear();
-        $style->success('Synchronization completed.');
-    }
-
-    /** @param array<Blacklist> $list */
-    private function isValueExists(string $value, array $list): bool
-    {
-        foreach ($list as $item) {
-            if ($item->getValue() === $value) {
-                return true;
-            }
-        }
-
-        return false;
+        return 0;
     }
 }

@@ -5,6 +5,10 @@ includes:
 
 parameters:
 
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false
+
     paths:
         - src
         - tests
@@ -19,12 +23,13 @@ parameters:
     excludes_analyse:
         - "%rootDir%/../../../src/Migrations/*"
         - "%rootDir%/../../../src/Validator/Constraints/*"
+        - "%rootDir%/../../../tests/Command/UpdateDisposableEmailDomainsTest.php"
+        - "%rootDir%/../../../tests/Command/Blacklist/SynchronizeTokenBlacklistTest.php"
 
-    autoload_files:
-        - vendor/bin/.phpunit/phpunit-6.5/vendor/autoload.php
+    bootstrapFiles:
+        - vendor/bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
 
     ignoreErrors:
-        - '#Cannot call method (.*) on (.*)\|null\.#'
-        - '#Property (.+) \((.+)Repository\) does not accept Doctrine\\ORM\\EntityRepository(.+).#'
+        - '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
         - '#Method (.*)Repository\(\) should return (.*)Repository but returns (.*).#'
         - '#Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface::section\(\)\.#'

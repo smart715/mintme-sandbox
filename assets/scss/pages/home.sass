@@ -1,0 +1,229 @@
+@import '../variables'
+@import '../mixins'
+
+.homepage
+  font-size: 15px
+
+  nav
+    position: relative
+
+    @include media-breakpoint-up(lg)
+      top: 0
+      left: 0
+      width: 100%
+      z-index: $zindex-sticky
+      background: none
+
+  .position-sm-absolute
+    position: relative
+
+    @include media-breakpoint-up(sm)
+      position: absolute
+
+  #top-showcase
+    margin-top: 0
+    background: linear-gradient(#345385, #152138 30%)
+    font-size: 14px
+
+    @include media-breakpoint-up(md)
+      margin-top: 5%
+      background: none
+      font-size: 16px
+
+    .h-100 // To fix chrome display issue
+      @include media-breakpoint-down(sm)
+        height: auto !important
+
+    .container
+      @media screen and (min-width: 1400px)
+        padding-left: 0 !important
+        padding-right: 0 !important
+
+        #home
+         .title
+           margin-bottom:  7.5px
+
+    .title
+      font-family: $concord-font
+      font-size: 2em
+      min-height: 4em
+
+      @media screen and (min-width: 320px)
+        font-size: 2.1em
+
+      @include media-breakpoint-up(sm)
+        font-size: 2.5em
+        min-height: 0
+
+      @include media-breakpoint-up(md)
+        font-size: 2.5em
+
+      @include media-breakpoint-up(lg)
+        font-size: 3.5em
+
+      @include media-breakpoint-up(xl)
+        font-size: 4em
+
+      @media screen and (min-width: 1400px)
+        font-size: 5.5em
+
+      #typed
+        br
+          @include media-breakpoint-up(sm)
+            display: none
+
+    .subtitle
+      font-size: 1.58em
+
+      @include media-breakpoint-up(md)
+        font-size: 1.3em
+        margin-top: 10%
+
+      @include media-breakpoint-up(xl)
+        font-size: 1.44em
+
+      @media screen and (min-width: 1400px)
+        font-size: 2em
+
+    .tip
+      display: inline-block
+      font-size: 0.5em
+      line-height: 1.25
+
+    .feed-container
+      width: 100%
+
+      @include media-breakpoint-up(lg)
+        width: 75%
+
+      .feed
+        border-radius: 1em
+        border: 1px solid #ffffff
+        overflow: hidden
+        background-color: #1e5496
+
+        .feed-row
+          background-color: #194276
+
+          &:nth-of-type(2n)
+            background-color: #1e5496
+
+          &--preload
+            min-height: 33.6px
+            background: none
+
+          .feed-cell
+            padding: 0.3em
+
+            &:first-child
+              padding-left: 1em
+              word-break: break-all
+
+            &:last-child
+              padding-right: 1em
+              white-space: nowrap
+              text-align: center
+
+            a
+              color: $dark-white
+
+  .btn-register
+    text-transform: uppercase
+    border-color: $dark-white
+    color: $primary
+    background-color: $primary-light
+    font-size: 2rem
+
+    &.btn-register-hover-light:hover
+      background: $blue !important
+      color: $dark-white !important
+
+    &.btn-register-hover-dark:hover
+      background: $dark-white !important
+      color: $primary !important
+
+  .homepage-action-button
+    @media screen and (min-width: 1400px)
+      font-size: 2em
+      padding: 0.3em 0.8em
+
+  .btn-ghost
+    border-color: $dark-white
+    background: transparent
+    color: $dark-white !important
+    transition: all .3s ease
+    @media (hover: hover)
+      &:hover
+        color: $secondary !important
+        background-color: $dark-white !important
+    @media (hover: none)
+      background-color: $secondary-dark !important
+      border-color: $dark-white !important
+
+    &.ghost-alt
+      &:hover
+        color: $primary-light
+
+  #description
+    margin-top: 0
+
+    .countdown
+      border: $ghost-light solid 2px
+
+      .countdown-list
+        margin: 4px
+
+        .countdown-item
+          padding: 10px 35px
+          background: $ghost-light
+
+          @include media-breakpoint-down(sm)
+            padding: 5px
+
+          h2
+            @include media-breakpoint-down(md)
+              @include font-scale(sm)
+
+            @include media-breakpoint-down(sm)
+              @include font-scale(xs)
+
+          &:not(:last-of-type)
+            margin-right: 3px
+
+    .feature-boxes
+      img
+        max-width: 70%
+        @include media-breakpoint-up(sm)
+          max-width: 50%
+        @include media-breakpoint-up(xl)
+          max-width: 55%
+
+    .faq
+      .row
+
+        &:nth-child(odd)
+          background-color: red
+
+        &:nth-child(even)
+          background-color: green
+
+      .card
+        border: none
+
+        .card-body
+          background: transparent
+
+        .card-header
+          background: transparent
+
+          /* stylelint-disable no-descending-specificity */
+          a
+            text-decoration: none
+            white-space: normal
+          /* stylelint-enable no-descending-specificity */
+
+.absolute-center
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)

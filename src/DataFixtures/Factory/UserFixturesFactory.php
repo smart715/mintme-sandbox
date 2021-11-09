@@ -4,7 +4,7 @@ namespace App\DataFixtures\Factory;
 
 use App\DataFixtures\FakerHelper;
 use App\Entity\User;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 
 /** @codeCoverageIgnore */
@@ -22,7 +22,7 @@ class UserFixturesFactory extends AbstractFixturesFactory
     /** @var UserManagerInterface */
     private $userManager;
 
-    public function __construct(ObjectManager $objectManager, UserManagerInterface $userManager)
+    public function __construct(EntityManagerInterface $objectManager, UserManagerInterface $userManager)
     {
         $this->userManager = $userManager;
 
@@ -36,7 +36,7 @@ class UserFixturesFactory extends AbstractFixturesFactory
             ->setUsername($this->getFaker()->userName)
             ->setEmail(self::DEFAULT_NAME . ++self::$counter . '@mail.org')
             ->setPlainPassword(self::DEFAULT_PASSWORD)
-            ->setRoles([User::ROLE_DEFAULT])
+            ->setRoles([User::ROLE_DEFAULT, User::ROLE_SEMI_AUTHENTICATED])
             ->setEnabled(true);
 
         $this->userManager->updateUser($user);

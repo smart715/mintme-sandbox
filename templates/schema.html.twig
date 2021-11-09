@@ -2,107 +2,346 @@
 {
     "@context": "http://schema.org",
     "@graph": [
-    {
-        "@type": "WebSite",
-        "name": "Mintme cryptocurrency exchange",
-        "url": "{{ url('homepage') }}",
-        "about": "Mintme revolutionizes how people help each other by allowing sides to earn. Anyone can create a token that represents themselves or a project which they have created for their fanbase and supporters to support them in fundraising. It helps content creators to realize their maximum potential through a new innovative way of crowdfunding. It's also a social platform where cryptocurrency traders can interact with token creators and other traders.",
-        "copyrightYear": "2019",
-        "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, token, dapps"
-    },
-    {
-        "@type": "product",
-        "brand": "Mintme",
-        "name": "Mintme cryptocurrency exchange",
-        "logo": {
-                "@type": "ImageObject",
-                "caption": "MintmeLogo",
-                "contentUrl": "{{ absolute_url(asset('build/images/logo.png')) }}",
-                "description": "Mintme cryptocurrency exchange logo.",
-                "name": "Mintme cryptocurrency exchange",
-                "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, token, dapps"
-        },
-        "image": {
-            "@type": "ImageObject",
-            "caption": "MintmeImage",
-            "contentUrl": "{{ absolute_url(asset('build/images/hero_image.jpg')) }}",
-            "description": "Mintme image explaining how people help each other by allowing sides to earn through creating tokens that represent themselves or a project which they have created for their fanbase and supporters to support them in crowdfunding.",
-            "name": "Mintme cryptocurrency exchange.",
+        {
+            "@type": "WebSite",
+            "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+            "url": "{{ url('homepage') }}",
+            "about": "mintMe revolutionizes how people help each other by allowing both sides to earn through an innovative way of crowdfunding.\n Anyone can create a token that represents themselves or a project in just a few clicks, personalize it and promote it to obtain support in fundraising. It helps content creators to realize their maximum potential through a new innovative way of crowdfunding. It's also a social platform where cryptocurrency traders can interact with token creators and other traders.",
+            "copyrightYear": "2019",
             "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, token, dapps"
         },
-        "offers": {
-            "@type": "Offer",
-            "price": "0.00",
-            "priceCurrency": "USD",
-            "description": "When you refer someone, you will get 50% of his trading fees!",
-            "mainEntityOfPage": "{{ url('referral-program') }}",
-            "image": {
-                    "@type": "ImageObject",
-                    "caption": "Mintme referral",
-                    "contentUrl": "{{ absolute_url(asset('build/images/easy_icon_04.png')) }}",
-                    "description": "Mintme referral program",
-                    "name": "MintmeReferral",
-                    "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+        {
+            "@type": "Product",
+            "brand": "mintMe",
+            "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+            "url": "{{ url('homepage') }}",
+            "logo": {
+                "@type": "ImageObject",
+                "caption": "mintMeLogo",
+                "contentUrl": "{{ absolute_url(asset('build/images/logo.png')) }}",
+                "description": "Mintme cryptocurrency exchange logo.",
+                "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+                "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, token, dapps"
             },
-            "name": "ReferralProgram"
-        },
-        "description": "Mintme revolutionizes how people help each other by allowing sides to earn. Anyone can create a token that represents themselves or a project that they have created for their fanbase and supporters to support them."
-    },
-    {
-        "@type": "WebApplication",
-        "name": "Mintme cryptocurrency exchange",
-        "applicationCategory": "cryptocurrency exchange",
-        "operatingSystem": "all",
-        "description": "Mintme revolutionizes how people help each other by allowing sides to earn.",
-        "downloadUrl": "{{ url('fos_user_registration_register') }}",
-        "featureList": "{{ url('homepage') }}",
-        "installUrl": "{{ url('homepage') }}",
-        "releaseNotes": "{{ url('sonata_news_archive') }}",
-        "screenshot": "{{ url('homepage') }}",
-        "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program",
-        "offers": {
-            "@type": "Offer",
-            "price": "0.00",
-            "priceCurrency": "USD",
-            "description": "When you refer someone, you will get 50% of his trading fees!",
-            "mainEntityOfPage": "{{ url('referral-program') }}",
             "image": {
                 "@type": "ImageObject",
-                "caption": "Mintme referral",
-                "contentUrl": "{{ absolute_url(asset('build/images/easy_icon_04.png')) }}",
-                "description": "Mintme referral program",
-                "name": "MintmeReferral",
-                "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+                "caption": "mintMeImage",
+                "contentUrl": "{{ absolute_url(asset('build/images/hero_image.jpg')) }}",
+                "description": "mintMe revolutionizes how people help each other by allowing both sides to earn through an innovative way of crowdfunding.",
+                "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+                "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, token, dapps"
             },
-            "name": "ReferralProgram"
+            "offers": {
+                "@type": "Offer",
+                "price": "0.00",
+                "priceCurrency": "USD",
+                "description": "When you refer someone, you will get 50% of his trading fees!",
+                "mainEntityOfPage": "{{ url('referral-program') }}",
+                "image": {
+                        "@type": "ImageObject",
+                        "caption": "mintMe referral",
+                        "contentUrl": "{{ absolute_url(asset('build/images/easy_icon_04.png')) }}",
+                        "description": "mintMe referral program",
+                        "name": "mintMeReferral",
+                        "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+                },
+                "name": "ReferralProgram",
+                "url": "{{ url('referral-program') }}",
+                "availability": "http://schema.org/InStock"
+            },
+            "description": "mintMe revolutionizes how people help each other by allowing both sides to earn. Anyone can create a token that represents themselves or a project that they have created for their fanbase and supporters to support them.",
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "reviewCount": "14",
+                "ratingValue": "5",
+                "author": {
+                    "@type": "Organization",
+                    "name": "AlternativeTo",
+                    "url": "https://alternativeto.net/software/mintme/reviews/"
+                },
+                "name": "mintMeRating"
+            }
         },
-        "image": [ {
-            "@type": "ImageObject",
-            "caption": "MintmeLogo",
-            "contentUrl": "{{ absolute_url(asset('build/images/logo.png')) }}",
-            "description": "Mintme cryptocurrency exchange logo.",
-            "name": "Mintme cryptocurrency exchange",
-            "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
-        } ,
         {
-            "@type": "ImageObject",
-            "caption": "MintmeImage",
-            "contentUrl": "{{ absolute_url(asset('build/images/hero_image.jpg')) }}",
-            "description": "Mintme image explaining how people help each other by allowing sides to earn through creating tokens that represent themselves or a project which they have created for their fanbase and supporters to support them in crowdfunding.",
-            "name": "Mintme cryptocurrency exchange",
-            "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
-        }],
-        "softwareHelp": {
-            "@type": "HowTo",
-            "description": "Mintme revolutionizes how people help each other by allowing sides to earn. Anyone can create a token that represents themselves or a project that they have created for their fanbase and supporters to support them.",
-            "mainEntityOfPage": "{{ url('homepage') }}",
-            "name": "MintmeHelp",
+            "@type": "WebApplication",
+            "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+            "applicationCategory": "crowdfunding /cryptocurrency exchange",
+            "operatingSystem": "all",
+            "description": "mintMe revolutionizes how people help each other by allowing both sides to earn.",
+            "featureList": "Create tokens, trade tokens, two factor authenthication",
+            "url": "{{ url('homepage') }}",
+            "releaseNotes": "{{ url('sonata_news_home') }}",
+            "screenshot": "{{ absolute_url(asset('build/images/screenshot.png')) }}",
             "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program",
-            "url": "{{ url('homepage') }}"
-        },
-        "softwareRequirements": "{{ url('homepage') }}",
-        "about": "Mintme revolutionizes how people help each other by allowing sides to earn. Anyone can create a token that represents themselves or a project that they have created for their fanbase and supporters to support them."
-    }
+            "offers": {
+                "@type": "Offer",
+                "price": "0.00",
+                "priceCurrency": "USD",
+                "description": "When you refer someone, you will get 50% of his trading fees!",
+                "mainEntityOfPage": "{{ url('referral-program') }}",
+                "image": {
+                    "@type": "ImageObject",
+                    "caption": "mintMe referral",
+                    "contentUrl": "{{ absolute_url(asset('build/images/easy_icon_04.png')) }}",
+                    "description": "Mintme referral program",
+                    "name": "mintMeReferral",
+                    "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+                },
+                "name": "ReferralProgram"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "reviewCount": "14",
+                "ratingValue": "5",
+                "author": {
+                    "@type": "Organization",
+                    "name": "AlternativeTo",
+                    "url": "https://alternativeto.net/software/mintme/reviews/"
+                },
+                "name": "mintMeRating"
+            },
+            "image": [
+                {
+                    "@type": "ImageObject",
+                    "caption": "mintMeLogo",
+                    "contentUrl": "{{ absolute_url(asset('build/images/logo.png')) }}",
+                    "description": "mintMe cryptocurrency exchange logo.",
+                    "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+                    "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+                } ,
+                {
+                    "@type": "ImageObject",
+                    "caption": "mintMeImage",
+                    "contentUrl": "{{ absolute_url(asset('build/images/hero_image.jpg')) }}",
+                    "description": "mintMe revolutionizes how people help each other by allowing both sides to earn through an innovative way of crowdfunding.",
+                    "name": "mintMe crowdfunding & cryptocurrency exchange platform.",
+                    "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program"
+                }
+            ],
+            "softwareHelp": {
+                "@type": "HowTo",
+                "description": "mintMe revolutionizes how people help each other by allowing both sides to earn through an innovative way of crowdfunding.\n Anyone can create a token that represents themselves or a project in just a few clicks, personalize it and promote it to obtain support.",
+                "about": "mintMe revolutionizes how people help each other by allowing both sides to earn through an innovative way of crowdfunding.\n Anyone can create a token that represents themselves or a project in just a few clicks, personalize it and promote it to obtain support.",
+                "mainEntityOfPage": "{{ url('homepage') }}",
+                "name": "mintMeHelp",
+                "keywords": "project crowdfunding, create token, token creation, make coin, create coin, crypto, exchanger, referral program",
+                "url": "{{ url('homepage') }}",
+                "totalTime": "PT20M",
+                "tool": [
+                    {
+                      "@type": "HowToTool",
+                      "name": "Project idea"
+                    },
+                    {
+                      "@type": "HowToTool",
+                      "name": "Webchain Coin"
+                    },
+                    {
+                      "@type": "HowToTool",
+                      "name": "Bitcoin"
+                    },
+                    {
+                      "@type": "HowToTool",
+                      "name": "Token"
+                    },
+                    {
+                      "@type": "HowToTool",
+                      "name": "Valid email address"
+                    }
+                ],
+                "step": [
+                    {
+                        "@type": "HowToSection",
+                        "name": "Registration",
+                        "position": "1",
+                        "itemListElement": [
+                            {
+                                "@type": "HowToStep",
+                                "name": "Go to mintMe",
+                                "url": "{{ url('homepage') }}",
+                                "position": "1",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Go to mintMe.com"
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Go to Sign Up",
+                                "url": "{{ url('fos_user_registration_register') }}",
+                                "position": "2",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Click \"Sign Up\" on the top bar"
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Fill registration form",
+                                "url": "{{ url('fos_user_registration_register') }}",
+                                "position": "3",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Fill the registration form appropriately."
+                                    },
+                                    {
+                                        "@type": "HowToTip",
+                                        "position": "2",
+                                        "text": " You will need to use a valid email and an acceptable password."
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Click Sign Up button",
+                                "url": "{{ url('fos_user_registration_register') }}",
+                                "position": "4",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Click the \"Sign Up\" button."
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Activate your account",
+                                "position": "5",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Check for the activation link in the email inbox you used to signup. Click the link to activate the account"
+                                    },
+                                    {
+                                        "@type": "HowToTip",
+                                        "position": "2",
+                                        "text": "Check your spam folder"
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Complete your profile",
+                                "url": "{{ url('profile') }}",
+                                "position": "6",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Finish adding your profile information."
+                                    },
+                                    {
+                                        "@type": "HowToTip",
+                                        "position": "2",
+                                        "text": "It is necessary to complete editing your profile before creating a new token"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "HowToSection",
+                        "name": "Create token",
+                        "position": "2",
+                        "itemListElement": [
+                            {
+                                "@type": "HowToStep",
+                                "name": "Go to token page",
+                                "url": "{{ url('token_create') }}",
+                                "position": "1",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Click \"My Token\" option in the top menu bar."
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Create token",
+                                "url": "{{ url('token_create') }}",
+                                "position": "2",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Add the token name and click \"Create token\" button."
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "HowToSection",
+                        "name": "Create sell order",
+                        "position": "3",
+                        "itemListElement": [
+                            {
+                                "@type": "HowToStep",
+                                "name": "Go to trading",
+                                "url": "{{ url('trading') }}",
+                                "position": "1",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Click Trading option in the top menu bar"
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Select market",
+                                "url": "{{ url('trading') }}",
+                                "position": "2",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Select your appropriate pair from the trading list to go to the token page."
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Create sell order",
+                                "position": "3",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Scroll down the trading page to the SELL section, fill in the Sell Order form appropriately and click \"Create Sell order\" button."
+                                    }
+                                ]
+                            },
+                            {
+                                "@type": "HowToStep",
+                                "name": "Wait",
+                                "position": "4",
+                                "itemListElement": [
+                                    {
+                                        "@type": "HowToDirection",
+                                        "position": "1",
+                                        "text": "Wait patiently for the system to match and execute your order automatically."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
     ]
 }
 </script>

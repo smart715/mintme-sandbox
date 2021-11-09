@@ -1,0 +1,34 @@
+.icon-loading
+    display: inline-block
+    width: 16px
+    height: 16px
+    vertical-align: text-bottom
+    border: 2px solid currentColor
+    border-right-color: transparent
+    border-radius: 50%
+    animation: spinner 1s linear infinite
+
+.icon-success, .icon-warning, .icon-error, .icon-info, .icon-danger, .icon-primary
+  display: inline-block
+  width: 32px
+  height: 32px
+  min-width: 32px
+  min-height: 32px
+  background-size: contain
+  background-repeat: no-repeat
+
+.icon-success
+  background-image: url('../img/success-icon.svg')
+
+.icon-warning
+  background-image: url('../img/warning-icon.svg')
+
+.icon-error, .icon-danger
+  background-image: url('../img/fail-icon.svg')
+
+.icon-info, .icon-primary
+  background-image: url('../img/info-icon.svg')
+
+@keyframes spinner
+  to
+    transform: rotate(360deg)

@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/chat') }}
+{% endblock %}
+
+{% block content %}
+    <div id="chat" class="container">
+        <chat-widget
+            class="pt-4"
+            nickname="{{ app.user.profile.nickname }}"
+            :threads="{{ threads | json_encode }}"
+            :thread-id-prop="{{ threadId }}"
+            :d-m-min-amount="{{ dMMinAmount }}"
+            user-token-name="{{ app.user.profile.hasTokens ? app.user.profile.firstToken.name : '' }}"
+            :token-precision="{{ precision }}"
+            websocket-url="{{ global_websocket_url }}"
+            user-hash="{{ hash }}"
+        />
+    </div>
+<p style="display: none;">Hello World</p>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/chat') }}
+{% endblock %}

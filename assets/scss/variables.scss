@@ -1,9 +1,11 @@
+@import "~bootstrap/scss/functions";
+
 // Change bootstrap variables to match Mintme style
 
 // Fonts
-$lato-font: 'Lato', sans-serif;
-$concord-font: 'ConcordBold';
-$cloud-font: 'AlphaCloud', sans-serif;
+$lato-font: 'Lato', 'Arial', sans-serif;
+$concord-font: 'Concord';
+$concord-bold-font: 'ConcordBold';
 
 $font-scales: (
   xs: 13px,
@@ -17,22 +19,27 @@ $border-radius: 0;
 
 // Colors
 $ghost-dark: rgba(0, 0, 0, 0.15);
-
 $ghost-light: rgba(255, 255, 255, 0.25);
 $grey-light: #8A96A4;
+$grey: #a09999;
 $grey-dark: #778588;
 $yellow: #be8817;
 $orange: #f7931e;
 $green: #8dc63f;
 $red: #fe6e43;
 $white: white;
+$dark-white: #ebebeb;
+$pale-gray: #ced4da;
 $black: #131313;
 $secondary: #152D47;
+$notification-link: #3DB5FF;
 $secondary-dark: #112438;
 $primary: #0E3B58;
 $primary-light: #017bbc;
 $blue: #1da1f3;
 $meterbg-list: (#b71c1c, #d32f2f, #f9a825, #8bc34a, #558b2f);
+$gold: #C1AE83;
+$odd-item-color: #00334E;
 // This variable affects the `.h-*` and `.w-*` classes.
 $sizes: () !default;
 
@@ -67,13 +74,13 @@ $theme-colors: (
   "blue": $blue
 );
 
-$body-background: $black url("../img/sky_image.jpg") no-repeat fixed;
+$body-background: $black url("../img/sky_image.webp") no-repeat fixed;
 $body-background-sm: linear-gradient(#184b80, #193a5d);
 $module-background: linear-gradient(#0b3c57, #19263d);
 $body-text-color: #1a1a1a;
-$color-nav: $white;
-$color-nav-active: #0071bc;
-$color-nav-hover: #0071bc;
+$color-nav: $dark-white;
+$color-nav-active: $gold;
+$color-nav-hover: $gold;
 $color-link: $blue;
 $color-link-hover: #90c7ff;
 $color-tabs: $primary;
@@ -81,27 +88,31 @@ $color-tabs-links: #0078bb;
 $color-slider-range: #007ABB;
 $color-facebook: #3b5998;
 $color-twitter: $blue;
-$color-tooltip: #007DC0;
+$color-tooltip: #5B6C7E;
 $color-badge: #4FC2F8;
 $color-linkedin: #0077b5;
-$color-wallet-code: #666666;
+$color-toggle-password-active: #0071bc;
+$color-toggle-password-hover: #0071bc;
 $modal-alert-border-color: $primary;
 $index-description-bg: linear-gradient(180deg, #102238, #102238, #102238, #102238, transparent, transparent) repeat-x;
 
 // Forms
-$input-bg: $grey-light;
+$input-bg: #1D3D61;
 $input-btn-padding-y: .25rem;
 $input-btn-padding-x: 1rem;
 $input-focus-border-color: $input-bg;
 $input-btn-focus-color: $input-bg;
+$input-focus: #193554;
+$search-input: #1D3D61;
+$input-placeholder-color: $white;
 
 // Card
 $card-border-width: 0.6rem;
 $card-border-color: $ghost-dark;
-$card-input-color: $grey-dark;
+$card-input-color: $input-bg;
 $card-header-bg: $primary;
 $card-body-bg: $secondary;
-$card-text-color: $white;
+$card-text-color: $dark-white;
 
 // Pagination
 $pagination-color: $primary;
@@ -113,3 +124,29 @@ $modal-content-border-width: 0;
 
 $navbar-toogler: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
 $navbar-sm-background: radial-gradient(#184b80, #1b4776);
+
+// Tables
+$b-table-sort-icon-bg-not-sorted: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/></svg>") !default;
+$b-table-sort-icon-bg-ascending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' opacity='.3' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
+$b-table-sort-icon-bg-descending: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'><path fill='white' opacity='.3' d='M51 1l25 23 24 22H1l25-22z'/><path fill='white' d='M51 101l25-23 24-22H1l25 22z'/></svg>") !default;
+
+// Notifications
+$toast-error-bg: #ff524e;
+$toast-error-text: #ffffff;
+$toast-info-bg: #6fcbfa;
+$toast-info-text: #003858;
+$toast-success-bg: #8dd7a6;
+$toast-success-text: #2e7d32;
+$toast-warning-bg: #ffcc7c;
+$toast-warning-text: #de3300;
+
+// spaces
+$token-avatar-margin-left: 115px;
+
+// Posts
+$post-border-color: #0e3b59;
+
+// This variable should mirror config/paramaters.dist.yml translation_flags.flag variable.
+$translation-flags: gb, es, ru, ua, pl, ae, pt, fr;
+
+@import "~bootstrap/scss/variables";

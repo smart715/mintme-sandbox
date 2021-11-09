@@ -7,6 +7,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 /**
  * Invokable class which adds remote IP address and username to the log entry.
+ *
+ * @codeCoverageIgnore
  */
 class UserActionProcessor
 {
@@ -26,13 +28,17 @@ class UserActionProcessor
 
     public function __invoke(array $record): array
     {
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
         $record['extra']['username'] = $this->getUsername();
-        $record['extra']['ip_address'] = $this->requestStack->getCurrentRequest()->getClientIp();
+        $record['extra']['ip_address'] = $currentRequest
+            ? $currentRequest->getClientIp()
+            : 'localhost';
 
         return $record;
     }
 
-    private function getUsername(): string
+    protected function getUsername(): string
     {
         $token = $this->tokenStorage->getToken();
 

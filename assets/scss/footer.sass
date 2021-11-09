@@ -1,4 +1,6 @@
 @import "variables"
+@import "mixins"
+@import 'lang-menu'
 
 #footer
   margin-top: 65px
@@ -15,11 +17,44 @@
     top: -52px
     width: 100%
     height: 55px
-    background: url("../img/grass.png") repeat-x
+    background: url("./../img/grass.svg") repeat-x
     background-size: auto 100%
 
   .socialmedia
     margin-top: 20px
+
     img
       width: 45px
       height: 45px
+      transition: all .3s ease
+
+      &:hover
+        filter: brightness(1.2)
+
+  .currency-mode-switcher
+    bottom: 1px
+
+    .btn
+      border: none
+
+      &:hover, &:focus, &.active, &:active
+        background-color: transparent !important
+        color: $color-nav-hover !important
+        border: none
+
+    .dropdown-menu
+      min-width: 7rem
+
+  .drops-switcher
+    bottom: 12px
+
+    @media (max-width: 346px)
+      padding: 0
+
+
+  @media (max-width: 689px)
+    .cookies-term
+      display: block !important
+
+    .separator
+      display: none !important

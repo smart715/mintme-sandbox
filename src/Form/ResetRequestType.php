@@ -9,10 +9,19 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @codeCoverageIgnore  */
 class ResetRequestType extends AbstractType
 {
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -25,9 +34,8 @@ class ResetRequestType extends AbstractType
         $builder
             ->add('username', EmailType::class, [
                 'label' => false,
-                'constraints' => [new Email(['message' => 'Invalid email address.']) ],
+                'constraints' => [new Email(['message' => $this->translator->trans('form.reset.invalid_email')]) ],
             ])
-
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'attr' => [
                     'options' => [

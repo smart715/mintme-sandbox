@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/register') }}
+{% endblock %}
+
+{% block title %}Sign Up Landing | mintMe{% endblock %}
+
+{% set formHeader = 'sign_up' %}
+
+{% block content %}
+    <div id="sign-up-langing" class="container">
+        <div class="row flex-md-row justify-content-center flex-column-reverse align-items-center py-5 px-xl-5">
+            <div id="form" class="col-sm-10 col-md-5 col-lg-3 pr-xs-2 pr-md-0">
+                <div class="card">
+                    <div class="card-header">
+                        {{ formHeader|trans }}
+                    </div>
+                    <div class="card-body py-2">
+                        {{ form_start(form, {'method': 'post', 'action': path('sign_up'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
+                        {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required'} }) }}
+                        {% include 'form/nickname_field.html.twig' %}
+                        <div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
+                            Minimum length must be 2
+                        </div>
+                        <div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
+                            Nickname can contain only latin letters and numbers
+                        </div>
+                        <div>
+                            <passwordmeter :password="password" @toggle-error="toggleError">
+                                    <span @click="togglePassword()" class="show-password">
+                                        <font-awesome-icon icon="eye"></font-awesome-icon>
+                                    </span>
+                                {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+                            </passwordmeter>
+                        </div>
+                        <div class="py-2">
+                            {{ form_row(form.recaptcha, { 'inline': false }) }}
+                        </div>
+                        <div class="text-left">
+                            <input type="submit" :disabled="disabled" class="btn btn-primary" value="{% trans %}sign_up{% endtrans %}">
+                            <span class="px-3">{% trans %}or{% endtrans %}</span>
+                            <a class="btn-cancel" href="{{ path('fos_user_security_login') }}">{% trans %}log_in{% endtrans %}</a>
+                        </div>
+                        <p class="text-left pt-3">
+                            {% trans %}page.landing.content.1{% endtrans%} <br>
+                            <a target="_blank" href="{{ path('terms_of_service') }}">
+                                {% trans %}terms_of_service{% endtrans %}</a> {% trans %}and{% endtrans %}
+                            <a target="_blank" href="{{ path('privacy_policy') }}">{% trans %}privacy_policy{% endtrans %}</a>
+                        </p>
+                        {{ form_end(form) }}
+                        {% include 'recaptcha_script.html.twig' with { recaptcha: form.recaptcha } %}
+                    </div>
+                </div>
+            </div>
+            <div class="logo-text col-sm-12 col-md-7 col-lg-9 px-0">
+                <div class="logo-div order-2">
+                    <img class="logo-web w-70" src="{{ asset('build/images/logo-with-web.png') }}">
+                </div>
+                <div class="we-will-pay d-inline-block pr-3 order-1">
+                    <span class="letter-space title text-white h1">{% trans %}page.landing.content.2{% endtrans %}</span><br>
+                    <span class="letter-space landing-font float-right">{% trans %}page.landing.content.3{% endtrans %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row py-5 justify-content-center">
+            <div class="col-xl-6 col-lg-12 col-sm-12 what-is landing-font text-center">
+                <span>{% trans %}page.landing.content.4{% endtrans %} <i>mintMe?</i></span> <br>
+                <span>{% trans %}page.landing.content.5{% endtrans %}</span>
+            </div>
+        </div>
+        <div class="row steps py-3 pb-5 px-5 mx-0 landing-font justify-content-center text-center">
+            <div class="col-lg-4 col-md-12 col-sm-12 px-0 py-2">
+                <img class="arrows" src="{{ asset('build/images/number-one.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>{% trans %}page.landing.content.6{% endtrans %}</span>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 px-0 py-3 py-md-2">
+                <img class="arrows" src="{{ asset('build/images/number-two.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>{% trans %}page.landing.content.7{% endtrans %}</span>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 px-0">
+                <img class="arrows" src="{{ asset('build/images/number-three.png') }}">
+                <div class="arr-text d-inline-block align-middle text-center">
+                    <span>{% trans %}page.landing.content.8{% endtrans %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row feature-row border border-white m-5 px-0 py-3">
+            <div class="col-md-6 col-lg-3 py-2 order-md-0 text-center">
+                <img class="hand-and-lamp" src="{{ asset('build/images/hand-coin.png') }}">
+            </div>
+            <div class="col-md-6 col-lg-6 order-md-1 text-center">
+                <div class="pt-5">
+                    <span class="title text-white h2">
+                        {% trans %}page.landing.content.9{% endtrans%}
+                    </span>
+                </div>
+                <div class="xl-text pt-2 w-80 mx-auto">
+                    <a href="#form"
+                       class="text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
+                        {% trans %}page.index.promo.btn.register{% endtrans %}
+                    </a>
+                    <div class="xl-text d-inline-block small-text">
+                        {% trans with {'%landing_web_bonus%': landing_web_bonus} %}page.landing.content.10{% endtrans %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 py-2 order-md-3 text-center">
+                <img class="hand-and-lamp" src="{{ asset('build/images/lamp.png') }}">
+            </div>
+            <div class="md-text col-md-6 pt-5 w-80 order-md-2 mx-auto text-center d-none">
+                <a href="#form"
+                   class="text-uppercase text-center align-bottom d-inline-block btn btn-primary border-0 btn-register btn-register-hover-dark text-white m-3 py-2">
+                    {% trans %}page.index.promo.btn.register{% endtrans %}
+                </a>
+                <div class="d-inline-block small-text">
+                    {% trans with {'%landing_web_bonus%': landing_web_bonus} %}page.landing.content.10{% endtrans %}
+                </div>
+            </div>
+        </div>
+        <div class="diagrams row justify-content-center m-5 py-5">
+            <div class="col-md-3 col-lg-2 py-2 text-center">
+                <img class="pb-4" src="{{ asset('build/images/diagram.png') }}">
+                <img class="d-md-block d-none d-lg-none mt-5 pt-5" src="{{ asset('build/images/diagram-2.png') }}">
+            </div>
+            <div class="col-md-8 col-lg-8 mx-auto pl-md-5 pt-3 landing-font text-center">
+                {% trans with {'%landing_web_bonus%': landing_web_bonus} %}page.landing.content.11{% endtrans %}
+            </div>
+            <div class="d-lg-block d-md-none col-lg-2 py-2 text-center">
+                <img src="{{ asset('build/images/diagram-2.png') }}">
+            </div>
+        </div>
+        <div class="row feature-row border border-white m-5 py-3">
+            <div class="col-md-5 col-xl-4 py-2 text-center p-4 my-auto">
+                <h1 class="d-block d-md-none px-0 font-weight-bold">Can you afford not to try?</h1>
+                <img class="web-chain" src="{{ asset('build/images/mintme-coin-graphic.png') }}">
+            </div>
+            <div class="col-md-7 col-xl-8 py-2 text-center pl-2 text-center my-auto">
+                <h1 class="d-none d-md-block px-5 font-weight-bold">{% trans %}page.landing.content.12{% endtrans %}</h1>
+                <span class="not-demand letter-space landing-font">
+                    {% trans %}page.landing.content.13{% endtrans %}
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/register') }}
+{% endblock %}

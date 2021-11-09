@@ -1,0 +1,29 @@
+{{ form_start(form, {'method': 'post', 'action': path('register'), 'attr': {'class': 'fos_user_registration_register', 'id': 'register'}}) }}
+    {{ form_row(form.email, { 'inline': false, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'autofocus': 'autofocus'} }) }}
+    {% include 'form/nickname_field.html.twig' %}
+<div v-cloak="$v.nickname" v-if="!$v.nickname.minLength" class="text-danger text-center small">
+    {% trans from 'messages' %}page.profile.error.nickname.min{% endtrans %}
+</div>
+<div v-cloak="$v.nickname" v-if="!$v.nickname.helpers" class="text-danger text-center small">
+    {% trans from 'messages' %}page.profile.error.nickname.letters_numbers{% endtrans %}
+</div>
+<div id="register-form-password-container">
+    <passwordmeter :password="password" @toggle-error="toggleError">
+                <span @click="togglePassword()" class="show-password">
+                    <font-awesome-icon icon="eye"></font-awesome-icon>
+                </span>
+        {{ form_row(form.plainPassword, { 'inline': false, 'attr': {'v-model': 'password'} }) }}
+    </passwordmeter>
+</div>
+<div id="register-form-captcha-container" class="py-2">
+    {{ form_row(form.recaptcha, { 'inline': false }) }}
+</div>
+<div class="text-left">
+    <input type="submit" :disabled="disabled" class="btn btn-primary" value="{% trans from 'FOSUserBundle' %}form.signup.submit{% endtrans %}">
+    <span class="px-3">{% trans %}or{% endtrans %}</span>
+    <a class="btn-cancel px-0" id="login-button" href="{{ path('login') }}">{% trans from 'FOSUserBundle' %}form.login.submit{% endtrans %}</a>
+</div>
+<p class="text-left pt-3">
+    {% trans from 'FOSUserBundle' %}register.accepting{% endtrans %} <br><a target="_blank" href="{{ path('terms_of_service') }}">{% trans from 'messages' %}terms_of_service{% endtrans %}</a> {% trans from 'messages' %}and{% endtrans %} <a target="_blank" href="{{ path('privacy_policy') }}">{% trans from 'messages' %}privacy_policy{% endtrans %}</a>
+</p>
+{{ form_end(form) }}

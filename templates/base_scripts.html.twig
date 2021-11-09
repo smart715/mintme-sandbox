@@ -1,0 +1,5 @@
+<script defer src="{{ path('translations-ui') }}"></script>
+<script defer src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+<script defer src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+{{ encore_entry_script_tags('base_main') }}
+{{ encore_entry_script_tags('footer') }}

@@ -1,0 +1,316 @@
+{% if isTokenPage %}
+<div class="row mt-5 justify-content-center" v-if="false">
+    <div class="col-md-10 d-flex justify-content-between">
+        <div class="token-avatar ml-2">
+            <div class="d-flex align-items-center token-name">
+                <div class="overflow-hidden token-name d-flex align-items-center">
+                    <h1 class="h2 current-token-name">{{ token.name }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row pt-1 justify-content-center" v-if="false">
+    {% if isTokenPage %}
+    <div class="col-md-10">
+        <div class="tabs tabs-theme transparent">
+            <div class="tabs-wrapper">
+                <div class="tabs-left-margin-container"></div>
+                <ul role="tablist" class="nav nav-tabs spinner-tabs">
+                    <li
+                        role="presentation"
+                        class="nav-item {% if isTokenPage and token.isControlledToken %} token-avatar-left {% endif %}"
+                    >
+                        <a
+                            role="tab"
+                            aria-selected="true"
+                            aria-setsize="2"
+                            aria-posinset="1"
+                            target="_self"
+                            href="{{ path('token_show', {name: token.name, tab: 'intro'}) }}"
+                            class="nav-link {% if tab|default and tab == 'intro' %}active{% endif %}"
+                        >
+                            {% trans %}page.pair.tab.introduction{% endtrans %}
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2"
+                            target="_self"
+                            href="{{ path('new_show_post', {name: token.name}) }}"
+                            class="nav-link {% if tab and tab == 'posts' %}active{% endif %}"
+                        >
+                            {% trans %}page.pair.posts_title{% endtrans %}
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2"
+                            target="_self"
+                            href="{{ path('token_show', {name: token.name, tab: 'trade'}) }}"
+                            class="nav-link {% if tab and tab == 'trade' %}active{% endif %}"
+                        >
+                            {% trans %}page.pair.tab.trade{% endtrans %}
+                        </a>
+                    </li>
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="false"
+                            aria-setsize="2"
+                            aria-posinset="2"
+                            target="_self"
+                            href="{{ path('token_list_voting', {name: token.name, tab: 'voting'}) }}"
+                            class="nav-link {% if tab and tab == 'voting' %}active{% endif %}"
+                        >
+                            {% trans %}voting.voting{% endtrans %}
+                        </a>
+                    </li>
+                    <li class="nav-item-token">
+                        <div class="nav-link-token">
+                            <div class="truncate-token">
+                                <span>&nbsp;</span>
+                            </div>
+                        </div>
+                    </li>
+                    <div class="clearfix"></div>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div class="row">
+                    {{ include('spinners/donation.html.twig') }}
+                </div>
+                {% if tab|default and tab and tab == 'intro' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        <div class="row">
+                            <div class="col-12 pb-3">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        {% trans %}token.intro.description.header{% endtrans %}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row fix-height custom-scrollbar">
+                                            <div class="col-12">
+                                                <div>
+                                                    <p>
+                                                        {% if token.description and tokenDescription is defined %}
+                                                            {{ tokenDescription }}
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row token-info-container">
+                            <div class="h-100 col-12 col-lg-7 pr-lg-1">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        {% trans %}page.pair.recent_posts{% endtrans %}
+                                    </div>
+                                    {% include 'spinners/posts_card_body.html.twig' %}
+                                </div>
+                            </div>
+                            <div class="h-100 col-12 col-lg-5 pt-3 pt-lg-0 pl-lg-1">
+                                <div class="card h-100 top-holders">
+                                    <div class="card-header">
+                                        {% trans %}trade.top_holders.header{% endtrans %}
+                                    </div>
+                                        {% if topHolders is not empty %}
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table role="table" aria-busy="false" aria-colcount="2" class="table b-table">
+                                                        <thead role="rowgroup">
+                                                        <tr role="row">
+                                                            <th role="columnheader" scope="col" aria-colindex="1">
+                                                                {% trans %}trade.top_holders.trader{% endtrans %}
+                                                            </th>
+                                                            <th role="columnheader" scope="col" aria-colindex="3">
+                                                                {% trans %}trade.top_holders.amount{% endtrans %}
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody role="rowgroup">
+                                                            {% for holder in topHolders %}
+                                                            <tr role="row">
+                                                                <td role="cell" aria-colindex="1">
+                                                                    <div class="d-flex flex-row flex-nowrap justify-content-between w-100">
+                                                                        <img
+                                                                            src="{{ holder.user.profile.image.avatar_small }}"
+                                                                            alt="avatar" class="d-block rounded-circle">
+                                                                        <a
+                                                                            href="{{ path('profile', {nickname: holder.user.profile.nickname}) }}"
+                                                                            class="holder-name mr-1 text-white">
+                                                                            <div class="overflow-hidden">
+                                                                                <span>
+                                                                                    {{ holder.user.profile.nickname|truncate(12) }}
+                                                                                </span>
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td role="cell" aria-colindex="3">
+                                                                    {{ holder.balance | toMoney(0) }}
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="card-body h-100 d-flex align-items-center justify-content-center">
+                                                <span class="py-4">
+                                                    <div class="icon-loading"></div>
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="card col-12 mt-3">
+                                <div class="card-body text-center">
+                                    <a target"_self" href="#" style="pointer-events: none;">
+                                        {% trans %}token.intro.statistics.show{% endtrans %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'trade' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/trade_tab.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'posts' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/posts_tab.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'post' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane ">
+                        {{ include('spinners/single_post_tab.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_list.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'create-voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_create.html.twig') }}
+                    </div>
+                {% endif %}
+                {% if tab|default and tab and tab == 'show-voting' %}
+                    <div role="tabpanel" aria-hidden="false" class="tab-pane active">
+                        {{ include('spinners/voting_show.html.twig') }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-10">
+        <div class="row mb-3 v-cloak--block"></div>
+        <div class="tabs tabs-theme transparent" id="__BVID__33">
+            <div>
+                <ul role="tablist" class="nav nav-tabs" id="__BVID__33__BV_tab_controls_">
+                    <li role="presentation" class="nav-item">
+                        <a
+                            role="tab"
+                            aria-selected="true"
+                            aria-setsize="1"
+                            aria-posinset="1"
+                            target="_self"
+                            href="{{ path('coin', {base: market.base.symbol, quote: market.quote.symbol|rebranding}) }}"
+                            class="nav-link active"
+                            id="__BVID__35___BV_tab_button__"
+                            aria-controls="__BVID__35">
+                            {% trans %}page.pair.tab.trade{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {% if is_granted('trading') %}
+            <div class="tab-content" id="__BVID__33__BV_tab_container_">
+                <div class="row">
+                    {{ include('spinners/donation.html.twig') }}
+                </div>
+                <div
+                    role="tabpanel"
+                    aria-hidden="false"
+                    class="tab-pane active"
+                    id="__BVID__35"
+                    aria-labelledby="__BVID__35___BV_tab_button__">
+                    <div class="container-fluid px-0">
+                        <div class="row">
+                            <div class="card col">
+                                <div class="card-body p-2">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div
+                                                class="m-2 ve-candle"
+                                                style="width: auto; height: 400px; position: relative;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row trade-orders">
+                            <div class="col-12 col-lg-6 pr-lg-2 mt-3">
+                                <div class="h-100">
+                                    <div class="card h-100">
+                                        <div class="card-header text-left">
+                                            {% trans %}trade.buy_order.header{% endtrans %}
+                                        </div>
+                                        <div class="card-body" style="height: 200px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6 pl-lg-2 mt-3">
+                                <div class="h-100">
+                                    <div class="card h-100">
+                                        <div class="card-header text-left">
+                                            {% trans %}trade.sell_order.header{% endtrans %}
+                                        </div>
+                                        <div class="card-body" style="height: 200px"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-header">{% trans %}trade.history.header{% endtrans %}</div>
+                                    <div class="card-body p-0" style="height: 200px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div>
+                <div class="h1 text-center pt-5 mt-5">
+                    {% trans %}trade.page.disabled{% endtrans %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>

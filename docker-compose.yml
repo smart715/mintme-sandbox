@@ -1,4 +1,4 @@
-version: "3.3"
+version: "2.2"
 services:
   # APP
   panel:
@@ -8,12 +8,15 @@ services:
       - rabbitmq
       - withdraw
       - deposit
+      - deploytok
       - btc
     networks:
       - middleend
       - backward
     volumes:
       - .:/var/www/html/panel
+      - .docker/panel.env:/var/www/html/panel/.env
+      - .docker/parameters.yaml:/var/www/html/panel/config/parameters.yaml
 
   withdraw:
     build: .docker/withdraw
@@ -39,13 +42,31 @@ services:
       - rabbitmq
       - webchain-cli
     volumes:
+      - .docker/deposit:/src
       - .docker/deposit.conf.yaml:/src/config/default.yaml
       - .docker/deposit.env:/src/.env
     networks:
       - middleend
 
+  deploytok:
+    build: .docker/tokdeploy/contract-gateway
+    ports:
+      - 3001:3001
+    depends_on:
+      - db
+      - webchaind
+      - rabbitmq
+      - webchain-cli
+    volumes:
+      - .docker/tokdeploy/contract-gateway:/src
+      - .docker/tokdeploy.yaml:/src/config/default.yaml
+      - .docker/tokdeploy.env:/src/.env
+      - webchaind_root:/src/webchain_root
+    networks:
+      - middleend
+
   webchain-cli:
-    image: 22116/webchain-cli
+    image: lukaszmatczak/webchain-cli
     networks:
       - middleend
     ports:
@@ -55,7 +76,8 @@ services:
       - .docker/default/WEB:/data
 
   webchaind:
-    image: 22116/webchaind
+    build: .docker/webchaind
+    cpus: 0.30
     ports:
       - 39573:39573 # debug
     networks:
@@ -63,12 +85,37 @@ services:
     volumes:
       # Replace next paths with actuals on your system
       - .docker/default/WEB/password.txt:/data/password
-      - .docker/default/WEB/private.txt:/data/private
+      - .docker/default/WEB/account.json:/root/.webchain/morden/keystore/9139413fe7247da35ae0797f9270271ba758d248
+      - webchaind_root:/root/.webchain/morden
+
+  openethereum:
+    image: parity/parity:v2.5.12-stable
+    volumes:
+      - .docker/default/ETH/:/root/eth/
+    ports:
+      - 8545:8545
+      - 8080:8080
+    command:
+      --light
+      --chain=ropsten
+      --jsonrpc-interface=all
+      --jsonrpc-cors=all
+      --jsonrpc-apis=web3,eth,pubsub,net,parity,parity_pubsub,traces,rpc,secretstore,parity_accounts,personal
+      --unlock=0xc26dcee6092beb24b42ebd789f82bb6f8d63387c
+      --password /root/eth/pass
+      --base-path /root/eth
+    working_dir: /home/openethereum
+    user: root
+    mem_limit: 2gb
+    cpuset: '0,3'
+    networks:
+      - middleend
 
   nginx:
     image: nginx:latest
     ports:
       - 80:80
+      - 443:443
       - 16614:16614
       - 8000:8000 # php-withdraw debug
       - 8008:8008
@@ -89,16 +136,18 @@ services:
     image: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: withdraw
     ports:
       - 3306:3306
     networks:
       - middleend
+      - backend
     volumes:
-      - .docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - .docker/sql:/docker-entrypoint-initdb.d
+      - .docker/my.cnf:/etc/mysql/my.cnf
+      - mariadb-data:/var/lib/mysql
 
   rabbitmq:
-    image: rabbitmq:3-management
+    build: .docker/rabbitmq
     ports:
       - 15672:15672
       - 5672:5672
@@ -147,32 +196,23 @@ services:
       - .docker/viabtc/btc/btc/alertcenter/config.json:/btc/alertcenter/config.json
       - .docker/viabtc/btc/btc/readhistory/config.json:/btc/readhistory/config.json
     depends_on:
-      - mysql
+      - db
       - mq
       - redis_sentinel
-      - redis_slave
       - redis_master
-    links:
-      - mysql:db
     networks:
       - backend
       - backward
 
   redis_master:
     container_name: btc-redis-master
-    image: redis:4.0.2-alpine
+    build: .docker/redis
     ports:
       - 16379:6379
     networks:
       - backend
-
-  redis_slave:
-    container_name: btc-redis-slave
-    image: redis:4.0.2-alpine
-    ports:
-      - 16380:6379
-    networks:
-      - backend
+    volumes:
+      - .docker/redis.conf:/usr/local/etc/redis/redis.conf
 
   redis_sentinel:
     container_name: btc-redis-sentinel
@@ -182,21 +222,12 @@ services:
       - MASTER_NAME=mymaster
       - QUORUM=1
       - MASTER=redis_master
-      - SLAVES=redis_slave
     depends_on:
       - redis_master
     networks:
       - backend
     ports:
       - 26379:26379
-
-  mysql:
-    container_name: btc-mysql
-    build: .docker/viabtc/db/
-    ports:
-      - 13306:3306
-    networks:
-      - backend
 
   zookeeper:
     container_name: btc-zookeeper
@@ -209,7 +240,7 @@ services:
   mq:
     container_name: btc-kafka
     image: wurstmeister/kafka
-    restart: on-failure:5
+    restart: on-failure
     ports:
       - 19092:9092
     environment:
@@ -221,6 +252,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backend
+
+volumes:
+  webchaind_root:
+  mariadb-data:
 
 networks:
   backward:

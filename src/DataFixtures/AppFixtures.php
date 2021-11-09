@@ -4,7 +4,7 @@ namespace App\DataFixtures;
 
 use App\DataFixtures\Factory\TokenFixturesFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 /** @codeCoverageIgnore */
 class AppFixtures extends Fixture
@@ -19,7 +19,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        array_map(function (): void {
+        array_map(function ($value): void {
             $this->tokenFixturesFactory->create();
         }, range(1, 50));
     }

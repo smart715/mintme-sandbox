@@ -1,0 +1,12 @@
+# Expose your documentation as JSON swagger compliant
+app.swagger.areas:
+    path: /dev/documentation/{area}.json
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger }
+
+app.swagger_ui:
+    path: /dev/documentation/{area}
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+    requirements:
+        area: 'v1|v2'

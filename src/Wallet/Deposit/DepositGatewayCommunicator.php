@@ -4,9 +4,11 @@ namespace App\Wallet\Deposit;
 
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
+use App\Entity\Crypto;
 use App\Entity\User;
 use App\Manager\CryptoManagerInterface;
 use App\Wallet\Deposit\Model\DepositCredentials;
+use App\Wallet\Model\DepositInfo;
 use App\Wallet\Model\Status;
 use App\Wallet\Model\Transaction;
 use App\Wallet\Model\Type;
@@ -26,7 +28,7 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
     private $moneyWrapper;
 
     private const GET_DEPOSIT_CREDENTIALS_METHOD = "get_deposit_credentials";
-    private const GET_DEPOSIT_FEE_METHOD = "get_fee";
+    private const GET_DEPOSIT_INFO_METHOD = "get_deposit_info";
 
     public const GET_TRANSACTIONS_METHOD = "get_transactions";
 
@@ -40,19 +42,21 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         $this->moneyWrapper = $moneyWrapper;
     }
 
-    public function getDepositCredentials(int $userId, array $predefinedTokens): DepositCredentials
+    /** {@inheritdoc} */
+    public function getDepositCredentials(int $userId, array $cryptos): DepositCredentials
     {
         $credentials = [];
 
-        foreach ($predefinedTokens as $token) {
+        /** @var Crypto $crypto */
+        foreach ($cryptos as $crypto) {
             $response = $this->jsonRpc->send(
                 self::GET_DEPOSIT_CREDENTIALS_METHOD,
                 [
                     'user_id' => $userId,
-                    'currency' => $token->getName(),
+                    'currency' => $crypto->getSymbol(),
                 ]
             );
-            $credentials[$token->getName()] = $response->hasError() ?
+            $credentials[$crypto->getSymbol()] = $response->hasError() ?
                 "Address unavailable." :
                 $response->getResult();
         }
@@ -85,15 +89,22 @@ class DepositGatewayCommunicator implements DepositGatewayCommunicatorInterface
         return $this->parseTransactions($response->getResult());
     }
 
-    public function getFee(string $crypto): Money
+    public function getDepositInfo(string $crypto): DepositInfo
     {
-        $response = $this->jsonRpc->send(self::GET_DEPOSIT_FEE_METHOD, ['currency' => $crypto]);
+        $response = $this->jsonRpc->send(self::GET_DEPOSIT_INFO_METHOD, ['currency' => $crypto]);
 
         if ($response->getError()) {
             throw new FetchException((string)json_encode($response->getError()));
         }
 
-        return new Money($response->getResult(), new Currency($crypto));
+        $result = $response->getResult();
+
+        return new DepositInfo(
+            new Money($result['fee'], new Currency($crypto)),
+            $result['minDeposit']
+                ? new Money($result['minDeposit'], new Currency($crypto))
+                : null
+        );
     }
 
     private function parseTransactions(array $transactions): array

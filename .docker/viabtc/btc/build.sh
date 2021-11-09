@@ -11,12 +11,13 @@ libs=${libs//\//\\\/}
 c="s/INCS =/INCS =${cflags}/g"
 l="s/LIBS =/LIBS =${libs}/g"
 
-cd  /src/viabtc/matchengine
-sed -i "$c" makefile
-sed -i "$l" makefile
+
+export PATH=$PATH:/usr/local/bin:/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/go/bin:$GOPATH/bin
+
+cd  /src/viabtc/mintme_backend/marketprice
 make
 
-cd  /src/viabtc/marketprice/
+cd  /src/viabtc/mintme_backend/matchengine
 make
 
 cd  /src/viabtc/accesshttp/

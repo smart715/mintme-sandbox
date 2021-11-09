@@ -2,6 +2,9 @@
 
 namespace App\Exchange\Trade;
 
+use Exception;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 class TradeResult
 {
     public const SUCCESS = 1;
@@ -10,39 +13,53 @@ class TradeResult
     public const ORDER_NOT_FOUND = 4;
     public const USER_NOT_MATCH = 5;
     public const SMALL_AMOUNT = 11;
+    public const NO_ENOUGH_TRADER = 12;
 
     private const MESSAGES = [
         self::SUCCESS =>
-            'ORDER CREATED',
+            'place_order.created',
 
         self::FAILED =>
-            'Order has failed. Try again later.',
+            'place_order.failed',
 
         self::INSUFFICIENT_BALANCE =>
-            'Insufficient Balance',
+            'place_order.insufficient_balance',
 
         self::ORDER_NOT_FOUND =>
-            'Order has not been found',
+            'place_order.not_found',
 
         self::USER_NOT_MATCH =>
-            'You don\'t match with this order',
+            'place_order.not_match',
 
         self::SMALL_AMOUNT =>
-            'Amount is too small',
+            'place_order.too_small',
+
+        self::NO_ENOUGH_TRADER =>
+            'execute_order.no_enough_trader',
     ];
 
     /** @var int */
     private $result;
 
-    public function __construct(int $result)
+    /** @var TranslatorInterface */
+    private $translator;
+
+    private ?string $translatedMessage;
+
+    public function __construct(int $result, TranslatorInterface $translator, ?string $translatedMessage = null)
     {
-        assert(in_array($result, array_keys(self::MESSAGES)));
+        if (!array_key_exists($result, self::MESSAGES) && !$translatedMessage) {
+            throw new Exception('Undefined error message');
+        }
+
         $this->result = $result;
+        $this->translator = $translator;
+        $this->translatedMessage = $translatedMessage;
     }
 
     public function getMessage(): string
     {
-        return self::MESSAGES[$this->result];
+        return $this->translatedMessage ?? $this->translator->trans(self::MESSAGES[$this->result]);
     }
 
     public function getResult(): int

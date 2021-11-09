@@ -1,7 +1,7 @@
 {% trans_default_domain 'FOSUserBundle' %}
 {% extends 'form.html.twig' %}
 
-{% set formHeader = "Change Password" %}
+{% set formHeader = "request.header"|trans %}
 {% set featured = true %}
 
 {% block formBody %}
@@ -18,10 +18,10 @@
                 {% endif %}
                 <div class="row">
                     <div  class="col-12  text-left">
-                        <label for="inputEmail" class="d-block label-featured">Email:</label>
+                        <label for="inputEmail" class="d-block label-featured">{% trans %}form.email{% endtrans %}</label>
                     </div>
                     <div class="col">
-                        {{ form_widget(form.username, { 'inline': true, 'attr': {'pattern': '[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$', 'required': 'required', 'autofocus': 'autofocus'} }) }}
+                        {{ form_widget(form.username, { 'inline': true, 'attr': {'pattern': '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', 'required': 'required', 'autofocus': 'autofocus'} }) }}
                     </div>
                 </div>
             </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="form-group row">
             <div class="col-md-12 text-left">
-                <input type="submit" class="btn btn-primary" value="Change password" />
+                <input type="submit" class="btn btn-primary" value="{% trans %}resetting.reset.submit{% endtrans %}" />
             </div>
         </div>
     </form>

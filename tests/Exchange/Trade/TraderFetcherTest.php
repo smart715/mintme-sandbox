@@ -5,24 +5,12 @@ namespace App\Tests\Exchange\Trade;
 use App\Communications\Exception\FetchException;
 use App\Communications\JsonRpcInterface;
 use App\Communications\JsonRpcResponse;
-use App\Entity\User;
 use App\Exchange\Config\Config;
-use App\Exchange\Market;
-use App\Exchange\Order;
-use App\Exchange\Trade\Config\LimitOrderConfig;
-use App\Exchange\Trade\Config\PrelaunchConfig;
-use App\Exchange\Trade\Trader;
 use App\Exchange\Trade\TradeResult;
 use App\Exchange\Trade\TraderFetcher;
-use App\Repository\UserRepository;
-use App\Utils\DateTimeInterface;
-use App\Wallet\Money\MoneyWrapper;
-use App\Wallet\Money\MoneyWrapperInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Money\Currency;
-use Money\Money;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TraderFetcherTest extends TestCase
 {
@@ -42,7 +30,7 @@ class TraderFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         $this->assertEquals(
             $tradeResult,
@@ -68,7 +56,8 @@ class TraderFetcherTest extends TestCase
 
         $trader = new TraderFetcher(
             $jsonRpc,
-            $this->mockConfig(0)
+            $this->mockConfig(0),
+            $this->mockTranslator()
         );
 
         $this->assertEquals(
@@ -93,10 +82,11 @@ class TraderFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         $this->assertEquals(
             $tradeResult,
+            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -119,10 +109,11 @@ class TraderFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         $this->assertEquals(
             TradeResult::FAILED,
+            /** @phpstan-ignore-next-line */
             $trader->cancelOrder(...$params)->getResult()
         );
     }
@@ -148,7 +139,7 @@ class TraderFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         if ($hasError) {
             $this->expectException(FetchException::class);
@@ -156,6 +147,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $finishedOrders,
+            /** @phpstan-ignore-next-line */
             $trader->getFinishedOrders(...$params)
         );
     }
@@ -176,10 +168,10 @@ class TraderFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         $this->expectException(FetchException::class);
-
+        /** @phpstan-ignore-next-line */
         $trader->getFinishedOrders(...$params);
     }
 
@@ -204,7 +196,7 @@ class TraderFetcherTest extends TestCase
             ->with($this->equalTo($method), $this->equalTo($params))
             ->willReturn($jsonResponse);
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
 
         if ($hasError) {
             $this->expectException(FetchException::class);
@@ -212,6 +204,7 @@ class TraderFetcherTest extends TestCase
 
         $this->assertEquals(
             $pendingOrders,
+            /** @phpstan-ignore-next-line */
             $trader->getPendingOrders(...$params)
         );
     }
@@ -232,9 +225,10 @@ class TraderFetcherTest extends TestCase
         $jsonRpc->method('send')
             ->will($this->throwException(new FetchException()));
 
-        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0));
+        $trader = new TraderFetcher($jsonRpc, $this->mockConfig(0), $this->mockTranslator());
         $this->expectException(FetchException::class);
 
+        /** @phpstan-ignore-next-line */
         $trader->getPendingOrders(...$params);
     }
 
@@ -282,5 +276,10 @@ class TraderFetcherTest extends TestCase
             'deal_stock' => '0.9000000000',
             'deal_fee' => '0.0009000000',
         ]];
+    }
+
+    private function mockTranslator(): TranslatorInterface
+    {
+        return $this->createMock(TranslatorInterface::class);
     }
 }

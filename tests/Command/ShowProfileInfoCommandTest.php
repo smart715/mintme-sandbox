@@ -11,16 +11,24 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class ShowProfileInfoCommandTest extends KernelTestCase
 {
+    /** @var Application */
+    private $app;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $kernel = self::bootKernel();
+        $this->app = new Application($kernel);
+    }
+
     public function testExecute(): void
     {
-        $kernel = self::bootKernel();
-        $application = new Application($kernel);
-
-        $application->add(new ShowProfileInfoCommand(
+        $this->app->add(new ShowProfileInfoCommand(
             $this->profileManagerMock()
         ));
 
-        $command = $application->find('app:profile:info');
+        $command = $this->app->find('app:profile:info');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'email'  => 'info@coinimp.com',
@@ -34,13 +42,30 @@ class ShowProfileInfoCommandTest extends KernelTestCase
         $this->assertContains('Changes locked   No', $output);
     }
 
-    private function profileManagerMock(): ProfileManagerInterface
+    public function testExecuteWithUnesistentEmail(): void
+    {
+        $this->app->add(new ShowProfileInfoCommand(
+            $this->profileManagerMock(true)
+        ));
+
+        $command = $this->app->find('app:profile:info');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'email'  => 'info@coinimp.com',
+        ]);
+
+        $output = $commandTester->getDisplay();
+
+        $this->assertContains('Profile of \'info@coinimp.com\' not found', $output);
+    }
+
+    private function profileManagerMock(bool $null = false): ProfileManagerInterface
     {
         $profileManagerMock = $this->createMock(profileManagerInterface::class);
         $profileManagerMock->expects($this->once())
             ->method('findByEmail')
             ->with($this->equalTo('info@coinimp.com'))
-            ->willReturn($this->profileMock())
+            ->willReturn($null ? null : $this->profileMock())
         ;
 
         return $profileManagerMock;

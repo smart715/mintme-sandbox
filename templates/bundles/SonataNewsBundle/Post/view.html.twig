@@ -1,15 +1,37 @@
 {% extends 'base.html.twig' %}
-{% block title %}
-{% spaceless %}
-    Mintme | {{ post.title }}
-{% endspaceless %}
+
+{% if post.image is not null %}
+    {% set metaImage %}{% path post.image, 'reference' %}{% endset %}
+{% endif %}
+{% set title = post|translateArticle('title') %}
+{% set abstract = post|translateArticle('abstract') %}
+{% set metaTitle = title ~ ' | mintMe' %}
+{% set metaImageAlt = title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('pages/news') }}
 {% endblock %}
-{% block metaDescription %}{{ post.abstract }}{% endblock %}
+
+{% block title %}
+    {% spaceless %}
+        {{ title }} | mintMe
+    {% endspaceless %}
+{% endblock %}
+
+{% block metaDescription %}
+    <meta property="og:description" content="{{ abstract }}">
+    <meta name="description" content="{{ abstract }}">
+{% endblock %}
 
 {% block contentClass %}blog{% endblock %}
 
 {% block content %}
-    <div class="py-4">
+    <div id="news" class="py-4">
         {{ include("@SonataNews/Post/view_content.html.twig") }}
     </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ encore_entry_script_tags('pages/news') }}
 {% endblock %}

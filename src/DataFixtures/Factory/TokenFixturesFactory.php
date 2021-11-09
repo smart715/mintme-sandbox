@@ -4,7 +4,7 @@ namespace App\DataFixtures\Factory;
 
 use App\DataFixtures\FakerHelper;
 use App\Entity\Token\Token;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /** @codeCoverageIgnore */
 class TokenFixturesFactory extends AbstractFixturesFactory
@@ -15,7 +15,7 @@ class TokenFixturesFactory extends AbstractFixturesFactory
     /** @var ProfileFixturesFactory */
     private $profileFixturesFactory;
 
-    public function __construct(ObjectManager $manager, ProfileFixturesFactory $profileFixturesFactory)
+    public function __construct(EntityManagerInterface $manager, ProfileFixturesFactory $profileFixturesFactory)
     {
         $this->profileFixturesFactory = $profileFixturesFactory;
 

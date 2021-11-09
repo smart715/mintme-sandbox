@@ -1,58 +1,100 @@
 <template>
     <sidebar-menu
-            @collapse="isClicked = true"
-            :class="clickedStyles"
-            :width="!isClicked ? '30px' : '350px'"
-            :menu="menu" />
+        :class="clickedStyles"
+        :menu="menu"
+        :width="menuWidth"
+        @collapse="isClicked = true"
+    />
 </template>
 
 <script>
-import Vue from 'vue';
-import VueSidebarMenu from 'vue-sidebar-menu';
+import {SidebarMenu} from 'vue-sidebar-menu';
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faTasks, faAnchor, faCubes, faSignInAlt} from '@fortawesome/free-solid-svg-icons';
 
-Vue.use(VueSidebarMenu);
+library.add(faTasks, faAnchor, faCubes, faSignInAlt);
 
 export default {
     name: 'AdminMenu',
+    components: {
+        SidebarMenu,
+    },
+    props: {
+        isUserLogged: Boolean,
+    },
     data() {
         return {
             isClicked: false,
-            menu: [
+            testingMenu:
+                {
+                    title: 'Tester Options',
+                    icon: 'fa fa-tasks',
+                    child: [
+                        {
+                            href: this.$routing.generate('hacker-toggle-info-bar'),
+                            title: this.$t('hacker_menu.tester_widget'),
+                        },
+                    ],
+                },
+            authorizedMenu: [
                 {
                     header: true,
-                    title: 'HACKER MENU',
+                    title: this.$t('hacker_menu.title'),
                 },
                 {
-                    href: this.$routing.generate('hacker-delete-token'),
-                    title: 'Delete my token',
-                    icon: 'fa fa-bomb',
-                },
-                {
-                    title: 'Permissions',
+                    title: this.$t('hacker_menu.permissions.title'),
                     icon: 'fa fa-anchor',
                     child: [
                         {
                             href: this.$routing.generate('hacker-set-role', {role: 'admin'}),
-                            title: 'Make me Admin',
+                            title: this.$t('hacker_menu.permissions.admin'),
                         },
                         {
                             href: this.$routing.generate('hacker-set-role', {role: 'user'}),
-                            title: 'Make me User',
+                            title: this.$t('hacker_menu.permissions.user'),
                         },
                     ],
                 },
                 {
-                    title: 'Crypto',
+                    title: this.$t('hacker_menu.crypto.title'),
                     icon: 'fa fa-cubes',
                     child: [
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'web'}),
-                            title: 'Add 100 WEBs',
+                            title: this.$t('hacker_menu.crypto.web'),
+                        },
+                        {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'eth'}),
+                            title: this.$t('hacker_menu.crypto.eth'),
                         },
                         {
                             href: this.$routing.generate('hacker-add-crypto', {crypto: 'btc'}),
-                            title: 'Add 100 BTCs',
+                            title: this.$t('hacker_menu.crypto.btc'),
+                        },
+                        {
+                          href: this.$routing.generate('hacker-add-crypto', {crypto: 'usdc'}),
+                          title: this.$t('hacker_menu.crypto.usdc'),
+                        },
+                        {
+                            href: this.$routing.generate('hacker-add-crypto', {crypto: 'bnb'}),
+                            title: this.$t('hacker_menu.crypto.bnb'),
+                        },
+                    ],
+                },
+            ],
+            nonAuthorizedMenu: [
+                {
+                    header: true,
+                    title: this.$t('hacker_menu.permissions.title'),
+                },
+                {
+                    title: 'Quick Menu',
+                    icon: 'fa fa-sign-in-alt',
+                    child: [
+                        {
+                            href: this.$routing.generate('quick-registration'),
+                            title: this.$t('hacker_menu.quick_registration'),
                         },
                     ],
                 },
@@ -62,6 +104,17 @@ export default {
     computed: {
         clickedStyles: function() {
             return !this.isClicked ? 'v-sidebar-menu vsm-collapsed' : '';
+        },
+        menu: function() {
+            let menu = this.isUserLogged ?
+                this.authorizedMenu :
+                this.nonAuthorizedMenu;
+
+            menu.push(this.testingMenu);
+            return menu;
+        },
+        menuWidth: function() {
+            return this.isClicked ? '350px' : '30px';
         },
     },
     watch: {
@@ -73,33 +126,47 @@ export default {
 };
 </script>
 
-<style lang="sass">
-    @import '../../scss/variables'
+<style lang="scss">
+    @import '../../scss/variables';
 
-    .v-sidebar-menu
-        background: $secondary !important
+    .v-sidebar-menu {
+        background: $secondary !important;
+        z-index: 1040;
+    }
 
-    .v-sidebar-menu .vsm-dropdown>.vsm-list
-        background: $primary !important
+    .v-sidebar-menu .vsm-dropdown>.vsm-list {
+        background: $primary !important;
+    }
 
-    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon
-        background: transparent !important
+    .v-sidebar-menu .vsm-item.first-item>.vsm-link>.vsm-icon {
+        background: transparent !important;
+    }
 
-    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link
-        background: $primary-light !important
+    .v-sidebar-menu.vsm-default .vsm-item.first-item.open-item>.vsm-link {
+        background: $primary-light !important;
+    }
 
-    .v-sidebar-menu.vsm-collapsed
-        background: none !important
+    .v-sidebar-menu.vsm-collapsed {
+        background: none !important;
 
-        & > *:not(button)
-            display: none !important
+        & > *:not(button) {
+            display: none !important;
+        }
+    }
 
-    .v-sidebar-menu .vsm-arrow:after
-        content: "↓" !important
+    .v-sidebar-menu .vsm-arrow:after {
+        content: "↓" !important;
+    }
 
-    .v-sidebar-menu .collapse-btn:after
-        content: ">" !important
+    .v-sidebar-menu .collapse-btn:after {
+        content: ">" !important;
+    }
 
-    .vsm-collapsed
-        width: 30px !important
+    .vsm-collapsed {
+        width: 10px !important;
+
+        .collapse-btn {
+            width: 30px !important;
+        }
+    }
 </style>

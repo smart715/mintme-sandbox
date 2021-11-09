@@ -4,13 +4,16 @@ namespace App\Admin;
 
 use App\Admin\Form\PasswordGeneratorButtonType;
 use App\Entity\User;
+use App\Form\Type\NicknameType;
 use Exception;
+use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Sonata\AdminBundle\Admin\AbstractAdmin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Route\RouteCollection;
+use Sonata\AdminBundle\Show\ShowMapper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -32,6 +35,7 @@ class UserAdmin extends AbstractAdmin
         if ('create' == $this->getFormAction()) {
             $formMapper
                 ->add('email', null, ['attr' => ['placeholder' => 'Email']])
+                ->add('nickname', NicknameType::class, [])
                 ->add('plainPassword', TextType::class, [
                     'attr' => [
                         'class' => 'password-generator-input',
@@ -100,6 +104,15 @@ class UserAdmin extends AbstractAdmin
         }
     }
 
+    protected function configureShowFields(ShowMapper $showMapper): void
+    {
+        $showMapper
+            ->add('username')
+            ->add('email')
+            ->add('enabled')
+            ->add('roles');
+    }
+
     public function init(UserManagerInterface $userManager): void
     {
         $this->setUserManager($userManager);
@@ -108,6 +121,7 @@ class UserAdmin extends AbstractAdmin
     /** {@inheritdoc} */
     public function prePersist($user): void
     {
+        /** @var UserInterface $user */
         $this->userManager->updatePassword($user);
     }
 

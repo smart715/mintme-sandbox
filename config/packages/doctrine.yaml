@@ -32,3 +32,9 @@ doctrine:
         dql:
             string_functions:
                 replace: Oro\ORM\Query\AST\Functions\String\Replace
+            numeric_functions:
+                change_percentage: App\Utils\ChangePercentage
+                to_number: App\Utils\ToNumber
+                marketcap: App\Utils\Marketcap
+            datetime_functions:
+                utc_timestamp: App\Utils\UtcTimestamp

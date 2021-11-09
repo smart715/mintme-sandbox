@@ -5,49 +5,29 @@ namespace App\Exchange;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-class Deal
+/** @codeCoverageIgnore */
+class Deal extends AbstractOrder
 {
-    public const SELL_SIDE = 1;
-    public const BUY_SIDE = 2;
     public const MAKER_ROLE= 1;
     public const TAKER_ROLE = 2;
-    
-    /** @var int|null */
-    private $id;
-    
-    /** @var float|null */
-    private $timestamp;
 
     /** @var int|null */
     private $userId;
-    
-    /** @var int */
-    private $side;
-    
+
     /** @var int */
     private $role;
 
-    /** @var Money */
-    private $amount;
-
-    /** @var Money */
-    private $price;
-
     /** @var Money|null */
     private $deal;
-    
-    /** @var Money */
-    private $fee;
 
     /** @var int|null */
     private $dealOrderId;
-    
-    /** @var Market */
-    private $market;
+
+    private int $orderId;
 
     public function __construct(
         ?int $id,
-        ?float $timestamp,
+        ?int $timestamp,
         ?int $userId,
         int $side,
         int $role,
@@ -56,6 +36,7 @@ class Deal
         ?Money $deal,
         Money $fee,
         ?int $dealOrderId,
+        int $orderId,
         Market $market
     ) {
         $this->id = $id;
@@ -68,12 +49,8 @@ class Deal
         $this->deal = $deal;
         $this->fee = $fee;
         $this->dealOrderId = $dealOrderId;
+        $this->orderId = $orderId;
         $this->market = $market;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getDeal(): ?Money
@@ -81,9 +58,16 @@ class Deal
         return $this->deal;
     }
 
+    /** @Groups({"Default", "API", "dev"}) */
     public function getDealOrderId(): ?int
     {
         return $this->dealOrderId;
+    }
+
+    /** @Groups({"Default", "API", "dev"}) */
+    public function getOrderId(): ?int
+    {
+        return $this->orderId;
     }
 
     public function getUserId(): ?int
@@ -96,39 +80,13 @@ class Deal
         return $this->role;
     }
 
-    /** @Groups({"Default", "API"}) */
     public function getMarket(): Market
     {
         return $this->market;
     }
 
-    /** @Groups({"Default", "API"}) */
-    public function getAmount(): Money
+    public function setMarket(Market $market): void
     {
-        return $this->amount;
-    }
-
-    /** @Groups({"Default", "API"}) */
-    public function getPrice(): Money
-    {
-        return $this->price;
-    }
-
-    /** @Groups({"Default", "API"}) */
-    public function getSide(): int
-    {
-        return $this->side;
-    }
-
-    /** @Groups({"Default", "API"}) */
-    public function getFee(): Money
-    {
-        return $this->fee;
-    }
-
-    /** @Groups({"Default", "API"}) */
-    public function getTimestamp(): ?float
-    {
-        return $this->timestamp;
+        $this->market = $market;
     }
 }

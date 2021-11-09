@@ -6,9 +6,10 @@ export default {
     props: {
         basePrecision: Number,
         quotePrecision: Number,
+        loggedIn: Boolean,
     },
     computed: {
-        ...mapGetters('makeOrder', [
+        ...mapGetters('tradeBalance', [
             'getBaseBalance',
             'getQuoteBalance',
             'getUseSellMarketPrice',
@@ -17,12 +18,16 @@ export default {
     },
     methods: {
         orderClicked: function(order) {
+            if (!this.loggedIn) return;
+
             if (!this.getUseSellMarketPrice) {
                 this.setSellPriceInput(toMoney(order.price, this.basePrecision));
+                this.setSellPriceManuallyEdited(true);
             }
 
             if (!this.getUseBuyMarketPrice) {
                 this.setBuyPriceInput(toMoney(order.price, this.basePrecision));
+                this.setBuyPriceManuallyEdited(true);
             }
 
             this.setSellAmountInput(
@@ -37,11 +42,13 @@ export default {
                     : toMoney(order.amount, this.quotePrecision)
             );
         },
-        ...mapMutations('makeOrder', [
+        ...mapMutations('tradeBalance', [
             'setSellPriceInput',
             'setSellAmountInput',
             'setBuyPriceInput',
             'setBuyAmountInput',
+            'setSellPriceManuallyEdited',
+            'setBuyPriceManuallyEdited',
         ]),
     },
 };

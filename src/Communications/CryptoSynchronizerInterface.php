@@ -4,6 +4,5 @@ namespace App\Communications;
 
 interface CryptoSynchronizerInterface
 {
-    /** @return array<string> */
     public function fetchCryptos(): array;
 }

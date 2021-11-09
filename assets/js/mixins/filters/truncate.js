@@ -1,5 +1,5 @@
 const truncateFunc = function(val, max) {
-    return val.length > max ? val.slice(0, max) + '..' : val;
+    return val.length > max ? val.slice(0, max) + '...' : val;
 };
 
 export default {

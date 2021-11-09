@@ -1,4 +1,7 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% block title %} {% trans %}page.login.title{% endtrans %} | mintMe{% endblock %}
 
 {% block fos_user_content %}
     {{ include('@FOSUser/Security/login_content.html.twig') }}
@@ -7,5 +10,5 @@
 {% block messageContainer %} {% endblock %}
 
 {% block pagescripts %}
-    <script src="{{ asset('build/login.js') }}"></script>
+    {{ encore_entry_script_tags('pages/login') }}
 {% endblock %}
