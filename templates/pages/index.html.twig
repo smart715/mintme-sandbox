@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-
 {% block title %}{% trans %}page.index.title{% endtrans %}{% endblock %}
 
 {% block stylesheets %}
@@ -231,6 +230,16 @@
                         </span>
                             <span slot="body">
                             {% trans %}page.index.faq.q5.body{% endtrans %}
+                        </span>
+                        </faq-item>
+                    </div>
+                    <div class="row faq-block mx-0">
+                        <faq-item>
+                        <span slot="title">
+                            {% trans %}page.index.faq.q6.header{% endtrans %}
+                        </span>
+                            <span slot="body">
+                            {% trans %}page.index.faq.q6.body{% endtrans %}
                         </span>
                         </faq-item>
                     </div>
