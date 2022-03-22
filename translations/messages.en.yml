@@ -107,12 +107,13 @@ page.error.404.title: '404 - Page not found'
 page.error.404.header: 'Page not found'
 page.error.404.body: 'The requested page couldn''t be located. Checkout for any URL misspelling'
 page.error.500.title: '500 - Internal Server Error'
-page.error.500.header: 'Internal Server Error'
+page.error.page.index.promo.500.header: 'Internal Server Error'
 page.error.500.body: 'Something is broken. Please let us know what you were doing when this error occurred. We will fix it as soon as possible. Sorry for any inconvenience caused.'
 page.news.title: News
 page.news.read_more: 'Read More'
 page.news.current: 'Read More'
 page.index.title: 'Create coin, create token, help others and earn! Make your own tradable token for free'
+page.index.promo.greetings: 'Hi, Welcome'
 page.index.promo.main_1: 'Create a coin'
 page.index.promo.main_2: for
 page.index.promo.main_3: your
