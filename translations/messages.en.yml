@@ -113,7 +113,7 @@ page.news.title: News
 page.news.read_more: 'Read More'
 page.news.current: 'Read More'
 page.index.title: 'Create coin, create token, help others and earn! Make your own tradable token for free'
-page.index.promo.greetings: 'Hi, Welcome'
+page.index.promo.greetings: 'Hi, '
 page.index.promo.main_1: 'Create a coin'
 page.index.promo.main_2: for
 page.index.promo.main_3: your
@@ -121,7 +121,7 @@ page.index.promo.main.word_1: idea
 page.index.promo.main.word_2: community
 page.index.promo.main.word_3: project
 page.index.promo.main.word_4: self
-page.index.promo.description: 'or earn on trading and supporting other tokens'
+page.index.promo.description: 'Earn on trading and supporting other tokens'
 page.index.promo.btn.register: 'Register Now'
 page.index.promo.btn.trade: 'Trade Now'
 page.index.block_1.header: 'HOW DOES IT WORK?'
