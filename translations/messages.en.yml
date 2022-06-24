@@ -113,7 +113,6 @@ page.news.title: News
 page.news.read_more: 'Read More'
 page.news.current: 'Read More'
 page.index.title: 'Create coin, create token, help others and earn! Make your own tradable token for free'
-page.index.promo.greetings: 'Hi, Welcome'
 page.index.promo.main_1: 'Create a coin'
 page.index.promo.main_2: for
 page.index.promo.main_3: your
@@ -139,7 +138,7 @@ page.index.block_4.btn.register: 'Register Now!!'
 page.index.block_4.btn.trade: 'Trade Now'
 page.index.block_5.header: 'FUELED BY MINTME COIN (MINTME)'
 page.index.block_5.body: 'MintMe exchange is based on our custom blockchain solution called MintMe.com Coin - smart contracts platform, created for the World Wide Web. Traders on our exchange will use MINTME to trade people tokens and on top of that all token creators who want to tokenize themselves, will be using MintMe Coin as base for their projects. This will guarantee real non-speculative demand for MintMe Coin.'
-page.index.faq.header: 'FAQs'
+page.index.faq.header: 'FAQ''s'
 page.index.faq.q1.header: 'When I create a coin, does it have any value?'
 page.index.faq.q1.body: 'Coins are as valuable as you make them, you give them the value because they are a tokenized representation of yourself or your project.'
 page.index.faq.q2.header: 'I''ve created a token. How can I give it a real value?'
