@@ -106,3 +106,7 @@ syntax_correction         |perform corrections for phpcs linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 syntax_correction_assets  |perform corrections for js linting rules
 correct                   |run all correction commands above
+
+# Younes Tests
+- Test merge request
+- Test pushing new commit before merging the last merge request 
